@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.OData.Formatting</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.FromODataUriAttribute">
+            <summary>
+            An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.FromODataUriAttribute.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.FromODataUriAttribute"/> class.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataModelBinder">
+            <summary>
+            A model binder for ODataParameterValue values.
+            </summary>
+            <remarks>
+            This class is similar to ODataModelBinderProvider in AspNet. The flow is similar but the
+            type are dissimilar enough making a common version more complex than separate versions.
+            </remarks>
+        </member>
+    </members>
+</doc>
