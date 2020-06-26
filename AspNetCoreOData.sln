@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30223.230
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{B1F86961-6958-4617-ACA4-C231F95AE099}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Routing", "src\Microsoft.AspNetCore.OData.Routing\Microsoft.AspNetCore.OData.Routing.csproj", "{C8E0F631-C42F-4F4A-A399-6855B05A40FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Abstracts", "src\Microsoft.AspNetCore.OData.Abstracts\Microsoft.AspNetCore.OData.Abstracts.csproj", "{FE9DAF68-76F4-4160-A5FF-B6644D65246A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8E0F631-C42F-4F4A-A399-6855B05A40FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8E0F631-C42F-4F4A-A399-6855B05A40FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8E0F631-C42F-4F4A-A399-6855B05A40FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8E0F631-C42F-4F4A-A399-6855B05A40FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE9DAF68-76F4-4160-A5FF-B6644D65246A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE9DAF68-76F4-4160-A5FF-B6644D65246A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE9DAF68-76F4-4160-A5FF-B6644D65246A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE9DAF68-76F4-4160-A5FF-B6644D65246A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C8E0F631-C42F-4F4A-A399-6855B05A40FA} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
+		{FE9DAF68-76F4-4160-A5FF-B6644D65246A} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {540C9752-AAC0-49EA-BA60-78490C90FF86}
+	EndGlobalSection
+EndGlobal

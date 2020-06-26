@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.OData.Abstracts</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder">
+            <summary>
+            An interface for configuring essential OData services.
+            </summary>
+            <summary>
+            Allows fine grained configuration of essential OData services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder"/> class.
+            </summary>
+            <param name="services">The service collection.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
+            <summary>
+            An interface for configuring essential OData services.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder.Services">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> where essential OData services are configured.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature">
+            <summary>
+            Provide the interface for the details of a given OData request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Model">
+            <summary>
+            Gets or sets the OData path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Path">
+            <summary>
+            Gets or sets the OData path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RouteName">
+            <summary>
+            Gets/sets the route name
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Endpoint">
+            <summary>
+            Gets/sets the endpoint selected
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataFeature">
+            <summary>
+            Contains the details of a given OData request. These properties should all be mutable.
+            None of these properties should ever be set to null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataFeature"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Model">
+            <summary>
+            Gets or sets the OData path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Path">
+            <summary>
+            Gets or sets the OData path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Endpoint">
+            <summary>
+            Add a boolean value indicate whether it's endpoint routing or not.
+            Maybe it's unnecessary later.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RouteName">
+            <summary>
+            Gets or sets the route name.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptions">
+            <summary>
+            Contains the details of a given OData request. These properties should all be mutable.
+            None of these properties should ever be set to null.
+            </summary>
+            <summary>
+            Provides programmatic configuration for the OData service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.UrlKeyDelimiter">
+            <summary>
+            Gets or Sets the <see cref="T:Microsoft.OData.ODataUrlKeyDelimiter"/> to use while parsing, specifically
+            whether to recognize keys as segments or not in DefaultODataPathHandler.
+            </summary>
+            <remarks>Default value is unspecified (null).</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.NullDynamicPropertyIsEnabled">
+            <summary>
+            Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.EnableContinueOnErrorHeader">
+            <summary>
+            Gets or Sets a value indicating if batch requests should continue on error.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions">
+            <summary>
+            Provides extension methods to add odata services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Abstracts.ODataOptions})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute">
+            <summary>
+            
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute.ShouldValidateEntry(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry,Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry)">
+            <summary>
+            
+            </summary>
+            <param name="entry"></param>
+            <param name="parentEntry"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute.BindingSource">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Commons.ODataActionParameters">
+            <summary>
+            
+            </summary>
+        </member>
+    </members>
+</doc>
