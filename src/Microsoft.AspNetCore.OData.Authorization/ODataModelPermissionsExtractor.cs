@@ -8,7 +8,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNet.OData.Authorization
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     internal static class ODataModelPermissionsExtractor
     {

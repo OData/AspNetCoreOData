@@ -1,6 +1,6 @@
 using System;
 
-namespace AspNetCore3ODataPermissionsSample
+namespace ODataAuthorizationSample
 {
     public class WeatherForecast
     {

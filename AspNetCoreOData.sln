@@ -17,11 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataRoutingSample", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Formatting", "src\Microsoft.AspNetCore.OData.Formatting\Microsoft.AspNetCore.OData.Formatting.csproj", "{0D812D96-0F07-4314-BA0E-262B62385AEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Authorization", "src\Microsoft.AspNet.OData.Authorization\Microsoft.AspNet.OData.Authorization.csproj", "{1CD032E4-F5C4-429E-81DF-6424C596224E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Authorization", "src\Microsoft.AspNetCore.OData.Authorization\Microsoft.AspNetCore.OData.Authorization.csproj", "{6C0965A2-E024-43DA-A725-F3ECD987BA28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Authorization.Tests", "test\Microsoft.AspNet.OData.Authorization.Tests\Microsoft.AspNet.OData.Authorization.Tests.csproj", "{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Authorization.Tests", "test\Microsoft.AspNetCore.OData.Authorization.Tests\Microsoft.AspNetCore.OData.Authorization.Tests.csproj", "{62367BA7-8A0C-436D-B51B-C0B5AB6303B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataAuthorizationSample", "sample\ODataAuthorizationSample\ODataAuthorizationSample.csproj", "{443AA911-C371-4372-BDA3-91639CBB29FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataAuthorizationSample", "sample\ODataAuthorizationSample\ODataAuthorizationSample.csproj", "{86248CD5-C9B6-46BA-9F78-F1CF009B17F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,18 +45,18 @@ Global
 		{0D812D96-0F07-4314-BA0E-262B62385AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D812D96-0F07-4314-BA0E-262B62385AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D812D96-0F07-4314-BA0E-262B62385AEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1CD032E4-F5C4-429E-81DF-6424C596224E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1CD032E4-F5C4-429E-81DF-6424C596224E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1CD032E4-F5C4-429E-81DF-6424C596224E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1CD032E4-F5C4-429E-81DF-6424C596224E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{443AA911-C371-4372-BDA3-91639CBB29FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{443AA911-C371-4372-BDA3-91639CBB29FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{443AA911-C371-4372-BDA3-91639CBB29FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{443AA911-C371-4372-BDA3-91639CBB29FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C0965A2-E024-43DA-A725-F3ECD987BA28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C0965A2-E024-43DA-A725-F3ECD987BA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C0965A2-E024-43DA-A725-F3ECD987BA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C0965A2-E024-43DA-A725-F3ECD987BA28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62367BA7-8A0C-436D-B51B-C0B5AB6303B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62367BA7-8A0C-436D-B51B-C0B5AB6303B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62367BA7-8A0C-436D-B51B-C0B5AB6303B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62367BA7-8A0C-436D-B51B-C0B5AB6303B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86248CD5-C9B6-46BA-9F78-F1CF009B17F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86248CD5-C9B6-46BA-9F78-F1CF009B17F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86248CD5-C9B6-46BA-9F78-F1CF009B17F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86248CD5-C9B6-46BA-9F78-F1CF009B17F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,9 +66,9 @@ Global
 		{FE9DAF68-76F4-4160-A5FF-B6644D65246A} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
 		{A949AA11-2C07-490C-8F07-8A87A2B2E0B8} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 		{0D812D96-0F07-4314-BA0E-262B62385AEA} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
-		{1CD032E4-F5C4-429E-81DF-6424C596224E} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
-		{2CF62DFD-AE82-4B3A-A860-3DE02F7CB21A} = {F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}
-		{443AA911-C371-4372-BDA3-91639CBB29FC} = {B1F86961-6958-4617-ACA4-C231F95AE099}
+		{6C0965A2-E024-43DA-A725-F3ECD987BA28} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
+		{62367BA7-8A0C-436D-B51B-C0B5AB6303B8} = {F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}
+		{86248CD5-C9B6-46BA-9F78-F1CF009B17F7} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {540C9752-AAC0-49EA-BA60-78490C90FF86}

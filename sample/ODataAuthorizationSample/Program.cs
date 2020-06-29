@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetCore3ODataPermissionsSample
+namespace ODataAuthorizationSample
 {
     public class Program
     {

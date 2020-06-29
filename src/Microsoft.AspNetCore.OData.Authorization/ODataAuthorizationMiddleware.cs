@@ -7,7 +7,7 @@ using Microsoft.AspNet.OData.Extensions;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Microsoft.AspNet.OData.Authorization
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     /// <summary>
     /// The OData authorization middleware

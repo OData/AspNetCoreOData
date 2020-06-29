@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests
+namespace Microsoft.AspNetCore.OData.Authorization.Tests
 {
     public class ODataAuthorizationHandlerTest
     {

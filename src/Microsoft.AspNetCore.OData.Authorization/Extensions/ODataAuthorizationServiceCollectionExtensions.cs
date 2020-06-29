@@ -1,9 +1,8 @@
 ﻿using System;
-using Microsoft.AspNet.OData.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNet.OData.Extensions
+namespace Microsoft.AspNetCore.OData.Authorization
 {
 
     /// <summary>

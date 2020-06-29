@@ -9,7 +9,7 @@ using Microsoft.AspNet.OData.Builder;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Models
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Models
 {
     public class TestModel
     {

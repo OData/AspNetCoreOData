@@ -8,7 +8,7 @@ to an OData service based on `Microsoft.AspNetCore.OData`.
 In your `Startup.cs` file:
 
 ```c#
-using Microsoft.AspNetCore.OData.Authorization;
+using Microsoft.AspNet.OData.Extensions
 ```
 ```c#
 public void ConfigureServices(IServiceCollection services)

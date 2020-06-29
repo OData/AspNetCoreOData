@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Authorization\Microsoft.AspNet.OData.Authorization.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Authorization\Microsoft.AspNetCore.OData.Authorization.csproj" />
   </ItemGroup>
 
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Microsoft.AspNet.OData.Authorization
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     /// <summary>
     /// Decides whether an OData request should be authorized or denied.

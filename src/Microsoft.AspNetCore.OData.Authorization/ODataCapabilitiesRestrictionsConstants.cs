@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNet.OData.Authorization
+﻿namespace Microsoft.AspNetCore.OData.Authorization
 {
     internal static class ODataCapabilityRestrictionsConstants
     {

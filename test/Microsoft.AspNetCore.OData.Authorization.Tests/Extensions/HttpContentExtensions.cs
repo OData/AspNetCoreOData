@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Extensions
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Extensions
 {
     /// <summary>
     /// Extensions for HttpContent.

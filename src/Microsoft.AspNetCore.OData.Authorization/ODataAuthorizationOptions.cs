@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.OData.Authorization
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     /// <summary>
     /// Provides configuration for the OData authorization layer

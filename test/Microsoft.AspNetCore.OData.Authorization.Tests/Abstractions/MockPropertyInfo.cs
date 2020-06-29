@@ -5,7 +5,7 @@ using System;
 using System.Reflection;
 using Moq;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Abstractions
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Abstractions
 {
     public sealed class MockPropertyInfo : Mock<PropertyInfo>
     {

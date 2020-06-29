@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace AspNetCore3ODataPermissionsSample.Models
+namespace ODataAuthorizationSample.Models
 {
     public class AppDbContext : DbContext
     {

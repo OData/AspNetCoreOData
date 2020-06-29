@@ -8,7 +8,7 @@ using System.Reflection;
 using Moq;
 using Moq.Protected;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Abstractions
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Abstractions
 {
     public sealed class MockType : Mock<Type>
     {
