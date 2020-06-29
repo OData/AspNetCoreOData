@@ -9,25 +9,23 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match $metadata.
     /// </summary>
     public class MetadataSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Gets the static instace of $metadata
         /// </summary>
         public static MetadataSegmentTemplate Instance { get; } = new MetadataSegmentTemplate();
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="MetadataSegmentTemplate" /> class.
         /// </summary>
         private MetadataSegmentTemplate()
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => "$metadata";
 
         /// <inheritdoc />

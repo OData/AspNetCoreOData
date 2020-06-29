@@ -34,10 +34,6 @@ namespace ODataRoutingSample
             //    options.Conventions.Add(new MetadataActionModelConvention());
             });
 
-
-            // services.AddODataRouting();
-            // services.AddODataRouting(model);
-
             services.AddConvention<MyConvention>();
 
             services.AddOData()

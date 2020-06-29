@@ -14,20 +14,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public class CountSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Gets the static instance of <see cref="CountSegmentTemplate"/>
         /// </summary>
         public static CountSegmentTemplate Instance { get; } = new CountSegmentTemplate();
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="CountSegmentTemplate" /> class.
         /// </summary>
         private CountSegmentTemplate()
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => "$count";
 
         /// <inheritdoc />

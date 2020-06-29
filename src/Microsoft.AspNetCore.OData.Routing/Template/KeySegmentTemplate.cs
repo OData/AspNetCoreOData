@@ -14,7 +14,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match a key segment.
     /// </summary>
     public class KeySegmentTemplate : ODataSegmentTemplate
     {
@@ -26,18 +26,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         private IDictionary<string, (string, IEdmTypeReference)> _keyMappings { get; } = new Dictionary<string, (string, IEdmTypeReference)>();
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
-        /// <param name="entityType"></param>
+        /// <param name="entityType">The declaring type containes the key.</param>
         public KeySegmentTemplate(IEdmEntityType entityType)
             : this(entityType, keyPrefix: "key")
         {
 
         }
+
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
-        /// <param name="entityType">The type containes the key.</param>
+        /// <param name="entityType">The declaring type containes the key.</param>
         /// <param name="keyPrefix">The prefix for the key mapping, for example, for the navigation it count be "relatedKey".</param>
         public KeySegmentTemplate(IEdmEntityType entityType, string keyPrefix)
         {
@@ -62,13 +63,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template { get; }
 
         /// <summary>
-        /// 
+        /// Gets the entity type declaring this key.
         /// </summary>
         public IEdmEntityType EntityType { get; }
 

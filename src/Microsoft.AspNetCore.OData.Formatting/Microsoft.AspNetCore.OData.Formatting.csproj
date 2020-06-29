@@ -8,12 +8,15 @@
     <!-- Let's generate our own assembly info -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>Library</OutputType>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1307</NoWarn>
   </PropertyGroup>
 
+  <Import Project="..\..\tool\build.props" />
+  
   <ItemGroup>
     <None Remove="Microsoft.AspNetCore.OData.Formatting.xml" />
     <None Remove="Microsoft.AspNetCore.OData.Formatting.*.nuspec" />

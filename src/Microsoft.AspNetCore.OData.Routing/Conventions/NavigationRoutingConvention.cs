@@ -172,7 +172,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                             segments.Add(new CastSegmentTemplate(declaredEntityType));
                         }
 
-                        segments.Add(new PropertySegmentTemplate((string)null/*entityType*/));
+                        segments.Add(new PropertyCatchAllSegmentTemplate(entityType));
 
                         ODataPathTemplate template = new ODataPathTemplate(segments);
                         action.AddSelector(prefix, model, template);

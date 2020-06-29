@@ -15,23 +15,23 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmFunction"/>.
     /// </summary>
     public class FunctionSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="function">The type containes the key.</param>
+        /// <param name="function">The Edm function.</param>
         public FunctionSegmentTemplate(IEdmFunction function)
             : this(function, unqualifiedFunctionCall: false)
         {
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="function">The type containes the key.</param>
+        /// <param name="function">The Edm function.</param>
         /// <param name="unqualifiedFunctionCall">Unqualified function call boolean value.</param>
         public FunctionSegmentTemplate(IEdmFunction function, bool unqualifiedFunctionCall)
         {
@@ -61,13 +61,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template { get; }
 
         /// <summary>
-        /// 
+        /// Gets the wrapped Edm function.
         /// </summary>
         public IEdmFunction Function { get; }
 

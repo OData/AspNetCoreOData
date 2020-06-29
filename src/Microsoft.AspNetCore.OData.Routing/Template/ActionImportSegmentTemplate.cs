@@ -10,12 +10,12 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmActionImport"/>.
     /// </summary>
     public class ActionImportSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ActionImportSegmentTemplate" /> class.
         /// </summary>
         /// <param name="actionImport">.</param>
         public ActionImportSegmentTemplate(IEdmActionImport actionImport)
@@ -23,13 +23,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             ActionImport = actionImport ?? throw new ArgumentNullException(nameof(actionImport));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => ActionImport.Name;
 
         /// <summary>
-        /// 
+        /// Gets the wrapped action import.
         /// </summary>
         public IEdmActionImport ActionImport { get; }
 

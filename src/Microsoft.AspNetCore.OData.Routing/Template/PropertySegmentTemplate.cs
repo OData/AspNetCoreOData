@@ -10,34 +10,24 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmStructuralProperty"/>.
     /// </summary>
     public class PropertySegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="PropertySegmentTemplate" /> class.
         /// </summary>
-        /// <param name="property">The .</param>
+        /// <param name="property">The wrapped Edm property.</param>
         public PropertySegmentTemplate(IEdmStructuralProperty property)
         {
             Property = property ?? throw new ArgumentNullException(nameof(property));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="template"></param>
-        public PropertySegmentTemplate(string template)
-        {
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => Property.Name;
 
         /// <summary>
-        /// 
+        /// Gets the wrapped Edm property.
         /// </summary>
         public IEdmStructuralProperty Property { get; }
 

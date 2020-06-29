@@ -10,26 +10,24 @@ using System;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmSingleton"/>.
     /// </summary>
     public class SingletonSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="SingletonSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="singleton"></param>
+        /// <param name="singleton">The Edm singleton</param>
         public SingletonSegmentTemplate(IEdmSingleton singleton)
         {
             Singleton = singleton ?? throw new ArgumentNullException(nameof(singleton));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => Singleton.Name;
 
         /// <summary>
-        /// 
+        /// Gets the wrapped Edm singleton.
         /// </summary>
         public IEdmSingleton Singleton { get; }
 

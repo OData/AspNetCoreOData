@@ -10,12 +10,12 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match a type cast segment.
     /// </summary>
     public class CastSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
         /// </summary>
         /// <param name="castType">The actual structured type.</param>
         public CastSegmentTemplate(IEdmStructuredType castType)
@@ -23,13 +23,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             CastType = castType ?? throw new ArgumentNullException(nameof(castType));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => CastType.FullTypeName();
 
         /// <summary>
-        /// 
+        /// Gets the actual structured type.
         /// </summary>
         public IEdmStructuredType CastType { get; }
 

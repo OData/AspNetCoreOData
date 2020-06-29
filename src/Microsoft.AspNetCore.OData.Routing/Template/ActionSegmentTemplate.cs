@@ -11,45 +11,35 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmAction"/>.
     /// </summary>
     public class ActionSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="action">The type containes the key.</param>
+        /// <param name="action">The Edm action.</param>
         public ActionSegmentTemplate(IEdmAction action)
             : this(action, unqualifiedFunctionCall: false)
         {
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="action">The type containes the key.</param>
-        /// <param name="unqualifiedFunctionCall">Unqualified function call boolean value.</param>
+        /// <param name="action">The Edm action.</param>
+        /// <param name="unqualifiedFunctionCall">Unqualified function/action call boolean value.</param>
         public ActionSegmentTemplate(IEdmAction action, bool unqualifiedFunctionCall)
         {
             Action = action ?? throw new ArgumentNullException(nameof(action));
-
-            if (unqualifiedFunctionCall)
-            {
-                Template = action.Name;
-            }
-            else
-            {
-                Template = action.FullName();
-            }
+            Template = unqualifiedFunctionCall ? action.Name : action.FullName();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template { get; }
 
         /// <summary>
-        /// 
+        /// Gets the wrapped Edm action.
         /// </summary>
         public IEdmAction Action { get; }
 

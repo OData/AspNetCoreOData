@@ -9,12 +9,12 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents an OData segment template that could match an <see cref="ODataSegmentTemplate"/>.
     /// </summary>
     public abstract class ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Gets the segment template string.
         /// </summary>
         public abstract string Template { get; }
 

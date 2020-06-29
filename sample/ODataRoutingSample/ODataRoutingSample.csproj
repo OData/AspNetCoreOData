@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Abstracts\Microsoft.AspNetCore.OData.Abstracts.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Formatting\Microsoft.AspNetCore.OData.Formatting.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Routing\Microsoft.AspNetCore.OData.Routing.csproj" />
   </ItemGroup>

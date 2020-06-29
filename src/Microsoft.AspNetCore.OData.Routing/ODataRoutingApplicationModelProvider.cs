@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (!_options.EnableAttributeRouting)
             {
-                conventions.Where(c => !(c is AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
+                _controllerActionConventions = conventions.Where(c => !(c is AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
             }
             else
             {

@@ -9,26 +9,24 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match a $ref segment.
+    /// Represents a template that could match a $value segment.
     /// </summary>
     public class ValueSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ValueSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="previousType"></param>
+        /// <param name="previousType">The value segment Edm type.</param>
         public ValueSegmentTemplate(IEdmType previousType)
         {
             ValueType = previousType;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => "$value";
 
         /// <summary>
-        /// 
+        /// Gets the value type.
         /// </summary>
         public IEdmType ValueType { get; }
 

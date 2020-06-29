@@ -1,0 +1,35 @@
+<Project>
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(WebStackRootPath)bin\$(Configuration)\</OutputPath>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+
+    <!-- Variables for output redirection (localization, signing, etc)-->
+    <Language Condition=" '$(Language)' == '' ">ENU</Language>
+    <LocalizedPath Condition=" '$(LocalizedPath)' == '' "></LocalizedPath>
+
+    <!-- Everything is delay signed by default -->
+    <DelaySign>true</DelaySign>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileFullPath)\..\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>	
+
+    <ModelBuildPath>$(MSBuildThisFileDirectory)</ModelBuildPath>
+
+   <!-- Use CustomAfterMicrosoftCommonTargets property (defined in Microsoft.Common.targets) to
+      inject post-Common targets files without requiring the inclusion -->
+    <CustomAfterMicrosoftCommonTargets>$(ModelBuildPath)build.targets</CustomAfterMicrosoftCommonTargets>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+</Project>

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
@@ -10,26 +9,24 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match '{property}' segment.
     /// </summary>
     public class PropertyCatchAllSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="PropertyCatchAllSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="declaredType"></param>
+        /// <param name="declaredType">The declared type.</param>
         public PropertyCatchAllSegmentTemplate(IEdmStructuredType declaredType)
         {
             StructuredType = declaredType;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => "{property}";
 
         /// <summary>
-        /// 
+        /// Gets the declared type for this property template.
         /// </summary>
         public IEdmStructuredType StructuredType { get; }
 

@@ -14,20 +14,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public class RefSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="RefSegmentTemplate" /> class.
         /// </summary>
+        /// <param name="navigation">The Edm navigation property.</param>
         public RefSegmentTemplate(IEdmNavigationProperty navigation)
         {
             Navigation = navigation;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template => "$ref";
 
         /// <summary>
-        /// 
+        /// Gets the wrapped navigation property.
         /// </summary>
         public IEdmNavigationProperty Navigation { get; }
 

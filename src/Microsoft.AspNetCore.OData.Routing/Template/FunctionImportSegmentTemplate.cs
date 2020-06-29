@@ -15,14 +15,14 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Represents a template that could match an <see cref="IEdmFunctionImport"/>.
     /// </summary>
     public class FunctionImportSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="FunctionImportSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="functionImport">.</param>
+        /// <param name="functionImport">The Edm function import.</param>
         public FunctionImportSegmentTemplate(IEdmFunctionImport functionImport)
         {
             FunctionImport = functionImport ?? throw new ArgumentNullException(nameof(functionImport));
@@ -36,13 +36,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Template = functionImport.Name + "(" + string.Join(",", keyMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public override string Template { get; }
 
         /// <summary>
-        /// 
+        /// Gets the wrapped Edm function import.
         /// </summary>
         public IEdmFunctionImport FunctionImport { get; }
 
