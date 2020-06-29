@@ -415,37 +415,6 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.HttpContextExtensions">
-            <summary>
-            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpContextExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpContext)">
-            <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-            <param name="httpContext">The Http context.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions">
-            <summary>
-            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.
-            </summary>
-            <param name="request">The request.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions.GetModel(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.
-            </summary>
-            <param name="request">The request.</param>
-            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.NonODataControllerAttribute">
             <summary>
             
@@ -609,16 +578,6 @@
             <typeparam name="T"></typeparam>
             <param name="services"></param>
             <returns></returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.MyConvention">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.MyConvention.Order">
-            <summary>
-            
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.SRResources">
             <summary>

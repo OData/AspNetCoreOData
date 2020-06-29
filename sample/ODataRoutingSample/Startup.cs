@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using ODataRoutingSample.Models;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
 
 namespace ODataRoutingSample
 {
@@ -72,6 +73,37 @@ namespace ODataRoutingSample
                 endpoints.MapControllers();//.WithOData(model);
       //          endpoints.MapODataRoute("odata", "odata", model);
             });
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class MyConvention : IODataControllerActionConvention
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Order => -100;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public bool AppliesToAction(ODataControllerActionContext context)
+        {
+            return true; // apply to all controller
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public bool AppliesToController(ODataControllerActionContext context)
+        {
+            return false; // continue for all others
         }
     }
 }

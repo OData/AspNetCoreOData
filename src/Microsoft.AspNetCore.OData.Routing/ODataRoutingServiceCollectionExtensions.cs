@@ -118,30 +118,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             // ~/EntitySet{key}|Singleton/{NavigationProperty}/$ref
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, RefRoutingConvention>());
-
-            //services.TryAddEnumerable(
-            //    ServiceDescriptor.Transient<IODataControllerActionConvention, MyConvention>());
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class MyConvention : IODataControllerActionConvention
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Order => -100;
-
-        public bool AppliesToAction(ODataControllerActionContext context)
-        {
-            return true; // apply to all controller
-        }
-
-        public bool AppliesToController(ODataControllerActionContext context)
-        {
-            return false; // continue for all others
         }
     }
 }
