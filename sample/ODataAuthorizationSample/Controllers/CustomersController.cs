@@ -1,4 +1,4 @@
-﻿using AspNetCore3ODataPermissionsSample.Models;
+﻿using ODataAuthorizationSample.Models;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AspNetCore3ODataPermissionsSample.Controllers
+namespace ODataAuthorizationSample.Controllers
 {
     public class CustomersController : ODataController
     {

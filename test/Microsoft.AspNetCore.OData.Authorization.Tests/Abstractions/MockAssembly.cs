@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Abstractions
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Abstractions
 {
     public sealed class MockAssembly : Assembly
     {

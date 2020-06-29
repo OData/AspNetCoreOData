@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Microsoft.AspNet.OData.Authorization
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     /// <summary>
     /// Contains information used to extract permission scopes

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNet.OData.Authorization;
 
-namespace Microsoft.AspNet.OData.Extensions
+namespace Microsoft.AspNetCore.OData.Authorization
 {
     /// <summary>
     /// Provides extension methods for <see cref="IApplicationBuilder"/> to add OData authorization

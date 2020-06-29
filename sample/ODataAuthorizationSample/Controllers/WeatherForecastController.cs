@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetCore3ODataPermissionsSample.Controllers
+namespace ODataAuthorizationSample.Controllers
 {
     [ApiController]
     [Route("[controller]")]

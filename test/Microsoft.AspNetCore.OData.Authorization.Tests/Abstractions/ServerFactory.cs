@@ -5,7 +5,6 @@ using System;
 using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNet.OData.Extensions;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -16,7 +15,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNet.OData.Authorization.Tests.Abstractions
+namespace Microsoft.AspNetCore.OData.Authorization.Tests.Abstractions
 {
     /// <summary>
     /// Factory for creating a test servers.

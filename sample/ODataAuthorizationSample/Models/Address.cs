@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspNetCore3ODataPermissionsSample.Models
+namespace ODataAuthorizationSample.Models
 {
     [Owned, ComplexType]
     public class Address

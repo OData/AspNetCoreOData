@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AspNetCore3ODataPermissionsSample.Models
+namespace ODataAuthorizationSample.Models
 {
     public class Customer
     {

@@ -3,7 +3,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 using System.Linq;
 
-namespace AspNetCore3ODataPermissionsSample.Models
+namespace ODataAuthorizationSample.Models
 {
     public class AppModel
     {
