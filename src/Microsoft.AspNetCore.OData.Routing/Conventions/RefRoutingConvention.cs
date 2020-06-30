@@ -11,7 +11,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// An implementation of <see cref="IODataControllerActionConvention"/> that handles entity reference manipulations.
     /// </summary>
     public class RefRoutingConvention : IODataControllerActionConvention
     {

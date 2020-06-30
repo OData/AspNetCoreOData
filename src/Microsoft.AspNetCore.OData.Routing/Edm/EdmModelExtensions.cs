@@ -110,6 +110,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Edm
             return model.FindAllDerivedTypes(structuralType);
         }
 
+        /// <summary>
+        /// Find the given type in a structured type inheritance, include itself.
+        /// </summary>
+        /// <param name="structuralType">The starting structural type.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="typeName">The searching type name.</param>
+        /// <returns>The found type.</returns>
         public static IEdmStructuredType FindTypeInInheritance(this IEdmStructuredType structuralType, IEdmModel model, string typeName)
         {
             IEdmStructuredType baseType = structuralType;

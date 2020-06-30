@@ -8,8 +8,8 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// <summary>
     /// 
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class NonODataControllerAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class NonODataActionAttribute : Attribute
     {
     }
 }

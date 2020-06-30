@@ -19,6 +19,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public abstract string Template { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the output value is single value or collection value of this segment.
+        /// </summary>
+        public abstract bool IsSingle { get; }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="model"></param>

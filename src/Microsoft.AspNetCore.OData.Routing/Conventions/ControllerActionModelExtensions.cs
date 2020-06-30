@@ -18,6 +18,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static bool IsODataAction(this ActionModel action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            return !action.Attributes.Any(a => a is NonODataActionAttribute);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="controller"></param>
         /// <returns></returns>
@@ -61,6 +76,49 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             return action.Attributes.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="entityType"></param>
+        /// <param name="keyPrefix"></param>
+        /// <returns></returns>
+        public static bool HasODataKeyParameter(this ActionModel action,
+            IEdmEntityType entityType,
+            string keyPrefix = "key")
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (entityType == null)
+            {
+                throw new ArgumentNullException(nameof(entityType));
+            }
+
+            var keys = entityType.Key().ToArray();
+            if (keys.Length == 1)
+            {
+                // one key
+                return action.Parameters.Any(p => p.ParameterInfo.Name == keyPrefix);
+            }
+            else
+            {
+                // multipe key
+                foreach (var key in keys)
+                {
+                    string keyName = $"{keyPrefix}{key.Name}";
+                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }
 
         /// <summary>

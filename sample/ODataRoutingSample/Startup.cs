@@ -54,6 +54,7 @@ namespace ODataRoutingSample
 
             app.UseRouting();
 
+            // Test middelware
             app.Use(next => context =>
             {
                 var endpoint = context.GetEndpoint();
@@ -62,7 +63,6 @@ namespace ODataRoutingSample
                     return next(context);
                 }
 
-
                 return next(context);
             });
 
@@ -70,8 +70,7 @@ namespace ODataRoutingSample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();//.WithOData(model);
-      //          endpoints.MapODataRoute("odata", "odata", model);
+                endpoints.MapControllers();
             });
         }
     }

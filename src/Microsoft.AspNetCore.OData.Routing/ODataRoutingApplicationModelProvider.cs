@@ -63,8 +63,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                         continue;
                     }
 
-                    // Add here
-                    //
                     ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
                     odataContext.Controller = controller;
 
@@ -74,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                     if (newConventions.Length > 0)
                     {
-                        foreach (var action in controller.Actions)
+                        foreach (var action in controller.Actions.Where(a => a.IsODataAction()))
                         {
                             odataContext.Action = action;
 

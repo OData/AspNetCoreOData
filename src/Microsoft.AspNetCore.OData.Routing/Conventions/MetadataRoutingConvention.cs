@@ -11,31 +11,26 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// The convention for metadata.
     /// </summary>
     public class MetadataRoutingConvention : IODataControllerActionConvention
     {
         private static TypeInfo metadataTypeInfo = typeof(MetadataController).GetTypeInfo();
 
         /// <summary>
-        /// 
+        /// Gets the order value for determining the order of execution of conventions.
+        /// Metadata routing convention has 0 order.
         /// </summary>
         public virtual int Order => 0;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            // This convention only applies to "MetadataController".
             return context?.Controller?.ControllerType == metadataTypeInfo;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
@@ -47,24 +42,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Debug.Assert(context.Action != null);
             ActionModel action = context.Action;
 
-            if (action.Controller.ControllerType != typeof(MetadataController).GetTypeInfo())
-            {
-                return false;
-            }
+            string actionName = action.ActionMethod.Name;
 
-            if (action.ActionMethod.Name == "GetMetadata")
+            // for ~$metadata
+            if (actionName == "GetMetadata")
             {
                 ODataPathTemplate template = new ODataPathTemplate(MetadataSegmentTemplate.Instance);
                 action.AddSelector(context.Prefix, context.Model, template);
-
                 return true;
             }
 
-            if (action.ActionMethod.Name == "GetServiceDocument")
+            // for ~/
+            if (actionName == "GetServiceDocument")
             {
                 ODataPathTemplate template = new ODataPathTemplate();
                 action.AddSelector(context.Prefix, context.Model, template);
-
                 return true;
             }
 

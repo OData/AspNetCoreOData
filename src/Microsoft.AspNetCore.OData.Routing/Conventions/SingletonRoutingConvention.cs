@@ -3,37 +3,28 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// The convention for <see cref="IEdmSingleton"/>.
     /// </summary>
     public class SingletonRoutingConvention : IODataControllerActionConvention
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public virtual int Order => 200;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             return context?.Singleton != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
@@ -41,18 +32,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // use the cached
             Debug.Assert(context.Singleton != null);
             Debug.Assert(context.Action != null);
-            ActionModel action = context.Action;
 
+            ActionModel action = context.Action;
             string singletonName = context.Singleton.Name;
-            string prefix = context.Prefix;
-            IEdmModel model = context.Model;
 
             string actionMethodName = action.ActionMethod.Name;
             if (IsSupportedActionName(actionMethodName, singletonName))
             {
+                // ~/Me
                 ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton));
                 action.AddSelector(context.Prefix, context.Model, template);
 
@@ -61,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // type cast
-            // Get{SingletonName}From{EntityTypeName} or GetFrom{EntityTypeName}
+            // GetFrom{EntityTypeName} or Get{SingletonName}From{EntityTypeName}
             int index = actionMethodName.IndexOf("From", StringComparison.Ordinal);
             if (index == -1)
             {
@@ -71,33 +60,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             string actionPrefix = actionMethodName.Substring(0, index);
             if (IsSupportedActionName(actionPrefix, singletonName))
             {
-                IEdmEntityType entityType = context.Singleton.EntityType();
                 string castTypeName = actionMethodName.Substring(index + 4);
+                IEdmEntityType entityType = context.Singleton.EntityType();
 
                 // Shall we cast to base type and the type itself? I think yes.
-                IEdmEntityType baseType = entityType;
-                while (baseType != null)
-                {
-                    if (baseType.Name == castTypeName)
-                    {
-                        ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton),
-                            new CastSegmentTemplate(baseType));
-                        action.AddSelector(context.Prefix, context.Model, template);
-
-                        return true;
-                    }
-
-                    baseType = baseType.BaseEntityType();
-                }
-
-                // shall we cast to derived type
-                IEdmEntityType castType = model.FindAllDerivedTypes(entityType).OfType<IEdmEntityType>().FirstOrDefault(c => c.Name == castTypeName);
+                IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
                 if (castType != null)
                 {
-                    ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton),
+                    // ~/Me/Namespace.TypeCast
+                    ODataPathTemplate template = new ODataPathTemplate(
+                        new SingletonSegmentTemplate(context.Singleton),
                         new CastSegmentTemplate(castType));
-                    action.AddSelector(context.Prefix, context.Model, template);
 
+                    action.AddSelector(context.Prefix, context.Model, template);
                     return true;
                 }
             }
@@ -107,9 +82,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
         private static bool IsSupportedActionName(string actionName, string singletonName)
         {
-            return actionName == "Get" || actionName == $"Get{singletonName}" ||
-                actionName == "Put" || actionName == $"Put{singletonName}" ||
-                actionName == "Patch" || actionName == $"Patch{singletonName}";
+            return actionName == "Get" ||
+                actionName == $"Get{singletonName}" ||
+                actionName == "Put" ||
+                actionName == $"Put{singletonName}" ||
+                actionName == "Patch" ||
+                actionName == $"Patch{singletonName}";
         }
     }
 }
