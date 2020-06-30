@@ -21,6 +21,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public ActionImportSegmentTemplate(IEdmActionImport actionImport)
         {
             ActionImport = actionImport ?? throw new ArgumentNullException(nameof(actionImport));
+
+            if (actionImport.Action.ReturnType != null)
+            {
+                IsSingle = actionImport.Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
+            }
         }
 
         /// <inheritdoc />
@@ -30,6 +35,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped action import.
         /// </summary>
         public IEdmActionImport ActionImport { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model,

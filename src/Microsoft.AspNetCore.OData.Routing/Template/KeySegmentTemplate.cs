@@ -72,6 +72,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmEntityType EntityType { get; }
 
         /// <inheritdoc />
+        public override bool IsSingle => true;
+
+        /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,
             RouteValueDictionary routeValue, QueryString queryString)
         {

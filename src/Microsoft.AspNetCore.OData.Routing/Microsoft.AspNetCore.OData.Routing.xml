@@ -49,6 +49,13 @@
             
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.IsODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.HasAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
             <summary>
             
@@ -73,6 +80,15 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="entityType"></param>
+            <param name="keyPrefix"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
             
@@ -84,49 +100,32 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention">
             <summary>
-            
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/> with key.
+            It supports key in parenthesis and key as segment if it's single key.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.Order">
-            <summary>
-            
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention">
             <summary>
-            
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.Order">
-            <summary>
-            
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention">
             <summary>
@@ -153,49 +152,61 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention">
             <summary>
-            
+            The interface for all OData convention routing.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention.Order">
             <summary>
-            
+            Gets the order value for determining the order of execution of conventions.
+            Conventions execute in ascending numeric value of the <see cref="P:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention.Order"/> property.
             </summary>
+            <para>
+            If two conventions have the same numeric value of <see cref="P:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention.Order"/>, then their relative execution order
+            is undefined.
+            </para>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <summary>
-            
+            Applies the convention on controller
             </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <param name="context">The controller action context.</param>
+            <returns>
+            True: yes, applies the convention on the actions of this controller.
+            False: no, please skip this convention on the actions of this controller.
+            </returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <summary>
-            
+            Applies the convention on action of this controller.
             </summary>
-            <param name="context"></param>
+            <param name="context">The controller action context.</param>
+            <returns>
+            True: yes, applied the convention, please stop to execute the remaining conventions.
+            False: no, please continue to execute the remaining conventions.
+            </returns>
+            <remarks>
+            The OData action convention should not put limitation on the action parameters.
+            That's, if an action has extra parameter that's no required for a certain convention,
+            We consider this action is valid for this convention.
+            For example, Entity convention requires the key(s) parameters, doesn't care about other parameters.
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention">
             <summary>
-            
+            The convention for metadata.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention.Order">
             <summary>
-            
+            Gets the order value for determining the order of execution of conventions.
+            Metadata routing convention has 0 order.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention">
             <summary>
@@ -371,7 +382,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention">
             <summary>
-            
+            An implementation of <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention"/> that handles entity reference manipulations.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention.Order">
@@ -394,26 +405,48 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention">
             <summary>
-            
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmSingleton"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.Order">
-            <summary>
-            
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
+            <summary>
+            Resolve the navigation source using the input identifier
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="identifier">The indentifier</param>
+            <param name="enableCaseInsensitive">Enable case insensitive</param>
+            <returns>Null or the found navigation source.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Edm.EdmModelExtensions.TryGetEntityType(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmEntityType@)">
+            <summary>
+            Try to get the entity type <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> from the input <see cref="T:Microsoft.OData.Edm.IEdmType"/>
+            </summary>
+            <param name="edmType">The input Edm Type.</param>
+            <param name="entityType">The output Entity Type.</param>
+            <returns>True/false</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Find the given type in a structured type inheritance, include itself.
+            </summary>
+            <param name="structuralType">The starting structural type.</param>
+            <param name="model">The Edm model.</param>
+            <param name="typeName">The searching type name.</param>
+            <returns>The found type.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.NonODataActionAttribute">
             <summary>
             
             </summary>
-            <param name="context"></param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.NonODataControllerAttribute">
             <summary>
@@ -579,6 +612,120 @@
             <param name="services"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser">
+            <summary>
+            Parse the OData routing template
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse111(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="odataPath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Parse the string like "/users/{id | userPrincipalName}/contactFolders/{contactFolderId}/contacts"
+            to segments
+            </summary>
+            <param name="model">the IEdm model.</param>
+            <param name="odataPath">the setting.</param>
+            <returns>Null or <see cref="T:System.UriParser"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.CreateFirstSegment(System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Process the first segment in the request uri.
+            The first segment could be only singleton/entityset/operationimport, doesn't consider the $metadata, $batch
+            </summary>
+            <param name="identifier">the whole identifier of this segment</param>
+            <param name="model">The Edm model.</param>
+            <param name="path">The out put of the path, because it may include the key segment.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.CreateNextSegment(System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Create the next segment for the request uri.
+            </summary>
+            <param name="identifier">The request segment uri literal</param>
+            <param name="model">The Edm model.</param>
+            <param name="path">The out of the path</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindNavigationSource(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind the idenfier as navigation source segment,
+            Append it into path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindOperationImport(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind the idenfier as operation import (function import or action import) segment,
+            Append it into path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindPropertySegment(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind the idenfier as property segment,
+            Append it into path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindKeySegment(System.String,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind the parenthesisExpressions as key,
+            parenthesisExpressions should have '(' and ')' wrapped.
+            </summary>
+            <param name="parenthesisExpressions">'(' and ')' wrapped string.</param>
+            <param name="path">the decorated path.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindTypeCastSegment(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind namespace-qualified type cast segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindOperations(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
+            <summary>
+            Try to bind the idenfier as bound operation segment,
+            Append it into path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.ParseSegments(System.String)">
+            <summary>
+            Parses the OData path into segments.
+            </summary>
+            <param name="odataPath">The OData path.</param>
+            <returns>The segments of the OData path.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.ParseNextSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate,Microsoft.OData.Edm.IEdmType,System.String)">
+            <summary>
+            Parses the next OData path segment.
+            </summary>
+            <param name="model">The model to use for path parsing.</param>
+            <param name="previous">The previous path segment.</param>
+            <param name="previousEdmType">The EDM type of the OData path up to the previous segment.</param>
+            <param name="segment">The value of the segment to parse.</param>
+            <returns>A parsed representation of the segment.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.ParseFirstSegment(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Parses the first OData segment following the service base URI.
+            </summary>
+            <param name="model">The model to use for path parsing.</param>
+            <param name="segment">The value of the segment to parse.</param>
+            <returns>A parsed representation of the segment.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="odataPath"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.SRResources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -639,6 +786,9 @@
             Gets the wrapped action import.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -668,6 +818,9 @@
             Gets the wrapped Edm action.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -690,6 +843,9 @@
             Gets the actual structured type.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -709,6 +865,9 @@
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Template">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
@@ -733,6 +892,9 @@
             Gets the wrapped entity set.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -754,6 +916,9 @@
             <summary>
             Gets the wrapped Edm function import.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.IsSingle">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
@@ -783,6 +948,9 @@
             <summary>
             Gets the wrapped Edm function.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.IsSingle">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
@@ -820,6 +988,9 @@
             Gets the entity type declaring this key.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -839,6 +1010,9 @@
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Template">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
@@ -862,6 +1036,9 @@
             <summary>
             Gets the wrapped navigation property.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.IsSingle">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
@@ -944,6 +1121,71 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds">
+            <summary>
+            Provides the values of segment kinds for implementations of <see cref="!:ODataPathSegment" />.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.ServiceBase">
+            <summary>
+            Represents the service root segment (for OData service document).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Batch">
+            <summary>
+            Represents the OData $batch segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Ref">
+            <summary>
+            Represents the OData $ref segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Metadata">
+            <summary>
+            Represents the OData $metadata segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Value">
+            <summary>
+            Represents the OData $value segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Action">
+            <summary>
+            Represents a segment indicating an OData action.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Cast">
+            <summary>
+            Represents a segment indicating a type cast.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.EntitySet">
+            <summary>
+            Represents a segment indicating an entity set.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Key">
+            <summary>
+            Represents a segment indicating an index by key operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Navigation">
+            <summary>
+            Represents a segment indicating a navigation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Property">
+            <summary>
+            Represents a segment indicating a property access.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.Unresolved">
+            <summary>
+            Represents a segment that is not understood.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate">
             <summary>
             Represents an OData segment template that could match an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate"/>.
@@ -952,6 +1194,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Template">
             <summary>
             Gets the segment template string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.IsSingle">
+            <summary>
+            Gets a value indicating whether the output value is single value or collection value of this segment.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
@@ -976,6 +1223,9 @@
             <param name="declaredType">The declared type.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.Template">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.StructuredType">
@@ -1005,6 +1255,9 @@
             Gets the wrapped Edm property.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -1026,6 +1279,9 @@
             <summary>
             Gets the wrapped navigation property.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.IsSingle">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
@@ -1049,6 +1305,9 @@
             Gets the wrapped Edm singleton.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.GenerateODataSegment(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <inheritdoc />
         </member>
@@ -1064,6 +1323,9 @@
             <param name="previousType">The value segment Edm type.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Template">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueType">

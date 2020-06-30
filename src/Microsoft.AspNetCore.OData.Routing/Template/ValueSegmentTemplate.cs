@@ -25,6 +25,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override string Template => "$value";
 
+        /// <inheritdoc />
+        public override bool IsSingle => true;
+
         /// <summary>
         /// Gets the value type.
         /// </summary>

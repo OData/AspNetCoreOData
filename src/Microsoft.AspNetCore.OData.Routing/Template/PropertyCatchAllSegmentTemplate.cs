@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -24,6 +25,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override string Template => "{property}";
+
+        /// <inheritdoc />
+        public override bool IsSingle => throw new NotSupportedException();
 
         /// <summary>
         /// Gets the declared type for this property template.

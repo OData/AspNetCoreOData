@@ -21,6 +21,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public CastSegmentTemplate(IEdmStructuredType castType)
         {
             CastType = castType ?? throw new ArgumentNullException(nameof(castType));
+
+            // TODO:
+            IsSingle = castType.TypeKind != EdmTypeKind.Collection;
         }
 
         /// <inheritdoc />
@@ -30,6 +33,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the actual structured type.
         /// </summary>
         public IEdmStructuredType CastType { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model,

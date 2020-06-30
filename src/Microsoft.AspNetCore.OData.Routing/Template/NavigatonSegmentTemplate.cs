@@ -21,6 +21,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationSegmentTemplate(IEdmNavigationProperty navigation)
         {
             Navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+
+            IsSingle = !navigation.Type.IsCollection();
         }
 
         /// <inheritdoc />
@@ -30,6 +32,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped navigation property.
         /// </summary>
         public IEdmNavigationProperty Navigation { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,

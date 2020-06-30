@@ -59,6 +59,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             {
                 Template = function.FullName() + "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
             }
+
+            IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <inheritdoc />
@@ -68,6 +70,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped Edm function.
         /// </summary>
         public IEdmFunction Function { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,

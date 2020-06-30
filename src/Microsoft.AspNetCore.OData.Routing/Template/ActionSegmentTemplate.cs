@@ -33,6 +33,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             Action = action ?? throw new ArgumentNullException(nameof(action));
             Template = unqualifiedFunctionCall ? action.Name : action.FullName();
+
+            if (action.ReturnType != null)
+            {
+                IsSingle = action.ReturnType.TypeKind() != EdmTypeKind.Collection;
+            }
         }
 
         /// <inheritdoc />
@@ -42,6 +47,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped Edm action.
         /// </summary>
         public IEdmAction Action { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model,

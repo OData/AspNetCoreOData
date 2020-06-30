@@ -21,6 +21,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public PropertySegmentTemplate(IEdmStructuralProperty property)
         {
             Property = property ?? throw new ArgumentNullException(nameof(property));
+
+            IsSingle = !property.Type.IsCollection();
         }
 
         /// <inheritdoc />
@@ -30,6 +32,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped Edm property.
         /// </summary>
         public IEdmStructuralProperty Property { get; }
+
+        /// <inheritdoc />
+        public override bool IsSingle { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment GenerateODataSegment(IEdmModel model,
