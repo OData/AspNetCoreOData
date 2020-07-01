@@ -54,5 +54,10 @@ namespace ODataRoutingSample.Controllers.v2
         {
             return "Orders Title";
         }
+
+        public string CreateRefToCategory(int key)
+        {
+            return "CreateRefToCategory";
+        }
     }
 }

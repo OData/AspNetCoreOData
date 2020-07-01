@@ -19,6 +19,29 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// 
         /// </summary>
         /// <param name="action"></param>
+        /// <param name="parameterName"></param>
+        /// <returns></returns>
+        public static bool HasParameter<T>(this ActionModel action, string parameterName)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            // parameter name is unique?
+            ParameterModel parameter = action.Parameters.FirstOrDefault(p => p.Name == parameterName);
+            if (parameter == null)
+            {
+                return false;
+            }
+
+            return parameter.ParameterType == typeof(T);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
         /// <returns></returns>
         public static bool IsODataAction(this ActionModel action)
         {

@@ -3,10 +3,9 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Routing
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequest"/>.

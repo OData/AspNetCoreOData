@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Microsoft.AspNetCore.OData.Routing.Commons
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// 

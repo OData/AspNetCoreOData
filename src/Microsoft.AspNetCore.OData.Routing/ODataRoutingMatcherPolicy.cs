@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 
@@ -61,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 var oPath = oDataMetadata.GenerateODataPath(originalValues, httpContext.Request.QueryString);
                 if (oPath != null)
                 {
-                    var odata = httpContext.Request.ODataFeature();
+                    var odata = httpContext.ODataFeature();
                     odata.Model = oDataMetadata.Model;
                     odata.Path = oPath;
 

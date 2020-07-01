@@ -23,6 +23,37 @@
             Gets the services collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            </summary>
+            <param name="httpContext">The Http context.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetModel(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -56,6 +87,28 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Endpoint">
             <summary>
             Gets/sets the endpoint selected
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
+            <summary>
+            
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.ShouldValidateEntry(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry,Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry)">
+            <summary>
+            
+            </summary>
+            <param name="entry"></param>
+            <param name="parentEntry"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataActionParameters">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataFeature">
@@ -135,59 +188,6 @@
             <param name="services"></param>
             <param name="setupAction"></param>
             <returns></returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.HttpContextExtensions">
-            <summary>
-            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpContextExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpContext)">
-            <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-            <param name="httpContext">The Http context.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions">
-            <summary>
-            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.
-            </summary>
-            <param name="request">The request.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.HttpRequestExtensions.GetModel(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.
-            </summary>
-            <param name="request">The request.</param>
-            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute">
-            <summary>
-            
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute.ShouldValidateEntry(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry,Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry)">
-            <summary>
-            
-            </summary>
-            <param name="entry"></param>
-            <param name="parentEntry"></param>
-            <returns></returns>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Commons.NonValidatingParameterBindingAttribute.BindingSource">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Commons.ODataActionParameters">
-            <summary>
-            
-            </summary>
         </member>
     </members>
 </doc>

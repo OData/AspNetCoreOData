@@ -4,7 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.Routing.Commons
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// 

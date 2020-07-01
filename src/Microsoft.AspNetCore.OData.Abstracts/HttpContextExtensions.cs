@@ -3,9 +3,8 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
 
-namespace Microsoft.AspNetCore.OData.Routing
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/>.

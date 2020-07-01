@@ -8,6 +8,24 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 {
     internal static class StringExtensions
     {
+        public static string[] ExtractItems(this string input, params string[] seperators)
+        {
+            string text = input;
+            List<string> items = new List<string>();
+            for (int i = seperators.Length - 1; i >= 0; i--)
+            {
+                int index = text.IndexOf(seperators[i], StringComparison.Ordinal);
+                if (index > 0)
+                {
+                    items.Add(text.Substring(index + seperators[i].Length));
+                    text = text.Substring(0, index);
+                }
+            }
+
+            items.Reverse();
+            return items.ToArray();
+        }
+
         public static string ExtractParenthesis(this string identifier, out string parenthesisExpressions)
         {
             // also supports: name(abc)(efg)
