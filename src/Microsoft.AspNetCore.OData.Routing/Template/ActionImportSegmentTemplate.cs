@@ -29,12 +29,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => ActionImport.Name;
+        public override string Literal => ActionImport.Name;
 
         /// <summary>
         /// Gets the wrapped action import.
         /// </summary>
         public IEdmActionImport ActionImport { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.ActionImport;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

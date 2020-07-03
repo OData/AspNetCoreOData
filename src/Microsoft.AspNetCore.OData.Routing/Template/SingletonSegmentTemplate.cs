@@ -24,12 +24,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => Singleton.Name;
+        public override string Literal => Singleton.Name;
 
         /// <summary>
         /// Gets the wrapped Edm singleton.
         /// </summary>
         public IEdmSingleton Singleton { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Singleton;
 
         /// <inheritdoc />
         public override bool IsSingle => true;

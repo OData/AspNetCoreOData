@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             if (keys.Length == 1)
             {
                 // {key}
-                Template = $"{{{keyPrefix}}}";
+                Literal = $"{{{keyPrefix}}}";
                 _keyMappings[keys[0].Name] = ($"{keyPrefix}", keys[0].Type);
             }
             else
@@ -59,17 +59,27 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     _keyMappings[key.Name] = ($"{keyPrefix}{key.Name}", key.Type);
                 }
 
-                Template = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
+                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
             }
+
+            Count = keys.Length;
         }
 
         /// <inheritdoc />
-        public override string Template { get; }
+        public override string Literal { get; }
 
         /// <summary>
         /// Gets the entity type declaring this key.
         /// </summary>
         public IEdmEntityType EntityType { get; }
+
+        /// <summary>
+        /// Gets the key count
+        /// </summary>
+        public int Count { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Key;
 
         /// <inheritdoc />
         public override bool IsSingle => true;

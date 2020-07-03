@@ -10,6 +10,14 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// <summary>
     /// 
     /// </summary>
+    public class ODataRoutingOptionsBuilder
+    {
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class ODataRoutingOptions
     {
         /// <summary>

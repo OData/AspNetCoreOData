@@ -8,26 +8,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// </summary>
     public class FunctionRoutingConvention : IODataControllerActionConvention
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public int Order => 700;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             // bound operation supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public bool AppliesToAction(ODataControllerActionContext context)
         {
 

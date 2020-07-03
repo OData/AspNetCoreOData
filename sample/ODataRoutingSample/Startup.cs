@@ -42,6 +42,15 @@ namespace ODataRoutingSample
                     .AddModel(EdmModelBuilder.GetEdmModel())
                     .AddModel("v1", EdmModelBuilder.GetEdmModelV1())
                     .AddModel("v2{data}", EdmModelBuilder.GetEdmModelV2()));
+
+            /*
+            services.AddOData(opt => opt.UseODataRouting(model1).
+                opt.UseODataRouting("v1", model2).
+                opt.UseODataRouting("v2{data}", model3).
+                opt.UseODataFormatter().
+                opt.UseODataQuery()
+                );
+            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

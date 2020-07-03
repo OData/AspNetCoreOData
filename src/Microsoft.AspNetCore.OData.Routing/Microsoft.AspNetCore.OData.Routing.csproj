@@ -9,6 +9,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>Library</OutputType>
     <SignAssembly>false</SignAssembly>
+    <AssemblyName>Microsoft.AspNetCore.OData.Routing</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -27,12 +27,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => CastType.FullTypeName();
+        public override string Literal => CastType.FullTypeName();
 
         /// <summary>
         /// Gets the actual structured type.
         /// </summary>
         public IEdmStructuredType CastType { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Cast;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

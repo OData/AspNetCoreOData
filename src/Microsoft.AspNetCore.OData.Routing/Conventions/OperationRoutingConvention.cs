@@ -12,30 +12,21 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
     /// </summary>
     public class OperationRoutingConvention : IODataControllerActionConvention
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public virtual int Order => 600;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             // bound operation supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
@@ -56,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmModel model = context.Model;
             string prefix = context.Prefix;
             IEdmEntityType entityType = navigationSource.EntityType();
-            bool hasKeyParameter = HasKeyParameter(entityType, action);
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
 
             // found
             int keyNumber = entityType.Key().Count();

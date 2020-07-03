@@ -11,4 +11,9 @@ namespace ODataRoutingSample.Models
 
         public Category Category { get; set; }
     }
+
+    public class VipOrder : Order
+    {
+        public Category VipCategory { get; set; }
+    }
 }

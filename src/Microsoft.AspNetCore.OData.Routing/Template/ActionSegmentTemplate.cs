@@ -32,7 +32,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public ActionSegmentTemplate(IEdmAction action, bool unqualifiedFunctionCall)
         {
             Action = action ?? throw new ArgumentNullException(nameof(action));
-            Template = unqualifiedFunctionCall ? action.Name : action.FullName();
 
             if (action.ReturnType != null)
             {
@@ -41,12 +40,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template { get; }
+        public override string Literal => Action.FullName();
 
         /// <summary>
         /// Gets the wrapped Edm action.
         /// </summary>
         public IEdmAction Action { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Action;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

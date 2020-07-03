@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -17,6 +18,24 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     public static class ODataRoutingServiceCollectionExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static ODataOptionsBuilder UseODataRouting(this ODataOptionsBuilder builder, IEdmModel model)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            //AddODataRoutingServices(builder.Services);
+            //builder.Services.Configure(setupAction);
+            return builder;
+        }
+
         /// <summary>
         /// 
         /// </summary>

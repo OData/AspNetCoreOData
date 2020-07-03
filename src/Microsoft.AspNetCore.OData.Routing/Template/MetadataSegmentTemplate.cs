@@ -26,7 +26,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => "$metadata";
+        public override string Literal => "$metadata";
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Metadata;
 
         /// <inheritdoc />
         public override bool IsSingle => true;

@@ -23,7 +23,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => "$value";
+        public override string Literal => "$value";
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Value;
 
         /// <inheritdoc />
         public override bool IsSingle => true;

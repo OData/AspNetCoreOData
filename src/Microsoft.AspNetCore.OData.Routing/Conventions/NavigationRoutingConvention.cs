@@ -7,35 +7,43 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
+    /// Conventions for <see cref="IEdmNavigationProperty"/>.
+    /// Action name convention should follow up: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
     /// 
     /// </summary>
     public class NavigationRoutingConvention : IODataControllerActionConvention
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual int Order => 500;
+        private readonly ILogger<NavigationRoutingConvention> _logger;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="logger"></param>
+        public NavigationRoutingConvention(ILogger<NavigationRoutingConvention> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            string message = $"About page visited at {DateTime.UtcNow.ToLongTimeString()}";
+            _logger.LogInformation(message);
+        }
+
+        /// <inheritdoc />
+        public virtual int Order => 500;
+
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             // structural property supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
@@ -43,229 +51,172 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            ActionModel action = context.Action;
-
             if (context.EntitySet == null && context.Singleton == null)
             {
                 return false;
             }
-            IEdmNavigationSource navigationSource = context.EntitySet == null ?
-                (IEdmNavigationSource)context.Singleton :
-                (IEdmNavigationSource)context.EntitySet;
 
+            ActionModel action = context.Action;
+
+            // Filter by the action name.
+            // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
             string actionName = action.ActionMethod.Name;
-
-            string method = Split(actionName, out string property, out string cast, out string declared);
+            string method = SplitActionName(actionName, out string property, out string declared);
             if (method == null || string.IsNullOrEmpty(property))
             {
                 return false;
             }
 
+            IEdmNavigationSource navigationSource = context.EntitySet == null ?
+                (IEdmNavigationSource)context.Singleton :
+                (IEdmNavigationSource)context.EntitySet;
+
+            // filter by action parameter
             IEdmEntityType entityType = navigationSource.EntityType();
-            IEdmModel model = context.Model;
-            string prefix = context.Prefix;
-            IEdmEntityType declaredEntityType = null;
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
+            if (!(context.Singleton != null ^ hasKeyParameter))
+            {
+                // Singleton, doesn't allow to query property with key
+                // entityset, doesn't allow for non-key to query property
+                return false;
+            }
+
+            // Find the declaring type of the property if we have the declaring type name in the action name.
+            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
-                declaredEntityType = entityType.FindTypeInInheritance(model, declared) as IEdmEntityType;
-                if (declaredEntityType == null)
+                declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
+                if (declaringEntityType == null)
                 {
                     return false;
                 }
-
-                if (declaredEntityType == entityType)
-                {
-                    declaredEntityType = null;
-                }
             }
 
-            bool hasKeyParameter = HasKeyParameter(entityType, action);
-            IEdmSingleton singleton = navigationSource as IEdmSingleton;
-            if (singleton != null && hasKeyParameter)
+            // Find the property, and we only care about the navigation property.
+            IEdmProperty edmProperty = declaringEntityType.FindProperty(property);
+            if (edmProperty == null || edmProperty.PropertyKind == EdmPropertyKind.Structural)
             {
-                // Singleton, doesn't allow to query property with key
                 return false;
             }
 
-            if (singleton == null && !hasKeyParameter)
+            // Starts the routing template
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (context.EntitySet != null)
             {
-                // in entityset, doesn't allow for non-key to query property
-                return false;
-            }
-
-            IEdmProperty edmProperty = entityType.FindProperty(property);
-            if (edmProperty != null && edmProperty.PropertyKind == EdmPropertyKind.Structural)
-            {
-                // only process structural property
-                IEdmStructuredType castComplexType = null;
-                if (cast != null)
-                {
-                    IEdmTypeReference propertyType = edmProperty.Type;
-                    if (propertyType.IsCollection())
-                    {
-                        propertyType = propertyType.AsCollection().ElementType();
-                    }
-                    if (!propertyType.IsComplex())
-                    {
-                        return false;
-                    }
-
-                    castComplexType = propertyType.ToStructuredType().FindTypeInInheritance(model, cast);
-                    if (castComplexType == null)
-                    {
-                        return false;
-                    }
-                }
-
-                IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                if (context.EntitySet != null)
-                {
-                    segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                }
-                else
-                {
-                    segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                }
-
-                if (hasKeyParameter)
-                {
-                    segments.Add(new KeySegmentTemplate(entityType));
-                }
-                if (declaredEntityType != null && declaredEntityType != entityType)
-                {
-                    segments.Add(new CastSegmentTemplate(declaredEntityType));
-                }
-
-                segments.Add(new PropertySegmentTemplate((IEdmStructuralProperty)edmProperty));
-
-                ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, model, template);
-                return true;
+                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
             }
             else
             {
-                // map to a static action like:  <method>Property(int key, string property)From<...>
-                if (property == "Property" && cast == null)
-                {
-                    if (action.Parameters.Any(p => p.ParameterInfo.Name == "property" && p.ParameterType == typeof(string)))
-                    {
-                        // we find a static method mapping for all property
-                        // we find a action route
-                        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                        if (context.EntitySet != null)
-                        {
-                            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                        }
-                        else
-                        {
-                            segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                        }
-
-                        if (hasKeyParameter)
-                        {
-                            segments.Add(new KeySegmentTemplate(entityType));
-                        }
-                        if (declaredEntityType != null)
-                        {
-                            segments.Add(new CastSegmentTemplate(declaredEntityType));
-                        }
-
-                        segments.Add(new PropertyCatchAllSegmentTemplate(entityType));
-
-                        ODataPathTemplate template = new ODataPathTemplate(segments);
-                        action.AddSelector(prefix, model, template);
-                        return true;
-                    }
-                }
+                segments.Add(new SingletonSegmentTemplate(context.Singleton));
             }
 
-            return false;
+            if (hasKeyParameter)
+            {
+                segments.Add(new KeySegmentTemplate(entityType));
+            }
+
+            if (declared != null)
+            {
+                segments.Add(new CastSegmentTemplate(declaringEntityType));
+            }
+
+            IEdmNavigationProperty navigationProperty = (IEdmNavigationProperty)edmProperty;
+            IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
+
+            segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
+
+            ODataPathTemplate template = new ODataPathTemplate(segments);
+            action.AddSelector(context.Prefix, context.Model, template);
+
+         //   selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+          //  selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+
+            Log.AddedODataSelector(_logger, action, template);
+
+            return true;
         }
 
-        private static bool HasKeyParameter(IEdmEntityType entityType, ActionModel action)
-        {
-            var keys = entityType.Key().ToArray();
-            if (keys.Length == 1)
-            {
-                return action.Parameters.Any(p => p.ParameterInfo.Name == "key");
-            }
-            else
-            {
-                foreach (var key in keys)
-                {
-                    string keyName = $"key{key.Name}";
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
-        private static string Split(string actionName, out string property, out string cast, out string declared)
+        /// <summary>
+        /// split action using navigation action name convention.
+        /// For example: PostToOrdersFromVipOrder
+        /// => Method Name: PostTo
+        /// => property : Orders
+        /// => declaring: VipOrder
+        /// </summary>
+        /// <param name="actionName">The input action name.</param>
+        /// <param name="property">The property name (out).</param>
+        /// <param name="declaring">The declaring name (out).</param>
+        /// <returns>The http method name or null.</returns>
+        private static string SplitActionName(string actionName, out string property, out string declaring)
         {
             string method = null;
-            property = null;
-            cast = null;
-            declared = null;
+            string text = null;
 
-            string text;
-            // Get{PropertyName}Of<cast>From<declard>
-            if (actionName.StartsWith("Get", StringComparison.OrdinalIgnoreCase))
+            // HttpMethodName{NavigationPropertyName}From<declaring>
+            foreach (var prefix in new[] { "Get", "PostTo", "PutTo", "PatchTo" })
             {
-                method = "Get";
-                text = actionName.Substring(3);
+                if (actionName.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    method = prefix;
+                    text = actionName.Substring(prefix.Length);
+                    break;
+                }
             }
-            else if (actionName.StartsWith("PutTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "PutTo";
-                text = actionName.Substring(5);
-            }
-            else if (actionName.StartsWith("PatchTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "PatchTo";
-                text = actionName.Substring(7);
-            }
-            else if (actionName.StartsWith("DeleteTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "DeleteTo";
-                text = actionName.Substring(8);
-            }
-            else
+
+            property = null;
+            declaring = null;
+            if (method == null)
             {
                 return null;
             }
 
-            int index = text.IndexOf("Of", StringComparison.OrdinalIgnoreCase);
+            int index = text.IndexOf("From", StringComparison.Ordinal);
             if (index > 0)
             {
                 property = text.Substring(0, index);
-                text = text.Substring(index + 2);
-                cast = Match(text, out declared);
+                declaring = text.Substring(index + 4);
             }
             else
             {
-                property = Match(text, out declared);
+                property = text;
             }
 
             return method;
         }
 
-        private static string Match(string text, out string declared)
+        private static class Log
         {
-            declared = null;
-            int index = text.IndexOf("From");
-            if (index > 0)
-            {
-                declared = text.Substring(index + 4);
-                return text.Substring(0, index);
-            }
+            //private static readonly Action<ILogger, string, Exception> _executingEndpoint = LoggerMessage.Define<string>(
+            //    LogLevel.Information,
+            //    new EventId(0, "ExecutingEndpoint"),
+            //    "Executing endpoint '{EndpointName}'");
 
-            return text;
+            //private static readonly Action<ILogger, string, Exception> _executedEndpoint = LoggerMessage.Define<string>(
+            //    LogLevel.Information,
+            //    new EventId(1, "ExecutedEndpoint"),
+            //    "Executed endpoint '{EndpointName}'");
+
+            private static readonly Action<ILogger, string, Exception> _addedODataSelector = LoggerMessage.Define<string>(
+                LogLevel.Information,
+                new EventId(1, "AddODataNavigationConvention"),
+                "Added OData Convention '{ConventionMessage}'");
+
+            //public static void ExecutingEndpoint(ILogger logger, Endpoint endpoint)
+            //{
+            //    _executingEndpoint(logger, endpoint.DisplayName, null);
+            //}
+
+            //public static void ExecutedEndpoint(ILogger logger, Endpoint endpoint)
+            //{
+            //    _executedEndpoint(logger, endpoint.DisplayName, null);
+            //}
+
+            public static void AddedODataSelector(ILogger logger, ActionModel action, ODataPathTemplate template)
+            {
+                string message = action.DisplayName + ": " + template.Template;
+                _addedODataSelector(logger, message, null);
+            }
         }
     }
 }

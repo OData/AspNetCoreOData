@@ -27,7 +27,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                             continue;
                         }
 
-
                         /*{metadata.Template.Template}*/
                         Console.WriteLine($"{action.ActionMethod.Name} in {controller.ControllerName}Controller: '{selector.AttributeRouteModel.Template}' ");
                     }

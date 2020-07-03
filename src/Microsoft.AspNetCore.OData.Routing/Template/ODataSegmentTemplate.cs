@@ -14,9 +14,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public abstract class ODataSegmentTemplate
     {
         /// <summary>
-        /// Gets the segment template string.
+        /// Gets the segment URL literal.
         /// </summary>
-        public abstract string Template { get; }
+        public abstract string Literal { get; }
+
+        /// <summary>
+        /// Gets the segment kind.
+        /// </summary>
+        public abstract ODataSegmentKind Kind { get; }
 
         /// <summary>
         /// Gets a value indicating whether the output value is single value or collection value of this segment.

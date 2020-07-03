@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -12,30 +13,37 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// The convention for the property access.
+    /// Get|PostTo|PutTo|PatchTo|DeleteTo ~/entityset/key/property
+    /// GET|PostTo|PutTo|PatchTo|DeleteTo ~/singleton/property
+    /// Get|PostTo|PutTo|PatchTo|DeleteTo ~/entityset/key/cast/property/
+    /// GET|PostTo|PutTo|PatchTo|DeleteTo ~/singleton/cast/property
+    /// Get|PostTo|PutTo|PatchTo|DeleteTo ~/entityset/key/property/cast
+    /// GET|PostTo|PutTo|PatchTo|DeleteTo ~/singleton/property/cast
+    /// Get|PostTo|PutTo|PatchTo|DeleteTo ~/entityset/key/cast/property/cast
+    /// GET|PostTo|PutTo|PatchTo|DeleteTo ~/singleton/cast/property/cast
+    /// GET ~/entityset/key/property/$value
+    /// GET ~/entityset/key/cast/property/$value
+    /// GET ~/singleton/property/$value
+    /// GET ~/singleton/cast/property/$value
+    /// GET ~/entityset/key/property/$count
+    /// GET ~/entityset/key/cast/property/$count
+    /// GET ~/singleton/property/$count
+    /// GET ~/singleton/cast/property/$count
     /// </summary>
     public class PropertyRoutingConvention : IODataControllerActionConvention
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc />
         public virtual int Order => 400;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             // structural property supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
@@ -49,198 +57,182 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             {
                 return false;
             }
+
             IEdmNavigationSource navigationSource = context.EntitySet == null ?
                 (IEdmNavigationSource)context.Singleton :
                 (IEdmNavigationSource)context.EntitySet;
 
             string actionName = action.ActionMethod.Name;
 
-            string method = Split(actionName, out string property, out string cast, out string declared);
+            string method = SplitActionName(actionName, out string property, out string cast, out string declared);
             if (method == null || string.IsNullOrEmpty(property))
             {
                 return false;
             }
 
+            // filter by action parameter
             IEdmEntityType entityType = navigationSource.EntityType();
-            IEdmModel model = context.Model;
-            string prefix = context.Prefix;
-            IEdmEntityType declaredEntityType = null;
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
+            if (!(context.Singleton != null ^ hasKeyParameter))
+            {
+                // Singleton, doesn't allow to query property with key
+                // entityset, doesn't allow for non-key to query property
+                return false;
+            }
+
+            // Find the declaring type of the property if we have the declaring type name in the action name.
+            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
-                declaredEntityType = entityType.FindTypeInInheritance(model, declared) as IEdmEntityType;
-                if (declaredEntityType == null)
+                declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
+                if (declaringEntityType == null)
+                {
+                    return false;
+                }
+            }
+
+            IEdmProperty edmProperty = declaringEntityType.FindProperty(property);
+            if (edmProperty == null || edmProperty.PropertyKind != EdmPropertyKind.Structural)
+            {
+                return false;
+            }
+
+            IEdmComplexType castType = null;
+            if (cast != null)
+            {
+                IEdmTypeReference propertyElementType = edmProperty.Type.ElementType();
+                if (propertyElementType.IsComplex())
+                {
+                    IEdmComplexType complexType = propertyElementType.AsComplex().ComplexDefinition();
+                    castType = complexType.FindTypeInInheritance(context.Model, cast) as IEdmComplexType;
+                    if (castType == null)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // only support complex type cast, (TODO: maybe consider to support Edm.PrimitiveType cast)
+                    return false;
+                }
+
+            }
+
+            // only process structural property
+            IEdmStructuredType castComplexType = null;
+            if (cast != null)
+            {
+                IEdmTypeReference propertyType = edmProperty.Type;
+                if (propertyType.IsCollection())
+                {
+                    propertyType = propertyType.AsCollection().ElementType();
+                }
+                if (!propertyType.IsComplex())
                 {
                     return false;
                 }
 
-                if (declaredEntityType == entityType)
+                castComplexType = propertyType.ToStructuredType().FindTypeInInheritance(context.Model, cast);
+                if (castComplexType == null)
                 {
-                    declaredEntityType = null;
+                    return false;
                 }
             }
 
-            bool hasKeyParameter = HasKeyParameter(entityType, action);
-            IEdmSingleton singleton = navigationSource as IEdmSingleton;
-            if (singleton != null && hasKeyParameter)
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (context.EntitySet != null)
             {
-                // Singleton, doesn't allow to query property with key
-                return false;
-            }
-
-            if (singleton == null && !hasKeyParameter)
-            {
-                // in entityset, doesn't allow for non-key to query property
-                return false;
-            }
-
-            IEdmProperty edmProperty = entityType.FindProperty(property);
-            if (edmProperty != null && edmProperty.PropertyKind == EdmPropertyKind.Structural)
-            {
-                // only process structural property
-                IEdmStructuredType castComplexType = null;
-                if (cast != null)
-                {
-                    IEdmTypeReference propertyType = edmProperty.Type;
-                    if (propertyType.IsCollection())
-                    {
-                        propertyType = propertyType.AsCollection().ElementType();
-                    }
-                    if (!propertyType.IsComplex())
-                    {
-                        return false;
-                    }
-
-                    castComplexType = propertyType.ToStructuredType().FindTypeInInheritance(model, cast);
-                    if (castComplexType == null)
-                    {
-                        return false;
-                    }
-                }
-
-                IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                if (context.EntitySet != null)
-                {
-                    segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                }
-                else
-                {
-                    segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                }
-
-                if (hasKeyParameter)
-                {
-                    segments.Add(new KeySegmentTemplate(entityType));
-                }
-                if (declaredEntityType != null && declaredEntityType != entityType)
-                {
-                    segments.Add(new CastSegmentTemplate(declaredEntityType));
-                }
-
-                segments.Add(new PropertySegmentTemplate((IEdmStructuralProperty)edmProperty));
-
-                ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, model, template);
-                return true;
+                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
             }
             else
             {
-                // map to a static action like:  <method>Property(int key, string property)From<...>
-                if (property == "Property" && cast == null)
-                {
-                    if (action.Parameters.Any(p => p.ParameterInfo.Name == "property" && p.ParameterType == typeof(string)))
-                    {
-                        // we find a static method mapping for all property
-                        // we find a action route
-                        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                        if (context.EntitySet != null)
-                        {
-                            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                        }
-                        else
-                        {
-                            segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                        }
-
-                        if (hasKeyParameter)
-                        {
-                            segments.Add(new KeySegmentTemplate(entityType));
-                        }
-                        if (declaredEntityType != null)
-                        {
-                            segments.Add(new CastSegmentTemplate(declaredEntityType));
-                        }
-
-                        segments.Add(new PropertyCatchAllSegmentTemplate(entityType));
-
-                        ODataPathTemplate template = new ODataPathTemplate(segments);
-                        action.AddSelector(prefix, model, template);
-                        return true;
-                    }
-                }
+                segments.Add(new SingletonSegmentTemplate(context.Singleton));
             }
 
-            return false;
+            if (hasKeyParameter)
+            {
+                segments.Add(new KeySegmentTemplate(entityType));
+            }
+            if (declaringEntityType != null && declaringEntityType != entityType)
+            {
+                segments.Add(new CastSegmentTemplate(declaringEntityType));
+            }
+
+            segments.Add(new PropertySegmentTemplate((IEdmStructuralProperty)edmProperty));
+
+            if (castComplexType != null)
+            {
+                segments.Add(new CastSegmentTemplate(castComplexType));
+            }
+
+            ODataPathTemplate template = new ODataPathTemplate(segments);
+            action.AddSelector(context.Prefix, context.Model, template);
+            return true;
+
+            //else
+            //{
+            //// map to a static action like:  <method>Property(int key, string property)From<...>
+            //if (property == "Property" && cast == null)
+            //{
+            //    if (action.Parameters.Any(p => p.ParameterInfo.Name == "property" && p.ParameterType == typeof(string)))
+            //    {
+            //        // we find a static method mapping for all property
+            //        // we find a action route
+            //        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+
+            //        if (context.EntitySet != null)
+            //        {
+            //            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+            //        }
+            //        else
+            //        {
+            //            segments.Add(new SingletonSegmentTemplate(context.Singleton));
+            //        }
+
+            //        if (hasKeyParameter)
+            //        {
+            //            segments.Add(new KeySegmentTemplate(entityType));
+            //        }
+            //        if (declaringEntityType != null)
+            //        {
+            //            segments.Add(new CastSegmentTemplate(declaringEntityType));
+            //        }
+
+            //        segments.Add(new PropertyCatchAllSegmentTemplate(entityType));
+
+            //        ODataPathTemplate template = new ODataPathTemplate(segments);
+            //        action.AddSelector(context.Prefix, context.Model, template);
+            //        return true;
+            //    }
+            //}
+            //}
         }
 
-        private static bool HasKeyParameter(IEdmEntityType entityType, ActionModel action)
-        {
-            var keys = entityType.Key().ToArray();
-            if (keys.Length == 1)
-            {
-                return action.Parameters.Any(p => p.ParameterInfo.Name == "key");
-            }
-            else
-            {
-                foreach (var key in keys)
-                {
-                    string keyName = $"key{key.Name}";
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
-        private static string Split(string actionName, out string property, out string cast, out string declared)
+        private static string SplitActionName(string actionName, out string property, out string cast, out string declared)
         {
             string method = null;
+            string text = "";
+            // Get{PropertyName}Of<cast>From<declaring>: GetCityOfSubAddressFromVipCustomer
+            foreach (var prefix in new[] { "Get", "PostTo", "PutTo", "PatchTo", "DeleteTo" })
+            {
+                if (actionName.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    method = prefix;
+                    text = actionName.Substring(prefix.Length);
+                    break;
+                }
+            }
+
             property = null;
             cast = null;
             declared = null;
-
-            string text;
-            // Get{PropertyName}Of<cast>From<declard>
-            if (actionName.StartsWith("Get", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "Get";
-                text = actionName.Substring(3);
-            }
-            else if (actionName.StartsWith("PutTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "PutTo";
-                text = actionName.Substring(5);
-            }
-            else if (actionName.StartsWith("PatchTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "PatchTo";
-                text = actionName.Substring(7);
-            }
-            else if (actionName.StartsWith("DeleteTo", StringComparison.OrdinalIgnoreCase))
-            {
-                method = "DeleteTo";
-                text = actionName.Substring(8);
-            }
-            else
+            if (method == null)
             {
                 return null;
             }
 
-            int index = text.IndexOf("Of", StringComparison.OrdinalIgnoreCase);
+            int index = text.IndexOf("Of", StringComparison.Ordinal);
             if (index > 0)
             {
                 property = text.Substring(0, index);

@@ -52,5 +52,30 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             return new DefaultODataBuilder(services);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="setupAction"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptionsBuilder> setupAction)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (setupAction == null)
+            {
+                throw new ArgumentNullException(nameof(setupAction));
+            }
+
+            // services.AddSingleton<ODataOptions>();
+
+            services.Configure(setupAction);
+
+            return services;
+        }
     }
 }

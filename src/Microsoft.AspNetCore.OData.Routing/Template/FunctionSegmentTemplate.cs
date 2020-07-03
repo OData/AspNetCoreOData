@@ -51,25 +51,29 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 parametersMappings[parameter.Name] = $"{{{parameter.Name}}}";
             }
 
-            if (unqualifiedFunctionCall)
-            {
-                Template = function.Name + "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
-            }
-            else
-            {
-                Template = function.FullName() + "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
-            }
+            string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+
+            UnqualifiedIdentifier = function.Name + parameters;
+            Literal = function.FullName() + parameters;
 
             IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <inheritdoc />
-        public override string Template { get; }
+        public override string Literal { get; }
 
         /// <summary>
         /// Gets the wrapped Edm function.
         /// </summary>
         public IEdmFunction Function { get; }
+
+        /// <summary>
+        /// Key=value, Key=value
+        /// </summary>
+        internal string UnqualifiedIdentifier { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Function;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

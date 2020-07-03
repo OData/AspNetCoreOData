@@ -7,7 +7,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatting;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.AspNetCore.OData.Routing.Commons;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v2
@@ -53,6 +52,24 @@ namespace ODataRoutingSample.Controllers.v2
         public string GetTitle(int key)
         {
             return "Orders Title";
+        }
+
+        [HttpPost]
+        public string PostToCategory(int key)
+        {
+            return "PostToCategory + " + key;
+        }
+
+        [HttpPost]
+        public string PostToCategoryFromVipOrder(int key)
+        {
+            return "PostToCategoryFromVipOrder + " + key;
+        }
+
+        [HttpPost]
+        public string PostToCategoryFromUnknowOrder(int key)
+        {
+            return "PostToCategoryFromUnknowOrder + " + key;
         }
 
         public string CreateRefToCategory(int key)

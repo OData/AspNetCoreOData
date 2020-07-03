@@ -26,7 +26,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => "$count";
+        public override string Literal => "$count";
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Count;
 
         /// <inheritdoc />
         public override bool IsSingle => true;

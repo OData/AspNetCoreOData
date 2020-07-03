@@ -55,12 +55,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         public IEdmSingleton Singleton { get; }
 
         /// <summary>
-        /// 
+        /// Gets the related controller model in this context
+        /// We guarentee that this property should never be "null".
         /// </summary>
         public ControllerModel Controller { get; internal set; }
 
         /// <summary>
-        /// 
+        /// Gets the related action model in this context
+        /// We guarentee that this property should never be "null" when calling "AppliesToAction"
         /// </summary>
         public ActionModel Action { get; internal set; }
 

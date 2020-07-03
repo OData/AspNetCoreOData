@@ -33,18 +33,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 keyMappings[parameter.Name] = $"{{{parameter.Name}}}";
             }
 
-            Template = functionImport.Name + "(" + string.Join(",", keyMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+            Literal = functionImport.Name + "(" + string.Join(",", keyMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
 
             IsSingle = functionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <inheritdoc />
-        public override string Template { get; }
+        public override string Literal { get; }
 
         /// <summary>
         /// Gets the wrapped Edm function import.
         /// </summary>
         public IEdmFunctionImport FunctionImport { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.FunctionImport;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

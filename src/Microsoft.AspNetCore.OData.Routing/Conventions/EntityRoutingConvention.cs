@@ -14,6 +14,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// The convention for <see cref="IEdmEntitySet"/> with key.
     /// It supports key in parenthesis and key as segment if it's single key.
+    /// Conventions:
+    /// GET ~/entityset/key
+    /// GET ~/entityset/key/cast
+    /// PUT ~/entityset/key
+    /// PUT ~/entityset/key/cast
+    /// PATCH ~/entityset/key
+    /// PATCH ~/entityset/key/cast
+    /// DELETE ~/entityset/key
+    /// DELETE ~/entityset/key/cast
     /// </summary>
     public class EntityEndpointConvention : IODataControllerActionConvention
     {

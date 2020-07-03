@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="ODataPathTemplate"/>.
+    /// Represents a path template that could contains a list of <see cref="ODataSegmentTemplate"/>.
     /// </summary>
     public class ODataPathTemplate
     {
@@ -73,6 +73,124 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             {
                 KeyAsSegment = this.KeyAsSegment
             };
+        }
+
+        /// <summary>
+        /// Gets the all templates supported in this path.
+        /// </summary>
+        /// <returns>The supported templates.</returns>
+        public IList<string> GetTemplates()
+        {
+            bool canKeyAsSegment = CanKeyAsSegment();
+            bool canUnqualifiedCall = Segments.Any(s => s.Kind == ODataSegmentKind.Function || s.Kind == ODataSegmentKind.Action);
+
+            IList<string> templates = new List<string>();
+            templates.Add(GetTemplate(false, unqualifiedCall: false));
+
+            if (canKeyAsSegment)
+            {
+                templates.Add(GetTemplate(true, unqualifiedCall: false));
+            }
+
+            if (canUnqualifiedCall)
+            {
+                templates.Add(GetTemplate(false, unqualifiedCall: true));
+                if (canKeyAsSegment)
+                {
+                    templates.Add(GetTemplate(true, unqualifiedCall: true));
+                }
+            }
+
+            return templates;
+        }
+
+        private bool CanKeyAsSegment()
+        {
+            foreach (var segment in Segments)
+            {
+                if (segment.Kind != ODataSegmentKind.Key)
+                {
+                    continue;
+                }
+
+                // if existing a key segment with 1 key, we can support the whole path using key as segment
+                KeySegmentTemplate keySegment = (KeySegmentTemplate)segment;
+                if (keySegment.Count == 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyAsSegment"></param>
+        /// <param name="unqualifiedCall"></param>
+        /// <returns></returns>
+        private string GetTemplate(bool keyAsSegment, bool unqualifiedCall)
+        {
+            int index = 0;
+            StringBuilder sb = new StringBuilder();
+            foreach (var segment in Segments)
+            {
+                if (segment.Kind == ODataSegmentKind.Key)
+                {
+                    KeySegmentTemplate keySg = segment as KeySegmentTemplate;
+                    if (keyAsSegment && keySg.Count == 1)
+                    {
+                        sb.Append("/");
+                        sb.Append(segment.Literal);
+                    }
+                    else
+                    {
+                        sb.Append("(");
+                        sb.Append(segment.Literal);
+                        sb.Append(")");
+                    }
+                }
+                else
+                {
+                    if (index != 0)
+                    {
+                        sb.Append("/");
+                        index++;
+                    }
+
+                    if (segment.Kind == ODataSegmentKind.Function)
+                    {
+                        FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
+                        if (unqualifiedCall)
+                        {
+                            sb.Append(function.UnqualifiedIdentifier);
+                        }
+                        else
+                        {
+                            sb.Append(function.Literal);
+                        }
+                    }
+                    else if (segment.Kind == ODataSegmentKind.Action)
+                    {
+                        ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
+                        if (unqualifiedCall)
+                        {
+                            sb.Append(action.Action.Name);
+                        }
+                        else
+                        {
+                            sb.Append(action.Action.FullName());
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(segment.Literal);
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -169,6 +287,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return null;
             }
 
+            NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
+            if (navigationPropertySegment != null)
+            {
+                return navigationPropertySegment.NavigationSource;
+            }
+
             throw new Exception("Not supported segment in endpoint routing convention!");
         }
 
@@ -201,12 +325,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     if (KeyAsSegment)
                     {
                         sb.Append("/");
-                        sb.Append(segment.Template);
+                        sb.Append(segment.Literal);
                     }
                     else
                     {
                         sb.Append("(");
-                        sb.Append(segment.Template);
+                        sb.Append(segment.Literal);
                         sb.Append(")");
                     }
                 }
@@ -216,7 +340,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     {
                         sb.Append("/");
                     }
-                    sb.Append(segment.Template);
+                    sb.Append(segment.Literal);
                     index++;
                 }
             }

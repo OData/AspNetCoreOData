@@ -26,12 +26,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => Property.Name;
+        public override string Literal => Property.Name;
 
         /// <summary>
         /// Gets the wrapped Edm property.
         /// </summary>
         public IEdmStructuralProperty Property { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Property;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

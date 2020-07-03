@@ -25,13 +25,34 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             IsSingle = !navigation.Type.IsCollection();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NavigationSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="navigation">The Edm navigation property.</param>
+        /// <param name="targetNavigationSource">The target navigation source.</param>
+        public NavigationSegmentTemplate(IEdmNavigationProperty navigation, IEdmNavigationSource targetNavigationSource)
+        {
+            Navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            TargetNavigationSource = targetNavigationSource ?? throw new ArgumentNullException(nameof(targetNavigationSource));
+
+            IsSingle = !navigation.Type.IsCollection();
+        }
+
         /// <inheritdoc />
-        public override string Template => Navigation.Name;
+        public override string Literal => Navigation.Name;
 
         /// <summary>
         /// Gets the wrapped navigation property.
         /// </summary>
         public IEdmNavigationProperty Navigation { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Navigation;
+
+        /// <summary>
+        /// Gets the wrapped navigation property.
+        /// </summary>
+        public IEdmNavigationSource TargetNavigationSource { get; }
 
         /// <inheritdoc />
         public override bool IsSingle { get; }
@@ -40,8 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,
             RouteValueDictionary routeValue, QueryString queryString)
         {
-            // TODO: calculate the target
-            return new NavigationPropertySegment(Navigation, previous);
+            return new NavigationPropertySegment(Navigation, TargetNavigationSource);
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for <see cref="IEdmSingleton"/>.
+    /// The Conventions:
+    /// Get|Put|Patch ~/singleton
+    /// Get|Put|Patch ~/singleton/cast
     /// </summary>
     public class SingletonRoutingConvention : IODataControllerActionConvention
     {

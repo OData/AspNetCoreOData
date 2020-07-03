@@ -25,7 +25,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => "$ref";
+        public override string Literal => "$ref";
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.Ref;
 
         /// <summary>
         /// Gets the wrapped navigation property.

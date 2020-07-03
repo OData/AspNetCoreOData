@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.OData;
-using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Edm;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Parser
 {
     /// <summary>
-    /// Parse the OData routing template
+    /// Exposes the ability to parse an OData path template as an <see cref="ODataPathTemplate"/>.
     /// </summary>
     public class DefaultODataPathTemplateParser : IODataPathTemplateParser
     {
@@ -55,10 +54,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Parse the string like "/users/{id | userPrincipalName}/contactFolders/{contactFolderId}/contacts"
+        /// Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
         /// to segments
         /// </summary>
-        /// <param name="model">the IEdm model.</param>
+        /// <param name="model">the Edm model.</param>
         /// <param name="odataPath">the setting.</param>
         /// <returns>Null or <see cref="UriParser"/>.</returns>
         public virtual ODataPathTemplate Parse(IEdmModel model, string odataPath)
@@ -69,7 +68,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             }
 
             // TODO: process the one-drive uri escape function call
-
             string[] items = odataPath.Split('/');
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
             foreach (var item in items)
@@ -160,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 return;
             }
 
-            throw new Exception($"Unknown kind of segment: '{identifier}', previous segment: '{path.Last().Template}'.");
+            throw new Exception($"Unknown kind of segment: '{identifier}', previous segment: '{path.Last().Literal}'.");
         }
 
         /// <summary>

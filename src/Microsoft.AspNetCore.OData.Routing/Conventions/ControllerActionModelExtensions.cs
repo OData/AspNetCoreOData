@@ -150,17 +150,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="action"></param>
         /// <param name="prefix"></param>
         /// <param name="model"></param>
-        /// <param name="template"></param>
-        public static void AddSelector(this ActionModel action, string prefix, IEdmModel model, ODataPathTemplate template)
+        /// <param name="path"></param>
+        public static void AddSelector(this ActionModel action,
+            string prefix, IEdmModel model, ODataPathTemplate path)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
-            }
-
-            if (prefix == null)
-            {
-                throw new ArgumentNullException(nameof(prefix));
             }
 
             if (model == null)
@@ -168,22 +164,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(model));
             }
 
-            if (template == null)
+            if (path == null)
             {
-                throw new ArgumentNullException(nameof(template));
+                throw new ArgumentNullException(nameof(path));
             }
 
-            SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-            if (selectorModel == null)
+            foreach (var template in path.GetTemplates())
             {
-                selectorModel = new SelectorModel();
-                action.Selectors.Add(selectorModel);
+                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
+                if (selectorModel == null)
+                {
+                    selectorModel = new SelectorModel();
+                    action.Selectors.Add(selectorModel);
+                }
+
+                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
+                selectorModel.EndpointMetadata.Add(new ODataEndpointMetadata(prefix, model, path));
             }
-
-            string templateStr = string.IsNullOrEmpty(prefix) ? template.Template : $"{prefix}/{template.Template}";
-
-            selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-            selectorModel.EndpointMetadata.Add(new ODataEndpointMetadata(prefix, model, template));
         }
     }
 }

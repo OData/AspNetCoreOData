@@ -168,14 +168,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Edm
 
 
         public static IEdmNavigationSource FindNavigationTarget(this IEdmNavigationSource navigationSource,
-            IEdmNavigationProperty navigationProperty, IList<ODataSegmentTemplate> parsedSegments, out IEdmPathExpression bindingPath)
+            IEdmNavigationProperty navigationProperty,
+            IList<ODataSegmentTemplate> parsedSegments,
+            out IEdmPathExpression bindingPath)
         {
             bindingPath = null;
 
             if (navigationProperty.ContainsTarget)
             {
                 return navigationSource;
-                // return navigationSource.FindNavigationTarget(navigationProperty);
             }
 
             IEnumerable<IEdmNavigationPropertyBinding> bindings =
@@ -370,6 +371,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Edm
             }
 
             return ((IEdmComplexType)type).Name;
+        }
+
+        public static IEdmTypeReference ElementType(this IEdmTypeReference typeReference)
+        {
+            if (typeReference.TypeKind() == EdmTypeKind.Collection)
+            {
+                IEdmCollectionTypeReference collectType = typeReference.AsCollection();
+                return collectType.ElementType();
+            }
+
+            return typeReference;
         }
     }
 }

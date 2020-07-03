@@ -24,12 +24,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <inheritdoc />
-        public override string Template => EntitySet.Name;
+        public override string Literal => EntitySet.Name;
 
         /// <summary>
         /// Gets the wrapped entity set.
         /// </summary>
         public IEdmEntitySet EntitySet { get; }
+
+        /// <inheritdoc />
+        public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
 
         /// <inheritdoc />
         public override bool IsSingle => false;

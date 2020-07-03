@@ -169,6 +169,26 @@
             Gets or Sets a value indicating if batch requests should continue on error.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder">
+            <summary>
+            Contains the details of a given OData request. These properties should all be mutable.
+            None of these properties should ever be set to null.
+            </summary>
+            <summary>
+            Provides programmatic configuration for the OData service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder.#ctor(Microsoft.AspNetCore.OData.Abstracts.ODataOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder" /> class.
+            </summary>
+            <param name="options"> The options to be configured. </param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder.Options">
+            <summary>
+            Gets the options being configured.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions">
             <summary>
             Provides extension methods to add odata services.
@@ -182,6 +202,14 @@
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Abstracts.ODataOptions})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder})">
             <summary>
             
             </summary>

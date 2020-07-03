@@ -6,6 +6,82 @@ using System.Threading.Tasks;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public enum ODataSegmentKind
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        Metadata,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        EntitySet,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Singleton,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Key,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Cast,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Property,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Navigation,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Function,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Action,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        FunctionImport,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ActionImport,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Value,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Ref,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Count,
+    }
+
+    /// <summary>
     /// Provides the values of segment kinds for implementations of <see cref="ODataPathSegment" />.
     /// </summary>
     public static class ODataSegmentKinds

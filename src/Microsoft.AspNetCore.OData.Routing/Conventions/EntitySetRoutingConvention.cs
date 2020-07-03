@@ -13,6 +13,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for <see cref="IEdmEntitySet"/>.
+    /// Conventions:
+    /// GET ~/entityset
+    /// GET ~/entityset/$count
+    /// GET ~/entityset/cast
+    /// GET ~/entityset/cast/$count
+    /// POST ~/entityset
+    /// POST ~/entityset/cast
     /// </summary>
     public class EntitySetEndpointConvention : IODataControllerActionConvention
     {
