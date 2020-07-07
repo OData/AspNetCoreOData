@@ -3,6 +3,8 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Formatting.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -13,6 +15,9 @@ namespace Microsoft.AspNetCore.OData.Formatting.Deserialization
     /// </summary>
     public class ODataDeserializerContext
     {
+        private bool? _isDeltaOfT;
+        private bool? _isUntyped;
+
         /// <summary>
         /// Gets or sets the type of the top-level object the request needs to be deserialized into.
         /// </summary>
@@ -37,5 +42,42 @@ namespace Microsoft.AspNetCore.OData.Formatting.Deserialization
         /// Gets or sets the HTTP Request whose response is being serialized.
         /// </summary>
         public HttpRequest Request { get; set; }
+
+        internal bool IsDeltaOfT
+        {
+            get
+            {
+                if (!_isDeltaOfT.HasValue)
+                {
+                    _isDeltaOfT = ResourceType != null && TypeHelper.IsGenericType(ResourceType) && ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
+                }
+
+                return _isDeltaOfT.Value;
+            }
+        }
+
+        internal bool IsUntyped
+        {
+            get
+            {
+                if (!_isUntyped.HasValue)
+                {
+                    _isUntyped = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
+                        typeof(ODataUntypedActionParameters) == ResourceType;
+                }
+
+                return _isUntyped.Value;
+            }
+        }
+
+        internal IEdmTypeReference GetEdmType(Type type)
+        {
+            if (ResourceEdmType != null)
+            {
+                return ResourceEdmType;
+            }
+
+            return EdmLibHelper.GetExpectedPayloadType(type, Path, Model);
+        }
     }
 }

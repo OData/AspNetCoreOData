@@ -4,6 +4,74 @@
         <name>Microsoft.AspNetCore.OData.Formatting</name>
     </assembly>
     <members>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ClrTypeCache">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider">
+            <summary>
+            The default <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider"/> class.
+            </summary>
+            <param name="rootContainer">The root container.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc />
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataActionPayloadDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> for reading OData action parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataActionPayloadDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataActionPayloadDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataActionPayloadDeserializer.DeserializerProvider">
+            <summary>
+            Gets the deserializer provider to use to read inner objects.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataActionPayloadDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can read OData collection payloads.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataCollectionDeserializer.ReadCollectionValue(Microsoft.OData.ODataCollectionValue,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="collectionValue"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="collectionValue">The <see cref="T:Microsoft.OData.ODataCollectionValue"/> to deserialize.</param>
+            <param name="elementType">The element type of the collection to read.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The deserialized collection.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer">
             <summary>
             An <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> is used to read an ODataMessage into a CLR object.
@@ -77,6 +145,217 @@
             <param name="request">The request being deserialized.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer"/> for the given EDM type.
+            </summary>
+            <param name="edmType">The EDM type.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer">
+            <summary>
+            Base class for all <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer" />s that deserialize into an object backed by <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer.#ctor(Microsoft.OData.ODataPayloadKind)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer"/> class.
+            </summary>
+            <param name="payloadKind">The kind of OData payload that this deserializer reads.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer.#ctor(Microsoft.OData.ODataPayloadKind,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer"/> class.
+            </summary>
+            <param name="payloadKind">The kind of OData payload this deserializer handles.</param>
+            <param name="deserializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer.DeserializerProvider">
+            <summary>
+            The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider"/> to use for deserializing inner items.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEdmTypeDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
+            </summary>
+            <param name="item">The item to deserialize.</param>
+            <param name="edmType">The EDM type of the object to read into.</param>
+            <param name="readContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext"/>.</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEntityReferenceLinkDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can read OData entity reference link payloads.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEntityReferenceLinkDeserializer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEntityReferenceLinkDeserializer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEntityReferenceLinkDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEnumDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can read OData enum types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEnumDeserializer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEnumDeserializer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEnumDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataEnumDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can read OData primitve types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataPrimitiveDeserializer.ReadPrimitive(Microsoft.OData.ODataProperty,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the primitive from the given <paramref name="primitiveProperty"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="primitiveProperty">The primitive property to deserialize.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The deserialized OData primitive value.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> for reading OData resource payloads.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ReadResource(Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="resourceWrapper"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="resourceWrapper">The OData resource to deserialize.</param>
+            <param name="structuredType">The type of the resource to deserialize.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The deserialized resource.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.CreateResourceInstance(Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Creates a new instance of the backing CLR object for the given resource type.
+            </summary>
+            <param name="structuredType">The EDM type of the resource to create.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created CLR object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ApplyNestedProperties(System.Object,Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the nested properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the nested properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the nested properties.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ApplyNestedProperty(System.Object,Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the nested property from <paramref name="resourceInfoWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the nested property should be read.</param>
+            <param name="resourceInfoWrapper">The nested resource info.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ApplyStructuralProperties(System.Object,Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the structural properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the structural properties.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceDeserializer.ApplyStructuralProperty(System.Object,Microsoft.OData.ODataProperty,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="structuralProperty"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the structural property should be read.</param>
+            <param name="structuralProperty">The structural property.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializer"/> that can read OData resource sets.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataResourceSetDeserializer.ReadResourceSet(Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="resourceSet"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="resourceSet">The resource set to deserialize.</param>
+            <param name="readContext">The deserializer context.</param>
+            <param name="elementType">The element type of the resource set being read.</param>
+            <returns>The deserialized resource set object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.EdmLibHelper.GetExpectedPayloadType(System.Type,Microsoft.OData.UriParser.ODataPath,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Get the expected payload type of an OData path.
+            </summary>
+            <param name="type">The Type to use.</param>
+            <param name="path">The path to use.</param>
+            <param name="model">The EdmModel to use.</param>
+            <returns>The expected payload type of an OData path.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.EdmLibHelper.GetTypeMappingCache(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.EdmLibHelper.TryGetInnerTypeForDelta(System.Type@)">
+            <summary>
+            Try to return the inner type of a generic Delta.
+            </summary>
+            <param name="type">in: The type to test; out: inner type of a generic Delta.</param>
+            <returns>True if the type was generic Delta; false otherwise.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Error">
             <summary>
@@ -556,6 +835,26 @@
               Looks up a localized string similar to The argument must be of type &apos;{0}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotAddToNullCollection">
+            <summary>
+              Looks up a localized string similar to The property &apos;{0}&apos; on type &apos;{1}&apos; returned a null value. The input stream contains collection items which cannot be added if the instance is null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotDeserializeUnknownProperty">
+            <summary>
+              Looks up a localized string similar to The property &apos;{0}&apos; does not exist on type &apos;{1}&apos;. Make sure to only use property names that are defined by the type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotInstantiateAbstractResourceType">
+            <summary>
+              Looks up a localized string similar to An instance of the abstract resource type &apos;{0}&apos; was found. Abstract resource types cannot be instantiated..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotPatchNavigationProperties">
+            <summary>
+              Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotSetDynamicPropertyDictionary">
             <summary>
               Looks up a localized string similar to The dynamic dictionary property &apos;{0}&apos; of type &apos;{1}&apos; cannot be set. The dynamic property dictionary must have a setter..
@@ -564,6 +863,21 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotWriteType">
             <summary>
               Looks up a localized string similar to {0} cannot write an object of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CollectionParameterShouldHaveAddMethod">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; does not have an Add method. Consider using a collection type that does have an Add method - for example IList&lt;T&gt; or ICollection&lt;T&gt;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CollectionShouldHaveAddMethod">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of the property &apos;{1}&apos; on type &apos;{2}&apos; does not have an Add method. Consider using a collection type that does have an Add method - for example IList&lt;T&gt; or ICollection&lt;T&gt;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CollectionShouldHaveClearMethod">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of the property &apos;{1}&apos; on type &apos;{2}&apos; does not have a Clear method. Consider using a collection type that does have a Clear method, such as IList&lt;T&gt; or ICollection&lt;T&gt;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CreateODataValueNotSupported">
@@ -591,6 +905,66 @@
               Looks up a localized string similar to &apos;{0}&apos; does not support Read..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DoesNotSupportReadInLine">
+            <summary>
+              Looks up a localized string similar to Type &apos;{0}&apos; does not support ReadInline..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DuplicateDynamicPropertyNameFound">
+            <summary>
+              Looks up a localized string similar to Duplicate dynamic property name &apos;{0}&apos; found in open type &apos;{1}&apos;. Each dynamic property name must be unique..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DynamicResourceSetTypeNameIsRequired">
+            <summary>
+              Looks up a localized string similar to The type name of the dynamic resource set &apos;{0}&apos; is required and cannot be empty. Consider using a OData type annotation explicitly..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmTypeNotSupported">
+            <summary>
+              Looks up a localized string similar to {0} is not a supported EDM type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.GetOnlyCollectionCannotBeArray">
+            <summary>
+              Looks up a localized string similar to The value of the property &apos;{0}&apos; on type &apos;{1}&apos; is an array. Consider adding a setter for the property..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.InvalidODataUntypedValue">
+            <summary>
+              Looks up a localized string similar to The given untyped value &apos;{0}&apos; in payload is invalid. Consider using a OData type annotation explicitly..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.MappingDoesNotContainResourceType">
+            <summary>
+              Looks up a localized string similar to The provided mapping does not contain a resource for the resource type &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ModelMissingFromReadContext">
+            <summary>
+              Looks up a localized string similar to The EDM model is missing on the read context. The model is required on the read context to deserialize the payload..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.MultipleMatchingClrTypesForEdmType">
+            <summary>
+              Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.NavigationSourceMissingDuringDeserialization">
+            <summary>
+              Looks up a localized string similar to The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to deserialize the payload..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.NestedCollectionsNotSupported">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is a nested collection type. Nested collection types are not allowed..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.NestedPropertyNotfound">
+            <summary>
+              Looks up a localized string similar to Cannot find nested property &apos;{0}&apos; on the resource type &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.NullContainer">
             <summary>
               Looks up a localized string similar to The container built by the container builder must not be null..
@@ -601,14 +975,84 @@
               Looks up a localized string similar to Collections cannot contain null elements..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ODataPathMissing">
+            <summary>
+              Looks up a localized string similar to The operation cannot be completed because no ODataPath is available for the request..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyIsNotCollection">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of the property &apos;{1}&apos; on type &apos;{2}&apos; must be a collection..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeBoolean">
+            <summary>
+              Looks up a localized string similar to The value must be a boolean..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeDateTimeOffsetOrDate">
+            <summary>
+              Looks up a localized string similar to The value must be a DateTimeOffset or Date..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeEnum">
+            <summary>
+              Looks up a localized string similar to The value with type &apos;{0}&apos; must have type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeString">
+            <summary>
+              Looks up a localized string similar to The value must be a string..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeStringLengthOne">
+            <summary>
+              Looks up a localized string similar to The value must be a string with a length of 1..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeStringMaxLengthOne">
+            <summary>
+              Looks up a localized string similar to The value must be a string with a maximum length of 1..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyMustBeTimeOfDay">
+            <summary>
+              Looks up a localized string similar to The value must be a Edm.TimeOfDay..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ReadFromStreamAsyncMustHaveRequest">
             <summary>
               Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.RequestNotActionInvocation">
+            <summary>
+              Looks up a localized string similar to The last segment of the request URI &apos;{0}&apos; was not recognized as an OData action..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ResourceTypeNotInModel">
+            <summary>
+              Looks up a localized string similar to Cannot find the resource type &apos;{0}&apos; in the model..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeCannotBeDeserialized">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeCannotBeSerialized">
             <summary>
               Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the ODataMediaTypeFormatter..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeMustBeEnumOrNullableEnum">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; must be an enum or Nullable&lt;T&gt; where T is an enum type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeMustBeResourceSet">
+            <summary>
+              Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.UnexpectedElementType">
@@ -1012,6 +1456,20 @@
             </summary>
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a generic type; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.IsNullable(System.Type)">
+            <summary>
+            Determine if a type is null-able.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is null-able; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.ToNullable(System.Type)">
+            <summary>
+            Return the type from a nullable type.
+            </summary>
+            <param name="clrType">The type to convert.</param>
+            <returns>The type from a nullable type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.IsCollection(System.Type)">
             <summary>
@@ -1845,6 +2303,117 @@
             </summary>
             <param name="type">The type to check.</param>
             <returns>True if it is a Delta generic type; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataEntityReferenceLinkBase">
+            <summary>
+            Encapuslates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataEntityReferenceLinkBase.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataEntityReferenceLinkBase"/>.
+            </summary>
+            <param name="item">The wrapped item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataEntityReferenceLinkBase.EntityReferenceLink">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataItemBase">
+            <summary>
+            Base class for all classes that wrap an <see cref="T:Microsoft.OData.ODataItem"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataItemBase.#ctor(Microsoft.OData.ODataItem)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataItemBase"/>.
+            </summary>
+            <param name="item">The wrapped item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataItemBase.Item">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataItem"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> and the list of nested items.
+            </summary>
+            <remarks>
+            A nested resource info for a singleton nested property can only contain one item - either ODataResource or ODataEntityReferenceLink.
+            A nested resource info for a collection nested property can contain any number of items - each is either ODataResource or ODataEntityReferenceLink.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper.#ctor(Microsoft.OData.ODataNestedResourceInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper"/>.
+            </summary>
+            <param name="item">The wrapped item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceInfo">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataNestedResourceInfoWrapper.NestedItems">
+            <summary>
+            Gets the nested items that are part of this nested resource info.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataReaderExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.OData.ODataReader"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSet(Microsoft.OData.ODataReader)">
+            <summary>
+            Reads a <see cref="T:Microsoft.OData.ODataResource"/> or <see cref="T:Microsoft.OData.ODataResourceSet"/> object.
+            </summary>
+            <param name="reader">The OData reader to read from.</param>
+            <returns>The read resource or resource set.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSet"/> and the <see cref="T:Microsoft.OData.ODataResource"/>'s that are part of it.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper.#ctor(Microsoft.OData.ODataResourceSet)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper"/>.
+            </summary>
+            <param name="item">The wrapped item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper.ResourceSet">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataResourceSet"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceSetWrapper.Resources">
+            <summary>
+            Gets the nested resources of this ResourceSet.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/> and the inner nested resource infos.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResource)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper"/>.
+            </summary>
+            <param name="item">The wrapped item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper.Resource">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataResource"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataResourceWrapper.NestedResourceInfos">
+            <summary>
+            Gets the inner nested resource infos.
+            </summary>
         </member>
     </members>
 </doc>

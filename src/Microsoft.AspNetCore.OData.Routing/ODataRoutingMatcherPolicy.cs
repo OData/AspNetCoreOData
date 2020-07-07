@@ -12,31 +12,32 @@ using Microsoft.AspNetCore.Routing.Matching;
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
-    /// 
+    /// Defines a policy that applies behaviors to the OData Uri matcher.
     /// </summary>
     internal class ODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     {
         /// <summary>
-        /// 
+        /// Gets a value that determines the order of this policy.
         /// </summary>
         public override int Order => 1000 - 102;
 
         /// <summary>
-        /// 
+        /// Returns a value that indicates whether the matcher applies to any endpoint in endpoints.
         /// </summary>
-        /// <param name="endpoints"></param>
-        /// <returns></returns>
+        /// <param name="endpoints">The set of candidate values.</param>
+        /// <returns>true if the policy applies to any endpoint in endpoints, otherwise false.</returns>
         public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints)
         {
+            // Let's apply this matcher policy to all the endpoints.
             return true;
         }
 
         /// <summary>
-        /// 
+        /// Applies the policy to the CandidateSet.
         /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="candidates"></param>
-        /// <returns></returns>
+        /// <param name="httpContext">The context associated with the current request.</param>
+        /// <param name="candidates">The CandidateSet.</param>
+        /// <returns>The task.</returns>
         public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
         {
             // The goal of this method is to perform the final matching:
@@ -67,12 +68,10 @@ namespace Microsoft.AspNetCore.OData.Routing
                     odata.Path = oPath;
 
                     //candidates.SetValidity(i, true); // Double confirm whether it's required or not?
-                    continue;
                 }
                 else
                 {
                     candidates.SetValidity(i, false);
-                    continue;
                 }
             }
 

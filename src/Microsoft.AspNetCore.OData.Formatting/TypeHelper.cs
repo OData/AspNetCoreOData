@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Abstracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -69,6 +71,42 @@ namespace Microsoft.AspNetCore.OData.Formatting
         }
 
         /// <summary>
+        /// Determine if a type is null-able.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is null-able; false otherwise.</returns>
+        public static bool IsNullable(Type clrType)
+        {
+            if (TypeHelper.IsValueType(clrType))
+            {
+                // value types are only nullable if they are Nullable<T>
+                return TypeHelper.IsGenericType(clrType) && clrType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            }
+            else
+            {
+                // reference types are always nullable
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Return the type from a nullable type.
+        /// </summary>
+        /// <param name="clrType">The type to convert.</param>
+        /// <returns>The type from a nullable type.</returns>
+        public static Type ToNullable(Type clrType)
+        {
+            if (TypeHelper.IsNullable(clrType))
+            {
+                return clrType;
+            }
+            else
+            {
+                return typeof(Nullable<>).MakeGenericType(clrType);
+            }
+        }
+
+        /// <summary>
         /// Determine if a type is a collection.
         /// </summary>
         /// <param name="clrType">The type to test.</param>
@@ -114,6 +152,50 @@ namespace Microsoft.AspNetCore.OData.Formatting
             }
 
             return false;
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
+        // This code is copied from DefaultHttpControllerTypeResolver.GetControllerTypes.
+        internal static IEnumerable<Type> GetLoadedTypes(IAssemblyResolver assembliesResolver)
+        {
+            List<Type> result = new List<Type>();
+
+            if (assembliesResolver == null)
+            {
+                return result;
+            }
+
+            // Go through all assemblies referenced by the application and search for types matching a predicate
+            IEnumerable<Assembly> assemblies = assembliesResolver.Assemblies;
+            foreach (Assembly assembly in assemblies)
+            {
+                Type[] exportedTypes = null;
+                if (assembly == null || assembly.IsDynamic)
+                {
+                    // can't call GetTypes on a null (or dynamic?) assembly
+                    continue;
+                }
+
+                try
+                {
+                    exportedTypes = assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    exportedTypes = ex.Types;
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (exportedTypes != null)
+                {
+                    result.AddRange(exportedTypes.Where(t => t != null && t.IsVisible));
+                }
+            }
+
+            return result;
         }
 
         internal static Type GetTaskInnerTypeOrSelf(Type type)

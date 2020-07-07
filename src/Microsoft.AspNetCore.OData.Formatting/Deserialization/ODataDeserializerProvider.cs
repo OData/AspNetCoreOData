@@ -26,6 +26,6 @@ namespace Microsoft.AspNetCore.OData.Formatting.Deserialization
         /// </summary>
         /// <param name="edmType">The EDM type.</param>
         /// <returns>An <see cref="ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
-        //public abstract ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType);
+        public abstract ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType);
     }
 }

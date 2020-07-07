@@ -52,40 +52,6 @@ namespace Microsoft.AspNetCore.OData.Formatting
         }
 
         /// <summary>
-        /// Creates an <see cref="ArgumentException"/> with a message saying that the argument must be an "http" or "https" URI.
-        /// </summary>
-        /// <param name="parameterName">The name of the parameter that caused the current exception.</param>
-        /// <param name="actualValue">The value of the argument that causes this exception.</param>
-        /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentException ArgumentUriNotHttpOrHttpsScheme(string parameterName, Uri actualValue)
-        //{
-        //    return new ArgumentException(Error.Format(CommonWebApiResources.ArgumentInvalidHttpUriScheme, actualValue, HttpScheme, HttpsScheme), parameterName);
-        //}
-
-        /// <summary>
-        /// Creates an <see cref="ArgumentException"/> with a message saying that the argument must be an absolute URI.
-        /// </summary>
-        /// <param name="parameterName">The name of the parameter that caused the current exception.</param>
-        /// <param name="actualValue">The value of the argument that causes this exception.</param>
-        /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentException ArgumentUriNotAbsolute(string parameterName, Uri actualValue)
-        //{
-        //    return new ArgumentException(Error.Format(CommonWebApiResources.ArgumentInvalidAbsoluteUri, actualValue), parameterName);
-        //}
-
-        /// <summary>
-        /// Creates an <see cref="ArgumentException"/> with a message saying that the argument must be an absolute URI 
-        /// without a query or fragment identifier and then logs it with <see cref="TraceLevel.Error"/>.
-        /// </summary>
-        /// <param name="parameterName">The name of the parameter that caused the current exception.</param>
-        /// <param name="actualValue">The value of the argument that causes this exception.</param>
-        /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentException ArgumentUriHasQueryOrFragment(string parameterName, Uri actualValue)
-        //{
-        //    return new ArgumentException(Error.Format(CommonWebApiResources.ArgumentUriHasQueryOrFragment, actualValue), parameterName);
-        //}
-
-        /// <summary>
         /// Creates an <see cref="ArgumentNullException"/> with the provided properties.
         /// </summary>
         /// <returns>The logged <see cref="Exception"/>.</returns>

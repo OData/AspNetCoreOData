@@ -11,11 +11,19 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
+    /// <summary>
+    /// Builds or modifies <see cref="ApplicationModel" /> for action discovery.
+    /// </summary>
     internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
         private readonly IODataControllerActionConvention[] _controllerActionConventions;
         private readonly ODataRoutingOptions _options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRoutingApplicationModelProvider" /> class.
+        /// </summary>
+        /// <param name="conventions">The registered OData routing conventions.</param>
+        /// <param name="options">The registered OData routing options.</param>
         public ODataRoutingApplicationModelProvider(
             IEnumerable<IODataControllerActionConvention> conventions,
             IOptions<ODataRoutingOptions> options)
@@ -32,8 +40,15 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
+        /// <summary>
+        /// Gets the order value for determining the order of execution of providers.
+        /// </summary>
         public int Order => 100;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
             //var conventions = _options.Value.Conventions.OrderBy(c => c.Order);
@@ -112,9 +127,13 @@ namespace Microsoft.AspNetCore.OData.Routing
             return new ODataControllerActionContext(prefix, model);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
         {
-            Console.WriteLine("OnProvidersExecuting");
+            // Nothing here.
         }
 
         private static bool CanApply(string prefix, ControllerModel controller)

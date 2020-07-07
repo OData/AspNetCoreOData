@@ -516,30 +516,59 @@
             Gets the OData URL path template that this action handles.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider">
+            <summary>
+            Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for action discovery.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider" /> class.
+            </summary>
+            <param name="conventions">The registered OData routing conventions.</param>
+            <param name="options">The registered OData routing options.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.Order">
+            <summary>
+            Gets the order value for determining the order of execution of providers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
             <summary>
             
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
+            <summary>
+            Defines a policy that applies behaviors to the OData Uri matcher.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy.Order">
             <summary>
-            
+            Gets a value that determines the order of this policy.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy.AppliesToEndpoints(System.Collections.Generic.IReadOnlyList{Microsoft.AspNetCore.Http.Endpoint})">
             <summary>
-            
+            Returns a value that indicates whether the matcher applies to any endpoint in endpoints.
             </summary>
-            <param name="endpoints"></param>
-            <returns></returns>
+            <param name="endpoints">The set of candidate values.</param>
+            <returns>true if the policy applies to any endpoint in endpoints, otherwise false.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy.ApplyAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.Matching.CandidateSet)">
             <summary>
-            
+            Applies the policy to the CandidateSet.
             </summary>
-            <param name="httpContext"></param>
-            <param name="candidates"></param>
-            <returns></returns>
+            <param name="httpContext">The context associated with the current request.</param>
+            <param name="candidates">The CandidateSet.</param>
+            <returns>The task.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptionsBuilder">
             <summary>
