@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -27,6 +28,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override string Literal => "$metadata";
+
+        /// <inheritdoc />
+        public override IEdmType EdmType => throw new NotSupportedException();
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Metadata;

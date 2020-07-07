@@ -28,6 +28,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override string Literal => Property.Name;
 
+        /// <inheritdoc />
+        public override IEdmType EdmType => Property.Type.Definition;
+
         /// <summary>
         /// Gets the wrapped Edm property.
         /// </summary>

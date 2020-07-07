@@ -23,10 +23,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         private CountSegmentTemplate()
         {
+            EdmType = EdmCoreModel.Instance.GetInt32(false).Definition;
         }
 
         /// <inheritdoc />
         public override string Literal => "$count";
+
+        /// <inheritdoc />
+        public override IEdmType EdmType { get; }
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Count;

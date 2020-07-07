@@ -36,11 +36,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             if (action.ReturnType != null)
             {
                 IsSingle = action.ReturnType.TypeKind() != EdmTypeKind.Collection;
+                EdmType = action.ReturnType.Definition;
             }
         }
 
         /// <inheritdoc />
         public override string Literal => Action.FullName();
+
+        /// <inheritdoc />
+        public override IEdmType EdmType { get; }
 
         /// <summary>
         /// Gets the wrapped Edm action.

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -22,6 +23,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the segment kind.
         /// </summary>
         public abstract ODataSegmentKind Kind { get; }
+
+        /// <summary>
+        /// Gets the Edm type of this segment.
+        /// </summary>
+        public abstract IEdmType EdmType { get; }
+
+        /// <summary>
+        /// Gets the target Navigation source of this segment.
+        /// </summary>
+        public virtual IEdmNavigationSource NavigationSource => throw new NotSupportedException();
 
         /// <summary>
         /// Gets a value indicating whether the output value is single value or collection value of this segment.

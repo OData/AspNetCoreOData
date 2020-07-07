@@ -41,6 +41,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override string Literal { get; }
 
+        /// <inheritdoc />
+        public override IEdmType EdmType => FunctionImport.Function.ReturnType.Definition;
+
         /// <summary>
         /// Gets the wrapped Edm function import.
         /// </summary>

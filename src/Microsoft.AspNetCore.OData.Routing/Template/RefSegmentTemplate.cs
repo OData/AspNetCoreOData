@@ -28,6 +28,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override string Literal => "$ref";
 
         /// <inheritdoc />
+        public override IEdmType EdmType => Navigation.Type.Definition;
+
+        /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Ref;
 
         /// <summary>

@@ -65,8 +65,44 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Count = keys.Length;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <param name="entityType"></param>
+        /// <param name="navigationSource"></param>
+        public KeySegmentTemplate(IDictionary<string, string> keys,
+            IEdmEntityType entityType, IEdmNavigationSource navigationSource)
+        {
+            if (keys == null)
+            {
+                throw new ArgumentNullException(nameof(keys));
+            }
+
+            EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
+            NavigationSource = navigationSource ?? throw new ArgumentNullException(nameof(navigationSource));
+
+            foreach (var key in keys)
+            {
+                string keyName = key.Key;
+                IEdmStructuralProperty keyProperty = entityType.Key().FirstOrDefault(k => k.Name == keyName);
+                if (keyProperty == null)
+                {
+                    throw new InvalidOperationException($"Cannot find '{keyName}' key in the '{entityType.FullName()}' type.");
+                }
+
+                _keyMappings[keyName] = (key.Value, keyProperty.Type);
+            }
+        }
+
         /// <inheritdoc />
         public override string Literal { get; }
+
+        /// <inheritdoc />
+        public override IEdmType EdmType => EntityType;
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the entity type declaring this key.

@@ -16,44 +16,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
     public class DefaultODataPathTemplateParser : IODataPathTemplateParser
     {
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="odataPath"></param>
-        /// <returns></returns>
-        public virtual ODataPathTemplate Parse111(IEdmModel model, string odataPath)
-        {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
-
-            if (odataPath == null)
-            {
-                throw new ArgumentNullException(nameof(odataPath));
-            }
-
-            List<ODataSegmentTemplate> pathSegments = new List<ODataSegmentTemplate>();
-            ODataSegmentTemplate pathSegment = null;
-            IEdmType previousEdmType = null;
-            foreach (string segment in ParseSegments(odataPath))
-            {
-                pathSegment = ParseNextSegment(model, pathSegment, previousEdmType, segment);
-
-                // If the Uri stops matching the model at any point, return null
-                if (pathSegment == null)
-                {
-                    return null;
-                }
-
-                pathSegments.Add(pathSegment);
-              //  previousEdmType = pathSegment.GetEdmType(previousEdmType);
-            }
-
-            return new ODataPathTemplate(pathSegments);
-        }
-
-        /// <summary>
         /// Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
         /// to segments
         /// </summary>
@@ -67,7 +29,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 return null;
             }
 
-            // TODO: process the one-drive uri escape function call
             string[] items = odataPath.Split('/');
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
             foreach (var item in items)
@@ -101,6 +62,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         internal static void CreateFirstSegment(string identifier, IEdmModel model,
             IList<ODataSegmentTemplate> path)
         {
+            if (identifier == "$metadata")
+            {
+                path.Add(MetadataSegmentTemplate.Instance);
+                return;
+            }
+
             // the identifier maybe include the key, for example: ~/users({id})
             identifier = identifier.ExtractParenthesis(out string parenthesisExpressions);
 
@@ -206,7 +173,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Try to bind the idenfier as operation import (function import or action import) segment,
+        /// Try to bind the identifier as operation import (function import or action import) segment,
         /// Append it into path.
         /// </summary>
         private static bool TryBindOperationImport(string identifier, string parenthesisExpressions,
@@ -251,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             {
                 return false;
             }
-            /*
+
             IEdmStructuredType structuredType = preSegment.EdmType as IEdmStructuredType;
             if (structuredType == null)
             {
@@ -269,18 +236,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             {
                 var navigationProperty = (IEdmNavigationProperty)property;
 
-                IEdmNavigationSource navigationSource = null;
-                if (preSegment.NavigationSource != null)
-                {
-                    IEdmPathExpression bindingPath;
-                    navigationSource = preSegment.NavigationSource.FindNavigationTarget(navigationProperty, path, out bindingPath);
-                }
+                //IEdmNavigationSource navigationSource = null;
+                //if (preSegment.NavigationSource != null)
+                //{
+                //    IEdmPathExpression bindingPath;
+                //    navigationSource = preSegment.NavigationSource.FindNavigationTarget(navigationProperty, path, out bindingPath);
+                //}
 
                 // Relationship between TargetMultiplicity and navigation property:
                 //  1) EdmMultiplicity.Many <=> collection navigation property
                 //  2) EdmMultiplicity.ZeroOrOne <=> nullable singleton navigation property
                 //  3) EdmMultiplicity.One <=> non-nullable singleton navigation property
-                segment = new NavigationSegmentTemplate(navigationProperty, navigationSource, identifier);
+                segment = new NavigationSegmentTemplate(navigationProperty/*, navigationSource, identifier*/);
             }
             else
             {
@@ -294,7 +261,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 throw new Exception($"Invalid '{parenthesisExpressions}' after property '{identifier}'.");
             }
 
-            TryBindKeySegment(parenthesisExpressions, path);*/
+            TryBindKeySegment(parenthesisExpressions, path);
             return true;
         }
 
@@ -313,7 +280,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             {
                 return false;
             }
-/*
+
             IEdmEntityType targetEntityType;
             if (!preSegment.EdmType.TryGetEntityType(out targetEntityType))
             {
@@ -358,7 +325,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 throw new Exception($"Invalid key parathesis '{parenthesisExpressions}'.");
             }
 
-            path.Add(new KeySegmentTemplate(retrievedkeys, targetEntityType, preSegment.NavigationSource));*/
+            path.Add(new KeySegmentTemplate(retrievedkeys, targetEntityType, preSegment.NavigationSource));
             return true;
         }
 
@@ -392,7 +359,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             {
                 return false;
             }
-            /*
+
             IEdmType previousEdmType = preSegment.EdmType;
             bool isNullable = false;
             if (previousEdmType.TypeKind == EdmTypeKind.Collection)
@@ -429,10 +396,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                     }
                 }
             }
-
-            TypeSegment typeCast = new TypeSegment(actualTypeOfTheTypeSegment, preSegment.EdmType, preSegment.NavigationSource, identifier);
+            
+            CastSegmentTemplate typeCast = new CastSegmentTemplate(actualTypeOfTheTypeSegment, preSegment.EdmType, preSegment.NavigationSource);
             path.Add(typeCast);
-            */
+
             TryBindKeySegment(parenthesisExpressions, path);
 
             return true;
@@ -451,14 +418,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 // bound operation cannot be the first segment.
                 return false;
             }
-            /*
+
             IEdmType bindingType = preSegment.EdmType;
 
             // operation
             parenthesisExpressions.ExtractKeyValuePairs(out IDictionary<string, string> parameters, out string remaining);
             IList<string> parameterNames = parameters == null ? null : parameters.Keys.ToList();
 
-            IEdmOperation operation = OperationHelper.ResolveOperations(identifier, parameterNames, bindingType, model, settings.EnableCaseInsensitive);
+            IEdmOperation operation = OperationHelper.ResolveOperations(identifier, parameterNames, bindingType, model, true);
             if (operation != null)
             {
                 IEdmEntitySetBase targetset = null;
@@ -468,7 +435,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                     targetset = operation.GetTargetEntitySet(source, model);
                 }
 
-                path.Add(new OperationSegmentTemplate(operation, targetset, identifier));
+                if (operation.IsFunction())
+                {
+                    path.Add(new FunctionSegmentTemplate((IEdmFunction)operation/*, targetset*/));
+                }
+                else
+                {
+                    path.Add(new ActionSegmentTemplate((IEdmAction)operation));
+                }
 
                 if (remaining != null && operation.IsFunction())
                 {
@@ -485,167 +459,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
                 return true;
             }
-            */
+
             return false;
         }
-
-        /// <summary>
-        /// Parses the OData path into segments.
-        /// </summary>
-        /// <param name="odataPath">The OData path.</param>
-        /// <returns>The segments of the OData path.</returns>
-        internal static IEnumerable<string> ParseSegments(string odataPath)
-        {
-            string[] segments = odataPath.Split('/');
-
-            foreach (string segment in segments)
-            {
-                int startIndex = 0;
-                int openParensIndex = 0;
-                bool insideParens = false;
-                for (int i = 0; i < segment.Length; i++)
-                {
-                    switch (segment[i])
-                    {
-                        case '(':
-                            openParensIndex = i;
-                            insideParens = true;
-                            break;
-                        case ')':
-                            if (insideParens)
-                            {
-                                if (openParensIndex > startIndex)
-                                {
-                                    yield return segment.Substring(startIndex, openParensIndex - startIndex);
-                                }
-                                if (i > openParensIndex + 1)
-                                {
-                                    // yield parentheses substring if there are any characters inside the parentheses
-                                    yield return segment.Substring(openParensIndex, (i + 1) - openParensIndex);
-                                }
-                                startIndex = i + 1;
-                                insideParens = false;
-                            }
-                            break;
-                    }
-                }
-
-                if (startIndex < segment.Length)
-                {
-                    yield return segment.Substring(startIndex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses the next OData path segment.
-        /// </summary>
-        /// <param name="model">The model to use for path parsing.</param>
-        /// <param name="previous">The previous path segment.</param>
-        /// <param name="previousEdmType">The EDM type of the OData path up to the previous segment.</param>
-        /// <param name="segment">The value of the segment to parse.</param>
-        /// <returns>A parsed representation of the segment.</returns>
-        protected virtual ODataSegmentTemplate ParseNextSegment(IEdmModel model,
-            ODataSegmentTemplate previous, IEdmType previousEdmType, string segment)
-        {
-            if (String.IsNullOrEmpty(segment))
-            {
-                throw new ArgumentNullException(nameof(segment));
-            }
-
-            if (previous == null)
-            {
-                // Parse first segment
-                return ParseFirstSegment(model, segment);
-            }
-            else
-            {
-                // Parse non-first segment
-                //if (previousEdmType == null)
-                //{
-                //    throw new ODataException(Error.Format(SRResources.InvalidPathSegment, segment, previous));
-                //}
-
-                //switch (previousEdmType.TypeKind)
-                //{
-                //    case EdmTypeKind.Collection:
-                //        return ParseAtCollection(model, previous, previousEdmType, segment);
-
-                //    case EdmTypeKind.Entity:
-                //        return ParseAtEntity(model, previous, previousEdmType, segment);
-
-                //    case EdmTypeKind.Complex:
-                //        return ParseAtComplex(model, previous, previousEdmType, segment);
-
-                //    case EdmTypeKind.Primitive:
-                //        return ParseAtPrimitiveProperty(model, previous, previousEdmType, segment);
-
-                //    default:
-                //        throw new ODataException(Error.Format(SRResources.InvalidPathSegment, segment, previous));
-                //}
-
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Parses the first OData segment following the service base URI.
-        /// </summary>
-        /// <param name="model">The model to use for path parsing.</param>
-        /// <param name="segment">The value of the segment to parse.</param>
-        /// <returns>A parsed representation of the segment.</returns>
-        protected virtual ODataSegmentTemplate ParseFirstSegment(IEdmModel model, string segment)
-        {
-            if (segment == "$metadata")
-            {
-                return MetadataSegmentTemplate.Instance;
-            }
-            //else if (segment == ODataSegmentKinds.Batch)
-            //{
-            //    return new BatchPathSegment();
-            //}
-
-            IEdmEntityContainer container = model.EntityContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            IEdmEntitySet entitySet = container.FindEntitySet(segment);
-            if (entitySet != null)
-            {
-                return new EntitySetSegmentTemplate(entitySet);
-            }
-
-            IEdmSingleton singleton = container.FindSingleton(segment);
-            if (singleton != null)
-            {
-                return new SingletonSegmentTemplate(singleton);
-            }
-
-            IEdmOperationImport[] operationImports = container.FindOperationImports(segment).ToArray();
-            if (operationImports.Length > 0)
-            {
-                if (operationImports.Length == 1)
-                {
-                    IEdmOperationImport operationImport = operationImports[0];
-                    if (operationImport.IsActionImport())
-                    {
-                        return new ActionImportSegmentTemplate((IEdmActionImport)operationImport);
-                    }
-                    else
-                    {
-                        return new FunctionImportSegmentTemplate((IEdmFunctionImport)operationImport);
-                    }
-                }
-
-                throw new InvalidOperationException($"Found mulitple operation import '{segment}' in one Edm container.");
-            }
-
-            // segment does not match the model
-            return null;
-        }
-
-
     }
 }

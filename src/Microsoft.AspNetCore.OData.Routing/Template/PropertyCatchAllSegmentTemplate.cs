@@ -30,6 +30,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override ODataSegmentKind Kind => ODataSegmentKind.Property;
 
         /// <inheritdoc />
+        public override IEdmType EdmType => throw new NotSupportedException();
+
+        /// <inheritdoc />
         public override bool IsSingle => throw new NotSupportedException();
 
         /// <summary>

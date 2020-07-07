@@ -41,6 +41,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override string Literal => Navigation.Name;
 
+        /// <inheritdoc />
+        public override IEdmType EdmType => Navigation.Type.Definition;
+
         /// <summary>
         /// Gets the wrapped navigation property.
         /// </summary>

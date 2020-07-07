@@ -26,6 +26,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override string Literal => EntitySet.Name;
 
+        /// <inheritdoc />
+        public override IEdmType EdmType => EntitySet.EntityType();
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource => EntitySet;
+
         /// <summary>
         /// Gets the wrapped entity set.
         /// </summary>

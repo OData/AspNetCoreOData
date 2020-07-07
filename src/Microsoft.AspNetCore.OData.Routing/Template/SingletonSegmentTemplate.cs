@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -25,6 +25,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override string Literal => Singleton.Name;
+
+        /// <inheritdoc />
+        public override IEdmType EdmType => Singleton.EntityType();
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource => Singleton;
 
         /// <summary>
         /// Gets the wrapped Edm singleton.

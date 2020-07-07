@@ -26,8 +26,35 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             IsSingle = castType.TypeKind != EdmTypeKind.Collection;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="castType"></param>
+        /// <param name="expectedType"></param>
+        /// <param name="navigationSource"></param>
+        public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
+        {
+            EdmType = castType ?? throw new ArgumentNullException(nameof(castType));
+            ExpectedType = expectedType ?? throw new ArgumentNullException(nameof(expectedType));
+            NavigationSource = navigationSource ?? throw new ArgumentNullException(nameof(navigationSource));
+
+            // TODO:
+            IsSingle = castType.TypeKind != EdmTypeKind.Collection;
+        }
+
         /// <inheritdoc />
         public override string Literal => CastType.FullTypeName();
+
+        /// <inheritdoc />
+        public override IEdmType EdmType { get; }
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
+
+        /// <summary>
+        /// Gets the expected type.
+        /// </summary>
+        public IEdmType ExpectedType { get; }
 
         /// <summary>
         /// Gets the actual structured type.

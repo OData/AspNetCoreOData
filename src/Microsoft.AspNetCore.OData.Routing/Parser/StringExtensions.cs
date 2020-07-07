@@ -33,12 +33,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             // => (abc)(efg)
             parenthesisExpressions = null;
 
-            int parenthesisStart = identifier.IndexOf('(');
+            int parenthesisStart = identifier.IndexOf('(', StringComparison.Ordinal);
             if (parenthesisStart >= 0)
             {
                 if (identifier[identifier.Length - 1] != ')')
                 {
-                    throw new Exception($"Invalid identifier {identifier}, cannot find the end character ')'");
+                    throw new Exception($"Invalid identifier {identifier}, cannot find the end ')' character.");
                 }
 
                 // split the string to grab the identifier and remove the parentheses
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
             // maybe with keys after function parameters
             // .... (...)(...)
-            int startIndex = input.IndexOf('(');
+            int startIndex = input.IndexOf('(', StringComparison.Ordinal);
             int endIndex = input.IndexOf(')', startIndex + 1);
             string parenthsis = input.Substring(startIndex + 1, endIndex - startIndex - 1);
 

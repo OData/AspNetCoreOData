@@ -25,11 +25,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             if (actionImport.Action.ReturnType != null)
             {
                 IsSingle = actionImport.Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
+
+                EdmType = actionImport.Action.ReturnType.Definition;
             }
         }
 
         /// <inheritdoc />
         public override string Literal => ActionImport.Name;
+
+        /// <inheritdoc />
+        public override IEdmType EdmType { get; }
 
         /// <summary>
         /// Gets the wrapped action import.
