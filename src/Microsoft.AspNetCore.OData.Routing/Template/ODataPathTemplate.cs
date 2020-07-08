@@ -156,8 +156,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     if (index != 0)
                     {
                         sb.Append("/");
-                        index++;
                     }
+                    index++;
 
                     if (segment.Kind == ODataSegmentKind.Function)
                     {

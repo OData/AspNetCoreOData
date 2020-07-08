@@ -40,6 +40,7 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<Order>("Orders");
 
             builder.Singleton<Order>("VipOrder");
+            builder.Singleton<Category>("Categories");
 
             var functionWithComplexTypeParameter = builder.EntityType<Order>().Function("CanMoveToAddress").Returns<bool>();
             functionWithComplexTypeParameter.Parameter<Address>("address");

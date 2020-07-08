@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             string templateStr = string.IsNullOrEmpty(prefix) ? routeTemplate : $"{prefix}/{routeTemplate}";
 
             selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-            selectorModel.EndpointMetadata.Add(new ODataEndpointMetadata(prefix, model, templateStr));
+            selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, templateStr));
 
             return true;
         }

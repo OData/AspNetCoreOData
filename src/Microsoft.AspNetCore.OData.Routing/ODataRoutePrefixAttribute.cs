@@ -29,6 +29,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <summary>
         /// Gets the OData URL path template that this action handles.
         /// </summary>
-        public string Prefix { get; private set; }
+        public string Prefix { get; }
     }
 }

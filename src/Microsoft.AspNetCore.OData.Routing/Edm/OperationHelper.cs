@@ -4,12 +4,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Edm
 {
     internal static class OperationHelper
     {
+        public static (IList<IEdmActionImport>, IList<IEdmFunctionImport>) Split(this IEnumerable<IEdmOperationImport> operationImports)
+        {
+            IList<IEdmActionImport> actions = new List<IEdmActionImport>();
+            IList<IEdmFunctionImport> functions = new List<IEdmFunctionImport>();
+            foreach (var import in operationImports)
+            {
+                if (import.IsActionImport())
+                {
+                    actions.Add((IEdmActionImport)import);
+                }
+                else
+                {
+                    functions.Add((IEdmFunctionImport)import);
+                }
+            }
+
+            return (actions, functions);
+        }
+
         public static string TargetName(this IEdmOperation operation)
         {
             if (operation.IsFunction())

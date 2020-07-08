@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// </returns>
         /// <remarks>
         /// The OData action convention should not put limitation on the action parameters.
-        /// That's, if an action has extra parameter that's no required for a certain convention,
+        /// That's, if an action has extra parameter that's not required for a certain convention,
         /// We consider this action is valid for this convention.
         /// For example, Entity convention requires the key(s) parameters, doesn't care about other parameters.
         /// </remarks>

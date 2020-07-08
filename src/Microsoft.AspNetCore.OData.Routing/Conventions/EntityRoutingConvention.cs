@@ -32,7 +32,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
-            return context?.EntitySet != null;
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            return context.EntitySet != null;
         }
 
         /// <inheritdoc />

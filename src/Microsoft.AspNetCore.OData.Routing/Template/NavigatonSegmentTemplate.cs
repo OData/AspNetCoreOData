@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationSegmentTemplate(IEdmNavigationProperty navigation, IEdmNavigationSource targetNavigationSource)
         {
             Navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            TargetNavigationSource = targetNavigationSource ?? throw new ArgumentNullException(nameof(targetNavigationSource));
+            TargetNavigationSource = targetNavigationSource;
 
             IsSingle = !navigation.Type.IsCollection();
         }

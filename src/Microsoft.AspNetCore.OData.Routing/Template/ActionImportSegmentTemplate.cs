@@ -17,8 +17,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionImportSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="actionImport">.</param>
-        public ActionImportSegmentTemplate(IEdmActionImport actionImport)
+        /// <param name="actionImport">The wrapper action import.</param>
+        /// <param name="navigationSource">The target navigation source. it could be null.</param>
+        public ActionImportSegmentTemplate(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
         {
             ActionImport = actionImport ?? throw new ArgumentNullException(nameof(actionImport));
 
@@ -28,6 +29,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
                 EdmType = actionImport.Action.ReturnType.Definition;
             }
+
+            NavigationSource = navigationSource;
         }
 
         /// <inheritdoc />
@@ -35,6 +38,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override IEdmType EdmType { get; }
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the wrapped action import.

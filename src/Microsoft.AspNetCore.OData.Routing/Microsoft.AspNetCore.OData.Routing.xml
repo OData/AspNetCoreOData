@@ -201,7 +201,7 @@
             </returns>
             <remarks>
             The OData action convention should not put limitation on the action parameters.
-            That's, if an action has extra parameter that's no required for a certain convention,
+            That's, if an action has extra parameter that's not required for a certain convention,
             We consider this action is valid for this convention.
             For example, Entity convention requires the key(s) parameters, doesn't care about other parameters.
             </remarks>
@@ -309,31 +309,19 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
             <summary>
-            
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmOperationImport"/>.
+            Get ~/functionimport(....)
+            Post ~/actionimport
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention.Order">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention.OperationImport">
-            <summary>
-            used for cache
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention">
             <summary>
@@ -446,11 +434,6 @@
             
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataEndpointMetadata">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataModelAttribute">
             <summary>
             The attribute to specify a controller to an Edm model using the model name.
@@ -474,7 +457,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteAttribute">
             <summary>
-            Represents an attribute that can be placed on an action of an ODataController to specify
+            Represents an attribute that can be placed on an action of an Controller to specify
             the OData URLs that the action handles.
             </summary>
         </member>
@@ -569,6 +552,55 @@
             <param name="httpContext">The context associated with the current request.</param>
             <param name="candidates">The CandidateSet.</param>
             <returns>The task.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata">
+            <summary>
+            Represents OData Endpoint metadata used during routing.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata"/> class.
+            </summary>
+            <param name="prefix">The prefix string.</param>
+            <param name="model">The Edm model.</param>
+            <param name="template">The Routing path template.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata"/> class.
+            </summary>
+            <param name="prefix">The prefix string.</param>
+            <param name="model">The Edm model.</param>
+            <param name="template">The Routing path template.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Prefix">
+            <summary>
+            Gets the prefix string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Model">
+            <summary>
+            Gets the Edm model.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.StrTemplate">
+            <summary>
+            Gets the template string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
+            <summary>
+            Gets the OData path template
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.GenerateODataPath(Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
+            <summary>
+            Generate the real <see cref="T:Microsoft.OData.UriParser.ODataPath"/> based on the template the route values.
+            </summary>
+            <param name="values">The route values.</param>
+            <param name="queryString">The query string.</param>
+            <returns>The built <see cref="T:Microsoft.OData.UriParser.ODataPath" />.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptionsBuilder">
             <summary>
@@ -774,16 +806,20 @@
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmActionImport"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmActionImport)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmActionImport,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate" /> class.
             </summary>
-            <param name="actionImport">.</param>
+            <param name="actionImport">The wrapper action import.</param>
+            <param name="navigationSource">The target navigation source. it could be null.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Literal">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.EdmType">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.NavigationSource">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImport">
@@ -954,17 +990,23 @@
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmFunctionImport"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunctionImport)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunctionImport,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate" /> class.
             </summary>
             <param name="functionImport">The Edm function import.</param>
+            <param name="navigationSource">The target navigation source, it could be null.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Literal">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.EdmType">
             <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.NavigationSource">
+            <summary>
+            Gets the target Navigation source of this segment.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.FunctionImport">
             <summary>

@@ -23,9 +23,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="FunctionImportSegmentTemplate" /> class.
         /// </summary>
         /// <param name="functionImport">The Edm function import.</param>
-        public FunctionImportSegmentTemplate(IEdmFunctionImport functionImport)
+        /// <param name="navigationSource">The target navigation source, it could be null.</param>
+        public FunctionImportSegmentTemplate(IEdmFunctionImport functionImport, IEdmNavigationSource navigationSource)
         {
             FunctionImport = functionImport ?? throw new ArgumentNullException(nameof(functionImport));
+            NavigationSource = navigationSource;
 
             IDictionary<string, string> keyMappings = new Dictionary<string, string>();
             foreach (var parameter in functionImport.Function.Parameters)
@@ -43,6 +45,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override IEdmType EdmType => FunctionImport.Function.ReturnType.Definition;
+
+        /// <summary>
+        /// Gets the target Navigation source of this segment.
+        /// </summary>
+        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the wrapped Edm function import.

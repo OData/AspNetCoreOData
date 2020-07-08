@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                var oDataMetadata = candidate.Endpoint.Metadata.OfType<ODataEndpointMetadata>().FirstOrDefault();
+                var oDataMetadata = candidate.Endpoint.Metadata.OfType<ODataRoutingMetadata>().FirstOrDefault();
                 if (oDataMetadata == null)
                 {
                     continue;
@@ -67,7 +67,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                     odata.Model = oDataMetadata.Model;
                     odata.Path = oPath;
 
-                    //candidates.SetValidity(i, true); // Double confirm whether it's required or not?
+                    // Double confirm whether it's required or not?
+                    //candidates.SetValidity(i, true); 
                 }
                 else
                 {
