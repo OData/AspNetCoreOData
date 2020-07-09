@@ -467,6 +467,234 @@
             <param name="path"></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions.GetPathString(System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
+            <summary>
+            
+            </summary>
+            <param name="segments"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler">
+            <summary>
+            A handler used to calculate some values based on the odata path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.NavigationSource">
+            <summary>
+            Gets the path navigation source.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.PathTemplate">
+            <summary>
+            Gets the path template.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.PathLiteral">
+            <summary>
+            Gets the path literal.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.EntitySetSegment)">
+            <summary>
+            Handle a EntitySetSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.KeySegment)">
+            <summary>
+            Handle a KeySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
+            <summary>
+            Handle a NavigationPropertyLinkSegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.NavigationPropertySegment)">
+            <summary>
+            Handle a NavigationPropertySegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.DynamicPathSegment)">
+            <summary>
+            Handle a OpenPropertySegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Handle a OperationImportSegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.OperationSegment)">
+            <summary>
+            Handle an OperationSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.PathTemplateSegment)">
+            <summary>
+            Handle a PropertySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.PropertySegment)">
+            <summary>
+            Handle a PropertySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.SingletonSegment)">
+            <summary>
+            Handle a SingletonSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.TypeSegment)">
+            <summary>
+            Handle a TypeSegment, we use "cast" for type segment.
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.ValueSegment)">
+            <summary>
+            Handle a ValueSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.CountSegment)">
+            <summary>
+            Handle a CountSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.BatchSegment)">
+            <summary>
+            Handle a BatchSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.MetadataSegment)">
+            <summary>
+            Handle a MetadataSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.ODataPathSegment)">
+            <summary>
+            Handle a general path segment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds">
+            <summary>
+            Provides the values of segment kinds for implementations of odata path template.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.ServiceBase">
+            <summary>
+            Represents the service root segment (for OData service document).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Batch">
+            <summary>
+            Represents the OData $batch segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Ref">
+            <summary>
+            Represents the OData $ref segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Metadata">
+            <summary>
+            Represents the OData $metadata segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Value">
+            <summary>
+            Represents the OData $value segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Count">
+            <summary>
+            Represents the OData $count segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Action">
+            <summary>
+            Represents a segment indicating a bound OData action.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Function">
+            <summary>
+            Represents a segment indicating a bound OData function.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.UnboundAction">
+            <summary>
+            Represents a segment indicating an unbound OData action.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.UnboundFunction">
+            <summary>
+            Represents a segment indicating an unbound OData function.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Cast">
+            <summary>
+            Represents a segment indicating a type cast.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.EntitySet">
+            <summary>
+            Represents a segment indicating an entity set.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Singleton">
+            <summary>
+            Represents a segment indicating a singleton.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Key">
+            <summary>
+            Represents a segment indicating an index by key operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Navigation">
+            <summary>
+            Represents a segment indicating a navigation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.PathTemplate">
+            <summary>
+            Represents a segment indicating a navigation link.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Property">
+            <summary>
+            Represents a segment indicating a property access.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.DynamicProperty">
+            <summary>
+            Represents a segment indicating an dynamic property access.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataSegmentKinds.Unresolved">
+            <summary>
+            Represents a segment that is not understood.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions">
             <summary>
             Provides extension methods to add odata services.

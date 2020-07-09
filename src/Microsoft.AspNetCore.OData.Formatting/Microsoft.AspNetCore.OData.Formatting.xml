@@ -1529,6 +1529,13 @@
             
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.String,Microsoft.OData.UriParser.ODataPathSegment[])">
+            <summary>
+            
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Mvc.IUrlHelper,Microsoft.OData.UriParser.ODataPathSegment[])">
             <summary>
             Generates an OData link using the request's OData route name and path handler and given segments.

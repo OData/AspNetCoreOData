@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatting.MediaType;
 using Microsoft.AspNetCore.OData.Formatting.Serialization;
 using Microsoft.AspNetCore.OData.Formatting.Value;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -288,6 +289,20 @@ namespace Microsoft.AspNetCore.OData.Formatting
             if (request == null)
             {
                 throw Error.ArgumentNull("request");
+            }
+
+            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+            if (linkGenerator != null)
+            {
+             //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
+
+                Endpoint endPoint = request.HttpContext.GetEndpoint();
+                EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
+
+                string aUri = linkGenerator.GetUriByName(request.HttpContext, name.EndpointName,
+                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
+
+                return new Uri(aUri);
             }
 
             //string baseAddress = request.GetUrlHelper().CreateODataLink();

@@ -80,6 +80,10 @@ namespace Microsoft.AspNetCore.OData.Formatting
             writerSettings.Validations = writerSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
             string metadataLink = urlHelper.CreateODataLink(MetadataSegment.Instance);
+            if (metadataLink == null || metadataLink == "")
+            {
+                metadataLink = request.CreateODataLink(baseAddress.OriginalString, MetadataSegment.Instance);
+            }
 
             if (metadataLink == null)
             {

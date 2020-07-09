@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
@@ -151,6 +152,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
                 selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
+
+               // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
             }
         }
     }

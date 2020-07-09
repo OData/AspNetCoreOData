@@ -32,13 +32,13 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
                 throw Error.ArgumentNull("graph");
             }
 
-            //ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
-            //if (serviceDocument == null)
-            //{
-            //    throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type.Name));
-            //}
+            ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
+            if (serviceDocument == null)
+            {
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type.Name));
+            }
 
-            //messageWriter.WriteServiceDocument(serviceDocument);
+            messageWriter.WriteServiceDocument(serviceDocument);
         }
     }
 }
