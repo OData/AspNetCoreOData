@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                     if (newConventions.Length > 0)
                     {
-                        foreach (var action in controller.Actions.Where(a => a.IsODataAction()))
+                        foreach (var action in controller.Actions.Where(a => !a.IsNonODataAction()))
                         {
                             odataContext.Action = action;
 

@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// POST ~/entityset
     /// POST ~/entityset/cast
     /// </summary>
-    public class EntitySetEndpointConvention : IODataControllerActionConvention
+    public class EntitySetRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
         public virtual int Order => 200;

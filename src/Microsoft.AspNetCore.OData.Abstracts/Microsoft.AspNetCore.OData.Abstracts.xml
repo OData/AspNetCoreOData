@@ -186,6 +186,32 @@
             Gets the services collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers">
+            <summary>
+            Provides the functionalities related to the <see cref="T:System.Type"/> and Edm type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="clrType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.IsNullable(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.GetEdmPrimitiveTypeReference(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="clrType"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions">
             <summary>
             Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
@@ -197,6 +223,20 @@
             </summary>
             <param name="httpContext">The Http context.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions.GetUrlHelper(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            </summary>
+            <param name="httpContext">The Http context.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions.GetLinkGenerator(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            </summary>
+            <param name="httpContext">The Http context.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions">
             <summary>
@@ -216,6 +256,27 @@
             </summary>
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetUrlHelper(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
+            </summary>
+            <param name="request">The Http request.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetWriterSettings(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver">
             <summary>
@@ -261,6 +322,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Endpoint">
             <summary>
             Gets/sets the endpoint selected
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.UrlHelper">
+            <summary>
+            Gets or sets the Url helper.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
@@ -315,6 +381,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RouteName">
             <summary>
             Gets or sets the route name.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
+            <summary>
+            Gets or sets the Url helper.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptions">
@@ -385,6 +456,17 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions.GetNavigationSource(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions">
             <summary>
             Provides extension methods to add odata services.
@@ -428,6 +510,56 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataUntypedActionParameters.Action">
             <summary>
             Gets the OData action of this parameters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataVersionConstraint">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult">
+            <summary>
+            Represents an <see cref="T:System.Linq.IQueryable"/> containing zero or one entities. Use together with an
+            <c>[EnableQuery]</c>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.SingleResult.#ctor(System.Linq.IQueryable)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult"/> class.
+            </summary>
+            <param name="queryable">The <see cref="T:System.Linq.IQueryable"/> containing zero or one entities.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SingleResult.Queryable">
+            <summary>
+            The <see cref="T:System.Linq.IQueryable"/> containing zero or one entities.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.SingleResult.Create``1(System.Linq.IQueryable{``0})">
+            <summary>
+            Creates a <see cref="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1"/> from an <see cref="T:System.Linq.IQueryable`1"/>. A helper method to instantiate
+            a <see cref="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1"/> object without having to explicitly specify the type
+            <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of the data in the data source.</typeparam>
+            <param name="queryable">The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1">
+            <summary>
+            Represents an <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities. Use together with an
+            <c>[EnableQuery]</c>.
+            </summary>
+            <typeparam name="T">The type of the data in the data source.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1.#ctor(System.Linq.IQueryable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1"/> class.
+            </summary>
+            <param name="queryable">The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1.Queryable">
+            <summary>
+            The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
             </summary>
         </member>
     </members>

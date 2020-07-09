@@ -667,6 +667,18 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatting.MediaType.QueryStringMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdocs />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataFormattingServiceCollectionExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ODataFormattingServiceCollectionExtensions.AddODataFormatter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataInputFormatter">
             <summary>
             <see cref="T:Microsoft.AspNetCore.Mvc.Formatters.TextInputFormatter"/> class to handle OData.
@@ -721,6 +733,17 @@
             Creates a list of media type formatters to handle OData.
             </summary>
             <returns>A list of media type formatters to handle OData.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataMessageWrapper">
+            <summary>
+            Wrapper for IODataRequestMessage and IODataResponseMessage.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ODataMessageWrapper.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ODataMessageWrapper.Dispose(System.Boolean)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataMetadataLevel">
             <summary>
@@ -920,6 +943,11 @@
               Looks up a localized string similar to The type name of the dynamic resource set &apos;{0}&apos; is required and cannot be empty. Consider using a OData type annotation explicitly..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmTypeCannotBeNull">
+            <summary>
+              Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an {1} cannot be null..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmTypeNotSupported">
             <summary>
               Looks up a localized string similar to {0} is not a supported EDM type..
@@ -1025,6 +1053,11 @@
               Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.RequestMustHaveModel">
+            <summary>
+              Looks up a localized string similar to The request must have an associated EDM model..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.RequestNotActionInvocation">
             <summary>
               Looks up a localized string similar to The last segment of the request URI &apos;{0}&apos; was not recognized as an OData action..
@@ -1053,6 +1086,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeMustBeResourceSet">
             <summary>
               Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.UnableToDetermineMetadataUrl">
+            <summary>
+              Looks up a localized string similar to The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.UnexpectedElementType">
@@ -1133,7 +1171,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.DefaultODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.DefaultODataSerializerProvider.GetODataPayloadSerializerImpl(System.Type,System.Func{Microsoft.OData.Edm.IEdmModel},Microsoft.OData.UriParser.ODataPath,System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.DefaultODataSerializerProvider.GetODataPayloadSerializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializer">
@@ -1485,6 +1523,25 @@
             <param name="clrType">The type to test.</param>
             <param name="elementType">out: the element type of the collection.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.UrlHelperExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Mvc.IUrlHelper,Microsoft.OData.UriParser.ODataPathSegment[])">
+            <summary>
+            Generates an OData link using the request's OData route name and path handler and given segments.
+            </summary>
+            <param name="segments">The OData path segments.</param>
+            <returns>The generated OData link.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Mvc.IUrlHelper,System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
+            <summary>
+            Generates an OData link using the request's OData route name and path handler and given segments.
+            </summary>
+            <param name="segments">The OData path segments.</param>
+            <returns>The generated OData link.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta">
             <summary>

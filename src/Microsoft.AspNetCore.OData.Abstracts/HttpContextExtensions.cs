@@ -3,6 +3,11 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -31,6 +36,45 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             }
 
             return odataFeature;
+        }
+
+        /// <summary>
+        /// Extension method to return the <see cref="IUrlHelper"/> from the <see cref="HttpContext"/>.
+        /// </summary>
+        /// <param name="httpContext">The Http context.</param>
+        /// <returns>The <see cref="IUrlHelper"/>.</returns>
+        public static IUrlHelper GetUrlHelper(this HttpContext httpContext)
+        {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
+            IActionContextAccessor accessor = httpContext.RequestServices.GetService<IActionContextAccessor>();
+            if (accessor == null)
+            {
+                return null;
+            }
+
+            // Get an IUrlHelper from the global service provider.
+            ActionContext actionContext = accessor.ActionContext;
+            return httpContext.RequestServices.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(actionContext);
+        }
+
+        /// <summary>
+        /// Extension method to return the <see cref="IUrlHelper"/> from the <see cref="HttpContext"/>.
+        /// </summary>
+        /// <param name="httpContext">The Http context.</param>
+        /// <returns>The <see cref="IUrlHelper"/>.</returns>
+        public static LinkGenerator GetLinkGenerator(this HttpContext httpContext)
+        {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
+            // Get an IUrlHelper from the global service provider.
+            return httpContext.RequestServices.GetRequiredService<LinkGenerator>();
         }
     }
 }

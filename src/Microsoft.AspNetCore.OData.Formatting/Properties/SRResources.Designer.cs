@@ -223,6 +223,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an {1} cannot be null..
+        /// </summary>
+        internal static string EdmTypeCannotBeNull {
+            get {
+                return ResourceManager.GetString("EdmTypeCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not a supported EDM type..
         /// </summary>
         internal static string EdmTypeNotSupported {
@@ -412,6 +421,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The request must have an associated EDM model..
+        /// </summary>
+        internal static string RequestMustHaveModel {
+            get {
+                return ResourceManager.GetString("RequestMustHaveModel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The last segment of the request URI &apos;{0}&apos; was not recognized as an OData action..
         /// </summary>
         internal static string RequestNotActionInvocation {
@@ -462,6 +480,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         internal static string TypeMustBeResourceSet {
             get {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response..
+        /// </summary>
+        internal static string UnableToDetermineMetadataUrl {
+            get {
+                return ResourceManager.GetString("UnableToDetermineMetadataUrl", resourceCulture);
             }
         }
         

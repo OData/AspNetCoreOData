@@ -251,4 +251,13 @@
   <data name="TypeMustBeEnumOrNullableEnum" xml:space="preserve">
     <value>The type '{0}' must be an enum or Nullable&lt;T&gt; where T is an enum type.</value>
   </data>
+  <data name="EdmTypeCannotBeNull" xml:space="preserve">
+    <value>The EDM type of the object of type '{0}' is null. The EDM type of an {1} cannot be null.</value>
+  </data>
+  <data name="RequestMustHaveModel" xml:space="preserve">
+    <value>The request must have an associated EDM model.</value>
+  </data>
+  <data name="UnableToDetermineMetadataUrl" xml:space="preserve">
+    <value>The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response.</value>
+  </data>
 </root>

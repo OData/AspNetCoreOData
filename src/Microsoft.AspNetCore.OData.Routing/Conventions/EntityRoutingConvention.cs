@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -24,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// DELETE ~/entityset/key
     /// DELETE ~/entityset/key/cast
     /// </summary>
-    public class EntityEndpointConvention : IODataControllerActionConvention
+    public class EntityRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
         public int Order => 300;
@@ -77,14 +76,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action, false);
-
-            // if one key, we should support key as segment template
-            if (entityType.Key().Count() == 1)
-            {
-                AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action, true);
-            }
-
+            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action);
             return true;
         }
 
@@ -126,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         private static void AddSelector(IEdmEntitySet entitySet, IEdmEntityType entityType,
-            IEdmStructuredType castType, string prefix, IEdmModel model, ActionModel action, bool keyAsSegment)
+            IEdmStructuredType castType, string prefix, IEdmModel model, ActionModel action)
         {
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
             {
@@ -142,23 +134,23 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // If cast type is the entity type of the entity set.
                     // we support two templates
                     // ~/Customers({key})
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments) { KeyAsSegment = keyAsSegment });
+                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
 
                     // ~/Customers({key})/Ns.Customer
                     segments.Add(new CastSegmentTemplate(entityType));
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments) { KeyAsSegment = keyAsSegment });
+                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
                 }
                 else
                 {
                     // ~/Customers({key})/Ns.Customer
                     segments.Add(new CastSegmentTemplate(entityType));
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments) { KeyAsSegment = keyAsSegment });
+                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
                 }
             }
             else
             {
                 // ~/Customers({key})
-                action.AddSelector(prefix, model, new ODataPathTemplate(segments) { KeyAsSegment = keyAsSegment });
+                action.AddSelector(prefix, model, new ODataPathTemplate(segments));
             }
         }
     }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// The convention for metadata.
+    /// The convention for $metadata.
     /// </summary>
     public class MetadataRoutingConvention : IODataControllerActionConvention
     {
@@ -26,8 +26,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             // This convention only applies to "MetadataController".
-            return context?.Controller?.ControllerType == metadataTypeInfo;
+            return context.Controller.ControllerType == metadataTypeInfo;
         }
 
         /// <inheritdoc />
@@ -41,7 +46,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Debug.Assert(context.Controller != null);
             Debug.Assert(context.Action != null);
             ActionModel action = context.Action;
-
             string actionName = action.ActionMethod.Name;
 
             // for ~$metadata

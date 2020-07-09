@@ -11,10 +11,25 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// 
+    /// The extension methods for <see cref="ActionModel"/>.
     /// </summary>
-    public static class ControllerActionModelExtension
+    public static class ActionModelExtensions
     {
+        /// <summary>
+        /// Test whether the action is not suitable for OData action.
+        /// </summary>
+        /// <param name="action">The given action model.</param>
+        /// <returns>True/False.</returns>
+        public static bool IsNonODataAction(this ActionModel action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            return action.Attributes.Any(a => a is NonODataActionAttribute);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -41,53 +56,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static bool IsODataAction(this ActionModel action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            return !action.Attributes.Any(a => a is NonODataActionAttribute);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="controller"></param>
-        /// <returns></returns>
-        public static bool HasAttribute<T>(this ControllerModel controller)
-        {
-            if (controller == null)
-            {
-                throw new ArgumentNullException(nameof(controller));
-            }
-
-            return controller.Attributes.Any(a => a is T);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="controller"></param>
-        /// <returns></returns>
-        public static T GetAttribute<T>(this ControllerModel controller)
-        {
-            if (controller == null)
-            {
-                throw new ArgumentNullException(nameof(controller));
-            }
-
-            return controller.Attributes.OfType<T>().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
@@ -102,12 +70,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// 
+        /// Test whether the action has the key parameter defined.
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="entityType"></param>
-        /// <param name="keyPrefix"></param>
-        /// <returns></returns>
+        /// <param name="action">The action model.</param>
+        /// <param name="entityType">The Edm entity type.</param>
+        /// <param name="keyPrefix">The key prefix for the actio parameter.</param>
+        /// <returns>True/false.</returns>
         public static bool HasODataKeyParameter(this ActionModel action,
             IEdmEntityType entityType,
             string keyPrefix = "key")
@@ -122,6 +90,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(entityType));
             }
 
+            // TODO: shall we make sure the type is matching?
             var keys = entityType.Key().ToArray();
             if (keys.Length == 1)
             {
@@ -130,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else
             {
-                // multipe key
+                // multipe keys
                 foreach (var key in keys)
                 {
                     string keyName = $"{keyPrefix}{key.Name}";

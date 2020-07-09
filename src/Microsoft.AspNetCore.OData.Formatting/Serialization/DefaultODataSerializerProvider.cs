@@ -70,23 +70,21 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
             }
         }
 
-        public override ODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
-        {
-            // Using a Func<IEdmModel> to delay evaluation of the model.
-            return GetODataPayloadSerializerImpl(type, () => request.GetModel(), request.ODataFeature().Path, typeof(SerializableError));
-        }
-
         /// <inheritdoc />
-        internal ODataSerializer GetODataPayloadSerializerImpl(Type type, Func<IEdmModel> modelFunction, ODataPath path, Type errorType)
+        public override ODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
         {
             if (type == null)
             {
                 throw Error.ArgumentNull("type");
             }
-            if (modelFunction == null)
+
+            if (request == null)
             {
-                throw Error.ArgumentNull("modelFunction");
+                throw Error.ArgumentNull("request");
             }
+
+            ODataPath path = request.ODataFeature().Path;
+            Type errorType = typeof(SerializableError);
 
             // handle the special types.
             if (type == typeof(ODataServiceDocument))
@@ -112,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
 
             // Get the model. Using a Func<IEdmModel> to delay evaluation of the model
             // until after the above checks have passed.
-            IEdmModel model = modelFunction();
+            IEdmModel model = request.GetModel();
 
             // if it is not a special type, assume it has a corresponding EdmType.
             //ClrTypeCache typeMappingCache = model.GetTypeMappingCache();

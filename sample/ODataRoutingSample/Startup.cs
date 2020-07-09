@@ -12,6 +12,7 @@ using ODataRoutingSample.Models;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Formatting;
 
 namespace ODataRoutingSample
 {
@@ -42,6 +43,8 @@ namespace ODataRoutingSample
                     .AddModel(EdmModelBuilder.GetEdmModel())
                     .AddModel("v1", EdmModelBuilder.GetEdmModelV1())
                     .AddModel("v2{data}", EdmModelBuilder.GetEdmModelV2()));
+
+            services.AddODataFormatter();
 
             /*
             services.AddOData(opt => opt.UseODataRouting(model1).

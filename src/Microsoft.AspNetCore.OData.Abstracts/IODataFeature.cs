@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -31,5 +32,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets/sets the endpoint selected
         /// </summary>
         EndPoint Endpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Url helper.
+        /// </summary>
+        IUrlHelper UrlHelper { get; set; }
     }
 }

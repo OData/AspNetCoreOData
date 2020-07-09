@@ -5,6 +5,7 @@ using System.Net;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -44,5 +45,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the route name.
         /// </summary>
         public string RouteName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Url helper.
+        /// </summary>
+        public IUrlHelper UrlHelper { get; set; }
     }
 }

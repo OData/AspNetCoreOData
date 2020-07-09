@@ -2,7 +2,13 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
@@ -40,6 +46,111 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             }
 
             return request.ODataFeature().Model;
+        }
+
+        /// <summary>
+        /// Extension method to return the <see cref="IUrlHelper"/> from the <see cref="HttpRequest"/>.
+        /// </summary>
+        /// <param name="request">The Http request.</param>
+        /// <returns>The <see cref="IUrlHelper"/>.</returns>
+        public static IUrlHelper GetUrlHelper(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            IODataFeature feature = request.ODataFeature();
+            if (feature.UrlHelper == null)
+            {
+                // if not set, get it from global.
+                feature.UrlHelper = request.HttpContext.GetUrlHelper();
+            }
+
+            return feature.UrlHelper;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ODataMessageWriterSettings"/> from the request container.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The <see cref="ODataMessageWriterSettings"/> from the request container.</returns>
+        public static ODataMessageWriterSettings GetWriterSettings(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            // TODO Maybe clone one???
+            return request.HttpContext.RequestServices.GetRequiredService<ODataMessageWriterSettings>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static ODataVersion GetODataResponseVersion(this HttpRequest request)
+        {
+            Contract.Assert(request != null, "GetODataResponseVersion called with a null request");
+            return request.ODataMaxServiceVersion() ??
+                request.ODataMinServiceVersion() ??
+                request.ODataServiceVersion() ??
+                ODataVersionConstraint.DefaultODataVersion;
+        }
+
+        internal static ODataVersion? ODataServiceVersion(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataServiceVersionHeader);
+        }
+
+        internal static ODataVersion? ODataMaxServiceVersion(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMaxServiceVersionHeader);
+        }
+
+        internal static ODataVersion? ODataMinServiceVersion(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMinServiceVersionHeader);
+        }
+
+        private static ODataVersion? GetODataVersionFromHeader(IHeaderDictionary headers, string headerName)
+        {
+            StringValues values;
+            if (headers.TryGetValue(headerName, out values))
+            {
+                string value = values.FirstOrDefault();
+                if (value != null)
+                {
+                    string trimmedValue = value.Trim(' ', ';');
+                    try
+                    {
+                        return ODataUtils.StringToODataVersion(trimmedValue);
+                    }
+                    catch (ODataException)
+                    {
+                        // Parsing the odata version failed.
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

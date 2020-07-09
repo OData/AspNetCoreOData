@@ -44,69 +44,7 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.HasParameter``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String)">
-            <summary>
-            
-            </summary>
-            <param name="action"></param>
-            <param name="parameterName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.IsODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            
-            </summary>
-            <param name="action"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.HasAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
-            <summary>
-            
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="controller"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.GetAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
-            <summary>
-            
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="controller"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.GetAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="action"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
-            <summary>
-            
-            </summary>
-            <param name="action"></param>
-            <param name="entityType"></param>
-            <param name="keyPrefix"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerActionModelExtension.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
-            <summary>
-            
-            </summary>
-            <param name="action"></param>
-            <param name="prefix"></param>
-            <param name="model"></param>
-            <param name="path"></param>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/> with key.
             It supports key in parenthesis and key as segment if it's single key.
@@ -121,16 +59,16 @@
             DELETE ~/entityset/key/cast
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.Order">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention.Order">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityEndpointConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/>.
             Conventions:
@@ -142,13 +80,13 @@
             POST ~/entityset/cast
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.Order">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.Order">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetEndpointConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention">
@@ -208,7 +146,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention">
             <summary>
-            The convention for metadata.
+            The convention for $metadata.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention.Order">
@@ -397,6 +335,80 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions">
+            <summary>
+            The extension methods for <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.IsNonODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            Test whether the action is not suitable for OData action.
+            </summary>
+            <param name="action">The given action model.</param>
+            <returns>True/False.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.HasParameter``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="parameterName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.GetAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
+            <summary>
+            Test whether the action has the key parameter defined.
+            </summary>
+            <param name="action">The action model.</param>
+            <param name="entityType">The Edm entity type.</param>
+            <param name="keyPrefix">The key prefix for the actio parameter.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="prefix"></param>
+            <param name="model"></param>
+            <param name="path"></param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions">
+            <summary>
+            The extension methods for the <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions.IsNonODataController(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
+            <summary>
+            Test whether the controller is not suitable for OData controller.
+            </summary>
+            <param name="controller">The given controller model.</param>
+            <returns>True/False.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions.HasAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
+            <summary>
+            Test whether the controller has the specified attribute defined
+            </summary>
+            <typeparam name="T">The attribute type.</typeparam>
+            <param name="controller">The given controller model.</param>
+            <returns>True/False.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions.GetAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
+            <summary>
+            Gets the attribute from the controller model.
+            </summary>
+            <typeparam name="T">The attribute type.</typeparam>
+            <param name="controller">The given controller model.</param>
+            <returns>The attribute or null.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
