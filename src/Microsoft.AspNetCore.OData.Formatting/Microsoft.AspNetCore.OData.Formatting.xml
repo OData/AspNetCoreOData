@@ -9,6 +9,9 @@
             
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.DefaultODataETagHandler.NullLiteralInETag">
+            <summary>null literal that needs to be return in ETag value when the value is null</summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.DefaultODataDeserializerProvider">
             <summary>
             The default <see cref="T:Microsoft.AspNetCore.OData.Formatting.Deserialization.ODataDeserializerProvider"/>.
@@ -878,6 +881,11 @@
               Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotSerializerNull">
+            <summary>
+              Looks up a localized string similar to Cannot serialize a null &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotSetDynamicPropertyDictionary">
             <summary>
               Looks up a localized string similar to The dynamic dictionary property &apos;{0}&apos; of type &apos;{1}&apos; cannot be set. The dynamic property dictionary must have a setter..
@@ -886,6 +894,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CannotWriteType">
             <summary>
               Looks up a localized string similar to {0} cannot write an object of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ClrTypeNotInModel">
+            <summary>
+              Looks up a localized string similar to The given model does not contain the type &apos;{0}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.CollectionParameterShouldHaveAddMethod">
@@ -938,9 +951,29 @@
               Looks up a localized string similar to Duplicate dynamic property name &apos;{0}&apos; found in open type &apos;{1}&apos;. Each dynamic property name must be unique..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DynamicPropertyCannotBeSerialized">
+            <summary>
+              Looks up a localized string similar to The dynamic property &apos;{0}&apos; with Edm type &apos;{1}&apos; cannot be serialized..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName">
+            <summary>
+              Looks up a localized string similar to The name of dynamic property &apos;{0}&apos; was already used as the declared property name of open type &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.DynamicResourceSetTypeNameIsRequired">
             <summary>
               Looks up a localized string similar to The type name of the dynamic resource set &apos;{0}&apos; is required and cannot be empty. Consider using a OData type annotation explicitly..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmComplexObjectNullRef">
+            <summary>
+              Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmObjectNull">
+            <summary>
+              Looks up a localized string similar to The property &apos;EdmObject&apos; of {0} cannot be null..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.EdmTypeCannotBeNull">
@@ -953,6 +986,11 @@
               Looks up a localized string similar to {0} is not a supported EDM type..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.FormatterReadIsNotSupportedForType">
+            <summary>
+              Looks up a localized string similar to Reading type &apos;{0}&apos; is not supported by &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.GetOnlyCollectionCannotBeArray">
             <summary>
               Looks up a localized string similar to The value of the property &apos;{0}&apos; on type &apos;{1}&apos; is an array. Consider adding a setter for the property..
@@ -961,6 +999,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.InvalidODataUntypedValue">
             <summary>
               Looks up a localized string similar to The given untyped value &apos;{0}&apos; in payload is invalid. Consider using a OData type annotation explicitly..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.KeyValueCannotBeNull">
+            <summary>
+              Looks up a localized string similar to Key property &apos;{0}&apos; of type &apos;{1}&apos; is null. Key properties cannot have null values..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.MappingDoesNotContainResourceType">
@@ -1048,6 +1091,11 @@
               Looks up a localized string similar to The value must be a Edm.TimeOfDay..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.PropertyNotFound">
+            <summary>
+              Looks up a localized string similar to The EDM instance of type &apos;{0}&apos; is missing the property &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ReadFromStreamAsyncMustHaveRequest">
             <summary>
               Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
@@ -1068,6 +1116,16 @@
               Looks up a localized string similar to Cannot find the resource type &apos;{0}&apos; in the model..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.RootElementNameMissing">
+            <summary>
+              Looks up a localized string similar to The &apos;RootElementName&apos; property is required on &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.SelectionTypeNotSupported">
+            <summary>
+              Looks up a localized string similar to $select does not support selections of type &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeCannotBeDeserialized">
             <summary>
               Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
@@ -1086,6 +1144,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeMustBeResourceSet">
             <summary>
               Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.TypeOfDynamicPropertyNotSupported">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.UnableToDetermineMetadataUrl">
@@ -1156,6 +1219,121 @@
             <param name="propertyInfo">propertyInfo to extract the getter for.</param>
             <returns>a fast getter.</returns>
             <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ResourceContext">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ResourceContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.ResourceContext"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ResourceContext.#ctor(Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext,Microsoft.OData.Edm.IEdmStructuredTypeReference,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.ResourceContext"/> class.
+            </summary>
+            <param name="serializerContext">The backing <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/>.</param>
+            <param name="structuredType">The EDM structured type of this instance context.</param>
+            <param name="resourceInstance">The object representing the instance of this context.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.SerializerContext">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.EdmModel">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to which this instance belongs.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.NavigationSource">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> to which this instance belongs.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.StructuredType">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this resource instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.EdmObject">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject"/> backing this instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.ResourceInstance">
+            <summary>
+            Gets or sets the value of this resource instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.Request">
+            <summary>
+            Gets or sets the HTTP request that caused this instance to be generated.
+            </summary>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.SkipExpensiveAvailabilityChecks">
+            <summary>
+            Gets or sets a value indicating whether ActionAvailabilityChecks should be performed or not.
+            </summary>
+            <remarks>
+            This value is used to tell the formatter whether to check availability of an action before including a link
+            to it. When in a feed we skip this check.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceContext.DynamicComplexProperties">
+            <summary>
+            Gets or sets the dynamic complex or collection of complex properties should be nested in this instance.
+            </summary>
+            <remarks>
+            The key is the dynamic property name.
+            The value is the dynamic property value.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ResourceContext.GetPropertyValue(System.String)">
+            <summary>
+            Gets the value of the property with the given name from the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject"/> of this instance if present; throws if the property is
+            not present.
+            </summary>
+            <param name="propertyName">The name of the property to get.</param>
+            <returns>The value of the property if present.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext">
+            <summary>
+            Contains context information about the resource set currently being serialized.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext.EntitySetBase">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmEntitySetBase"/> this instance belongs to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext.ResourceSetInstance">
+            <summary>
+            Gets the value of this feed instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext.Request">
+            <summary>
+            Gets or sets the HTTP request that caused this instance to be generated.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext.EdmModel">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to which this instance belongs.
+            </summary>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext.Create(Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext,System.Collections.IEnumerable)">
+            <summary>
+            Create a <see cref="T:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext"/> from an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/> and <see cref="T:System.Collections.IEnumerable"/>.
+            </summary>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatting.ResourceSetContext"/>.</returns>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.DefaultODataSerializerProvider">
             <summary>
@@ -1367,6 +1545,31 @@
             <remarks>The metadata written is from the model set on the <paramref name="messageWriter"/>. The <paramref name="graph" />
             is not used.</remarks>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializer"/> for serializing <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveType" />'s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataPrimitiveSerializer.CreateODataPrimitiveValue(System.Object,Microsoft.OData.Edm.IEdmPrimitiveTypeReference,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> for the object represented by <paramref name="graph"/>.
+            </summary>
+            <param name="graph">The primitive value.</param>
+            <param name="primitiveType">The EDM primitive type of the value.</param>
+            <param name="writeContext">The serializer write context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataRawValueSerializer">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializer"/> for serializing the raw value of an <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveType"/>.
@@ -1380,6 +1583,145 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataRawValueSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer">
+            <summary>
+            ODataSerializer for serializing instances of <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> or <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.WriteObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.WriteDeltaObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+            Writes the given object specified by the parameter graph as a part of an existing OData message using the given
+            deltaWriter and the writeContext.
+            </summary>
+            <param name="graph">The object to be written.</param>
+            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/>.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
+            </summary>
+            <param name="resourceContext">Contains the entity instance being written and the context.</param>
+            <returns>
+            The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateResource(Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataResource"/> to be written while writing this resource.
+            </summary>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.AppendDynamicProperties(Microsoft.OData.ODataResource,Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="T:Microsoft.OData.ODataResource"/>.
+            If the dynamic property is a property of the complex or collection of complex, it will be saved into
+            the dynamic complex properties dictionary of <paramref name="resourceContext"/> and be written later.
+            </summary>
+            <param name="resource">The <see cref="T:Microsoft.OData.ODataResource"/> describing the resource.</param>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateETag(Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates the ETag for the given entity.
+            </summary>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+            <returns>The created ETag.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.WriteNavigationLinks(Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatting.ResourceContext,Microsoft.OData.ODataWriter)">
+            <summary>
+            Write the navigation link for the select navigation properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateNavigationLink(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> to be written while writing this entity.
+            </summary>
+            <param name="navigationProperty">The navigation property for which the navigation link is being created.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The navigation link to be written.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given entity and the structural property.
+            </summary>
+            <param name="structuralProperty">The EDM structural property being written.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> to write.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateODataAction(Microsoft.OData.Edm.IEdmAction,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataAction" /> to be written for the given action and the entity instance.
+            </summary>
+            <param name="action">The OData action.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The created action or null if the action should not be written.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSerializer.CreateODataFunction(Microsoft.OData.Edm.IEdmFunction,Microsoft.AspNetCore.OData.Formatting.ResourceContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataFunction" /> to be written for the given action and the entity instance.
+            </summary>
+            <param name="function">The OData function.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The created function or null if the action should not be written.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer">
+            <summary>
+            OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" /> or <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerProvider)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer"/>.
+            </summary>
+            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.WriteObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.CreateResourceSet(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+            Create the <see cref="T:Microsoft.OData.ODataResourceSet"/> to be written for the given resourceSet instance.
+            </summary>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <param name="resourceSetType">The EDM type of the resourceSet being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataResourceSet"/> object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.GetNextLinkGenerator(Microsoft.OData.ODataResourceSetBase,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates a function that takes in an object and generates nextlink uri.
+            </summary>
+            <param name="resourceSet">The resource set describing a collection of structured objects.</param>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>The function that generates the NextLink from an object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataResourceSetSerializer.CreateODataOperation(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Formatting.ResourceSetContext,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+             Creates an <see cref="T:Microsoft.OData.ODataOperation" /> to be written for the given operation and the resourceSet instance.
+            </summary>
+            <param name="operation">The OData operation.</param>
+            <param name="resourceSetContext">The context for the resourceSet instance being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>The created operation or null if the operation should not be written.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializer"/> for serializing the raw value of an <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveType"/>.
@@ -1389,6 +1731,28 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/> class.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.#ctor(Microsoft.AspNetCore.OData.Formatting.ResourceContext,Microsoft.OData.UriParser.SelectExpandClause,Microsoft.OData.Edm.IEdmProperty)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/> class.
+            </summary>
+            <param name="resource">The resource whose property is being nested.</param>
+            <param name="selectExpandClause">The <see cref="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.SelectExpandClause"/> for the property being nested.</param>
+            <param name="edmProperty">The complex property being nested or the navigation property being expanded.
+            If the resource property is the dynamic complex, the resource property is null.
+            </param>
+            <remarks>This constructor is used to construct the serializer context for writing nested and expanded properties.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.#ctor(Microsoft.AspNetCore.OData.Formatting.ResourceContext,Microsoft.OData.Edm.IEdmProperty,Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.OData.UriParser.SelectItem)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext"/> class for nested resources.
+            </summary>
+            <param name="resource">The resource whose property is being nested.</param>
+            <param name="edmProperty">The complex property being nested or the navigation property being expanded.
+            If the resource property is the dynamic complex, the resource property is null.
+            </param>
+            <param name="queryContext">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> for the property being nested.</param>
+            <param name="currentSelectItem">The <see cref="T:Microsoft.OData.UriParser.SelectItem"/> for the property being nested.></param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.NavigationSource">
             <summary>
@@ -1410,11 +1774,6 @@
             Gets or sets the metadata level of the response.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.Items">
-            <summary>
-            Gets a property bag associated with this context to store any generic data.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.Request">
             <summary>
             Gets or sets the HTTP Request whose response is being serialized.
@@ -1423,6 +1782,36 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.RootElementName">
             <summary>
             Gets or sets the root element name which is used when writing primitive and enum types
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.ExpandReference">
+            <summary>
+            Gets or sets the boolean value indicating whether it's $ref expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.EdmProperty">
+            <summary>
+            Gets or sets the complex property being nested or navigation property being expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.SkipExpensiveAvailabilityChecks">
+            <summary>
+            Get or sets whether expensive links should be calculated.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.Items">
+            <summary>
+            Gets a property bag associated with this context to store any generic data.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.ExpandedResource">
+            <summary>
+            Gets or sets the resource that is being expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.SelectExpandClause">
+            <summary>
+            Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext.SelectExpandClause"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerProvider">
@@ -1458,6 +1847,215 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.ODataServiceDocumentSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode">
+            <summary>
+            Describes the set of structural properties and navigation properties and actions to select and navigation properties to expand while
+            writing an <see cref="T:Microsoft.OData.ODataResource"/> in the response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.#ctor">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> class.
+            </summary>
+            <remarks>The default constructor is for unit testing only.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.#ctor(Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> class by copying the state of another instance. This is
+            intended for scenarios that wish to modify state without updating the values cached within ODataResourceSerializer.
+            </summary>
+            <param name="selectExpandNodeToCopy">The instance from which the state for the new instance will be copied.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.#ctor(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Formatting.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> class describing the set of structural properties,
+            nested properties, navigation properties, and actions to select and expand for the given <paramref name="writeContext"/>.
+            </summary>
+            <param name="structuredType">The structural type of the resource that would be written.</param>
+            <param name="writeContext">The serializer context to be used while creating the collection.</param>
+            <remarks>The default constructor is for unit testing only.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.#ctor(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode"/> class describing the set of structural properties,
+            nested properties, navigation properties, and actions to select and expand for the given <paramref name="selectExpandClause"/>.
+            </summary>
+            <param name="selectExpandClause">The parsed $select and $expand query options.</param>
+            <param name="structuredType">The structural type of the resource that would be written.</param>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> that contains the given structural type.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.ReferencedNavigationProperties">
+            <summary>
+            Gets the list of EDM navigation properties to be expand referenced in the response.
+            keeping this is only for non-breaking changes, This should be replaced by "ReferencedProperties" later.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedComplexProperties">
+            <summary>
+            Gets the list of EDM nested properties (complex or collection of complex) to be included in the response.
+            keeping this is only for non-breaking changes, This should be replaced by "SelectedComplexes".
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedStructuralProperties">
+            <summary>
+            Gets the list of EDM structural properties (primitive, enum or collection of them) to be included in the response.
+            It could be null if there's no property selected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedNavigationProperties">
+            <summary>
+            Gets the list of EDM navigation properties to be included as links in the response. It could be null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedComplexTypeProperties">
+            <summary>
+            Gets the list of Edm structural properties (complex or complex collection) to be included in the response.
+            The key is the Edm structural property.
+            The value is the potential sub select item.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.ExpandedProperties">
+            <summary>
+            Gets the list of EDM navigation properties to be expanded in the response along with the nested query options embedded in the expand.
+            It could be null if no navigation property to expand.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.ReferencedProperties">
+            <summary>
+            Gets the list of EDM navigation properties to be referenced in the response along with the nested query options embedded in the expand.
+            It could be null if no navigation property to reference.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedDynamicProperties">
+            <summary>s
+            Gets the list of dynamic properties to select. It could be null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectAllDynamicProperties">
+            <summary>
+            Gets the flag to indicate the dynamic property to be included in the response or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedActions">
+            <summary>
+            Gets the list of OData actions to be included in the response. It could be null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.SelectedFunctions">
+            <summary>
+            Gets the list of OData functions to be included in the response. It could be null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.Initialize(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.Boolean)">
+            <summary>
+            Initialize the Node from <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> for the given <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
+            </summary>
+            <param name="selectExpandClause">The input select and expand clause ($select and $expand).</param>
+            <param name="structuredType">The related structural type to select and expand.</param>
+            <param name="model">The Edm model.</param>
+            <param name="expandedReference">Is expanded reference.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.BuildSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
+            <summary>
+            Build $select and $expand clause
+            </summary>
+            <param name="selectExpandClause">The select expand clause</param>
+            <param name="structuralTypeInfo">The structural type properties.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.BuildExpandItem(Microsoft.OData.UriParser.ExpandedReferenceSelectItem,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty},Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
+            <summary>
+            Build the $expand item, it maybe $expand=nav, $expand=complex/nav, $expand=nav/$ref, etc.
+            </summary>
+            <param name="expandReferenceItem">The expanded reference select item.</param>
+            <param name="currentLevelPropertiesInclude">The current properties to include at current level.</param>
+            <param name="structuralTypeInfo">The structural type properties.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.BuildSelectItem(Microsoft.OData.UriParser.PathSelectItem,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty},Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
+            <summary>
+            Build the $select item, it maybe $select=complex/abc, $select=abc, $select=nav, etc.
+            </summary>
+            <param name="pathSelectItem">The expanded reference select item.</param>
+            <param name="currentLevelPropertiesInclude">The current properties to include at current level.</param>
+            <param name="structuralTypeInfo">The structural type properties.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.IsComplexOrCollectionComplex(Microsoft.OData.Edm.IEdmStructuralProperty)">
+            <summary>
+            Test whether the input structural property is complex property or collection of complex property.
+            </summary>
+            <param name="structuralProperty">The test structural property.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.GetStructuralProperties(Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.HashSet{Microsoft.OData.Edm.IEdmStructuralProperty},System.Collections.Generic.HashSet{Microsoft.OData.Edm.IEdmStructuralProperty})">
+            <summary>
+            Separate the structural properties into two parts:
+            1. Complex and collection of complex are nested structural properties.
+            2. Others are non-nested structural properties.
+            </summary>
+            <param name="structuredType">The structural type of the resource.</param>
+            <param name="structuralProperties">The non-nested structural properties of the structural type.</param>
+            <param name="nestedStructuralProperties">The nested structural properties of the structural type.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo">
+            <summary>
+            An internal cache class used to provide the propert, operations
+            and do verification on the given <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.AllStructuralProperties">
+            <summary>
+            Gets all structural properties defined on the structure type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.AllNavigationProperties">
+            <summary>
+            Gets all navigation properties defined on the structure type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.AllActions">
+            <summary>
+            Gets all actions bonding to the structure type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.AllFunctions">
+            <summary>
+            Gets all function bonding to the structure type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo"/> class
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="structuredType">The Edm structured Type.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.IsStructuralPropertyDefined(Microsoft.OData.Edm.IEdmStructuralProperty)">
+            <summary>
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmStructuralProperty"/> is defined on this type.
+            </summary>
+            <param name="property">The test property.</param>
+            <returns>True/false</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Serialization.SelectExpandNode.EdmStructuralTypeInfo.IsNavigationPropertyDefined(Microsoft.OData.Edm.IEdmNavigationProperty)">
+            <summary>
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/> is defined on this type.
+            </summary>
+            <param name="property">The test property.</param>
+            <returns>True/false</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.IsDateTime(System.Type)">
+            <summary>
+            Determine if a type is a DateTime.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateTime; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.IsTimeSpan(System.Type)">
+            <summary>
+            Determine if a type is a TimeSpan.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeSpan; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.TypeHelper.IsTypeAssignableFrom(System.Type,System.Type)">
             <summary>
@@ -2133,6 +2731,25 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection.GetEdmType">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions">
+            <summary>
+            Extension methods for the <see cref="T:Microsoft.OData.Edm.IEdmType"/> interface.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions.IsDeltaFeed(Microsoft.OData.Edm.IEdmType)">
+            <summary>
+            Method to determine whether the current type is a Delta Feed
+            </summary>
+            <param name="type">IEdmType to be compared</param>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaCollectionType"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions.IsDeltaResource(Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject)">
+            <summary>
+            Method to determine whether the current Edm object is a Delta Entry
+            </summary>
+            <param name="resource">IEdmObject to be compared</param>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject"/></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject"/> with no backing CLR <see cref="T:System.Type"/>.
@@ -2345,6 +2962,23 @@
             otherwise, null. The parameter is passed uninitialized.</param>
             <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/> that is null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject"/> class.
+            </summary>
+            <param name="edmType">The EDM type of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.GetEdmType">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedDelta">
             <summary>
             Represents a <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta"/> that can be used when a backing CLR type exists for
@@ -2367,6 +3001,61 @@
             </summary>
             <param name="type">The type to check.</param>
             <returns>True if it is a Delta generic type; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmComplexTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexTypeReference"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmEntityTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.Instance">
+            <summary>
+            Gets the backing CLR object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.Model">
+            <summary>
+            Gets the EDM model.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.Wrapper.ODataEntityReferenceLinkBase">
             <summary>

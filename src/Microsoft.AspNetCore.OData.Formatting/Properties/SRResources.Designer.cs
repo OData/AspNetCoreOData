@@ -106,6 +106,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot serialize a null &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotSerializerNull {
+            get {
+                return ResourceManager.GetString("CannotSerializerNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The dynamic dictionary property &apos;{0}&apos; of type &apos;{1}&apos; cannot be set. The dynamic property dictionary must have a setter..
         /// </summary>
         internal static string CannotSetDynamicPropertyDictionary {
@@ -120,6 +129,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         internal static string CannotWriteType {
             get {
                 return ResourceManager.GetString("CannotWriteType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given model does not contain the type &apos;{0}&apos;..
+        /// </summary>
+        internal static string ClrTypeNotInModel {
+            get {
+                return ResourceManager.GetString("ClrTypeNotInModel", resourceCulture);
             }
         }
         
@@ -214,11 +232,47 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The dynamic property &apos;{0}&apos; with Edm type &apos;{1}&apos; cannot be serialized..
+        /// </summary>
+        internal static string DynamicPropertyCannotBeSerialized {
+            get {
+                return ResourceManager.GetString("DynamicPropertyCannotBeSerialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of dynamic property &apos;{0}&apos; was already used as the declared property name of open type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName {
+            get {
+                return ResourceManager.GetString("DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type name of the dynamic resource set &apos;{0}&apos; is required and cannot be empty. Consider using a OData type annotation explicitly..
         /// </summary>
         internal static string DynamicResourceSetTypeNameIsRequired {
             get {
                 return ResourceManager.GetString("DynamicResourceSetTypeNameIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string EdmComplexObjectNullRef {
+            get {
+                return ResourceManager.GetString("EdmComplexObjectNullRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;EdmObject&apos; of {0} cannot be null..
+        /// </summary>
+        internal static string EdmObjectNull {
+            get {
+                return ResourceManager.GetString("EdmObjectNull", resourceCulture);
             }
         }
         
@@ -241,6 +295,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reading type &apos;{0}&apos; is not supported by &apos;{1}&apos;..
+        /// </summary>
+        internal static string FormatterReadIsNotSupportedForType {
+            get {
+                return ResourceManager.GetString("FormatterReadIsNotSupportedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value of the property &apos;{0}&apos; on type &apos;{1}&apos; is an array. Consider adding a setter for the property..
         /// </summary>
         internal static string GetOnlyCollectionCannotBeArray {
@@ -255,6 +318,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         internal static string InvalidODataUntypedValue {
             get {
                 return ResourceManager.GetString("InvalidODataUntypedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key property &apos;{0}&apos; of type &apos;{1}&apos; is null. Key properties cannot have null values..
+        /// </summary>
+        internal static string KeyValueCannotBeNull {
+            get {
+                return ResourceManager.GetString("KeyValueCannotBeNull", resourceCulture);
             }
         }
         
@@ -412,6 +484,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The EDM instance of type &apos;{0}&apos; is missing the property &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyNotFound {
+            get {
+                return ResourceManager.GetString("PropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
         /// </summary>
         internal static string ReadFromStreamAsyncMustHaveRequest {
@@ -448,6 +529,24 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;RootElementName&apos; property is required on &apos;{0}&apos;..
+        /// </summary>
+        internal static string RootElementNameMissing {
+            get {
+                return ResourceManager.GetString("RootElementNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to $select does not support selections of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string SelectionTypeNotSupported {
+            get {
+                return ResourceManager.GetString("SelectionTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
         /// </summary>
         internal static string TypeCannotBeDeserialized {
@@ -480,6 +579,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         internal static string TypeMustBeResourceSet {
             get {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
+        /// </summary>
+        internal static string TypeOfDynamicPropertyNotSupported {
+            get {
+                return ResourceManager.GetString("TypeOfDynamicPropertyNotSupported", resourceCulture);
             }
         }
         

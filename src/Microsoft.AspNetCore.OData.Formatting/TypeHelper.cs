@@ -19,6 +19,28 @@ namespace Microsoft.AspNetCore.OData.Formatting
         }
 
         /// <summary>
+        /// Determine if a type is a DateTime.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a DateTime; false otherwise.</returns>
+        public static bool IsDateTime(Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return Type.GetTypeCode(underlyingTypeOrSelf) == TypeCode.DateTime;
+        }
+
+        /// <summary>
+        /// Determine if a type is a TimeSpan.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a TimeSpan; false otherwise.</returns>
+        public static bool IsTimeSpan(Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return underlyingTypeOrSelf == typeof(TimeSpan);
+        }
+
+        /// <summary>
         /// Determine if a type is assignable from another type.
         /// </summary>
         /// <param name="clrType">The type to test.</param>

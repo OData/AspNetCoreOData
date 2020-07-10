@@ -61,6 +61,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(EntitySetSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.EntitySet;
 
             _pathTemplate.Add(ODataSegmentKinds.EntitySet); // entityset
@@ -74,6 +75,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(KeySegment segment)
         {
+            Contract.Assert(segment != null);
+
             _navigationSource = segment.NavigationSource;
 
             if (_pathTemplate.Last() == ODataSegmentKinds.Ref)
@@ -112,6 +115,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(NavigationPropertyLinkSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
 
             // TODO: do we really need to add $ref?
@@ -128,6 +132,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(NavigationPropertySegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
 
             _pathTemplate.Add(ODataSegmentKinds.Navigation); // navigation
@@ -141,6 +146,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(DynamicPathSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(ODataSegmentKinds.DynamicProperty); // dynamic property
@@ -154,6 +160,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(OperationImportSegment segment)
         {
+            Contract.Assert(segment != null);
+
             _navigationSource = segment.EntitySet;
 
             IEdmActionImport actionImport = segment.OperationImports.Single() as IEdmActionImport;
@@ -187,6 +195,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(OperationSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.EntitySet;
 
             IEdmAction action = segment.Operations.Single() as IEdmAction;
@@ -221,6 +230,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(PathTemplateSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(ODataSegmentKinds.Property); // path template
@@ -234,6 +244,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(PropertySegment segment)
         {
+            Contract.Assert(segment != null);
             // Not setting navigation source to null as the relevant navigation source for the path will be the previous navigation source.
 
             _pathTemplate.Add(ODataSegmentKinds.Property); // property
@@ -247,6 +258,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(SingletonSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.Singleton;
 
             _pathTemplate.Add(ODataSegmentKinds.Singleton); // singleton
@@ -260,6 +272,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(TypeSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
 
             _pathTemplate.Add(ODataSegmentKinds.Cast); // cast
@@ -282,6 +295,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         {
             // do nothing for the navigation source for $value.
             // It means to use the previous the navigation source
+            Contract.Assert(segment != null);
 
             _pathTemplate.Add(ODataSegmentKinds.Value); // $value
             _pathUriLiteral.Add(ODataSegmentKinds.Value);
@@ -293,6 +307,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(CountSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(ODataSegmentKinds.Count); // $count
@@ -305,6 +320,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(BatchSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(ODataSegmentKinds.Batch);
@@ -317,6 +333,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="segment">the segment to handle</param>
         public override void Handle(MetadataSegment segment)
         {
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(ODataSegmentKinds.Metadata); // $metadata
@@ -330,6 +347,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public override void Handle(ODataPathSegment segment)
         {
             // ODL doesn't provide the handle function for general path segment
+            Contract.Assert(segment != null);
             _navigationSource = null;
 
             _pathTemplate.Add(segment.ToString());

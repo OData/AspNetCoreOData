@@ -260,4 +260,40 @@
   <data name="UnableToDetermineMetadataUrl" xml:space="preserve">
     <value>The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response.</value>
   </data>
+  <data name="CannotSerializerNull" xml:space="preserve">
+    <value>Cannot serialize a null '{0}'.</value>
+  </data>
+  <data name="EdmComplexObjectNullRef" xml:space="preserve">
+    <value>Cannot get property '{0}' of a null EDM object of type '{1}'.</value>
+  </data>
+  <data name="SelectionTypeNotSupported" xml:space="preserve">
+    <value>$select does not support selections of type '{0}'.</value>
+  </data>
+  <data name="PropertyNotFound" xml:space="preserve">
+    <value>The EDM instance of type '{0}' is missing the property '{1}'.</value>
+  </data>
+  <data name="EdmObjectNull" xml:space="preserve">
+    <value>The property 'EdmObject' of {0} cannot be null.</value>
+  </data>
+  <data name="DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName" xml:space="preserve">
+    <value>The name of dynamic property '{0}' was already used as the declared property name of open type '{1}'.</value>
+  </data>
+  <data name="TypeOfDynamicPropertyNotSupported" xml:space="preserve">
+    <value>The type '{0}' of dynamic property '{1}' is not supported.</value>
+  </data>
+  <data name="DynamicPropertyCannotBeSerialized" xml:space="preserve">
+    <value>The dynamic property '{0}' with Edm type '{1}' cannot be serialized.</value>
+  </data>
+  <data name="KeyValueCannotBeNull" xml:space="preserve">
+    <value>Key property '{0}' of type '{1}' is null. Key properties cannot have null values.</value>
+  </data>
+  <data name="ClrTypeNotInModel" xml:space="preserve">
+    <value>The given model does not contain the type '{0}'.</value>
+  </data>
+  <data name="RootElementNameMissing" xml:space="preserve">
+    <value>The 'RootElementName' property is required on '{0}'.</value>
+  </data>
+  <data name="FormatterReadIsNotSupportedForType" xml:space="preserve">
+    <value>Reading type '{0}' is not supported by '{1}'.</value>
+  </data>
 </root>

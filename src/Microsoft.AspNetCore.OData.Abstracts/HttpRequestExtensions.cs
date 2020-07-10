@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -75,6 +76,22 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>The <see cref="ODataMessageWriterSettings"/> from the request container.</returns>
+        public static ODataMessageReaderSettings GetReaderSettings(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            // TODO Maybe clone one???
+            return request.HttpContext.RequestServices.GetRequiredService<ODataMessageReaderSettings>();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ODataMessageWriterSettings"/> from the request container.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The <see cref="ODataMessageWriterSettings"/> from the request container.</returns>
         public static ODataMessageWriterSettings GetWriterSettings(this HttpRequest request)
         {
             if (request == null)
@@ -84,6 +101,32 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // TODO Maybe clone one???
             return request.HttpContext.RequestServices.GetRequiredService<ODataMessageWriterSettings>();
+        }
+
+        /// <summary>
+        /// Creates an ETag from concurrency property names and values.
+        /// </summary>
+        /// <param name="request">The input property names and values.</param>
+        /// <param name="properties">The input property names and values.</param>
+        /// <returns>The generated ETag string.</returns>
+        public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties)
+        {
+            return request.GetETagHandler().CreateETag(properties)?.ToString();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IETagHandler"/> from the services container.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The <see cref="IETagHandler"/> from the services container.</returns>
+        public static IETagHandler GetETagHandler(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return request.HttpContext.RequestServices.GetRequiredService<IETagHandler>();
         }
 
         /// <summary>

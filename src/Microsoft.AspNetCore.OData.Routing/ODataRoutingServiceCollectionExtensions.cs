@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             // ~/EntitySet
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IODataControllerActionConvention, EntityRoutingConvention>());
+                ServiceDescriptor.Transient<IODataControllerActionConvention, EntitySetRoutingConvention>());
 
             // ~/EntitySet/{key}
             services.TryAddEnumerable(

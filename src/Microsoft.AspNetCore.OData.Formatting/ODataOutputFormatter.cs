@@ -230,14 +230,6 @@ namespace Microsoft.AspNetCore.OData.Formatting
                 Uri baseAddress = GetBaseAddressInternal(request);
                 MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
-                //Func<ODataSerializerContext> getODataSerializerContext = () =>
-                //{
-                //    return new ODataSerializerContext()
-                //    {
-                //        Request = request,
-                //    };
-                //};
-
                 ODataSerializerProvider serializerProvider = request.HttpContext.RequestServices.GetRequiredService<ODataSerializerProvider>();
 
                 ODataOutputFormatterHelper.WriteToStream(

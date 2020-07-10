@@ -32,14 +32,14 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
                 throw Error.ArgumentNull("graph");
             }
 
-            //if (TypeHelper.IsEnum(graph.GetType()))
-            //{
-            //    messageWriter.WriteValue(graph.ToString());
-            //}
-            //else
-            //{
-            //    messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph));
-            //}
+            if (TypeHelper.IsEnum(graph.GetType()))
+            {
+                messageWriter.WriteValue(graph.ToString());
+            }
+            else
+            {
+                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph));
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Formatting.Value;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -43,27 +44,28 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
                 case EdmTypeKind.Enum:
                     return _rootContainer.GetRequiredService<ODataEnumSerializer>();
 
-                //case EdmTypeKind.Primitive:
-                //    return _rootContainer.GetRequiredService<ODataPrimitiveSerializer>();
+                case EdmTypeKind.Primitive:
+                    return _rootContainer.GetRequiredService<ODataPrimitiveSerializer>();
 
-                //case EdmTypeKind.Collection:
-                //    IEdmCollectionTypeReference collectionType = edmType.AsCollection();
-                //    if (collectionType.Definition.IsDeltaFeed())
-                //    {
-                //        return _rootContainer.GetRequiredService<ODataDeltaFeedSerializer>();
-                //    }
-                //    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
-                //    {
-                //        return _rootContainer.GetRequiredService<ODataResourceSetSerializer>();
-                //    }
-                //    else
-                //    {
-                //        return _rootContainer.GetRequiredService<ODataCollectionSerializer>();
-                //    }
+                case EdmTypeKind.Collection:
+                    IEdmCollectionTypeReference collectionType = edmType.AsCollection();
+                    if (collectionType.Definition.IsDeltaFeed())
+                    {
+                        //return _rootContainer.GetRequiredService<ODataDeltaFeedSerializer>();
+                        return null;
+                    }
+                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
+                    {
+                        return _rootContainer.GetRequiredService<ODataResourceSetSerializer>();
+                    }
+                    else
+                    {
+                        return _rootContainer.GetRequiredService<ODataCollectionSerializer>();
+                    }
 
-                //case EdmTypeKind.Complex:
-                //case EdmTypeKind.Entity:
-                //    return _rootContainer.GetRequiredService<ODataResourceSerializer>();
+                case EdmTypeKind.Complex:
+                case EdmTypeKind.Entity:
+                    return _rootContainer.GetRequiredService<ODataResourceSerializer>();
 
                 default:
                     return null;
@@ -113,9 +115,8 @@ namespace Microsoft.AspNetCore.OData.Formatting.Serialization
             IEdmModel model = request.GetModel();
 
             // if it is not a special type, assume it has a corresponding EdmType.
-            //ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            // IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
-            IEdmTypeReference edmType = null;
+            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
+            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
 
             if (edmType != null)
             {

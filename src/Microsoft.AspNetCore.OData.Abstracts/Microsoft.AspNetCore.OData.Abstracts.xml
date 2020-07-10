@@ -9,6 +9,14 @@
             
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Annotations.AnnotationHelper.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="navigationSource"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.Annotations.AnnotationHelper.GetClrEnumMemberAnnotation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEnumType)">
             <summary>
             
@@ -212,6 +220,70 @@
             <param name="clrType"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder">
+            <summary>
+            This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder.#ctor(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Constructs a concurrent cache for looking up bindable operations for any EntityType in the provided model.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder.FindOperations(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Finds operations that can be invoked on the given entity type. This would include all the operations that are bound
+            to the given type and its base types.
+            </summary>
+            <param name="entityType">The EDM entity type.</param>
+            <returns>A collection of operations bound to the entity type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder.FindOperationsBoundToCollection(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Finds operations that can be invoked on the feed. This would include all the operations that are bound to the given
+            type and its base types.
+            </summary>
+            <param name="entityType">The EDM entity type.</param>
+            <returns>A collection of operations bound to the feed.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableActions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="entityType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableFunctions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="entityType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableOperationsBoundToCollection(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="entityType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableOperations(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="entityType"></param>
+            <param name="boundToCollection"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions">
             <summary>
             Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
@@ -264,12 +336,34 @@
             <param name="request">The Http request.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetReaderSettings(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetWriterSettings(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.
             </summary>
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.CreateETag(Microsoft.AspNetCore.Http.HttpRequest,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Creates an ETag from concurrency property names and values.
+            </summary>
+            <param name="request">The input property names and values.</param>
+            <param name="properties">The input property names and values.</param>
+            <returns>The generated ETag string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetETagHandler(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
@@ -288,6 +382,26 @@
             Gets a list of assemblies available for the application.
             </summary>
             <returns>A list of assemblies available for the application. </returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
+            <summary>
+            Exposes the ability to convert a collection of concurrency property names and values into an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/>
+            and parse an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/> into a list of concurrency property values.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.CreateETag(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Creates an ETag from concurrency property names and values.
+            </summary>
+            <param name="properties">The input property names and values.</param>
+            <returns>The generated ETag string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.ParseETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Parses an ETag header value into concurrency property names and values.
+            </summary>
+            <param name="etagHeaderValue">The ETag header value.</param>
+            <returns>Concurrency property names and values.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
             <summary>
@@ -439,6 +553,11 @@
             
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataParameterValue.ParameterValuePrefix">
+            <summary>
+            This prefix is used to identify parameters in [FromODataUri] binding scenario.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataParameterValue.#ctor(System.Object,Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
             
@@ -459,6 +578,13 @@
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions">
             <summary>
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions.GetEdmType(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataPathExtensions.GetNavigationSource(Microsoft.OData.UriParser.ODataPath)">
             <summary>
@@ -744,6 +870,145 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext">
+            <summary>
+            This defines some context information used to perform query composition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.#ctor(Microsoft.OData.Edm.IEdmModel,System.Type,Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Constructs an instance of <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> with <see cref="T:Microsoft.OData.Edm.IEdmModel" />, element CLR type,
+            and <see cref="T:Microsoft.OData.UriParser.ODataPath" />.
+            </summary>
+            <param name="model">The EdmModel that includes the <see cref="T:Microsoft.OData.Edm.IEdmType"/> corresponding to
+            the given <paramref name="elementClrType"/>.</param>
+            <param name="elementClrType">The CLR type of the element of the collection being queried.</param>
+            <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
+            <remarks>
+            This is a public constructor used for stand-alone scenario; in this case, the services
+            container may not be present.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Constructs an instance of <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> with <see cref="T:Microsoft.OData.Edm.IEdmModel" />, element EDM type,
+            and <see cref="T:Microsoft.OData.UriParser.ODataPath" />.
+            </summary>
+            <param name="model">The EDM model the given EDM type belongs to.</param>
+            <param name="elementType">The EDM type of the element of the collection being queried.</param>
+            <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.Model">
+            <summary>
+            Gets the given <see cref="T:Microsoft.OData.Edm.IEdmModel"/> that contains the EntitySet.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.ElementType">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmType"/> of the element.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.NavigationSource">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> that contains the element.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.ElementClrType">
+            <summary>
+            Gets the CLR type of the element.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.Path">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.RequestContainer">
+            <summary>
+            Gets the request container.
+            </summary>
+            <remarks>
+            The services container may not be present. See the constructor in this file for
+            use in stand-alone scenarios.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty._propertySegment">
+            <summary>
+            the corresponding property segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty._navigationSource">
+            <summary>
+            the corresponding navigation source. maybe useless
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty._propertySelectItem">
+            <summary>
+            the path select item for this property.
+            for example: $select=abc or $select=NS.Type/abc
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty._subSelectItems">
+            <summary>
+            the sub $select and $expand for this property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty.#ctor(Microsoft.OData.UriParser.PropertySegment)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty"/> class.
+            </summary>
+            <param name="propertySegment">The property segment that has this select expand item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty.#ctor(Microsoft.OData.UriParser.PropertySegment,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty"/> class.
+            </summary>
+            <param name="propertySegment">The property segment that has this select expand item.</param>
+            <param name="navigationSource">The targe navigation source of this property segment.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty.ToPathSelectItem">
+            <summary>
+            Gets the merged <see cref="T:Microsoft.OData.UriParser.PathSelectItem"/> for this property.
+            </summary>
+            <returns>Null or the created <see cref="T:Microsoft.OData.UriParser.PathSelectItem"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty.AddSubSelectItem(System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment},Microsoft.OData.UriParser.PathSelectItem)">
+            <summary>
+            Add sub $select item for this include property.
+            </summary>
+            <param name="remainingSegments">The remaining segments star from this include property.</param>
+            <param name="oldSelectItem">The old $select item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandIncludedProperty.AddSubExpandItem(System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment},Microsoft.OData.UriParser.ExpandedReferenceSelectItem)">
+            <summary>
+            Add sub $expand item for this include property.
+            </summary>
+            <param name="remainingSegments">The remaining segments star from this include property.</param>
+            <param name="oldRefItem">The old $expand item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandPathExtensions.GetFirstNonTypeCastSegment(Microsoft.OData.UriParser.ODataSelectPath,System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment}@)">
+            <summary>
+            Verify the $select path and gets the first non type cast segment in a select path.
+            For example: $select=NS.SubType1/abc/NS.SubType2/xyz
+            => firstPropertySegment: "abc"
+            => remainingSegments:  NS.SubType2/xyz
+            </summary>
+            <param name="selectPath">The input $select path.</param>
+            <param name="remainingSegments">The remaining segments after the first non type segment.</param>
+            <returns>First non-type cast segment.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.SelectExpandPathExtensions.GetFirstNonTypeCastSegment(Microsoft.OData.UriParser.ODataExpandPath,System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment}@)">
+            <summary>
+            Verify the $expand path and gets the first non type cast segment in this expand path.
+            For example: $expand=NS.SubType1/abc/NS.SubType2/nav
+            => firstPropertySegment: "abc"
+            => remainingSegments:  NS.SubType2/nav
+            => leadingTypeSegment: NS.SubType1
+            </summary>
+            <param name="expandPath">The input $expand path.</param>
+            <param name="remainingSegments">The remaining segments after the first non type segment.</param>
+            <returns>First non-type cast segment.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult">
             <summary>

@@ -11,7 +11,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     public class ODataParameterValue
     {
-        // This prefix is used to identify parameters in [FromODataUri] binding scenario.
+        /// <summary>
+        /// This prefix is used to identify parameters in [FromODataUri] binding scenario.
+        /// </summary>
         public const string ParameterValuePrefix = "DF908045-6922-46A0-82F2-2F6E7F43D1B1_";
 
         /// <summary>

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -30,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             string message = $"About page visited at {DateTime.UtcNow.ToLongTimeString()}";
-            _logger.LogInformation(message);
+            _logger.LogTrace(message);
         }
 
         /// <inheritdoc />

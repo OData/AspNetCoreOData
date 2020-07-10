@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.OData.Formatting.Deserialization;
 using Microsoft.AspNetCore.OData.Formatting.Serialization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -63,17 +61,28 @@ namespace Microsoft.AspNetCore.OData.Formatting
                 // options.ValueProviderFactories.Insert(0, new ODataValueProviderFactory());
             });
 
+            services.AddSingleton<IETagHandler, DefaultODataETagHandler>();
+
             // SerializerProvider and DeserializerProvider.
             services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
             services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
 
+            // Deserializers.
+            services.AddSingleton<ODataResourceDeserializer>();
+            services.AddSingleton<ODataEnumDeserializer>();
+            services.AddSingleton<ODataPrimitiveDeserializer>();
+            services.AddSingleton<ODataResourceSetDeserializer>();
+            services.AddSingleton<ODataCollectionDeserializer>();
+            services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
+            services.AddSingleton<ODataActionPayloadDeserializer>();
+
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();
-         //   services.AddSingleton<ODataPrimitiveSerializer>();
+            services.AddSingleton<ODataPrimitiveSerializer>();
          //   services.AddSingleton<ODataDeltaFeedSerializer>();
-          //  services.AddSingleton<ODataResourceSetSerializer>();
+            services.AddSingleton<ODataResourceSetSerializer>();
             services.AddSingleton<ODataCollectionSerializer>();
-        //   services.AddSingleton<ODataResourceSerializer>();
+            services.AddSingleton<ODataResourceSerializer>();
             services.AddSingleton<ODataServiceDocumentSerializer>();
             services.AddSingleton<ODataEntityReferenceLinkSerializer>();
             services.AddSingleton<ODataEntityReferenceLinksSerializer>();

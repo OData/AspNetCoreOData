@@ -24,5 +24,15 @@ namespace ODataRoutingSample.Controllers.v1
             })
             .ToArray();
         }
+
+        [HttpGet]
+        public Customer Get(int key)
+        {
+            return new Customer
+            {
+                Id = key,
+                Name = "Name + " + key
+            };
+        }
     }
 }
