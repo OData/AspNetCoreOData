@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Formatting.Value;
 using Microsoft.AspNetCore.OData.Formatting.Wrapper;
@@ -62,12 +63,11 @@ namespace Microsoft.AspNetCore.OData.Formatting.Deserialization
                     throw Error.Argument("readContext", SRResources.ODataPathMissing);
                 }
 
-                // TODO: 
-                //navigationSource = readContext.Path.NavigationSource;
-                //if (navigationSource == null)
-                //{
-                //    throw new SerializationException(SRResources.NavigationSourceMissingDuringDeserialization);
-                //}
+                navigationSource = readContext.Path.GetNavigationSource();
+                if (navigationSource == null)
+                {
+                    throw new SerializationException(SRResources.NavigationSourceMissingDuringDeserialization);
+                }
             }
 
             ODataReader odataReader = messageReader.CreateODataResourceReader(navigationSource, structuredType.StructuredDefinition());

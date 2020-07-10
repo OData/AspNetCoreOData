@@ -499,6 +499,16 @@
             </summary>
             <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.FromODataBodyAttribute">
+            <summary>
+            An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.FromODataBodyAttribute.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.FromODataUriAttribute"/> class.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.FromODataUriAttribute">
             <summary>
             An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
@@ -669,6 +679,15 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.MediaType.QueryStringMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdocs />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataBodyModelBinder">
+            <summary>
+            A model binder for ODataParameterValue values.
+            </summary>
+            <remarks>
+            This class is similar to ODataModelBinderProvider in AspNet. The flow is similar but the
+            type are dissimilar enough making a common version more complex than separate versions.
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatting.ODataFormattingServiceCollectionExtensions">
             <summary>
@@ -1009,6 +1028,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.MappingDoesNotContainResourceType">
             <summary>
               Looks up a localized string similar to The provided mapping does not contain a resource for the resource type &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ModelBinderUtil_ModelMetadataCannotBeNull">
+            <summary>
+              Looks up a localized string similar to The binding context cannot have a null ModelMetadata..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatting.SRResources.ModelMissingFromReadContext">

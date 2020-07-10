@@ -258,12 +258,25 @@ namespace Microsoft.AspNetCore.OData.Formatting
                 //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
 
                 Endpoint endPoint = request.HttpContext.GetEndpoint();
-                EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
+                EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
 
-                string aUri = linkGenerator.GetUriByName(request.HttpContext, name.EndpointName,
+                if (endpointName != null)
+                {
+                    string aUri = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
                     request.RouteValues, request.Scheme, request.Host, request.PathBase);
 
-                return new Uri(aUri);
+                    return new Uri(aUri);
+                }
+
+
+                RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
+                if (routeName != null)
+                {
+                    string aUri = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
+                        request.RouteValues, request.Scheme, request.Host, request.PathBase);
+
+                    return new Uri(aUri);
+                }
             }
 
             //string baseAddress = request.GetUrlHelper().CreateODataLink();

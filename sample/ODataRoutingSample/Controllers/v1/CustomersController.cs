@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Formatting;
 using Microsoft.AspNetCore.OData.Routing;
 using ODataRoutingSample.Models;
 
@@ -33,6 +34,18 @@ namespace ODataRoutingSample.Controllers.v1
                 Id = key,
                 Name = "Name + " + key
             };
+        }
+
+        [HttpPost]
+        public IActionResult Post([FromBody]Customer newCustomer)
+        {
+            return Ok();
+        }
+
+        [HttpPost]
+        public string RateByName(int key, [FromODataBody]string name, [FromODataBody]int age)
+        {
+            return key + name + ": " + age;
         }
     }
 }

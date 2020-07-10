@@ -420,7 +420,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Model">
             <summary>
-            Gets or sets the OData path.
+            Gets or sets the OData model.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Path">
@@ -441,6 +441,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.UrlHelper">
             <summary>
             Gets or sets the Url helper.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
@@ -500,6 +505,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
             <summary>
             Gets or sets the Url helper.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BodyValues">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptions">

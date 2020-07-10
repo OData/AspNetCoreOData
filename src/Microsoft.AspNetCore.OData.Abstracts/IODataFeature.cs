@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData.Edm;
@@ -14,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     public interface IODataFeature
     {
         /// <summary>
-        /// Gets or sets the OData path.
+        /// Gets or sets the OData model.
         /// </summary>
         IEdmModel Model { get; set; }
 
@@ -37,5 +38,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the Url helper.
         /// </summary>
         IUrlHelper UrlHelper { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        IDictionary<string, object> BodyValues { get; set; }
     }
 }

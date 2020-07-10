@@ -6,6 +6,7 @@ using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -50,5 +51,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the Url helper.
         /// </summary>
         public IUrlHelper UrlHelper { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IDictionary<string, object> BodyValues { get; set; }
     }
 }

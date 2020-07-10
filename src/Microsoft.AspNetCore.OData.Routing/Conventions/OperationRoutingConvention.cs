@@ -125,28 +125,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return false;
         }
 
-        private static bool HasKeyParameter(IEdmEntityType entityType, ActionModel action)
-        {
-            var keys = entityType.Key().ToArray();
-            if (keys.Length == 1)
-            {
-                return action.Parameters.Any(p => p.ParameterInfo.Name == "key");
-            }
-            else
-            {
-                foreach (var key in keys)
-                {
-                    string keyName = $"key{key.Name}";
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
         private static IEdmFunction FindMatchFunction(int keyNumber, IEnumerable<IEdmFunction> functions, ActionModel action)
         {
             // if it's action

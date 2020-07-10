@@ -296,4 +296,7 @@
   <data name="FormatterReadIsNotSupportedForType" xml:space="preserve">
     <value>Reading type '{0}' is not supported by '{1}'.</value>
   </data>
+  <data name="ModelBinderUtil_ModelMetadataCannotBeNull" xml:space="preserve">
+    <value>The binding context cannot have a null ModelMetadata.</value>
+  </data>
 </root>

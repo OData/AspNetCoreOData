@@ -31,6 +31,11 @@ namespace ODataRoutingSample.Models
             function.Parameter<int>("order");
             function.Returns<int>();
 
+            var action = builder.EntityType<Customer>().Action("RateByName");
+            action.Parameter<string>("name");
+            action.Parameter<int>("age");
+            action.Returns<string>();
+
             return builder.GetEdmModel();
         }
 

@@ -340,6 +340,15 @@ namespace Microsoft.AspNetCore.OData.Formatting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The binding context cannot have a null ModelMetadata..
+        /// </summary>
+        internal static string ModelBinderUtil_ModelMetadataCannotBeNull {
+            get {
+                return ResourceManager.GetString("ModelBinderUtil_ModelMetadataCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The EDM model is missing on the read context. The model is required on the read context to deserialize the payload..
         /// </summary>
         internal static string ModelMissingFromReadContext {
