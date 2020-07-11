@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 

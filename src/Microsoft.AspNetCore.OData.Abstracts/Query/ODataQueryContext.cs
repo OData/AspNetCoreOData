@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -16,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Query
     /// </summary>
     public class ODataQueryContext
     {
-        //private DefaultQuerySettings _defaultQuerySettings;
+        private DefaultQuerySettings _defaultQuerySettings;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -91,23 +92,23 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Query
         {
         }
 
-        ///// <summary>
-        ///// Gets the given <see cref="DefaultQuerySettings"/>.
-        ///// </summary>
-        //public DefaultQuerySettings DefaultQuerySettings
-        //{
-        //    get
-        //    {
-        //        if (_defaultQuerySettings == null)
-        //        {
-        //            _defaultQuerySettings = RequestContainer == null
-        //                ? new DefaultQuerySettings()
-        //                : RequestContainer.GetRequiredService<DefaultQuerySettings>();
-        //        }
+        /// <summary>
+        /// Gets the given <see cref="DefaultQuerySettings"/>.
+        /// </summary>
+        public DefaultQuerySettings DefaultQuerySettings
+        {
+            get
+            {
+                if (_defaultQuerySettings == null)
+                {
+                    _defaultQuerySettings = RequestContainer == null
+                        ? new DefaultQuerySettings()
+                        : RequestContainer.GetRequiredService<DefaultQuerySettings>();
+                }
 
-        //        return _defaultQuerySettings;
-        //    }
-        //}
+                return _defaultQuerySettings;
+            }
+        }
 
         /// <summary>
         /// Gets the given <see cref="IEdmModel"/> that contains the EntitySet.

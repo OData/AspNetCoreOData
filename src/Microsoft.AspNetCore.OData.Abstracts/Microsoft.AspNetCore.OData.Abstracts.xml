@@ -284,6 +284,26 @@
             <param name="boundToCollection"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
+            <summary>
+            Exposes the ability to convert a collection of concurrency property names and values into an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/>
+            and parse an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/> into a list of concurrency property values.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.CreateETag(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Creates an ETag from concurrency property names and values.
+            </summary>
+            <param name="properties">The input property names and values.</param>
+            <returns>The generated ETag string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.ParseETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Parses an ETag header value into concurrency property names and values.
+            </summary>
+            <param name="etagHeaderValue">The ETag header value.</param>
+            <returns>Concurrency property names and values.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions">
             <summary>
             Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
@@ -382,26 +402,6 @@
             Gets a list of assemblies available for the application.
             </summary>
             <returns>A list of assemblies available for the application. </returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
-            <summary>
-            Exposes the ability to convert a collection of concurrency property names and values into an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/>
-            and parse an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/> into a list of concurrency property values.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.CreateETag(System.Collections.Generic.IDictionary{System.String,System.Object})">
-            <summary>
-            Creates an ETag from concurrency property names and values.
-            </summary>
-            <param name="properties">The input property names and values.</param>
-            <returns>The generated ETag string.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IETagHandler.ParseETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
-            <summary>
-            Parses an ETag header value into concurrency property names and values.
-            </summary>
-            <param name="etagHeaderValue">The ETag header value.</param>
-            <returns>Concurrency property names and values.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
             <summary>
@@ -881,6 +881,105 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.SRResources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentInvalidAbsoluteUri">
+            <summary>
+              Looks up a localized string similar to Relative URI values are not supported: &apos;{0}&apos;. The URI must be absolute..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentInvalidHttpUriScheme">
+            <summary>
+              Looks up a localized string similar to Unsupported URI scheme: &apos;{0}&apos;. The URI scheme must be either &apos;{1}&apos; or &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentMustBeGreaterThanOrEqualTo">
+            <summary>
+              Looks up a localized string similar to Value must be greater than or equal to {0}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentMustBeLessThanOrEqualTo">
+            <summary>
+              Looks up a localized string similar to Value must be less than or equal to {0}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentNullOrEmpty">
+            <summary>
+              Looks up a localized string similar to The argument &apos;{0}&apos; is null or empty..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.ArgumentUriHasQueryOrFragment">
+            <summary>
+              Looks up a localized string similar to URI must not contain a query component or a fragment identifier..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.InvalidEnumArgument">
+            <summary>
+              Looks up a localized string similar to The value of argument &apos;{0}&apos; ({1}) is invalid for Enum type &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.MultipleMatchingClrTypesForEdmType">
+            <summary>
+              Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings">
+            <summary>
+            This class describes the default settings to use during query composition.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableExpand">
+            <summary>
+            Gets or sets a value indicating whether navigation property can be expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableSelect">
+            <summary>
+            Gets or sets a value indicating whether property can be selected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableCount">
+            <summary>
+            Gets or sets a value indicating whether entity set and property can apply $count.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableOrderBy">
+            <summary>
+            Gets or sets a value indicating whether property can apply $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableFilter">
+            <summary>
+            Gets or sets a value indicating whether property can apply $filter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+            <value>
+            The max value of $top that a client can request, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings.EnableSkipToken">
+            <summary>
+            Gets or sets a value indicating whether the service will use skiptoken or not.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext">
             <summary>
             This defines some context information used to perform query composition.
@@ -908,6 +1007,11 @@
             <param name="model">The EDM model the given EDM type belongs to.</param>
             <param name="elementType">The EDM type of the element of the collection being queried.</param>
             <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.DefaultQuerySettings">
+            <summary>
+            Gets the given <see cref="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.DefaultQuerySettings"/>.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext.Model">
             <summary>
@@ -1064,6 +1168,256 @@
             <summary>
             The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsDateTime(System.Type)">
+            <summary>
+            Determine if a type is a DateTime.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateTime; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsTimeSpan(System.Type)">
+            <summary>
+            Determine if a type is a TimeSpan.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeSpan; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsTypeAssignableFrom(System.Type,System.Type)">
+            <summary>
+            Determine if a type is assignable from another type.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <param name="fromType">The type to assign from.</param>
+            <returns>True if the type is assignable; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.GetReflectedType(System.Reflection.MemberInfo)">
+            <summary>
+            Return the reflected type from a member info.
+            </summary>
+            <param name="memberInfo">The member info to convert.</param>
+            <returns>The reflected type from a member info.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsValueType(System.Type)">
+            <summary>
+            Determine if a type is a value type.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a value type; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsEnum(System.Type)">
+            <summary>
+            Determine if a type is an enumeration.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsGenericType(System.Type)">
+            <summary>
+            Determine if a type is a generic type.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a generic type; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsNullable(System.Type)">
+            <summary>
+            Determine if a type is null-able.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is null-able; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.ToNullable(System.Type)">
+            <summary>
+            Return the type from a nullable type.
+            </summary>
+            <param name="clrType">The type to convert.</param>
+            <returns>The type from a nullable type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsCollection(System.Type)">
+            <summary>
+            Determine if a type is a collection.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsCollection(System.Type,System.Type@)">
+            <summary>
+            Determine if a type is a collection.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <param name="elementType">out: the element type of the collection.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsInterface(System.Type)">
+            <summary>
+            Determine if a type is an interface.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is an interface; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.GetImplementedIEnumerableType(System.Type)">
+            <summary>
+            Returns type of T if the type implements IEnumerable of T, otherwise, return null.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Error">
+            <summary>
+            Utility class for creating and unwrapping <see cref="T:System.Exception"/> instances.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.Format(System.String,System.Object[])">
+            <summary>
+            Formats the specified resource string using <see cref="P:System.Globalization.CultureInfo.CurrentCulture"/>.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="args">An object array that contains zero or more objects to format.</param>
+            <returns>The formatted string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.Argument(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.ArgumentException"/> with the provided properties.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.Argument(System.String,System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.ArgumentException"/> with the provided properties.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.PropertyNull">
+            <summary>
+            Creates an <see cref="T:System.ArgumentNullException"/> with the provided properties.
+            </summary>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentNull(System.String)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentNullException"/> with the provided properties.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentNull(System.String,System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.ArgumentNullException"/> with the provided properties.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentNullOrEmpty(System.String)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentException"/> with a default message.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentOutOfRange(System.String,System.Object,System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.ArgumentOutOfRangeException"/> with the provided properties.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="actualValue">The value of the argument that causes this exception.</param>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentMustBeGreaterThanOrEqualTo(System.String,System.Object,System.Object)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentOutOfRangeException"/> with a message saying that the argument must be greater than or equal to <paramref name="minValue"/>.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="actualValue">The value of the argument that causes this exception.</param>
+            <param name="minValue">The minimum size of the argument.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ArgumentMustBeLessThanOrEqualTo(System.String,System.Object,System.Object)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentOutOfRangeException"/> with a message saying that the argument must be less than or equal to <paramref name="maxValue"/>.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="actualValue">The value of the argument that causes this exception.</param>
+            <param name="maxValue">The maximum size of the argument.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.KeyNotFound">
+            <summary>
+            Creates an <see cref="T:System.Collections.Generic.KeyNotFoundException"/> with a message saying that the key was not found.
+            </summary>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.KeyNotFound(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.Collections.Generic.KeyNotFoundException"/> with a message saying that the key was not found.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.ObjectDisposed(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.ObjectDisposedException"/> initialized according to guidelines.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.OperationCanceled">
+            <summary>
+            Creates an <see cref="T:System.OperationCanceledException"/> initialized with the provided parameters.
+            </summary>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.OperationCanceled(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.OperationCanceledException"/> initialized with the provided parameters.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.InvalidEnumArgument(System.String,System.Int32,System.Type)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentException"/> for an invalid enum argument.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <param name="invalidValue">The value of the argument that failed.</param>
+            <param name="enumClass">A <see cref="T:System.Type"/> that represents the enumeration class with the valid values.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.InvalidOperation(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.InvalidOperation(System.Exception,System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+            <param name="innerException">Inner exception</param>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Error.NotSupported(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
         </member>
     </members>
 </doc>

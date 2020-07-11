@@ -1,22 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Abstracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Microsoft.AspNetCore.OData.Formatting
+namespace Microsoft.AspNetCore.OData
 {
     /// <summary>
     /// Utility class for creating and unwrapping <see cref="Exception"/> instances.
     /// </summary>
     internal static class Error
     {
-        private const string HttpScheme = "http";
-        private const string HttpsScheme = "https";
-
         /// <summary>
         /// Formats the specified resource string using <see cref="CultureInfo.CurrentCulture"/>.
         /// </summary>
@@ -88,10 +86,11 @@ namespace Microsoft.AspNetCore.OData.Formatting
         /// </summary>
         /// <param name="parameterName">The name of the parameter that caused the current exception.</param>
         /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentException ArgumentNullOrEmpty(string parameterName)
-        //{
-        //    return Error.Argument(parameterName, CommonWebApiResources.ArgumentNullOrEmpty, parameterName);
-        //}
+        internal static ArgumentException ArgumentNullOrEmpty(string parameterName)
+        {
+            string message = $"The argument '{parameterName}' is null or empty.";
+            return new ArgumentException(message);
+        }
 
         /// <summary>
         /// Creates an <see cref="ArgumentOutOfRangeException"/> with the provided properties.
@@ -113,10 +112,10 @@ namespace Microsoft.AspNetCore.OData.Formatting
         /// <param name="actualValue">The value of the argument that causes this exception.</param>
         /// <param name="minValue">The minimum size of the argument.</param>
         /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentOutOfRangeException ArgumentMustBeGreaterThanOrEqualTo(string parameterName, object actualValue, object minValue)
-        //{
-        //    return new ArgumentOutOfRangeException(parameterName, actualValue, Error.Format(CommonWebApiResources.ArgumentMustBeGreaterThanOrEqualTo, minValue));
-        //}
+        internal static ArgumentOutOfRangeException ArgumentMustBeGreaterThanOrEqualTo(string parameterName, object actualValue, object minValue)
+        {
+            return new ArgumentOutOfRangeException(parameterName, actualValue, Error.Format(SRResources.ArgumentMustBeGreaterThanOrEqualTo, minValue));
+        }
 
         /// <summary>
         /// Creates an <see cref="ArgumentOutOfRangeException"/> with a message saying that the argument must be less than or equal to <paramref name="maxValue"/>.
@@ -125,10 +124,10 @@ namespace Microsoft.AspNetCore.OData.Formatting
         /// <param name="actualValue">The value of the argument that causes this exception.</param>
         /// <param name="maxValue">The maximum size of the argument.</param>
         /// <returns>The logged <see cref="Exception"/>.</returns>
-        //internal static ArgumentOutOfRangeException ArgumentMustBeLessThanOrEqualTo(string parameterName, object actualValue, object maxValue)
-        //{
-        //    return new ArgumentOutOfRangeException(parameterName, actualValue, Error.Format(CommonWebApiResources.ArgumentMustBeLessThanOrEqualTo, maxValue));
-        //}
+        internal static ArgumentOutOfRangeException ArgumentMustBeLessThanOrEqualTo(string parameterName, object actualValue, object maxValue)
+        {
+            return new ArgumentOutOfRangeException(parameterName, actualValue, Error.Format(SRResources.ArgumentMustBeLessThanOrEqualTo, maxValue));
+        }
 
         /// <summary>
         /// Creates an <see cref="KeyNotFoundException"/> with a message saying that the key was not found.

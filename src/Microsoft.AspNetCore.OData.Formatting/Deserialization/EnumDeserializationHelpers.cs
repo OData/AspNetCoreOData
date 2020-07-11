@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatting.Deserialization

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.OData.Abstracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNetCore.OData.Formatting
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     internal static class TypeHelper
     {
@@ -176,6 +175,55 @@ namespace Microsoft.AspNetCore.OData.Formatting
             return false;
         }
 
+        /// <summary>
+        /// Determine if a type is an interface.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is an interface; false otherwise.</returns>
+        public static bool IsInterface(Type clrType)
+        {
+            return clrType.IsInterface;
+        }
+
+        /// <summary>
+        /// Returns type of T if the type implements IEnumerable of T, otherwise, return null.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal static Type GetImplementedIEnumerableType(Type type)
+        {
+            // get inner type from Task<T>
+            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                type = type.GetGenericArguments().First();
+            }
+
+            if (TypeHelper.IsGenericType(type) && TypeHelper.IsInterface(type) &&
+                (type.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                 type.GetGenericTypeDefinition() == typeof(IQueryable<>)))
+            {
+                // special case the IEnumerable<T>
+                return GetInnerGenericType(type);
+            }
+            else
+            {
+                // for the rest of interfaces and strongly Type collections
+                Type[] interfaces = type.GetInterfaces();
+                foreach (Type interfaceType in interfaces)
+                {
+                    if (TypeHelper.IsGenericType(interfaceType) &&
+                        (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                         interfaceType.GetGenericTypeDefinition() == typeof(IQueryable<>)))
+                    {
+                        // special case the IEnumerable<T>
+                        return GetInnerGenericType(interfaceType);
+                    }
+                }
+            }
+
+            return null;
+        }
+
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
         // This code is copied from DefaultHttpControllerTypeResolver.GetControllerTypes.
         internal static IEnumerable<Type> GetLoadedTypes(IAssemblyResolver assembliesResolver)
@@ -228,6 +276,19 @@ namespace Microsoft.AspNetCore.OData.Formatting
             }
 
             return type;
+        }
+
+        private static Type GetInnerGenericType(Type interfaceType)
+        {
+            // Getting the type T definition if the returning type implements IEnumerable<T>
+            Type[] parameterTypes = interfaceType.GetGenericArguments();
+
+            if (parameterTypes.Length == 1)
+            {
+                return parameterTypes[0];
+            }
+
+            return null;
         }
     }
 }

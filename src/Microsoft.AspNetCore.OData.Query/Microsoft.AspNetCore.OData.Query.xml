@@ -1,0 +1,1384 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.OData.Query</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
+            <summary>
+            Arithmetic operators to allow for querying using $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.None">
+            <summary>
+            A value that corresponds to allowing no arithmetic operators in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Add">
+            <summary>
+            A value that corresponds to allowing 'Add' arithmetic operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Subtract">
+            <summary>
+            A value that corresponds to allowing 'Subtract' arithmetic operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Multiply">
+            <summary>
+            A value that corresponds to allowing 'Multiply' arithmetic operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Divide">
+            <summary>
+            A value that corresponds to allowing 'Divide' arithmetic operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Modulo">
+            <summary>
+            A value that corresponds to allowing 'Modulo' arithmetic operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.All">
+            <summary>
+            A value that corresponds to allowing all arithmetic operators in $filter.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.AllowedFunctions">
+            <summary>
+            Functions to allow for querying using $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.None">
+            <summary>
+            A value that corresponds to allowing no functions in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.StartsWith">
+            <summary>
+            A value that corresponds to allowing 'StartsWith' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.EndsWith">
+            <summary>
+            A value that corresponds to allowing 'EndsWith' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Contains">
+            <summary>
+            A value that corresponds to allowing 'Contains' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Length">
+            <summary>
+            A value that corresponds to allowing 'Length' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.IndexOf">
+            <summary>
+            A value that corresponds to allowing 'IndexOf' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Concat">
+            <summary>
+            A value that corresponds to allowing 'Concat' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Substring">
+            <summary>
+            A value that corresponds to allowing 'Substring' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToLower">
+            <summary>
+            A value that corresponds to allowing 'ToLower' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToUpper">
+            <summary>
+            A value that corresponds to allowing 'ToUpper' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Trim">
+            <summary>
+            A value that corresponds to allowing 'Trim' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Cast">
+            <summary>
+            A value that corresponds to allowing 'Cast' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Year">
+            <summary>
+            A value that corresponds to allowing 'Year' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Date">
+            <summary>
+            A value that corresponds to allowing 'Date' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Month">
+            <summary>
+            A value that corresponds to allowing 'Month' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Time">
+            <summary>
+            A value that corresponds to allowing 'Time' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Day">
+            <summary>
+            A value that corresponds to allowing 'Day' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Hour">
+            <summary>
+            A value that corresponds to allowing 'Hour' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Minute">
+            <summary>
+            A value that corresponds to allowing 'Minute' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Second">
+            <summary>
+            A value that corresponds to allowing 'Second' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.FractionalSeconds">
+            <summary>
+            A value that corresponds to allowing 'Fractionalseconds' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Round">
+            <summary>
+            A value that corresponds to allowing 'Round' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Floor">
+            <summary>
+            A value that corresponds to allowing 'Floor' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Ceiling">
+            <summary>
+            A value that corresponds to allowing 'Ceiling' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.IsOf">
+            <summary>
+            A value that corresponds to allowing 'IsOf' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Any">
+            <summary>
+            A value that corresponds to allowing 'Any' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.All">
+            <summary>
+            A value that corresponds to allowing 'All' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions">
+            <summary>
+            A value that corresponds to allowing all string related functions in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllDateTimeFunctions">
+            <summary>
+            A value that corresponds to allowing all datetime related functions in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllMathFunctions">
+            <summary>
+            A value that corresponds to allowing math related functions in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllFunctions">
+            <summary>
+            A value that corresponds to allowing all functions in $filter.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators">
+            <summary>
+            Logical operators to allow for querying using $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.None">
+            <summary>
+            A value that corresponds to allowing no logical operators in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.Or">
+            <summary>
+            A value that corresponds to allowing 'Or' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.And">
+            <summary>
+            A value that corresponds to allowing 'And' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.Equal">
+            <summary>
+            A value that corresponds to allowing 'Equal' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.NotEqual">
+            <summary>
+            A value that corresponds to allowing 'NotEqual' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.GreaterThan">
+            <summary>
+            A value that corresponds to allowing 'GreaterThan' logical operator in $filter.
+            </summary>   
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.GreaterThanOrEqual">
+            <summary>
+            A value that corresponds to allowing 'GreaterThanOrEqual' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.LessThan">
+            <summary>
+            A value that corresponds to allowing 'LessThan' logical operator in $filter.
+            </summary>  
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.LessThanOrEqual">
+            <summary>
+            A value that corresponds to allowing 'LessThanOrEqual' logical operator in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.Not">
+            <summary>
+            A value that corresponds to allowing 'Not' logical operator in $filter.
+            </summary>  
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.Has">
+            <summary>
+            A value that corresponds to allowing 'Has' logical operator in $filter.
+            </summary>  
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.All">
+            <summary>
+            A value that corresponds to allowing all logical operators in $filter.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions">
+            <summary>
+            OData query options to allow for querying.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.None">
+            <summary>
+            A value that corresponds to allowing no query options.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Filter">
+            <summary>
+            A value that corresponds to allowing the $filter query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Expand">
+            <summary>
+            A value that corresponds to allowing the $expand query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Select">
+            <summary>
+            A value that corresponds to allowing the $select query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.OrderBy">
+            <summary>
+            A value that corresponds to allowing the $orderby query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Top">
+            <summary>
+            A value that corresponds to allowing the $top query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Skip">
+            <summary>
+            A value that corresponds to allowing the $skip query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Count">
+            <summary>
+            A value that corresponds to allowing the $count query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Format">
+            <summary>
+            A value that corresponds to allowing the $format query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.SkipToken">
+            <summary>
+            A value that corresponds to allowing the $skiptoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.DeltaToken">
+            <summary>
+            A value that corresponds to allowing the $deltatoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Apply">
+            <summary>
+            A value that corresponds to allowing the $apply query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Supported">
+            <summary>
+            A value that corresponds to the default query options supported.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.All">
+            <summary>
+            A value that corresponds to allowing all query options.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">
+            <summary>
+            This class defines an attribute that can be applied to an action to enable querying using the OData query
+            syntax. To avoid processing unexpected or malicious queries, use the validation settings on
+            <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+            http://go.microsoft.com/fwlink/?LinkId=279712.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.#ctor">
+            <summary>
+            Enables a controller action to support OData query parameters.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnsureStableOrdering">
+            <summary>
+            Gets or sets a value indicating whether query composition should
+            alter the original query when necessary to ensure a stable sort order.
+            </summary>
+            <value>A <c>true</c> value indicates the original query should
+            be modified when necessary to guarantee a stable sort order.
+            A <c>false</c> value indicates the sort order can be considered
+            stable without modifying the query.  Query providers that ensure
+            a stable sort order should set this value to <c>false</c>.
+            The default value is <c>true</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.HandleNullPropagation">
+            <summary>
+            Gets or sets a value indicating how null propagation should
+            be handled during query composition.
+            </summary>
+            <value>
+            The default is <see cref="F:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default"/>.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableConstantParameterization">
+            <summary>
+            Gets or sets a value indicating whether constants should be parameterized. Parameterizing constants
+            would result in better performance with Entity framework.
+            </summary>
+            <value>The default value is <c>true</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
+            <summary>
+            Gets or sets a value indicating whether queries with expanded navigations should be formulated
+            to encourage correlated subquery results to be buffered.
+            Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
+            by buffering results from the subquery.
+            </summary>
+            <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxAnyAllExpressionDepth">
+            <summary>
+            Gets or sets the maximum depth of the Any or All elements nested inside the query. This limit helps prevent
+            Denial of Service attacks.
+            </summary>
+            <value>
+            The maximum depth of the Any or All elements nested inside the query. The default value is 1.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxNodeCount">
+            <summary>
+            Gets or sets the maximum number of nodes inside the $filter syntax tree.
+            </summary>
+            <value>The default value is 100.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.PageSize">
+            <summary>
+            Gets or sets the maximum number of query results to send back to clients.
+            </summary>
+            <value>
+            The maximum number of query results to send back to clients.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.HandleReferenceNavigationPropertyExpandFilter">
+            <summary>
+            Honor $filter inside $expand of non-collection navigation property.
+            The expanded property is only populated when the filter evaluates to true.
+            This setting is false by default.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.AllowedQueryOptions">
+            <summary>
+            Gets or sets the query parameters that are allowed in queries.
+            </summary>
+            <value>The default includes all query options: $filter, $skip, $top, $orderby, $expand, $select, $count,
+            $format, $skiptoken and $deltatoken.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.AllowedFunctions">
+            <summary>
+            Gets or sets a value that represents a list of allowed functions used in the $filter query. Supported
+            functions include the following:
+            <list type="definition">
+            <item>
+            <term>String related:</term>
+            <description>contains, endswith, startswith, length, indexof, substring, tolower, toupper, trim,
+            concat e.g. ~/Customers?$filter=length(CompanyName) eq 19</description>
+            </item>
+            <item>
+            <term>DateTime related:</term>
+            <description>year, month, day, hour, minute, second, fractionalseconds, date, time
+            e.g. ~/Employees?$filter=year(BirthDate) eq 1971</description>
+            </item>
+            <item>
+            <term>Math related:</term>
+            <description>round, floor, ceiling</description>
+            </item>
+            <item>
+            <term>Type related:</term>
+            <description>isof, cast</description>
+            </item>
+            <item>
+            <term>Collection related:</term>
+            <description>any, all</description>
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.AllowedArithmeticOperators">
+            <summary>
+            Gets or sets a value that represents a list of allowed arithmetic operators including 'add', 'sub', 'mul',
+            'div', 'mod'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.AllowedLogicalOperators">
+            <summary>
+            Gets or sets a value that represents a list of allowed logical Operators such as 'eq', 'ne', 'gt', 'ge',
+            'lt', 'le', 'and', 'or', 'not'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.AllowedOrderByProperties">
+             <summary>
+             <para>Gets or sets a string with comma separated list of property names. The queryable result can only be
+             ordered by those properties defined in this list.</para>
+            
+             <para>Note, by default this string is null, which means it can be ordered by any property.</para>
+            
+             <para>For example, setting this value to null or empty string means that we allow ordering the queryable
+             result by any properties. Setting this value to "Name" means we only allow queryable result to be ordered
+             by Name property.</para>
+             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxSkip">
+            <summary>
+            Gets or sets the max value of $skip that a client can request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxExpansionDepth">
+            <summary>
+            Gets or sets the max expansion depth for the $expand query option. To disable the maximum expansion depth
+            check, set this property to 0.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxOrderByNodeCount">
+            <summary>
+            Gets or sets the maximum number of expressions that can be present in the $orderby.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
+            <summary>
+            Performs the query composition after action is executed. It first tries to retrieve the IQueryable from the
+            returning response message. It then validates the query from uri based on the validation settings on
+            <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. It finally applies the query appropriately, and reset it back on
+            the response message.
+            </summary>
+            <param name="actionExecutedContext">The context related to this action, including the response message,
+            request message and HttpConfiguration etc.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuted(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest,System.Action{System.Net.HttpStatusCode},System.Action{System.Net.HttpStatusCode,System.String,System.Exception})">
+            <summary>
+            Performs the query composition after action is executed. It first tries to retrieve the IQueryable from the
+            returning response message. It then validates the query from uri based on the validation settings on
+            <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. It finally applies the query appropriately, and reset it back on
+            the response message.
+            </summary>
+            <param name="responseValue">The response content value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The internal request.</param>
+            <param name="modelFunction">A function to get the model.</param>
+            <param name="createQueryOptionFunction">A function used to create and validate query options.</param>
+            <param name="createResponseAction">An action used to create a response.</param>
+            <param name="createErrorAction">A function used to generate error response.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.IsSuccessStatusCode(System.Int32)">
+            <summary>
+            Determine if the status code indicates success.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <returns>True if the response has a success status code; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ETag">
+            <summary>
+            The ETag parsed from request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag.#ctor">
+            <summary>
+            Create an instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ETag"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ETag.Item(System.String)">
+            <summary>
+            Gets or sets the value associated with the specified key.
+            </summary>
+            <param name="key">The key of the value to get or set.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ETag.IsWellFormed">
+            <summary>
+            Gets or sets whether the ETag is well-formed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ETag.EntityType">
+            <summary>
+            Gets or sets an entity type of the ETag.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ETag.IsAny">
+            <summary>
+            Gets or sets whether the ETag is corresponding to "*".
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ETag.IsIfNoneMatch">
+            <summary>
+            Gets or sets whether If-None-Match set in the request header.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
+            <summary>
+            Gets a property value from the ETag.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
+            <summary>
+            Sets a property value to ETag.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag.ApplyTo(System.Linq.IQueryable)">
+            <summary>
+            Apply the ETag to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the ETag has been applied to.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ETag`1">
+            <summary>
+            OData ETag of an entity type <typeparamref name="TEntity"/>.
+            </summary>
+            <typeparam name="TEntity">TEntity is the type of entity.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag`1.#ctor">
+            <summary>
+            Creates an instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ETag`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag`1.ApplyTo(System.Linq.IQueryable)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ETag`1.ApplyTo(System.Linq.IQueryable{`0})">
+            <summary>
+            Apply the ETag to the given <see cref="T:System.Linq.IQueryable`1"/>.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable`1"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable`1"/> after the ETag has been applied.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption">
+            <summary>
+            This enum defines how to handle null propagation in queryable support.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default">
+            <summary>
+            Determine how to handle null propagation based on the
+            query provider during query composition.  This is the
+            default value used in <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.True">
+            <summary>
+            Handle null propagation during query composition.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.False">
+            <summary>
+            Do not handle null propagation during query composition.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Gets the OData <see cref="T:Microsoft.AspNetCore.OData.Query.ETag"/> from the given request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="entityTagHeaderValue">The entity tag header value.</param>
+            <returns>The parsed <see cref="T:Microsoft.AspNetCore.OData.Query.ETag"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag``1(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ETag`1"/> from the given request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="entityTagHeaderValue">The entity tag header value.</param>
+            <returns>The parsed <see cref="T:Microsoft.AspNetCore.OData.Query.ETag`1"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
+            <summary>
+            This defines a composite OData query options that can be used to perform query composition.
+            Currently this only supports $filter, $orderby, $top, $skip, and $count.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.#ctor(Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the incoming request and some metadata information from
+            the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.</param>
+            <param name="request">The incoming request message.</param>
+            <remarks>
+            This signature uses types that are AspNetCore-specific.
+            While the AspNet version of this class makes the HttpRequest available, AspNetCore
+            is unhappy when it sees the HttpRequest during validation so HttpRequest is not part
+            of the public Api for ODataQueryOptions.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Request">
+            <summary>
+            Gets the request message associated with this instance.
+            </summary>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Context">
+            <summary>
+             Gets the given <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Skip">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Top">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Count">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator">
+            <summary>
+            Gets or sets the query validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(System.String)">
+            <summary>
+            Check if the given query option is an OData system query option using $-prefix-required theme.
+            </summary>
+            <param name="queryOptionName">The name of the query option.</param>
+            <returns>Returns <c>true</c> if the query option is an OData system query option.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(System.String,System.Boolean)">
+            <summary>
+            Check if the given query option is an OData system query option.
+            </summary>
+            <param name="queryOptionName">The name of the query option.</param>
+            <param name="isDollarSignOptional">Whether the optional-$-prefix scheme is used for OData system query.</param>
+            <returns>Returns <c>true</c> if the query option is an OData system query option.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IfMatch">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ETag"/> from IfMatch header.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IfNoneMatch">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ETag"/> from IfNoneMatch header.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.GetETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Gets the EntityTagHeaderValue ETag.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSupportedQueryOption(System.String)">
+            <summary>
+            Check if the given query option is the supported query option.
+            </summary>
+            <param name="queryOptionName">The name of the query option.</param>
+            <returns>Returns <c>true</c> if the query option is the supported query option.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.AllowedQueryOptions)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.AllowedQueryOptions)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The settings to use in query composition.</param>
+            <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The settings to use in query composition.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Object,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.AllowedQueryOptions)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="entity">The original entity.</param>
+            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
+            <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+            <returns>The new entity after the $select and $expand query has been applied to.</returns>
+            <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+            query options.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Object,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Applies the query to the given entity using the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/>.
+            </summary>
+            <param name="entity">The original entity.</param>
+            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
+            <returns>The new entity after the $select and $expand query has been applied to.</returns>
+            <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+            query options.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
+            It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults(System.Linq.IQueryable,System.Int32,System.Boolean,System.Boolean@)">
+            <summary>
+            Ensures the given <see cref="!:OrderByQueryOption"/> will produce a stable sort.
+            If it will, the input <paramref name="orderBy"/> will be returned
+            unmodified.  If the given <see cref="!:OrderByQueryOption"/> will not produce a
+            stable sort, a new <see cref="!:OrderByQueryOption"/> instance will be created
+            and returned.
+            </summary>
+            <param name="orderBy">The <see cref="!:OrderByQueryOption"/> to evaluate.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.</param>
+            <param name="applySortOptions"></param>
+            <returns>An <see cref="!:OrderByQueryOption"/> that will produce a stable sort.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.AddAutoSelectExpandProperties">
+            <summary>
+            Limits the query results to a maximum number of results.
+            </summary>
+            <typeparam name="T">The entity CLR type</typeparam>
+            <param name="queryable">The queryable to limit.</param>
+            <param name="limit">The query result limit.</param>
+            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+            <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
+            <returns>The limited query results.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Initialize(Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the incoming request and some metadata information from
+            the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1">
+            <summary>
+            This defines a composite OData query options that can be used to perform query composition.
+            Currently this only supports $filter, $orderby, $top, $skip.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.#ctor(Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the incoming request and some metadata information from
+            the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the <see cref="!:IEdmModel"/> and some type information</param>
+            <param name="request">The incoming request message</param>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.IfMatch">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ETag`1"/> from IfMatch header.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.IfNoneMatch">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ETag`1"/> from IfNoneMatch header.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.GetETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue)">
+            <summary>
+            Gets the EntityTagHeaderValue ETag>.
+            </summary>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.ApplyTo(System.Linq.IQueryable)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the individual query to the given IQueryable in the right order.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The settings to use in query composition.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute">
+            <summary>
+            A <see cref="T:Microsoft.AspNetCore.Mvc.ModelBinderAttribute"/> to bind parameters of type <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> to the OData query from the incoming request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute"/> class.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings">
+            <summary>
+            This class describes the settings to use during query composition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> class
+            and initializes the default settings.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.ModelBoundPageSize">
+            <summary>
+            Gets or sets the maximum number of query results to return based on the type or property.
+            </summary>
+            <value>
+            The maximum number of query results to return based on the type or property,
+            or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.EnsureStableOrdering">
+            <summary>
+            Gets or sets a value indicating whether query composition should
+            alter the original query when necessary to ensure a stable sort order.
+            </summary>
+            <value>A <c>true</c> value indicates the original query should
+            be modified when necessary to guarantee a stable sort order.
+            A <c>false</c> value indicates the sort order can be considered
+            stable without modifying the query.  Query providers that ensure
+            a stable sort order should set this value to <c>false</c>.
+            The default value is <c>true</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleNullPropagation">
+            <summary>
+            Gets or sets a value indicating how null propagation should
+            be handled during query composition.
+            </summary>
+            <value>
+            The default is <see cref="F:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default"/>.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.EnableConstantParameterization">
+            <summary>
+            Gets or sets a value indicating whether constants should be parameterized. Parameterizing constants
+            would result in better performance with Entity framework.
+            </summary>
+            <value>The default value is <c>true</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.EnableCorrelatedSubqueryBuffering">
+            <summary>
+            Gets or sets a value indicating whether queries with expanded navigations should be formulated
+            to encourage correlated subquery results to be buffered.
+            Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
+            by buffering results from the subquery.
+            </summary>
+            <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize">
+            <summary>
+            Gets or sets the maximum number of query results to return.
+            </summary>
+            <value>
+            The maximum number of query results to return, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleReferenceNavigationPropertyExpandFilter">
+            <summary>
+            Honor $filter inside $expand of non-collection navigation property.
+            The expanded property is only populated when the filter evaluates to true.
+            This setting is false by default.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.SRResources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ActionContextMustHaveDescriptor">
+            <summary>
+              Looks up a localized string similar to The HttpActionContext.ActionDescriptor is null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ActionContextMustHaveRequest">
+            <summary>
+              Looks up a localized string similar to The HttpActionContext.Request is null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ActionExecutedContextMustHaveRequest">
+            <summary>
+              Looks up a localized string similar to The HttpExecutedActionContext.Request is null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ApplyToOnUntypedQueryOption">
+            <summary>
+              Looks up a localized string similar to The query option is not bound to any CLR type. &apos;{0}&apos; is only supported with a query option bound to a CLR type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.CannotApplyETagOfT">
+            <summary>
+              Looks up a localized string similar to Cannot apply {0} of &apos;{1}&apos; to {2} of &apos;{3}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.CannotApplyODataQueryOptionsOfT">
+            <summary>
+              Looks up a localized string similar to Cannot apply {0} of &apos;{1}&apos; to {2} of &apos;{3}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ElementClrTypeNull">
+            <summary>
+              Looks up a localized string similar to The property &apos;ElementClrType&apos; of {0} cannot be null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.EntityTypeMismatch">
+            <summary>
+              Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.ETagNotWellFormed">
+            <summary>
+              Looks up a localized string similar to The ETag is not well-formed..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull">
+            <summary>
+              Looks up a localized string similar to Cannot create an EDM model as the action &apos;{0}&apos; on controller &apos;{1}&apos; has a void return type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.FailedToRetrieveTypeToBuildEdmModel">
+            <summary>
+              Looks up a localized string similar to Cannot create an EDM model as the action &apos;{0}&apos; on controller &apos;{1}&apos; has a return type &apos;{2}&apos; that does not implement IEnumerable&lt;T&gt;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.NotAllowedQueryOption">
+            <summary>
+              Looks up a localized string similar to Query option &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.QueryCannotBeEmpty">
+            <summary>
+              Looks up a localized string similar to The value for OData query &apos;{0}&apos; cannot be empty..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.QueryParameterNotSupported">
+            <summary>
+              Looks up a localized string similar to The query parameter &apos;{0}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.SkipTopLimitExceeded">
+            <summary>
+              Looks up a localized string similar to The limit of &apos;{0}&apos; for {1} query has been exceeded. The value from the incoming request is &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SRResources.UriQueryStringInvalid">
+            <summary>
+              Looks up a localized string similar to The query specified in the URI is not valid. {0}.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.CountQueryOption">
+            <summary>
+            Represents the value of the $count query option and exposes a way to retrieve the number of entities that satisfy a query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" /> class.
+            </summary>
+            <param name="rawValue">The raw value for the $count query option.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the query context.</param>
+            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.Context">
+            <summary>
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.RawValue">
+            <summary>
+            Gets the raw $count value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.Value">
+            <summary>
+            Gets the value of the $count in a parsed form.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator">
+            <summary>
+            Gets or sets the $count query validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the count query based on the given <paramref name="validationSettings"/>.
+            It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance
+            which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.GetEntityCount(System.Linq.IQueryable)">
+            <summary>
+            Gets the number of entities that satisfy the given query if the response should include a count query option, or <c>null</c> otherwise.
+            </summary>
+            <param name="query">The query to compute the count for.</param>
+            <returns>The number of entities that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.GetEntityCountFunc(System.Linq.IQueryable)">
+            <summary>
+            Gets the Func of entities number that satisfy the given query if the response should include a count query option, or <c>null</c> otherwise.
+            </summary>
+            <param name="query">The query to compute the count for.</param>
+            <returns>The the Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption">
+            <summary>
+            This defines a $skip OData query option for querying.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+            <summary>
+            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/> based on the raw $skip value and
+            an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="rawValue">The raw value for $skip query. It can be null or empty.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SkipQueryOption.Context">
+            <summary>
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SkipQueryOption.RawValue">
+            <summary>
+            Gets the raw $skip value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SkipQueryOption.Value">
+            <summary>
+            Gets the value of the $skip as a parsed integer.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator">
+            <summary>
+            Gets or sets the Skip Query Validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $skip query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skip query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $skip query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skip query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the skip query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.TopQueryOption">
+            <summary>
+            This defines a $top OData query option for querying.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TopQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+            <summary>
+            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/> based on the raw $top value and 
+            an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="rawValue">The raw value for $top query. It can be null or empty.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TopQueryOption.Context">
+            <summary>
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TopQueryOption.RawValue">
+            <summary>
+            Gets the raw $top value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TopQueryOption.Value">
+            <summary>
+            Gets the value of the $top as a parsed integer.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator">
+            <summary>
+            Gets or sets the Top Query Validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $top query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the top query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $top query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the top query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TopQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the top query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator">
+            <summary>
+            Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption"/> 
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator" /> class based on
+            the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings" />.
+            </summary>
+            <param name="defaultQuerySettings">The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings" />.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" />.
+            </summary>
+            <param name="countQueryOption">The $count query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator">
+            <summary>
+            Represents a validator used to validate OData queries based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="options">The OData query to validate.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings">
+            <summary>
+            This class describes the validation settings for querying.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedArithmeticOperators">
+            <summary>
+            Gets or sets a list of allowed arithmetic operators including 'add', 'sub', 'mul', 'div', 'mod'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedFunctions">
+             <summary>
+             Gets or sets a list of allowed functions used in the $filter query.
+            
+             The allowed functions include the following:
+            
+             String related: contains, endswith, startswith, length, indexof, substring, tolower, toupper, trim, concat
+            
+             e.g. ~/Customers?$filter=length(CompanyName) eq 19
+            
+             Date and Time related: year, month, day, hour, minute, second, fractionalseconds, date, time
+            
+             e.g. ~/Employees?$filter=year(BirthDate) eq 1971
+            
+             Math related: round, floor, ceiling
+            
+             Type related:isof, cast,
+            
+             Collection related: any, all
+            
+             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators">
+            <summary>
+            Gets or sets a list of allowed logical operators such as 'eq', 'ne', 'gt', 'ge', 'lt', 'le', 'and', 'or', 'not'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedOrderByProperties">
+             <summary>
+             Gets a list of properties one can orderby the result with. Note, by default this list is empty,
+             it means it can be ordered by any property.
+            
+             For example, having an empty collection means client can order the queryable result by any properties.
+             Adding "Name" to this list means that it only allows queryable result to be ordered by Name property.
+             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedQueryOptions">
+            <summary>
+            Gets or sets the query parameters that are allowed inside query. The default is all query options,
+            including $filter, $skip, $top, $orderby, $expand, $select, $count, $format, $skiptoken and $deltatoken.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxOrderByNodeCount">
+            <summary>
+            Gets or sets the maximum number of expressions that can be present in the $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxAnyAllExpressionDepth">
+            <summary>
+            Gets or sets the maximum depth of the Any or All elements nested inside the query.
+            </summary>
+            <remarks>
+            The default value is 1.
+            </remarks>
+            <value>
+            The maximum depth of the Any or All elements nested inside the query.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxNodeCount">
+            <summary>
+            Gets or sets the maximum number of the nodes inside the $filter syntax tree.
+            </summary>
+            <remarks>
+            The default value is 100.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxSkip">
+            <summary>
+            Gets or sets the max value of $skip that a client can request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxExpansionDepth">
+            <summary>
+            Gets or sets the max expansion depth for the $expand query option.
+            </summary>
+            <remarks>To disable the maximum expansion depth check, set this property to 0.</remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator">
+            <summary>
+            Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption" />.
+            </summary>
+            <param name="skipQueryOption">The $skip query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator">
+            <summary>
+            Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption" />.
+            </summary>
+            <param name="topQueryOption">The $top query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+    </members>
+</doc>

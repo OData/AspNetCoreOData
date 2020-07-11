@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 

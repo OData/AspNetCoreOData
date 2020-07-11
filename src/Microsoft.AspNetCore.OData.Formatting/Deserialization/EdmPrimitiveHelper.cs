@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatting.Deserialization

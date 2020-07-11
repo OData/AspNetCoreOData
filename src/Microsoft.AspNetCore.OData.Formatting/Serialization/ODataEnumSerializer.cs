@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatting.Edm;
 using Microsoft.AspNetCore.OData.Formatting.Value;
 using Microsoft.OData;

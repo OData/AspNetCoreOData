@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.Spatial;
 
@@ -125,6 +128,107 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         private static IEdmPrimitiveType GetPrimitiveType(EdmPrimitiveTypeKind primitiveKind)
         {
             return _coreModel.GetPrimitiveType(primitiveKind);
+        }
+
+        public static Type GetClrType(IEdmTypeReference edmTypeReference, IEdmModel edmModel)
+        {
+            return GetClrType(edmTypeReference, edmModel, DefaultAssemblyResolver.Default);
+        }
+
+        public static Type GetClrType(IEdmTypeReference edmTypeReference, IEdmModel edmModel, IAssemblyResolver assembliesResolver)
+        {
+            if (edmTypeReference == null)
+            {
+                throw Error.ArgumentNull("edmTypeReference");
+            }
+
+            Type primitiveClrType = _builtInTypesMapping
+                .Where(kvp => edmTypeReference.Definition.IsEquivalentTo(kvp.Value) && (!edmTypeReference.IsNullable || IsNullable(kvp.Key)))
+                .Select(kvp => kvp.Key)
+                .FirstOrDefault();
+
+            if (primitiveClrType != null)
+            {
+                return primitiveClrType;
+            }
+            else
+            {
+                Type clrType = GetClrType(edmTypeReference.Definition, edmModel, assembliesResolver);
+                if (clrType != null && TypeHelper.IsEnum(clrType) && edmTypeReference.IsNullable)
+                {
+                    return TypeHelper.ToNullable(clrType);
+                }
+
+                return clrType;
+            }
+        }
+
+        public static Type GetClrType(IEdmType edmType, IEdmModel edmModel)
+        {
+            return GetClrType(edmType, edmModel, DefaultAssemblyResolver.Default);
+        }
+
+        public static Type GetClrType(IEdmType edmType, IEdmModel edmModel, IAssemblyResolver assembliesResolver)
+        {
+            IEdmSchemaType edmSchemaType = edmType as IEdmSchemaType;
+
+            Contract.Assert(edmSchemaType != null);
+
+            ClrTypeAnnotation annotation = edmModel.GetAnnotationValue<ClrTypeAnnotation>(edmSchemaType);
+            if (annotation != null)
+            {
+                return annotation.ClrType;
+            }
+
+            string typeName = edmSchemaType.FullName();
+            IEnumerable<Type> matchingTypes = GetMatchingTypes(typeName, assembliesResolver);
+
+            if (matchingTypes.Count() > 1)
+            {
+                throw Error.Argument("edmTypeReference", SRResources.MultipleMatchingClrTypesForEdmType,
+                    typeName, String.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
+            }
+
+            edmModel.SetAnnotationValue<ClrTypeAnnotation>(edmSchemaType, new ClrTypeAnnotation(matchingTypes.SingleOrDefault()));
+
+            return matchingTypes.SingleOrDefault();
+        }
+
+        private static IEnumerable<Type> GetMatchingTypes(string edmFullName, IAssemblyResolver assembliesResolver)
+        {
+            return TypeHelper.GetLoadedTypes(assembliesResolver).Where(t => t.IsPublic && t.EdmFullName() == edmFullName);
+        }
+
+        public static string EdmFullName(this Type clrType)
+        {
+            return String.Format(CultureInfo.InvariantCulture, "{0}.{1}", clrType.Namespace, clrType.EdmName());
+        }
+
+        // Mangle the invalid EDM literal Type.FullName (System.Collections.Generic.IEnumerable`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]])
+        // to a valid EDM literal (the C# type name IEnumerable<int>).
+        public static string EdmName(this Type clrType)
+        {
+            // We cannot use just Type.Name here as it doesn't work for generic types.
+            return MangleClrTypeName(clrType);
+        }
+
+        // TODO (workitem 336): Support nested types and anonymous types.
+        private static string MangleClrTypeName(Type type)
+        {
+            Contract.Assert(type != null);
+
+            if (!TypeHelper.IsGenericType(type))
+            {
+                return type.Name;
+            }
+            else
+            {
+                return String.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}Of{1}",
+                    type.Name.Replace('`', '_'),
+                    String.Join("_", type.GetGenericArguments().Select(t => MangleClrTypeName(t))));
+            }
         }
     }
 }
