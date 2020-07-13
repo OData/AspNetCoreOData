@@ -88,6 +88,33 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} type of aggregation is not supported..
+        /// </summary>
+        internal static string AggregateKindNotSupported {
+            get {
+                return ResourceManager.GetString("AggregateKindNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregation method &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string AggregationMethodNotSupported {
+            get {
+                return ResourceManager.GetString("AggregationMethodNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregation &apos;{0}&apos; not supported for property &apos;{1}&apos; of type &apos;{2}&apos;..
+        /// </summary>
+        internal static string AggregationNotSupportedForType {
+            get {
+                return ResourceManager.GetString("AggregationNotSupportedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The query option is not bound to any CLR type. &apos;{0}&apos; is only supported with a query option bound to a CLR type..
         /// </summary>
         internal static string ApplyToOnUntypedQueryOption {
@@ -124,6 +151,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot cast $filter of type &apos;{0}&apos; to type &apos;{1}&apos;..
+        /// </summary>
+        internal static string CannotCastFilter {
+            get {
+                return ResourceManager.GetString("CannotCastFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot compare an enum of type &apos;{0}&apos; to an expression of type &apos;{1}&apos;..
         /// </summary>
         internal static string ConvertToEnumFailed {
@@ -156,6 +192,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         internal static string ETagNotWellFormed {
             get {
                 return ResourceManager.GetString("ETagNotWellFormed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to $filter in $expand of reference navigation property &apos;{0}&apos; is not expected type &apos;{1}&apos;.
+        /// </summary>
+        internal static string ExpandFilterExpressionNotLambdaExpression {
+            get {
+                return ResourceManager.GetString("ExpandFilterExpressionNotLambdaExpression", resourceCulture);
             }
         }
         
@@ -210,6 +255,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         internal static string InvalidPropertyMapping {
             get {
                 return ResourceManager.GetString("InvalidPropertyMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided mapping does not contain a resource for the resource type &apos;{0}&apos;..
+        /// </summary>
+        internal static string MappingDoesNotContainResourceType {
+            get {
+                return ResourceManager.GetString("MappingDoesNotContainResourceType", resourceCulture);
             }
         }
         
@@ -340,6 +394,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transformation kind {0} is not supported..
+        /// </summary>
+        internal static string NotSupportedTransformationKind {
+            get {
+                return ResourceManager.GetString("NotSupportedTransformationKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown function &apos;{0}&apos;..
         /// </summary>
         internal static string ODataFunctionNotSupported {
@@ -426,6 +489,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         internal static string QueryParameterNotSupported {
             get {
                 return ResourceManager.GetString("QueryParameterNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found unexpected parameter &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReferenceNavigationPropertyExpandFilterVisitorUnexpectedParameter {
+            get {
+                return ResourceManager.GetString("ReferenceNavigationPropertyExpandFilterVisitorUnexpectedParameter", resourceCulture);
             }
         }
         

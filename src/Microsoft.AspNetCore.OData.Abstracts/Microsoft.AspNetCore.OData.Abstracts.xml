@@ -103,6 +103,37 @@
             Annotation to store cache for concurrency properties
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Annotations.CustomAggregateMethodAnnotation">
+            <summary>
+            Allows client to tell OData which are the custom aggregation methods defined.
+            In order to do it, it must receive a methodToken - that is the full identifier
+            of the method in the OData URL - and an IDictionary that maps the input type
+            of the aggregation method to its MethodInfo.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Annotations.CustomAggregateMethodAnnotation.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Annotations.CustomAggregateMethodAnnotation"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Annotations.CustomAggregateMethodAnnotation.AddMethod(System.String,System.Collections.Generic.IDictionary{System.Type,System.Reflection.MethodInfo})">
+            <summary>
+            Adds all implementations of a method that share the same methodToken.
+            </summary>
+            <param name="methodToken">The given method token.</param>
+            <param name="methods">The given method dictionary.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Annotations.CustomAggregateMethodAnnotation.GetMethodInfo(System.String,System.Type,System.Reflection.MethodInfo@)">
+            <summary>
+            Get an implementation of a method with the specifies returnType and methodToken.
+            If there's no method that matches the requirements, returns null.
+            </summary>
+            <param name="methodToken">The given method token.</param>
+            <param name="returnType">The given return type.</param>
+            <param name="methodInfo">The output of method info.</param>
+            <returns>True if the method info was found, false otherwise.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Annotations.DynamicPropertyDictionaryAnnotation">
             <summary>
             This annotation indicates the mapping from a <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> to a <see cref="P:Microsoft.AspNetCore.OData.Abstracts.Annotations.DynamicPropertyDictionaryAnnotation.PropertyInfo"/>.

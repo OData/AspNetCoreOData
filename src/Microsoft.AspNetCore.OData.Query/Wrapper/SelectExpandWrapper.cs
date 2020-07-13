@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.OData.Formatting.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
-
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
     internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWrapper
