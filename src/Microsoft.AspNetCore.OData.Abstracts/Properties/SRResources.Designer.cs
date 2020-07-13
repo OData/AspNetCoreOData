@@ -115,6 +115,60 @@ namespace Microsoft.AspNetCore.OData.Abstracts {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The dynamic dictionary property &apos;{0}&apos; of type &apos;{1}&apos; cannot be set. The dynamic property dictionary must have a setter..
+        /// </summary>
+        internal static string CannotSetDynamicPropertyDictionary {
+            get {
+                return ResourceManager.GetString("CannotSetDynamicPropertyDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The actual entity type &apos;{0}&apos; is not assignable to the expected type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DeltaEntityTypeNotAssignable {
+            get {
+                return ResourceManager.GetString("DeltaEntityTypeNotAssignable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find nested resource name &apos;{0}&apos; in parent resource type &apos;{1}&apos;.
+        /// </summary>
+        internal static string DeltaNestedResourceNameNotFound {
+            get {
+                return ResourceManager.GetString("DeltaNestedResourceNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot use Delta of type &apos;{0}&apos; on an entity of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DeltaTypeMismatch {
+            get {
+                return ResourceManager.GetString("DeltaTypeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string EdmComplexObjectNullRef {
+            get {
+                return ResourceManager.GetString("EdmComplexObjectNullRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a supported EDM type..
+        /// </summary>
+        internal static string EdmTypeNotSupported {
+            get {
+                return ResourceManager.GetString("EdmTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value of argument &apos;{0}&apos; ({1}) is invalid for Enum type &apos;{2}&apos;..
         /// </summary>
         internal static string InvalidEnumArgument {
@@ -129,6 +183,96 @@ namespace Microsoft.AspNetCore.OData.Abstracts {
         internal static string MultipleMatchingClrTypesForEdmType {
             get {
                 return ResourceManager.GetString("MultipleMatchingClrTypesForEdmType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a boolean..
+        /// </summary>
+        internal static string PropertyMustBeBoolean {
+            get {
+                return ResourceManager.GetString("PropertyMustBeBoolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a DateTimeOffset or Date..
+        /// </summary>
+        internal static string PropertyMustBeDateTimeOffsetOrDate {
+            get {
+                return ResourceManager.GetString("PropertyMustBeDateTimeOffsetOrDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value with type &apos;{0}&apos; must have type &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyMustBeEnum {
+            get {
+                return ResourceManager.GetString("PropertyMustBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a string..
+        /// </summary>
+        internal static string PropertyMustBeString {
+            get {
+                return ResourceManager.GetString("PropertyMustBeString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a string with a length of 1..
+        /// </summary>
+        internal static string PropertyMustBeStringLengthOne {
+            get {
+                return ResourceManager.GetString("PropertyMustBeStringLengthOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a string with a maximum length of 1..
+        /// </summary>
+        internal static string PropertyMustBeStringMaxLengthOne {
+            get {
+                return ResourceManager.GetString("PropertyMustBeStringMaxLengthOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be a Edm.TimeOfDay..
+        /// </summary>
+        internal static string PropertyMustBeTimeOfDay {
+            get {
+                return ResourceManager.GetString("PropertyMustBeTimeOfDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; must be an enum or Nullable&lt;T&gt; where T is an enum type..
+        /// </summary>
+        internal static string TypeMustBeEnumOrNullableEnum {
+            get {
+                return ResourceManager.GetString("TypeMustBeEnumOrNullableEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The element type &apos;{0}&apos; of the given collection type &apos;{1}&apos; is not of the type &apos;{2}&apos;..
+        /// </summary>
+        internal static string UnexpectedElementType {
+            get {
+                return ResourceManager.GetString("UnexpectedElementType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The EDM type &apos;{0}&apos; of kind &apos;{1}&apos; is not supported..
+        /// </summary>
+        internal static string UnsupportedEdmType {
+            get {
+                return ResourceManager.GetString("UnsupportedEdmType", resourceCulture);
             }
         }
     }

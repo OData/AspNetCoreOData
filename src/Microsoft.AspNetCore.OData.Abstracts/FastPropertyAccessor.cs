@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.OData.Abstracts;
 using System;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Formatting
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// FastPropertyAccessor is a <see cref="PropertyAccessor{TStructuralType}"/> that speeds up (compares to reflection)

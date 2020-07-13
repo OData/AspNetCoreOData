@@ -97,6 +97,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
+        /// </summary>
+        internal static string BinaryOperatorNotSupported {
+            get {
+                return ResourceManager.GetString("BinaryOperatorNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot apply {0} of &apos;{1}&apos; to {2} of &apos;{3}&apos;..
         /// </summary>
         internal static string CannotApplyETagOfT {
@@ -111,6 +120,15 @@ namespace Microsoft.AspNetCore.OData.Query {
         internal static string CannotApplyODataQueryOptionsOfT {
             get {
                 return ResourceManager.GetString("CannotApplyODataQueryOptionsOfT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compare an enum of type &apos;{0}&apos; to an expression of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string ConvertToEnumFailed {
+            get {
+                return ResourceManager.GetString("ConvertToEnumFailed", resourceCulture);
             }
         }
         
@@ -160,11 +178,218 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; function cannot be applied to an enumeration-typed argument..
+        /// </summary>
+        internal static string FunctionNotSupportedOnEnum {
+            get {
+                return ResourceManager.GetString("FunctionNotSupportedOnEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; should be less than or equal to &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidExpansionDepthValue {
+            get {
+                return ResourceManager.GetString("InvalidExpansionDepthValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The mapper provider must return a valid &apos;{0}&apos; instance for the given &apos;{1}&apos; IEdmType..
+        /// </summary>
+        internal static string InvalidPropertyMapper {
+            get {
+                return ResourceManager.GetString("InvalidPropertyMapper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be null or empty..
+        /// </summary>
+        internal static string InvalidPropertyMapping {
+            get {
+                return ResourceManager.GetString("InvalidPropertyMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request includes a $expand path which is too deep. The maximum depth allowed is {0}. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings, or set the &apos;MaxDepth&apos; property in ExpandAttribute..
+        /// </summary>
+        internal static string MaxExpandDepthExceeded {
+            get {
+                return ResourceManager.GetString("MaxExpandDepthExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The node count limit of &apos;{0}&apos; has been exceeded. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings..
+        /// </summary>
+        internal static string MaxNodeLimitExceeded {
+            get {
+                return ResourceManager.GetString("MaxNodeLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arithmetic operator &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
+        /// </summary>
+        internal static string NotAllowedArithmeticOperator {
+            get {
+                return ResourceManager.GetString("NotAllowedArithmeticOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Function &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
+        /// </summary>
+        internal static string NotAllowedFunction {
+            get {
+                return ResourceManager.GetString("NotAllowedFunction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logical operator &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
+        /// </summary>
+        internal static string NotAllowedLogicalOperator {
+            get {
+                return ResourceManager.GetString("NotAllowedLogicalOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order by &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
+        /// </summary>
+        internal static string NotAllowedOrderByProperty {
+            get {
+                return ResourceManager.GetString("NotAllowedOrderByProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Query option &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
         /// </summary>
         internal static string NotAllowedQueryOption {
             get {
                 return ResourceManager.GetString("NotAllowedQueryOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The entity set &apos;{0}&apos; cannot be used for $count..
+        /// </summary>
+        internal static string NotCountableEntitySetUsedForCount {
+            get {
+                return ResourceManager.GetString("NotCountableEntitySetUsedForCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used for $count..
+        /// </summary>
+        internal static string NotCountablePropertyUsedForCount {
+            get {
+                return ResourceManager.GetString("NotCountablePropertyUsedForCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $expand query option..
+        /// </summary>
+        internal static string NotExpandablePropertyUsedInExpand {
+            get {
+                return ResourceManager.GetString("NotExpandablePropertyUsedInExpand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $filter query option..
+        /// </summary>
+        internal static string NotFilterablePropertyUsedInFilter {
+            get {
+                return ResourceManager.GetString("NotFilterablePropertyUsedInFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used for navigation..
+        /// </summary>
+        internal static string NotNavigablePropertyUsedInNavigation {
+            get {
+                return ResourceManager.GetString("NotNavigablePropertyUsedInNavigation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $select query option..
+        /// </summary>
+        internal static string NotSelectablePropertyUsedInSelect {
+            get {
+                return ResourceManager.GetString("NotSelectablePropertyUsedInSelect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $orderby query option..
+        /// </summary>
+        internal static string NotSortablePropertyUsedInOrderBy {
+            get {
+                return ResourceManager.GetString("NotSortablePropertyUsedInOrderBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown function &apos;{0}&apos;..
+        /// </summary>
+        internal static string ODataFunctionNotSupported {
+            get {
+                return ResourceManager.GetString("ODataFunctionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
+        /// </summary>
+        internal static string OrderByClauseNotSupported {
+            get {
+                return ResourceManager.GetString("OrderByClauseNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple &apos;$it&apos; nodes are not supported in &apos;$orderby&apos;..
+        /// </summary>
+        internal static string OrderByDuplicateIt {
+            get {
+                return ResourceManager.GetString("OrderByDuplicateIt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate property named &apos;{0}&apos; is not supported in &apos;$orderby&apos;..
+        /// </summary>
+        internal static string OrderByDuplicateProperty {
+            get {
+                return ResourceManager.GetString("OrderByDuplicateProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is {0}..
+        /// </summary>
+        internal static string OrderByNodeCountExceeded {
+            get {
+                return ResourceManager.GetString("OrderByNodeCountExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
+        /// </summary>
+        internal static string PropertyOrPathWasRemovedFromContext {
+            get {
+                return ResourceManager.GetString("PropertyOrPathWasRemovedFromContext", resourceCulture);
             }
         }
         
@@ -178,6 +403,24 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Binding OData QueryNode of kind {0} is not supported by {1}..
+        /// </summary>
+        internal static string QueryNodeBindingNotSupported {
+            get {
+                return ResourceManager.GetString("QueryNodeBindingNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validating OData QueryNode of kind {0} is not supported by {1}..
+        /// </summary>
+        internal static string QueryNodeValidationNotSupported {
+            get {
+                return ResourceManager.GetString("QueryNodeValidationNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The query parameter &apos;{0}&apos; is not supported..
         /// </summary>
         internal static string QueryParameterNotSupported {
@@ -187,11 +430,38 @@ namespace Microsoft.AspNetCore.OData.Query {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;select&apos; and &apos;expand&apos; cannot be both null or empty..
+        /// </summary>
+        internal static string SelectExpandEmptyOrNull {
+            get {
+                return ResourceManager.GetString("SelectExpandEmptyOrNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not a structured type. Only structured types support $select and $expand..
+        /// </summary>
+        internal static string SelectNonStructured {
+            get {
+                return ResourceManager.GetString("SelectNonStructured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The limit of &apos;{0}&apos; for {1} query has been exceeded. The value from the incoming request is &apos;{2}&apos;..
         /// </summary>
         internal static string SkipTopLimitExceeded {
             get {
                 return ResourceManager.GetString("SkipTopLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The function &apos;{0}&apos; is already bound to another method..
+        /// </summary>
+        internal static string UriFunctionClrBinderAlreadyBound {
+            get {
+                return ResourceManager.GetString("UriFunctionClrBinderAlreadyBound", resourceCulture);
             }
         }
         

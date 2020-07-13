@@ -10,7 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Formatting
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     internal class PropertyHelper
     {

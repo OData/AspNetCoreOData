@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.OData.Edm;
@@ -130,11 +131,43 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             return _coreModel.GetPrimitiveType(primitiveKind);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="edmTypeReference"></param>
+        /// <param name="edmModel"></param>
+        /// <returns></returns>
         public static Type GetClrType(IEdmTypeReference edmTypeReference, IEdmModel edmModel)
         {
             return GetClrType(edmTypeReference, edmModel, DefaultAssemblyResolver.Default);
         }
 
+        /// <summary>
+        /// figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
+        /// and returns the corresponding clr type to which we map like uint => long.
+        /// </summary>
+        public static Type IsNonstandardEdmPrimitive(Type type, out bool isNonstandardEdmPrimitive)
+        {
+            IEdmPrimitiveTypeReference edmType = GetEdmPrimitiveTypeReference(type);
+            if (edmType == null)
+            {
+                isNonstandardEdmPrimitive = false;
+                return type;
+            }
+
+            Type reverseLookupClrType = GetClrType(edmType, EdmCoreModel.Instance);
+            isNonstandardEdmPrimitive = (type != reverseLookupClrType);
+
+            return reverseLookupClrType;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="edmTypeReference"></param>
+        /// <param name="edmModel"></param>
+        /// <param name="assembliesResolver"></param>
+        /// <returns></returns>
         public static Type GetClrType(IEdmTypeReference edmTypeReference, IEdmModel edmModel, IAssemblyResolver assembliesResolver)
         {
             if (edmTypeReference == null)
@@ -192,6 +225,29 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             edmModel.SetAnnotationValue<ClrTypeAnnotation>(edmSchemaType, new ClrTypeAnnotation(matchingTypes.SingleOrDefault()));
 
             return matchingTypes.SingleOrDefault();
+        }
+
+        public static IEdmTypeReference ToEdmTypeReference(this IEdmType edmType, bool isNullable)
+        {
+            Contract.Assert(edmType != null);
+
+            switch (edmType.TypeKind)
+            {
+                case EdmTypeKind.Collection:
+                    return new EdmCollectionTypeReference(edmType as IEdmCollectionType);
+                case EdmTypeKind.Complex:
+                    return new EdmComplexTypeReference(edmType as IEdmComplexType, isNullable);
+                case EdmTypeKind.Entity:
+                    return new EdmEntityTypeReference(edmType as IEdmEntityType, isNullable);
+                case EdmTypeKind.EntityReference:
+                    return new EdmEntityReferenceTypeReference(edmType as IEdmEntityReferenceType, isNullable);
+                case EdmTypeKind.Enum:
+                    return new EdmEnumTypeReference(edmType as IEdmEnumType, isNullable);
+                case EdmTypeKind.Primitive:
+                    return _coreModel.GetPrimitive((edmType as IEdmPrimitiveType).PrimitiveKind, isNullable);
+                default:
+                    throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
+            }
         }
 
         private static IEnumerable<Type> GetMatchingTypes(string edmFullName, IAssemblyResolver assembliesResolver)

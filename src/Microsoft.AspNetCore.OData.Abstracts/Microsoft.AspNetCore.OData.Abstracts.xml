@@ -159,6 +159,80 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions">
+            <summary>
+            Helper extension methods for fast use of collections.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.AppendAndReallocate``1(``0[],``0)">
+            <summary>
+            Return a new array with the value added to the end. Slow and best suited to long lived arrays with few writes relative to reads.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.AsArray``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Return the enumerable as an Array, copying if required. Optimized for common case where it is an Array. 
+            Avoid mutating the return value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.AsCollection``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Return the enumerable as a Collection of T, copying if required. Optimized for the common case where it is 
+            a Collection of T and avoiding a copy if it implements IList of T. Avoid mutating the return value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.AsIList``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Return the enumerable as a IList of T, copying if required. Avoid mutating the return value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.AsList``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Return the enumerable as a List of T, copying if required. Optimized for common case where it is an List of T 
+            or a ListWrapperCollection of T. Avoid mutating the return value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.RemoveFrom``1(System.Collections.Generic.List{``0},System.Int32)">
+            <summary>
+            Remove values from the list starting at the index start.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.SingleDefaultOrError``2(System.Collections.Generic.IList{``0},System.Action{``1},``1)">
+            <summary>
+            Return the only value from list, the type's default value if empty, or call the errorAction for 2 or more.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.SingleOfTypeDefaultOrError``3(System.Collections.Generic.IList{``0},System.Action{``2},``2)">
+            <summary>
+            Returns a single value in list matching type TMatch if there is only one, null if there are none of type TMatch or calls the
+            errorAction with errorArg1 if there is more than one.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.ToArrayWithoutNulls``1(System.Collections.Generic.ICollection{``0})">
+            <summary>
+            Convert an ICollection to an array, removing null values. Fast path for case where there are no null values.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.ToDictionaryFast``2(``1[],System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Convert the array to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for array input.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.ToDictionaryFast``2(System.Collections.Generic.IList{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input with fast path for array.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.ToDictionaryFast``2(System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Convert the enumerable to a Dictionary using the keySelector to extract keys from values and the specified comparer. Fast paths for array and IList of T.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.CollectionExtensions.ToDictionaryFastNoCheck``2(System.Collections.Generic.IList{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input. No checking for other types.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
             <summary>
             
@@ -218,6 +292,29 @@
             
             </summary>
             <param name="clrType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="edmTypeReference"></param>
+            <param name="edmModel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.IsNonstandardEdmPrimitive(System.Type,System.Boolean@)">
+            <summary>
+            figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
+            and returns the corresponding clr type to which we map like uint => long.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver)">
+            <summary>
+            
+            </summary>
+            <param name="edmTypeReference"></param>
+            <param name="edmModel"></param>
+            <param name="assembliesResolver"></param>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder">
@@ -303,6 +400,13 @@
             </summary>
             <param name="etagHeaderValue">The ETag header value.</param>
             <returns>Concurrency property names and values.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.FastPropertyAccessor`1">
+            <summary>
+            FastPropertyAccessor is a <see cref="T:Microsoft.AspNetCore.OData.Abstracts.PropertyAccessor`1"/> that speeds up (compares to reflection)
+            a Getter and Setter for the PropertyInfo of TEntityType provided via the constructor.
+            </summary>
+            <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpContextExtensions">
             <summary>
@@ -446,6 +550,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
             <summary>
             
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ListWrapperCollection`1">
+            <summary>
+            A class that inherits from Collection of T but also exposes its underlying data as List of T for performance.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
@@ -927,6 +1036,36 @@
               Looks up a localized string similar to URI must not contain a query component or a fragment identifier..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.CannotSetDynamicPropertyDictionary">
+            <summary>
+              Looks up a localized string similar to The dynamic dictionary property &apos;{0}&apos; of type &apos;{1}&apos; cannot be set. The dynamic property dictionary must have a setter..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.DeltaEntityTypeNotAssignable">
+            <summary>
+              Looks up a localized string similar to The actual entity type &apos;{0}&apos; is not assignable to the expected type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.DeltaNestedResourceNameNotFound">
+            <summary>
+              Looks up a localized string similar to Cannot find nested resource name &apos;{0}&apos; in parent resource type &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.DeltaTypeMismatch">
+            <summary>
+              Looks up a localized string similar to Cannot use Delta of type &apos;{0}&apos; on an entity of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.EdmComplexObjectNullRef">
+            <summary>
+              Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.EdmTypeNotSupported">
+            <summary>
+              Looks up a localized string similar to {0} is not a supported EDM type..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.InvalidEnumArgument">
             <summary>
               Looks up a localized string similar to The value of argument &apos;{0}&apos; ({1}) is invalid for Enum type &apos;{2}&apos;..
@@ -936,6 +1075,90 @@
             <summary>
               Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeBoolean">
+            <summary>
+              Looks up a localized string similar to The value must be a boolean..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeDateTimeOffsetOrDate">
+            <summary>
+              Looks up a localized string similar to The value must be a DateTimeOffset or Date..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeEnum">
+            <summary>
+              Looks up a localized string similar to The value with type &apos;{0}&apos; must have type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeString">
+            <summary>
+              Looks up a localized string similar to The value must be a string..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeStringLengthOne">
+            <summary>
+              Looks up a localized string similar to The value must be a string with a length of 1..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeStringMaxLengthOne">
+            <summary>
+              Looks up a localized string similar to The value must be a string with a maximum length of 1..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.PropertyMustBeTimeOfDay">
+            <summary>
+              Looks up a localized string similar to The value must be a Edm.TimeOfDay..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.TypeMustBeEnumOrNullableEnum">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; must be an enum or Nullable&lt;T&gt; where T is an enum type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.UnexpectedElementType">
+            <summary>
+              Looks up a localized string similar to The element type &apos;{0}&apos; of the given collection type &apos;{1}&apos; is not of the type &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.SRResources.UnsupportedEdmType">
+            <summary>
+              Looks up a localized string similar to The EDM type &apos;{0}&apos; of kind &apos;{1}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.PropertyAccessor`1">
+            <summary>
+            Represents a strategy for Getting and Setting a PropertyInfo on <typeparamref name="TStructuralType"/>
+            </summary>
+            <typeparam name="TStructuralType">The type that contains the PropertyInfo</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PropertyHelper.#ctor(System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a fast property helper. This constructor does not cache the helper.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PropertyHelper.MakeFastPropertySetter``1(System.Reflection.PropertyInfo)">
+            <summary>
+            Creates a single fast property setter. The result is not cached.
+            </summary>
+            <param name="propertyInfo">propertyInfo to extract the getter for.</param>
+            <returns>a fast setter.</returns>
+            <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PropertyHelper.GetProperties(System.Object)">
+            <summary>
+            Creates and caches fast property helpers that expose getters for every public get property on the underlying type.
+            </summary>
+            <param name="instance">the instance to extract property accessors for.</param>
+            <returns>a cached array of all public property getters from the underlying type of this instance.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PropertyHelper.MakeFastPropertyGetter(System.Reflection.PropertyInfo)">
+            <summary>
+            Creates a single fast property getter. The result is not cached.
+            </summary>
+            <param name="propertyInfo">propertyInfo to extract the getter for.</param>
+            <returns>a fast getter.</returns>
+            <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.DefaultQuerySettings">
             <summary>
@@ -979,6 +1202,63 @@
             <summary>
             Gets or sets a value indicating whether the service will use skiptoken or not.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper">
+            <summary>
+            The result of a $select and $expand projection is represented as an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/>
+            instance. That instance can be projected into an <see cref="T:System.Collections.Generic.IDictionary`2"/> instance by calling
+            <see cref="!:ISelectExpandWrapper.ToDictionary(Func&lt;IEdmModel,IEdmStructuredType,IPropertyMapper&gt;)"/>. 
+            That method will use the function to construct an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper"/> that will map the property 
+            names in that projection to the keys in the returned <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            The main purpose of converting an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/> instance into an 
+            <see cref="T:System.Collections.Generic.IDictionary`2"/> (using the method mentioned above) is to allow changing the names of the 
+            properties in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that will be used during the serialization of the $select 
+            and $expand projection by a given formatter. For example, to support custom serialization attributes of a
+            particular formatter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper.MapProperty(System.String)">
+            <summary>
+            Defines a mapping between the name of an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> of an <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>
+            and the name that should be used in other contexts, for example, when projecting an instance of an 
+            <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/> into an instance of an <see cref="T:System.Collections.Generic.IDictionary`2"/>
+            </summary>
+            <param name="propertyName">
+            The name of the property in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType" /> represented
+            by this instance of <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/>.
+            </param>
+            <returns>
+            The value that will be used as the key for this property in the <see cref="T:System.Collections.Generic.IDictionary`2" />
+            resulting from calling ToDictionary on an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/> instance.
+            </returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper">
+            <summary>
+            Represents the result of a $select and $expand query operation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper.ToDictionary">
+            <summary>
+            Projects the result of a $select and $expand query to a <see cref="T:System.Collections.Generic.IDictionary`2" />.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IDictionary`2"/> representing the $select and $expand result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper.ToDictionary(System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper})">
+            <summary>
+            Projects the result of a $select and/or $expand query to an <see cref="T:System.Collections.Generic.IDictionary`2" /> using 
+            the given <paramref name="propertyMapperProvider"/>. The <paramref name="propertyMapperProvider"/> is used 
+            to obtain an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper"/> for the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that this 
+            <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/> instance represents. This <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper"/> will be used to 
+            map the properties of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.ISelectExpandWrapper"/> instance to the keys of the 
+            returned <see cref="T:System.Collections.Generic.IDictionary`2"/>. This method can be used, for example, to map the property 
+            names in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> to the names that should be used to serialize the properties 
+            that this projection contains.
+            </summary>
+            <param name="propertyMapperProvider">
+            A function that provides a new instance of an <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Query.IPropertyMapper"/> for a given 
+            <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> and a given <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
+            </param>
+            <returns>An <see cref="T:System.Collections.Generic.IDictionary`2"/> representing the $select and $expand result.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Query.ODataQueryContext">
             <summary>
@@ -1124,6 +1404,19 @@
             <param name="remainingSegments">The remaining segments after the first non type segment.</param>
             <returns>First non-type cast segment.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Routing.ODataPathSegmentTranslator">
+            <summary>
+            Translator the parameter alias, convert node, returned entity set into OData path segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Routing.ODataPathSegmentTranslator.TranslateParameterAlias(Microsoft.OData.UriParser.SingleValueNode,System.Collections.Generic.IDictionary{System.String,Microsoft.OData.UriParser.SingleValueNode})">
+            <summary>
+            
+            </summary>
+            <param name="node"></param>
+            <param name="parameterAliasNodes"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.SingleResult">
             <summary>
             Represents an <see cref="T:System.Linq.IQueryable"/> containing zero or one entities. Use together with an
@@ -1168,6 +1461,13 @@
             <summary>
             The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.GetInnerElementType(System.Type)">
+            <summary>
+            Return the collection element type.
+            </summary>
+            <param name="clrType">The type to convert.</param>
+            <returns>The collection element type from a type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.IsDateTime(System.Type)">
             <summary>
@@ -1418,6 +1718,915 @@
             <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
             <param name="messageArgs">An object array that contains zero or more objects to format.</param>
             <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta">
+            <summary>
+            A class the tracks changes (i.e. the Delta) for an entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.Clear">
+            <summary>
+            Clears the Delta and resets the underlying Entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            <remarks>
+            Only properties that exist on Entity can be set.
+            If there is a type mismatch the request will fail.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>True if the Property was found</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
+            <summary>
+            Overrides the DynamicObject TrySetMember method, so that only the properties
+            of Entity can be set.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
+            <summary>
+            Overrides the DynamicObject TryGetMember method, so that only the properties
+            of Entity can be got.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1">
+            <summary>
+            A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="TStructuralType"/>.
+            </summary>
+            <typeparam name="TStructuralType">TStructuralType is the type of the instance this delta tracks changes for.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.StructuredType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.ExpectedClrType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.TryGetPropertyType(System.String,System.Type@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.GetInstance">
+            <summary>
+            Returns the instance that holds all the changes (and original values) being tracked by this Delta.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.GetChangedPropertyNames">
+            <summary>
+            Returns the known properties that have been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names.
+            Includes the structural properties at current level.
+            Does not include the names of the changed dynamic properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.GetUnchangedPropertyNames">
+            <summary>
+            Returns the known properties that have not been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names. Does not include the names of the changed dynamic
+            properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.CopyChangedValues(`0)">
+            <summary>
+            Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity recursively.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.CopyUnchangedValues(`0)">
+            <summary>
+            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.Patch(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.Put(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
+            <summary>
+            Attempts to get the property by the specified name.
+            </summary>
+            <param name="structural">The structural object.</param>
+            <param name="propertyName">Name of the property.</param>
+            <param name="propertyRef">Output for property value.</param>
+            <returns>true if the property is found; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection"/> class.
+            </summary>
+            <param name="entityType">The Edm entity type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection"/> class.
+            </summary>
+            <param name="entityType">The Edm type of the collection.</param>
+            <param name="changedObjectList">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmChangedObjectCollection.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
+            <summary>
+            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject})">
+            <summary>
+            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+            <param name="list">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObjectCollection.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexTypeReference"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaCollectionType">
+            <summary>
+            Implementing IEdmCollectionType to identify collection of DeltaFeed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaCollectionType.TypeKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaCollectionType.ElementType">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Entry object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexTypeReference"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Deleted Entry object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.Reason">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedEntityObject.NavigationSource">
+            <summary>
+            The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedLink"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Deleted Link object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedLink.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedLink.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedLink.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.Source">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.Target">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.Relationship">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaDeletedLink.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind">
+            <summary>
+            The Kind of the object within the DeltaPayload used to distinguish between Entry/DeletedEntry/DeltaLink/AddedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind.Entry">
+            <summary>
+            Corresponds to EdmEntityObject (Equivalent of ODataEntry in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind.DeletedEntry">
+            <summary>
+            Corresponds to EdmDeltaDeletedEntityObject (Equivalent of ODataDeltaDeletedEntry in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind.DeletedLinkEntry">
+            <summary>
+            Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind.LinkEntry">
+            <summary>
+            Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityKind.Unknown">
+            <summary>
+            Corresponds to any Unknown item added.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Entry object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject.NavigationSource">
+            <summary>
+            The navigation source of the entity. If null, then the entity is from the current feed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLink"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Added/Modified Link object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaLink.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaLink.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaLink.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.Source">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.Target">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.Relationship">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaLink.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaType">
+            <summary>
+            Implementing IEdmType to identify objects which are part of DeltaFeed Payload.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaType.TypeKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaType.DeltaKind">
+            <summary>
+            Returning DeltaKind of the object within DeltaFeed payload
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+            <param name="list">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObjectCollection.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEntityObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this object.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEnumObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.Value">
+            <summary>
+            Gets the value of the enumeration type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.IsNullable">
+            <summary>
+            Gets or sets whether the enum object is nullable or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.#ctor(Microsoft.OData.Edm.IEdmEnumType,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEnumType"/> of this object.</param>
+            <param name="value">The value of the enumeration type.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.#ctor(Microsoft.OData.Edm.IEdmEnumTypeReference,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEnumTypeReference"/> of this object.</param>
+            <param name="value">The value of the enumeration type.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.#ctor(Microsoft.OData.Edm.IEdmEnumType,System.String,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEnumTypeReference"/> of this object.</param>
+            <param name="value">The value of the enumeration type.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEnumObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
+            <summary>
+            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatting.Value.IEdmEnumObject})">
+            <summary>
+            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+            <param name="list">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmEnumObjectCollection.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions">
+            <summary>
+            Extension methods for the <see cref="T:Microsoft.OData.Edm.IEdmType"/> interface.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions.IsDeltaFeed(Microsoft.OData.Edm.IEdmType)">
+            <summary>
+            Method to determine whether the current type is a Delta Feed
+            </summary>
+            <param name="type">IEdmType to be compared</param>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaCollectionType"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmTypeExtensions.IsDeltaResource(Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject)">
+            <summary>
+            Method to determine whether the current Edm object is a Delta Entry
+            </summary>
+            <param name="resource">IEdmObject to be compared</param>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaEntityObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmDeltaComplexObject"/></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.#ctor(Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.#ctor(Microsoft.OData.Edm.IEdmStructuredTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredTypeReference"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.#ctor(Microsoft.OData.Edm.IEdmStructuredType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredTypeReference"/> of this object.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.ExpectedEdmType">
+            <summary>
+            Gets or sets the expected <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of the entity or complex type of this object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.ActualEdmType">
+            <summary>
+            Gets or sets the actual <see cref="T:Microsoft.OData.Edm.IEdmStructuredType" /> of the entity or complex type of this object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.IsNullable">
+            <summary>
+            Gets or sets whether the EDM object is nullable or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.TryGetPropertyType(System.String,System.Type@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.TryGetDynamicProperties">
+            <summary>
+            Get all dynamic properties
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.GetChangedPropertyNames">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.GetUnchangedPropertyNames">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.EdmStructuredObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IDelta">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IDelta" /> allows and tracks changes to an object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>Returns <c>true</c> if successful and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IDelta.Clear">
+            <summary>
+            Clears the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IDelta" />.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>.
+            Base interface to be implemented by any Delta object required to be part of the DeltaFeed Payload.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject.DeltaKind">
+            <summary>
+            DeltaKind for the objects part of the DeltaFeed Payload.
+            Used to determine which Delta object to create during serialization.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedEntityObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeltaDeletedEntry.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedEntityObject.Id">
+            <summary>
+            The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedEntityObject.Reason">
+            <summary>
+            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaDeletedLink">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLink">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeltaLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLinkBase">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create either ODataDeltaLink or ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLinkBase.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLinkBase.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.IEdmDeltaLinkBase.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEnumObject">
+            <summary>
+            Represents an instance of an enum value.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IEdmObject.GetEdmType">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> of this instance.
+            </summary>
+            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> of this instance.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Gets the value of the property with the given name.
+            </summary>
+            <param name="propertyName">The name of the property to get.</param>
+            <param name="value">When this method returns, contains the value of the property with the given name, if the property is found;
+            otherwise, null. The parameter is passed uninitialized.</param>
+            <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/> that is null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject"/> class.
+            </summary>
+            <param name="edmType">The EDM type of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.NullEdmComplexObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedDelta">
+            <summary>
+            Represents a <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.Delta"/> that can be used when a backing CLR type exists for
+            the entity type and complex type whose changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedDelta.StructuredType">
+            <summary>
+            Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedDelta.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedDelta.IsDeltaOfT(System.Type)">
+            <summary>
+            Helper method to check whether the given type is Delta generic type.
+            </summary>
+            <param name="type">The type to check.</param>
+            <returns>True if it is a Delta generic type; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmComplexObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmComplexTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmComplexObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexTypeReference"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmEntityObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmEntityTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmEntityObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.IEdmStructuredObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.Instance">
+            <summary>
+            Gets the backing CLR object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.Model">
+            <summary>
+            Gets the EDM model.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
         </member>
     </members>
 </doc>

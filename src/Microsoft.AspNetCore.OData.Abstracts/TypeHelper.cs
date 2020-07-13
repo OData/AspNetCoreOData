@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -12,6 +13,20 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 {
     internal static class TypeHelper
     {
+        /// <summary>
+        /// Return the collection element type.
+        /// </summary>
+        /// <param name="clrType">The type to convert.</param>
+        /// <returns>The collection element type from a type.</returns>
+        public static Type GetInnerElementType(Type clrType)
+        {
+            Type elementType;
+            TypeHelper.IsCollection(clrType, out elementType);
+            Contract.Assert(elementType != null);
+
+            return elementType;
+        }
+
         public static Type GetUnderlyingTypeOrSelf(Type type)
         {
             return Nullable.GetUnderlyingType(type) ?? type;

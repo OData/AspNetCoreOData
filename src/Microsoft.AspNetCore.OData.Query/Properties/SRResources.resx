@@ -146,4 +146,94 @@
   <data name="ActionContextMustHaveRequest" xml:space="preserve">
     <value>The HttpActionContext.Request is null.</value>
   </data>
+  <data name="NotAllowedLogicalOperator" xml:space="preserve">
+    <value>Logical operator '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>
+  </data>
+  <data name="NotAllowedOrderByProperty" xml:space="preserve">
+    <value>Order by '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>
+  </data>
+  <data name="NotAllowedArithmeticOperator" xml:space="preserve">
+    <value>Arithmetic operator '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>
+  </data>
+  <data name="NotFilterablePropertyUsedInFilter" xml:space="preserve">
+    <value>The property '{0}' cannot be used in the $filter query option.</value>
+  </data>
+  <data name="NotSortablePropertyUsedInOrderBy" xml:space="preserve">
+    <value>The property '{0}' cannot be used in the $orderby query option.</value>
+  </data>
+  <data name="NotExpandablePropertyUsedInExpand" xml:space="preserve">
+    <value>The property '{0}' cannot be used in the $expand query option.</value>
+  </data>
+  <data name="NotSelectablePropertyUsedInSelect" xml:space="preserve">
+    <value>The property '{0}' cannot be used in the $select query option.</value>
+  </data>
+  <data name="NotNavigablePropertyUsedInNavigation" xml:space="preserve">
+    <value>The property '{0}' cannot be used for navigation.</value>
+  </data>
+  <data name="NotCountablePropertyUsedForCount" xml:space="preserve">
+    <value>The property '{0}' cannot be used for $count.</value>
+  </data>
+  <data name="NotCountableEntitySetUsedForCount" xml:space="preserve">
+    <value>The entity set '{0}' cannot be used for $count.</value>
+  </data>
+  <data name="MaxNodeLimitExceeded" xml:space="preserve">
+    <value>The node count limit of '{0}' has been exceeded. To increase the limit, set the '{1}' property on EnableQueryAttribute or ODataValidationSettings.</value>
+  </data>
+  <data name="QueryNodeValidationNotSupported" xml:space="preserve">
+    <value>Validating OData QueryNode of kind {0} is not supported by {1}.</value>
+  </data>
+  <data name="NotAllowedFunction" xml:space="preserve">
+    <value>Function '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>
+  </data>
+  <data name="OrderByClauseNotSupported" xml:space="preserve">
+    <value>Only ordering by properties is supported for non-primitive collections. Expressions are not supported.</value>
+  </data>
+  <data name="OrderByNodeCountExceeded" xml:space="preserve">
+    <value>The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is {0}.</value>
+  </data>
+  <data name="OrderByDuplicateProperty" xml:space="preserve">
+    <value>Duplicate property named '{0}' is not supported in '$orderby'.</value>
+  </data>
+  <data name="OrderByDuplicateIt" xml:space="preserve">
+    <value>Multiple '$it' nodes are not supported in '$orderby'.</value>
+  </data>
+  <data name="SelectExpandEmptyOrNull" xml:space="preserve">
+    <value>'select' and 'expand' cannot be both null or empty.</value>
+  </data>
+  <data name="SelectNonStructured" xml:space="preserve">
+    <value>The type '{0}' is not a structured type. Only structured types support $select and $expand.</value>
+  </data>
+  <data name="InvalidExpansionDepthValue" xml:space="preserve">
+    <value>'{0}' should be less than or equal to '{1}'.</value>
+  </data>
+  <data name="MaxExpandDepthExceeded" xml:space="preserve">
+    <value>The request includes a $expand path which is too deep. The maximum depth allowed is {0}. To increase the limit, set the '{1}' property on EnableQueryAttribute or ODataValidationSettings, or set the 'MaxDepth' property in ExpandAttribute.</value>
+  </data>
+  <data name="FunctionNotSupportedOnEnum" xml:space="preserve">
+    <value>The '{0}' function cannot be applied to an enumeration-typed argument.</value>
+  </data>
+  <data name="ConvertToEnumFailed" xml:space="preserve">
+    <value>Cannot compare an enum of type '{0}' to an expression of type '{1}'.</value>
+  </data>
+  <data name="PropertyOrPathWasRemovedFromContext" xml:space="preserve">
+    <value>Property or path {0} isn't available in the current context. It was removed in earlier transformation.</value>
+  </data>
+  <data name="QueryNodeBindingNotSupported" xml:space="preserve">
+    <value>Binding OData QueryNode of kind {0} is not supported by {1}.</value>
+  </data>
+  <data name="BinaryOperatorNotSupported" xml:space="preserve">
+    <value>A binary operator with incompatible types was detected. Found operand types '{0}' and '{1}' for operator kind '{2}'.</value>
+  </data>
+  <data name="InvalidPropertyMapping" xml:space="preserve">
+    <value>The key mapping for the property '{0}' can't be null or empty.</value>
+  </data>
+  <data name="ODataFunctionNotSupported" xml:space="preserve">
+    <value>Unknown function '{0}'.</value>
+  </data>
+  <data name="UriFunctionClrBinderAlreadyBound" xml:space="preserve">
+    <value>The function '{0}' is already bound to another method.</value>
+  </data>
+  <data name="InvalidPropertyMapper" xml:space="preserve">
+    <value>The mapper provider must return a valid '{0}' instance for the given '{1}' IEdmType.</value>
+  </data>
 </root>

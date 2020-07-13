@@ -122,4 +122,52 @@
   <data name="MultipleMatchingClrTypesForEdmType" xml:space="preserve">
     <value>More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}.</value>
   </data>
+  <data name="PropertyMustBeTimeOfDay" xml:space="preserve">
+    <value>The value must be a Edm.TimeOfDay.</value>
+  </data>
+  <data name="PropertyMustBeStringLengthOne" xml:space="preserve">
+    <value>The value must be a string with a length of 1.</value>
+  </data>
+  <data name="PropertyMustBeStringMaxLengthOne" xml:space="preserve">
+    <value>The value must be a string with a maximum length of 1.</value>
+  </data>
+  <data name="PropertyMustBeString" xml:space="preserve">
+    <value>The value must be a string.</value>
+  </data>
+  <data name="PropertyMustBeDateTimeOffsetOrDate" xml:space="preserve">
+    <value>The value must be a DateTimeOffset or Date.</value>
+  </data>
+  <data name="PropertyMustBeBoolean" xml:space="preserve">
+    <value>The value must be a boolean.</value>
+  </data>
+  <data name="PropertyMustBeEnum" xml:space="preserve">
+    <value>The value with type '{0}' must have type '{1}'.</value>
+  </data>
+  <data name="TypeMustBeEnumOrNullableEnum" xml:space="preserve">
+    <value>The type '{0}' must be an enum or Nullable&lt;T&gt; where T is an enum type.</value>
+  </data>
+  <data name="EdmTypeNotSupported" xml:space="preserve">
+    <value>{0} is not a supported EDM type.</value>
+  </data>
+  <data name="DeltaTypeMismatch" xml:space="preserve">
+    <value>Cannot use Delta of type '{0}' on an entity of type '{1}'.</value>
+  </data>
+  <data name="DeltaNestedResourceNameNotFound" xml:space="preserve">
+    <value>Cannot find nested resource name '{0}' in parent resource type '{1}'</value>
+  </data>
+  <data name="CannotSetDynamicPropertyDictionary" xml:space="preserve">
+    <value>The dynamic dictionary property '{0}' of type '{1}' cannot be set. The dynamic property dictionary must have a setter.</value>
+  </data>
+  <data name="DeltaEntityTypeNotAssignable" xml:space="preserve">
+    <value>The actual entity type '{0}' is not assignable to the expected type '{1}'.</value>
+  </data>
+  <data name="UnexpectedElementType" xml:space="preserve">
+    <value>The element type '{0}' of the given collection type '{1}' is not of the type '{2}'.</value>
+  </data>
+  <data name="EdmComplexObjectNullRef" xml:space="preserve">
+    <value>Cannot get property '{0}' of a null EDM object of type '{1}'.</value>
+  </data>
+  <data name="UnsupportedEdmType" xml:space="preserve">
+    <value>The EDM type '{0}' of kind '{1}' is not supported.</value>
+  </data>
 </root>

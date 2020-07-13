@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Formatting
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// Represents a strategy for Getting and Setting a PropertyInfo on <typeparamref name="TStructuralType"/>
