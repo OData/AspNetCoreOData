@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -12,7 +11,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
-    /// Builds or modifies <see cref="ApplicationModel" /> for action discovery.
+    /// Builds or modifies <see cref="ApplicationModel" /> for OData convention action discovery.
     /// </summary>
     internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
@@ -46,15 +45,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         public int Order => 100;
 
         /// <summary>
-        /// 
+        /// Executed for the second pass of <see cref="ApplicationModel"/> built.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
-            //var conventions = _options.Value.Conventions.OrderBy(c => c.Order);
             var routes = _options.Models;
-
-            // Can apply on controller
             foreach (var route in routes)
             {
                 IEdmModel model = route.Value;
@@ -65,8 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                 foreach (var controller in context.Result.Controllers)
                 {
-                    // Skip the controller with [NonODataController] attribute decorated
-                    // Maybe we don't need this attribute.
+                    // Skip the controller with [NonODataController] attribute decorated.
                     if (controller.HasAttribute<NonODataControllerAttribute>())
                     {
                         continue;
@@ -79,7 +74,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                     }
 
                     ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
-                    odataContext.Controller = controller;
 
                     // consider to replace the Linq with others?
                     IODataControllerActionConvention[] newConventions =
@@ -89,6 +83,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     {
                         foreach (var action in controller.Actions.Where(a => !a.IsNonODataAction()))
                         {
+                            // Reset the action on the context.
                             odataContext.Action = action;
 
                             foreach (var con in newConventions)
@@ -102,38 +97,37 @@ namespace Microsoft.AspNetCore.OData.Routing
                     }
                 }
             }
+        }
 
-            Console.WriteLine("OnProvidersExecuted");
+        /// <summary>
+        /// Executed for the first pass of <see cref="ApplicationModel"/> building.
+        /// </summary>
+        /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
+        public void OnProvidersExecuting(ApplicationModelProviderContext context)
+        {
+            // Nothing here.
         }
 
         private static ODataControllerActionContext BuildContext(string prefix, IEdmModel model, ControllerModel controller)
         {
-            // The reason why it's better to create a context is that:
-            // We don't need to call te FindEntitySet or FindSingleton in every convention
+            // The reason why to create a context is that:
+            // We don't need to call te FindEntitySet or FindSingleton before every convention.
+            // So, for a controller, we try to call "FindEntitySet" or "FindSingleton" once.
             string controllerName = controller.ControllerName;
 
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(controllerName);
             if (entitySet != null)
             {
-                return new ODataControllerActionContext(prefix, model, entitySet);
+                return new ODataControllerActionContext(prefix, model, controller, entitySet);
             }
 
             IEdmSingleton singleton = model.EntityContainer.FindSingleton(controllerName);
             if (singleton != null)
             {
-                return new ODataControllerActionContext(prefix, model, singleton);
+                return new ODataControllerActionContext(prefix, model, controller, singleton);
             }
 
-            return new ODataControllerActionContext(prefix, model);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        public void OnProvidersExecuting(ApplicationModelProviderContext context)
-        {
-            // Nothing here.
+            return new ODataControllerActionContext(prefix, model, controller);
         }
 
         private static bool CanApply(string prefix, ControllerModel controller)

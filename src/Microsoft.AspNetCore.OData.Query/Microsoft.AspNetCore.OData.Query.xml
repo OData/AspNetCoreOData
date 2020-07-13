@@ -1271,6 +1271,13 @@
             Gets a value representing the total count of the collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ModelContainer">
+            <summary>
+            EntityFramework does not let you inject non primitive constant values (like IEdmModel) in Select queries. Primitives like strings and guids can be
+            injected as they can be translated into a SQL query. This container associates a unique string with each EDM model, so that, given the string the model
+            can be retrieved later.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
             This defines a composite OData query options that can be used to perform query composition.
@@ -3088,7 +3095,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.ModelID">
             <summary>
-            An ID to uniquely identify the model in the <see cref="!:ModelContainer"/>.
+            An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.ModelContainer"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper">
@@ -3137,7 +3144,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.ModelID">
             <summary>
-            An ID to uniquely identify the model in the <see cref="!:ModelContainer"/>.
+            An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.ModelContainer"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.UntypedInstance">

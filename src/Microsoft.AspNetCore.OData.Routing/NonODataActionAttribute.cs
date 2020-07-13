@@ -6,10 +6,10 @@ using System;
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
-    /// 
+    /// Indicates that a controller method is not an OData action method.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class NonODataActionAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public sealed class NonODataActionAttribute : Attribute
     {
     }
 }

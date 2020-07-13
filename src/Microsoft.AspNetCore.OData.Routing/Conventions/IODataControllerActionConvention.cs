@@ -43,12 +43,5 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// For example, Entity convention requires the key(s) parameters, doesn't care about other parameters.
         /// </remarks>
         bool AppliesToAction(ODataControllerActionContext context);
-
-        /*
-        /// <summary>
-        /// Maybe to seperate the query and apply into two parts?
-        /// </summary>
-        void Apply(...)
-        */
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
+    /// <summary>
+    /// Use for debug  for OData convention action discovery on <see cref="ApplicationModel" />.
+    /// </summary>
     internal class ODataRoutingApplicationModelDebugProvider : IApplicationModelProvider
     {
         public int Order => -100;

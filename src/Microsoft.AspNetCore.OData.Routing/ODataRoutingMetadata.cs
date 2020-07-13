@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// <summary>
     /// Represents OData Endpoint metadata used during routing.
     /// </summary>
-    public sealed class ODataRoutingMetadata
+    public sealed class ODataRoutingMetadata : IODataRoutingMetadata
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataRoutingMetadata"/> class.

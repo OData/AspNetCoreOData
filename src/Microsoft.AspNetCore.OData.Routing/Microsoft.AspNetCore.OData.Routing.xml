@@ -198,51 +198,72 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext">
             <summary>
-            
+            A context object for <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
             <summary>
-            
+             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
             </summary>
-            <param name="prefix"></param>
-            <param name="model"></param>
+            <param name="prefix">The prefix.</param>
+            <param name="model">The Edm model.</param>
+            <param name="controller">The controller model.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel,Microsoft.OData.Edm.IEdmEntitySet)">
+            <summary>
+             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
+            </summary>
+            <param name="prefix">The prefix.</param>
+            <param name="model">The Edm model.</param>
+            <param name="controller">The controller model.</param>
+            <param name="entitySet">The associated entity set for this controller.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel,Microsoft.OData.Edm.IEdmSingleton)">
+            <summary>
+             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
+            </summary>
+            <param name="prefix">The prefix.</param>
+            <param name="model">The Edm model.</param>
+            <param name="controller">The controller model.</param>
+            <param name="singleton">The associated singleton for this controller.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Prefix">
             <summary>
-            
+            Gets the associated prefix for this model.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Model">
             <summary>
-            
+            Gets the Edm model.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.EntitySet">
             <summary>
-            
+            Gets the associated <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/> for this controller.
+            It might be null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.EntityType">
+            <summary>
+            Gets the associated <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/>.
+            It might be null.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Singleton">
             <summary>
-            
+            Gets the associated <see cref="T:Microsoft.OData.Edm.IEdmSingleton"/> for this controller.
+            It might be null.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Controller">
             <summary>
-            Gets the related controller model in this context
-            We guarentee that this property should never be "null".
+            Gets the related controller model in this context. This property should never be "null".
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Action">
             <summary>
             Gets the related action model in this context
             We guarentee that this property should never be "null" when calling "AppliesToAction"
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.IsDone">
-            <summary>
-            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
@@ -436,14 +457,34 @@
             <param name="typeName">The searching type name.</param>
             <returns>The found type.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata">
+            <summary>
+            Defines a contract use to specify the OData routing related metadata in <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Prefix">
+            <summary>
+            Gets the prefix string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Model">
+            <summary>
+            Gets the Edm model.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
+            <summary>
+            Gets the OData path template
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.NonODataActionAttribute">
             <summary>
-            
+            Indicates that a controller method is not an OData action method.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.NonODataControllerAttribute">
             <summary>
-            
+            Indicates that a controller is not an OData controller.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataModelAttribute">
@@ -511,9 +552,14 @@
             Gets the OData URL path template that this action handles.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
+            <summary>
+            Use for debug  for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider">
             <summary>
-            Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for action discovery.
+            Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for OData convention action discovery.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
@@ -530,15 +576,15 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
             <summary>
-            
+            Executed for the second pass of <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel"/> built.
             </summary>
-            <param name="context"></param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
             <summary>
-            
+            Executed for the first pass of <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel"/> building.
             </summary>
-            <param name="context"></param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
             <summary>
