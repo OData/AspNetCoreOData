@@ -2,6 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.OData;
+using Microsoft.OData.Edm;
+using System;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -30,5 +33,59 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or Sets a value indicating if batch requests should continue on error.
         /// </summary>
         public bool EnableContinueOnErrorHeader { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool EnableAttributeRouting { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IDictionary<string, IEdmModel> Models { get; } = new Dictionary<string, IEdmModel>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="useAttributeRouting"></param>
+        /// <returns></returns>
+        public ODataOptions UseAttributeRouting(bool useAttributeRouting)
+        {
+            EnableAttributeRouting = useAttributeRouting;
+            return this;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public ODataOptions UseModel(IEdmModel model)
+        {
+            return UseModel(string.Empty, model);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public ODataOptions UseModel(string name, IEdmModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (Models.ContainsKey(name))
+            {
+                throw new Exception($"Contains the same name for the model: {name}");
+            }
+
+            Models[name] = model;
+            return this;
+        }
     }
 }

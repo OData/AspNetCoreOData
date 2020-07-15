@@ -11,7 +11,10 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
-    internal static class TypeHelper
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class TypeHelper
     {
         /// <summary>
         /// Return the collection element type.
@@ -111,8 +114,13 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <param name="clrType">The type to test.</param>
         /// <returns>True if the type is null-able; false otherwise.</returns>
-        public static bool IsNullable(Type clrType)
+        public static bool IsNullable(this Type clrType)
         {
+            if (clrType == null)
+            {
+                return false;
+            }
+
             if (TypeHelper.IsValueType(clrType))
             {
                 // value types are only nullable if they are Nullable<T>

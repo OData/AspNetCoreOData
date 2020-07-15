@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.OData.Abstracts.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
@@ -23,6 +24,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw new ArgumentNullException(nameof(services));
             }
 
+            services.AddCoreOData();
             // services.AddSingleton<ODataOptions>();
 
             return new DefaultODataBuilder(services);
@@ -46,6 +48,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw new ArgumentNullException(nameof(setupAction));
             }
 
+            services.AddCoreOData();
             // services.AddSingleton<ODataOptions>();
 
             services.Configure(setupAction);
@@ -71,11 +74,21 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw new ArgumentNullException(nameof(setupAction));
             }
 
+            services.AddCoreOData();
             // services.AddSingleton<ODataOptions>();
 
             services.Configure(setupAction);
 
             return services;
+        }
+
+        private static void AddCoreOData(this IServiceCollection services)
+        {
+            services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+
+            services.AddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
+
+            // services.AddSingleton(typeof(ODataClrTypeCache));
         }
     }
 }

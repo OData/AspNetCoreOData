@@ -76,19 +76,19 @@ namespace Microsoft.AspNetCore.OData.Routing
                     ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
 
                     // consider to replace the Linq with others?
-                    IODataControllerActionConvention[] newConventions =
+                    IODataControllerActionConvention[] conventions =
                         _controllerActionConventions.Where(c => c.AppliesToController(odataContext)).ToArray();
 
-                    if (newConventions.Length > 0)
+                    if (conventions.Length > 0)
                     {
                         foreach (var action in controller.Actions.Where(a => !a.IsNonODataAction()))
                         {
                             // Reset the action on the context.
                             odataContext.Action = action;
 
-                            foreach (var con in newConventions)
+                            foreach (var convention in conventions)
                             {
-                                if (con.AppliesToAction(odataContext))
+                                if (convention.AppliesToAction(odataContext))
                                 {
                                     break;
                                 }

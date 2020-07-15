@@ -371,23 +371,24 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.HasParameter``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String)">
             <summary>
-            
+            Test whether the action has the given parameter with the given type.
             </summary>
-            <param name="action"></param>
-            <param name="parameterName"></param>
-            <returns></returns>
+            <typeparam name="T">The parameter type.</typeparam>
+            <param name="action">The given action model.</param>
+            <param name="parameterName">The given parameter name.</param>
+            <returns>True/False.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.GetAttribute``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
-            
+            Gets the attribute on an action model.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="action"></param>
-            <returns></returns>
+            <typeparam name="T">The required attribute type.</typeparam>
+            <param name="action">The given action model.</param>
+            <returns>Null or the corresponing attribute.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
             <summary>
-            Test whether the action has the key parameter defined.
+            Test whether the action has the key parameters defined.
             </summary>
             <param name="action">The action model.</param>
             <param name="entityType">The Edm entity type.</param>
@@ -396,12 +397,12 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
-            
+            Adds the OData selector model to the action.
             </summary>
-            <param name="action"></param>
-            <param name="prefix"></param>
-            <param name="model"></param>
-            <param name="path"></param>
+            <param name="action">The given action model.</param>
+            <param name="prefix">The prefix.</param>
+            <param name="model">The Edm model.</param>
+            <param name="path">The OData path template.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions">
             <summary>
@@ -705,7 +706,15 @@
             
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingServiceCollectionExtensions.UseODataRouting(Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder,Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingServiceCollectionExtensions.AddODataRouting(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingServiceCollectionExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
             <summary>
             
             </summary>

@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// Gets the related controller model in this context. This property should never be "null".
         /// </summary>
-        public ControllerModel Controller { get; }
+        public ControllerModel Controller { get; set; }
 
         /// <summary>
         /// Gets the related action model in this context

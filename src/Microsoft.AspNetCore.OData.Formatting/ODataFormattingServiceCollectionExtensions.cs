@@ -22,6 +22,24 @@ namespace Microsoft.AspNetCore.OData.Formatting
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IODataBuilder AddFormatter(this IODataBuilder builder/*, Action<ODataRoutingOptions> setupAction*/)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            AddODataFormatterServices(builder.Services);
+            // services.Configure(setupAction);
+            return builder;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
         public static IServiceCollection AddODataFormatter(this IServiceCollection services/*, Action<ODataRoutingOptions> setupAction*/)

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Formatting;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace ODataRoutingSample
 {
@@ -30,6 +31,10 @@ namespace ODataRoutingSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IEdmModel model0 = EdmModelBuilder.GetEdmModel();
+            IEdmModel model1 = EdmModelBuilder.GetEdmModelV1();
+            IEdmModel model2 = EdmModelBuilder.GetEdmModelV2();
+
             services.AddControllers(options => {
             //{
             //    options.Conventions.Add(new MetadataApplicationModelConventionAttribute());
@@ -54,6 +59,12 @@ namespace ODataRoutingSample
                 opt.UseODataQuery()
                 );
             */
+            services.AddOData(opt => opt.UseModel(model0)
+                .UseModel("v1", model1)
+                .UseModel("v2{data}", model2))
+                .AddODataRouting()
+                .AddFormatter()
+                .AddODataQuery();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,7 +89,7 @@ namespace ODataRoutingSample
                 return next(context);
             });
 
-        //    app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

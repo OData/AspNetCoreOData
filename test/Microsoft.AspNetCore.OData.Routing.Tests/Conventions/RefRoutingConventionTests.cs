@@ -53,7 +53,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
 
         private static ODataControllerActionContext BuildContext(IEdmModel model)
         {
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, model);
+            ControllerModel controller = new ControllerModel(typeof(RefTestController).GetTypeInfo(), new List<object>());
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, model, controller);
             return context;
         }
 

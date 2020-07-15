@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Formatting\Microsoft.AspNetCore.OData.Formatting.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Query\Microsoft.AspNetCore.OData.Query.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Routing\Microsoft.AspNetCore.OData.Routing.csproj" />
   </ItemGroup>
 

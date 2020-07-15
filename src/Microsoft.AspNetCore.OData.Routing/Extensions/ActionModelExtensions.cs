@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
@@ -32,11 +31,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// 
+        /// Test whether the action has the given parameter with the given type.
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="parameterName"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The parameter type.</typeparam>
+        /// <param name="action">The given action model.</param>
+        /// <param name="parameterName">The given parameter name.</param>
+        /// <returns>True/False.</returns>
         public static bool HasParameter<T>(this ActionModel action, string parameterName)
         {
             if (action == null)
@@ -55,11 +55,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// 
+        /// Gets the attribute on an action model.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The required attribute type.</typeparam>
+        /// <param name="action">The given action model.</param>
+        /// <returns>Null or the corresponing attribute.</returns>
         public static T GetAttribute<T>(this ActionModel action)
         {
             if (action == null)
@@ -71,15 +71,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Test whether the action has the key parameter defined.
+        /// Test whether the action has the key parameters defined.
         /// </summary>
         /// <param name="action">The action model.</param>
         /// <param name="entityType">The Edm entity type.</param>
         /// <param name="keyPrefix">The key prefix for the actio parameter.</param>
         /// <returns>True/false.</returns>
-        public static bool HasODataKeyParameter(this ActionModel action,
-            IEdmEntityType entityType,
-            string keyPrefix = "key")
+        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, string keyPrefix = "key")
         {
             if (action == null)
             {
@@ -115,14 +113,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// 
+        /// Adds the OData selector model to the action.
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="prefix"></param>
-        /// <param name="model"></param>
-        /// <param name="path"></param>
-        public static void AddSelector(this ActionModel action,
-            string prefix, IEdmModel model, ODataPathTemplate path)
+        /// <param name="action">The given action model.</param>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="path">The OData path template.</param>
+        public static void AddSelector(this ActionModel action, string prefix, IEdmModel model, ODataPathTemplate path)
         {
             if (action == null)
             {
@@ -153,7 +150,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
                 selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
 
-               // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+                // Check with .NET Team whether the "Endpoint name metadata"
+                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
@@ -22,9 +23,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="template">The Routing path template.</param>
         public ODataRoutingMetadata(string prefix, IEdmModel model, ODataPathTemplate template)
         {
-            Prefix = prefix;
-            Model = model;
-            Template = template;
+            Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+            Model = model ?? throw new ArgumentNullException(nameof(model));
+            Template = template ?? throw new ArgumentNullException(nameof(template));
         }
 
         /// <summary>

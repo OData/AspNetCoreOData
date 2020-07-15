@@ -348,6 +348,14 @@
             <param name="assembliesResolver"></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.ToEdmTypeReference(Microsoft.OData.Edm.IEdmType,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="edmType"></param>
+            <param name="isNullable"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder">
             <summary>
             This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
@@ -538,6 +546,72 @@
             </summary>
             <returns>A list of assemblies available for the application. </returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider">
+            <summary>
+            Provides the mapping between CLR type and Edm type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider.MapTo(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="clrType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type for the given CLR type.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm primitive type.
+            </summary>
+            <param name="edmPrimitiveType">The given Edm primitive type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider.GetEdmType(Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the corresponding Edm type for the given CLR type.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="clrType">The CLR type.</param>
+            <returns>Null or the corresponding Edm type.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataClrTypeCache">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataClrTypeCache.GetEdmType(System.Type,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="clrType"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Interfaces.ODataClrTypeCache">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Interfaces.ODataClrTypeCache.#ctor(Microsoft.AspNetCore.OData.Abstracts.Interfaces.IODataTypeMappingProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.Interfaces.ODataClrTypeCache"/> class.
+            </summary>
+            <param name="typeProvider">The registered type provider.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -677,6 +751,38 @@
             <summary>
             Gets or Sets a value indicating if batch requests should continue on error.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.EnableAttributeRouting">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.Models">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.UseAttributeRouting(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="useAttributeRouting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.UseModel(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataOptions.UseModel(System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="model"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataOptionsBuilder">
             <summary>
@@ -997,6 +1103,77 @@
             </summary>
             <param name="services"></param>
             <param name="setupAction"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider._cache">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider._nonStandardPrimitiveTypes">
+            <summary>
+            the built-in mapping between Edm primitive type and the corresponding CLR type
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider._assemblyResolver">
+            <summary>
+            The registered assembly resolver.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.#ctor(Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider"/> class.
+            </summary>
+            <param name="resolver">The registered assembly resolver.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.MapTo(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="clrType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type for the given CLR type.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm primitive type.
+            </summary>
+            <param name="edmPrimitiveType">The given Edm primitive type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetEdmType(Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the Edm type for the given Clr Type.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="clrType">The given Clr type.</param>
+            <returns>Null or the Edm type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType)">
+            <summary>
+            
+            </summary>
+            <param name="edmModel"></param>
+            <param name="edmType"></param>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataUntypedActionParameters">
@@ -1491,6 +1668,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.SingleResult`1.Queryable">
             <summary>
             The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.TypeHelper">
+            <summary>
+            
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.TypeHelper.GetInnerElementType(System.Type)">

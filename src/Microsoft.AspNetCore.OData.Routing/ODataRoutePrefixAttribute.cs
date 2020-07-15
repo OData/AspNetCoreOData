@@ -18,12 +18,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="prefix">The OData URL path template that this action handles.</param>
         public ODataRoutePrefixAttribute(string prefix)
         {
-            if (String.IsNullOrEmpty(prefix))
-            {
-                throw new ArgumentNullException(nameof(prefix));
-            }
-
-            Prefix = prefix;
+            Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
         }
 
         /// <summary>

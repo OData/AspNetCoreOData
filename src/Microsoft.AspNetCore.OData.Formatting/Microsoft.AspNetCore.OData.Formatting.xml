@@ -555,6 +555,13 @@
             
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatting.ODataFormattingServiceCollectionExtensions.AddFormatter(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatting.ODataFormattingServiceCollectionExtensions.AddODataFormatter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             

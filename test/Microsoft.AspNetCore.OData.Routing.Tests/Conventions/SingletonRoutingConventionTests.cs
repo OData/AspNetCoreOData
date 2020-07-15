@@ -50,17 +50,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
 
         private static ODataControllerActionContext BuildContext(bool hasSingleton = true)
         {
+            ControllerModel controller = new ControllerModel(typeof(MeController).GetTypeInfo(), new List<object>());
             IEdmModel model = GetEdmModel();
             IEdmSingleton me = model.EntityContainer.FindSingleton("me");
             Assert.NotNull(me);
 
             if (hasSingleton)
             {
-                return new ODataControllerActionContext(string.Empty, model, me);
+                return new ODataControllerActionContext(string.Empty, model, controller, me);
             }
             else
             {
-                return new ODataControllerActionContext(string.Empty, model);
+                return new ODataControllerActionContext(string.Empty, model, controller);
             }
         }
 

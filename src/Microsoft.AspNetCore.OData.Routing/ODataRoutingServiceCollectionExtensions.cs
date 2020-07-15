@@ -24,7 +24,25 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="builder"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public static ODataOptionsBuilder UseODataRouting(this ODataOptionsBuilder builder, IEdmModel model)
+        public static IMvcBuilder AddODataRouting(this IMvcBuilder builder, Action<ODataRoutingOptions> setupAction)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            //AddODataRoutingServices(builder.Services);
+            //builder.Services.Configure(setupAction);
+            return builder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static IODataBuilder AddODataRouting(this IODataBuilder builder)
         {
             if (builder == null)
             {

@@ -1278,6 +1278,32 @@
             can be retrieved later.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableFilter">
+            <summary>
+            Gets or sets a value indicating whether property can apply $filter.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtentions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtentions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtentions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
             This defines a composite OData query options that can be used to perform query composition.

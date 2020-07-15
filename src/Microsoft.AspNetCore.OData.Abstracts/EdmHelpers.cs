@@ -7,7 +7,6 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.OData.Edm;
@@ -20,32 +19,35 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     public static class EdmHelpers
     {
-        private static readonly EdmCoreModel _coreModel = EdmCoreModel.Instance;
+        private static KeyValuePair<Type, IEdmPrimitiveType> BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveTypeKind)
+            => new KeyValuePair<Type, IEdmPrimitiveType>(typeof(T), GetPrimitiveType(primitiveTypeKind));
 
         private static readonly Dictionary<Type, IEdmPrimitiveType> _builtInTypesMapping =
             new[]
             {
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(string), GetPrimitiveType(EdmPrimitiveTypeKind.String)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(bool), GetPrimitiveType(EdmPrimitiveTypeKind.Boolean)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(bool?), GetPrimitiveType(EdmPrimitiveTypeKind.Boolean)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(byte), GetPrimitiveType(EdmPrimitiveTypeKind.Byte)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(byte?), GetPrimitiveType(EdmPrimitiveTypeKind.Byte)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(decimal), GetPrimitiveType(EdmPrimitiveTypeKind.Decimal)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(decimal?), GetPrimitiveType(EdmPrimitiveTypeKind.Decimal)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(double), GetPrimitiveType(EdmPrimitiveTypeKind.Double)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(double?), GetPrimitiveType(EdmPrimitiveTypeKind.Double)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(Guid), GetPrimitiveType(EdmPrimitiveTypeKind.Guid)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(Guid?), GetPrimitiveType(EdmPrimitiveTypeKind.Guid)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(short), GetPrimitiveType(EdmPrimitiveTypeKind.Int16)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(short?), GetPrimitiveType(EdmPrimitiveTypeKind.Int16)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(int), GetPrimitiveType(EdmPrimitiveTypeKind.Int32)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(int?), GetPrimitiveType(EdmPrimitiveTypeKind.Int32)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(long), GetPrimitiveType(EdmPrimitiveTypeKind.Int64)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(long?), GetPrimitiveType(EdmPrimitiveTypeKind.Int64)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(sbyte), GetPrimitiveType(EdmPrimitiveTypeKind.SByte)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(sbyte?), GetPrimitiveType(EdmPrimitiveTypeKind.SByte)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(float), GetPrimitiveType(EdmPrimitiveTypeKind.Single)),
-                new KeyValuePair<Type, IEdmPrimitiveType>(typeof(float?), GetPrimitiveType(EdmPrimitiveTypeKind.Single)),
+                BuildTypeMapping<string>(EdmPrimitiveTypeKind.String),
+                BuildTypeMapping<bool>(EdmPrimitiveTypeKind.Boolean),
+                BuildTypeMapping<bool?>(EdmPrimitiveTypeKind.Boolean),
+                BuildTypeMapping<byte>(EdmPrimitiveTypeKind.Byte),
+                BuildTypeMapping<byte?>(EdmPrimitiveTypeKind.Byte),
+                BuildTypeMapping<decimal>(EdmPrimitiveTypeKind.Decimal),
+                BuildTypeMapping<decimal?>(EdmPrimitiveTypeKind.Decimal),
+                BuildTypeMapping<double>(EdmPrimitiveTypeKind.Double),
+                BuildTypeMapping<double?>(EdmPrimitiveTypeKind.Double),
+                BuildTypeMapping<Guid>(EdmPrimitiveTypeKind.Guid),
+                BuildTypeMapping<Guid?>(EdmPrimitiveTypeKind.Guid),
+                BuildTypeMapping<short>(EdmPrimitiveTypeKind.Int16),
+                BuildTypeMapping<short?>(EdmPrimitiveTypeKind.Int16),
+                BuildTypeMapping<int>(EdmPrimitiveTypeKind.Int32),
+                BuildTypeMapping<int?>(EdmPrimitiveTypeKind.Int32),
+                BuildTypeMapping<long>(EdmPrimitiveTypeKind.Int64),
+                BuildTypeMapping<long?>(EdmPrimitiveTypeKind.Int64),
+                BuildTypeMapping<sbyte>(EdmPrimitiveTypeKind.SByte),
+                BuildTypeMapping<sbyte?>(EdmPrimitiveTypeKind.SByte),
+                BuildTypeMapping<float>(EdmPrimitiveTypeKind.Single),
+                BuildTypeMapping<float?>(EdmPrimitiveTypeKind.Single),
+
+
                 new KeyValuePair<Type, IEdmPrimitiveType>(typeof(byte[]), GetPrimitiveType(EdmPrimitiveTypeKind.Binary)),
                 new KeyValuePair<Type, IEdmPrimitiveType>(typeof(Stream), GetPrimitiveType(EdmPrimitiveTypeKind.Stream)),
                 new KeyValuePair<Type, IEdmPrimitiveType>(typeof(Geography), GetPrimitiveType(EdmPrimitiveTypeKind.Geography)),
@@ -123,12 +125,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public static IEdmPrimitiveTypeReference GetEdmPrimitiveTypeReference(Type clrType)
         {
             IEdmPrimitiveType primitiveType = GetEdmPrimitiveType(clrType);
-            return primitiveType != null ? _coreModel.GetPrimitive(primitiveType.PrimitiveKind, IsNullable(clrType)) : null;
+            return primitiveType != null ? EdmCoreModel.Instance.GetPrimitive(primitiveType.PrimitiveKind, IsNullable(clrType)) : null;
         }
 
         private static IEdmPrimitiveType GetPrimitiveType(EdmPrimitiveTypeKind primitiveKind)
         {
-            return _coreModel.GetPrimitiveType(primitiveKind);
+            return EdmCoreModel.Instance.GetPrimitiveType(primitiveKind);
         }
 
         /// <summary>
@@ -227,6 +229,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             return matchingTypes.SingleOrDefault();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="edmType"></param>
+        /// <param name="isNullable"></param>
+        /// <returns></returns>
         public static IEdmTypeReference ToEdmTypeReference(this IEdmType edmType, bool isNullable)
         {
             Contract.Assert(edmType != null);
@@ -244,7 +252,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 case EdmTypeKind.Enum:
                     return new EdmEnumTypeReference(edmType as IEdmEnumType, isNullable);
                 case EdmTypeKind.Primitive:
-                    return _coreModel.GetPrimitive((edmType as IEdmPrimitiveType).PrimitiveKind, isNullable);
+                    return EdmCoreModel.Instance.GetPrimitive((edmType as IEdmPrimitiveType).PrimitiveKind, isNullable);
                 default:
                     throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
             }
