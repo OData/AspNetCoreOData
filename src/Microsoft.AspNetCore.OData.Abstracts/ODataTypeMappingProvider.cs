@@ -20,20 +20,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     public class ODataTypeMappingProvider : IODataTypeMappingProvider
     {
-
-        private ConcurrentDictionary<IEdmModel, ConcurrentDictionary<Type, IEdmTypeReference>> _cache
-            = new ConcurrentDictionary<IEdmModel, ConcurrentDictionary<Type, IEdmTypeReference>>();
-
         /// <summary>
-        /// The mapping from <see cref="Type"/> to <see cref="IEdmTypeReference"/>.
+        /// The cache used to hold the type mapping between <see cref="Type"/> and <see cref="IEdmTypeReference"/>.
         /// </summary>
-        private ConcurrentDictionary<Type, IEdmTypeReference> _clrToEdmTypeReference = new ConcurrentDictionary<Type, IEdmTypeReference>();
-
-
-        /// <summary>
-        /// The mapping from <see cref="IEdmType"/> to <see cref="Type"/>.
-        /// </summary>
-        private ConcurrentDictionary<IEdmType, Type> _edmTypeToClr = new ConcurrentDictionary<IEdmType, Type>();
+        private ConcurrentDictionary<IEdmModel, ConcurrentDictionary<Type, IEdmTypeReference>> _cache;
 
         /// <summary>
         /// The registered assembly resolver.
@@ -47,8 +37,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public ODataTypeMappingProvider(IAssemblyResolver resolver)
         {
             _assemblyResolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
-
-           // InitPrimitiveTypes();
+            _cache = new ConcurrentDictionary<IEdmModel, ConcurrentDictionary<Type, IEdmTypeReference>>();
         }
 
         /// <summary>
@@ -62,19 +51,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 return null;
             }
-
-            //if (_clrToEdmTypeReference.TryGetValue(clrType, out IEdmTypeReference edmType))
-            //{
-            //    if (_edmTypeToClr.TryGetValue(edmType.Definition, out Type newType))
-            //    {
-            //        if (clrType.IsNullable())
-            //        {
-            //            return TypeHelper.ToNullable(newType);
-            //        }
-
-            //        return newType;
-            //    }
-            //}
 
             IEdmPrimitiveTypeReference edmTypeRef = GetEdmPrimitiveType(clrType);
             if (edmTypeRef != null)
@@ -108,8 +84,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 .FirstOrDefault();
         }
 
-        
-
         /// <summary>
         /// Gets the corresponding CLR type for a given Edm type reference.
         /// </summary>
@@ -128,36 +102,18 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw new ArgumentNullException(nameof(edmType));
             }
 
-            if (edmType.IsPrimitive())
-            {
-                return GetClrPrimitiveType((IEdmPrimitiveTypeReference)edmType);
-            }
-
             Type clrType = GetClrTypeInCache(model, edmType);
             if (clrType != null)
             {
                 return clrType;
             }
 
-
             IEdmType edmTypeDefinition = edmType.Definition;
-            //if (_edmTypeToClr.TryGetValue(edmTypeDefinition, out clrType))
-            //{
-            //    if (edmType.IsNullable && (clrType.IsValueType || clrType.IsEnum))
-            //    {
-            //        return TypeHelper.ToNullable(clrType);
-            //    }
-            //    else
-            //    {
-            //        return clrType;
-            //    }
-            //}
 
             // If not found, find the CLR type from the model.
             clrType = FindClrType(model, edmTypeDefinition);
 
-            //_edmTypeToClr[edmType.Definition] = clrType; // could be null
-            AddTypeMapping(model, clrType, edmType);
+            AddTypeMapping(model, clrType, edmType); // could be null
 
             if (clrType != null && edmType.IsNullable && clrType.IsEnum)
             {
@@ -188,51 +144,41 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             return FindEdmType(model, clrType, testCollections: true);
         }
 
-        private Type GetClrTypeInCache(IEdmModel model, IEdmTypeReference edmType)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="edmModel"></param>
+        /// <param name="edmType"></param>
+        /// <returns></returns>
+        private Type FindClrType(IEdmModel edmModel, IEdmType edmType)
         {
-            if (edmType.IsPrimitive())
+            Contract.Assert(edmModel != null);
+            Contract.Assert(edmType != null);
+
+            IEdmSchemaType edmSchemaType = edmType as IEdmSchemaType;
+            if (edmSchemaType == null)
             {
-                return GetClrPrimitiveType((IEdmPrimitiveTypeReference)edmType);
+                return null;
             }
 
-            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
+            ClrTypeAnnotation annotation = edmModel.GetAnnotationValue<ClrTypeAnnotation>(edmSchemaType);
+            if (annotation != null)
             {
-                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
-                _cache[model] = map;
+                return annotation.ClrType;
             }
 
-            return map
-                .Where(kvp => edmType.Definition.IsEquivalentTo(kvp.Value.Definition) && (!edmType.IsNullable || kvp.Key.IsNullable()))
-                .Select(kvp => kvp.Key)
-                .FirstOrDefault();
-        }
+            string typeName = edmSchemaType.FullName();
+            IEnumerable<Type> matchingTypes = GetMatchingTypes(typeName);
 
-        private void AddTypeMapping(IEdmModel model, Type clrType, IEdmTypeReference edmType)
-        {
-            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
+            if (matchingTypes.Count() > 1)
             {
-                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
-                _cache[model] = map;
+                throw Error.Argument("edmTypeReference", SRResources.MultipleMatchingClrTypesForEdmType,
+                    typeName, String.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
             }
 
-            map[clrType] = edmType;
-        }
-
-        private IEdmTypeReference GetEdmTypeInCache(IEdmModel model, Type clrType)
-        {
-            IEdmPrimitiveTypeReference edmPrimitiveTypeReference = GetEdmPrimitiveType(clrType);
-            if (edmPrimitiveTypeReference != null)
-            {
-                return edmPrimitiveTypeReference;
-            }
-
-            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
-            {
-                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
-                _cache[model] = map;
-            }
-
-            return map.TryGetValue(clrType, out IEdmTypeReference edmType) ? edmType : null;
+            Type clrType = matchingTypes.SingleOrDefault();
+            edmModel.SetAnnotationValue(edmSchemaType, new ClrTypeAnnotation(clrType));
+            return clrType;
         }
 
         private IEdmTypeReference FindEdmType(IEdmModel model, Type clrType, bool testCollections)
@@ -246,12 +192,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 return edmTypeRef;
             }
-
-            //IEdmTypeReference edmType;
-            //if (_clrToEdmTypeReference.TryGetValue(clrType, out edmType))
-            //{
-            //    return edmType;
-            //}
 
             if (testCollections)
             {
@@ -323,40 +263,73 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         }
 
         /// <summary>
-        /// 
+        /// Gets the <see cref="Type"/> from the <see cref="IEdmTypeReference"/>.
         /// </summary>
-        /// <param name="edmModel"></param>
-        /// <param name="edmType"></param>
-        /// <returns></returns>
-        private Type FindClrType(IEdmModel edmModel, IEdmType edmType)
+        /// <param name="model">The Edm model.</param>
+        /// <param name="edmType">The given Edm type.</param>
+        /// <returns>Null or the Clr type.</returns>
+        private Type GetClrTypeInCache(IEdmModel model, IEdmTypeReference edmType)
         {
-            Contract.Assert(edmModel != null);
-            Contract.Assert(edmType != null);
-
-            IEdmSchemaType edmSchemaType = edmType as IEdmSchemaType;
-            if(edmSchemaType == null)
+            if (edmType == null)
             {
                 return null;
             }
 
-            ClrTypeAnnotation annotation = edmModel.GetAnnotationValue<ClrTypeAnnotation>(edmSchemaType);
-            if (annotation != null)
+            if (edmType.IsPrimitive())
             {
-                return annotation.ClrType;
+                return GetClrPrimitiveType((IEdmPrimitiveTypeReference)edmType);
             }
 
-            string typeName = edmSchemaType.FullName();
-            IEnumerable<Type> matchingTypes = GetMatchingTypes(typeName);
-
-            if (matchingTypes.Count() > 1)
+            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
             {
-                throw Error.Argument("edmTypeReference", SRResources.MultipleMatchingClrTypesForEdmType,
-                    typeName, String.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
+                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
+                _cache[model] = map;
             }
 
-            Type clrType = matchingTypes.SingleOrDefault();
-            edmModel.SetAnnotationValue(edmSchemaType, new ClrTypeAnnotation(clrType));
-            return clrType;
+            return map
+                .Where(kvp => edmType.Definition.IsEquivalentTo(kvp.Value.Definition) && (!edmType.IsNullable || kvp.Key.IsNullable()))
+                .Select(kvp => kvp.Key)
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IEdmTypeReference"/> from the given <see cref="Type"/> in the cache.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="clrType">The given Clr type.</param>
+        /// <returns>Null or the Edm type reference.</returns>
+        private IEdmTypeReference GetEdmTypeInCache(IEdmModel model, Type clrType)
+        {
+            IEdmPrimitiveTypeReference edmPrimitiveTypeReference = GetEdmPrimitiveType(clrType);
+            if (edmPrimitiveTypeReference != null)
+            {
+                return edmPrimitiveTypeReference;
+            }
+
+            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
+            {
+                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
+                _cache[model] = map;
+            }
+
+            return map.TryGetValue(clrType, out IEdmTypeReference edmType) ? edmType : null;
+        }
+
+        /// <summary>
+        /// Add the mapping between <see cref="Type"/> and <see cref="IEdmTypeReference"/>.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="clrType">The Clr type.</param>
+        /// <param name="edmType">The Edm type reference.</param>
+        private void AddTypeMapping(IEdmModel model, Type clrType, IEdmTypeReference edmType)
+        {
+            if (!_cache.TryGetValue(model, out ConcurrentDictionary<Type, IEdmTypeReference> map))
+            {
+                map = new ConcurrentDictionary<Type, IEdmTypeReference>();
+                _cache[model] = map;
+            }
+
+            map[clrType] = edmType;
         }
 
         private static Type ExtractGenericInterface(Type queryType, Type interfaceType)
@@ -371,93 +344,96 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         //private static KeyValuePair<Type, IEdmPrimitiveType> BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind)
         //    => new KeyValuePair<Type, IEdmPrimitiveType>(typeof(T), EdmCoreModel.Instance.GetPrimitiveType(primitiveKind));
 
-        private void InitPrimitiveTypes()
-        {
-            EdmCoreModel coreModel = EdmCoreModel.Instance;
+        //private void InitPrimitiveTypes()
+        //{
+        //    EdmCoreModel coreModel = EdmCoreModel.Instance;
 
-            // be noted: don't change the order. we put the nullable after non-nullable to make sure
-            // _edmTypeToClr only contains the non-nullable CLR type.
-            foreach ((Type type, EdmPrimitiveTypeKind kind) in new[]
-                {
-                    (typeof(string), EdmPrimitiveTypeKind.String),
-                    (typeof(bool), EdmPrimitiveTypeKind.Boolean),
-                    (typeof(bool?), EdmPrimitiveTypeKind.Boolean),
-                    (typeof(byte), EdmPrimitiveTypeKind.Byte),
-                    (typeof(byte?), EdmPrimitiveTypeKind.Byte),
-                    (typeof(decimal), EdmPrimitiveTypeKind.Decimal),
-                    (typeof(decimal?), EdmPrimitiveTypeKind.Decimal),
-                    (typeof(double), EdmPrimitiveTypeKind.Double),
-                    (typeof(double?), EdmPrimitiveTypeKind.Double),
-                    (typeof(Guid), EdmPrimitiveTypeKind.Guid),
-                    (typeof(Guid?), EdmPrimitiveTypeKind.Guid),
-                    (typeof(short), EdmPrimitiveTypeKind.Int16),
-                    (typeof(short?), EdmPrimitiveTypeKind.Int16),
-                    (typeof(int), EdmPrimitiveTypeKind.Int32),
-                    (typeof(int?), EdmPrimitiveTypeKind.Int32),
-                    (typeof(long), EdmPrimitiveTypeKind.Int64),
-                    (typeof(long?), EdmPrimitiveTypeKind.Int64),
-                    (typeof(sbyte), EdmPrimitiveTypeKind.SByte),
-                    (typeof(sbyte?), EdmPrimitiveTypeKind.SByte),
-                    (typeof(float), EdmPrimitiveTypeKind.Single),
-                    (typeof(float?), EdmPrimitiveTypeKind.Single),
-                    (typeof(byte[]), EdmPrimitiveTypeKind.Binary),
-                    (typeof(Stream), EdmPrimitiveTypeKind.Stream),
-                    (typeof(DateTimeOffset), EdmPrimitiveTypeKind.DateTimeOffset),
-                    (typeof(DateTimeOffset?), EdmPrimitiveTypeKind.DateTimeOffset),
-                    (typeof(TimeSpan), EdmPrimitiveTypeKind.Duration),
-                    (typeof(TimeSpan?), EdmPrimitiveTypeKind.Duration),
-                    (typeof(Date), EdmPrimitiveTypeKind.Date),
-                    (typeof(Date?), EdmPrimitiveTypeKind.Date),
-                    (typeof(TimeOfDay), EdmPrimitiveTypeKind.TimeOfDay),
-                    (typeof(TimeOfDay?), EdmPrimitiveTypeKind.TimeOfDay),
-                    (typeof(Geography), EdmPrimitiveTypeKind.Geography),
-                    (typeof(GeographyPoint), EdmPrimitiveTypeKind.GeographyPoint),
-                    (typeof(GeographyLineString), EdmPrimitiveTypeKind.GeographyLineString),
-                    (typeof(GeographyPolygon), EdmPrimitiveTypeKind.GeographyPolygon),
-                    (typeof(GeographyCollection), EdmPrimitiveTypeKind.GeographyCollection),
-                    (typeof(GeographyMultiLineString), EdmPrimitiveTypeKind.GeographyMultiLineString),
-                    (typeof(GeographyMultiPoint), EdmPrimitiveTypeKind.GeographyMultiPoint),
-                    (typeof(GeographyMultiPolygon), EdmPrimitiveTypeKind.GeographyMultiPolygon),
-                    (typeof(Geometry), EdmPrimitiveTypeKind.Geometry),
-                    (typeof(GeometryPoint), EdmPrimitiveTypeKind.GeometryPoint),
-                    (typeof(GeometryLineString), EdmPrimitiveTypeKind.GeometryLineString),
-                    (typeof(GeometryPolygon), EdmPrimitiveTypeKind.GeometryPolygon),
-                    (typeof(GeometryCollection), EdmPrimitiveTypeKind.GeometryCollection),
-                    (typeof(GeometryMultiLineString), EdmPrimitiveTypeKind.GeometryMultiLineString),
-                    (typeof(GeometryMultiPoint), EdmPrimitiveTypeKind.GeometryMultiPoint),
-                    (typeof(GeometryMultiPolygon), EdmPrimitiveTypeKind.GeometryMultiPolygon),
-                })
-            {
-                IEdmPrimitiveTypeReference primitiveType = coreModel.GetPrimitive(kind, type.IsNullable());
-                _clrToEdmTypeReference[type] = primitiveType;
+        //    // be noted: don't change the order. we put the nullable after non-nullable to make sure
+        //    // _edmTypeToClr only contains the non-nullable CLR type.
+        //    foreach ((Type type, EdmPrimitiveTypeKind kind) in new[]
+        //        {
+        //            (typeof(string), EdmPrimitiveTypeKind.String),
+        //            (typeof(bool), EdmPrimitiveTypeKind.Boolean),
+        //            (typeof(bool?), EdmPrimitiveTypeKind.Boolean),
+        //            (typeof(byte), EdmPrimitiveTypeKind.Byte),
+        //            (typeof(byte?), EdmPrimitiveTypeKind.Byte),
+        //            (typeof(decimal), EdmPrimitiveTypeKind.Decimal),
+        //            (typeof(decimal?), EdmPrimitiveTypeKind.Decimal),
+        //            (typeof(double), EdmPrimitiveTypeKind.Double),
+        //            (typeof(double?), EdmPrimitiveTypeKind.Double),
+        //            (typeof(Guid), EdmPrimitiveTypeKind.Guid),
+        //            (typeof(Guid?), EdmPrimitiveTypeKind.Guid),
+        //            (typeof(short), EdmPrimitiveTypeKind.Int16),
+        //            (typeof(short?), EdmPrimitiveTypeKind.Int16),
+        //            (typeof(int), EdmPrimitiveTypeKind.Int32),
+        //            (typeof(int?), EdmPrimitiveTypeKind.Int32),
+        //            (typeof(long), EdmPrimitiveTypeKind.Int64),
+        //            (typeof(long?), EdmPrimitiveTypeKind.Int64),
+        //            (typeof(sbyte), EdmPrimitiveTypeKind.SByte),
+        //            (typeof(sbyte?), EdmPrimitiveTypeKind.SByte),
+        //            (typeof(float), EdmPrimitiveTypeKind.Single),
+        //            (typeof(float?), EdmPrimitiveTypeKind.Single),
+        //            (typeof(byte[]), EdmPrimitiveTypeKind.Binary),
+        //            (typeof(Stream), EdmPrimitiveTypeKind.Stream),
+        //            (typeof(DateTimeOffset), EdmPrimitiveTypeKind.DateTimeOffset),
+        //            (typeof(DateTimeOffset?), EdmPrimitiveTypeKind.DateTimeOffset),
+        //            (typeof(TimeSpan), EdmPrimitiveTypeKind.Duration),
+        //            (typeof(TimeSpan?), EdmPrimitiveTypeKind.Duration),
+        //            (typeof(Date), EdmPrimitiveTypeKind.Date),
+        //            (typeof(Date?), EdmPrimitiveTypeKind.Date),
+        //            (typeof(TimeOfDay), EdmPrimitiveTypeKind.TimeOfDay),
+        //            (typeof(TimeOfDay?), EdmPrimitiveTypeKind.TimeOfDay),
+        //            (typeof(Geography), EdmPrimitiveTypeKind.Geography),
+        //            (typeof(GeographyPoint), EdmPrimitiveTypeKind.GeographyPoint),
+        //            (typeof(GeographyLineString), EdmPrimitiveTypeKind.GeographyLineString),
+        //            (typeof(GeographyPolygon), EdmPrimitiveTypeKind.GeographyPolygon),
+        //            (typeof(GeographyCollection), EdmPrimitiveTypeKind.GeographyCollection),
+        //            (typeof(GeographyMultiLineString), EdmPrimitiveTypeKind.GeographyMultiLineString),
+        //            (typeof(GeographyMultiPoint), EdmPrimitiveTypeKind.GeographyMultiPoint),
+        //            (typeof(GeographyMultiPolygon), EdmPrimitiveTypeKind.GeographyMultiPolygon),
+        //            (typeof(Geometry), EdmPrimitiveTypeKind.Geometry),
+        //            (typeof(GeometryPoint), EdmPrimitiveTypeKind.GeometryPoint),
+        //            (typeof(GeometryLineString), EdmPrimitiveTypeKind.GeometryLineString),
+        //            (typeof(GeometryPolygon), EdmPrimitiveTypeKind.GeometryPolygon),
+        //            (typeof(GeometryCollection), EdmPrimitiveTypeKind.GeometryCollection),
+        //            (typeof(GeometryMultiLineString), EdmPrimitiveTypeKind.GeometryMultiLineString),
+        //            (typeof(GeometryMultiPoint), EdmPrimitiveTypeKind.GeometryMultiPoint),
+        //            (typeof(GeometryMultiPolygon), EdmPrimitiveTypeKind.GeometryMultiPolygon),
+        //        })
+        //    {
+        //        IEdmPrimitiveTypeReference primitiveType = coreModel.GetPrimitive(kind, type.IsNullable());
+        //        _clrToEdmTypeReference[type] = primitiveType;
 
-                if (!_edmTypeToClr.ContainsKey(primitiveType.Definition))
-                {
-                    _edmTypeToClr[primitiveType.Definition] = type;
-                }
-            }
+        //        if (!_edmTypeToClr.ContainsKey(primitiveType.Definition))
+        //        {
+        //            _edmTypeToClr[primitiveType.Definition] = type;
+        //        }
+        //    }
 
-            // below are non-standard
-            foreach ((Type type, EdmPrimitiveTypeKind kind) in new[]
-            {
-                (typeof(XElement), EdmPrimitiveTypeKind.String),
-                (typeof(ushort), EdmPrimitiveTypeKind.Int32),
-                (typeof(ushort?), EdmPrimitiveTypeKind.Int32),
-                (typeof(uint), EdmPrimitiveTypeKind.Int64),
-                (typeof(uint?), EdmPrimitiveTypeKind.Int64),
-                (typeof(ulong), EdmPrimitiveTypeKind.Int64),
-                (typeof(ulong?), EdmPrimitiveTypeKind.Int64),
-                (typeof(char[]), EdmPrimitiveTypeKind.String),
-                (typeof(char), EdmPrimitiveTypeKind.String),
-                (typeof(char?), EdmPrimitiveTypeKind.String),
-                (typeof(DateTime), EdmPrimitiveTypeKind.DateTimeOffset),
-                (typeof(DateTime?), EdmPrimitiveTypeKind.DateTimeOffset)
-            })
-            {
-                _clrToEdmTypeReference[type] = coreModel.GetPrimitive(kind, type.IsNullable());
-            }
-        }
+        //    // below are non-standard
+        //    foreach ((Type type, EdmPrimitiveTypeKind kind) in new[]
+        //    {
+        //        (typeof(XElement), EdmPrimitiveTypeKind.String),
+        //        (typeof(ushort), EdmPrimitiveTypeKind.Int32),
+        //        (typeof(ushort?), EdmPrimitiveTypeKind.Int32),
+        //        (typeof(uint), EdmPrimitiveTypeKind.Int64),
+        //        (typeof(uint?), EdmPrimitiveTypeKind.Int64),
+        //        (typeof(ulong), EdmPrimitiveTypeKind.Int64),
+        //        (typeof(ulong?), EdmPrimitiveTypeKind.Int64),
+        //        (typeof(char[]), EdmPrimitiveTypeKind.String),
+        //        (typeof(char), EdmPrimitiveTypeKind.String),
+        //        (typeof(char?), EdmPrimitiveTypeKind.String),
+        //        (typeof(DateTime), EdmPrimitiveTypeKind.DateTimeOffset),
+        //        (typeof(DateTime?), EdmPrimitiveTypeKind.DateTimeOffset)
+        //    })
+        //    {
+        //        _clrToEdmTypeReference[type] = coreModel.GetPrimitive(kind, type.IsNullable());
+        //    }
+        //}
 
+        /// <summary>
+        /// The mapping between Edm primitive type and Clr primitive type.
+        /// </summary>
         private static IDictionary<Type, IEdmPrimitiveTypeReference> BuiltInPrimitiveTypes = new[]
         {
             BuildTypeMapping<string>(EdmPrimitiveTypeKind.String),
@@ -520,7 +496,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             BuildTypeMapping<char?>(EdmPrimitiveTypeKind.String),
             BuildTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset),
             BuildTypeMapping<DateTime?>(EdmPrimitiveTypeKind.DateTimeOffset)
-        }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
         private static KeyValuePair<Type, IEdmPrimitiveTypeReference> BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind)
             => new KeyValuePair<Type, IEdmPrimitiveTypeReference>(typeof(T), EdmCoreModel.Instance.GetPrimitive(primitiveKind, typeof(T).IsNullable()));

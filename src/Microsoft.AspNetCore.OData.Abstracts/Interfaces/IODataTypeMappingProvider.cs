@@ -12,10 +12,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Interfaces
     public interface IODataTypeMappingProvider
     {
         /// <summary>
-        /// 
+        /// Maps a CLR type to standard CLR type.
         /// </summary>
-        /// <param name="clrType"></param>
-        /// <returns></returns>
+        /// <param name="clrType">The potential non-standard CLR type.</param>
+        /// <returns>The standard CLR type or the input CLR type itself.</returns>
         Type MapTo(Type clrType);
 
         /// <summary>
@@ -23,14 +23,14 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Interfaces
         /// </summary>
         /// <param name="clrType">The given CLR type.</param>
         /// <returns>Null or the Edm primitive type.</returns>
-        // IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType);
+        IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType);
 
         /// <summary>
         /// Gets the corresponding CLR type for a given Edm primitive type.
         /// </summary>
         /// <param name="edmPrimitiveType">The given Edm primitive type.</param>
         /// <returns>Null or the CLR type.</returns>
-       // Type GetClrPrimitiveType(IEdmPrimitiveTypeReference edmPrimitiveType);
+        Type GetClrPrimitiveType(IEdmPrimitiveTypeReference edmPrimitiveType);
 
         /// <summary>
         /// Gets the corresponding CLR type for a given Edm type.

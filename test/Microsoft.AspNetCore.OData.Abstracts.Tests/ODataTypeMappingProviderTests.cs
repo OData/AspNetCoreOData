@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         private static IEdmModel EdmModel = GetEdmModel();
         private ODataTypeMappingProvider _provider = new ODataTypeMappingProvider(new TestAssemblyResolver());
 
-        #region GetEdmType
+        #region GetEdmPrimitiveType
         [Theory]
         [InlineData(typeof(string), "Edm.String", true)]
         [InlineData(typeof(bool), "Edm.Boolean", false)]
@@ -50,10 +50,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(typeof(TimeOfDay?), "Edm.TimeOfDay", true)]
         [InlineData(typeof(byte[]), "Edm.Binary", true)]
         [InlineData(typeof(Stream), "Edm.Stream", true)]
-        public void GetEdmTypeWorksAsExpectedForStandardPrimitive(Type clrType, string name, bool nullable)
+        public void GetEdmPrimitiveTypeWorksAsExpectedForStandardPrimitive(Type clrType, string name, bool nullable)
         {
             // Arrange & Act
-            IEdmTypeReference edmType = _provider.GetEdmType(EdmModel, clrType);
+            IEdmTypeReference edmType = _provider.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(edmType);
@@ -75,10 +75,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(typeof(char?), "Edm.String", true)]
         [InlineData(typeof(DateTime), "Edm.DateTimeOffset", false)]
         [InlineData(typeof(DateTime?), "Edm.DateTimeOffset", true)]
-        public void GetEdmTypeWorksAsExpectedForNonStandardPrimitive(Type clrType, string name, bool nullable)
+        public void GetEdmPrimitiveTypeWorksAsExpectedForNonStandardPrimitive(Type clrType, string name, bool nullable)
         {
             // Arrange & Act
-            IEdmTypeReference edmType = _provider.GetEdmType(EdmModel, clrType);
+            IEdmTypeReference edmType = _provider.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(edmType);
@@ -104,10 +104,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(typeof(GeometryMultiLineString), "Edm.GeometryMultiLineString")]
         [InlineData(typeof(GeometryMultiPoint), "Edm.GeometryMultiPoint")]
         [InlineData(typeof(GeometryMultiPolygon), "Edm.GeometryMultiPolygon")]
-        public void GetEdmTypeWorksAsExpectedForSpatialPrimitive(Type clrType, string name)
+        public void GetEdmPrimitiveTypeWorksAsExpectedForSpatialPrimitive(Type clrType, string name)
         {
             // Arrange & Act
-            IEdmTypeReference edmType = _provider.GetEdmType(EdmModel, clrType);
+            IEdmTypeReference edmType = _provider.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(edmType);
@@ -115,28 +115,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
             Assert.Equal(name, edmType.FullName());
             Assert.True(edmType.IsNullable);
         }
-
-        [Theory]
-        [InlineData(typeof(Address), "NS.Address")]
-        [InlineData(typeof(CnAddress), "NS.CnAddress")]
-        [InlineData(typeof(Customer), "Microsoft.AspNetCore.OData.Abstracts.Tests.Customer")]
-        public void GetEdmTypeWorksAsExpectedForSchemaType(Type clrType, string typeName)
-        {
-            // Arrange
-            IEdmType expectedEdmType = EdmModel.FindType(typeName);
-            Assert.NotNull(expectedEdmType); // Guard
-
-            // Arrange & Act
-            IEdmTypeReference edmType = _provider.GetEdmType(EdmModel, clrType);
-
-            // Assert
-            Assert.NotNull(edmType);
-            Assert.Same(expectedEdmType, edmType.Definition);
-            Assert.True(edmType.IsNullable);
-        }
         #endregion
 
-        #region GetClrType
+        #region GetClrPrimitiveType
         [Theory]
         [InlineData(EdmPrimitiveTypeKind.String, typeof(string))]
         [InlineData(EdmPrimitiveTypeKind.Boolean, typeof(bool))]
@@ -155,11 +136,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(EdmPrimitiveTypeKind.Duration, typeof(TimeSpan))]
         [InlineData(EdmPrimitiveTypeKind.Date, typeof(Date))]
         [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay))]
-        public void GetClrTypeWorksAsExpectedForStandardPrimitive(EdmPrimitiveTypeKind kind, Type expected)
+        public void GetClrPrimitiveTypeWorksAsExpectedForStandardPrimitive(EdmPrimitiveTypeKind kind, Type expected)
         {
             // #1 Arrange & Act & Assert for nullable equasls to false
             IEdmPrimitiveTypeReference primitiveType = EdmCoreModel.Instance.GetPrimitive(kind, false);
-            Type clrType = _provider.GetClrType(EdmModel, primitiveType);
+            Type clrType = _provider.GetClrPrimitiveType(primitiveType);
             Assert.Equal(expected, clrType);
 
             // #2 Arrange & Act & Assert for nullable equals to true
@@ -183,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(EdmPrimitiveTypeKind.GeographyLineString, typeof(GeographyLineString))]
         [InlineData(EdmPrimitiveTypeKind.GeographyPolygon, typeof(GeographyPolygon))]
         [InlineData(EdmPrimitiveTypeKind.GeographyCollection, typeof(GeographyCollection))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyMultiLineString,typeof(GeographyMultiLineString))]
+        [InlineData(EdmPrimitiveTypeKind.GeographyMultiLineString, typeof(GeographyMultiLineString))]
         [InlineData(EdmPrimitiveTypeKind.GeographyMultiPoint, typeof(GeographyMultiPoint))]
         [InlineData(EdmPrimitiveTypeKind.GeographyMultiPolygon, typeof(GeographyMultiPolygon))]
         [InlineData(EdmPrimitiveTypeKind.Geometry, typeof(Geometry))]
@@ -191,23 +172,67 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
         [InlineData(EdmPrimitiveTypeKind.GeometryLineString, typeof(GeometryLineString))]
         [InlineData(EdmPrimitiveTypeKind.GeometryPolygon, typeof(GeometryPolygon))]
         [InlineData(EdmPrimitiveTypeKind.GeometryCollection, typeof(GeometryCollection))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryMultiLineString,typeof(GeometryMultiLineString))]
+        [InlineData(EdmPrimitiveTypeKind.GeometryMultiLineString, typeof(GeometryMultiLineString))]
         [InlineData(EdmPrimitiveTypeKind.GeometryMultiPoint, typeof(GeometryMultiPoint))]
         [InlineData(EdmPrimitiveTypeKind.GeometryMultiPolygon, typeof(GeometryMultiPolygon))]
-        public void GetClrTypeWorksAsExpectedForSpatialPrimitive(EdmPrimitiveTypeKind kind, Type type)
+        public void GetClrPrimitiveTypeWorksAsExpectedForSpatialPrimitive(EdmPrimitiveTypeKind kind, Type type)
         {
             // Arrange
             IEdmPrimitiveTypeReference primitiveType1 = EdmCoreModel.Instance.GetPrimitive(kind, true);
             IEdmPrimitiveTypeReference primitiveType2 = EdmCoreModel.Instance.GetPrimitive(kind, false);
 
             // Act
-            Type clrType1 = _provider.GetClrType(EdmModel, primitiveType1);
-            Type clrType2 = _provider.GetClrType(EdmModel, primitiveType2);
+            Type clrType1 = _provider.GetClrPrimitiveType(primitiveType1);
+            Type clrType2 = _provider.GetClrPrimitiveType(primitiveType2);
 
             // Assert
             Assert.Same(clrType1, clrType2);
             Assert.Same(type, clrType1);
         }
+        #endregion
+
+        #region GetEdmType
+        [Theory]
+        [InlineData(typeof(string), "Edm.String")]
+        [InlineData(typeof(int?), "Edm.Int32")]
+        [InlineData(typeof(Address), "NS.Address")]
+        [InlineData(typeof(CnAddress), "NS.CnAddress")]
+        [InlineData(typeof(Customer), "Microsoft.AspNetCore.OData.Abstracts.Tests.Customer")]
+        public void GetEdmTypeWorksAsExpectedForEdmType(Type clrType, string typeName)
+        {
+            // Arrange
+            IEdmType expectedEdmType = EdmModel.FindType(typeName);
+            Assert.NotNull(expectedEdmType); // Guard
+
+            // Arrange & Act
+            IEdmTypeReference edmType = _provider.GetEdmType(EdmModel, clrType);
+
+            // Assert
+            Assert.NotNull(edmType);
+            Assert.Same(expectedEdmType, edmType.Definition);
+            Assert.True(edmType.IsNullable);
+        }
+
+        [Fact]
+        public void GetEdmTypeWorksAsExpectedForSchemaEnumType()
+        {
+            // Arrange
+            IEdmType expectedType = EdmModel.FindType("NS.Color");
+            Assert.NotNull(expectedType); // Guard
+
+            // #1. Act & Assert
+            IEdmTypeReference colorType = _provider.GetEdmType(EdmModel, typeof(Color));
+            Assert.Same(expectedType, colorType.Definition);
+            Assert.False(colorType.IsNullable);
+
+            // #2. Act & Assert
+            colorType = _provider.GetEdmType(EdmModel, typeof(Color?));
+            Assert.Same(expectedType, colorType.Definition);
+            Assert.True(colorType.IsNullable);
+        }
+        #endregion
+
+        #region GetClrType
 
         [Theory]
         [InlineData("NS.Address", typeof(Address))] // use ClrTypeAnnotation
@@ -247,31 +272,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Tests
             clrType = _provider.GetClrType(EdmModel, edmTypeReference);
             Assert.Same(typeof(Color), clrType);
         }
-
-        [Fact]
-        public void GetEdmTypeWorksAsExpectedForSchemaEnumType()
-        {
-            var primitiveType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, true);
-            var clrType = _provider.GetClrPrimitiveType(primitiveType);
-            Assert.Equal("", clrType.FullName);
-        }
-
-        [Fact]
-        public void GetEdmTypeWorksAsExpectedForSchemaEnumType2()
-        {
-            var edmType = _provider.GetEdmPrimitiveType(typeof(ushort?));
-
-            // Assert.Equal("", clrType.FullName());
-            var clrType = _provider.GetClrPrimitiveType(edmType);
-            // Assert.Equal("", clrType.FullName);
-
-            edmType = _provider.GetEdmPrimitiveType(typeof(string));
-
-            // Assert.Equal("", clrType.FullName());
-            clrType = _provider.GetClrPrimitiveType(edmType);
-            // Assert.Equal("", clrType.FullName);
-        }
-
         #endregion
 
         [Theory]
