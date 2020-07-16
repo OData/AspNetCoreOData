@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Abstracts.Interfaces
@@ -24,14 +23,14 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Interfaces
         /// </summary>
         /// <param name="clrType">The given CLR type.</param>
         /// <returns>Null or the Edm primitive type.</returns>
-        IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType);
+        // IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType);
 
         /// <summary>
         /// Gets the corresponding CLR type for a given Edm primitive type.
         /// </summary>
         /// <param name="edmPrimitiveType">The given Edm primitive type.</param>
         /// <returns>Null or the CLR type.</returns>
-        Type GetClrPrimitiveType(IEdmPrimitiveTypeReference edmPrimitiveType);
+       // Type GetClrPrimitiveType(IEdmPrimitiveTypeReference edmPrimitiveType);
 
         /// <summary>
         /// Gets the corresponding CLR type for a given Edm type.
