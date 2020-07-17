@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Gets the associated prefix for this model.
+        /// Gets the associated model name for this model, it's also used as the routing prefix.
         /// </summary>
         public string Prefix { get; internal set; }
 

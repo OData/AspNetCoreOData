@@ -16,8 +16,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for an odata template string.
-    /// It looks for the <see cref="ODataRoutePrefixAttribute"/> on controller
-    /// and <see cref="ODataRouteAttribute"/> on action.
+    /// It looks for the <see cref="ODataRoutePrefixAttribute"/> on controller and <see cref="ODataRouteAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -47,8 +46,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            context.RoutePrefixes = GetODataRoutePrefixes(context.Prefix, context.Controller);
-
+            // It allows to use attribute routing without ODataRoutePrefixAttribute.
+            // In this case, we only use the ODataRouteAttrbute to construct the route template.
+            // Otherwise, we combine each route prefix with each route attribute to construct the route template.
             foreach (var routePrefix in GetODataRoutePrefixes(context.Prefix, context.Controller))
             {
                 foreach (var action in context.Controller.Actions)
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                     foreach (ODataRouteAttribute routeAttribute in routeAttributes)
                     {
-                        // If we have the route name setting, make sure we pass the attribute with the same route name.
+                        // If we have the model name setting, make sure we only let the attribute with the same model name to pass.
                         if (!string.IsNullOrEmpty(routeAttribute.ModelName) && routeAttribute.ModelName != context.Prefix)
                         {
                             continue;
@@ -71,6 +71,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                         }
                         catch(ODataException ex)
                         {
+                            // use the logger to log the wrong odata attribute template. Shall we log the others?
                             string warning = String.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
                                 routeAttribute.PathTemplate, action.ActionMethod.Name, context.Controller.ControllerName, ex.Message);
 
@@ -80,55 +81,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            // Returns false to make sure we don't want to call the AppliesToAction for this convention.
+            // We execute this convention on all actions in the controller level.
+            // So, returns false to make sure we don't want to call the AppliesToAction for this convention.
             return false;
         }
 
         /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            ActionModel action = context.Action;
-
-            // If we have the route name setting, make sure we pass the attribute with the same route name.
-            var routeAttributes = action.Attributes.OfType<ODataRouteAttribute>()
-                .Where(r => string.IsNullOrEmpty(r.ModelName) || r.ModelName != context.Prefix);
-            if (!routeAttributes.Any())
-            {
-                return false;
-            }
-
-            foreach (ODataRouteAttribute routeAttribute in routeAttributes)
-            {
-                IEnumerable<string> routePrefixes = context.RoutePrefixes;
-                if (routePrefixes == null)
-                {
-                    routePrefixes = new string[] { null };
-                }
-
-                foreach (var routePrefix in routePrefixes)
-                {
-                    try
-                    {
-                        string routeTemplate = GetODataPathTemplateString(routePrefix, routeAttribute.PathTemplate);
-                        ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate);
-                        action.AddSelector(context.Prefix, context.Model, pathTemplate);
-                    }
-                    catch (ODataException ex)
-                    {
-                        string warning = String.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
-                            routeAttribute.PathTemplate, action.ActionMethod.Name, context.Controller.ControllerName, ex.Message);
-
-                        _logger.LogWarning(warning);
-                    }
-                }
-            }
-
-            // we should let this action go to other conventions.
+            // Actually, we will never call here. So, we can throw exception here.
+            // However, let's just return false to let this action go to other conventions.
             return false;
         }
 
@@ -150,6 +112,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             foreach (ODataRoutePrefixAttribute prefixAttribute in prefixAttributes)
             {
+                // If we have the model name setting, make sure we only let the attribute with the same model name to pass.
                 if (!string.IsNullOrEmpty(prefixAttribute.ModelName) && prefixAttribute.ModelName != modelName)
                 {
                     continue;
@@ -158,10 +121,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 string prefix = prefixAttribute.RoutePrefix;
                 if (prefix != null && prefix.StartsWith("/", StringComparison.Ordinal))
                 {
+                    // So skip it? or let's remove the "/" and let it go?
                     _logger.LogWarning($"The OData route prefix '{prefix}' on the controller '{controller.ControllerName}' starts with a '/'. Route prefixes cannot start with a '/'.");
 
-                    // So skip it? or let's remove the "/" and let it go?
-                    // continue;
                     prefix = prefix.TrimStart('/');
                 }
 

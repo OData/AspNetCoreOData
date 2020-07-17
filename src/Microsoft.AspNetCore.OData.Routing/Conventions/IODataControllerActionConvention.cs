@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// </summary>
         /// <param name="context">The controller action context.</param>
         /// <returns>
-        /// True: yes, applies the convention on the actions of this controller.
+        /// True: applies the convention on the actions of this controller.
         /// False: no, please skip this convention on the actions of this controller.
         /// </returns>
         bool AppliesToController(ODataControllerActionContext context);

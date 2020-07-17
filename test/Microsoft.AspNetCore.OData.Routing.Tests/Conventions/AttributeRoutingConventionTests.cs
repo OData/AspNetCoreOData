@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.OData.Routing.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Xunit;
 
@@ -18,78 +19,101 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
     public class AttributeRoutingConventionTests
     {
         private static IEdmModel EdmModel = GetEdmModel();
-        private static RefRoutingConvention _ref = new RefRoutingConvention();
-
-        [Fact]
-        public void ConstructorThrows()
-        {
-            AttributeRoutingConvention convention = CreateConvention();
-            Assert.NotNull(convention);
-        }
-
-        [Fact]
-        public void Tests()
-        {
-            string actionMethodName = "CreateRef";
-            string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string prop, out string declaring);
-            Assert.Equal("CreateRef", method);
-            Assert.Null(prop);
-            Assert.Null(declaring);
-
-            actionMethodName = "GetRefToPropertyFromAbc";
-            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out prop, out declaring);
-            Assert.Equal("GetRef", method);
-            Assert.Equal("Property", prop);
-            Assert.Equal("Abc", declaring);
-
-            actionMethodName = "CreateRefFromAbcToProperty";
-            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out prop, out declaring);
-            Assert.Null(method);
-        }
 
         [Fact]
         public void AppliesToControllerWithoutRoutePrefixWorksAsExpected()
         {
-            Type controllerType = typeof(AttributeRoutingConvention1Controller);
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithoutPrefixController>("MyAction");
+            ActionModel action = controller.Actions.First();
 
-            MethodInfo methodInfo = controllerType.GetMethod("MyAction");
-            var attributes = methodInfo.GetCustomAttributes(inherit: true);
-            ActionModel action = new ActionModel(methodInfo, attributes);
-
-            ODataControllerActionContext context = BuildContext<AttributeRoutingConvention1Controller>(EdmModel);
-            context.Controller.Actions.Add(action);
-
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
             AttributeRoutingConvention attributeConvention = CreateConvention();
 
+            // Act
             bool ok = attributeConvention.AppliesToController(context);
-            Assert.Equal(4, action.Selectors.Count); 
             Assert.False(ok);
-        }
 
-        [Fact]
-        public void AppliesToControllerWithoutRoutePrefixWorksAsExpected()
-        {
-            Type controllerType = typeof(AttributeRoutingConvention1Controller);
-
-            MethodInfo methodInfo = controllerType.GetMethod("MyAction");
-            var attributes = methodInfo.GetCustomAttributes(inherit: true);
-            ActionModel action = new ActionModel(methodInfo, attributes);
-
-            ODataControllerActionContext context = BuildContext<AttributeRoutingConvention1Controller>(EdmModel);
-            context.Controller.Actions.Add(action);
-
-            AttributeRoutingConvention attributeConvention = CreateConvention();
-
-            bool ok = attributeConvention.AppliesToController(context);
             Assert.Equal(4, action.Selectors.Count);
-            Assert.False(ok);
+            Assert.Equal(new[]
+                {
+                    "Customers({key})",
+                    "Customers/{key}",
+                    "Customers({key})/Name",
+                    "Customers/{key}/Name"
+                },
+                action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
-        private static ODataControllerActionContext BuildContext<T>(IEdmModel model)
+        [Fact]
+        public void AppliesToControllerWithRoutePrefixWorksAsExpected()
         {
-            ControllerModel controller = new ControllerModel(typeof(T).GetTypeInfo(), new List<object>());
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, model, controller);
-            return context;
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithPrefixController>("List");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
+            AttributeRoutingConvention attributeConvention = CreateConvention();
+
+            // Act
+            bool ok = attributeConvention.AppliesToController(context);
+            Assert.False(ok);
+
+            // Assert
+            Assert.Equal(6, action.Selectors.Count);
+            Assert.Equal(new[]
+                {
+                    "Customers({key})",
+                    "Customers/{key}",
+                    "Customers",
+                    "Orders({key})",
+                    "Orders/{key}",
+                    "Orders",
+                },
+                action.Selectors.Select(s => s.AttributeRouteModel.Template));
+        }
+
+        [Fact]
+        public void AppliesToControllerWithLongTemplateWorksAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithoutPrefixController>("LongAction");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
+            AttributeRoutingConvention attributeConvention = CreateConvention();
+
+            // Act
+            bool ok = attributeConvention.AppliesToController(context);
+            Assert.False(ok);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.NotNull(selector.AttributeRouteModel);
+            Assert.Equal("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title", selector.AttributeRouteModel.Template);
+        }
+
+        [Theory]
+        [InlineData("GetVipCustomerWithPrefix", "VipCustomer")]
+        [InlineData("GetVipCustomerOrdersWithPrefix", "VipCustomer/Orders")]
+        [InlineData("GetVipCustomerNameWithPrefix", "VipCustomer/Name")]
+        public void AppliesToControllerForSingletonWorksAsExpected(string actionName, string expectedTemplate)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<SingletonTestControllerWithPrefix>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
+            AttributeRoutingConvention attributeConvention = CreateConvention();
+
+            // Act
+            bool ok = attributeConvention.AppliesToController(context);
+            Assert.False(ok);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.NotNull(selector.AttributeRouteModel);
+            Assert.Equal(expectedTemplate, selector.AttributeRouteModel.Template);
         }
 
         private AttributeRoutingConvention CreateConvention()
@@ -103,49 +127,87 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
             return services.BuildServiceProvider().GetRequiredService<AttributeRoutingConvention>();
         }
 
-        private AttributeRoutingConvention CreateConvention(Action<IServiceCollection> configAction)
-        {
-            var services = new ServiceCollection()
-                .AddLogging();
-
-            services.AddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
-            services.AddSingleton<AttributeRoutingConvention>();
-
-            configAction?.Invoke(services);
-
-            return services.BuildServiceProvider().GetRequiredService<AttributeRoutingConvention>();
-        }
-
         private static IEdmModel GetEdmModel()
         {
-            var model = new EdmModel();
-            var customer = new EdmEntityType("NS", "Customer");
+            EdmModel model = new EdmModel();
+
+            // Customer
+            EdmEntityType customer = new EdmEntityType("NS", "Customer");
             customer.AddKeys(customer.AddStructuralProperty("ID", EdmPrimitiveTypeKind.String));
             customer.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
             model.AddElement(customer);
 
-            var container = new EdmEntityContainer("NS", "Default");
-            container.AddEntitySet("Customers", customer);
+            // Order
+            EdmEntityType order = new EdmEntityType("NS", "Order", null, false, true);
+            order.AddKeys(order.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+            model.AddElement(order);
+
+            // MyOrder
+            EdmEntityType myOrder = new EdmEntityType("NS", "MyOrder");
+            myOrder.AddKeys(myOrder.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+            myOrder.AddStructuralProperty("Title", EdmPrimitiveTypeKind.String);
+            model.AddElement(myOrder);
+
+            EdmNavigationProperty ordersNavProp = customer.AddUnidirectionalNavigation(
+                new EdmNavigationPropertyInfo
+                {
+                    Name = "Orders",
+                    TargetMultiplicity = EdmMultiplicity.Many,
+                    Target = order
+                });
+
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+            EdmEntitySet orders = container.AddEntitySet("Orders", order);
+            EdmEntitySet customers = container.AddEntitySet("Customers", customer);
+            customers.AddNavigationTarget(ordersNavProp, orders);
+            EdmSingleton vipCustomer = container.AddSingleton("VipCustomer", customer);
+            vipCustomer.AddNavigationTarget(ordersNavProp, orders);
+
             model.AddElement(container);
             return model;
         }
 
-        private class AttributeRoutingConvention1Controller
+        private class WithoutPrefixController
         {
             [ODataRoute("Customers({key})")]
             [ODataRoute("Customers/{key}/Name")]
             public void MyAction(int key)
             {
             }
+
+            [ODataRoute("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title")]
+            public void LongAction()
+            {
+
+            }
         }
 
         [ODataRoutePrefix("Customers")]
         [ODataRoutePrefix("Orders")]
-        private class AttributeRoutingConvention2Controller
+        private class WithPrefixController
         {
             [ODataRoute("({key})")]
             [ODataRoute("")]
             public void List(int key)
+            {
+            }
+        }
+
+        [ODataRoutePrefix("VipCustomer")]
+        public class SingletonTestControllerWithPrefix
+        {
+            [ODataRoute("")]
+            public void GetVipCustomerWithPrefix()
+            {
+            }
+
+            [ODataRoute("Orders")]
+            public void GetVipCustomerOrdersWithPrefix()
+            {
+            }
+
+            [ODataRoute("Name")]
+            public void GetVipCustomerNameWithPrefix()
             {
             }
         }
