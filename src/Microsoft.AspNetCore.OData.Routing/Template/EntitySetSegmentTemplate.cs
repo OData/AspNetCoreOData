@@ -21,13 +21,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public EntitySetSegmentTemplate(IEdmEntitySet entitySet)
         {
             EntitySet = entitySet ?? throw new ArgumentNullException(nameof(entitySet));
+
+            EdmType = new EdmCollectionType(new EdmEntityTypeReference(entitySet.EntityType(), true));
         }
 
         /// <inheritdoc />
         public override string Literal => EntitySet.Name;
 
         /// <inheritdoc />
-        public override IEdmType EdmType => EntitySet.EntityType();
+        public override IEdmType EdmType { get; }
 
         /// <inheritdoc />
         public override IEdmNavigationSource NavigationSource => EntitySet;

@@ -2,6 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OData.Edm;
 
@@ -12,6 +14,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// </summary>
     public class ODataControllerActionContext
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public ODataControllerActionContext()
+        {
+
+        }
+
         /// <summary>
         ///  Initializes a new instance of the <see cref="ODataControllerActionContext" /> class.
         /// </summary>
@@ -56,40 +66,45 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// Gets the associated prefix for this model.
         /// </summary>
-        public string Prefix { get; }
+        public string Prefix { get; internal set; }
 
         /// <summary>
         /// Gets the Edm model.
         /// </summary>
-        public IEdmModel Model { get; }
+        public IEdmModel Model { get; internal set; }
 
         /// <summary>
         /// Gets the associated <see cref="IEdmEntitySet"/> for this controller.
         /// It might be null.
         /// </summary>
-        public IEdmEntitySet EntitySet { get; }
+        public IEdmEntitySet EntitySet { get; internal set; }
 
         /// <summary>
         /// Gets the associated <see cref="IEdmEntityType"/>.
         /// It might be null.
         /// </summary>
-        public IEdmEntityType EntityType { get; }
+        public IEdmEntityType EntityType { get; internal set; }
 
         /// <summary>
         /// Gets the associated <see cref=" IEdmSingleton"/> for this controller.
         /// It might be null.
         /// </summary>
-        public IEdmSingleton Singleton { get; }
+        public IEdmSingleton Singleton { get; internal set; }
 
         /// <summary>
         /// Gets the related controller model in this context. This property should never be "null".
         /// </summary>
-        public ControllerModel Controller { get; set; }
+        public ControllerModel Controller { get; internal set; }
 
         /// <summary>
         /// Gets the related action model in this context
         /// We guarentee that this property should never be "null" when calling "AppliesToAction"
         /// </summary>
         public ActionModel Action { get; internal set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal IEnumerable<string> RoutePrefixes { get; set; }
     }
 }

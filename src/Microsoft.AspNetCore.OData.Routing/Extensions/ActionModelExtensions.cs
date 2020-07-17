@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -68,6 +69,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             return action.Attributes.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetAttributes<T>(this ActionModel action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            return action.Attributes.OfType<T>();
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using System;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -155,6 +156,12 @@ namespace Microsoft.AspNetCore.OData.Routing
             // ~/EntitySet{key}|Singleton/{NavigationProperty}/$ref
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, RefRoutingConvention>());
+
+            // Attribute routing
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IODataControllerActionConvention, AttributeRoutingConvention>());
+
+            services.AddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
         }
     }
 }

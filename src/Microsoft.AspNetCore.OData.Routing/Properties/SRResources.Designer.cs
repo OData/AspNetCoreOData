@@ -61,6 +61,15 @@ namespace Microsoft.AspNetCore.OData.Routing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
+        /// </summary>
+        internal static string InvalidODataRouteOnAction {
+            get {
+                return ResourceManager.GetString("InvalidODataRouteOnAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find the services container for the non-OData route. This can occur when using OData components on the non-OData route and is usually a configuration issue. Call EnableDependencyInjection() to enable OData components on non-OData routes. This may also occur when a request was mistakenly handled by the ASP.NET Core routing layer instead of the OData routing layer, for instance the URL does not include the OData route prefix configured via a call to MapODataServiceRoute()..
         /// </summary>
         internal static string MissingNonODataContainer {

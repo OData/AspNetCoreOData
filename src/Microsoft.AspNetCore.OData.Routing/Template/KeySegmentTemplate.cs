@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
             }
 
-            Count = keys.Length;
+           // Count = keys.Length;
         }
 
         /// <summary>
@@ -82,16 +82,37 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
             NavigationSource = navigationSource ?? throw new ArgumentNullException(nameof(navigationSource));
 
-            foreach (var key in keys)
+            var entityTypeKeys = EntityType.Key();
+            if (keys.Count != entityTypeKeys.Count())
             {
-                string keyName = key.Key;
-                IEdmStructuralProperty keyProperty = entityType.Key().FirstOrDefault(k => k.Name == keyName);
-                if (keyProperty == null)
+                throw new ODataException("The input key count doesn't match the number of the entity type key count.");
+            }
+
+            if (keys.Count == 1)
+            {
+                KeyValuePair<string, string> key = keys.First();
+                IEdmStructuralProperty keyProperty = entityTypeKeys.First();
+                _keyMappings[keyProperty.Name] = (key.Value, keyProperty.Type);
+                Literal = key.Value;
+            }
+            else
+            {
+                foreach (var key in keys)
                 {
-                    throw new InvalidOperationException($"Cannot find '{keyName}' key in the '{entityType.FullName()}' type.");
+                    string keyName = key.Key;
+
+                    IEdmStructuralProperty keyProperty;
+
+                    keyProperty = entityType.Key().FirstOrDefault(k => k.Name == keyName);
+                    if (keyProperty == null)
+                    {
+                        throw new InvalidOperationException($"Cannot find '{keyName}' key in the '{entityType.FullName()}' type.");
+                    }
+
+                    _keyMappings[keyName] = (key.Value, keyProperty.Type);
                 }
 
-                _keyMappings[keyName] = (key.Value, keyProperty.Type);
+                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
             }
         }
 
@@ -112,7 +133,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the key count
         /// </summary>
-        public int Count { get; }
+        public int Count => _keyMappings.Count;
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Key;

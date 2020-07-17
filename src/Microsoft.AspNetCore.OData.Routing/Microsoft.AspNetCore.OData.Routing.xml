@@ -23,26 +23,34 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
             <summary>
-            
+            The convention for an odata template string.
+            It looks for the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutePrefixAttribute"/> on controller
+            and <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteAttribute"/> on action.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention},Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention"/> class.
+            </summary>
+            <param name="logger">The registered logger.</param>
+            <param name="parser">The registered parser.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.Order">
-            <summary>
-            
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.GetODataRoutePrefixes(System.String,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
             <summary>
-            
+            Gets the route prefix on the controller.
             </summary>
-            <param name="context"></param>
+            <param name="modelName">The model name.</param>
+            <param name="controller">The controller.</param>
+            <returns>The prefix string list.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention">
             <summary>
@@ -201,6 +209,11 @@
             A context object for <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
             <summary>
              Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
@@ -264,6 +277,11 @@
             <summary>
             Gets the related action model in this context
             We guarentee that this property should never be "null" when calling "AppliesToAction"
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.RoutePrefixes">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
@@ -386,6 +404,14 @@
             <param name="action">The given action model.</param>
             <returns>Null or the corresponing attribute.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.GetAttributes``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
             <summary>
             Test whether the action has the key parameters defined.
@@ -431,6 +457,14 @@
             <typeparam name="T">The attribute type.</typeparam>
             <param name="controller">The given controller model.</param>
             <returns>The attribute or null.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ControllerModelExtensions.GetAttributes``1(Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="controller"></param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
@@ -546,11 +580,16 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutePrefixAttribute"/> class.
             </summary>
-            <param name="prefix">The OData URL path template that this action handles.</param>
+            <param name="routePrefix">The OData URL path template that this action handles.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutePrefixAttribute.Prefix">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutePrefixAttribute.RoutePrefix">
             <summary>
             Gets the OData URL path template that this action handles.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutePrefixAttribute.ModelName">
+            <summary>
+            Gets or sets the model name with which to associate the attribute.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
@@ -841,6 +880,11 @@
             <summary>
               Overrides the current thread's CurrentUICulture property for all
               resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.InvalidODataRouteOnAction">
+            <summary>
+              Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.MissingNonODataContainer">

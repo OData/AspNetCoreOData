@@ -37,6 +37,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <summary>
         /// Gets or sets the OData route with which to associate the attribute.
         /// </summary>
-        public string RouteName { get; set; }
+        public string ModelName { get; set; }
     }
 }

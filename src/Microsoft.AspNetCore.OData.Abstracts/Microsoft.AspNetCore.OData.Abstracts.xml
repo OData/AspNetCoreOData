@@ -382,20 +382,12 @@
             <param name="entityType">The EDM entity type.</param>
             <returns>A collection of operations bound to the feed.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions">
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.EdmModelExtensions">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableActions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
-            <param name="entityType"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableFunctions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.EdmModelExtensions.GetAvailableActions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             
             </summary>
@@ -403,7 +395,7 @@
             <param name="entityType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableOperationsBoundToCollection(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.EdmModelExtensions.GetAvailableFunctions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             
             </summary>
@@ -411,7 +403,15 @@
             <param name="entityType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.ODataEdmModelExtensions.GetAvailableOperations(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.EdmModelExtensions.GetAvailableOperationsBoundToCollection(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="entityType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.Edm.EdmModelExtensions.GetAvailableOperations(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
             <summary>
             
             </summary>

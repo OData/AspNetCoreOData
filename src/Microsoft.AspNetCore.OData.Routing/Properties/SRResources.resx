@@ -113,4 +113,7 @@
   <data name="RequestMustHaveModel" xml:space="preserve">
     <value>The request must have an associated EDM model. Consider using the extension method HttpConfiguration.MapODataServiceRoute to register a route that parses the OData URI and attaches the model information.</value>
   </data>
+  <data name="InvalidODataRouteOnAction" xml:space="preserve">
+    <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
+  </data>
 </root>

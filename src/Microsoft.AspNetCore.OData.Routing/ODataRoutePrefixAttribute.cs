@@ -15,15 +15,20 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataRoutePrefixAttribute"/> class.
         /// </summary>
-        /// <param name="prefix">The OData URL path template that this action handles.</param>
-        public ODataRoutePrefixAttribute(string prefix)
+        /// <param name="routePrefix">The OData URL path template that this action handles.</param>
+        public ODataRoutePrefixAttribute(string routePrefix)
         {
-            Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+            RoutePrefix = routePrefix ?? throw new ArgumentNullException(nameof(routePrefix));
         }
 
         /// <summary>
         /// Gets the OData URL path template that this action handles.
         /// </summary>
-        public string Prefix { get; }
+        public string RoutePrefix { get; }
+
+        /// <summary>
+        /// Gets or sets the model name with which to associate the attribute.
+        /// </summary>
+        public string ModelName { get; set; }
     }
 }

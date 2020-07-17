@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Edm
     /// <summary>
     /// 
     /// </summary>
-    public static class ODataEdmModelExtensions
+    public static class EdmModelExtensions
     {
         /// <summary>
         /// 
