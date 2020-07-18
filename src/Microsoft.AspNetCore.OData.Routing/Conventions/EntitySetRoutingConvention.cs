@@ -45,9 +45,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            Debug.Assert(context.EntitySet != null);
-            Debug.Assert(context.Action != null);
-
             ActionModel action = context.Action;
             IEdmEntitySet entitySet = context.EntitySet;
             IEdmEntityType entityType = entitySet.EntityType();

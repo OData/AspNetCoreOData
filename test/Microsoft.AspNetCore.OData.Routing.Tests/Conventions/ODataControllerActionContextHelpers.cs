@@ -1,0 +1,38 @@
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+
+
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.OData.Edm;
+using Xunit;
+
+namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
+{
+    internal class ODataControllerActionContextHelpers
+    {
+        public static ODataControllerActionContext BuildContext(string modelPrefix, IEdmModel model, ControllerModel controller)
+        {
+            Assert.NotNull(model);
+
+            // The reason why to create a context is that:
+            // We don't need to call te FindEntitySet or FindSingleton before every convention.
+            // So, for a controller, we try to call "FindEntitySet" or "FindSingleton" once.
+            string controllerName = controller.ControllerName;
+
+            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(controllerName);
+            if (entitySet != null)
+            {
+                return new ODataControllerActionContext(modelPrefix, model, controller, entitySet);
+            }
+
+            IEdmSingleton singleton = model.EntityContainer.FindSingleton(controllerName);
+            if (singleton != null)
+            {
+                return new ODataControllerActionContext(modelPrefix, model, controller, singleton);
+            }
+
+            return new ODataControllerActionContext(modelPrefix, model, controller);
+        }
+    }
+}
