@@ -116,4 +116,7 @@
   <data name="InvalidODataRouteOnAction" xml:space="preserve">
     <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
   </data>
+  <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
+    <value>The input key count '{0}' doesn't match the number of the entity type key '{1}'.</value>
+  </data>
 </root>

@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Tests.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Xunit;
 
@@ -25,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType);
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
-            EntitySetRoutingConvention entitySetConvention = CreateConvention();
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
             // Act
             bool actual = entitySetConvention.AppliesToController(context);
@@ -46,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = action;
 
-            EntitySetRoutingConvention entitySetConvention = CreateConvention();
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
             // Act
             bool returnValue = entitySetConvention.AppliesToAction(context);
@@ -74,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = controller.Actions.First();
 
-            EntitySetRoutingConvention entitySetConvention = CreateConvention();
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
             // Act
             bool returnValue = entitySetConvention.AppliesToAction(context);
@@ -97,22 +96,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Conventions
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = controller.Actions.First();
 
-            EntitySetRoutingConvention entitySetConvention = CreateConvention();
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
             // Act
             entitySetConvention.AppliesToAction(context);
 
             // Assert
             Assert.Empty(action.Selectors);
-        }
-
-        private EntitySetRoutingConvention CreateConvention()
-        {
-            var services = new ServiceCollection()
-                .AddLogging();
-
-            services.AddSingleton<EntitySetRoutingConvention>();
-            return services.BuildServiceProvider().GetRequiredService<EntitySetRoutingConvention>();
         }
 
         private static IEdmModel GetEdmModel()

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -32,7 +33,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public KeySegmentTemplate(IEdmEntityType entityType)
             : this(entityType, keyPrefix: "key")
         {
-
         }
 
         /// <summary>
@@ -53,24 +53,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
             else
             {
-                // Id1={Id1},Id2={Id2}
+                // Id1={keyId1},Id2={keyId2}
                 foreach (var key in keys)
                 {
                     _keyMappings[key.Name] = ($"{keyPrefix}{key.Name}", key.Type);
                 }
 
-                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
+                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={{{a.Value.Item1}}}"));
             }
-
-           // Count = keys.Length;
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
-        /// <param name="keys"></param>
-        /// <param name="entityType"></param>
-        /// <param name="navigationSource"></param>
+        /// <param name="keys">The input key mappings.</param>
+        /// <param name="entityType">The declaring type containes the key.</param>
+        /// <param name="navigationSource">The navigation source.</param>
         public KeySegmentTemplate(IDictionary<string, string> keys,
             IEdmEntityType entityType, IEdmNavigationSource navigationSource)
         {
@@ -85,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             var entityTypeKeys = EntityType.Key();
             if (keys.Count != entityTypeKeys.Count())
             {
-                throw new ODataException("The input key count doesn't match the number of the entity type key count.");
+                throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.InputKeyNotMatchEntityTypeKey, keys.Count, entityTypeKeys.Count()));
             }
 
             if (keys.Count == 1)

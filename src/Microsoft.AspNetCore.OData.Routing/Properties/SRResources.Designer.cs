@@ -61,6 +61,15 @@ namespace Microsoft.AspNetCore.OData.Routing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+        /// </summary>
+        internal static string InputKeyNotMatchEntityTypeKey {
+            get {
+                return ResourceManager.GetString("InputKeyNotMatchEntityTypeKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
         /// </summary>
         internal static string InvalidODataRouteOnAction {

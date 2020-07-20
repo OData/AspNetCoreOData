@@ -54,7 +54,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/> with key.
-            It supports key in parenthesis and key as segment if it's single key.
+            It supports key in parenthesis and key as segment if it's a single key.
             Conventions:
             GET ~/entityset/key
             GET ~/entityset/key/cast
@@ -881,6 +881,11 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.InputKeyNotMatchEntityTypeKey">
+            <summary>
+              Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.InvalidODataRouteOnAction">
             <summary>
               Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
@@ -1202,11 +1207,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate" /> class.
             </summary>
-            <param name="keys"></param>
-            <param name="entityType"></param>
-            <param name="navigationSource"></param>
+            <param name="keys">The input key mappings.</param>
+            <param name="entityType">The declaring type containes the key.</param>
+            <param name="navigationSource">The navigation source.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Literal">
             <inheritdoc />

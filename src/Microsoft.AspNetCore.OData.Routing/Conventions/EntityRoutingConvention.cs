@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for <see cref="IEdmEntitySet"/> with key.
-    /// It supports key in parenthesis and key as segment if it's single key.
+    /// It supports key in parenthesis and key as segment if it's a single key.
     /// Conventions:
     /// GET ~/entityset/key
     /// GET ~/entityset/key/cast
@@ -142,8 +142,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
                 else
                 {
-                    // ~/Customers({key})/Ns.Customer
-                    segments.Add(new CastSegmentTemplate(entityType));
+                    // ~/Customers({key})/Ns.VipCustomer
+                    segments.Add(new CastSegmentTemplate(castType));
                     action.AddSelector(prefix, model, new ODataPathTemplate(segments));
                 }
             }
