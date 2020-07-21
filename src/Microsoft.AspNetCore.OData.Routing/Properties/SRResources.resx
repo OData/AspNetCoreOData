@@ -119,4 +119,10 @@
   <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
     <value>The input key count '{0}' doesn't match the number of the entity type key '{1}'.</value>
   </data>
+  <data name="InputCastTypeKindNotMatch" xml:space="preserve">
+    <value>The input cast type '{0}' does not match the expected type kind '{1}'.</value>
+  </data>
+  <data name="TypeMustBeRelated" xml:space="preserve">
+    <value>The type '{0}' does not inherit from and is not a base type of '{1}'.</value>
+  </data>
 </root>

@@ -294,5 +294,16 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                     String.Join("_", type.GetGenericArguments().Select(t => MangleClrTypeName(t))));
             }
         }
+
+        /// <summary>
+        /// Check whether the two are properly related types
+        /// </summary>
+        /// <param name="first">the first type</param>
+        /// <param name="second">the second type</param>
+        /// <returns>Whether the two types are related.</returns>
+        public static bool IsRelatedTo(IEdmType first, IEdmType second)
+        {
+            return second.IsOrInheritsFrom(first) || first.IsOrInheritsFrom(second);
+        }
     }
 }

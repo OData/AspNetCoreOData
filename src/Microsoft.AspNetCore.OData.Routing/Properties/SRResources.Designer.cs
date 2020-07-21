@@ -61,6 +61,15 @@ namespace Microsoft.AspNetCore.OData.Routing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The input cast type &apos;{0}&apos; does not match the expected type kind &apos;{1}&apos;..
+        /// </summary>
+        internal static string InputCastTypeKindNotMatch {
+            get {
+                return ResourceManager.GetString("InputCastTypeKindNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
         /// </summary>
         internal static string InputKeyNotMatchEntityTypeKey {
@@ -120,6 +129,15 @@ namespace Microsoft.AspNetCore.OData.Routing {
         internal static string RequestMustHaveModel {
             get {
                 return ResourceManager.GetString("RequestMustHaveModel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from and is not a base type of &apos;{1}&apos;..
+        /// </summary>
+        internal static string TypeMustBeRelated {
+            get {
+                return ResourceManager.GetString("TypeMustBeRelated", resourceCulture);
             }
         }
     }

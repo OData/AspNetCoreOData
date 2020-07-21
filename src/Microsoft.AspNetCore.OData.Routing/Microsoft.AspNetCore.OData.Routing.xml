@@ -542,6 +542,41 @@
             Gets the specified model name.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod">
+            <summary>
+            An enumeration for request methods.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.None">
+            <summary>
+            An unknown method.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.Get">
+            <summary>
+            "Get"
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.Post">
+            <summary>
+            "Post"
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.Put">
+            <summary>
+            "Put"
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.Patch">
+            <summary>
+            "Patch"
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.ODataRequestMethod.Delete">
+            <summary>
+            "Delete"
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteAttribute">
             <summary>
             Represents an attribute that can be placed on an action of an Controller to specify
@@ -881,6 +916,11 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.InputCastTypeKindNotMatch">
+            <summary>
+              Looks up a localized string similar to The input cast type &apos;{0}&apos; does not match the expected type kind &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.InputKeyNotMatchEntityTypeKey">
             <summary>
               Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
@@ -914,6 +954,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.RequestMustHaveModel">
             <summary>
               Looks up a localized string similar to The request must have an associated EDM model. Consider using the extension method HttpConfiguration.MapODataServiceRoute to register a route that parses the OData URI and attaches the model information..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.SRResources.TypeMustBeRelated">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from and is not a base type of &apos;{1}&apos;..
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate">
@@ -1000,13 +1045,19 @@
             </summary>
             <param name="castType">The actual structured type.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmNavigationSource)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.#ctor(Microsoft.OData.UriParser.TypeSegment)">
             <summary>
             
             </summary>
-            <param name="castType"></param>
-            <param name="expectedType"></param>
-            <param name="navigationSource"></param>
+            <param name="typeSegment"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate" /> class.
+            </summary>
+            <param name="castType">The cast Edm type.</param>
+            <param name="expectedType">The expected Edm type.</param>
+            <param name="navigationSource">The target navigation source. it could be null.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.Literal">
             <inheritdoc />
@@ -1191,6 +1242,13 @@
             Key: entity type key name, for example ID
             Value: a tuple of (string, IEdmTypeReference): Item1 is the mapped name, Item2 is the key's type
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate" /> class.
+            </summary>
+            <param name="entityType">The declaring type containes the key.</param>
+            <param name="navigationSource"></param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>

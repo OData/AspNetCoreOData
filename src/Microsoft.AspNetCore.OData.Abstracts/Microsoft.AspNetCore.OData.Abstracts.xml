@@ -356,6 +356,14 @@
             <param name="isNullable"></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.EdmHelpers.IsRelatedTo(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType)">
+            <summary>
+            Check whether the two are properly related types
+            </summary>
+            <param name="first">the first type</param>
+            <param name="second">the second type</param>
+            <returns>Whether the two types are related.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.Edm.BindableOperationFinder">
             <summary>
             This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
@@ -1951,6 +1959,19 @@
         <member name="M:Microsoft.AspNetCore.OData.Error.NotSupported(System.String,System.Object[])">
             <summary>
             Creates an <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ExceptionUtil">
+            <summary>
+            Utility class for creating and unwrapping <see cref="T:System.Exception"/> instances.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ExceptionUtil.ThrowODataException(System.String,System.Object[])">
+            <summary>
+            
             </summary>
             <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
             <param name="messageArgs">An object array that contains zero or more objects to format.</param>

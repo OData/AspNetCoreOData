@@ -373,7 +373,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Edm
             return ((IEdmComplexType)type).Name;
         }
 
-        public static IEdmTypeReference ElementType(this IEdmTypeReference typeReference)
+        public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
         {
             if (typeReference.TypeKind() == EdmTypeKind.Collection)
             {

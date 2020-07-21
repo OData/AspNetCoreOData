@@ -30,6 +30,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
         /// <param name="entityType">The declaring type containes the key.</param>
+        /// <param name="navigationSource"></param>
+        public KeySegmentTemplate(IEdmEntityType entityType, IEdmNavigationSource navigationSource)
+            : this(entityType, keyPrefix: "key")
+        {
+            NavigationSource = navigationSource;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="entityType">The declaring type containes the key.</param>
         public KeySegmentTemplate(IEdmEntityType entityType)
             : this(entityType, keyPrefix: "key")
         {

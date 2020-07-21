@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
@@ -37,6 +39,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             // structural property supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
@@ -49,8 +56,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            ActionModel action = context.Action;
-
             if (context.EntitySet == null && context.Singleton == null)
             {
                 return false;
@@ -60,6 +65,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 (IEdmNavigationSource)context.Singleton :
                 (IEdmNavigationSource)context.EntitySet;
 
+            ActionModel action = context.Action;
             string actionName = action.ActionMethod.Name;
 
             string method = SplitActionName(actionName, out string property, out string cast, out string declared);
@@ -96,13 +102,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
+            if (!CanApply(edmProperty, method))
+            {
+                return false;
+            }
+
             IEdmComplexType castType = null;
             if (cast != null)
             {
-                IEdmTypeReference propertyElementType = edmProperty.Type.ElementType();
-                if (propertyElementType.IsComplex())
+                IEdmType propertyElementType = edmProperty.Type.Definition.AsElementType();
+                if (propertyElementType.TypeKind == EdmTypeKind.Complex)
                 {
-                    IEdmComplexType complexType = propertyElementType.AsComplex().ComplexDefinition();
+                    IEdmComplexType complexType = (IEdmComplexType)propertyElementType;
                     castType = complexType.FindTypeInInheritance(context.Model, cast) as IEdmComplexType;
                     if (castType == null)
                     {
@@ -114,7 +125,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // only support complex type cast, (TODO: maybe consider to support Edm.PrimitiveType cast)
                     return false;
                 }
-
             }
 
             // only process structural property
@@ -138,75 +148,73 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-            if (context.EntitySet != null)
+            AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
+
+            if (CanApplyDollarCount(edmProperty, method))
             {
-                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+                AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
+            }
+
+            if (CanApplyDollarValue(edmProperty, method))
+            {
+                AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
+            }
+
+            return true;
+        }
+
+        private static void AddSelector(string prefix, IEdmModel model, ActionModel action,
+            IEdmNavigationSource navigationSource,
+            IEdmStructuralProperty edmProperty,
+            IEdmType cast, IEdmEntityType declaringType, bool dollarValue, bool dollarCount)
+        {
+            IEdmEntitySet entitySet = navigationSource as IEdmEntitySet;
+            IEdmEntityType entityType = navigationSource.EntityType();
+
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (entitySet != null)
+            {
+                segments.Add(new EntitySetSegmentTemplate(entitySet));
+                segments.Add(new KeySegmentTemplate(entityType, navigationSource));
             }
             else
             {
-                segments.Add(new SingletonSegmentTemplate(context.Singleton));
+                segments.Add(new SingletonSegmentTemplate(navigationSource as IEdmSingleton));
             }
 
-            if (hasKeyParameter)
+            if (declaringType != null && declaringType != entityType)
             {
-                segments.Add(new KeySegmentTemplate(entityType));
-            }
-            if (declaringEntityType != null && declaringEntityType != entityType)
-            {
-                segments.Add(new CastSegmentTemplate(declaringEntityType));
+                segments.Add(new CastSegmentTemplate(declaringType, entityType, navigationSource));
             }
 
-            segments.Add(new PropertySegmentTemplate((IEdmStructuralProperty)edmProperty));
+            segments.Add(new PropertySegmentTemplate(edmProperty));
 
-            if (castComplexType != null)
+            if (cast != null)
             {
-                segments.Add(new CastSegmentTemplate(castComplexType));
+                if (edmProperty.Type.IsCollection())
+                {
+                    cast = new EdmCollectionType(cast.ToEdmTypeReference(edmProperty.Type.IsNullable));
+                }
+
+                // TODO: maybe create the collection type for the collection????
+                segments.Add(new CastSegmentTemplate(cast, edmProperty.Type.Definition, navigationSource));
+            }
+
+            if (dollarValue)
+            {
+                segments.Add(new ValueSegmentTemplate(edmProperty.Type.Definition));
+            }
+
+            if (dollarCount)
+            {
+                segments.Add(CountSegmentTemplate.Instance);
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(context.Prefix, context.Model, template);
-            return true;
-
-            //else
-            //{
-            //// map to a static action like:  <method>Property(int key, string property)From<...>
-            //if (property == "Property" && cast == null)
-            //{
-            //    if (action.Parameters.Any(p => p.ParameterInfo.Name == "property" && p.ParameterType == typeof(string)))
-            //    {
-            //        // we find a static method mapping for all property
-            //        // we find a action route
-            //        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-            //        if (context.EntitySet != null)
-            //        {
-            //            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-            //        }
-            //        else
-            //        {
-            //            segments.Add(new SingletonSegmentTemplate(context.Singleton));
-            //        }
-
-            //        if (hasKeyParameter)
-            //        {
-            //            segments.Add(new KeySegmentTemplate(entityType));
-            //        }
-            //        if (declaringEntityType != null)
-            //        {
-            //            segments.Add(new CastSegmentTemplate(declaringEntityType));
-            //        }
-
-            //        segments.Add(new PropertyCatchAllSegmentTemplate(entityType));
-
-            //        ODataPathTemplate template = new ODataPathTemplate(segments);
-            //        action.AddSelector(context.Prefix, context.Model, template);
-            //        return true;
-            //    }
-            //}
-            //}
+            action.AddSelector(prefix, model, template);
         }
 
+        // Split the property such as "GetCityOfSubAddressFromVipCustomer"
         private static string SplitActionName(string actionName, out string property, out string cast, out string declared)
         {
             string method = null;
@@ -256,6 +264,53 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             return text;
+        }
+
+        private static bool CanApply(IEdmProperty edmProperty, string method)
+        {
+            Contract.Assert(edmProperty != null);
+
+            bool isCollection = edmProperty.Type.IsCollection();
+
+            // OData Spec: PATCH is not supported for collection properties.
+            if (isCollection && method == "PatchTo")
+            {
+                return false;
+            }
+
+            //Allow post only to collection properties
+            if (!isCollection && method == "PostTo")
+            {
+                return false;
+            }
+
+            // OData spec: A successful DELETE request to the edit URL for a structural property, ... sets the property to null.
+            // The request body is ignored and should be empty.
+            // DELETE request to a non-nullable value MUST fail and the service respond with 400 Bad Request or other appropriate error.
+            if (!edmProperty.Type.IsNullable && method == "DeleteTo")
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // OData spec: To retrieve the raw value of a primitive type property, the client sends a GET request to the property value URL.
+        // So, let's apply $value for the "Get" and non-collection primitive property
+        private static bool CanApplyDollarValue(IEdmProperty edmProperty, string method)
+        {
+            Contract.Assert(edmProperty != null);
+
+            return method == "Get" && !edmProperty.Type.IsCollection() && edmProperty.Type.IsPrimitive();
+        }
+
+        // OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+        // the client issues a GET request with /$count appended to the resource path of the collection.
+        private static bool CanApplyDollarCount(IEdmProperty edmProperty, string method)
+        {
+            Contract.Assert(edmProperty != null);
+
+            return method == "Get" && edmProperty.Type.IsCollection();
         }
     }
 }
