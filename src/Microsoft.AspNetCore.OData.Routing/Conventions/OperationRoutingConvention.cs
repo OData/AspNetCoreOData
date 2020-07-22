@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
@@ -13,6 +14,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
+    /// Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
+    /// Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
+    /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
+    /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
     /// </summary>
     public class OperationRoutingConvention : IODataControllerActionConvention
     {
@@ -34,7 +39,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            ActionModel action = context.Action;
 
             if (context.EntitySet == null && context.Singleton == null)
             {
@@ -47,6 +51,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmModel model = context.Model;
             string prefix = context.Prefix;
             IEdmEntityType entityType = navigationSource.EntityType();
+
+            ActionModel action = context.Action;
             bool hasKeyParameter = action.HasODataKeyParameter(entityType);
 
             // found
@@ -112,7 +118,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     segments.Add(new KeySegmentTemplate(entityType));
                 }
-                segments.Add(new FunctionSegmentTemplate(function, false));
+
+                IEdmNavigationSource targetset = function.GetTargetEntitySet(navigationSource, context.Model);
+                segments.Add(new FunctionSegmentTemplate(function, targetset));
 
                 ODataPathTemplate template = new ODataPathTemplate(segments);
 

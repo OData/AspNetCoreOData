@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="function">The Edm function.</param>
         public FunctionSegmentTemplate(IEdmFunction function)
-            : this(function, unqualifiedFunctionCall: false)
+            : this(function, navigationSource: null)
         {
         }
 
@@ -32,10 +32,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
         /// <param name="function">The Edm function.</param>
-        /// <param name="unqualifiedFunctionCall">Unqualified function call boolean value.</param>
-        public FunctionSegmentTemplate(IEdmFunction function, bool unqualifiedFunctionCall)
+        /// <param name="navigationSource">Unqualified function call boolean value.</param>
+        public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource)
         {
             Function = function ?? throw new ArgumentNullException(nameof(function));
+            NavigationSource = navigationSource;
 
             if (!function.IsBound)
             {
@@ -69,6 +70,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped Edm function.
         /// </summary>
         public IEdmFunction Function { get; }
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Key=value, Key=value

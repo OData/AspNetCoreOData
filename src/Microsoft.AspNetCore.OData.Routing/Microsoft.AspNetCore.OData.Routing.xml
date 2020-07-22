@@ -21,6 +21,22 @@
             </summary>
             <returns>The service document for the service.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention">
+            <summary>
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmAction"/>.
+            Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
+            Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.Order">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+            <inheritdoc />
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
             <summary>
             The convention for an odata template string.
@@ -98,7 +114,9 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention">
             <summary>
-            
+            The convention for <see cref="T:Microsoft.OData.Edm.IEdmFunction"/>.
+            Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
+            Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.Order">
@@ -302,6 +320,10 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention">
             <summary>
             Conventions for <see cref="T:Microsoft.OData.Edm.IEdmAction"/> and <see cref="T:Microsoft.OData.Edm.IEdmFunction"/>.
+            Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
+            Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
+            Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
+            Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.Order">
@@ -1199,12 +1221,12 @@
             </summary>
             <param name="function">The Edm function.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunction,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunction,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate" /> class.
             </summary>
             <param name="function">The Edm function.</param>
-            <param name="unqualifiedFunctionCall">Unqualified function call boolean value.</param>
+            <param name="navigationSource">Unqualified function call boolean value.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Literal">
             <inheritdoc />
@@ -1216,6 +1238,9 @@
             <summary>
             Gets the wrapped Edm function.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.NavigationSource">
+            <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.UnqualifiedIdentifier">
             <summary>

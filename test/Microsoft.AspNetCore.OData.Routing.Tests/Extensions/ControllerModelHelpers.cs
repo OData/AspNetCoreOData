@@ -73,6 +73,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Tests.Extensions
             {
                 object[] attributes = methodInfo.GetCustomAttributes(inherit: true);
                 ActionModel actionModel = new ActionModel(methodInfo, attributes);
+
+                foreach (var parameterInfo in methodInfo.GetParameters())
+                {
+                    object[] paramAttributes = parameterInfo.GetCustomAttributes(inherit: true);
+                    ParameterModel parameterModel = new ParameterModel(parameterInfo, paramAttributes)
+                    {
+                        ParameterName = parameterInfo.Name,
+                    };
+
+                    actionModel.Parameters.Add(parameterModel);
+                }
+
                 controller.Actions.Add(actionModel);
             }
 

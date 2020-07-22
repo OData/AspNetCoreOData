@@ -14,14 +14,14 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// The convention for <see cref="IEdmFunction"/>.
-    /// Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
-    /// Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
+    /// The convention for <see cref="IEdmAction"/>.
+    /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
+    /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
     /// </summary>
-    public class FunctionRoutingConvention : IODataControllerActionConvention
+    public class ActionRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public int Order => 700;
+        public int Order => 800;
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
@@ -48,47 +48,30 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ActionModel action = context.Action;
 
-            // function should have the [HttpGet]
-            if (!action.Attributes.Any(a => a is HttpGetAttribute))
+            // function should have the [HttpPost]
+            if (!action.Attributes.Any(a => a is HttpPostAttribute))
             {
                 return false;
             }
 
             bool hasKeyParameter = action.HasODataKeyParameter(entityType);
-            if (context.Singleton != null && hasKeyParameter)
-            {
-                // Singleton, doesn't allow to query property with key
-                // entityset, doesn't allow for non-key to query property
-                return false;
-            }
-
             string actionName = action.ActionMethod.Name;
-            IEnumerable<IEdmFunction> candidates = model.SchemaElements.OfType<IEdmFunction>().Where(f => f.IsBound && f.Name == actionName);
-            foreach (IEdmFunction edmFunction in candidates)
+            IEnumerable<IEdmAction> candidates = model.SchemaElements.OfType<IEdmAction>().Where(f => f.IsBound && f.Name == actionName);
+            foreach (IEdmAction edmAction in candidates)
             {
-                IEdmOperationParameter bindingParameter = edmFunction.Parameters.FirstOrDefault();
+                IEdmOperationParameter bindingParameter = edmAction.Parameters.FirstOrDefault();
                 if (bindingParameter == null)
                 {
                     continue;
                 }
 
                 IEdmTypeReference bindingType = bindingParameter.Type;
-                bool bindToCollection = bindingType.TypeKind() == EdmTypeKind.Collection;
-                if (bindToCollection)
+                bool bindToNonCollection = bindingType.TypeKind() != EdmTypeKind.Collection;
+                if (hasKeyParameter != bindToNonCollection)
                 {
-                    // if binding to collection and the action has key parameter or a singleton, skip
-                    if (context.Singleton != null || hasKeyParameter)
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
+                    // if binding to collection and the action has key parameter, skip
                     // if binding to non-collection and the action hasn't key parameter, skip
-                    if (context.EntitySet != null && !hasKeyParameter)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 if (!bindingType.Definition.IsEntityOrEntityCollectionType(out IEdmEntityType bindingEntityType))
@@ -112,27 +95,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     continue;
                 }
 
-                // TODO: need discussion ahout:
-                // 1) Do we need to match the whole parameter count?
-                // 2) Do we need to select the best match? So far, i don't think and let it go.
-                if (!IsFunctionParameterMeet(edmFunction, action))
-                {
-                    continue;
-                }
-
                 // Now, let's add the selector model.
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
                 if (context.EntitySet != null)
                 {
                     segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                    if (hasKeyParameter)
-                    {
-                        segments.Add(new KeySegmentTemplate(entityType, navigationSource));
-                    }
                 }
                 else
                 {
                     segments.Add(new SingletonSegmentTemplate(context.Singleton));
+                }
+
+                if (hasKeyParameter)
+                {
+                    segments.Add(new KeySegmentTemplate(entityType, navigationSource));
                 }
 
                 if (castType != null)
@@ -148,9 +124,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     }
                 }
 
-                IEdmNavigationSource targetset = edmFunction.GetTargetEntitySet(navigationSource, context.Model);
-
-                segments.Add(new FunctionSegmentTemplate(edmFunction, targetset));
+                segments.Add(new ActionSegmentTemplate(edmAction, false));
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector(prefix, model, template);
             }
@@ -158,28 +132,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // in OData operationImport routing convention, all action are processed by default
             // even it's not a really edm operation import call.
             return false;
-        }
-
-        private static bool IsFunctionParameterMeet(IEdmFunction function, ActionModel action)
-        {
-            // we can allow the action has other parameters except the functio parameters.
-            foreach (var parameter in function.Parameters.Skip(1))
-            {
-                // It seems we don't need to distinguish the optional parameter here
-                // It means whether it's optional parameter or not, the action descriptor should have such parameter defined.
-                // Meanwhile, the send request may or may not have such parameter value.
-                //IEdmOptionalParameter optionalParameter = parameter as IEdmOptionalParameter;
-                //if (optionalParameter != null)
-                //{
-                //    continue;
-                //}
-                if (!action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

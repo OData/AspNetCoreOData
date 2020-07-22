@@ -82,6 +82,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IList<string> GetTemplates()
         {
             bool canKeyAsSegment = CanKeyAsSegment();
+
+            // TODO: shall we support the optional parameter??
             bool canUnqualifiedCall = Segments.Any(s => s.Kind == ODataSegmentKind.Function || s.Kind == ODataSegmentKind.Action);
 
             IList<string> templates = new List<string>();

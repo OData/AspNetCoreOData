@@ -39,11 +39,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             // structural property supports for entity set and singleton
             return context?.EntitySet != null || context?.Singleton != null;
         }
