@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Routing.Edm;
-using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
@@ -18,20 +17,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
     /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
     /// </summary>
-    public class ActionRoutingConvention : IODataControllerActionConvention
+    public class ActionRoutingConvention : OperationRoutingConvention
     {
         /// <inheritdoc />
-        public int Order => 800;
+        public override int Order => 800;
 
         /// <inheritdoc />
-        public virtual bool AppliesToController(ODataControllerActionContext context)
-        {
-            // bound operation supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
-        }
-
-        /// <inheritdoc />
-        public virtual bool AppliesToAction(ODataControllerActionContext context)
+        public override bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context == null)
             {
@@ -42,96 +34,41 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 (IEdmNavigationSource)context.Singleton :
                 (IEdmNavigationSource)context.EntitySet;
 
-            IEdmModel model = context.Model;
-            string prefix = context.Prefix;
             IEdmEntityType entityType = navigationSource.EntityType();
 
-            ActionModel action = context.Action;
-
             // function should have the [HttpPost]
-            if (!action.Attributes.Any(a => a is HttpPostAttribute))
+            if (!context.Action.Attributes.Any(a => a is HttpPostAttribute))
             {
                 return false;
             }
 
-            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
-            string actionName = action.ActionMethod.Name;
-            IEnumerable<IEdmAction> candidates = model.SchemaElements.OfType<IEdmAction>().Where(f => f.IsBound && f.Name == actionName);
-            foreach (IEdmAction edmAction in candidates)
-            {
-                IEdmOperationParameter bindingParameter = edmAction.Parameters.FirstOrDefault();
-                if (bindingParameter == null)
-                {
-                    continue;
-                }
-
-                IEdmTypeReference bindingType = bindingParameter.Type;
-                bool bindToNonCollection = bindingType.TypeKind() != EdmTypeKind.Collection;
-                if (hasKeyParameter != bindToNonCollection)
-                {
-                    // if binding to collection and the action has key parameter, skip
-                    // if binding to non-collection and the action hasn't key parameter, skip
-                    continue;
-                }
-
-                if (!bindingType.Definition.IsEntityOrEntityCollectionType(out IEdmEntityType bindingEntityType))
-                {
-                    continue;
-                }
-
-                IEdmEntityType castType = null;
-                if (entityType.IsOrInheritsFrom(bindingEntityType))
-                {
-                    // True if and only if the thisType is equivalent to or inherits from otherType.
-                    castType = null;
-                }
-                else if (bindingEntityType.InheritsFrom(entityType))
-                {
-                    // True if and only if the type inherits from the potential base type.
-                    castType = bindingEntityType;
-                }
-                else
-                {
-                    continue;
-                }
-
-                // Now, let's add the selector model.
-                IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-                if (context.EntitySet != null)
-                {
-                    segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                }
-                else
-                {
-                    segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                }
-
-                if (hasKeyParameter)
-                {
-                    segments.Add(new KeySegmentTemplate(entityType, navigationSource));
-                }
-
-                if (castType != null)
-                {
-                    if (context.Singleton != null || !hasKeyParameter)
-                    {
-                        segments.Add(new CastSegmentTemplate(castType, entityType, navigationSource));
-                    }
-                    else
-                    {
-                        segments.Add(new CastSegmentTemplate(new EdmCollectionType(castType.ToEdmTypeReference(false)),
-                            new EdmCollectionType(entityType.ToEdmTypeReference(false)), navigationSource));
-                    }
-                }
-
-                segments.Add(new ActionSegmentTemplate(edmAction, false));
-                ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, model, template);
-            }
+            // action overload on binding type, only one action overload on the same binding type.
+            // however, it supports the bound action on derived type.
+            ProcessOperations(context, entityType, navigationSource);
 
             // in OData operationImport routing convention, all action are processed by default
             // even it's not a really edm operation import call.
             return false;
+        }
+
+        /// <inheritdoc />
+        protected override bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action)
+        {
+            Contract.Assert(operation != null);
+            Contract.Assert(operation.IsAction());
+            Contract.Assert(action != null);
+
+            // So far, we use the "ODataActionParameters" and "ODataUntypedActionParameters" to hold the action parameter values.
+            // TODO: consider to use [FromODataBody] to seperate the parameters to each corresponding 
+            if (operation.Parameters.Count() > 1)
+            {
+                if (!action.Parameters.Any(p => p.ParameterType == typeof(ODataActionParameters) || p.ParameterType == typeof(ODataUntypedActionParameters)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

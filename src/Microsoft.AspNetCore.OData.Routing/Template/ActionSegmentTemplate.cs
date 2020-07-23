@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="action">The Edm action.</param>
         public ActionSegmentTemplate(IEdmAction action)
-            : this(action, unqualifiedFunctionCall: false)
+            : this(action, null)
         {
         }
 
@@ -28,10 +28,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
         /// <param name="action">The Edm action.</param>
-        /// <param name="unqualifiedFunctionCall">Unqualified function/action call boolean value.</param>
-        public ActionSegmentTemplate(IEdmAction action, bool unqualifiedFunctionCall)
+        /// <param name="navigationSource">Unqualified function/action call boolean value.</param>
+        public ActionSegmentTemplate(IEdmAction action, IEdmNavigationSource navigationSource)
         {
             Action = action ?? throw new ArgumentNullException(nameof(action));
+            NavigationSource = navigationSource;
 
             if (action.ReturnType != null)
             {
@@ -50,6 +51,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the wrapped Edm action.
         /// </summary>
         public IEdmAction Action { get; }
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Action;

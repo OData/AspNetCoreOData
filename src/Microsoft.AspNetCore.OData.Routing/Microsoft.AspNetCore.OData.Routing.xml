@@ -31,10 +31,10 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.Order">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
@@ -122,10 +122,10 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.Order">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention">
@@ -334,6 +334,42 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.ProcessOperations(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext,Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Process the operation candidates using the information.
+            </summary>
+            <param name="context"></param>
+            <param name="entityType"></param>
+            <param name="navigationSource"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            Verify the parameter of the edm operation meets the parameter defined in action.
+            </summary>
+            <param name="operation">The Edm operation.</param>
+            <param name="action">The action model.</param>
+            <returns>true/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.SplitActionName(System.String,System.String@,System.Boolean@)">
+            <summary>
+            Split the action based on supporting pattern.
+            </summary>
+            <param name="actionName">The input action name.</param>
+            <param name="cast">The out of cast type name.</param>
+            <param name="isOnCollection">The out of collection binding flag.</param>
+            <returns>The operation name.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AddSelector(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext,Microsoft.OData.Edm.IEdmOperation,System.Boolean,Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+            <param name="edmOperation"></param>
+            <param name="hasKeyParameter"></param>
+            <param name="entityType"></param>
+            <param name="navigationSource"></param>
+            <param name="castType"></param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention">
             <summary>
@@ -1029,12 +1065,12 @@
             </summary>
             <param name="action">The Edm action.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmAction,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmAction,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate" /> class.
             </summary>
             <param name="action">The Edm action.</param>
-            <param name="unqualifiedFunctionCall">Unqualified function/action call boolean value.</param>
+            <param name="navigationSource">Unqualified function/action call boolean value.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Literal">
             <inheritdoc />
@@ -1046,6 +1082,9 @@
             <summary>
             Gets the wrapped Edm action.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.NavigationSource">
+            <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Kind">
             <inheritdoc />

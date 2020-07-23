@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -19,10 +20,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
     /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
     /// </summary>
-    public class OperationRoutingConvention : IODataControllerActionConvention
+    public abstract class OperationRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public virtual int Order => 600;
+        public abstract int Order { get; }
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
@@ -32,136 +33,237 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <inheritdoc />
-        public virtual bool AppliesToAction(ODataControllerActionContext context)
+        public abstract bool AppliesToAction(ODataControllerActionContext context);
+
+        /// <summary>
+        /// Process the operation candidates using the information.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="entityType"></param>
+        /// <param name="navigationSource"></param>
+        protected void ProcessOperations(ODataControllerActionContext context, IEdmEntityType entityType,  IEdmNavigationSource navigationSource)
         {
-            if (context == null)
+            Contract.Assert(context != null);
+            Contract.Assert(entityType != null);
+            Contract.Assert(navigationSource != null);
+
+            string actionName = context.Action.ActionMethod.Name;
+
+            bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType);
+            if (context.Singleton != null && hasKeyParameter)
             {
-                throw new ArgumentNullException(nameof(context));
+                // Singleton doesn't allow to call action with key.
+                return;
             }
 
+            // OperationNameOnCollectionOfEntityType
+            string operationName = SplitActionName(actionName, out string cast, out bool isOnCollection);
 
-            if (context.EntitySet == null && context.Singleton == null)
+            IEdmEntityType castTypeFromActionName = null;
+            if (cast != null)
             {
-                return false;
-            }
-            IEdmNavigationSource navigationSource = context.EntitySet == null ?
-                (IEdmNavigationSource)context.Singleton :
-                (IEdmNavigationSource)context.EntitySet;
-
-            IEdmModel model = context.Model;
-            string prefix = context.Prefix;
-            IEdmEntityType entityType = navigationSource.EntityType();
-
-            ActionModel action = context.Action;
-            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
-
-            // found
-            int keyNumber = entityType.Key().Count();
-            IEdmType bindType = entityType;
-            if (!hasKeyParameter)
-            {
-                // bond to collection
-                bindType = new EdmCollectionType(new EdmEntityTypeReference(entityType, true));
-                keyNumber = 0;
-            }
-
-            string actionName = action.ActionMethod.Name;
-            var operations = model.FindBoundOperations(bindType).Where(p => p.Name == actionName);
-
-            var actions = operations.OfType<IEdmAction>().ToList();
-            if (actions.Count == 1) // action overload on binding type, only one action overload on the same binding type
-            {
-                if (action.Parameters.Any(p => p.ParameterType == typeof(ODataActionParameters)))
+                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast) as IEdmEntityType;
+                if (castTypeFromActionName == null)
                 {
-                    // we find a action route
-                    IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                    if (context.EntitySet != null)
-                    {
-                        segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                    }
-                    else
-                    {
-                        segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                    }
-
-
-                    if (hasKeyParameter)
-                    {
-                        segments.Add(new KeySegmentTemplate(entityType));
-                    }
-                    segments.Add(new ActionSegmentTemplate(actions[0], false));
-
-                    ODataPathTemplate template = new ODataPathTemplate(segments);
-
-                    action.AddSelector(prefix, model, template);
-                    return true;
+                    return;
                 }
             }
 
-            var functions = operations.OfType<IEdmFunction>().ToList();
-            IEdmFunction function = FindMatchFunction(keyNumber, functions, action);
-            if (function != null)
+            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name == operationName);
+            foreach (IEdmOperation edmOperation in candidates)
             {
-                IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-
-                if (context.EntitySet != null)
+                IEdmOperationParameter bindingParameter = edmOperation.Parameters.FirstOrDefault();
+                if (bindingParameter == null)
                 {
-                    segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                }
-                else
-                {
-                    segments.Add(new SingletonSegmentTemplate(context.Singleton));
-                }
-
-                if (hasKeyParameter)
-                {
-                    segments.Add(new KeySegmentTemplate(entityType));
-                }
-
-                IEdmNavigationSource targetset = function.GetTargetEntitySet(navigationSource, context.Model);
-                segments.Add(new FunctionSegmentTemplate(function, targetset));
-
-                ODataPathTemplate template = new ODataPathTemplate(segments);
-
-                action.AddSelector(prefix, model, template);
-                return true;
-            }
-
-            // in OData operationImport routing convention, all action are processed by default
-            // even it's not a really edm operation import call.
-            return false;
-        }
-
-        private static IEdmFunction FindMatchFunction(int keyNumber, IEnumerable<IEdmFunction> functions, ActionModel action)
-        {
-            // if it's action
-            int actionParameterNumber = action.Parameters.Count - keyNumber + 1; // +1 means to include the binding type
-            foreach (var function in functions)
-            {
-                if (function.Parameters.Count() != actionParameterNumber)
-                {
-                    // maybe we can allow other parameters
+                    // bound operation at least has one parameter which type is the binding type.
                     continue;
                 }
 
-                bool matched = true;
-                foreach (var parameter in function.Parameters.Skip(1)) // skip 1 because bound
+                IEdmTypeReference bindingType = bindingParameter.Type;
+                bool bindToCollection = bindingType.TypeKind() == EdmTypeKind.Collection;
+                if (bindToCollection)
                 {
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))
+                    // if binding to collection the action has key parameter or a singleton, skip
+                    if (context.Singleton != null || hasKeyParameter)
                     {
-                        matched = false;
-                        break;
+                        continue;
+                    }
+                }
+                else
+                {
+                    // if binding to non-collection and the action hasn't key parameter, skip
+                    if (isOnCollection || (context.EntitySet != null && !hasKeyParameter))
+                    {
+                        continue;
                     }
                 }
 
-                if (matched)
+                // We only allow the binding type is entity type or collection of entity type.
+                if (!bindingType.Definition.IsEntityOrEntityCollectionType(out IEdmEntityType bindingEntityType))
                 {
-                    return function;
+                    continue;
+                }
+
+                IEdmEntityType castType = null;
+                if (castTypeFromActionName == null)
+                {
+                    if (entityType.IsOrInheritsFrom(bindingEntityType))
+                    {
+                        // True if and only if the thisType is equivalent to or inherits from otherType.
+                        castType = null;
+                    }
+                    else if (bindingEntityType.InheritsFrom(entityType))
+                    {
+                        // True if and only if the type inherits from the potential base type.
+                        castType = bindingEntityType;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (isOnCollection && !bindToCollection)
+                    {
+                        continue;
+                    }
+
+                    if (bindingEntityType != castTypeFromActionName)
+                    {
+                        continue;
+                    }
+
+                    if (castTypeFromActionName != entityType)
+                    {
+                        castType = castTypeFromActionName;
+                    }
+                }
+
+                // TODO: need discussion ahout:
+                // 1) Do we need to match the whole parameter count?
+                // 2) Do we need to select the best match? So far, i don't think and let it go.
+                if (!IsOperationParameterMeet(edmOperation, context.Action))
+                {
+                    continue;
+                }
+
+                AddSelector(context, edmOperation, hasKeyParameter, entityType, navigationSource, castType);
+            }
+        }
+
+        /// <summary>
+        /// Verify the parameter of the edm operation meets the parameter defined in action.
+        /// </summary>
+        /// <param name="operation">The Edm operation.</param>
+        /// <param name="action">The action model.</param>
+        /// <returns>true/false.</returns>
+        protected abstract bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action);
+
+        /// <summary>
+        /// Split the action based on supporting pattern.
+        /// </summary>
+        /// <param name="actionName">The input action name.</param>
+        /// <param name="cast">The out of cast type name.</param>
+        /// <param name="isOnCollection">The out of collection binding flag.</param>
+        /// <returns>The operation name.</returns>
+        internal static string SplitActionName(string actionName, out string cast, out bool isOnCollection)
+        {
+            Contract.Assert(actionName != null);
+
+            // We support the following function/action name pattern:
+            // OperationNameOnCollectionOfEntityType
+            // OperationNameOnEntityType
+            // OperationName
+            cast = null;
+            isOnCollection = false;
+            string operation;
+            int index = actionName.IndexOf("OnCollectionOf", StringComparison.Ordinal);
+            if (index > 0)
+            {
+                operation = actionName.Substring(0, index);
+                cast = actionName.Substring(index + "OnCollectionOf".Length);
+                isOnCollection = true;
+                return operation;
+            }
+
+            index = actionName.IndexOf("On", StringComparison.Ordinal);
+            if (index > 0)
+            {
+                operation = actionName.Substring(0, index);
+                cast = actionName.Substring(index + "On".Length);
+                return operation;
+            }
+
+            return actionName;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="edmOperation"></param>
+        /// <param name="hasKeyParameter"></param>
+        /// <param name="entityType"></param>
+        /// <param name="navigationSource"></param>
+        /// <param name="castType"></param>
+        protected static void AddSelector(ODataControllerActionContext context,
+            IEdmOperation edmOperation,
+            bool hasKeyParameter,
+            IEdmEntityType entityType,
+            IEdmNavigationSource navigationSource,
+            IEdmEntityType castType)
+        {
+            Contract.Assert(context != null);
+            Contract.Assert(entityType != null);
+            Contract.Assert(navigationSource != null);
+            Contract.Assert(edmOperation != null);
+
+            // Now, let's add the selector model.
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (context.EntitySet != null)
+            {
+                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+                if (hasKeyParameter)
+                {
+                    segments.Add(new KeySegmentTemplate(entityType, navigationSource));
+                }
+            }
+            else
+            {
+                segments.Add(new SingletonSegmentTemplate(context.Singleton));
+            }
+
+            if (castType != null)
+            {
+                if (context.Singleton != null || !hasKeyParameter)
+                {
+                    segments.Add(new CastSegmentTemplate(castType, entityType, navigationSource));
+                }
+                else
+                {
+                    segments.Add(new CastSegmentTemplate(new EdmCollectionType(castType.ToEdmTypeReference(false)),
+                        new EdmCollectionType(entityType.ToEdmTypeReference(false)), navigationSource));
                 }
             }
 
-            return null;
+            IEdmNavigationSource targetset = null;
+            if (edmOperation.ReturnType != null)
+            {
+                targetset = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
+            }
+
+            if (edmOperation.IsAction())
+            {
+                segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetset));
+            }
+            else
+            {
+                segments.Add(new FunctionSegmentTemplate((IEdmFunction)edmOperation, targetset));
+            }
+
+            ODataPathTemplate template = new ODataPathTemplate(segments);
+            context.Action.AddSelector(context.Prefix, context.Model, template);
         }
     }
 }
