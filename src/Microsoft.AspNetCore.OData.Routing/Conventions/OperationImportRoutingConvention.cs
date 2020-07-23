@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -62,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             {
                 throw new ODataException($"Action import and function import '{actionMethodName}' MUST be unique within an entity container");
             }
-            else if (actionImports.Count > 0)
+            else if (actionImports.Count > 0 && context.Action.Attributes.Any(a => a is HttpPostAttribute))
             {
                 if (actionImports.Count != 1)
                 {
@@ -81,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 action.AddSelector(context.Prefix, context.Model, template);
                 return true;
             }
-            else if (functionImports.Count > 0)
+            else if (functionImports.Count > 0 && context.Action.Attributes.Any(a => a is HttpGetAttribute))
             {
                 IEdmFunctionImport functionImport = FindFunctionImport(functionImports, action);
                 if (functionImport == null)
@@ -114,18 +115,23 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     continue;
                 }
 
+                bool match = true;
                 foreach (var parameter in functionImport.Function.Parameters)
                 {
                     if (!action.Parameters.Any(p => p.ParameterName == parameter.Name))
                     {
                         // if any parameter is not in the action parameters, skip this.
-                        continue;
+                        match = false;
+                        break;
                     }
 
                     // TODO: shall we check each parameter has the [FromODataUri] attribute?
                 }
 
-                return functionImport;
+                if (match)
+                {
+                    return functionImport;
+                }
             }
 
             return null;

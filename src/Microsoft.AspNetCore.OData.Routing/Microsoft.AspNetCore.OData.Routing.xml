@@ -343,14 +343,6 @@
             <param name="entityType"></param>
             <param name="navigationSource"></param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            Verify the parameter of the edm operation meets the parameter defined in action.
-            </summary>
-            <param name="operation">The Edm operation.</param>
-            <param name="action">The action model.</param>
-            <returns>true/false.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.SplitActionName(System.String,System.String@,System.Boolean@)">
             <summary>
             Split the action based on supporting pattern.
@@ -360,16 +352,24 @@
             <param name="isOnCollection">The out of collection binding flag.</param>
             <returns>The operation name.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            Verify the parameter of the edm operation meets the parameter defined in action.
+            </summary>
+            <param name="operation">The Edm operation.</param>
+            <param name="action">The action model.</param>
+            <returns>true/false.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AddSelector(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext,Microsoft.OData.Edm.IEdmOperation,System.Boolean,Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
-            
+            Add the template to the action
             </summary>
-            <param name="context"></param>
-            <param name="edmOperation"></param>
-            <param name="hasKeyParameter"></param>
-            <param name="entityType"></param>
-            <param name="navigationSource"></param>
-            <param name="castType"></param>
+            <param name="context">The context.</param>
+            <param name="edmOperation">The Edm operation.</param>
+            <param name="hasKeyParameter">Has key parameter or not.</param>
+            <param name="entityType">The entity type.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="castType">The type cast.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention">
             <summary>

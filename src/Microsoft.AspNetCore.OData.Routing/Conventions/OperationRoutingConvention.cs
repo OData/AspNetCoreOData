@@ -153,14 +153,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Verify the parameter of the edm operation meets the parameter defined in action.
-        /// </summary>
-        /// <param name="operation">The Edm operation.</param>
-        /// <param name="action">The action model.</param>
-        /// <returns>true/false.</returns>
-        protected abstract bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action);
-
-        /// <summary>
         /// Split the action based on supporting pattern.
         /// </summary>
         /// <param name="actionName">The input action name.</param>
@@ -199,14 +191,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// 
+        /// Verify the parameter of the edm operation meets the parameter defined in action.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="edmOperation"></param>
-        /// <param name="hasKeyParameter"></param>
-        /// <param name="entityType"></param>
-        /// <param name="navigationSource"></param>
-        /// <param name="castType"></param>
+        /// <param name="operation">The Edm operation.</param>
+        /// <param name="action">The action model.</param>
+        /// <returns>true/false.</returns>
+        protected abstract bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action);
+
+        /// <summary>
+        /// Add the template to the action
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="edmOperation">The Edm operation.</param>
+        /// <param name="hasKeyParameter">Has key parameter or not.</param>
+        /// <param name="entityType">The entity type.</param>
+        /// <param name="navigationSource">The navigation source.</param>
+        /// <param name="castType">The type cast.</param>
         protected static void AddSelector(ODataControllerActionContext context,
             IEdmOperation edmOperation,
             bool hasKeyParameter,
