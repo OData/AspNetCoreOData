@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // ~/Me/Namespace.TypeCast
                     ODataPathTemplate template = new ODataPathTemplate(
                         new SingletonSegmentTemplate(context.Singleton),
-                        new CastSegmentTemplate(castType));
+                        new CastSegmentTemplate(castType, entityType, context.Singleton));
 
                     action.AddSelector(context.Prefix, context.Model, template);
                     return true;
