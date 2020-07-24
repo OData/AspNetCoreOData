@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatting;
-using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v2

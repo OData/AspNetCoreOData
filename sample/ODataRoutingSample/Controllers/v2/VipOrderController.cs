@@ -2,7 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers

@@ -3977,6 +3977,30 @@
             <param name="setupAction"></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddConvention``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="services"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.SRResources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.

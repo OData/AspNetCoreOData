@@ -11,5 +11,9 @@
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.1-beta" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj" />
+  </ItemGroup>
+
 
 </Project>

@@ -9,11 +9,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Http;
 using ODataRoutingSample.Models;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
-using Microsoft.AspNetCore.OData.Formatting;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData;
 
 namespace ODataRoutingSample
 {
