@@ -8,8 +8,22 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Routing.Tests.Parser
 {
-    public class DefautlODataPathTemplateParserTests
+    public class DefaultODataPathTemplateParserTests
     {
+        private static IEdmModel EdmModel = GetEdmModel();
+
+        [Theory]
+        [InlineData("$metadata")]
+        [InlineData("Customers")]
+        [InlineData("Customers({key})")]
+        [InlineData("Me")]
+        [InlineData("RateByInfoImport(order={order},name={name})")]
+        public void CreateFirstSegmentWorksAsExpected(string identifier)
+        {
+            // Act
+            DefaultODataPathTemplateParser.CreateFirstSegment(identifier, model, path);
+        }
+
         [Theory]
         [InlineData("Customers", "GetCustomers")]
         [InlineData("Customers({key})/Orders", "GetOrdersOfACustomer")]

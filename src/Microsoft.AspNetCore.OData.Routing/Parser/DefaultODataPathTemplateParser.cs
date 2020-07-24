@@ -7,6 +7,8 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.OData.Edm;
+using System.Diagnostics.Contracts;
+using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Routing.Parser
 {
@@ -21,21 +23,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// </summary>
         /// <param name="model">the Edm model.</param>
         /// <param name="odataPath">the setting.</param>
-        /// <returns>Null or <see cref="UriParser"/>.</returns>
+        /// <returns>Null or <see cref="ODataPathTemplate"/>.</returns>
         public virtual ODataPathTemplate Parse(IEdmModel model, string odataPath)
         {
-            if (model == null || String.IsNullOrEmpty(odataPath))
+            if (model == null || string.IsNullOrEmpty(odataPath))
             {
                 return null;
             }
 
             string[] items = odataPath.Split('/');
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-            foreach (var item in items)
+            foreach (string item in items)
             {
                 string trimedItem = item.Trim();
                 if (string.IsNullOrEmpty(trimedItem))
                 {
+                    // skip //
                     continue;
                 }
 
@@ -59,16 +62,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <param name="identifier">the whole identifier of this segment</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The out put of the path, because it may include the key segment.</param>
-        internal static void CreateFirstSegment(string identifier, IEdmModel model,
-            IList<ODataSegmentTemplate> path)
+        internal static void CreateFirstSegment(string identifier, IEdmModel model, IList<ODataSegmentTemplate> path)
         {
-            if (identifier == "$metadata")
+            Contract.Assert(model != null);
+            Contract.Assert(path != null);
+
+            if (IdentifierIs("$metadata", identifier))
             {
                 path.Add(MetadataSegmentTemplate.Instance);
                 return;
             }
 
-            // the identifier maybe include the key, for example: ~/users({id})
+            // The identifier maybe include the key, for example: users({id})
             identifier = identifier.ExtractParenthesis(out string parenthesisExpressions);
 
             // Try to bind entity set or singleton
@@ -83,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 return;
             }
 
-            throw new Exception($"Unknown kind of first segment: '{identifier}'");
+            throw new ODataException($"Unknown kind of first segment: '{identifier}'");
         }
 
         /// <summary>
@@ -461,6 +466,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Check whether identifiers matches according to case in sensitive option.
+        /// </summary>
+        /// <param name="expected">The expected identifier.</param>
+        /// <param name="identifier">Identifier to be evaluated.</param>
+        /// <returns>Whether the identifier matches.</returns>
+        private static bool IdentifierIs(string expected, string identifier)
+        {
+            return string.Equals(expected, identifier, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
