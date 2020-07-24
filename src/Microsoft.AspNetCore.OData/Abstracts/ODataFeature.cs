@@ -2,11 +2,11 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Net;
+using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
