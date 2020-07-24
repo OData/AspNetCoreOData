@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// Conventions for <see cref="IEdmNavigationProperty"/>.
     /// Action name convention should follow up: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
-    /// 
     /// </summary>
     public class NavigationRoutingConvention : IODataControllerActionConvention
     {
@@ -117,7 +117,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             if (declared != null)
             {
-                segments.Add(new CastSegmentTemplate(declaringEntityType));
+                // It should be always single type
+                segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
             }
 
             IEdmNavigationProperty navigationProperty = (IEdmNavigationProperty)edmProperty;
@@ -127,9 +128,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
             action.AddSelector(context.Prefix, context.Model, template);
-
-         //   selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-          //  selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
 
             Log.AddedODataSelector(_logger, action, template);
 
@@ -147,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="property">The property name (out).</param>
         /// <param name="declaring">The declaring name (out).</param>
         /// <returns>The http method name or null.</returns>
-        private static string SplitActionName(string actionName, out string property, out string declaring)
+        internal static string SplitActionName(string actionName, out string property, out string declaring)
         {
             string method = null;
             string text = null;
@@ -186,30 +184,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
         private static class Log
         {
-            //private static readonly Action<ILogger, string, Exception> _executingEndpoint = LoggerMessage.Define<string>(
-            //    LogLevel.Information,
-            //    new EventId(0, "ExecutingEndpoint"),
-            //    "Executing endpoint '{EndpointName}'");
-
-            //private static readonly Action<ILogger, string, Exception> _executedEndpoint = LoggerMessage.Define<string>(
-            //    LogLevel.Information,
-            //    new EventId(1, "ExecutedEndpoint"),
-            //    "Executed endpoint '{EndpointName}'");
-
             private static readonly Action<ILogger, string, Exception> _addedODataSelector = LoggerMessage.Define<string>(
                 LogLevel.Information,
                 new EventId(1, "AddODataNavigationConvention"),
                 "Added OData Convention '{ConventionMessage}'");
-
-            //public static void ExecutingEndpoint(ILogger logger, Endpoint endpoint)
-            //{
-            //    _executingEndpoint(logger, endpoint.DisplayName, null);
-            //}
-
-            //public static void ExecutedEndpoint(ILogger logger, Endpoint endpoint)
-            //{
-            //    _executedEndpoint(logger, endpoint.DisplayName, null);
-            //}
 
             public static void AddedODataSelector(ILogger logger, ActionModel action, ODataPathTemplate template)
             {

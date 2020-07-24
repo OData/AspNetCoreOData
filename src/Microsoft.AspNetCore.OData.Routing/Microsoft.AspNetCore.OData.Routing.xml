@@ -190,7 +190,6 @@
             <summary>
             Conventions for <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
             Action name convention should follow up: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
-            
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention})">
