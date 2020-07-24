@@ -32,10 +32,6 @@
     <PackageReference Include="Microsoft.OData.Edm" Version="7.6.4" />
     <PackageReference Include="Microsoft.Spatial" Version="7.6.4" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNetCore.OData.Abstracts\Microsoft.AspNetCore.OData.Abstracts.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Container\PropertyContainer.generated.cs">

@@ -16,8 +16,4 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Authorization\Microsoft.AspNetCore.OData.Authorization.csproj" />
-  </ItemGroup>
-
 </Project>

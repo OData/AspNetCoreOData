@@ -11,9 +11,5 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Authorization\Microsoft.AspNetCore.OData.Authorization.csproj" />
-  </ItemGroup>
-
 
 </Project>

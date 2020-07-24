@@ -20,6 +20,25 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder">
+            <summary>
+            An interface for configuring essential OData services.
+            </summary>
+            <summary>
+            Allows fine grained configuration of essential OData services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder"/> class.
+            </summary>
+            <param name="services">The service collection.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver">
             <summary>
             
@@ -3851,6 +3870,112 @@
             <summary>
             Gets the inner nested resource infos.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
+            <summary>
+            Contains the details of a given OData request. These properties should all be mutable.
+            None of these properties should ever be set to null.
+            </summary>
+            <summary>
+            Provides programmatic configuration for the OData service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter">
+            <summary>
+            Gets or Sets the <see cref="T:Microsoft.OData.ODataUrlKeyDelimiter"/> to use while parsing, specifically
+            whether to recognize keys as segments or not in DefaultODataPathHandler.
+            </summary>
+            <remarks>Default value is unspecified (null).</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.NullDynamicPropertyIsEnabled">
+            <summary>
+            Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader">
+            <summary>
+            Gets or Sets a value indicating if batch requests should continue on error.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseAttributeRouting(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="useAttributeRouting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseModel(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseModel(System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder">
+            <summary>
+            Contains the details of a given OData request. These properties should all be mutable.
+            None of these properties should ever be set to null.
+            </summary>
+            <summary>
+            Provides programmatic configuration for the OData service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptionsBuilder.#ctor(Microsoft.AspNetCore.OData.ODataOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder" /> class.
+            </summary>
+            <param name="options"> The options to be configured. </param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptionsBuilder.Options">
+            <summary>
+            Gets the options being configured.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
+            <summary>
+            Provides extension methods to add odata services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptionsBuilder})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.SRResources">
             <summary>
