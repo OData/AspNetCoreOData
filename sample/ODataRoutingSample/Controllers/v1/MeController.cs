@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1

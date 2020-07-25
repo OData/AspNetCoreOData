@@ -41,10 +41,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmStructuredType StructuredType { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model,
-            IEdmNavigationSource previous, RouteValueDictionary routeValue, QueryString queryString)
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
-            if (routeValue.TryGetValue("property", out object value))
+            if (context.RouteValues.TryGetValue("property", out object value))
             {
                 string rawValue = value as string;
                 IEdmProperty edmProperty = StructuredType.FindProperty(rawValue);

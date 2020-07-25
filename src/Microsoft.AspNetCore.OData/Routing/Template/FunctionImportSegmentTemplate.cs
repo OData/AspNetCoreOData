@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
@@ -63,21 +62,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model,
-            IEdmNavigationSource previous, RouteValueDictionary routeValue, QueryString queryString)
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
+            IEdmModel model = context.Model;
+            RouteValueDictionary routeValues = context.RouteValues;
             // TODO: process the parameter alias
             IList<OperationSegmentParameter> parameters = new List<OperationSegmentParameter>();
             foreach (var parameter in FunctionImport.Function.Parameters)
             {
-                if (routeValue.TryGetValue(parameter.Name, out object rawValue))
+                if (routeValues.TryGetValue(parameter.Name, out object rawValue))
                 {
                     // for resource or collection resource, this method will return "ODataResourceValue, ..." we should support it.
                     if (parameter.Type.IsResourceOrCollectionResource())
                     {
                         // For FromODataUri
                         string prefixName = ODataParameterValue.ParameterValuePrefix + parameter.Name;
-                        routeValue[prefixName] = new ODataParameterValue(rawValue, parameter.Type);
+                        routeValues[prefixName] = new ODataParameterValue(rawValue, parameter.Type);
 
                         parameters.Add(new OperationSegmentParameter(parameter.Name, rawValue));
                     }
@@ -87,11 +87,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, model, parameter.Type);
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
-                        routeValue[parameter.Name] = newValue;
+                        routeValues[parameter.Name] = newValue;
 
                         // For FromODataUri
                         string prefixName = ODataParameterValue.ParameterValuePrefix + parameter.Name;
-                        routeValue[prefixName] = new ODataParameterValue(newValue, parameter.Type);
+                        routeValues[prefixName] = new ODataParameterValue(newValue, parameter.Type);
 
                         parameters.Add(new OperationSegmentParameter(parameter.Name, newValue));
                     }

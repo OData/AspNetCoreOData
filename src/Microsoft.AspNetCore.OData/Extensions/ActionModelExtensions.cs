@@ -74,27 +74,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static IEnumerable<T> GetAttributes<T>(this ActionModel action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            return action.Attributes.OfType<T>();
-        }
-
-        /// <summary>
         /// Test whether the action has the key parameters defined.
         /// </summary>
         /// <param name="action">The action model.</param>
         /// <param name="entityType">The Edm entity type.</param>
-        /// <param name="keyPrefix">The key prefix for the actio parameter.</param>
+        /// <param name="keyPrefix">The key prefix for the action parameter.</param>
         /// <returns>True/false.</returns>
         public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, string keyPrefix = "key")
         {
@@ -172,48 +156,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // Check with .NET Team whether the "Endpoint name metadata"
                 // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
             }
-
-            ///// <summary>
-            ///// Adds the OData selector model to the action.
-            ///// </summary>
-            ///// <param name="action">The given action model.</param>
-            ///// <param name="prefix">The prefix.</param>
-            ///// <param name="model">The Edm model.</param>
-            ///// <param name="path">The OData path template.</param>
-            //public static void AddSelector<T>(this ActionModel action, string prefix, IEdmModel model, ODataPathTemplate path, ILogger<T> logger)
-            //{
-            //    if (action == null)
-            //    {
-            //        throw new ArgumentNullException(nameof(action));
-            //    }
-
-            //    if (model == null)
-            //    {
-            //        throw new ArgumentNullException(nameof(model));
-            //    }
-
-            //    if (path == null)
-            //    {
-            //        throw new ArgumentNullException(nameof(path));
-            //    }
-
-            //    foreach (var template in path.GetTemplates())
-            //    {
-            //        SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-            //        if (selectorModel == null)
-            //        {
-            //            selectorModel = new SelectorModel();
-            //            action.Selectors.Add(selectorModel);
-            //        }
-
-            //        string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-            //        selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-            //        selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
-
-            //        // Check with .NET Team whether the "Endpoint name metadata"
-            //        // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
-            //    }
-            }
+        }
     }
 }

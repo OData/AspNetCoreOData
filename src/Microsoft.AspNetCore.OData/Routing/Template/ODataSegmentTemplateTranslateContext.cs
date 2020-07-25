@@ -11,8 +11,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// <summary>
     /// The context used to generate the <see cref="ODataPathSegment"/>.
     /// </summary>
-    public class ODataPathSegmentGeneratorContext
+    public class ODataSegmentTemplateTranslateContext
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="request"></param>
+        public ODataSegmentTemplateTranslateContext(IEdmModel model, HttpRequest request)
+        {
+            Model = model;
+            Request = request;
+        }
+
         /// <summary>
         /// Gets the Edm model.
         /// </summary>
@@ -21,12 +32,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the current HttpContext.
         /// </summary>
-        public HttpContext HttpContext { get; }
+        public HttpRequest Request { get; }
 
         /// <summary>
         /// Gets the route values.
         /// </summary>
-        public RouteValueDictionary RouteValues { get; }
+        public RouteValueDictionary RouteValues => Request.RouteValues;
 
         /// <summary>
         /// Gets the previous navigation source.

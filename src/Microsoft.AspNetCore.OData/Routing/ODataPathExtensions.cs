@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -12,6 +13,22 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     public static class ODataPathExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAllTemplates(this ODataPathTemplate path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            return null;
+            // we want to return "keyAsSegment", "NonqualifiedFunctionCall", OptionalParameter
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -42,12 +42,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="previous"></param>
-        /// <param name="routeValue"></param>
-        /// <param name="queryString"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public abstract ODataPathSegment GenerateODataSegment(IEdmModel model,
-            IEdmNavigationSource previous, RouteValueDictionary routeValue, QueryString queryString);
+        public abstract ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context);
     }
 }

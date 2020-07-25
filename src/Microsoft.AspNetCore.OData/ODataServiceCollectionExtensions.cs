@@ -185,9 +185,13 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, SingletonRoutingConvention>());
 
-            // ~/EntitySet|Singleton/.../NS.Operation
+            // ~/EntitySet|Singleton/.../NS.Function
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IODataControllerActionConvention, OperationRoutingConvention>());
+                ServiceDescriptor.Transient<IODataControllerActionConvention, FunctionRoutingConvention>());
+
+            // ~/EntitySet|Singleton/.../NS.Action
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IODataControllerActionConvention, ActionRoutingConvention>());
 
             // ~/OperationImport
             services.TryAddEnumerable(

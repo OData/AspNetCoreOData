@@ -29,6 +29,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
+        /// <param name="segment">The key segment.</param>
+        public KeySegmentTemplate(KeySegment segment)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
+        /// </summary>
         /// <param name="entityType">The declaring type containes the key.</param>
         /// <param name="navigationSource"></param>
         public KeySegmentTemplate(IEdmEntityType entityType, IEdmNavigationSource navigationSource)
@@ -150,33 +158,38 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle => true;
 
-        /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,
-            RouteValueDictionary routeValue, QueryString queryString)
+        public static string GetUriLiteral(string name, RouteValueDictionary routeValues, QueryString queryString)
         {
+            return null;
+        }
+
+        /// <inheritdoc />
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
+        {
+            RouteValueDictionary routeValues = context.RouteValues;
             IDictionary<string, object> keysValues = new Dictionary<string, object>();
             foreach (var key in _keyMappings)
             {
                 string keyName = key.Key;
                 string templateName = key.Value.Item1;
                 IEdmTypeReference edmType = key.Value.Item2;
-                if (routeValue.TryGetValue(templateName, out object rawValue))
+                if (routeValues.TryGetValue(templateName, out object rawValue))
                 {
                     string strValue = rawValue as string;
-                    object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, model, edmType);
+                    object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
 
                     // for without FromODataUri, so update it, for example, remove the single quote for string value.
-                    routeValue[templateName] = newValue;
+                    routeValues[templateName] = newValue;
 
                     // For FromODataUri
                     string prefixName = ODataParameterValue.ParameterValuePrefix + templateName;
-                    routeValue[prefixName] = new ODataParameterValue(newValue, edmType);
+                    routeValues[prefixName] = new ODataParameterValue(newValue, edmType);
 
                     keysValues[keyName] = newValue;
                 }
             }
 
-            return new KeySegment(keysValues, EntityType, previous);
+            return new KeySegment(keysValues, EntityType, NavigationSource);
         }
     }
 }

@@ -2,8 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -19,25 +17,37 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="entitySet">The Edm entity set.</param>
         public EntitySetSegmentTemplate(IEdmEntitySet entitySet)
+            : this(new EntitySetSegment(entitySet))
         {
-            EntitySet = entitySet ?? throw new ArgumentNullException(nameof(entitySet));
+        }
 
-            EdmType = new EdmCollectionType(new EdmEntityTypeReference(entitySet.EntityType(), true));
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntitySetSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="segment">The entity set segment.</param>
+        public EntitySetSegmentTemplate(EntitySetSegment segment)
+        {
+            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
         }
 
         /// <inheritdoc />
-        public override string Literal => EntitySet.Name;
+        public override string Literal => Segment.EntitySet.Name;
 
         /// <inheritdoc />
-        public override IEdmType EdmType { get; }
+        public override IEdmType EdmType => Segment.EdmType;
 
         /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource => EntitySet;
+        public override IEdmNavigationSource NavigationSource => Segment.EntitySet;
 
         /// <summary>
         /// Gets the wrapped entity set.
         /// </summary>
-        public IEdmEntitySet EntitySet { get; }
+        public IEdmEntitySet EntitySet => Segment.EntitySet;
+
+        /// <summary>
+        /// Gets the entity set segment.
+        /// </summary>
+        public EntitySetSegment Segment { get; }
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
@@ -46,10 +56,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => false;
 
         /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model,
-            IEdmNavigationSource previous, RouteValueDictionary routeValue, QueryString queryString)
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
-            return new EntitySetSegment(EntitySet);
+            return Segment;
         }
     }
 }

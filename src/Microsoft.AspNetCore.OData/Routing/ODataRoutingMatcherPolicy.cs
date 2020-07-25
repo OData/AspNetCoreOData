@@ -1,13 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -59,8 +62,12 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
+                string serviceRoot = Test(httpContext.Request);
+
+                string servieRoot2 = Test2(candidate.Endpoint, httpContext.Request);
+
                 var originalValues = candidate.Values;
-                var oPath = oDataMetadata.GenerateODataPath(originalValues, httpContext.Request.QueryString);
+                var oPath = oDataMetadata.GenerateODataPath(httpContext.Request, originalValues, httpContext.Request.QueryString);
                 if (oPath != null)
                 {
                     var odata = httpContext.ODataFeature();
@@ -77,6 +84,36 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             return Task.CompletedTask;
+        }
+
+        private static string Test(HttpRequest request)
+        {
+            // We need to call Uri.GetLeftPart(), which returns an encoded Url.
+            // The ODL parser does not like raw values.
+            Uri requestUri = new Uri(request.GetEncodedUrl());
+            string requestLeftPart = requestUri.GetLeftPart(UriPartial.Path);
+
+
+            return requestLeftPart;
+        }
+
+        private string Test2(Endpoint endPoint, HttpRequest request)
+        {
+            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+            if (linkGenerator != null)
+            {
+                //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
+
+               // Endpoint endPoint = request.HttpContext.GetEndpoint();
+                EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
+
+                string aUri = linkGenerator.GetUriByName(request.HttpContext, name.EndpointName,
+                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
+
+                return aUri;
+            }
+
+            return null;
         }
     }
 }

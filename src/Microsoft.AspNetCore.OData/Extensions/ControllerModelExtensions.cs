@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
@@ -61,22 +60,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             return controller.Attributes.OfType<T>().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="controller"></param>
-        /// <returns></returns>
-        public static IEnumerable<T> GetAttributes<T>(this ControllerModel controller)
-        {
-            if (controller == null)
-            {
-                throw new ArgumentNullException(nameof(controller));
-            }
-
-            return controller.Attributes.OfType<T>();
         }
     }
 }

@@ -43,8 +43,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model,
-            IEdmNavigationSource previous, RouteValueDictionary routeValue, QueryString queryString)
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
             return new PropertySegment(Property);
         }

@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -86,9 +84,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment GenerateODataSegment(IEdmModel model, IEdmNavigationSource previous,
-            RouteValueDictionary routeValue, QueryString queryString)
+        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
+            var routeValue = context.RouteValues;
             // TODO: process the parameter alias
             int skip = Function.IsBound ? 1 : 0;
 
@@ -109,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     else
                     {
                         string strValue = rawValue as string;
-                        object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, model, parameter.Type);
+                        object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, parameter.Type);
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
                         routeValue[parameter.Name] = newValue;
@@ -123,9 +121,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            IEdmNavigationSource targetset = Function.GetTargetEntitySet(previous, model);
+       //     IEdmNavigationSource targetset = Function.GetTargetEntitySet(previous, model);
 
-            return new OperationSegment(Function, parameters, targetset as IEdmEntitySetBase);
+            return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
         }
     }
 }

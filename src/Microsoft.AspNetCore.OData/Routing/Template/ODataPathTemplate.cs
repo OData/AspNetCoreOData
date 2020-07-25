@@ -198,18 +198,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="routeValue"></param>
-        /// <param name="queryString"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public ODataPath GenerateODataPath(IEdmModel model, RouteValueDictionary routeValue, QueryString queryString)
+        public ODataPath Translate(ODataSegmentTemplateTranslateContext context)
         {
             // calculate every time
             IList<ODataPathSegment> oSegments = new List<ODataPathSegment>();
             IEdmNavigationSource previousNavigationSource = null;
             foreach (var segment in Segments)
             {
-                ODataPathSegment odataSegment = segment.GenerateODataSegment(model, previousNavigationSource, routeValue, queryString);
+                ODataPathSegment odataSegment = segment.Translate(context);
                 if (odataSegment == null)
                 {
                     return null;
