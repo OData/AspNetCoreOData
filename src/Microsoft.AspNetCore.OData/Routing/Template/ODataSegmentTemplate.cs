@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
@@ -18,6 +19,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the segment URL literal.
         /// </summary>
         public abstract string Literal { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        // public abstract IEnumerable<string> Templates { get; }
 
         /// <summary>
         /// Gets the segment kind.

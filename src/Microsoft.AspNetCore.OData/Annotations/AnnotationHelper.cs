@@ -165,5 +165,42 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static string GetModelName(this IEdmModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            ModelNameAnnotation annotation =
+                model.GetAnnotationValue<ModelNameAnnotation>(model);
+            if (annotation != null)
+            {
+                return annotation.ModelName;
+            }
+
+            return SetModelName(model);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        public static string SetModelName(this IEdmModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            string name = Guid.NewGuid().ToString();
+            model.SetAnnotationValue(model, new ModelNameAnnotation(name));
+            return name;
+        }
     }
 }

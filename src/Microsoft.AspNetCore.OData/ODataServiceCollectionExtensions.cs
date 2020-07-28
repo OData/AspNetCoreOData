@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -155,6 +156,9 @@ namespace Microsoft.AspNetCore.OData
             {
                 throw new ArgumentNullException(nameof(services));
             }
+
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IConfigureOptions<RouteOptions>, ODataRoutingConstraintConfiguration>());
 
             //services.TryAddEnumerable(
             //    ServiceDescriptor.Transient<IConfigureOptions<ODataRoutingOptions>, ODataRoutingOptionsSetup>());

@@ -43,6 +43,13 @@ namespace ODataRoutingSample.Controllers.v2
         }
 
         [HttpGet]
+        public string GetWholeSalary(int key, int minSalary, int maxSalary, int aveSalary)
+        {
+            return $"GetWholeSalary : {minSalary}, {maxSalary}, {aveSalary}" ;
+        }
+
+
+        [HttpGet]
         public string GetProperty(int key, string property)
         {
             return $"{property} in order";

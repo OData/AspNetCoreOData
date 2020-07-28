@@ -50,6 +50,12 @@ namespace ODataRoutingSample.Models
             var functionWithComplexTypeParameter = builder.EntityType<Order>().Function("CanMoveToAddress").Returns<bool>();
             functionWithComplexTypeParameter.Parameter<Address>("address");
 
+            // function with optional parameters
+            var functionWithOptional = builder.EntityType<Order>().Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
+            functionWithOptional.Parameter<int>("minSalary");
+            functionWithOptional.Parameter<int>("maxSalary").Optional();
+            functionWithOptional.Parameter<int>("aveSalary").HasDefaultValue("129");
+
             // Function 1
             var function = builder.Function("RateByOrder");
             function.Parameter<int>("order");

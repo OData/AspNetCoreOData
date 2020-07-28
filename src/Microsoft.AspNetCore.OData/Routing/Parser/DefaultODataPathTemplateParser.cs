@@ -442,7 +442,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
                 if (operation.IsFunction())
                 {
-                    path.Add(new FunctionSegmentTemplate((IEdmFunction)operation/*, targetset*/));
+                    path.Add(new FunctionSegmentTemplate((IEdmFunction)operation, targetset));
                 }
                 else
                 {

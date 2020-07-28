@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -139,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            foreach (var template in path.GetTemplates())
+            foreach (var template in path.GetAllTemplates())
             {
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
@@ -149,6 +150,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 }
 
                 string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+                string modelName = model.GetModelName();
+
+                templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
 
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
                 selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));

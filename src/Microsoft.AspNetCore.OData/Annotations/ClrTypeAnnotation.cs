@@ -25,4 +25,24 @@ namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
         /// </summary>
         public Type ClrType { get; private set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ModelNameAnnotation
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        public ModelNameAnnotation(string name)
+        {
+            ModelName = name ?? throw new ArgumentNullException(nameof(name));
+        }
+
+        /// <summary>
+        /// Gets the backing CLR type for the EDM type.
+        /// </summary>
+        public string ModelName { get; }
+    }
 }

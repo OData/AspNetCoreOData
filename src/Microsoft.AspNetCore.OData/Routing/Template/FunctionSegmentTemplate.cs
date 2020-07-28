@@ -48,12 +48,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             foreach (var parameter in function.Parameters.Skip(skip))
             {
                 parametersMappings[parameter.Name] = $"{{{parameter.Name}}}";
+
+                if (parameter is IEdmOptionalParameter)
+                {
+                    HasOptional = true;
+                }
             }
 
-            string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+            if (HasOptional)
+            {
+                string parameters = string.Join(";", parametersMappings.Select(a => a.Key));
+                string constaint = $"({{parameters:OdataFunctionParameters(MODELNAME,{function.FullName()},true,{parameters})}})";
 
-            UnqualifiedIdentifier = function.Name + parameters;
-            Literal = function.FullName() + parameters;
+               // string constaint = "({parameters:OdataFunctionParameters(abc,efg,true,ijk)})";
+                UnqualifiedIdentifier = function.Name + constaint;
+                Literal = function.FullName() + constaint;
+            }
+            else
+            {
+                string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+                UnqualifiedIdentifier = function.Name + parameters;
+                Literal = function.FullName() + parameters;
+            }
 
             IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
@@ -76,6 +92,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Key=value, Key=value
         /// </summary>
         internal string UnqualifiedIdentifier { get; }
+
+        internal bool HasOptional { get; }
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Function;

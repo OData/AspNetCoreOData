@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -37,6 +38,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override bool IsSingle => true;
+
+        /// <inheritdoc />
+        //public override IEnumerable<string> Templates
+        //{
+        //    get
+        //    {
+        //        yield return "metadata";
+        //    }
+        //}
 
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)

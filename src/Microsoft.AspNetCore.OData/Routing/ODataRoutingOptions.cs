@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing
@@ -59,6 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             Models[name] = model;
+            model.SetModelName();
             return this;
         }
     }
