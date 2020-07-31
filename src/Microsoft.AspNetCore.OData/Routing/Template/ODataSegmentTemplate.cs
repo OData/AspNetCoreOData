@@ -2,9 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -19,11 +16,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the segment URL literal.
         /// </summary>
         public abstract string Literal { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        // public abstract IEnumerable<string> Templates { get; }
 
         /// <summary>
         /// Gets the segment kind.
@@ -46,10 +38,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public abstract bool IsSingle { get; }
 
         /// <summary>
-        /// 
+        /// Translate the template into a real OData path segment, <see cref="ODataPathSegment"/>
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="context">The translate context.</param>
+        /// <returns>null or ODataPathSegment.</returns>
         public abstract ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context);
     }
 }

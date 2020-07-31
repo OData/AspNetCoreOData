@@ -45,7 +45,7 @@ namespace ODataRoutingSample.Controllers.v2
         [HttpGet]
         public string GetWholeSalary(int key, int minSalary, int maxSalary, int aveSalary)
         {
-            return $"GetWholeSalary : {minSalary}, {maxSalary}, {aveSalary}" ;
+            return $"Orders/{key}/GetWholeSalary: {minSalary}, {maxSalary}, {aveSalary}" ;
         }
 
 

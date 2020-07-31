@@ -651,6 +651,16 @@
             <returns>a fast getter.</returns>
             <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.ExtractKeyValuePairs(System.String)">
+            <summary>
+            Each key/value pair is separated using ",".
+            Each value could be a string using single quote, so it could have "," and escaped doulbe single quote.
+            "minSalary=2,maxSalary=3"
+            "minSalary='af''d,2,897abc' , maxSalary=3"
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.TypeHelper">
             <summary>
             
@@ -8705,7 +8715,7 @@
             Gets the OData path template
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.GenerateODataPath(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.GenerateODataPath(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
             <summary>
             Generate the real <see cref="T:Microsoft.OData.UriParser.ODataPath"/> based on the template the route values.
             </summary>
@@ -9196,6 +9206,13 @@
             <param name="function">The Edm function.</param>
             <param name="navigationSource">Unqualified function call boolean value.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunction,Microsoft.OData.Edm.IEdmNavigationSource,System.Collections.Generic.ISet{System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate" /> class.
+            </summary>
+            <param name="function">The Edm function.</param>
+            <param name="navigationSource">Unqualified function call boolean value.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Literal">
             <inheritdoc />
         </member>
@@ -9441,6 +9458,36 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GenerateFunctionSegments(Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate)">
+            <summary>
+            Generates all templates for an input function.
+            </summary>
+            <param name="segment">The input function.</param>
+            <returns>All templates.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetAllPaths(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+            <summary>
+            
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate}},Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate)">
+            <summary>
+            Combinates the next template to the existing templates.
+            </summary>
+            <param name="templates">The existing templates.</param>
+            <param name="nextTemplate">The nexte template.</param>
+            <returns>The templates.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates``1(System.Collections.Generic.IList{System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate}},System.Collections.Generic.IList{``0})">
+            <summary>
+            Combinates the next templates with existing templates.
+            </summary>
+            <param name="templates">The existing templates.</param>
+            <param name="nextTemplates">The nexte templates.</param>
+            <returns>The new templates.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetAllTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
             Gets the whole supported template belongs to a <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
@@ -9672,17 +9719,17 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext)">
             <summary>
-            
+            Translate the template into a real OData path segment, <see cref="T:Microsoft.OData.UriParser.ODataPathSegment"/>
             </summary>
-            <param name="context"></param>
-            <returns></returns>
+            <param name="context">The translate context.</param>
+            <returns>null or ODataPathSegment.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext">
             <summary>
             The context used to generate the <see cref="T:Microsoft.OData.UriParser.ODataPathSegment"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             
             </summary>
@@ -9694,7 +9741,7 @@
             Gets the Edm model.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext.Request">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext.HttpContext">
             <summary>
             Gets the current HttpContext.
             </summary>

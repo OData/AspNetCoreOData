@@ -259,11 +259,31 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else
             {
-                segments.Add(new FunctionSegmentTemplate((IEdmFunction)edmOperation, targetset));
+                ISet<String> required = GetRequiredFunctionParamters(edmOperation, context.Action);
+                segments.Add(new FunctionSegmentTemplate((IEdmFunction)edmOperation, targetset, required));
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
             context.Action.AddSelector(context.Prefix, context.Model, template);
+        }
+
+        private static ISet<String> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
+        {
+            Contract.Assert(operation != null);
+            Contract.Assert(operation.IsFunction());
+            Contract.Assert(action != null);
+
+            ISet<string> requiredParameters = new HashSet<string>();
+            // we can allow the action has other parameters except the functio parameters.
+            foreach (var parameter in operation.Parameters.Skip(1))
+            {
+                if (action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))
+                {
+                    requiredParameters.Add(parameter.Name);
+                }
+            }
+
+            return requiredParameters;
         }
     }
 }

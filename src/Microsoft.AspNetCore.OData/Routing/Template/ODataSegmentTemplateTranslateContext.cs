@@ -18,10 +18,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="model"></param>
         /// <param name="request"></param>
-        public ODataSegmentTemplateTranslateContext(IEdmModel model, HttpRequest request)
+        public ODataSegmentTemplateTranslateContext(IEdmModel model, HttpContext context)
         {
             Model = model;
-            Request = request;
+            HttpContext = context;
         }
 
         /// <summary>
@@ -32,12 +32,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the current HttpContext.
         /// </summary>
-        public HttpRequest Request { get; }
+        public HttpContext HttpContext { get; }
 
         /// <summary>
         /// Gets the route values.
         /// </summary>
-        public RouteValueDictionary RouteValues => Request.RouteValues;
+        public RouteValueDictionary RouteValues { get; set; }
 
         /// <summary>
         /// Gets the previous navigation source.

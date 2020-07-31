@@ -31,8 +31,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>true if the policy applies to any endpoint in endpoints, otherwise false.</returns>
         public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints)
         {
-            // Let's apply this matcher policy to all the endpoints.
-            return true;
+            return endpoints.Any(e => e.Metadata.OfType<ODataRoutingMetadata>().FirstOrDefault() != null);
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 string servieRoot2 = Test2(candidate.Endpoint, httpContext.Request);
 
                 var originalValues = candidate.Values;
-                var oPath = oDataMetadata.GenerateODataPath(httpContext.Request, originalValues, httpContext.Request.QueryString);
+                var oPath = oDataMetadata.GenerateODataPath(httpContext, originalValues, httpContext.Request.QueryString);
                 if (oPath != null)
                 {
                     var odata = httpContext.ODataFeature();

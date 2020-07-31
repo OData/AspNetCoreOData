@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OData.Edm;

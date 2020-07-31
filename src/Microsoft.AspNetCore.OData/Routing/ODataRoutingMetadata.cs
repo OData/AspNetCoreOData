@@ -68,9 +68,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="values">The route values.</param>
         /// <param name="queryString">The query string.</param>
         /// <returns>The built <see cref="ODataPath" />.</returns>
-        public ODataPath GenerateODataPath(HttpRequest request, RouteValueDictionary values, QueryString queryString)
+        public ODataPath GenerateODataPath(HttpContext httpContext, RouteValueDictionary values, QueryString queryString)
         {
-            ODataSegmentTemplateTranslateContext context = new ODataSegmentTemplateTranslateContext(Model, request);
+            ODataSegmentTemplateTranslateContext context = new ODataSegmentTemplateTranslateContext(Model, httpContext);
+            context.RouteValues = values;
+
             if (Template != null)
             {
                 return Template.Translate(context);

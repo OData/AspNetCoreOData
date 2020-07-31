@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 using System.Diagnostics.Contracts;
 using Microsoft.OData;
+using Microsoft.AspNetCore.OData.Common;
 
 namespace Microsoft.AspNetCore.OData.Routing.Parser
 {

@@ -16,6 +16,12 @@ namespace ODataRoutingSample.Models
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
 
+            // function with optional parameters
+            var functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
+            functionWithOptional.Parameter<int>("minSalary");
+            functionWithOptional.Parameter<int>("maxSalary").Optional();
+            functionWithOptional.Parameter<int>("aveSalary").HasDefaultValue("129");
+
             builder.Action("ResetData");
 
             return builder.GetEdmModel();

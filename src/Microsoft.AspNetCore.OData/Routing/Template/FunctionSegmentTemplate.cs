@@ -4,8 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -54,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     HasOptional = true;
                 }
             }
-
+           
             if (HasOptional)
             {
                 string parameters = string.Join(";", parametersMappings.Select(a => a.Key));
@@ -70,8 +73,29 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 UnqualifiedIdentifier = function.Name + parameters;
                 Literal = function.FullName() + parameters;
             }
-
+/* 
+            string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+            UnqualifiedIdentifier = function.Name + parameters;
+            Literal = function.FullName() + parameters;
+*/
             IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
+
+            RequiredParameters = new HashSet<string>(parametersMappings.Select(e => e.Key));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="function">The Edm function.</param>
+        /// <param name="navigationSource">Unqualified function call boolean value.</param>
+        internal FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource, ISet<string> requiredParameters)
+            : this (function, navigationSource)
+        {
+            RequiredParameters = requiredParameters;
+
+            string parameters = "(" + string.Join(",", requiredParameters.Select(a => $"{a}={{{a}}}")) + ")";
+            UnqualifiedIdentifier = function.Name + parameters;
+            Literal = function.FullName() + parameters;
         }
 
         /// <inheritdoc />
@@ -101,12 +125,45 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
+        internal ISet<string> RequiredParameters { get; set; }
+
+        internal bool IsAllParameters(RouteValueDictionary routeValue)
+        {
+            foreach (var parameter in RequiredParameters)
+            {
+                if (!routeValue.ContainsKey(parameter))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
             var routeValue = context.RouteValues;
             // TODO: process the parameter alias
             int skip = Function.IsBound ? 1 : 0;
+
+            if (!IsAllParameters(routeValue))
+            {
+                return null;
+            }
+
+            if (HasOptional)
+            {
+                if (routeValue.TryGetValue("parameters", out object value))
+                {
+                    string parametersStr = value as string;
+                    if (!parametersStr.TryExtractKeyValuePairs(out IDictionary<string, string> pairs))
+                    {
+                        return null;
+                    }
+
+                }
+            }
 
             IList<OperationSegmentParameter> parameters = new List<OperationSegmentParameter>();
             foreach (var parameter in Function.Parameters.Skip(skip))
@@ -143,5 +200,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
         }
+
+        
     }
 }

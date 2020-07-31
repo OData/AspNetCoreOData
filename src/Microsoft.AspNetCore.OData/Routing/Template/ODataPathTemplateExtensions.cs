@@ -16,6 +16,129 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public static class ODataPathTemplateExtensions
     {
         /// <summary>
+        /// Generates all templates for an input function.
+        /// </summary>
+        /// <param name="segment">The input function.</param>
+        /// <returns>All templates.</returns>
+        public static IList<FunctionSegmentTemplate> GenerateFunctionSegments(this FunctionSegmentTemplate segment)
+        {
+            if (segment == null)
+            {
+                throw new ArgumentNullException(nameof(segment));
+            }
+
+            // split parameters
+            (var fixes, var optionals) = SplitParameters(segment.Function);
+
+            // gets all combinations of the optional parameters.
+            Stack<IEdmOptionalParameter> current = new Stack<IEdmOptionalParameter>();
+            IList<IEdmOptionalParameter[]> full = new List<IEdmOptionalParameter[]>();
+            int length = optionals.Count;
+            if (optionals.Count > 0)
+            {
+                Traveral(optionals.ToArray(), 0, length, current, full);
+            }
+
+            IList<FunctionSegmentTemplate> newList = new List<FunctionSegmentTemplate>();
+            foreach (var optional in full)
+            {
+                ISet<string> requiredParameters = new HashSet<string>(fixes.Select(e => e.Name));
+                foreach (var optionalParameter in optional)
+                {
+                    requiredParameters.Add(optionalParameter.Name);
+                }
+
+                newList.Add(new FunctionSegmentTemplate(segment.Function, segment.NavigationSource, requiredParameters));
+            }
+
+            return newList;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static IEnumerable<ODataPathTemplate> GetAllPaths(this ODataPathTemplate path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            IList<IList<ODataSegmentTemplate>> templates = new List<IList<ODataSegmentTemplate>>
+            {
+                new List<ODataSegmentTemplate>()
+            };
+
+            foreach (ODataSegmentTemplate segment in path.Segments)
+            {
+                if (segment.Kind == ODataSegmentKind.Function)
+                {
+                    FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
+                    IList<FunctionSegmentTemplate> functionTemplates = function.GenerateFunctionSegments();
+                    templates = CombinateTemplates(templates, functionTemplates);
+                }
+                else if (segment.Kind == ODataSegmentKind.FunctionImport)
+                {
+                    //FunctionImportSegmentTemplate functionImport = (FunctionImportSegmentTemplate)segment;
+                    //IList<string> functionTemplates = functionImport.FunctionImport.Function.GenerateFunctionTemplates();
+                    //templates = CombinateTemplates(templates, functionTemplates);
+                }
+                else
+                {
+                    templates = CombinateTemplate(templates, segment);
+                }
+            }
+
+            return templates.Select(e => new ODataPathTemplate(e));
+        }
+
+        /// <summary>
+        /// Combinates the next template to the existing templates.
+        /// </summary>
+        /// <param name="templates">The existing templates.</param>
+        /// <param name="nextTemplate">The nexte template.</param>
+        /// <returns>The templates.</returns>
+        private static IList<IList<ODataSegmentTemplate>> CombinateTemplate(IList<IList<ODataSegmentTemplate>> templates, ODataSegmentTemplate nextTemplate)
+        {
+            Contract.Assert(templates != null);
+            Contract.Assert(nextTemplate != null);
+
+            foreach (IList<ODataSegmentTemplate> sb in templates)
+            {
+                sb.Add(nextTemplate);
+            }
+
+            return templates;
+        }
+
+        /// <summary>
+        /// Combinates the next templates with existing templates.
+        /// </summary>
+        /// <param name="templates">The existing templates.</param>
+        /// <param name="nextTemplates">The nexte templates.</param>
+        /// <returns>The new templates.</returns>
+        private static IList<IList<ODataSegmentTemplate>> CombinateTemplates<T>(IList<IList<ODataSegmentTemplate>> templates, IList<T> nextTemplates)
+            where T : ODataSegmentTemplate
+        {
+            Contract.Assert(templates != null);
+
+            IList<IList<ODataSegmentTemplate>> newList = new List<IList<ODataSegmentTemplate>>(templates.Count * nextTemplates.Count);
+
+            foreach (IList<ODataSegmentTemplate> sb in templates)
+            {
+                foreach (ODataSegmentTemplate newTemplate in nextTemplates)
+                {
+                    IList<ODataSegmentTemplate> newSb = new List<ODataSegmentTemplate>(sb);
+                    newSb.Add(newTemplate);
+                    newList.Add(newSb);
+                }
+            }
+
+            return newList;
+        }
+        /// <summary>
         /// Gets the whole supported template belongs to a <see cref="ODataPathTemplate"/>.
         /// We supports:
         /// 1. Key as segment if it's single key (We doesn't consider the alternate key so far)
@@ -92,7 +215,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="edmFunction">The input function.</param>
         /// <returns>All templates.</returns>
-        internal static IList<string> GenerateFunctionTemplates(this IEdmFunction edmFunction)
+        public static IList<string> GenerateFunctionTemplates(this IEdmFunction edmFunction)
         {
             if (edmFunction == null)
             {

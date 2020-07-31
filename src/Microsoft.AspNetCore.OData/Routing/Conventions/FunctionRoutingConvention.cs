@@ -57,11 +57,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 // It seems we don't need to distinguish the optional parameter here
                 // It means whether it's optional parameter or not, the action descriptor should have such parameter defined.
                 // Meanwhile, the send request may or may not have such parameter value.
-                //IEdmOptionalParameter optionalParameter = parameter as IEdmOptionalParameter;
-                //if (optionalParameter != null)
-                //{
-                //    continue;
-                //}
+                IEdmOptionalParameter optionalParameter = parameter as IEdmOptionalParameter;
+                if (optionalParameter != null)
+                {
+                    continue;
+                }
+
                 if (!action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))
                 {
                     return false;
