@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataSerializerContext writeContext = BuildSerializerContext(request);
                 writeContext.NavigationSource = targetNavigationSource;
                 writeContext.Model = model;
-                //writeContext.RootElementName = GetRootElementName(path) ?? "root";
+                writeContext.RootElementName = GetRootElementName(path) ?? "root";
                 //writeContext.SkipExpensiveAvailabilityChecks = serializer.ODataPayloadKind == ODataPayloadKind.ResourceSet;
                 writeContext.Path = path;
                 writeContext.MetadataLevel = metadataLevel;
@@ -183,6 +183,32 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             return serializer;
         }
-    }
 
+        private static string GetRootElementName(ODataPath path)
+        {
+            if (path != null)
+            {
+                ODataPathSegment lastSegment = path.LastSegment;
+                if (lastSegment != null)
+                {
+                    OperationSegment actionSegment = lastSegment as OperationSegment;
+                    if (actionSegment != null)
+                    {
+                        IEdmAction action = actionSegment.Operations.Single() as IEdmAction;
+                        if (action != null)
+                        {
+                            return action.Name;
+                        }
+                    }
+
+                    PropertySegment propertyAccessSegment = lastSegment as PropertySegment;
+                    if (propertyAccessSegment != null)
+                    {
+                        return propertyAccessSegment.Property.Name;
+                    }
+                }
+            }
+            return null;
+        }
+    }
 }

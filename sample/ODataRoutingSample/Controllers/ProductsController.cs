@@ -35,5 +35,17 @@ namespace ODataRoutingSample.Controllers
         {
             return $"Products/GetWholeSalary: {minSalary}, {maxSalary}";
         }
+
+        [HttpGet]
+        public string GetWholeSalary(int minSalary, string name)
+        {
+            return $"Products/GetWholeSalary: {minSalary}, {name}";
+        }
+
+        [HttpGet]
+        public string GetWholeSalary(string order, string name)
+        {
+            return $"Products/GetWholeSalary: {order}, {name}";
+        }
     }
 }

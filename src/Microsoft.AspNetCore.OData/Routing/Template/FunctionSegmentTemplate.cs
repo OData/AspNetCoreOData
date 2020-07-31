@@ -140,12 +140,33 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return true;
         }
 
+        public bool IsMatch(ODataSegmentTemplateTranslateContext context)
+        {
+            var routeValue = context.RouteValues;
+            int skip = Function.IsBound ? 1 : 0;
+            ISet<string> actualParameters = new HashSet<string>();
+            foreach (var parameter in Function.Parameters.Skip(skip))
+            {
+                if (routeValue.ContainsKey(parameter.Name))
+                {
+                    actualParameters.Add(parameter.Name);
+                }
+            }
+
+            return RequiredParameters.SetEquals(actualParameters);
+        }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
         {
             var routeValue = context.RouteValues;
             // TODO: process the parameter alias
             int skip = Function.IsBound ? 1 : 0;
+
+            if (!TestParameters(context, out IDictionary<string, string> actualParameters))
+            {
+                return null;
+            }
 
             if (!IsAllParameters(routeValue))
             {
@@ -201,6 +222,29 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
         }
 
-        
+
+        private bool TestParameters(ODataSegmentTemplateTranslateContext context, out IDictionary<string, string> actualParameters)
+        {
+            var routeValue = context.RouteValues;
+
+            int skip = Function.IsBound ? 1 : 0;
+            actualParameters = new Dictionary<string, string>();
+            foreach (var parameter in Function.Parameters.Skip(skip))
+            {
+                if (routeValue.TryGetValue(parameter.Name, out object rawValue))
+                {
+                    actualParameters[parameter.Name] = rawValue as string;
+                }
+            }
+
+            string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
+
+            if (!combintes.TryExtractKeyValuePairs(out actualParameters))
+            {
+                return false;
+            }
+
+            return RequiredParameters.SetEquals(actualParameters.Keys);
+        }
     }
 }

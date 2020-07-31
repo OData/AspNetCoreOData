@@ -600,6 +600,12 @@
             Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input. No checking for other types.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.Text">
+            <summary>Text being parsed.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.TextLen">
+            <summary>Length of text being parsed.</summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.FastPropertyAccessor`1">
             <summary>
             FastPropertyAccessor is a <see cref="T:Microsoft.AspNetCore.OData.Common.PropertyAccessor`1"/> that speeds up (compares to reflection)

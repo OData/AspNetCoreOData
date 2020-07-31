@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Microsoft.AspNetCore.OData.Routing
@@ -22,6 +23,8 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 foreach (var action in controller.Actions)
                 {
+                    string parameters = string.Join(",", action.Parameters.Select(p => p.Name));
+
                     foreach (var selector in action.Selectors)
                     {
                         ODataRoutingMetadata metadata = selector.EndpointMetadata.OfType<ODataRoutingMetadata>().FirstOrDefault();
@@ -31,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                         }
 
                         /*{metadata.Template.Template}*/
-                        Console.WriteLine($"{action.ActionMethod.Name} in {controller.ControllerName}Controller: '{selector.AttributeRouteModel.Template}' ");
+                        Console.WriteLine($"{action.ActionMethod.Name}({parameters}) in {controller.ControllerName}Controller: '{selector.AttributeRouteModel.Template}' ");
                     }
                 }
             }
