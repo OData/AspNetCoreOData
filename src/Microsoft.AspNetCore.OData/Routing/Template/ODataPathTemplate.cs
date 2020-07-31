@@ -58,144 +58,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// 
         /// </summary>
-        public bool KeyAsSegment { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public ODataPathTemplate Clone()
-        {
-            IList<ODataSegmentTemplate> newSegmes = new List<ODataSegmentTemplate>(Segments);
-            return new ODataPathTemplate(newSegmes)
-            {
-                KeyAsSegment = this.KeyAsSegment
-            };
-        }
-
-        /// <summary>
-        /// Gets the all templates supported in this path.
-        /// </summary>
-        /// <returns>The supported templates.</returns>
-        public IList<string> GetTemplates()
-        {
-            bool canKeyAsSegment = CanKeyAsSegment();
-
-            // TODO: shall we support the optional parameter??
-            bool canUnqualifiedCall = Segments.Any(s => s.Kind == ODataSegmentKind.Function || s.Kind == ODataSegmentKind.Action);
-
-            IList<string> templates = new List<string>();
-            templates.Add(GetTemplate(false, unqualifiedCall: false));
-
-            if (canKeyAsSegment)
-            {
-                templates.Add(GetTemplate(true, unqualifiedCall: false));
-            }
-
-            if (canUnqualifiedCall)
-            {
-                templates.Add(GetTemplate(false, unqualifiedCall: true));
-                if (canKeyAsSegment)
-                {
-                    templates.Add(GetTemplate(true, unqualifiedCall: true));
-                }
-            }
-
-            return templates;
-        }
-
-        private bool CanKeyAsSegment()
-        {
-            foreach (var segment in Segments)
-            {
-                if (segment.Kind != ODataSegmentKind.Key)
-                {
-                    continue;
-                }
-
-                // if existing a key segment with 1 key, we can support the whole path using key as segment
-                KeySegmentTemplate keySegment = (KeySegmentTemplate)segment;
-                if (keySegment.Count == 1)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="keyAsSegment"></param>
-        /// <param name="unqualifiedCall"></param>
-        /// <returns></returns>
-        private string GetTemplate(bool keyAsSegment, bool unqualifiedCall)
-        {
-            int index = 0;
-            StringBuilder sb = new StringBuilder();
-            foreach (var segment in Segments)
-            {
-                if (segment.Kind == ODataSegmentKind.Key)
-                {
-                    KeySegmentTemplate keySg = segment as KeySegmentTemplate;
-                    if (keyAsSegment && keySg.Count == 1)
-                    {
-                        sb.Append("/");
-                        sb.Append(segment.Literal);
-                    }
-                    else
-                    {
-                        sb.Append("(");
-                        sb.Append(segment.Literal);
-                        sb.Append(")");
-                    }
-                }
-                else
-                {
-                    if (index != 0)
-                    {
-                        sb.Append("/");
-                    }
-                    index++;
-
-                    if (segment.Kind == ODataSegmentKind.Function)
-                    {
-                        FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
-                        if (unqualifiedCall)
-                        {
-                            sb.Append(function.UnqualifiedIdentifier);
-                        }
-                        else
-                        {
-                            sb.Append(function.Literal);
-                        }
-                    }
-                    else if (segment.Kind == ODataSegmentKind.Action)
-                    {
-                        ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
-                        if (unqualifiedCall)
-                        {
-                            sb.Append(action.Action.Name);
-                        }
-                        else
-                        {
-                            sb.Append(action.Action.FullName());
-                        }
-                    }
-                    else
-                    {
-                        sb.Append(segment.Literal);
-                    }
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
         public ODataPath Translate(ODataSegmentTemplateTranslateContext context)
@@ -320,17 +182,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 KeySegmentTemplate keySg = segment as KeySegmentTemplate;
                 if (keySg != null)
                 {
-                    if (KeyAsSegment)
-                    {
-                        sb.Append("/");
-                        sb.Append(segment.Literal);
-                    }
-                    else
-                    {
-                        sb.Append("(");
-                        sb.Append(segment.Literal);
-                        sb.Append(")");
-                    }
+                    sb.Append("(");
+                    sb.Append(segment.Literal);
+                    sb.Append(")");
                 }
                 else
                 {

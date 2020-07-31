@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -140,31 +139,27 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            //foreach (var template in path.GetAllTemplates())
-            //foreach (var newPath in path.GetAllPaths())
-            //{
-                foreach (var template in path.GetTemplates())
+            foreach (var template in path.GetTemplates())
+            {
+                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
+                if (selectorModel == null)
                 {
-                    SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-                    if (selectorModel == null)
-                    {
-                        selectorModel = new SelectorModel();
-                        action.Selectors.Add(selectorModel);
-                    }
-
-                    string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-                    string modelName = model.GetModelName();
-
-                    templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
-
-                    selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-                    selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
-
-                    // Check with .NET Team whether the "Endpoint name metadata"
-                    // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+                    selectorModel = new SelectorModel();
+                    action.Selectors.Add(selectorModel);
                 }
-           // }
+
+                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+                string modelName = model.GetModelName();
+
+                templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
+
+                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
+                selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
+
+                // Check with .NET Team whether the "Endpoint name metadata"
+                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+            }
         }
     }
 }

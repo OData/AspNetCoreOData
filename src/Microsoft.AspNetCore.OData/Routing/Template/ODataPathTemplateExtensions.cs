@@ -16,6 +16,67 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public static class ODataPathTemplateExtensions
     {
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetTemplates(this ODataPathTemplate path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            IList<StringBuilder> templates = new List<StringBuilder>
+            {
+                new StringBuilder()
+            };
+
+            int index = 0;
+            foreach (ODataSegmentTemplate segment in path.Segments)
+            {
+                if (segment.Kind == ODataSegmentKind.Key)
+                {
+                    KeySegmentTemplate keySg = segment as KeySegmentTemplate;
+                    if (keySg.Count == 1)
+                    {
+                        templates = CombinateTemplates(templates, "(" + segment.Literal + ")", "/" + segment.Literal);
+                    }
+                    else
+                    {
+                        templates = CombinateTemplate(templates, "(" + segment.Literal + ")");
+                    }
+
+                    index++;
+                    continue;
+                }
+
+                if (index != 0)
+                {
+                    templates = CombinateTemplate(templates, "/");
+                }
+                index++;
+
+                if (segment.Kind == ODataSegmentKind.Action)
+                {
+                    ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
+                    templates = CombinateTemplates(templates, action.Action.FullName(), action.Action.Name);
+                }
+                else if (segment.Kind == ODataSegmentKind.Function)
+                {
+                    FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
+                    templates = CombinateTemplates(templates, function.Literal, function.UnqualifiedIdentifier);
+                }
+                else
+                {
+                    templates = CombinateTemplate(templates, segment.Literal);
+                }
+            }
+
+            return templates.Select(t => t.ToString());
+        }
+
+        /// <summary>
         /// Generates all templates for an input function.
         /// </summary>
         /// <param name="segment">The input function.</param>

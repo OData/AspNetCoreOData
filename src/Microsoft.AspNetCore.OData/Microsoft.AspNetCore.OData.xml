@@ -9422,31 +9422,6 @@
             Gets the path segments for the OData path.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.KeyAsSegment">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Clone">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates">
-            <summary>
-            Gets the all templates supported in this path.
-            </summary>
-            <returns>The supported templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplate(System.Boolean,System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="keyAsSegment"></param>
-            <param name="unqualifiedCall"></param>
-            <returns></returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplateTranslateContext)">
             <summary>
             
@@ -9463,6 +9438,13 @@
             <summary>
             The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+            <summary>
+            
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GenerateFunctionSegments(Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate)">
             <summary>
