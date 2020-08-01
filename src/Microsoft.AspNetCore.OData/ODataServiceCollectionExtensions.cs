@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
+using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -217,6 +218,7 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, AttributeRoutingConvention>());
 
+            services.AddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
             services.AddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
         }
     }

@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => true;
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
+        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             return CountSegment.Instance;
         }

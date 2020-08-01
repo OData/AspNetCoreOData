@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,17 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     internal class ODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     {
+        private IODataTemplateTranslator _translator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRoutingMatcherPolicy" /> class.
+        /// </summary>
+        /// <param name="translator">The registered path template translator.</param>
+        public ODataRoutingMatcherPolicy(IODataTemplateTranslator translator)
+        {
+            _translator = translator;
+        }
+
         /// <summary>
         /// Gets a value that determines the order of this policy.
         /// </summary>
@@ -55,23 +67,21 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                var oDataMetadata = candidate.Endpoint.Metadata.OfType<ODataRoutingMetadata>().FirstOrDefault();
+                var oDataMetadata = candidate.Endpoint.Metadata.OfType<IODataRoutingMetadata>().FirstOrDefault();
                 if (oDataMetadata == null)
                 {
                     continue;
                 }
 
-                string serviceRoot = Test(httpContext.Request);
+                ODataTemplateTranslateContext translatorContext =
+                    new ODataTemplateTranslateContext(httpContext, candidate.Values, oDataMetadata.Model);
 
-                string servieRoot2 = Test2(candidate.Endpoint, httpContext.Request);
-
-                var originalValues = candidate.Values;
-                var oPath = oDataMetadata.GenerateODataPath(httpContext, originalValues, httpContext.Request.QueryString);
-                if (oPath != null)
+                var odataPath = _translator.Translate(oDataMetadata.Template, translatorContext);
+                if (odataPath != null)
                 {
                     var odata = httpContext.ODataFeature();
                     odata.Model = oDataMetadata.Model;
-                    odata.Path = oPath;
+                    odata.Path = odataPath;
 
                     // Double confirm whether it's required or not?
                     //candidates.SetValidity(i, true); 

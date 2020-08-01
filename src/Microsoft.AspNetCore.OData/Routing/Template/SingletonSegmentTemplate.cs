@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmSingleton Singleton => Segment.Singleton;
 
         /// <summary>
-        /// Gets the wrapped Edm singleton.
+        /// Gets the wrapped singleton segment.
         /// </summary>
         public SingletonSegment Segment { get; }
 
@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => true;
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
+        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             return Segment;
         }

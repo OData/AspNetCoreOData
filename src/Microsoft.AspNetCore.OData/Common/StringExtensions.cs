@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Common
             int length = input.Length;
 
             char ch = input[start];
-            if (ch == '\'') // it could be {. [
+            if (ch == '\'') // TODO: it could be {. [
             {
                 int end = start;
                 do

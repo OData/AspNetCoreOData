@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -16,27 +15,19 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match an <see cref="IEdmFunction"/>.
+    /// Represents a template that could match a bound <see cref="IEdmFunction"/>.
     /// </summary>
     public class FunctionSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="function">The Edm function.</param>
-        public FunctionSegmentTemplate(IEdmFunction function)
-            : this(function, navigationSource: null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="function">The Edm function.</param>
-        /// <param name="navigationSource">Unqualified function call boolean value.</param>
+        /// <param name="function">The Edm function, it should be bound function..</param>
+        /// <param name="navigationSource">The Edm navigation source of this function return.</param>
         public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource)
         {
             Function = function ?? throw new ArgumentNullException(nameof(function));
+
             NavigationSource = navigationSource;
 
             if (!function.IsBound)
@@ -57,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     HasOptional = true;
                 }
             }
-           
+
             if (HasOptional)
             {
                 string parameters = string.Join(";", parametersMappings.Select(a => a.Key));
@@ -140,24 +131,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return true;
         }
 
-        public bool IsMatch(ODataSegmentTemplateTranslateContext context)
-        {
-            var routeValue = context.RouteValues;
-            int skip = Function.IsBound ? 1 : 0;
-            ISet<string> actualParameters = new HashSet<string>();
-            foreach (var parameter in Function.Parameters.Skip(skip))
-            {
-                if (routeValue.ContainsKey(parameter.Name))
-                {
-                    actualParameters.Add(parameter.Name);
-                }
-            }
-
-            return RequiredParameters.SetEquals(actualParameters);
-        }
-
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
+        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             var routeValue = context.RouteValues;
             // TODO: process the parameter alias
@@ -223,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
 
-        private bool TestParameters(ODataSegmentTemplateTranslateContext context, out IDictionary<string, string> actualParameters)
+        private bool TestParameters(ODataTemplateTranslateContext context, out IDictionary<string, string> actualParameters)
         {
             var routeValue = context.RouteValues;
 

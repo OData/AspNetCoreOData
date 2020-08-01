@@ -42,6 +42,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="context">The translate context.</param>
         /// <returns>null or ODataPathSegment.</returns>
-        public abstract ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context);
+        public abstract ODataPathSegment Translate(ODataTemplateTranslateContext context);
     }
 }

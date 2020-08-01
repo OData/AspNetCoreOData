@@ -29,19 +29,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataRoutingMetadata"/> class.
-        /// </summary>
-        /// <param name="prefix">The prefix string.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="template">The Routing path template.</param>
-        public ODataRoutingMetadata(string prefix, IEdmModel model, string template)
-        {
-            Prefix = prefix;
-            Model = model;
-            StrTemplate = template;
-        }
-
-        /// <summary>
         /// Gets the prefix string.
         /// </summary>
         public string Prefix { get; }
@@ -50,11 +37,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the Edm model.
         /// </summary>
         public IEdmModel Model { get; }
-
-        /// <summary>
-        /// Gets the template string.
-        /// </summary>
-        public string StrTemplate { get; }
 
         /// <summary>
         /// Gets the OData path template
@@ -70,8 +52,8 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>The built <see cref="ODataPath" />.</returns>
         public ODataPath GenerateODataPath(HttpContext httpContext, RouteValueDictionary values, QueryString queryString)
         {
-            ODataSegmentTemplateTranslateContext context = new ODataSegmentTemplateTranslateContext(Model, httpContext);
-            context.RouteValues = values;
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, values, Model);
+          //  context.RouteValues = values;
 
             if (Template != null)
             {

@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public ODataPath Translate(ODataSegmentTemplateTranslateContext context)
+        public ODataPath Translate(ODataTemplateTranslateContext context)
         {
             // calculate every time
             IList<ODataPathSegment> oSegments = new List<ODataPathSegment>();

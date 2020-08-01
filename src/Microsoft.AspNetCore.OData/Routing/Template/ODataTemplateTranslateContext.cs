@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -11,17 +12,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// <summary>
     /// The context used to generate the <see cref="ODataPathSegment"/>.
     /// </summary>
-    public class ODataSegmentTemplateTranslateContext
+    public class ODataTemplateTranslateContext
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="request"></param>
-        public ODataSegmentTemplateTranslateContext(IEdmModel model, HttpContext context)
+        internal ODataTemplateTranslateContext(HttpContext context, 
+             RouteValueDictionary routeValues, IEdmModel model)
         {
-            Model = model;
             HttpContext = context;
+            RouteValues = routeValues;
+            Model = model;
         }
 
         /// <summary>
@@ -37,11 +35,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the route values.
         /// </summary>
-        public RouteValueDictionary RouteValues { get; set; }
+        public RouteValueDictionary RouteValues { get; }
 
         /// <summary>
-        /// Gets the previous navigation source.
+        /// 
         /// </summary>
-        public IEdmNavigationSource NavigationSource { get; set; }
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public StringValues GetQueryString(string key)
+        {
+            HttpContext.Request.Query.TryGetValue(key, out StringValues values);
+            return values;
+        }
     }
 }

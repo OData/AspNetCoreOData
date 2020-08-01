@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataSegmentTemplateTranslateContext context)
+        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             // ODL implementation is complex, here i just use the NavigationPropertyLinkSegment
             return new NavigationPropertyLinkSegment(Navigation, NavigationSource);
