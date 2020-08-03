@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        ///  Initializes a new instance of the <see cref="ODataControllerActionContext" /> class.
+        /// Initializes a new instance of the <see cref="ODataControllerActionContext" /> class.
         /// </summary>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>

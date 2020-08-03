@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
@@ -14,18 +15,30 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// </summary>
     public class ODataTemplateTranslateContext
     {
-        internal ODataTemplateTranslateContext(HttpContext context, 
-             RouteValueDictionary routeValues, IEdmModel model)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
+        /// </summary>
+        /// <param name="context">The HttpContext.</param>
+        /// <param name="routeValues">The route values.</param>
+        /// <param name="model">The Edm model.</param>
+        internal ODataTemplateTranslateContext(HttpContext context, RouteValueDictionary routeValues, IEdmModel model)
         {
-            HttpContext = context;
-            RouteValues = routeValues;
-            Model = model;
+            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
+
+            RouteValues = routeValues ?? throw new ArgumentNullException(nameof(routeValues));
+
+            Model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         /// <summary>
-        /// Gets the Edm model.
+        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
+        /// For Unit test only.
         /// </summary>
-        public IEdmModel Model { get; }
+        /// <param name="context">The HttpContext.</param>
+        internal ODataTemplateTranslateContext(HttpContext context)
+        {
+            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
+        }
 
         /// <summary>
         /// Gets the current HttpContext.
@@ -38,10 +51,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public RouteValueDictionary RouteValues { get; }
 
         /// <summary>
-        /// 
+        /// Gets the Edm model.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        public IEdmModel Model { get; }
+
+        /// <summary>
+        /// Gets the query string using the key.
+        /// </summary>
+        /// <param name="key">The query string key.</param>
+        /// <returns>Null or the string value of the query.</returns>
         public StringValues GetQueryString(string key)
         {
             HttpContext.Request.Query.TryGetValue(key, out StringValues values);

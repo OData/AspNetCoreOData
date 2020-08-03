@@ -8206,7 +8206,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
             <summary>
-             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
             </summary>
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
@@ -8662,9 +8662,9 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy.#ctor(Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator)">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy" /> class.
             </summary>
-            <param name="translator"></param>
+            <param name="translator">The registered path template translator.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy.Order">
             <summary>
@@ -9107,16 +9107,11 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator">
             <summary>
-            Defines a contract use to specify the OData routing related metadata in <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata"/>.
+            Default implemetation for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <summary>
-            
-            </summary>
-            <param name="path"></param>
-            <param name="context"></param>
-            <returns></returns>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate">
             <summary>
@@ -9249,16 +9244,16 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator">
             <summary>
-            Defines a contract use to specify the OData routing related metadata in <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata"/>.
+            Defines a contract use to translate the OData path tempalte to OData path.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <summary>
-            
+            Translate the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/> to <see cref="T:Microsoft.OData.UriParser.ODataPath"/>
             </summary>
-            <param name="path"></param>
-            <param name="context"></param>
-            <returns></returns>
+            <param name="path">The OData path template.</param>
+            <param name="context">The translate context.</param>
+            <returns>The OData Path.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate">
             <summary>
@@ -9730,10 +9725,20 @@
             The context used to generate the <see cref="T:Microsoft.OData.UriParser.ODataPathSegment"/>.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            Gets the Edm model.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext" /> class.
             </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="routeValues">The route values.</param>
+            <param name="model">The Edm model.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext" /> class.
+            For Unit test only.
+            </summary>
+            <param name="context">The HttpContext.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.HttpContext">
             <summary>
@@ -9745,12 +9750,17 @@
             Gets the route values.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model">
+            <summary>
+            Gets the Edm model.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.GetQueryString(System.String)">
             <summary>
-            
+            Gets the query string using the key.
             </summary>
-            <param name="key"></param>
-            <returns></returns>
+            <param name="key">The query string key.</param>
+            <returns>Null or the string value of the query.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate">
             <summary>
@@ -9878,7 +9888,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Segment">
             <summary>
-            Gets the wrapped Edm singleton.
+            Gets the wrapped singleton segment.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Kind">
