@@ -4,6 +4,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Extensions
 {
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Extensions
 
                 return root.GetProperty("value").GetString();
             }
-            catch (JsonException)
+            catch (System.Text.Json.JsonException)
             {
             }
 
@@ -42,8 +43,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Extensions
         public static async Task<T> ReadAsObject<T>(this HttpContent content)
         {
             string json = await content.ReadAsStringAsync();
-
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         /// <summary>

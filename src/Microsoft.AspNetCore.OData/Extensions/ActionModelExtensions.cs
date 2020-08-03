@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Extensions
@@ -161,5 +162,56 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
             }
         }
+
+        /// <summary>
+        /// Adds the OData selector model to the action.
+        /// </summary>
+        /// <param name="action">The given action model.</param>
+        /// <param name="httpMethod">The prefix.</param>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="path">The OData path template.</param>
+        public static void AddSelector(this ActionModel action, string httpMethod, string prefix, IEdmModel model, ODataPathTemplate path)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            foreach (var template in path.GetTemplates())
+            {
+                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
+                if (selectorModel == null)
+                {
+                    selectorModel = new SelectorModel();
+                    action.Selectors.Add(selectorModel);
+                }
+
+                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+                string modelName = model.GetModelName();
+
+                templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
+
+                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
+                selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
+
+                selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(new[] { httpMethod }));
+
+                // Check with .NET Team whether the "Endpoint name metadata"
+                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+            }
+        }
     }
 }
+

@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action);
+            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action, httpMethod);
             return true;
         }
 
@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         private static void AddSelector(IEdmEntitySet entitySet, IEdmEntityType entityType,
-            IEdmStructuredType castType, string prefix, IEdmModel model, ActionModel action)
+            IEdmStructuredType castType, string prefix, IEdmModel model, ActionModel action, string httpMethod)
         {
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
             {
@@ -135,23 +135,23 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // If cast type is the entity type of the entity set.
                     // we support two templates
                     // ~/Customers({key})
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
+                    action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
 
                     // ~/Customers({key})/Ns.Customer
                     segments.Add(new CastSegmentTemplate(entityType));
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
+                    action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
                 }
                 else
                 {
                     // ~/Customers({key})/Ns.VipCustomer
                     segments.Add(new CastSegmentTemplate(castType));
-                    action.AddSelector(prefix, model, new ODataPathTemplate(segments));
+                    action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
                 }
             }
             else
             {
                 // ~/Customers({key})
-                action.AddSelector(prefix, model, new ODataPathTemplate(segments));
+                action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
             }
         }
     }
