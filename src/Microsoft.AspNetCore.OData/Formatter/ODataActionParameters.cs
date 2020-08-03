@@ -7,10 +7,11 @@ using System.Collections.Generic;
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
+    /// ActionPayload holds the Parameter names and values provided by a client in a POST request
+    /// to invoke a particular Action. The Parameter values are stored in the dictionary keyed using the Parameter name.
     /// </summary>
     [NonValidatingParameterBinding]
-    [SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "<Pending>")]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "ODataActionParameters is more appropriate here.")]
     public class ODataActionParameters : Dictionary<string, object>
     {
     }

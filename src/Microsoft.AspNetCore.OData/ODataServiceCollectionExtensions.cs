@@ -109,7 +109,6 @@ namespace Microsoft.AspNetCore.OData
         /// 
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="model"></param>
         /// <returns></returns>
         public static IODataBuilder AddODataRouting(this IODataBuilder builder)
         {

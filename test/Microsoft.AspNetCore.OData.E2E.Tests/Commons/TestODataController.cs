@@ -16,13 +16,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         public new TestOkObjectResult Ok(object value) { return new TestOkObjectResult(value); }
 
         [NonAction]
-        public new TestCreatedODataResult<T> Created<T>(T entity) { return new TestCreatedODataResult<T>(entity); }
+        public TestCreatedODataResult<T> Created<T>(T entity) { return new TestCreatedODataResult<T>(entity); }
 
         [NonAction]
-        public new TestCreatedResult Created(string uri, object entity) { return new TestCreatedResult(base.Created(uri, entity)); }
+        public TestCreatedResult Created(string uri, object entity) { return new TestCreatedResult(base.Created(uri, entity)); }
 
         [NonAction]
-        public new TestUpdatedODataResult<T> Updated<T>(T entity) { return new TestUpdatedODataResult<T>(entity); }
+        public TestUpdatedODataResult<T> Updated<T>(T entity) { return new TestUpdatedODataResult<T>(entity); }
     }
 
     /// <summary>

@@ -158,11 +158,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle => true;
 
-        public static string GetUriLiteral(string name, RouteValueDictionary routeValues, QueryString queryString)
-        {
-            return null;
-        }
-
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {

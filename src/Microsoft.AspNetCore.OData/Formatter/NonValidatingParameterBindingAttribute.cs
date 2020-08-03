@@ -9,18 +9,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
-    /// 
+    /// An attribute to disable model validation for a particular type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class NonValidatingParameterBindingAttribute : ModelBinderAttribute, IPropertyValidationFilter
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="parentEntry"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool ShouldValidateEntry(ValidationEntry entry, ValidationEntry parentEntry)
         {
             return false;

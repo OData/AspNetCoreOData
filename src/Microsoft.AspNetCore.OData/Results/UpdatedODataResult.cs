@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (entity == null)
             {
-                throw Error.ArgumentNull("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             this._innerResult = entity;
@@ -47,10 +48,15 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <inheritdoc/>
         public async virtual Task ExecuteResultAsync(ActionContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             HttpResponse response = context.HttpContext.Response;
             HttpRequest request = context.HttpContext.Request;
             IActionResult result = GetInnerActionResult(request);
-            await result.ExecuteResultAsync(context);
+            await result.ExecuteResultAsync(context).ConfigureAwait(false);
             ResultHelpers.AddServiceVersion(response, () => ODataUtils.ODataVersionToString(ResultHelpers.GetODataResponseVersion(request)));
         }
 
