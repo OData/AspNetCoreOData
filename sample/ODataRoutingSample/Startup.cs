@@ -58,12 +58,12 @@ namespace ODataRoutingSample
                 opt.UseODataQuery()
                 );
             */
-            services.AddOData(opt => opt.UseModel(model0)
-                .UseModel("v1", model1)
-                .UseModel("v2{data}", model2))
-                .AddODataRouting()
-                .AddFormatter()
-                .AddODataQuery();
+            //services.AddOData(opt => opt.UseModel(model0)
+            //    .UseModel("v1", model1)
+            //    .UseModel("v2{data}", model2))
+            //    .AddODataRouting()
+            //    .AddFormatter()
+            //    .AddODataQuery();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

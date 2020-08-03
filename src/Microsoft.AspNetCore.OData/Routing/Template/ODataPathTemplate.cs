@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -56,109 +54,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public ReadOnlyCollection<ODataSegmentTemplate> Segments { get; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public ODataPath Translate(ODataTemplateTranslateContext context)
-        {
-            // calculate every time
-            IList<ODataPathSegment> oSegments = new List<ODataPathSegment>();
-            IEdmNavigationSource previousNavigationSource = null;
-            foreach (var segment in Segments)
-            {
-                ODataPathSegment odataSegment = segment.Translate(context);
-                if (odataSegment == null)
-                {
-                    return null;
-                }
-
-                oSegments.Add(odataSegment);
-                previousNavigationSource = GetTargetNavigationSource(previousNavigationSource, odataSegment);
-            }
-
-            return new ODataPath(oSegments);
-        }
-
-        private static IEdmNavigationSource GetTargetNavigationSource(IEdmNavigationSource previous, ODataPathSegment segment)
-        {
-            if (segment == null)
-            {
-                return null;
-            }
-
-            EntitySetSegment entitySet = segment as EntitySetSegment;
-            if (entitySet != null)
-            {
-                return entitySet.EntitySet;
-            }
-
-            SingletonSegment singleton = segment as SingletonSegment;
-            if (singleton != null)
-            {
-                return singleton.Singleton;
-            }
-
-            TypeSegment cast = segment as TypeSegment;
-            if (cast != null)
-            {
-                return cast.NavigationSource;
-            }
-
-            KeySegment key = segment as KeySegment;
-            if (key != null)
-            {
-                return key.NavigationSource;
-            }
-
-            OperationSegment opertion = segment as OperationSegment;
-            if (opertion != null)
-            {
-                return opertion.EntitySet;
-            }
-
-            OperationImportSegment import = segment as OperationImportSegment;
-            if (import != null)
-            {
-                return import.EntitySet;
-            }
-
-            PropertySegment property = segment as PropertySegment;
-            if (property != null)
-            {
-                return previous; // for property, return the previous, or return null????
-            }
-
-            MetadataSegment metadata = segment as MetadataSegment;
-            if (metadata != null)
-            {
-                return null;
-            }
-
-            CountSegment count = segment as CountSegment;
-            if (count != null)
-            {
-                return null;
-            }
-
-            OperationImportSegment operationImport = segment as OperationImportSegment;
-            if (operationImport != null)
-            {
-                return null;
-            }
-
-            NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
-            if (navigationPropertySegment != null)
-            {
-                return navigationPropertySegment.NavigationSource;
-            }
-
-            throw new Exception("Not supported segment in endpoint routing convention!");
-        }
-
-
-        /// <summary>
-        /// 
+        /// Gets the OData path template literal.
         /// </summary>
         public string Template
         {

@@ -385,6 +385,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The edit link builder for the entity set &apos;{0}&apos; returned null. An edit link is required for the location header..
+        /// </summary>
+        internal static string EditLinkNullForLocationHeader {
+            get {
+                return ResourceManager.GetString("EditLinkNullForLocationHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
         /// </summary>
         internal static string EdmComplexObjectNullRef {
@@ -498,6 +507,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string GetOnlyCollectionCannotBeArray {
             get {
                 return ResourceManager.GetString("GetOnlyCollectionCannotBeArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Id link builder for the entity set &apos;{0}&apos; returned null. An Id link is required for the OData-EntityId header..
+        /// </summary>
+        internal static string IdLinkNullForEntityIdHeader {
+            get {
+                return ResourceManager.GetString("IdLinkNullForEntityIdHeader", resourceCulture);
             }
         }
         
@@ -660,6 +678,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string NavigationSourceMissingDuringDeserialization {
             get {
                 return ResourceManager.GetString("NavigationSourceMissingDuringDeserialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to serialize the payload..
+        /// </summary>
+        internal static string NavigationSourceMissingDuringSerialization {
+            get {
+                return ResourceManager.GetString("NavigationSourceMissingDuringSerialization", resourceCulture);
             }
         }
         
@@ -1101,6 +1128,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string TypeCannotBeSerialized {
             get {
                 return ResourceManager.GetString("TypeCannotBeSerialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not an entity type. Only entity types are supported..
+        /// </summary>
+        internal static string TypeMustBeEntity {
+            get {
+                return ResourceManager.GetString("TypeMustBeEntity", resourceCulture);
             }
         }
         

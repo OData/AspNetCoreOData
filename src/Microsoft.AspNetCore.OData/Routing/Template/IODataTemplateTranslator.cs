@@ -6,7 +6,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Defines a contract use to translate the OData path tempalte to OData path.
+    /// Defines a contract used to translate the OData path template to OData path.
     /// </summary>
     public interface IODataTemplateTranslator
     {

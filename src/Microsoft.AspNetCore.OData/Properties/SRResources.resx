@@ -488,4 +488,16 @@
   <data name="ReferenceNavigationPropertyExpandFilterVisitorUnexpectedParameter" xml:space="preserve">
     <value>Found unexpected parameter '{0}'.</value>
   </data>
+  <data name="TypeMustBeEntity" xml:space="preserve">
+    <value>{0} is not an entity type. Only entity types are supported.</value>
+  </data>
+  <data name="EditLinkNullForLocationHeader" xml:space="preserve">
+    <value>The edit link builder for the entity set '{0}' returned null. An edit link is required for the location header.</value>
+  </data>
+  <data name="IdLinkNullForEntityIdHeader" xml:space="preserve">
+    <value>The Id link builder for the entity set '{0}' returned null. An Id link is required for the OData-EntityId header.</value>
+  </data>
+  <data name="NavigationSourceMissingDuringSerialization" xml:space="preserve">
+    <value>The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to serialize the payload.</value>
+  </data>
 </root>

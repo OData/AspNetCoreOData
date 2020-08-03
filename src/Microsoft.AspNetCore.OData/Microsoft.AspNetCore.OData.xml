@@ -4226,6 +4226,11 @@
               Looks up a localized string similar to The type name of the dynamic resource set &apos;{0}&apos; is required and cannot be empty. Consider using a OData type annotation explicitly..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.EditLinkNullForLocationHeader">
+            <summary>
+              Looks up a localized string similar to The edit link builder for the entity set &apos;{0}&apos; returned null. An edit link is required for the location header..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EdmComplexObjectNullRef">
             <summary>
               Looks up a localized string similar to Cannot get property &apos;{0}&apos; of a null EDM object of type &apos;{1}&apos;..
@@ -4289,6 +4294,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.GetOnlyCollectionCannotBeArray">
             <summary>
               Looks up a localized string similar to The value of the property &apos;{0}&apos; on type &apos;{1}&apos; is an array. Consider adding a setter for the property..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.IdLinkNullForEntityIdHeader">
+            <summary>
+              Looks up a localized string similar to The Id link builder for the entity set &apos;{0}&apos; returned null. An Id link is required for the OData-EntityId header..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InputCastTypeKindNotMatch">
@@ -4379,6 +4389,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NavigationSourceMissingDuringDeserialization">
             <summary>
               Looks up a localized string similar to The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to deserialize the payload..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.NavigationSourceMissingDuringSerialization">
+            <summary>
+              Looks up a localized string similar to The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to serialize the payload..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NestedCollectionsNotSupported">
@@ -4624,6 +4639,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeCannotBeSerialized">
             <summary>
               Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the ODataMediaTypeFormatter..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeEntity">
+            <summary>
+              Looks up a localized string similar to {0} is not an entity type. Only entity types are supported..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeEnumOrNullableEnum">
@@ -7853,6 +7873,35 @@
             Gets or sets the instance of the element being selected and expanded.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1">
+            <summary>
+            Represents an action result that is a response to a create operation that adds an entity to an entity set.
+            </summary>
+            <typeparam name="T">The entity type.</typeparam>
+            <remarks>This action result handles content negotiation and the HTTP prefer header. It generates a location
+            header containing the edit link of the created entity and, if response has status code: NoContent, also
+            generates an OData-EntityId header.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1"/> class.
+            </summary>
+            <param name="entity">The created entity.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1.Entity">
+            <summary>
+            Gets the entity that was created.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ResultHelpers.GenerateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.Object,System.Boolean)">
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ResultHelpers.AddEntityId(Microsoft.AspNetCore.Http.HttpResponse,System.Func{System.Uri})">
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.SingleResult">
             <summary>
             Represents an <see cref="T:System.Linq.IQueryable"/> containing zero or one entities. Use together with an
@@ -7897,6 +7946,27 @@
             <summary>
             The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1">
+            <summary>
+            Represents an action result that is a response to a PUT, PATCH, or a MERGE operation on an OData entity.
+            </summary>
+            <typeparam name="T">The entity type.</typeparam>
+            <remarks>This action result handles content negotiation and the HTTP prefer header.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1"/> class.
+            </summary>
+            <param name="entity">The updated entity.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1.Entity">
+            <summary>
+            Gets the entity that was updated.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.NonODataActionAttribute">
             <summary>
@@ -7994,6 +8064,31 @@
             Generates the OData service document.
             </summary>
             <returns>The service document for the service.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created``1(``0)">
+            <summary>
+            Creates an action result with the specified values that is a response to a POST operation with an entity
+            to an entity set.
+            </summary>
+            <typeparam name="TEntity">The created entity type.</typeparam>
+            <param name="entity">The created entity.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1"/> with the specified values.</returns>
+            <remarks>These function uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Updated``1(``0)">
+            <summary>
+            Creates an action result with the specified values that is a response to a PUT, PATCH, or a MERGE operation
+            on an OData entity.
+            </summary>
+            <typeparam name="TEntity">The updated entity type.</typeparam>
+            <param name="entity">The updated entity.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1"/> with the specified values.</returns>
+            <remarks>These function uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention">
             <summary>
@@ -8714,14 +8809,6 @@
             Gets the OData path template
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.GenerateODataPath(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Http.QueryString)">
-            <summary>
-            Generate the real <see cref="T:Microsoft.OData.UriParser.ODataPath"/> based on the template the route values.
-            </summary>
-            <param name="values">The route values.</param>
-            <param name="queryString">The query string.</param>
-            <returns>The built <see cref="T:Microsoft.OData.UriParser.ODataPath" />.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptionsBuilder">
             <summary>
             
@@ -9244,7 +9331,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator">
             <summary>
-            Defines a contract use to translate the OData path tempalte to OData path.
+            Defines a contract used to translate the OData path template to OData path.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
@@ -9430,16 +9517,9 @@
             Gets the path segments for the OData path.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <summary>
-            
-            </summary>
-            <param name="context"></param>
-            <returns></returns>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Template">
             <summary>
-            
+            Gets the OData path template literal.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions">

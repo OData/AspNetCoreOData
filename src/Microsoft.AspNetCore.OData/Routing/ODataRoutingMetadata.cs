@@ -2,11 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -24,7 +21,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         public ODataRoutingMetadata(string prefix, IEdmModel model, ODataPathTemplate template)
         {
             Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+
             Model = model ?? throw new ArgumentNullException(nameof(model));
+
             Template = template ?? throw new ArgumentNullException(nameof(template));
         }
 
@@ -42,25 +41,5 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the OData path template
         /// </summary>
         public ODataPathTemplate Template { get; }
-
-        // { { "$filter", "IntProp eq @p1" }, { "@p1", "@p2" }, { "@p2", "123" } });
-        /// <summary>
-        /// Generate the real <see cref="ODataPath"/> based on the template the route values.
-        /// </summary>
-        /// <param name="values">The route values.</param>
-        /// <param name="queryString">The query string.</param>
-        /// <returns>The built <see cref="ODataPath" />.</returns>
-        public ODataPath GenerateODataPath(HttpContext httpContext, RouteValueDictionary values, QueryString queryString)
-        {
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, values, Model);
-          //  context.RouteValues = values;
-
-            if (Template != null)
-            {
-                return Template.Translate(context);
-            }
-
-            return null;
-        }
     }
 }
