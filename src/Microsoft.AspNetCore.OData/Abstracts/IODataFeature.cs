@@ -54,5 +54,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// 
         /// </summary>
         IDictionary<string, object> BodyValues { get; set; }
+
+        /// <summary>
+        /// Gets the data store used by routing conventions to store any custom route data.
+        /// </summary>
+        /// <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
+        IDictionary<string, object> RoutingConventionsStore { get; set; }
     }
 }

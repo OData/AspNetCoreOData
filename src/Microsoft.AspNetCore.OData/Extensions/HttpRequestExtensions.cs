@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
@@ -119,6 +120,51 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             // TODO Maybe clone one???
             return request.HttpContext.RequestServices.GetRequiredService<ODataMessageWriterSettings>();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IODataBatchFeature"/> from the services container.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The <see cref="IODataBatchFeature"/> from the services container.</returns>
+        //public static IODataBatchFeature ODataBatchFeature(this HttpRequest request)
+        //{
+        //    if (request == null)
+        //    {
+        //        throw Error.ArgumentNull("request");
+        //    }
+
+        //    return request.HttpContext.ODataBatchFeature();
+        //}
+
+        /// <summary>
+        /// get the deserializer provider associated with the request.
+        /// </summary>
+        /// <returns></returns>
+        public static ODataDeserializerProvider GetDeserializerProvider(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
+        }
+
+        /// <summary>
+        /// Retrieves the Content-ID to Location mapping associated with the request.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The Content-ID to Location mapping associated with this request, or <c>null</c> if there isn't one.</returns>
+        public static IDictionary<string, string> GetODataContentIdMapping(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull("request");
+            }
+
+            return null;
+            // return request.ODataBatchFeature().ContentIdMapping;
         }
 
         /// <summary>

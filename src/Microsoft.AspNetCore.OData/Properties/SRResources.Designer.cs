@@ -448,6 +448,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
+        /// </summary>
+        internal static string EntityReferenceMustHasKeySegment {
+            get {
+                return ResourceManager.GetString("EntityReferenceMustHasKeySegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
         /// </summary>
         internal static string EntityTypeMismatch {
@@ -660,6 +669,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ModelBinderUtil_ModelMetadataCannotBeNull {
             get {
                 return ResourceManager.GetString("ModelBinderUtil_ModelMetadataCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The binding value &apos;{0}&apos; cannot be bound to the enum type &apos;{1}&apos;..
+        /// </summary>
+        internal static string ModelBinderUtil_ValueCannotBeEnum {
+            get {
+                return ResourceManager.GetString("ModelBinderUtil_ValueCannotBeEnum", resourceCulture);
             }
         }
         
@@ -912,6 +930,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string OrderByNodeCountExceeded {
             get {
                 return ResourceManager.GetString("OrderByNodeCountExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; must be a collection..
+        /// </summary>
+        internal static string ParameterTypeIsNotCollection {
+            get {
+                return ResourceManager.GetString("ParameterTypeIsNotCollection", resourceCulture);
             }
         }
         
@@ -1272,6 +1299,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string UriQueryStringInvalid {
             get {
                 return ResourceManager.GetString("UriQueryStringInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; is invalid. {1}.
+        /// </summary>
+        internal static string ValueIsInvalid {
+            get {
+                return ResourceManager.GetString("ValueIsInvalid", resourceCulture);
             }
         }
         

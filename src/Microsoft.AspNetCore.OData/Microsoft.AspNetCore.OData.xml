@@ -126,6 +126,12 @@
             
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutingConventionsStore">
+            <summary>
+            Gets the data store used by routing conventions to store any custom route data.
+            </summary>
+            <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider">
             <summary>
             Provides the mapping between CLR type and Edm type.
@@ -230,6 +236,12 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutingConventionsStore">
+            <summary>
+            Gets the data store used by <see cref="!:IODataRoutingConvention"/>s to store any custom route data.
+            </summary>
+            <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider">
             <summary>
@@ -1358,6 +1370,19 @@
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            get the deserializer provider associated with the request.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataContentIdMapping(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Retrieves the Content-ID to Location mapping associated with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The Content-ID to Location mapping associated with this request, or <c>null</c> if there isn't one.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(Microsoft.AspNetCore.Http.HttpRequest,System.Int32,System.Object,System.Func{System.Object,System.String})">
             <summary>
             Creates a link for the next page of results; To be used as the value of @odata.nextLink.
@@ -2125,6 +2150,23 @@
             This class is similar to ODataModelBinderProvider in AspNet. The flow is similar but the
             type are dissimilar enough making a common version more complex than separate versions.
             </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataModelBinderConverter">
+            <summary>
+            Expose functionality to convert an function parameter value into a CLR object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataModelBinderConverter.Convert(System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.Type,System.String,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext,System.IServiceProvider)">
+            <summary>
+            Convert an OData value into a CLR object.
+            </summary>
+            <param name="graph">The given object.</param>
+            <param name="edmTypeReference">The EDM type of the given object.</param>
+            <param name="clrType">The CLR type of the given object.</param>
+            <param name="parameterName">The parameter name of the given object.</param>
+            <param name="readContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext"/> use to convert.</param>
+            <param name="requestContainer">The dependency injection container for the request.</param>
+            <returns>The converted object.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter">
             <summary>
@@ -4482,6 +4524,11 @@
               Looks up a localized string similar to The property &apos;ElementClrType&apos; of {0} cannot be null..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityReferenceMustHasKeySegment">
+            <summary>
+              Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityTypeMismatch">
             <summary>
               Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
@@ -4600,6 +4647,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelBinderUtil_ModelMetadataCannotBeNull">
             <summary>
               Looks up a localized string similar to The binding context cannot have a null ModelMetadata..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelBinderUtil_ValueCannotBeEnum">
+            <summary>
+              Looks up a localized string similar to The binding value &apos;{0}&apos; cannot be bound to the enum type &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelMissingFromReadContext">
@@ -4740,6 +4792,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByNodeCountExceeded">
             <summary>
               Looks up a localized string similar to The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is {0}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ParameterTypeIsNotCollection">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; must be a collection..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyIsNotCollection">
@@ -4940,6 +4997,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UriQueryStringInvalid">
             <summary>
               Looks up a localized string similar to The query specified in the URI is not valid. {0}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ValueIsInvalid">
+            <summary>
+              Looks up a localized string similar to The value &apos;{0}&apos; is invalid. {1}.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.WriteObjectInlineNotSupported">
@@ -5796,9 +5858,6 @@
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The internal request.</param>
-            <param name="createQueryOptionFunction">A function used to create and validate query options.</param>
-            <param name="createResponseAction">An action used to create a response.</param>
-            <param name="createErrorAction">A function used to generate error response.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
             <summary>
@@ -5831,7 +5890,6 @@
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-            <param name="modelFunction">A function to get the model.</param>
             <param name="request">The internal request.</param>
             <returns></returns>
         </member>
@@ -6686,7 +6744,6 @@
             
             </summary>
             <param name="builder"></param>
-            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
@@ -10516,7 +10573,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds">
             <summary>
-            Provides the values of segment kinds for implementations of <see cref="!:ODataPathSegment" />.
+            Provides the values of segment kinds for implementations of <see cref="T:Microsoft.OData.UriParser.ODataPathSegment" />.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKinds.ServiceBase">
