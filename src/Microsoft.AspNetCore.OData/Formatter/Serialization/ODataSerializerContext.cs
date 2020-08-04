@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     public class ODataSerializerContext
     {
         private IDictionary<object, object> _items;
+        private ODataQueryContext _queryContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
@@ -69,13 +70,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Items = context.Items;
             ExpandReference = context.ExpandReference;
 
-            /*
             QueryContext = queryContext;
 
             ExpandedResource = resource; // parent resource
 
             CurrentSelectItem = currentSelectItem;
-
+/*
             var expandedNavigationSelectItem = currentSelectItem as ExpandedNavigationSelectItem;
             if (expandedNavigationSelectItem != null)
             {
@@ -159,6 +159,33 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Get or sets whether expensive links should be calculated.
         /// </summary>
         public bool SkipExpensiveAvailabilityChecks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ODataQueryOptions"/>.
+        /// </summary>
+        public ODataQueryOptions QueryOptions { get; internal set; }
+
+        /// <summary>
+        /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
+        /// </summary>
+        internal ODataQueryContext QueryContext
+        {
+            get
+            {
+                if (QueryOptions != null)
+                {
+                    return QueryOptions.Context;
+                }
+
+                return _queryContext;
+            }
+            private set { _queryContext = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SelectItem"/>.
+        /// </summary>
+        internal SelectItem CurrentSelectItem { get; set; }
 
         /// <summary>
         /// Gets a property bag associated with this context to store any generic data.

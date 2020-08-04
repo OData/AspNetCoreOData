@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -36,10 +37,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public AllowedArithmeticOperators AllowedArithmeticOperators
         {
-            get
-            {
-                return _allowedArithmeticOperators;
-            }
+            get => _allowedArithmeticOperators;
             set
             {
                 if (value > AllowedArithmeticOperators.All || value < AllowedArithmeticOperators.None)
@@ -73,10 +71,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public AllowedFunctions AllowedFunctions
         {
-            get
-            {
-                return _allowedFunctions;
-            }
+            get => _allowedFunctions;
             set
             {
                 if (value > AllowedFunctions.AllFunctions || value < AllowedFunctions.None)
@@ -93,10 +88,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public AllowedLogicalOperators AllowedLogicalOperators
         {
-            get
-            {
-                return _allowedLogicalOperators;
-            }
+            get => _allowedLogicalOperators;
             set
             {
                 if (value > AllowedLogicalOperators.All || value < AllowedLogicalOperators.None)
@@ -115,13 +107,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// For example, having an empty collection means client can order the queryable result by any properties.
         /// Adding "Name" to this list means that it only allows queryable result to be ordered by Name property.
         /// </summary>
-        public Collection<string> AllowedOrderByProperties
-        {
-            get
-            {
-                return _allowedOrderByProperties;
-            }
-        }
+        public ICollection<string> AllowedOrderByProperties { get => _allowedOrderByProperties; }
 
         /// <summary>
         /// Gets or sets the query parameters that are allowed inside query. The default is all query options,
@@ -129,10 +115,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public AllowedQueryOptions AllowedQueryOptions
         {
-            get
-            {
-                return _allowedQueryParameters;
-            }
+            get => _allowedQueryParameters;
             set
             {
                 if (value > AllowedQueryOptions.All || value < AllowedQueryOptions.None)
@@ -149,10 +132,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public int MaxOrderByNodeCount
         {
-            get
-            {
-                return _maxOrderByNodeCount;
-            }
+            get => _maxOrderByNodeCount;
             set
             {
                 if (value < MinMaxOrderByNodeCount)
@@ -175,10 +155,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </value>
         public int MaxAnyAllExpressionDepth
         {
-            get
-            {
-                return _maxAnyAllExpressionDepth;
-            }
+            get => _maxAnyAllExpressionDepth;
             set
             {
                 if (value < MinMaxAnyAllExpressionDepth)
@@ -198,10 +175,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         public int MaxNodeCount
         {
-            get
-            {
-                return _maxNodeCount;
-            }
+            get => _maxNodeCount;
             set
             {
                 if (value < MinMaxNodeCount)
@@ -218,10 +192,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public int? MaxSkip
         {
-            get
-            {
-                return _maxSkip;
-            }
+            get => _maxSkip;
             set
             {
                 if (value.HasValue && value < MinMaxSkip)
@@ -238,10 +209,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         public int? MaxTop
         {
-            get
-            {
-                return _maxTop;
-            }
+            get => _maxTop;
             set
             {
                 if (value.HasValue && value < MinMaxTop)
@@ -259,7 +227,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <remarks>To disable the maximum expansion depth check, set this property to 0.</remarks>
         public int MaxExpansionDepth
         {
-            get { return _maxExpansionDepth; }
+            get => _maxExpansionDepth;
             set
             {
                 if (value < MinMaxExpansionDepth)

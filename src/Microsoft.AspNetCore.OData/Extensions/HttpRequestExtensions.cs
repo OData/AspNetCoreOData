@@ -122,6 +122,63 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Creates a link for the next page of results; To be used as the value of @odata.nextLink.
+        /// </summary>
+        /// <param name="request">The request on which to base the next page link.</param>
+        /// <param name="pageSize">The number of results allowed per page.</param>
+        /// <param name="instance">Object which can be used to generate the skiptoken value.</param>
+        /// <param name="objectToSkipTokenValue">Function that takes in the last object and returns the skiptoken value string.</param>
+        /// <returns>A next page link.</returns>
+        public static Uri GetNextPageLink(this HttpRequest request, int pageSize, object instance, Func<object, string> objectToSkipTokenValue)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            UriBuilder uriBuilder = new UriBuilder(request.Scheme, request.Host.Host)
+            {
+                Path = (request.PathBase + request.Path).ToUriComponent()
+            };
+            if (request.Host.Port.HasValue)
+            {
+                uriBuilder.Port = request.Host.Port.Value;
+            }
+
+            CompatibilityOptions compatibilityOptions = request.GetCompatibilityOptions();
+
+            IEnumerable<KeyValuePair<string, string>> queryParameters = request.Query.SelectMany(kvp => kvp.Value, (kvp, value) => new KeyValuePair<string, string>(kvp.Key, value));
+            return GetNextPageHelper.GetNextPageLink(uriBuilder.Uri, queryParameters, pageSize, instance, objectToSkipTokenValue, compatibilityOptions);
+        }
+
+        /// <summary>
+        /// Gets the set of flags for <see cref="CompatibilityOptions"/> from ODataOptions. 
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>Set of flags for <see cref="CompatibilityOptions"/> from ODataOptions.</returns>
+        internal static CompatibilityOptions GetCompatibilityOptions(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (request.HttpContext == null)
+            {
+                return CompatibilityOptions.None;
+            }
+
+            ODataOptions options = request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+
+            if (options == null)
+            {
+                return CompatibilityOptions.None;
+            }
+
+            return options.CompatibilityOptions;
+        }
+
+        /// <summary>
         /// Creates an ETag from concurrency property names and values.
         /// </summary>
         /// <param name="request">The input property names and values.</param>

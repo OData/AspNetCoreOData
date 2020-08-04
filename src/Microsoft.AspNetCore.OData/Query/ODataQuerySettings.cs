@@ -13,8 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query
         private int? _modelBoundPageSize;
 
         /// <summary>
-        /// Instantiates a new instance of the <see cref="ODataQuerySettings"/> class
-        /// and initializes the default settings.
+        /// Initializes a new instance of the <see cref="ODataQuerySettings" /> class.
         /// </summary>
         public ODataQuerySettings()
         {

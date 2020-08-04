@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -15,6 +16,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -43,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private bool _enableNoDollarSignQueryOptions = false;
 
-      //  private OrderByQueryOption _stableOrderBy;
+        private OrderByQueryOption _stableOrderBy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
@@ -89,20 +91,20 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         public ODataQueryContext Context { get; private set; }
 
-        ///// <summary>
-        ///// Gets the raw string of all the OData query options
-        ///// </summary>
-        //public ODataRawQueryOptions RawValues { get; private set; }
+        /// <summary>
+        /// Gets the raw string of all the OData query options
+        /// </summary>
+        public ODataRawQueryOptions RawValues { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SelectExpandQueryOption"/>.
         /// </summary>
         public SelectExpandQueryOption SelectExpand { get; private set; }
 
-        ///// <summary>
-        ///// Gets the <see cref="ApplyQueryOption"/>.
-        ///// </summary>
-        //public ApplyQueryOption Apply { get; private set; }
+        /// <summary>
+        /// Gets the <see cref="ApplyQueryOption"/>.
+        /// </summary>
+        public ApplyQueryOption Apply { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="FilterQueryOption"/>.
@@ -442,66 +444,66 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Generates the Stable OrderBy query option based on the existing OrderBy and other query options. 
         /// </summary>
         /// <returns>An order by query option that ensures stable ordering of the results.</returns>
-        //public virtual OrderByQueryOption GenerateStableOrder()
-        //{
-        //    if (_stableOrderBy != null)
-        //    {
-        //        return _stableOrderBy;
-        //    }
+        public virtual OrderByQueryOption GenerateStableOrder()
+        {
+            if (_stableOrderBy != null)
+            {
+                return _stableOrderBy;
+            }
 
-        //    ApplyClause apply = Apply != null ? Apply.ApplyClause : null;
-        //    List<string> applySortOptions = GetApplySortOptions(apply);
+            ApplyClause apply = Apply != null ? Apply.ApplyClause : null;
+            List<string> applySortOptions = GetApplySortOptions(apply);
 
-        //    _stableOrderBy = OrderBy == null
-        //        ? GenerateDefaultOrderBy(Context, applySortOptions)
-        //        : EnsureStableSortOrderBy(OrderBy, Context, applySortOptions);
+            _stableOrderBy = OrderBy == null
+                ? GenerateDefaultOrderBy(Context, applySortOptions)
+                : EnsureStableSortOrderBy(OrderBy, Context, applySortOptions);
 
-        //    return _stableOrderBy;
-        //}
+            return _stableOrderBy;
+        }
 
-        //private static List<string> GetApplySortOptions(ApplyClause apply)
-        //{
-        //    Func<TransformationNode, bool> transformPredicate = t => t.Kind == TransformationNodeKind.Aggregate || t.Kind == TransformationNodeKind.GroupBy;
-        //    if (apply == null || !apply.Transformations.Any(transformPredicate))
-        //    {
-        //        return null;
-        //    }
+        private static List<string> GetApplySortOptions(ApplyClause apply)
+        {
+            Func<TransformationNode, bool> transformPredicate = t => t.Kind == TransformationNodeKind.Aggregate || t.Kind == TransformationNodeKind.GroupBy;
+            if (apply == null || !apply.Transformations.Any(transformPredicate))
+            {
+                return null;
+            }
 
-        //    var result = new List<string>();
-        //    var lastTransform = apply.Transformations.Last(transformPredicate);
-        //    if (lastTransform.Kind == TransformationNodeKind.Aggregate)
-        //    {
-        //        var aggregateClause = lastTransform as AggregateTransformationNode;
-        //        foreach (var expr in aggregateClause.AggregateExpressions.OfType<AggregateExpression>())
-        //        {
-        //            result.Add(expr.Alias);
-        //        }
-        //    }
-        //    else if (lastTransform.Kind == TransformationNodeKind.GroupBy)
-        //    {
-        //        var groupByClause = lastTransform as GroupByTransformationNode;
-        //        var groupingProperties = groupByClause.GroupingProperties;
-        //        ExtractGroupingProperties(result, groupingProperties);
-        //    }
+            var result = new List<string>();
+            var lastTransform = apply.Transformations.Last(transformPredicate);
+            if (lastTransform.Kind == TransformationNodeKind.Aggregate)
+            {
+                var aggregateClause = lastTransform as AggregateTransformationNode;
+                foreach (var expr in aggregateClause.AggregateExpressions.OfType<AggregateExpression>())
+                {
+                    result.Add(expr.Alias);
+                }
+            }
+            else if (lastTransform.Kind == TransformationNodeKind.GroupBy)
+            {
+                var groupByClause = lastTransform as GroupByTransformationNode;
+                var groupingProperties = groupByClause.GroupingProperties;
+                ExtractGroupingProperties(result, groupingProperties);
+            }
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        //private static void ExtractGroupingProperties(List<string> result, IEnumerable<GroupByPropertyNode> groupingProperties, string prefix = null)
-        //{
-        //    foreach (var gp in groupingProperties)
-        //    {
-        //        var fullPath = prefix != null ? prefix + "/" + gp.Name : gp.Name;
-        //        if (gp.ChildTransformations != null && gp.ChildTransformations.Any())
-        //        {
-        //            ExtractGroupingProperties(result, gp.ChildTransformations, fullPath);
-        //        }
-        //        else
-        //        {
-        //            result.Add(fullPath);
-        //        }
-        //    }
-        //}
+        private static void ExtractGroupingProperties(List<string> result, IEnumerable<GroupByPropertyNode> groupingProperties, string prefix = null)
+        {
+            foreach (var gp in groupingProperties)
+            {
+                var fullPath = prefix != null ? prefix + "/" + gp.Name : gp.Name;
+                if (gp.ChildTransformations != null && gp.ChildTransformations.Any())
+                {
+                    ExtractGroupingProperties(result, gp.ChildTransformations, fullPath);
+                }
+                else
+                {
+                    result.Add(fullPath);
+                }
+            }
+        }
 
         /// <summary>
         /// Apply the individual query to the given IQueryable in the right order.
@@ -609,25 +611,25 @@ namespace Microsoft.AspNetCore.OData.Query
         // Generates the OrderByQueryOption to use by default for $skip or $top
         // when no other $orderby is available.  It will produce a stable sort.
         // This may return a null if there are no available properties.
-        //private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryContext context, List<string> applySortOptions)
-        //{
-        //    string orderByRaw = String.Empty;
-        //    if (applySortOptions != null)
-        //    {
-        //        orderByRaw = String.Join(",", applySortOptions);
-        //        return new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
-        //    }
-        //    else
-        //    {
-        //        orderByRaw = String.Join(",",
-        //            GetAvailableOrderByProperties(context)
-        //                .Select(property => property.Name));
-        //    }
+        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryContext context, List<string> applySortOptions)
+        {
+            string orderByRaw = String.Empty;
+            if (applySortOptions != null)
+            {
+                orderByRaw = String.Join(",", applySortOptions);
+                return new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+            }
+            else
+            {
+                orderByRaw = String.Join(",",
+                    GetAvailableOrderByProperties(context)
+                        .Select(property => property.Name));
+            }
 
-        //    return String.IsNullOrEmpty(orderByRaw)
-        //            ? null
-        //            : new OrderByQueryOption(orderByRaw, context);
-        //}
+            return String.IsNullOrEmpty(orderByRaw)
+                    ? null
+                    : new OrderByQueryOption(orderByRaw, context);
+        }
 
         /// <summary>
         /// Ensures the given <see cref="OrderByQueryOption"/> will produce a stable sort.
@@ -640,56 +642,56 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="context">The <see cref="ODataQueryContext"/>.</param>
         /// <param name="applySortOptions"></param>
         /// <returns>An <see cref="OrderByQueryOption"/> that will produce a stable sort.</returns>
-        //private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryContext context, List<string> applySortOptions)
-        //{
-        //    Contract.Assert(orderBy != null);
-        //    Contract.Assert(context != null);
+        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryContext context, List<string> applySortOptions)
+        {
+            Contract.Assert(orderBy != null);
+            Contract.Assert(context != null);
 
-        //    // Strategy: create a hash of all properties already used in the given OrderBy
-        //    // and remove them from the list of properties we need to add to make the sort stable.
-        //    Func<OrderByPropertyNode, string> propertyFunc = null;
-        //    if (applySortOptions != null)
-        //    {
-        //        propertyFunc = node => node.PropertyPath;
-        //    }
-        //    else
-        //    {
-        //        propertyFunc = node => node.Property.Name;
-        //    }
+            // Strategy: create a hash of all properties already used in the given OrderBy
+            // and remove them from the list of properties we need to add to make the sort stable.
+            Func<OrderByPropertyNode, string> propertyFunc = null;
+            if (applySortOptions != null)
+            {
+                propertyFunc = node => node.PropertyPath;
+            }
+            else
+            {
+                propertyFunc = node => node.Property.Name;
+            }
 
-        //    HashSet<string> usedPropertyNames = new HashSet<string>(orderBy.OrderByNodes
-        //                                                                   .OfType<OrderByPropertyNode>().Select(propertyFunc)
-        //                                                                   .Concat(orderBy.OrderByNodes.OfType<OrderByOpenPropertyNode>().Select(p => p.PropertyName)));
+            HashSet<string> usedPropertyNames = new HashSet<string>(orderBy.OrderByNodes
+                                                                           .OfType<OrderByPropertyNode>().Select(propertyFunc)
+                                                                           .Concat(orderBy.OrderByNodes.OfType<OrderByOpenPropertyNode>().Select(p => p.PropertyName)));
 
-        //    if (applySortOptions != null)
-        //    {
-        //        var propertyPathsToAdd = applySortOptions.Where(p => !usedPropertyNames.Contains(p)).OrderBy(p => p);
-        //        if (propertyPathsToAdd.Any())
-        //        {
-        //            var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd);
-        //            orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        IEnumerable<IEdmStructuralProperty> propertiesToAdd = GetAvailableOrderByProperties(context).Where(prop => !usedPropertyNames.Contains(prop.Name));
-        //        if (propertiesToAdd.Any())
-        //        {
-        //            // The existing query options has too few properties to create a stable sort.
-        //            // Clone the given one and add the remaining properties to end, thereby making
-        //            // the sort stable but preserving the user's original intent for the major
-        //            // sort order.
-        //            orderBy = new OrderByQueryOption(orderBy);
+            if (applySortOptions != null)
+            {
+                var propertyPathsToAdd = applySortOptions.Where(p => !usedPropertyNames.Contains(p)).OrderBy(p => p);
+                if (propertyPathsToAdd.Any())
+                {
+                    var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd);
+                    orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+                }
+            }
+            else
+            {
+                IEnumerable<IEdmStructuralProperty> propertiesToAdd = GetAvailableOrderByProperties(context).Where(prop => !usedPropertyNames.Contains(prop.Name));
+                if (propertiesToAdd.Any())
+                {
+                    // The existing query options has too few properties to create a stable sort.
+                    // Clone the given one and add the remaining properties to end, thereby making
+                    // the sort stable but preserving the user's original intent for the major
+                    // sort order.
+                    orderBy = new OrderByQueryOption(orderBy);
 
-        //            foreach (IEdmStructuralProperty property in propertiesToAdd)
-        //            {
-        //                orderBy.OrderByNodes.Add(new OrderByPropertyNode(property, OrderByDirection.Ascending));
-        //            }
-        //        }
-        //    }
+                    foreach (IEdmStructuralProperty property in propertiesToAdd)
+                    {
+                        orderBy.OrderByNodes.Add(new OrderByPropertyNode(property, OrderByDirection.Ascending));
+                    }
+                }
+            }
 
-        //    return orderBy;
-        //}
+            return orderBy;
+        }
 
         internal static IQueryable LimitResults(IQueryable queryable, int limit, bool parameterize, out bool resultsLimited)
         {
@@ -786,7 +788,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
             foreach (var query in Request.Query)
             {
-               // KeyValuePair<string, string> kvp = query.
                 string key = query.Key.Trim();
                 string value = query.Value.ToString();
                 // Check supported system query options per $-sign-prefix option.
@@ -902,7 +903,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             return expandRawValue;
         }
-
+*/
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
             Justification = "Need lower case string here.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
@@ -971,7 +972,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     Context, _queryOptionParser);
             }
 
-            if (InternalRequest.IsCountRequest())
+            if (Request.IsCountRequest())
             {
                 Count = new CountQueryOption(
                     "true",
@@ -983,7 +984,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         new Dictionary<string, string> { { "$count", "true" } },
                         Context.RequestContainer));
             }
-        }*/
+        }
 
         private bool IsAvailableODataQueryOption(object queryOption, AllowedQueryOptions queryOptionFlag)
         {
@@ -1045,25 +1046,25 @@ namespace Microsoft.AspNetCore.OData.Query
                 _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
             }
 
-            //// Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
-            //// OData query parameters are normalized with the $-sign prefixes when the
-            //// <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
-            //RawValues = new ODataRawQueryOptions();
-            //IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
+            // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
+            // OData query parameters are normalized with the $-sign prefixes when the
+            // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
+            RawValues = new ODataRawQueryOptions();
+            IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
 
-            //_queryOptionParser = new ODataQueryOptionParser(
-            //    context.Model,
-            //    context.ElementType,
-            //    context.NavigationSource,
-            //    normalizedQueryParameters);
+            _queryOptionParser = new ODataQueryOptionParser(
+                context.Model,
+                context.ElementType,
+                context.NavigationSource,
+                normalizedQueryParameters);
 
-            //// Note: the context.RequestContainer must be set by the ODataQueryOptions constructor.
-            //Contract.Assert(context.RequestContainer != null);
-            //_queryOptionParser.Resolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
+            // Note: the context.RequestContainer must be set by the ODataQueryOptions constructor.
+            Contract.Assert(context.RequestContainer != null);
+            _queryOptionParser.Resolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
 
-            //BuildQueryOptions(normalizedQueryParameters);
+            BuildQueryOptions(normalizedQueryParameters);
 
-            //Validator = ODataQueryValidator.GetODataQueryValidator(context);
+            Validator = ODataQueryValidator.GetODataQueryValidator(context);
         }
     }
 }

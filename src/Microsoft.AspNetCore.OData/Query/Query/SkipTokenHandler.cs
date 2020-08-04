@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -35,6 +36,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="instance">Instance based on which SkipToken value will be generated.</param>
         /// <param name="context">Serializer context</param>
         /// <returns>URI for the NextPageLink.</returns>
-        // public abstract Uri GenerateNextPageLink(Uri baseUri, int pageSize, Object instance, ODataSerializerContext context);
+        public abstract Uri GenerateNextPageLink(Uri baseUri, int pageSize, Object instance, ODataSerializerContext context);
     }
 }

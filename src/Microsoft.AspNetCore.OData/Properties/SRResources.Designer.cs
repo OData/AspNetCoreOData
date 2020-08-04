@@ -115,6 +115,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
+        /// </summary>
+        internal static string ApplyQueryOptionNotSupportedForLinq2SQL {
+            get {
+                return ResourceManager.GetString("ApplyQueryOptionNotSupportedForLinq2SQL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The query option is not bound to any CLR type. &apos;{0}&apos; is only supported with a query option bound to a CLR type..
         /// </summary>
         internal static string ApplyToOnUntypedQueryOption {
@@ -1128,6 +1137,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SingleResultHasMoreThanOneEntity {
             get {
                 return ResourceManager.GetString("SingleResultHasMoreThanOneEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to parse the skiptoken value. Skiptoken value should always be server generated..
+        /// </summary>
+        internal static string SkipTokenParseError {
+            get {
+                return ResourceManager.GetString("SkipTokenParseError", resourceCulture);
             }
         }
         
