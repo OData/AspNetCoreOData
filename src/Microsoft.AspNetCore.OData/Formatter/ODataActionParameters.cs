@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Abstracts;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {

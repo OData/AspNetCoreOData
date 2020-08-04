@@ -709,6 +709,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The requested resource is not a collection. Query options $filter, $orderby, $count, $skip, and $top can be applied only on collections..
+        /// </summary>
+        internal static string NonSelectExpandOnSingleEntity {
+            get {
+                return ResourceManager.GetString("NonSelectExpandOnSingleEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arithmetic operator &apos;{0}&apos; is not allowed. To allow it, set the &apos;{1}&apos; property on EnableQueryAttribute or QueryValidationSettings..
         /// </summary>
         internal static string NotAllowedArithmeticOperator {
@@ -997,6 +1006,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A model is required for querying. Consider implementing the EnableQueryAttribute.GetModel method never to return a null value..
+        /// </summary>
+        internal static string QueryGetModelMustNotReturnNull {
+            get {
+                return ResourceManager.GetString("QueryGetModelMustNotReturnNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Binding OData QueryNode of kind {0} is not supported by {1}..
         /// </summary>
         internal static string QueryNodeBindingNotSupported {
@@ -1101,6 +1119,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SelectNonStructured {
             get {
                 return ResourceManager.GetString("SelectNonStructured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
+        /// </summary>
+        internal static string SingleResultHasMoreThanOneEntity {
+            get {
+                return ResourceManager.GetString("SingleResultHasMoreThanOneEntity", resourceCulture);
             }
         }
         

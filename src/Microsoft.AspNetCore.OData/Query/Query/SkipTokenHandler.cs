@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 
-namespace Microsoft.AspNetCore.OData.Query.Query
+namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// Represents how NextLink for paging is generated.

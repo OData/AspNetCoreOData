@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
@@ -49,6 +50,21 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             return request.ODataFeature().Model;
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this is a count request.
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsCountRequest(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            ODataPath path = request.ODataFeature().Path;
+            return path != null && path.LastSegment is CountSegment;
         }
 
         /// <summary>

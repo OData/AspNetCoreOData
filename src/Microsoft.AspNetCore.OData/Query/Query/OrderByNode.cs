@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Query.Query
+namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// Represents a single order by expression in the $orderby clause.

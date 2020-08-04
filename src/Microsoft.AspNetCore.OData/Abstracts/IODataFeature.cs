@@ -40,6 +40,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         IUrlHelper UrlHelper { get; set; }
 
         /// <summary>
+        /// Gets or sets the total count for the OData response.
+        /// </summary>
+        /// <value><c>null</c> if no count should be sent back to the client.</value>
+        long? TotalCount { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         IDictionary<string, object> BodyValues { get; set; }

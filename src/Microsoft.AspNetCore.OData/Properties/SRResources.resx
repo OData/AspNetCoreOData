@@ -500,4 +500,13 @@
   <data name="NavigationSourceMissingDuringSerialization" xml:space="preserve">
     <value>The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to serialize the payload.</value>
   </data>
+  <data name="NonSelectExpandOnSingleEntity" xml:space="preserve">
+    <value>The requested resource is not a collection. Query options $filter, $orderby, $count, $skip, and $top can be applied only on collections.</value>
+  </data>
+  <data name="SingleResultHasMoreThanOneEntity" xml:space="preserve">
+    <value>The action '{0}' on controller '{1}' returned a {2} containing more than one element. {2} must have zero or one elements.</value>
+  </data>
+  <data name="QueryGetModelMustNotReturnNull" xml:space="preserve">
+    <value>A model is required for querying. Consider implementing the EnableQueryAttribute.GetModel method never to return a null value.</value>
+  </data>
 </root>

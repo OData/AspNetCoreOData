@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
+using Microsoft.AspNetCore.OData.Abstracts;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {

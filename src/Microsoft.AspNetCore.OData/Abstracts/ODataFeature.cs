@@ -7,6 +7,7 @@ using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -19,11 +20,15 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         internal const string ODataServiceVersionHeader = "OData-Version";
         internal const ODataVersion DefaultODataVersion = ODataVersion.V4;
 
+        private long? _totalCount;
+        private bool _totalCountSet;
+
         /// <summary>
         /// Instantiates a new instance of the <see cref="ODataFeature"/> class.
         /// </summary>
         public ODataFeature()
         {
+            _totalCountSet = false;
         }
 
         /// <summary>
@@ -51,6 +56,40 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the Url helper.
         /// </summary>
         public IUrlHelper UrlHelper { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total count for the OData response.
+        /// </summary>
+        /// <value><c>null</c> if no count should be sent back to the client.</value>
+        public long? TotalCount
+        {
+            get
+            {
+                if (_totalCountSet)
+                {
+                    return _totalCount;
+                }
+
+                if (this.TotalCountFunc != null)
+                {
+                    _totalCount = this.TotalCountFunc();
+                    _totalCountSet = true;
+                    return _totalCount;
+                }
+
+                return null;
+            }
+            set
+            {
+                _totalCount = value;
+                _totalCountSet = value.HasValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the total count function for the OData response.
+        /// </summary>
+        public Func<long> TotalCountFunc { get; set; }
 
         /// <summary>
         /// 

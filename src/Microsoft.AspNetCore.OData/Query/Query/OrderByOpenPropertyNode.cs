@@ -4,7 +4,7 @@
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Query.Query
+namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// Represents ordering on a dynamic property

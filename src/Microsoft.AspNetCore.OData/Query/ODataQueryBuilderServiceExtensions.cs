@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -28,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Query
     /// <summary>
     /// 
     /// </summary>
-    public static class ODataQueryBuilderServiceExtentions
+    public static class ODataQueryBuilderServiceExtensions
     {
         /// <summary>
         /// 
@@ -64,6 +65,28 @@ namespace Microsoft.AspNetCore.OData.Query
             //AddODataRoutingServices(builder.Services);
             //builder.Services.Configure(setupAction);
             return builder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddODataQuery(this IServiceCollection services/*, Action<ODataRoutingOptions> setupAction*/)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            AddODataQueryServices(services);
+            // services.Configure(setupAction);
+            return services;
+        }
+
+        static void AddODataQueryServices(IServiceCollection services)
+        {
+
         }
     }
 }

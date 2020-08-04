@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Query.Query
+namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// This defines a $filter OData query option for querying.

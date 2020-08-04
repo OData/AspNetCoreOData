@@ -2,17 +2,26 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.OData;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -443,21 +452,18 @@ namespace Microsoft.AspNetCore.OData.Query
                             singleResultCollection = propInfo.GetValue(singleResult) as IQueryable;
                         }
 
-                        //// Execution the action.
-                        //object queryResult = OnActionExecuted(
-                        //    responseContent.Value,
-                        //    singleResultCollection,
-                        //    new WebApiActionDescriptor(actionDescriptor as ControllerActionDescriptor),
-                        //    new WebApiRequestMessage(request),
-                        //    (elementClrType) => GetModel(elementClrType, request, actionDescriptor),
-                        //    (queryContext) => CreateAndValidateQueryOptions(request, queryContext),
-                        //    (statusCode) => actionExecutedContext.Result = new StatusCodeResult((int)statusCode),
-                        //    (statusCode, message, exception) => actionExecutedContext.Result = CreateBadRequestResult(message, exception));
+                        // Execution the action.
+                        object queryResult = OnActionExecuted(
+                            actionExecutedContext,
+                            responseContent.Value,
+                            singleResultCollection,
+                            actionDescriptor as ControllerActionDescriptor,
+                            request);
 
-                        //if (queryResult != null)
-                        //{
-                        //    responseContent.Value = queryResult;
-                        //}
+                        if (queryResult != null)
+                        {
+                            responseContent.Value = queryResult;
+                        }
                     }
                 }
             }
@@ -469,22 +475,20 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <see cref="EnableQueryAttribute"/>. It finally applies the query appropriately, and reset it back on
         /// the response message.
         /// </summary>
+        /// <param name="actionExecutedContext">.</param>
         /// <param name="responseValue">The response content value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The internal request.</param>
-        /// <param name="modelFunction">A function to get the model.</param>
         /// <param name="createQueryOptionFunction">A function used to create and validate query options.</param>
         /// <param name="createResponseAction">An action used to create a response.</param>
         /// <param name="createErrorAction">A function used to generate error response.</param>
         private object OnActionExecuted(
+            ActionExecutedContext actionExecutedContext,
             object responseValue,
             IQueryable singleResultCollection,
-            ActionDescriptor actionDescriptor,
-            HttpRequest request,
-      //      Func<ODataQueryContext, ODataQueryOptions> createQueryOptionFunction,
-            Action<HttpStatusCode> createResponseAction,
-            Action<HttpStatusCode, string, Exception> createErrorAction)
+            ControllerActionDescriptor actionDescriptor,
+            HttpRequest request)
         {
             //if (!_querySettings.PageSize.HasValue && responseValue != null)
             //{
@@ -493,7 +497,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             //// Apply the query if there are any query options, if there is a page size set, in the case of
             //// SingleResult or in the case of $count request.
-            bool shouldApplyQuery = false;
+            bool shouldApplyQuery = true;
             // bool shouldApplyQuery = responseValue != null &&
             //    request.RequestUri != null &&
             //    (!String.IsNullOrWhiteSpace(request.RequestUri.Query) ||
@@ -508,52 +512,82 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 try
                 {
-                    object queryResult = null;
-                    //object queryResult = ExecuteQuery(responseValue, singleResultCollection, actionDescriptor, modelFunction, request, createQueryOptionFunction);
-                    //if (queryResult == null && (request.Context.Path == null || singleResultCollection != null))
-                    //{
-                    //    // This is the case in which a regular OData service uses the EnableQuery attribute.
-                    //    // For OData services ODataNullValueMessageHandler should be plugged in for the service
-                    //    // if this behavior is desired.
-                    //    // For non OData services this behavior is equivalent as the one in the v3 version in order
-                    //    // to reduce the friction when they decide to move to use the v4 EnableQueryAttribute.
-                    //    createResponseAction(HttpStatusCode.NotFound);
-                    //}
+                    object queryResult = ExecuteQuery(responseValue, singleResultCollection, actionDescriptor, request);
+                    if (queryResult == null && (request.ODataFeature().Path == null || singleResultCollection != null))
+                    {
+                        // This is the case in which a regular OData service uses the EnableQuery attribute.
+                        // For OData services ODataNullValueMessageHandler should be plugged in for the service
+                        // if this behavior is desired.
+                        // For non OData services this behavior is equivalent as the one in the v3 version in order
+                        // to reduce the friction when they decide to move to use the v4 EnableQueryAttribute.
+                        actionExecutedContext.Result = new StatusCodeResult((int)HttpStatusCode.NotFound);
+                    }
 
                     returnValue = queryResult;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
-                    createErrorAction(
-                        HttpStatusCode.BadRequest,
-                        Error.Format(SRResources.QueryParameterNotSupported, e.Message),
-                        e);
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.QueryParameterNotSupported, e.Message), e);
                 }
                 catch (NotImplementedException e)
                 {
-                    createErrorAction(
-                        HttpStatusCode.BadRequest,
-                        Error.Format(SRResources.UriQueryStringInvalid, e.Message),
-                        e);
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
                 }
                 catch (NotSupportedException e)
                 {
-                    createErrorAction(
-                        HttpStatusCode.BadRequest,
-                        Error.Format(SRResources.UriQueryStringInvalid, e.Message),
-                        e);
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
                 }
                 catch (InvalidOperationException e)
                 {
                     // Will also catch ODataException here because ODataException derives from InvalidOperationException.
-                    createErrorAction(
-                        HttpStatusCode.BadRequest,
-                        Error.Format(SRResources.UriQueryStringInvalid, e.Message),
-                        e);
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
                 }
             }
 
             return returnValue;
+        }
+
+        /// <summary>
+        /// Create a BadRequestObjectResult.
+        /// </summary>
+        /// <param name="message">The error message.</param>
+        /// <param name="exception">The exception.</param>
+        /// <returns>A BadRequestObjectResult.</returns>
+        private static BadRequestObjectResult CreateBadRequestResult(string message, Exception exception)
+        {
+            SerializableError error = CreateErrorResponse(message, exception);
+            return new BadRequestObjectResult(error);
+        }
+
+        /// <summary>
+        /// Create an error response.
+        /// </summary>
+        /// <param name="message">The message of the error.</param>
+        /// <param name="exception">The error exception if any.</param>
+        /// <returns>A SerializableError.</returns>
+        /// <remarks>This function is recursive.</remarks>
+        public static SerializableError CreateErrorResponse(string message, Exception exception = null)
+        {
+            // The key values mimic the behavior of HttpError in AspNet. It's a fine format
+            // and many of the test cases expect it.
+            SerializableError error = new SerializableError();
+            if (!String.IsNullOrEmpty(message))
+            {
+                error.Add(SerializableErrorKeys.MessageKey, message);
+            }
+
+            if (exception != null)
+            {
+                error.Add(SerializableErrorKeys.ExceptionMessageKey, exception.Message);
+                error.Add(SerializableErrorKeys.ExceptionTypeKey, exception.GetType().FullName);
+                error.Add(SerializableErrorKeys.StackTraceKey, exception.StackTrace);
+                if (exception.InnerException != null)
+                {
+                    error.Add(SerializableErrorKeys.InnerExceptionKey, CreateErrorResponse(String.Empty, exception.InnerException));
+                }
+            }
+
+            return error;
         }
 
         /// <summary>
@@ -564,6 +598,307 @@ namespace Microsoft.AspNetCore.OData.Query
         private static bool IsSuccessStatusCode(int statusCode)
         {
             return statusCode >= 200 && statusCode < 300;
+        }
+
+        /// <summary>
+        /// Execute the query.
+        /// </summary>
+        /// <param name="responseValue">The response value.</param>
+        /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <param name="modelFunction">A function to get the model.</param>
+        /// <param name="request">The internal request.</param>
+        /// <returns></returns>
+        private object ExecuteQuery(
+            object responseValue,
+            IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor,
+            HttpRequest request)
+        {
+            ODataQueryContext queryContext = GetODataQueryContext(responseValue, singleResultCollection, actionDescriptor, request);
+
+            // Create and validate the query options.
+            ODataQueryOptions queryOptions = CreateAndValidateQueryOptions(request, queryContext);
+
+            // apply the query
+            IEnumerable enumerable = responseValue as IEnumerable;
+            if (enumerable == null || responseValue is string || responseValue is byte[])
+            {
+                // response is not a collection; we only support $select and $expand on single entities.
+                ValidateSelectExpandOnly(queryOptions);
+
+                if (singleResultCollection == null)
+                {
+                    // response is a single entity.
+                    return ApplyQuery(entity: responseValue, queryOptions: queryOptions);
+                }
+                else
+                {
+                    IQueryable queryable = singleResultCollection as IQueryable;
+                    queryable = ApplyQuery(queryable, queryOptions);
+                    return SingleOrDefault(queryable, actionDescriptor);
+                }
+            }
+            else
+            {
+                // response is a collection.
+                IQueryable queryable = (enumerable as IQueryable) ?? enumerable.AsQueryable();
+                queryable = ApplyQuery(queryable, queryOptions);
+
+                if (request.IsCountRequest())
+                {
+                    long? count = request.ODataFeature().TotalCount;
+
+                    if (count.HasValue)
+                    {
+                        // Return the count value if it is a $count request.
+                        return count.Value;
+                    }
+                }
+
+                return queryable;
+            }
+        }
+
+        /// <summary>
+        /// Applies the query to the given IQueryable based on incoming query from uri and query settings. By default,
+        /// the implementation supports $top, $skip, $orderby and $filter. Override this method to perform additional
+        /// query composition of the query.
+        /// </summary>
+        /// <param name="queryable">The original queryable instance from the response message.</param>
+        /// <param name="queryOptions">
+        /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
+        /// </param>
+        public virtual IQueryable ApplyQuery(IQueryable queryable, ODataQueryOptions queryOptions)
+        {
+            if (queryable == null)
+            {
+                throw Error.ArgumentNull("queryable");
+            }
+            if (queryOptions == null)
+            {
+                throw Error.ArgumentNull("queryOptions");
+            }
+
+            return queryOptions.ApplyTo(queryable, _querySettings);
+        }
+
+        /// <summary>
+        /// Applies the query to the given entity based on incoming query from uri and query settings.
+        /// </summary>
+        /// <param name="entity">The original entity from the response message.</param>
+        /// <param name="queryOptions">
+        /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
+        /// </param>
+        /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        public virtual object ApplyQuery(object entity, ODataQueryOptions queryOptions)
+        {
+            if (entity == null)
+            {
+                throw Error.ArgumentNull("entity");
+            }
+            if (queryOptions == null)
+            {
+                throw Error.ArgumentNull("queryOptions");
+            }
+
+            return queryOptions.ApplyTo(entity, _querySettings);
+        }
+
+        /// <summary>
+        /// Create and validate a new instance of <see cref="ODataQueryOptions"/> from a query and context.
+        /// </summary>
+        /// <param name="request">The incoming request.</param>
+        /// <param name="queryContext">The query context.</param>
+        /// <returns></returns>
+        private ODataQueryOptions CreateAndValidateQueryOptions(HttpRequest request, ODataQueryContext queryContext)
+        {
+            ODataQueryOptions queryOptions = new ODataQueryOptions(queryContext, request);
+            ValidateQuery(request, queryOptions);
+
+            return queryOptions;
+        }
+
+        /// <summary>
+        /// Get a single or default value from a collection.
+        /// </summary>
+        /// <param name="queryable">The response value as <see cref="IQueryable"/>.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <returns></returns>
+        internal static object SingleOrDefault(
+            IQueryable queryable,
+            ControllerActionDescriptor actionDescriptor)
+        {
+            var enumerator = queryable.GetEnumerator();
+            try
+            {
+                var result = enumerator.MoveNext() ? enumerator.Current : null;
+
+                if (enumerator.MoveNext())
+                {
+                    throw new InvalidOperationException(Error.Format(
+                        SRResources.SingleResultHasMoreThanOneEntity,
+                        actionDescriptor.ActionName,
+                        actionDescriptor.ControllerName,
+                        "SingleResult"));
+                }
+
+                return result;
+            }
+            finally
+            {
+                // Ensure any active/open database objects that were created
+                // iterating over the IQueryable object are properly closed.
+                var disposable = enumerator as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validate the select and expand options.
+        /// </summary>
+        /// <param name="queryOptions">The query options.</param>
+        internal static void ValidateSelectExpandOnly(ODataQueryOptions queryOptions)
+        {
+            if (queryOptions.Filter != null || queryOptions.Count != null || queryOptions.OrderBy != null
+                || queryOptions.Skip != null || queryOptions.Top != null)
+            {
+                throw new ODataException(Error.Format(SRResources.NonSelectExpandOnSingleEntity));
+            }
+        }
+
+        /// <summary>
+        /// Get the ODaya query context.
+        /// </summary>
+        /// <param name="responseValue">The response value.</param>
+        /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <param name="request">The OData path.</param>
+        /// <returns></returns>
+        private ODataQueryContext GetODataQueryContext(
+            object responseValue,
+            IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor,
+            HttpRequest request)
+        {
+            Type elementClrType = GetElementType(responseValue, singleResultCollection, actionDescriptor);
+
+            IEdmModel model = GetModel(elementClrType, request, actionDescriptor);
+            if (model == null)
+            {
+                throw Error.InvalidOperation(SRResources.QueryGetModelMustNotReturnNull);
+            }
+
+            return new ODataQueryContext(model, elementClrType, request.ODataFeature().Path);
+        }
+
+        /// <summary>
+        /// Get the element type.
+        /// </summary>
+        /// <param name="responseValue">The response value.</param>
+        /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <returns></returns>
+        internal static Type GetElementType(
+            object responseValue,
+            IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor)
+        {
+            Contract.Assert(responseValue != null);
+
+            IEnumerable enumerable = responseValue as IEnumerable;
+            if (enumerable == null)
+            {
+                if (singleResultCollection == null)
+                {
+                    return responseValue.GetType();
+                }
+
+                enumerable = singleResultCollection as IEnumerable;
+            }
+
+            Type elementClrType = TypeHelper.GetImplementedIEnumerableType(enumerable.GetType());
+            if (elementClrType == null)
+            {
+                // The element type cannot be determined because the type of the content
+                // is not IEnumerable<T> or IQueryable<T>.
+                throw Error.InvalidOperation(
+                    SRResources.FailedToRetrieveTypeToBuildEdmModel,
+                    typeof(EnableQueryAttribute).Name,
+                    actionDescriptor.ActionName,
+                    actionDescriptor.ControllerName,
+                    responseValue.GetType().FullName);
+            }
+
+            return elementClrType;
+        }
+
+        /// <summary>
+        /// Validates the OData query in the incoming request. By default, the implementation throws an exception if
+        /// the query contains unsupported query parameters. Override this method to perform additional validation of
+        /// the query.
+        /// </summary>
+        /// <param name="request">The incoming request.</param>
+        /// <param name="queryOptions">
+        /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
+        /// </param>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "Response disposed after being sent.")]
+        public virtual void ValidateQuery(HttpRequest request, ODataQueryOptions queryOptions)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull("request");
+            }
+
+            if (queryOptions == null)
+            {
+                throw Error.ArgumentNull("queryOptions");
+            }
+
+            IQueryCollection queryParameters = request.Query;
+            foreach (var kvp in queryParameters)
+            {
+                if (!queryOptions.IsSupportedQueryOption(kvp.Key) &&
+                     kvp.Key.StartsWith("$", StringComparison.Ordinal))
+                {
+                    // we don't support any custom query options that start with $
+                    // this should be caught be OnActionExecuted().
+                    throw new ArgumentOutOfRangeException(kvp.Key);
+                }
+            }
+
+            queryOptions.Validate(_validationSettings);
+        }
+
+        /// <summary>
+        /// Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
+        /// querying.
+        /// </summary>
+        /// <param name = "elementClrType" > The CLR type to retrieve a model for.</param>
+        /// <param name = "request" > The request message to retrieve a model for.</param>
+        /// <param name = "actionDescriptor" > The action descriptor for the action being queried on.</param>
+        /// <returns>The EDM model for the given type and request.</returns>
+        public virtual IEdmModel GetModel(
+            Type elementClrType,
+            HttpRequest request,
+            ActionDescriptor actionDescriptor)
+        {
+            // Get model for the request
+            IEdmModel model = request.GetModel();
+
+            if (model == EdmCoreModel.Instance || model.GetEdmType(elementClrType) == null)
+            {
+                // user has not configured anything or has registered a model without the element type
+                // let's create one just for this type and cache it in the action descriptor
+                model = actionDescriptor.GetEdmModel(request, elementClrType);
+            }
+
+            Contract.Assert(model != null);
+            return model;
         }
     }
 }

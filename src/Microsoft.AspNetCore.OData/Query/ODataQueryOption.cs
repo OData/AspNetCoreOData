@@ -89,10 +89,40 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         public ODataQueryContext Context { get; private set; }
 
+        ///// <summary>
+        ///// Gets the raw string of all the OData query options
+        ///// </summary>
+        //public ODataRawQueryOptions RawValues { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="SelectExpandQueryOption"/>.
+        /// </summary>
+        public SelectExpandQueryOption SelectExpand { get; private set; }
+
+        ///// <summary>
+        ///// Gets the <see cref="ApplyQueryOption"/>.
+        ///// </summary>
+        //public ApplyQueryOption Apply { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="FilterQueryOption"/>.
+        /// </summary>
+        public FilterQueryOption Filter { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="OrderByQueryOption"/>.
+        /// </summary>
+        public OrderByQueryOption OrderBy { get; private set; }
+
         /// <summary>
         /// Gets the <see cref="SkipQueryOption"/>.
         /// </summary>
         public SkipQueryOption Skip { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="SkipTokenQueryOption"/>.
+        /// </summary>
+        public SkipTokenQueryOption SkipToken { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="TopQueryOption"/>.
