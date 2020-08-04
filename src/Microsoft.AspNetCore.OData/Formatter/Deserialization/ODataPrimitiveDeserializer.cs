@@ -26,7 +26,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw Error.ArgumentNull("messageReader");
+                throw new ArgumentNullException(nameof(messageReader));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             IEdmTypeReference edmType = readContext.GetEdmType(type);

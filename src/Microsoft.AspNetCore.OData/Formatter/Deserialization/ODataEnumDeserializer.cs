@@ -55,6 +55,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return null;
             }
 
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
+            }
+
             ODataProperty property = item as ODataProperty;
             if (property != null)
             {

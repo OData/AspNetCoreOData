@@ -8,7 +8,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
@@ -17,8 +16,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     internal static class CollectionDeserializationHelpers
     {
-        private static readonly Type[] _emptyTypeArray = new Type[0];
-        private static readonly object[] _emptyObjectArray = new object[0];
+        private static readonly Type[] _emptyTypeArray = Array.Empty<Type>();
+        private static readonly object[] _emptyObjectArray = Array.Empty<object>();
         private static readonly MethodInfo _toArrayMethodInfo = typeof(Enumerable).GetMethod("ToArray");
 
         public static void AddToCollection(this IEnumerable items, IEnumerable collection, Type elementType,

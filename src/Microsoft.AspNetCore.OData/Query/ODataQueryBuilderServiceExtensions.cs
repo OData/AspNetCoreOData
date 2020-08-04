@@ -35,7 +35,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// 
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="model"></param>
         /// <returns></returns>
         public static IODataBuilder AddODataQuery(this IODataBuilder builder)
         {

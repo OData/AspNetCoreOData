@@ -64,6 +64,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             IEdmModel model = context.Model;
             RouteValueDictionary routeValues = context.RouteValues;
             // TODO: process the parameter alias

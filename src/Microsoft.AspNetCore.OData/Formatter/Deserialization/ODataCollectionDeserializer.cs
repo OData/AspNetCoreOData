@@ -38,6 +38,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull("messageReader");
             }
 
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
+            }
+
             IEdmTypeReference edmType = readContext.GetEdmType(type);
             Contract.Assert(edmType != null);
 
@@ -62,7 +67,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (edmType == null)
             {
-                throw Error.ArgumentNull("edmType");
+                throw new ArgumentNullException(nameof(edmType));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             if (!edmType.IsCollection())

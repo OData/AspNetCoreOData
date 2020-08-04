@@ -134,6 +134,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var routeValue = context.RouteValues;
             // TODO: process the parameter alias
             int skip = Function.IsBound ? 1 : 0;

@@ -97,8 +97,8 @@ namespace Microsoft.AspNetCore.OData.Query
                             // But it could be a SingleResult() or SingleResult<T>. Sort by number of parameters
                             // on the property and get the one with the most parameters.
                             PropertyInfo propInfo = responseContent.Value.GetType().GetProperties()
-                                .OrderBy(p => p.GetIndexParameters().Count())
-                                .Where(p => p.Name.Equals("Queryable"))
+                                .OrderBy(p => p.GetIndexParameters().Length)
+                                .Where(p => p.Name.Equals("Queryable", StringComparison.Ordinal))
                                 .LastOrDefault();
 
                             singleResultCollection = propInfo.GetValue(singleResult) as IQueryable;
@@ -132,9 +132,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The internal request.</param>
-        /// <param name="createQueryOptionFunction">A function used to create and validate query options.</param>
-        /// <param name="createResponseAction">An action used to create a response.</param>
-        /// <param name="createErrorAction">A function used to generate error response.</param>
         private object OnActionExecuted(
             ActionExecutedContext actionExecutedContext,
             object responseValue,
@@ -258,7 +255,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="responseValue">The response value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-        /// <param name="modelFunction">A function to get the model.</param>
         /// <param name="request">The internal request.</param>
         /// <returns></returns>
         private object ExecuteQuery(

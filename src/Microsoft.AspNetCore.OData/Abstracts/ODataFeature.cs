@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Net;
 using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -90,6 +91,16 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the total count function for the OData response.
         /// </summary>
         public Func<long> TotalCountFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.
+        /// </summary>
+        public SelectExpandClause SelectExpandClause { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parsed <see cref="ODataQueryOptions"/> of the request.
+        /// </summary>
+        internal ODataQueryOptions QueryOptions { get; set; }
 
         /// <summary>
         /// 

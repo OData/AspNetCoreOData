@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             }
             var dictionary1 = this.Values;
             var dictionary2 = compareWith.Values;
-            return dictionary1.Count() == dictionary2.Count() && !dictionary1.Except(dictionary2).Any();
+            return dictionary1.Count == dictionary2.Count && !dictionary1.Except(dictionary2).Any();
         }
 
         /// <inheritdoc />

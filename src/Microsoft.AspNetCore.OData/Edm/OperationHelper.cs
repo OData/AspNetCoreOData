@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return null;
             }
 
-            bool hasParameters = parameterNames.Count() > 0;
+            bool hasParameters = parameterNames.Count > 0;
             if (hasParameters)
             {
                 candidates = candidates.Where(o => o.IsFunction()).FilterOperationsByParameterNames(parameterNames, true); // remove actions

@@ -161,6 +161,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             RouteValueDictionary routeValues = context.RouteValues;
             IDictionary<string, object> keysValues = new Dictionary<string, object>();
             foreach (var key in _keyMappings)

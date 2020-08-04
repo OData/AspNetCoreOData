@@ -10,19 +10,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
     public class TestODataController : ControllerBase
     {
         [NonAction]
-        public new TestOkResult Ok() { return new TestOkResult(base.Ok()); }
+        public new TestOkResult Ok() => new TestOkResult(base.Ok());
 
         [NonAction]
-        public new TestOkObjectResult Ok(object value) { return new TestOkObjectResult(value); }
+        public new TestOkObjectResult Ok(object value) => new TestOkObjectResult(value);
 
         [NonAction]
-        public TestCreatedODataResult<T> Created<T>(T entity) { return new TestCreatedODataResult<T>(entity); }
+        public TestCreatedODataResult<T> Created<T>(T entity) => new TestCreatedODataResult<T>(entity);
 
         [NonAction]
-        public TestCreatedResult Created(string uri, object entity) { return new TestCreatedResult(base.Created(uri, entity)); }
+        public new TestCreatedResult Created(string uri, object entity) => new TestCreatedResult(base.Created(uri, entity));
 
         [NonAction]
-        public TestUpdatedODataResult<T> Updated<T>(T entity) { return new TestUpdatedODataResult<T>(entity); }
+        public TestUpdatedODataResult<T> Updated<T>(T entity) => new TestUpdatedODataResult<T>(entity);
     }
 
     /// <summary>

@@ -46,6 +46,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         long? TotalCount { get; set; }
 
         /// <summary>
+        /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.
+        /// </summary>
+        SelectExpandClause SelectExpandClause { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         IDictionary<string, object> BodyValues { get; set; }

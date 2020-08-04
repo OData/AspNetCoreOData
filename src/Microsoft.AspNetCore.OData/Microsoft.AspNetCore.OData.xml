@@ -116,6 +116,11 @@
             </summary>
             <value><c>null</c> if no count should be sent back to the client.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause">
+            <summary>
+            Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause"/> of the request.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
             <summary>
             
@@ -209,6 +214,16 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCountFunc">
             <summary>
             Gets or sets the total count function for the OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause">
+            <summary>
+            Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause"/> of the request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.QueryOptions">
+            <summary>
+            Gets or sets the parsed <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> of the request.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BodyValues">
@@ -536,6 +551,79 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions">
+            <summary>
+            Represents a queryable restriction on an EDM property, including not filterable, not sortable,
+            not navigable, not expandable, not countable, automatically expand.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NotFilterable">
+            <summary>
+            Gets or sets whether the property is not filterable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NonFilterable">
+            <summary>
+            Gets or sets whether the property is nonfilterable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NotSortable">
+            <summary>
+            Gets or sets whether the property is not sortable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.Unsortable">
+            <summary>
+            Gets or sets whether the property is unsortable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NotNavigable">
+            <summary>
+            Gets or sets whether the property is not navigable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NotExpandable">
+            <summary>
+            Gets or sets whether the property is not expandable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.NotCountable">
+            <summary>
+            Gets or sets whether the property is not countable. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.AutoExpand">
+            <summary>
+            Gets or sets whether the property is automatically expanded. default is false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions.DisableAutoExpandWhenSelectIsPresent">
+            <summary>
+            If set to <c>true</c> then automatic expand will be disabled if there is a $select specify by client.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictionsAnnotation">
+            <summary>
+            Represents an annotation to add the queryable restrictions on an EDM property, including not filterable, 
+            not sortable, not navigable, not expandable, not countable, automatically expand.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictionsAnnotation.#ctor(Microsoft.AspNetCore.OData.Annotations.QueryableRestrictions)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictionsAnnotation"/> class.
+            </summary>
+            <param name="restrictions">The queryable restrictions for the EDM property.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Annotations.QueryableRestrictionsAnnotation.Restrictions">
+            <summary>
+            Gets the restrictions for the EDM property.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.CollectionExtensions">
             <summary>
@@ -5215,6 +5303,41 @@
             could throw exceptions at runtime.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ExpandConfiguration">
+            <summary>
+            Represents a configuration of an expandable property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ExpandConfiguration.ExpandType">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandType"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ExpandConfiguration.MaxDepth">
+            <summary>
+            Gets or sets the maximum depth.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.SelectExpandType">
+            <summary>
+            Represents the type of expand and select.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Allowed">
+            <summary>
+            Allowed to be expanded and selected.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Automatic">
+            <summary>
+            Automatic expanded and selected.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Disabled">
+            <summary>
+            Disallowed to be expanded and selected.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer">
             <summary>
             Reperesent properties used in groupby and aggregate clauses to make them accessiable in further clauses/transformations
@@ -6425,6 +6548,122 @@
             </param>
             <returns>An <see cref="T:System.Collections.Generic.IDictionary`2"/> representing the $select and $expand result.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ITruncatedCollection">
+            <summary>
+            Represents a collection that is truncated to a given page size.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ITruncatedCollection.PageSize">
+            <summary>
+            Gets the page size the collection is truncated to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ITruncatedCollection.IsTruncated">
+            <summary>
+            Gets a value representing if the collection is truncated or not.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings">
+            <summary>
+            This class describes the model bound settings to use during query composition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.#ctor">
+            <summary>
+            Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings"/> class
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.#ctor(Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings)">
+            <summary>
+            Copy and create new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings"/> class 
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+            <value>
+            The max value of $top that a client can request, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.PageSize">
+            <summary>
+            Gets or sets the maximum number of query results to return.
+            </summary>
+            <value>
+            The maximum number of query results to return, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.Countable">
+            <summary>
+            Represents the $count can be applied or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.ExpandConfigurations">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ExpandConfiguration"/>s of navigation properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultExpandType">
+            <summary>
+            Gets or sets the default <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandType"/> of navigation properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultMaxDepth">
+            <summary>
+            Gets or sets the default maxDepth of navigation properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableOrderBy">
+            <summary>
+            Gets or sets whether the properties can apply $orderby by default.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableFilter">
+            <summary>
+            Gets or sets whether the properties can apply $filter by default.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultSelectType">
+            <summary>
+            Gets or sets whether the properties can apply $select by default.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.OrderByConfigurations">
+            <summary>
+            Gets the $orderby configuration of properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.FilterConfigurations">
+            <summary>
+            Gets the $filter configuration of properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.SelectConfigurations">
+            <summary>
+            Gets the $select configuration of properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopyExpandConfigurations(System.Collections.Generic.Dictionary{System.String,Microsoft.AspNetCore.OData.Query.ExpandConfiguration})">
+            <summary>
+            Copy the <see cref="T:Microsoft.AspNetCore.OData.Query.ExpandConfiguration"/>s of navigation properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopyOrderByConfigurations(System.Collections.Generic.Dictionary{System.String,System.Boolean})">
+            <summary>
+            Copy the $orderby configuration of properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopySelectConfigurations(System.Collections.Generic.Dictionary{System.String,Microsoft.AspNetCore.OData.Query.SelectExpandType})">
+            <summary>
+            Copy the $select configuration of properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopyFilterConfigurations(System.Collections.Generic.Dictionary{System.String,System.Boolean})">
+            <summary>
+            Copy the $filter configuration of properties.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ModelContainer">
             <summary>
             EntityFramework does not let you inject non primitive constant values (like IEdmModel) in Select queries. Primitives like strings and guids can be
@@ -6729,7 +6968,17 @@
             <param name="applySortOptions"></param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> that will produce a stable sort.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.AddAutoSelectExpandProperties">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Boolean@)">
+            <summary>
+            Limits the query results to a maximum number of results.
+            </summary>
+            <typeparam name="T">The entity CLR type</typeparam>
+            <param name="queryable">The queryable to limit.</param>
+            <param name="limit">The query result limit.</param>
+            <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
+            <returns>The limited query results.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Boolean,System.Boolean@)">
             <summary>
             Limits the query results to a maximum number of results.
             </summary>
@@ -7834,6 +8083,68 @@
             <param name="expandPath">The input $expand path.</param>
             <param name="remainingSegments">The remaining segments after the first non type segment.</param>
             <returns>First non-type cast segment.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1">
+            <summary>
+            Represents a class that truncates a collection to a given page size.
+            </summary>
+            <typeparam name="T">The collection element type.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
+            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.PageSize">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.IsTruncated">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.TruncatedCollection`1.TotalCount">
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator">
             <summary>

@@ -399,7 +399,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             return typeof(Queryable).GetMethods()
                 .Where(m => m.Name == methodName)
-                .Where(m => m.GetParameters().Count() == 2)
+                .Where(m => m.GetParameters().Length == 2)
                 .ToDictionary(m => m.ReturnType);
         }
 
@@ -411,7 +411,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             return typeof(Enumerable).GetMethods()
                 .Where(m => m.Name == methodName)
-                .Where(m => m.GetParameters().Count() == 2)
+                .Where(m => m.GetParameters().Length == 2)
                 .ToDictionary(m => m.ReturnType);
         }
 

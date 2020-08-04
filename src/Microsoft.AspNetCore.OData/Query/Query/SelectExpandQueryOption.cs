@@ -545,7 +545,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             List<SelectItem> autoExpandItems = new List<SelectItem>(originAutoExpandItems);
-            bool hasAutoSelectExpandInExpand = (originAutoSelectItems.Count() + originAutoExpandItems.Count() != 0);
+            bool hasAutoSelectExpandInExpand = (originAutoSelectItems.Count + originAutoExpandItems.Count != 0);
             bool allSelected = originAutoSelectItems.Count == 0 && selectExpandClause.AllSelected;
 
             while (level > 0)
@@ -556,7 +556,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     if (hasAutoSelectExpandInExpand)
                     {
                         currentSelectExpandClause = new SelectExpandClause(
-                            new SelectItem[] { }.Concat(selectExpandClause.SelectedItems)
+                            Array.Empty<SelectItem>().Concat(selectExpandClause.SelectedItems)
                                 .Concat(originAutoSelectItems).Concat(autoExpandItems),
                             allSelected);
                     }
@@ -582,7 +582,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     // Keep default SelectItems before expanded item to keep consistent with normal SelectExpandClause
                     SelectItem[] items = new SelectItem[] { item, pathSelectItem };
                     currentSelectExpandClause = new SelectExpandClause(
-                        new SelectItem[] { }.Concat(selectExpandClause.SelectedItems)
+                        Array.Empty<SelectItem>().Concat(selectExpandClause.SelectedItems)
                             .Concat(items)
                             .Concat(originAutoSelectItems).Concat(autoExpandItems),
                         allSelected);

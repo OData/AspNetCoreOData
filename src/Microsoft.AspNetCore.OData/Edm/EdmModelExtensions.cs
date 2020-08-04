@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             IEdmType bindingType, bool enableCaseInsensitive = false)
         {
             IEnumerable<IEdmOperation> results;
-            if (identifier.Contains("."))
+            if (identifier.Contains(".", StringComparison.Ordinal))
             {
                 results = FindAcrossModels<IEdmOperation>(model, identifier, true, enableCaseInsensitive);
             }
@@ -120,10 +120,10 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             var operations = results?.ToList();
-            if (operations != null && operations.Count() > 0)
+            if (operations != null && operations.Any())
             {
                 IList<IEdmOperation> matchedOperation = new List<IEdmOperation>();
-                for (int i = 0; i < operations.Count(); i++)
+                for (int i = 0; i < operations.Count; i++)
                 {
                     if (operations[i].HasEquivalentBindingType(bindingType))
                     {
