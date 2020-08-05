@@ -1502,14 +1502,13 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider"/> class.
             </summary>
-            <param name="rootContainer">The root container.</param>
+            <param name="serviceProvider">The service provider.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc />
-            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer">
             <summary>
@@ -1628,7 +1627,6 @@
             <param name="type">The CLR type.</param>
             <param name="request">The request being deserialized.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
-            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
@@ -2407,36 +2405,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetODataPayloadSerializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer">
-            <summary>
-            An ODataSerializer is used to write a CLR object to an ODataMessage.
-            </summary>
-            <remarks>
-            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
-            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
-            Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.#ctor(Microsoft.OData.ODataPayloadKind)">
-            <summary>
-            Constructs an ODataSerializer that can generate OData payload of the specified kind.
-            </summary>
-            <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind">
-            <summary>
-            Gets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind"/> that this serializer generates.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Writes the given object specified by the parameter graph as a whole using the given messageWriter and writeContext.
-            </summary>
-            <param name="graph">The object to be written</param>
-            <param name="type">The type of the object to be written.</param>
-            <param name="messageWriter">The <see cref="T:Microsoft.OData.ODataMessageWriter"/> to be used for writing.</param>
-            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer">
             <summary>
             ODataSerializer for serializing collection of primitive or enum types.
@@ -2776,6 +2744,36 @@
             <param name="resourceSetContext">The context for the resourceSet instance being written.</param>
             <param name="writeContext">The serializer context.</param>
             <returns>The created operation or null if the operation should not be written.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer">
+            <summary>
+            An ODataSerializer is used to write a CLR object to an ODataMessage.
+            </summary>
+            <remarks>
+            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.#ctor(Microsoft.OData.ODataPayloadKind)">
+            <summary>
+            Constructs an ODataSerializer that can generate OData payload of the specified kind.
+            </summary>
+            <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind">
+            <summary>
+            Gets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind"/> that this serializer generates.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Writes the given object specified by the parameter graph as a whole using the given messageWriter and writeContext.
+            </summary>
+            <param name="graph">The object to be written</param>
+            <param name="type">The type of the object to be written.</param>
+            <param name="messageWriter">The <see cref="T:Microsoft.OData.ODataMessageWriter"/> to be used for writing.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext">
             <summary>

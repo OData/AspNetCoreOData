@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -15,20 +16,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     /// </summary>
     public class DefaultODataDeserializerProvider : ODataDeserializerProvider
     {
-        private readonly IServiceProvider _rootContainer;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultODataDeserializerProvider"/> class.
         /// </summary>
-        /// <param name="rootContainer">The root container.</param>
-        public DefaultODataDeserializerProvider(IServiceProvider rootContainer)
+        /// <param name="serviceProvider">The service provider.</param>
+        public DefaultODataDeserializerProvider(IServiceProvider serviceProvider)
         {
-            if (rootContainer == null)
-            {
-                throw Error.ArgumentNull("rootContainer");
-            }
-
-            _rootContainer = rootContainer;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         /// <inheritdoc />
@@ -36,30 +32,30 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (edmType == null)
             {
-                throw Error.ArgumentNull("edmType");
+                throw new ArgumentNullException(nameof(edmType));
             }
 
             switch (edmType.TypeKind())
             {
                 case EdmTypeKind.Entity:
                 case EdmTypeKind.Complex:
-                    return _rootContainer.GetRequiredService<ODataResourceDeserializer>();
+                    return _serviceProvider.GetRequiredService<ODataResourceDeserializer>();
 
                 case EdmTypeKind.Enum:
-                    return _rootContainer.GetRequiredService<ODataEnumDeserializer>();
+                    return _serviceProvider.GetRequiredService<ODataEnumDeserializer>();
 
                 case EdmTypeKind.Primitive:
-                    return _rootContainer.GetRequiredService<ODataPrimitiveDeserializer>();
+                    return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
 
                 case EdmTypeKind.Collection:
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
                     if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
                     {
-                        return _rootContainer.GetRequiredService<ODataResourceSetDeserializer>();
+                        return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
                     }
                     else
                     {
-                        return _rootContainer.GetRequiredService<ODataCollectionDeserializer>();
+                        return _serviceProvider.GetRequiredService<ODataCollectionDeserializer>();
                     }
 
                 default:
@@ -68,34 +64,34 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         public override ODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
         {
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw new ArgumentNullException(nameof(type));
             }
 
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (type == typeof(Uri))
             {
-                return _rootContainer.GetRequiredService<ODataEntityReferenceLinkDeserializer>();
+                return _serviceProvider.GetRequiredService<ODataEntityReferenceLinkDeserializer>();
             }
 
             if (type == typeof(ODataActionParameters) || type == typeof(ODataUntypedActionParameters))
             {
-                return _rootContainer.GetRequiredService<ODataActionPayloadDeserializer>();
+                return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
             }
 
-            // Get the model. Using a Func<IEdmModel> to delay evaluation of the model
-            // until after the above checks have passed.
             IEdmModel model = request.GetModel();
-            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
+            IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
+
+            // ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
+            // IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
+            IEdmTypeReference edmType = typeMappingProvider.GetEdmType(model, type);
 
             if (edmType == null)
             {

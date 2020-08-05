@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     /// </summary>
     public class DefaultODataSerializerProvider : ODataSerializerProvider
     {
-        private readonly IServiceProvider _rootContainer;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultODataSerializerProvider"/> class.
@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="serviceProvider">The root container.</param>
         public DefaultODataSerializerProvider(IServiceProvider serviceProvider)
         {
-            _rootContainer = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         /// <inheritdoc />
@@ -36,16 +36,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (edmType == null)
             {
-                throw Error.ArgumentNull("edmType");
+                throw new ArgumentNullException(nameof(edmType));
             }
 
             switch (edmType.TypeKind())
             {
                 case EdmTypeKind.Enum:
-                    return _rootContainer.GetRequiredService<ODataEnumSerializer>();
+                    return _serviceProvider.GetRequiredService<ODataEnumSerializer>();
 
                 case EdmTypeKind.Primitive:
-                    return _rootContainer.GetRequiredService<ODataPrimitiveSerializer>();
+                    return _serviceProvider.GetRequiredService<ODataPrimitiveSerializer>();
 
                 case EdmTypeKind.Collection:
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
@@ -56,16 +56,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
                     else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
                     {
-                        return _rootContainer.GetRequiredService<ODataResourceSetSerializer>();
+                        return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
                     }
                     else
                     {
-                        return _rootContainer.GetRequiredService<ODataCollectionSerializer>();
+                        return _serviceProvider.GetRequiredService<ODataCollectionSerializer>();
                     }
 
                 case EdmTypeKind.Complex:
                 case EdmTypeKind.Entity:
-                    return _rootContainer.GetRequiredService<ODataResourceSerializer>();
+                    return _serviceProvider.GetRequiredService<ODataResourceSerializer>();
 
                 default:
                     return null;
@@ -77,12 +77,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw new ArgumentNullException(nameof(type));
             }
 
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             ODataPath path = request.ODataFeature().Path;
@@ -91,27 +91,25 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // handle the special types.
             if (type == typeof(ODataServiceDocument))
             {
-                return _rootContainer.GetRequiredService<ODataServiceDocumentSerializer>();
+                return _serviceProvider.GetRequiredService<ODataServiceDocumentSerializer>();
             }
             else if (type == typeof(Uri) || type == typeof(ODataEntityReferenceLink))
             {
-                return _rootContainer.GetRequiredService<ODataEntityReferenceLinkSerializer>();
+                return _serviceProvider.GetRequiredService<ODataEntityReferenceLinkSerializer>();
             }
             else if (TypeHelper.IsTypeAssignableFrom(typeof(IEnumerable<Uri>), type) || type == typeof(ODataEntityReferenceLinks))
             {
-                return _rootContainer.GetRequiredService<ODataEntityReferenceLinksSerializer>();
+                return _serviceProvider.GetRequiredService<ODataEntityReferenceLinksSerializer>();
             }
             else if (type == typeof(ODataError) || type == errorType)
             {
-                return _rootContainer.GetRequiredService<ODataErrorSerializer>();
+                return _serviceProvider.GetRequiredService<ODataErrorSerializer>();
             }
             else if (TypeHelper.IsTypeAssignableFrom(typeof(IEdmModel), type))
             {
-                return _rootContainer.GetRequiredService<ODataMetadataSerializer>();
+                return _serviceProvider.GetRequiredService<ODataMetadataSerializer>();
             }
 
-            // Get the model. Using a Func<IEdmModel> to delay evaluation of the model
-            // until after the above checks have passed.
             IEdmModel model = request.GetModel();
 
             // if it is not a special type, assume it has a corresponding EdmType.
@@ -125,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 if (((edmType.IsPrimitive() || edmType.IsEnum()) && isRawValueRequest) || isCountRequest)
                 {
-                    return _rootContainer.GetRequiredService<ODataRawValueSerializer>();
+                    return _serviceProvider.GetRequiredService<ODataRawValueSerializer>();
                 }
                 else
                 {
