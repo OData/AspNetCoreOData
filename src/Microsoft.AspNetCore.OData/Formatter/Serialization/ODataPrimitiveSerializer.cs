@@ -28,12 +28,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw new ArgumentNullException(nameof(messageWriter));
             }
+
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw new ArgumentNullException(nameof(writeContext));
             }
+
             if (writeContext.RootElementName == null)
             {
                 throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
@@ -72,7 +74,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public virtual ODataPrimitiveValue CreateODataPrimitiveValue(object graph, IEdmPrimitiveTypeReference primitiveType,
             ODataSerializerContext writeContext)
         {
-            // TODO: Bug 467598: validate the type of the object being passed in here with the underlying primitive type. 
             return CreatePrimitive(graph, primitiveType, writeContext);
         }
 

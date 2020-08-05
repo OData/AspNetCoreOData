@@ -22,7 +22,7 @@
         </member>
         <member name="T:Microsoft.OData.Abstractions.IAssemblyResolver">
             <summary>
-            
+            Provides an abstraction for managing the assemblies of an application.
             </summary>
         </member>
         <member name="P:Microsoft.OData.Abstractions.IAssemblyResolver.Assemblies">
