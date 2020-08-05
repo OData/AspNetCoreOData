@@ -19,22 +19,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             : base(item)
         {
             Resources = new List<ODataResourceWrapper>();
+            ResourceSet = item;
         }
 
         /// <summary>
         /// Gets the wrapped <see cref="ODataResourceSet"/>.
         /// </summary>
-        public ODataResourceSet ResourceSet
-        {
-            get
-            {
-                return Item as ODataResourceSet;
-            }
-        }
+        public ODataResourceSet ResourceSet { get; }
 
         /// <summary>
         /// Gets the nested resources of this ResourceSet.
         /// </summary>
-        public IList<ODataResourceWrapper> Resources { get; private set; }
+        public IList<ODataResourceWrapper> Resources { get; }
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.OData;
@@ -21,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         {
             if (reader == null)
             {
-                throw Error.ArgumentNull("reader");
+                throw new ArgumentNullException(nameof(reader));
             }
 
             ODataItemBase topLevelItem = null;

@@ -23,22 +23,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             : base(item)
         {
             NestedItems = new List<ODataItemBase>();
+            NestedResourceInfo = item;
         }
 
         /// <summary>
         /// Gets the wrapped <see cref="ODataNestedResourceInfo"/>.
         /// </summary>
-        public ODataNestedResourceInfo NestedResourceInfo
-        {
-            get
-            {
-                return Item as ODataNestedResourceInfo;
-            }
-        }
+        public ODataNestedResourceInfo NestedResourceInfo { get; }
 
         /// <summary>
         /// Gets the nested items that are part of this nested resource info.
         /// </summary>
-        public IList<ODataItemBase> NestedItems { get; private set; }
+        public IList<ODataItemBase> NestedItems { get; }
     }
 }

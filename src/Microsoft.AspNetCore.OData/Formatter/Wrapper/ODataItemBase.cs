@@ -10,26 +10,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
     /// </summary>
     public abstract class ODataItemBase
     {
-        private ODataItem _item;
-
         /// <summary>
         /// Initializes a new instance of <see cref="ODataItemBase"/>.
         /// </summary>
         /// <param name="item">The wrapped item.</param>
         protected ODataItemBase(ODataItem item)
         {
-            _item = item;
+            Item = item;
         }
 
         /// <summary>
         /// Gets the wrapped <see cref="ODataItem"/>.
         /// </summary>
-        public ODataItem Item
-        {
-            get
-            {
-                return _item;
-            }
-        }
+        public ODataItem Item { get; }
     }
 }
