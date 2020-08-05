@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.OData.Abstractions\Microsoft.OData.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.OData.ModelBuilder\Microsoft.OData.ModelBuilder.csproj" />
   </ItemGroup>
 
 </Project>

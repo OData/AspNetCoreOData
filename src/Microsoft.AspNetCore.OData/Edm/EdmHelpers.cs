@@ -8,11 +8,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Annotations;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.OData.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.Spatial;
 
@@ -512,7 +512,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             return autoSelectProperties;
         }
-
 
         private static IEnumerable<Type> GetMatchingTypes(string edmFullName, IAssemblyResolver assembliesResolver)
         {

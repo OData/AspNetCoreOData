@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.1-beta" />
+    <!--<PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.1-beta" />-->
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Abstracts
+namespace Microsoft.OData.Abstractions
 {
     /// <summary>
     /// 

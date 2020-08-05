@@ -13,6 +13,7 @@ using Microsoft.OData.Edm;
 using Microsoft.Spatial;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.OData.Abstractions;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {

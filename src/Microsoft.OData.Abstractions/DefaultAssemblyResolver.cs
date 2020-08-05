@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Abstracts
+namespace Microsoft.OData.Abstractions
 {
     /// <summary>
     /// 
@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// This static instance is used in the shared code in places where the request container context
         /// is not known or does not contain an instance of IWebApiAssembliesResolver.
         /// </summary>
-        public static IAssemblyResolver Default => defaultAssemblyResolver;
+        public static IAssemblyResolver Default = defaultAssemblyResolver;
 
         /// <summary>
         /// 

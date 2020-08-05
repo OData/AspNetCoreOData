@@ -6,6 +6,7 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
@@ -48,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
             else
             {
-                Microsoft.OData.ModelBuilder.IAssemblyResolver resolver = request.HttpContext.RequestServices.GetService<Microsoft.OData.ModelBuilder.IAssemblyResolver>() as Microsoft.OData.ModelBuilder.IAssemblyResolver;
+                IAssemblyResolver resolver = request.HttpContext.RequestServices.GetService<IAssemblyResolver>();
                 ODataConventionModelBuilder builder;
                 if (resolver != null)
                 {

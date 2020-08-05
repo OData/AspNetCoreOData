@@ -4,22 +4,6 @@
         <name>Microsoft.AspNetCore.OData</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Default">
-            <summary>
-            This static instance is used in the shared code in places where the request container context
-            is not known or does not contain an instance of IWebApiAssembliesResolver.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Assemblies">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -38,17 +22,6 @@
             <summary>
             Gets the services collection.
             </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver.Assemblies">
-            <summary>
-            Gets a list of assemblies available for the application.
-            </summary>
-            <returns>A list of assemblies available for the application. </returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
             <summary>
@@ -258,7 +231,7 @@
             The registered assembly resolver.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.#ctor(Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.#ctor(Microsoft.OData.Abstractions.IAssemblyResolver)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider"/> class.
             </summary>
@@ -1106,7 +1079,7 @@
             and returns the corresponding clr type to which we map like uint => long.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Abstracts.IAssemblyResolver)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Abstractions.IAssemblyResolver)">
             <summary>
             
             </summary>
