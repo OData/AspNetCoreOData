@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.OData.Abstractions
+namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// 
     /// </summary>
-    public class DefaultAssemblyResolver : IAssemblyResolver
+    internal class DefaultAssemblyResolver : IAssemblyResolver
     {
         private Assembly[] _assemblies = GetAssembliesInteral();
 

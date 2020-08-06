@@ -2,9 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.OData.Edm;
 
-namespace Microsoft.OData.Abstractions.Annotations
+namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
     /// 

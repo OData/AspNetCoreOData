@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.OData.Abstractions.Annotations;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing

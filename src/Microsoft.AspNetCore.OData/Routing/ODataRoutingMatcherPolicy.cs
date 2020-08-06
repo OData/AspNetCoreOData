@@ -73,6 +73,16 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
+                ODataHttpMethodMetadata httpMethodMetadata = candidate.Endpoint.Metadata.OfType<ODataHttpMethodMetadata>().FirstOrDefault();
+                if (httpMethodMetadata != null)
+                {
+                    if (!httpMethodMetadata.Methods.Contains(httpContext.Request.Method))
+                    {
+                        candidates.SetValidity(i, false);
+                        continue;
+                    }
+                }
+
                 ODataTemplateTranslateContext translatorContext =
                     new ODataTemplateTranslateContext(httpContext, candidate.Values, oDataMetadata.Model);
 

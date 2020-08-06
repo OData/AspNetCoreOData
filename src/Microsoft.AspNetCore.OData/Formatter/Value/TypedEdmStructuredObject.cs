@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Common;
-using Microsoft.OData.Abstractions.Annotations;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value

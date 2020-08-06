@@ -8,11 +8,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OData.Abstractions;
-using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.Spatial;
 
 namespace Microsoft.AspNetCore.OData.Edm

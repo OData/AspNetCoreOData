@@ -9,8 +9,9 @@ using System.Reflection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.Edm.Vocabularies.V1;
+using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.OData.Abstractions.Annotations
+namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
     /// The extensions for the <see cref="IEdmModel"/> for the annotations.

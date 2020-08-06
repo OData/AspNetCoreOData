@@ -4,6 +4,22 @@
         <name>Microsoft.AspNetCore.OData</name>
     </assembly>
     <members>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Default">
+            <summary>
+            This static instance is used in the shared code in places where the request container context
+            is not known or does not contain an instance of IWebApiAssembliesResolver.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Assemblies">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -231,7 +247,7 @@
             The registered assembly resolver.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.#ctor(Microsoft.OData.Abstractions.IAssemblyResolver)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.#ctor(Microsoft.OData.ModelBuilder.IAssemblyResolver)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider"/> class.
             </summary>
@@ -751,6 +767,37 @@
             <param name="entityType">The EDM entity type.</param>
             <returns>A collection of operations bound to the feed.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation">
+            <summary>
+            Allows client to tell OData which are the custom aggregation methods defined.
+            In order to do it, it must receive a methodToken - that is the full identifier
+            of the method in the OData URL - and an IDictionary that maps the input type
+            of the aggregation method to its MethodInfo.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.AddMethod(System.String,System.Collections.Generic.IDictionary{System.Type,System.Reflection.MethodInfo})">
+            <summary>
+            Adds all implementations of a method that share the same methodToken.
+            </summary>
+            <param name="methodToken">The given method token.</param>
+            <param name="methods">The given method dictionary.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.GetMethodInfo(System.String,System.Type,System.Reflection.MethodInfo@)">
+            <summary>
+            Get an implementation of a method with the specifies returnType and methodToken.
+            If there's no method that matches the requirements, returns null.
+            </summary>
+            <param name="methodToken">The given method token.</param>
+            <param name="returnType">The given return type.</param>
+            <param name="methodInfo">The output of method info.</param>
+            <returns>True if the method info was found, false otherwise.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
             <summary>
             Provides the functionalities related to the <see cref="T:System.Type"/> and Edm type.
@@ -791,7 +838,7 @@
             and returns the corresponding clr type to which we map like uint => long.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Abstractions.IAssemblyResolver)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
             <summary>
             
             </summary>
@@ -815,6 +862,56 @@
             <param name="first">the first type</param>
             <param name="second">the second type</param>
             <returns>Whether the two types are related.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions">
+            <summary>
+            The extensions for the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> for the annotations.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <param name="navigationSource"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrEnumMemberAnnotation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEnumType)">
+            <summary>
+            
+            </summary>
+            <param name="edmModel"></param>
+            <param name="enumType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrPropertyName(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmProperty)">
+            <summary>
+            
+            </summary>
+            <param name="edmModel"></param>
+            <param name="edmProperty"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetDynamicPropertyDictionary(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            
+            </summary>
+            <param name="edmModel"></param>
+            <param name="edmType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
@@ -874,6 +971,22 @@
             <param name="entityType"></param>
             <param name="boundToCollection"></param>
             <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelName">
+            <summary>
+            Gets the backing CLR type for the EDM type.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions">
             <summary>

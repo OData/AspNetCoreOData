@@ -26,7 +26,7 @@ namespace ODataRoutingSample.Controllers.v2
             .ToArray();
         }
 
-        [HttpGet]
+        //[HttpGet] // ~/Oders({key})
         public Order Get(int key)
         {
             return new Order
@@ -34,6 +34,18 @@ namespace ODataRoutingSample.Controllers.v2
                 Id = key,
                 Title = "Title + " + key
             };
+        }
+
+        [HttpDelete] // ~/Oders({key})
+        public string Delete(int key)
+        {
+            return $"Delete Order at {key}";
+        }
+
+       // [Http] // ~/Oders({key})
+        public string Patch(int key)
+        {
+            return $"Patch Order at {key}";
         }
 
         [HttpGet]

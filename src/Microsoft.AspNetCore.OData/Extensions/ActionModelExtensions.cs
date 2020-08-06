@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Extensions
@@ -206,11 +207,25 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
                 selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
 
-                selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(new[] { httpMethod }));
+               // if (!HasHttpMethod(action))
+                {
+                    //selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(new[] { httpMethod }));
+                    selectorModel.EndpointMetadata.Add(new ODataHttpMethodMetadata(httpMethod));
+                }
 
                 // Check with .NET Team whether the "Endpoint name metadata"
-                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+                selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
+        }
+
+        private static bool HasHttpMethod(ActionModel action)
+        {
+            if (action.Attributes.Any(a => a as HttpMethodAttribute != null))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

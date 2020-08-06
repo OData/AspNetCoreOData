@@ -20,12 +20,12 @@ namespace ODataRoutingSample.Models
             var functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
             functionWithOptional.Parameter<int>("minSalary");
             functionWithOptional.Parameter<int>("maxSalary").Optional();
-            functionWithOptional.Parameter<int>("aveSalary").HasDefaultValue("129");
+            functionWithOptional.Parameter<string>("aveSalary").HasDefaultValue("129");
 
             // overload
             functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
             functionWithOptional.Parameter<int>("minSalary");
-            functionWithOptional.Parameter<string>("name");
+            functionWithOptional.Parameter<double>("name");
 
             // overload
             functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");

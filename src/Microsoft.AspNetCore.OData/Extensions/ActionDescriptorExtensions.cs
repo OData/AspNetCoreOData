@@ -6,7 +6,6 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 

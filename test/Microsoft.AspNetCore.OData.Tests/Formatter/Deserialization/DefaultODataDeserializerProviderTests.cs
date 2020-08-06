@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
-using Microsoft.OData.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Moq;

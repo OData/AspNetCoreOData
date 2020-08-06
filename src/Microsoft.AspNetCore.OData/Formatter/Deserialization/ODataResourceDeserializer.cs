@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
-using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
+using Microsoft.AspNetCore.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {

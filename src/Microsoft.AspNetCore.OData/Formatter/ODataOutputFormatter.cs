@@ -293,7 +293,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Endpoint endPoint = request.HttpContext.GetEndpoint();
                 EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
 
-                string aUri = linkGenerator.GetUriByName(request.HttpContext, name.EndpointName,
+
+                string aUri = linkGenerator.GetUriByName(request.HttpContext, name?.EndpointName,
                     request.RouteValues, request.Scheme, request.Host, request.PathBase);
 
                 return new Uri(aUri);

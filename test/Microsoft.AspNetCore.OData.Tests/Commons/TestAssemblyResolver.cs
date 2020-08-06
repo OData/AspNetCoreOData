@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.OData.Abstractions;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Tests.Commons
 {

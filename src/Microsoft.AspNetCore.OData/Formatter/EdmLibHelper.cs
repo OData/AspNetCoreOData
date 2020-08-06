@@ -8,13 +8,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Value;
-using Microsoft.OData.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.Spatial;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.AspNetCore.OData.Abstracts;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {

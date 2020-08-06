@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Microsoft.OData.Abstractions.Annotations
+namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
     /// Allows client to tell OData which are the custom aggregation methods defined.
