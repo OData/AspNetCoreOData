@@ -37,12 +37,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw Error.ArgumentNull("messageReader");
+                throw new ArgumentNullException(nameof(messageReader));
             }
 
             if (readContext == null)
             {
-                throw Error.ArgumentNull("readContext");
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             IEdmTypeReference edmType = readContext.GetEdmType(type);
@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (edmType == null)
             {
-                throw Error.ArgumentNull("edmType");
+                throw new ArgumentNullException(nameof(edmType));
             }
 
             if (edmType.IsComplex() && item == null)
@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (item == null)
             {
-                throw Error.ArgumentNull("item");
+                throw new ArgumentNullException(nameof(item));
             }
 
             if (!edmType.IsStructured())
@@ -124,12 +124,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceWrapper == null)
             {
-                throw Error.ArgumentNull("resourceWrapper");
+                throw new ArgumentNullException(nameof(resourceWrapper));
             }
 
             if (readContext == null)
             {
-                throw Error.ArgumentNull("readContext");
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) && structuredType.FullName() != resourceWrapper.Resource.TypeName)
@@ -198,14 +198,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <returns>The created CLR object.</returns>
         public virtual object CreateResourceInstance(IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
         {
-            if (readContext == null)
-            {
-                throw Error.ArgumentNull("readContext");
-            }
-
             if (structuredType == null)
             {
-                throw Error.ArgumentNull("structuredType");
+                throw new ArgumentNullException(nameof(structuredType));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             IEdmModel model = readContext.Model;
@@ -269,7 +269,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceWrapper == null)
             {
-                throw Error.ArgumentNull("resourceWrapper");
+                throw new ArgumentNullException(nameof(resourceWrapper));
             }
 
             foreach (ODataNestedResourceInfoWrapper nestedResourceInfo in resourceWrapper.NestedResourceInfos)
@@ -290,12 +290,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resource == null)
             {
-                throw Error.ArgumentNull("resource");
+                throw new ArgumentNullException(nameof(resource));
             }
 
             if (resourceInfoWrapper == null)
             {
-                throw Error.ArgumentNull("resourceInfoWrapper");
+                throw new ArgumentNullException(nameof(resourceInfoWrapper));
             }
 
             IEdmProperty edmProperty = structuredType.FindProperty(resourceInfoWrapper.NestedResourceInfo.Name);
@@ -378,7 +378,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceWrapper == null)
             {
-                throw Error.ArgumentNull("resourceWrapper");
+                throw new ArgumentNullException(nameof(resourceWrapper));
             }
 
             foreach (ODataProperty property in resourceWrapper.Resource.Properties)
@@ -399,12 +399,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resource == null)
             {
-                throw Error.ArgumentNull("resource");
+                throw new ArgumentNullException(nameof(resource));
             }
 
             if (structuralProperty == null)
             {
-                throw Error.ArgumentNull("structuralProperty");
+                throw new ArgumentNullException(nameof(structuralProperty));
+            }
+
+            if (structuredType == null)
+            {
+                throw new ArgumentNullException(nameof(structuredType));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             DeserializationHelpers.ApplyProperty(structuralProperty, structuredType, resource, DeserializerProvider, readContext);
@@ -487,7 +497,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Model = readContext.Model,
             };
 
-            Type clrType = null;
+            Type clrType;
             if (readContext.IsUntyped)
             {
                 clrType = structuredType.IsEntity()
@@ -541,7 +551,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            if (String.IsNullOrEmpty(resourceSetWrapper.ResourceSet.TypeName))
+            if (string.IsNullOrEmpty(resourceSetWrapper.ResourceSet.TypeName))
             {
                 string message = Error.Format(SRResources.DynamicResourceSetTypeNameIsRequired, propertyName);
                 throw new ODataException(message);

@@ -36,7 +36,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw Error.ArgumentNull("messageReader");
+                throw new ArgumentNullException(nameof(messageReader));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             IEdmTypeReference edmType = readContext.GetEdmType(type);
@@ -63,7 +68,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (edmType == null)
             {
-                throw Error.ArgumentNull("edmType");
+                throw new ArgumentNullException(nameof(edmType));
+            }
+
+            if (readContext == null)
+            {
+                throw new ArgumentNullException(nameof(readContext));
             }
 
             if (!edmType.IsCollection() || !edmType.AsCollection().ElementType().IsStructured())
@@ -118,6 +128,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <returns>The deserialized resource set object.</returns>
         public virtual IEnumerable ReadResourceSet(ODataResourceSetWrapper resourceSet, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
         {
+            if (resourceSet == null)
+            {
+                throw new ArgumentNullException(nameof(resourceSet));
+            }
+
             ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
             if (deserializer == null)
             {
