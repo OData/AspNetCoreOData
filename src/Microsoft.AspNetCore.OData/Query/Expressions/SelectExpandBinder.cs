@@ -8,12 +8,12 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// This annotation indicates the mapping from a <see cref="IEdmStructuredType"/> to a <see cref="PropertyInfo"/>.

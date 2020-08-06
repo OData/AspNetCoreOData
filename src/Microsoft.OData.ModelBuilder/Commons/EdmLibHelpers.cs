@@ -9,10 +9,10 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.OData.Abstractions;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.Edm.Vocabularies.V1;
-using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.Spatial;
 

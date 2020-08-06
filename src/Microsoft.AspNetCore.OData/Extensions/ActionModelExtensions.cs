@@ -5,11 +5,11 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Extensions

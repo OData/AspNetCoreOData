@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Container

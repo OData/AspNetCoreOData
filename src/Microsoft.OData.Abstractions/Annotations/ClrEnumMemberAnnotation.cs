@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// Represents a mapping betwwen an <see cref="IEdmEnumMember"/> and a CLR Enum member.

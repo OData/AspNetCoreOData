@@ -9,11 +9,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization

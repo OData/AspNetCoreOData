@@ -4,7 +4,7 @@
 using System;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// This annotation indicates the mapping from an <see cref="IEdmOperation"/> to a <see cref="String"/>.

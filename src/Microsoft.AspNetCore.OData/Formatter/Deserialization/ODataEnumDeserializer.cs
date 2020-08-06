@@ -4,9 +4,9 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization

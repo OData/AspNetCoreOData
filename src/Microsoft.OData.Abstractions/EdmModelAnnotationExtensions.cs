@@ -10,12 +10,12 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.Edm.Vocabularies.V1;
 
-namespace Microsoft.AspNetCore.OData.Abstracts.Annotations
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
-    /// 
+    /// The extensions for the <see cref="IEdmModel"/> for the annotations.
     /// </summary>
-    public static class AnnotationHelper
+    public static class EmdModelAnnotationExtensions
     {
         /// <summary>
         /// 

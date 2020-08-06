@@ -13,13 +13,12 @@ namespace Microsoft.OData.Abstractions
     public class DefaultAssemblyResolver : IAssemblyResolver
     {
         private Assembly[] _assemblies = GetAssembliesInteral();
-        private static readonly DefaultAssemblyResolver defaultAssemblyResolver = new DefaultAssemblyResolver();
 
         /// <summary>
         /// This static instance is used in the shared code in places where the request container context
         /// is not known or does not contain an instance of IWebApiAssembliesResolver.
         /// </summary>
-        public static IAssemblyResolver Default = defaultAssemblyResolver;
+        public static readonly IAssemblyResolver Default = new DefaultAssemblyResolver();
 
         /// <summary>
         /// 

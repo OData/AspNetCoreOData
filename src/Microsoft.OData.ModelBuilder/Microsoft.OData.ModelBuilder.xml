@@ -4,130 +4,6 @@
         <name>Microsoft.OData.ModelBuilder</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation">
-            <summary>
-            Represents a mapping betwwen an <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/> and a CLR Enum member.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation.#ctor(System.Collections.Generic.IDictionary{System.Enum,Microsoft.OData.Edm.IEdmEnumMember})">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation"/> class.
-            </summary>
-            <param name="map">The mapping between CLR Enum member and the EDM <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/>.</param>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation.GetEdmEnumMember(System.Enum)">
-            <summary>
-            Gets the <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/> for the CLR Enum member.
-            </summary>
-            <param name="clrEnumMemberInfo">The backing CLR Enum member info.</param>
-            <returns>The Edm <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/>.</returns>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation.GetClrEnumMember(Microsoft.OData.Edm.IEdmEnumMember)">
-            <summary>
-            Gets the CLR Enum member for <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/>.
-            </summary>
-            <param name="edmEnumMember">The Edm <see cref="T:Microsoft.OData.Edm.IEdmEnumMember"/>.</param>
-            <returns>The backing CLR Enum member info.</returns>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.ClrPropertyInfoAnnotation">
-            <summary>
-            Represents a mapping from an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> to a CLR property info.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.ClrPropertyInfoAnnotation.#ctor(System.Reflection.PropertyInfo)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.OData.ModelBuilder.ClrPropertyInfoAnnotation"/> class.
-            </summary>
-            <param name="clrPropertyInfo">The backing CLR property info for the EDM property.</param>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.ClrPropertyInfoAnnotation.ClrPropertyInfo">
-            <summary>
-            Gets the backing CLR property info for the EDM property.
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.ClrTypeAnnotation">
-            <summary>
-            Represents a mapping from an <see cref="T:Microsoft.OData.Edm.IEdmType"/> to a CLR type.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.ClrTypeAnnotation.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.OData.ModelBuilder.ClrTypeAnnotation"/> class.
-            </summary>
-            <param name="clrType">The backing CLR type for the EDM type.</param>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.ClrTypeAnnotation.ClrType">
-            <summary>
-            Gets the backing CLR type for the EDM type.
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.ConcurrencyPropertiesAnnotation">
-            <summary>
-            Annotation to store cache for concurrency properties
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation">
-            <summary>
-            This annotation indicates the mapping from a <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> to a <see cref="P:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.PropertyInfo"/>.
-            The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> is an open type and the <see cref="P:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.PropertyInfo"/> is the specific
-            property which is used in an open type to save/retrieve the dynamic properties.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.#ctor(System.Reflection.PropertyInfo)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation"/> class.
-            </summary>
-            <param name="propertyInfo">The backing <see cref="P:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.PropertyInfo"/>.</param>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.PropertyInfo">
-            <summary>
-            Gets the <see cref="P:Microsoft.OData.ModelBuilder.DynamicPropertyDictionaryAnnotation.PropertyInfo"/> which backs the dynamic properties of the open type.
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation">
-            <summary>
-            <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate an <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource" /> inside an <see cref="T:Microsoft.OData.Edm.IEdmModel" />
-            with information about how to build links related to that navigation source.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation" /> class.
-            </summary>
-            <remarks>The default constructor is intended for use by unit testing only.</remarks>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation.#ctor(Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> class.
-            </summary>
-            <param name="navigationSource">The navigation source for which the link builder is being constructed.</param>
-            <param name="model">The EDM model that this navigation source belongs to.</param>
-            <remarks>This constructor creates a link builder that generates URL's that follow OData conventions for the given navigation source.</remarks>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.Annotations.QueryableRestrictionsAnnotation">
-            <summary>
-            Represents an annotation to add the queryable restrictions on an EDM property, including not filterable, 
-            not sortable, not navigable, not expandable, not countable, automatically expand.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.Annotations.QueryableRestrictionsAnnotation.#ctor(Microsoft.OData.ModelBuilder.Config.QueryableRestrictions)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.OData.ModelBuilder.Annotations.QueryableRestrictionsAnnotation"/> class.
-            </summary>
-            <param name="restrictions">The queryable restrictions for the EDM property.</param>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Annotations.QueryableRestrictionsAnnotation.Restrictions">
-            <summary>
-            Gets the restrictions for the EDM property.
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.ReturnedEntitySetAnnotation">
-            <summary>
-            This annotation indicates the mapping from an <see cref="T:Microsoft.OData.Edm.IEdmOperation"/> to a <see cref="T:System.String"/>.
-            The <see cref="T:Microsoft.OData.Edm.IEdmOperation"/> is a bound action/function and the <see cref="T:System.String"/> is the
-            entity set name given by user to indicate the entity set returned from this action/function.
-            </summary>
-        </member>
         <member name="T:Microsoft.OData.ModelBuilder.ActionOnDeleteAttribute">
             <summary>
             Represents an <see cref="T:System.Attribute"/> that can be placed on a navigation property to specify the applied
@@ -812,68 +688,6 @@
         <member name="M:Microsoft.OData.ModelBuilder.Config.ModelBoundQuerySettings.CopyFilterConfigurations(System.Collections.Generic.Dictionary{System.String,System.Boolean})">
             <summary>
             Copy the $filter configuration of properties.
-            </summary>
-        </member>
-        <member name="T:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions">
-            <summary>
-            Represents a queryable restriction on an EDM property, including not filterable, not sortable,
-            not navigable, not expandable, not countable, automatically expand.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions"/> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.#ctor(Microsoft.OData.ModelBuilder.PropertyConfiguration)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions"/> class.
-            </summary>
-            <param name="propertyConfiguration">The PropertyConfiguration containing queryable restrictions.</param>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NotFilterable">
-            <summary>
-            Gets or sets whether the property is not filterable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NonFilterable">
-            <summary>
-            Gets or sets whether the property is nonfilterable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NotSortable">
-            <summary>
-            Gets or sets whether the property is not sortable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.Unsortable">
-            <summary>
-            Gets or sets whether the property is unsortable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NotNavigable">
-            <summary>
-            Gets or sets whether the property is not navigable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NotExpandable">
-            <summary>
-            Gets or sets whether the property is not expandable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.NotCountable">
-            <summary>
-            Gets or sets whether the property is not countable. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.AutoExpand">
-            <summary>
-            Gets or sets whether the property is automatically expanded. default is false.
-            </summary>
-        </member>
-        <member name="P:Microsoft.OData.ModelBuilder.Config.QueryableRestrictions.DisableAutoExpandWhenSelectIsPresent">
-            <summary>
-            If set to <c>true</c> then automatic expand will be disabled if there is a $select specify by client.
             </summary>
         </member>
         <member name="T:Microsoft.OData.ModelBuilder.BindingPathConfiguration`1">
@@ -1996,23 +1810,23 @@
         </member>
         <member name="M:Microsoft.OData.ModelBuilder.EdmModelExtensions.GetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
-            Gets the <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            Gets the <see cref="T:Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
             links for the given navigation source.
             </summary>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
             <param name="navigationSource">The navigation source.</param>
-            <returns>The <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
-            a new <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
+            <returns>The <see cref="T:Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
+            a new <see cref="T:Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
             </returns>
         </member>
-        <member name="M:Microsoft.OData.ModelBuilder.EdmModelExtensions.SetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation)">
+        <member name="M:Microsoft.OData.ModelBuilder.EdmModelExtensions.SetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation)">
             <summary>
-            Sets the <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            Sets the <see cref="T:Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
             links for the given navigation source.
             </summary>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
             <param name="navigationSource">The navigation source.</param>
-            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.OData.ModelBuilder.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
+            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.OData.Abstractions.Annotations.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
         </member>
         <member name="M:Microsoft.OData.ModelBuilder.Helpers.EdmTypeBuilder.GetTypeKind(System.Type)">
             <summary>

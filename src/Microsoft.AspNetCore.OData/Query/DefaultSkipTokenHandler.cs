@@ -9,7 +9,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
-using Microsoft.AspNetCore.OData.Abstracts.Annotations;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -18,6 +17,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 

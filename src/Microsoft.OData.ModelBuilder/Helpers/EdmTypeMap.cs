@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
 

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-namespace Microsoft.OData.ModelBuilder.Config
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// Represents a queryable restriction on an EDM property, including not filterable, not sortable,
@@ -16,26 +16,6 @@ namespace Microsoft.OData.ModelBuilder.Config
         /// </summary>
         public QueryableRestrictions()
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="QueryableRestrictions"/> class.
-        /// </summary>
-        /// <param name="propertyConfiguration">The PropertyConfiguration containing queryable restrictions.</param>
-        public QueryableRestrictions(PropertyConfiguration propertyConfiguration)
-        {
-            if (propertyConfiguration == null)
-            {
-                throw Error.ArgumentNull(nameof(propertyConfiguration));
-            }
-
-            NotFilterable = propertyConfiguration.NotFilterable;
-            NotSortable = propertyConfiguration.NotSortable;
-            NotNavigable = propertyConfiguration.NotNavigable;
-            NotExpandable = propertyConfiguration.NotExpandable;
-            NotCountable = propertyConfiguration.NotCountable;
-            DisableAutoExpandWhenSelectIsPresent = propertyConfiguration.DisableAutoExpandWhenSelectIsPresent;
-            _autoExpand = propertyConfiguration.AutoExpand;
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.OData.ModelBuilder
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// Annotation to store cache for concurrency properties

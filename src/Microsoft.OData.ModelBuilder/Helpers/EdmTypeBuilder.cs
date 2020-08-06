@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Microsoft.OData.Abstractions.Annotations;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
 
@@ -255,7 +256,7 @@ namespace Microsoft.OData.ModelBuilder.Helpers
                    
                     if (prop.IsRestricted)
                     {
-                        _propertiesRestrictions[edmProperty] = new QueryableRestrictions(prop);
+                        _propertiesRestrictions[edmProperty] = BuildQueryRestriction(prop);
                     }
  /*
                     if (prop.QueryConfiguration.ModelBoundQuerySettings != null)
@@ -408,7 +409,7 @@ namespace Microsoft.OData.ModelBuilder.Helpers
 
                     if (property.IsRestricted)
                     {
-                        _propertiesRestrictions[edmProperty] = new QueryableRestrictions(property);
+                        _propertiesRestrictions[edmProperty] = BuildQueryRestriction(property);
                     }
 
                     //if (property.QueryConfiguration.ModelBoundQuerySettings != null)
@@ -556,6 +557,20 @@ namespace Microsoft.OData.ModelBuilder.Helpers
             _types.TryGetValue(clrType, out edmType);
 
             return edmType;
+        }
+
+        private static QueryableRestrictions BuildQueryRestriction(PropertyConfiguration propertyConfiguration)
+        {
+            return new QueryableRestrictions
+            {
+                NotFilterable = propertyConfiguration.NotFilterable,
+                NotSortable = propertyConfiguration.NotSortable,
+                NotNavigable = propertyConfiguration.NotNavigable,
+                NotExpandable = propertyConfiguration.NotExpandable,
+                NotCountable = propertyConfiguration.NotCountable,
+                DisableAutoExpandWhenSelectIsPresent = propertyConfiguration.DisableAutoExpandWhenSelectIsPresent,
+                AutoExpand = propertyConfiguration.AutoExpand,
+            };
         }
     }
 }

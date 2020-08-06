@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.OData.ModelBuilder
+namespace Microsoft.OData.Abstractions.Annotations
 {
     /// <summary>
     /// <see cref="NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate an <see cref="IEdmNavigationSource" /> inside an <see cref="IEdmModel" />
@@ -38,12 +38,12 @@ namespace Microsoft.OData.ModelBuilder
         {
             if (navigationSource == null)
             {
-                throw Error.ArgumentNull("navigationSource");
+                throw new ArgumentNullException(nameof(navigationSource));
             }
 
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw new ArgumentNullException(nameof(model));
             }
 
             IEdmEntityType elementType = navigationSource.EntityType();
