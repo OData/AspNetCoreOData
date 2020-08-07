@@ -9,11 +9,11 @@ namespace ODataRoutingSample.Models
 
         public string Title { get; set; }
 
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
     }
 
     public class VipOrder : Order
     {
-        public Category VipCategory { get; set; }
+        public virtual Category VipCategory { get; set; }
     }
 }

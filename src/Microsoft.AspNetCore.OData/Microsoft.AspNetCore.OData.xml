@@ -978,6 +978,26 @@
             </summary>
             <param name="model"></param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            links for the given navigation source.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
+            a new <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.SetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation)">
+            <summary>
+            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            links for the given navigation source.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Resolve the navigation source using the input identifier
@@ -1037,6 +1057,26 @@
             <param name="boundToCollection"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks">
+            <summary>
+            EntitySelfLinks contains the Id, Edit and Read links for an entity.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.IdLink">
+            <summary>
+            A string that uniquely identifies the resource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.EditLink">
+            <summary>
+            A URL that can be used to edit a copy of the resource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.ReadLink">
+            <summary>
+            A URL that can be used to retrieve a copy of the resource.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation">
             <summary>
             
@@ -1051,6 +1091,110 @@
         <member name="P:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelName">
             <summary>
             Gets the backing CLR type for the EDM type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder">
+            <summary>
+            Encapsulates a navigation link factory and whether the link factory follows conventions or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmNavigationProperty,System.Uri},System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder"/> class.
+            </summary>
+            <param name="navigationLinkFactory">The navigation link factory for creating navigation links.</param>
+            <param name="followsConventions">Represents whether this factory follows OData conventions or not.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.Factory">
+            <summary>
+            Gets the navigation link factory for creating navigation links.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.FollowsConventions">
+            <summary>
+            Gets a value representing whether this factory follows OData conventions or not.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate an <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource" /> inside an <see cref="T:Microsoft.OData.Edm.IEdmModel" />
+            with information about how to build links related to that navigation source.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> class.
+            </summary>
+            <remarks>The default constructor is intended for use by unit testing only.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor(Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> class.
+            </summary>
+            <param name="navigationSource">The navigation source for which the link builder is being constructed.</param>
+            <param name="model">The EDM model that this navigation source belongs to.</param>
+            <remarks>This constructor creates a link builder that generates URL's that follow OData conventions for the given navigation source.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor(Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri},Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri},Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri})">
+            <summary>
+            Constructs an instance of an <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> class.
+            </summary>
+            <param name="navigationSource">The navigation source for which the link builder is being constructed.</param>
+            <param name="idLinkBuilder">The ID link builder which is used to build the ID link.</param>
+            <param name="editLinkBuilder">The Edit link builder which is used to build the Edit link.</param>
+            <param name="readLinkBuilder">The Read link builder which is used to build the Read link.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.AddNavigationPropertyLinkBuilder(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder)">
+            <summary>
+            Register a link builder for a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty" /> that navigates from Entities in this navigation source. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEntitySelfLinks(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
+            <summary>
+            Constructs the <see cref="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks" /> for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildIdLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
+            <summary>
+            Constructs the IdLink for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEditLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel,System.Uri)">
+            <summary>
+            Constructs the EditLink URL for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildReadLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel,System.Uri)">
+            <summary>
+            Constructs a ReadLink URL for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildNavigationLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
+            <summary>
+            Constructs a NavigationLink for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" />, <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1">
+            <summary>
+            Encapsulates a self link factory and whether the link factory follows conventions or not.
+            </summary>
+            <typeparam name="T">The type of the self link generated. This should be <see cref="T:System.String"/> for ID links and <see cref="T:System.Uri"/> for read and edit links.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,`0},System.Boolean)">
+            <summary>
+            Constructs a new instance of <see cref="T:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1"/>.
+            </summary>
+            <param name="linkFactory">The link factory.</param>
+            <param name="followsConventions">Whether the factory follows odata conventions for link generation.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1.Factory">
+            <summary>
+            Gets the factory for generating links.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1.FollowsConventions">
+            <summary>
+            Gets a boolean indicating whether the link factory follows OData conventions or not.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions">
@@ -1284,6 +1428,27 @@
             </summary>
             <param name="request"></param>
             <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.OData.UriParser.ODataPathSegment[])">
+            <summary>
+            Generates an OData link using the request's OData route name and path handler and given segments.
+            </summary>
+            <param name="request">The URL helper.</param>
+            <param name="segments">The OData path segments.</param>
+            <returns>The generated OData link.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
+            <summary>
+            Generates an OData link using the given OData route name, path handler, and segments.
+            </summary>
+            <param name="request">The name of the OData route.</param>
+            <param name="segments">The OData path segments.</param>
+            <returns>The generated OData link.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions">
             <summary>
@@ -1715,6 +1880,65 @@
             Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.FromODataUriAttribute"/> class.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers">
+            <summary>
+            Contains helper methods for generating OData links that follow OData URL conventions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateSelfLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)">
+            <summary>
+            Generates a self link following the OData URL conventions for the entity represented by <paramref name="resourceContext"/>.
+            </summary>
+            <param name="resourceContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> representing the entity for which the self link needs to be generated.</param>
+            <param name="includeCast">Represents whether the generated link should have a cast segment representing a type cast.</param>
+            <returns>The self link following the OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateNavigationPropertyLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmNavigationProperty,System.Boolean)">
+            <summary>
+            Generates a navigation link following the OData URL conventions for the entity represented by <paramref name="resourceContext"/> and the given 
+            navigation property.
+            </summary>
+            <param name="resourceContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> representing the entity for which the navigation link needs to be generated.</param>
+            <param name="navigationProperty">The EDM navigation property.</param>
+            <param name="includeCast">Represents whether the generated link should have a cast segment representing a type cast.</param>
+            <returns>The navigation link following the OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateActionLink(Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Generates an action link following the OData URL conventions for the action <paramref name="action"/> and bound to the
+            collection of entity represented by <paramref name="resourceSetContext"/>.
+            </summary>
+            <param name="resourceSetContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/> representing the feed for which the action link needs to be generated.</param>
+            <param name="action">The action for which the action link needs to be generated.</param>
+            <returns>The generated action link following OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateFunctionLink(Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Generates a function link following the OData URL conventions for the function <paramref name="function"/> and bound to the
+            collection of entity represented by <paramref name="resourceSetContext"/>.
+            </summary>
+            <param name="resourceSetContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/> representing the feed for which the function link needs to be generated.</param>
+            <param name="function">The function for which the function link needs to be generated.</param>
+            <returns>The generated function link following OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateActionLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Generates an action link following the OData URL conventions for the action <paramref name="action"/> and bound to the entity
+            represented by <paramref name="resourceContext"/>.
+            </summary>
+            <param name="resourceContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> representing the entity for which the action link needs to be generated.</param>
+            <param name="action">The action for which the action link needs to be generated.</param>
+            <returns>The generated action link following OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateFunctionLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Generates an function link following the OData URL conventions for the function <paramref name="function"/> and bound to the entity
+            represented by <paramref name="resourceContext"/>.
+            </summary>
+            <param name="resourceContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> representing the entity for which the function link needs to be generated.</param>
+            <param name="function">The function for which the function link needs to be generated.</param>
+            <returns>The generated function link following OData URL conventions.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.IMediaTypeMappingCollection">
             <summary>
             An interface that defines a property to access a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping"/> objects.
@@ -1928,8 +2152,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.BaseAddressFactory">
             <summary>
-            Gets or sets a method that allows consumers to provide an alternate base
-            address for OData Uri.
+            Gets or sets a method that allows consumers to provide an alternate base address for OData Uri.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.CanRead(Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext)">
@@ -2686,6 +2909,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Request">
             <summary>
             Gets or sets the HTTP Request whose response is being serialized.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.LinkGenerator">
+            <summary>
+            
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.RootElementName">
@@ -4178,6 +4406,16 @@
               Looks up a localized string similar to The HttpExecutedActionContext.Request is null..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionNotBoundToCollectionOfEntity">
+            <summary>
+              Looks up a localized string similar to The action &apos;{0}&apos; is not bound to the collection of entity. Only actions that are bound to entities can have action links..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionNotBoundToEntity">
+            <summary>
+              Looks up a localized string similar to The action &apos;{0}&apos; is not bound to an entity. Only actions that are bound to entities can have action links..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.AggregateKindNotSupported">
             <summary>
               Looks up a localized string similar to {0} type of aggregation is not supported..
@@ -4411,6 +4649,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.FormatterReadIsNotSupportedForType">
             <summary>
               Looks up a localized string similar to Reading type &apos;{0}&apos; is not supported by &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.FunctionNotBoundToCollectionOfEntity">
+            <summary>
+              Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.FunctionNotBoundToEntity">
+            <summary>
+              Looks up a localized string similar to The function &apos;{0}&apos; is not bound to an entity. Only functions that are bound to entities can have function links..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.FunctionNotSupportedOnEnum">
@@ -4821,6 +5069,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeOfDynamicPropertyNotSupported">
             <summary>
               Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToDetermineBaseUrl">
+            <summary>
+              Looks up a localized string similar to The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToDetermineMetadataUrl">

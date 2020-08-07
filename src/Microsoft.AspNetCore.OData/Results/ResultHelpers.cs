@@ -86,38 +86,37 @@ namespace Microsoft.AspNetCore.OData.Results
                 return GenerateContainmentODataPathSegments(resourceContext, isEntityId);
             }
 
-            //NavigationSourceLinkBuilderAnnotation linkBuilder =
-            //    resourceContext.EdmModel.GetNavigationSourceLinkBuilder(resourceContext.NavigationSource);
-            //Contract.Assert(linkBuilder != null);
+            NavigationSourceLinkBuilderAnnotation linkBuilder =
+                resourceContext.EdmModel.GetNavigationSourceLinkBuilder(resourceContext.NavigationSource);
+            Contract.Assert(linkBuilder != null);
 
-            //Uri idLink = linkBuilder.BuildIdLink(resourceContext);
-            //if (isEntityId)
-            //{
-            //    if (idLink == null)
-            //    {
-            //        throw Error.InvalidOperation(
-            //            SRResources.IdLinkNullForEntityIdHeader,
-            //            resourceContext.NavigationSource.Name);
-            //    }
+            Uri idLink = linkBuilder.BuildIdLink(resourceContext);
+            if (isEntityId)
+            {
+                if (idLink == null)
+                {
+                    throw Error.InvalidOperation(
+                        SRResources.IdLinkNullForEntityIdHeader,
+                        resourceContext.NavigationSource.Name);
+                }
 
-            //    return idLink;
-            //}
+                return idLink;
+            }
 
-            //Uri editLink = linkBuilder.BuildEditLink(resourceContext);
-            //if (editLink == null)
-            //{
-            //    if (idLink != null)
-            //    {
-            //        return idLink;
-            //    }
+            Uri editLink = linkBuilder.BuildEditLink(resourceContext);
+            if (editLink == null)
+            {
+                if (idLink != null)
+                {
+                    return idLink;
+                }
 
-            //    throw Error.InvalidOperation(
-            //        SRResources.EditLinkNullForLocationHeader,
-            //        resourceContext.NavigationSource.Name);
-            //}
+                throw Error.InvalidOperation(
+                    SRResources.EditLinkNullForLocationHeader,
+                    resourceContext.NavigationSource.Name);
+            }
 
-            //return editLink;
-            return null;
+            return editLink;
         }
 
         private static Uri GenerateContainmentODataPathSegments(ResourceContext resourceContext, bool isEntityId)
@@ -127,11 +126,11 @@ namespace Microsoft.AspNetCore.OData.Results
                 resourceContext.NavigationSource.NavigationSourceKind() == EdmNavigationSourceKind.ContainedEntitySet);
             Contract.Assert(resourceContext.Request != null);
 
-            //ODataPath path = resourceContext.Context.Path;
-            //if (path == null)
-            //{
-            //    throw Error.InvalidOperation(SRResources.ODataPathMissing);
-            //}
+            ODataPath path = resourceContext.Request.ODataFeature().Path;
+            if (path == null)
+            {
+                throw Error.InvalidOperation(SRResources.ODataPathMissing);
+            }
 
             //path = new ContainmentPathBuilder().TryComputeCanonicalContainingPath(path);
 

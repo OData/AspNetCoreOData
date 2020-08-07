@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
 
 namespace Microsoft.AspNetCore.OData.Edm
@@ -16,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// <summary>
     /// Provides the functionalities related to the <see cref="Type"/> and Edm type.
     /// </summary>
-    public static class EdmHelpers
+    internal static class EdmHelpers
     {
         /// <summary>
         /// 

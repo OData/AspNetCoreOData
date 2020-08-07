@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -38,17 +40,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <param name="payloadKinds">The kind of payloads this formatter supports.</param>
         public ODataInputFormatter(IEnumerable<ODataPayloadKind> payloadKinds)
         {
-            if (payloadKinds == null)
-            {
-                throw Error.ArgumentNull("payloadKinds");
-            }
-
-            _payloadKinds = payloadKinds;
+            _payloadKinds = payloadKinds ?? throw new ArgumentNullException(nameof(payloadKinds));
         }
 
         /// <summary>
-        /// Gets or sets a method that allows consumers to provide an alternate base
-        /// address for OData Uri.
+        /// Gets or sets a method that allows consumers to provide an alternate base address for OData Uri.
         /// </summary>
         public Func<HttpRequest, Uri> BaseAddressFactory { get; set; }
 
@@ -57,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             HttpRequest request = context.HttpContext.Request;
@@ -78,8 +74,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("type");
             }
 
-            IEdmTypeReference expectedPayloadType;
-            ODataDeserializer deserializer = GetDeserializer(type, request, out expectedPayloadType);
+            ODataDeserializer deserializer = GetDeserializer(type, request, out _);
             if (deserializer != null)
             {
                 return _payloadKinds.Contains(deserializer.ODataPayloadKind);
@@ -94,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             Type type = context.ModelType;
@@ -119,40 +114,17 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             try
             {
-                var body = request.HttpContext.Features.Get<AspNetCore.Http.Features.IHttpBodyControlFeature>();
+                var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
                 if (body != null)
                 {
                     body.AllowSynchronousIO = true;
                 }
 
-                Func<ODataDeserializerContext> getODataDeserializerContext = () =>
-                {
-                    return new ODataDeserializerContext
-                    {
-                        Request = request,
-                    };
-                };
+                IList<IDisposable> toDispose = new List<IDisposable>();
 
-                Action<Exception> logErrorAction = (ex) =>
-                {
-                    ILogger logger = context.HttpContext.RequestServices.GetService<ILogger>();
-                    if (logger == null)
-                    {
-                        throw ex;
-                    }
+                Uri baseAddress = GetBaseAddressInternal(request);
 
-                    logger.LogError(ex, String.Empty);
-                };
-
-                List<IDisposable> toDispose = new List<IDisposable>();
-
-                object result = ReadFromStream(
-                    type,
-                    defaultValue,
-                    GetBaseAddressInternal(request),
-                    request,
-                    (disposable) => toDispose.Add(disposable),
-                    logErrorAction);
+                object result = ReadFromStream(type, defaultValue, baseAddress, request, toDispose);
 
                 foreach (IDisposable obj in toDispose)
                 {
@@ -168,21 +140,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        private static ODataDeserializerContext GetODataDeserializerContext(HttpRequest request)
-        {
-            return new ODataDeserializerContext
-            {
-                Request = request,
-            };
-        }
-
-       internal static object ReadFromStream(
-            Type type,
-            object defaultValue,
-            Uri baseAddress,
-            HttpRequest request,
-            Action<IDisposable> registerForDisposeAction,
-            Action<Exception> logErrorAction)
+       internal static object ReadFromStream(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
         {
             object result;
             IEdmModel model = request.GetModel();
@@ -202,7 +160,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(request.Body, request.Headers/*, request.GetODataContentIdMapping(), request.GetRequestContainer()*/);
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
-                registerForDisposeAction(oDataMessageReader);
+                disposes.Add(oDataMessageReader);
 
                 ODataPath path = request.ODataFeature().Path;
                 ODataDeserializerContext readContext = GetODataDeserializerContext(request);
@@ -213,13 +171,32 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 result = deserializer.Read(oDataMessageReader, type, readContext);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logErrorAction(e);
+                LoggerError(request.HttpContext, ex);
                 result = defaultValue;
             }
 
             return result;
+        }
+
+        private static ODataDeserializerContext GetODataDeserializerContext(HttpRequest request)
+        {
+            return new ODataDeserializerContext
+            {
+                Request = request,
+            };
+        }
+
+        private static void LoggerError(HttpContext context, Exception ex)
+        {
+            ILogger logger = context.RequestServices.GetService<ILogger>();
+            if (logger == null)
+            {
+                throw ex;
+            }
+
+            logger.LogError(ex, String.Empty);
         }
 
         /// <summary>
@@ -250,43 +227,30 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
             if (linkGenerator != null)
             {
-                //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
-
                 Endpoint endPoint = request.HttpContext.GetEndpoint();
                 EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
 
                 if (endpointName != null)
                 {
                     string aUri = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
-                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
-
+                        request.RouteValues, request.Scheme, request.Host, request.PathBase);
                     return new Uri(aUri);
                 }
-
 
                 RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
                 if (routeName != null)
                 {
                     string aUri = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
                         request.RouteValues, request.Scheme, request.Host, request.PathBase);
-
                     return new Uri(aUri);
                 }
             }
-
-            //string baseAddress = request.GetUrlHelper().CreateODataLink();
-            //if (baseAddress == null)
-            //{
-            //    throw new SerializationException(SRResources.UnableToDetermineBaseUrl);
-            //}
-
-            //return baseAddress[baseAddress.Length - 1] != '/' ? new Uri(baseAddress + '/') : new Uri(baseAddress);
 
             return null;
         }
@@ -305,23 +269,28 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataVersionConstraint.DefaultODataVersion;
         }
 
-        private static ODataDeserializer GetDeserializer(
-           Type type, HttpRequest request,  out IEdmTypeReference expectedPayloadType)
+        private static ODataDeserializer GetDeserializer(Type type, HttpRequest request,  out IEdmTypeReference expectedPayloadType)
         {
-            ODataPath path = request.ODataFeature().Path;
-            IEdmModel model = request.GetModel();
+            Contract.Assert(request != null);
+
+            IODataFeature odataFeature = request.ODataFeature();
+            ODataPath path = odataFeature.Path;
+            IEdmModel model = odataFeature.Model;
+            expectedPayloadType = null;
 
             ODataDeserializerProvider deserializerProvider
                 = request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
 
-            expectedPayloadType = EdmLibHelper.GetExpectedPayloadType(type, path, model);
-
             // Get the deserializer using the CLR type first from the deserializer provider.
             ODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);
-            if (deserializer == null && expectedPayloadType != null)
+            if (deserializer == null)
             {
-                // we are in typeless mode, get the deserializer using the edm type from the path.
-                deserializer = deserializerProvider.GetEdmTypeDeserializer(expectedPayloadType);
+                expectedPayloadType = EdmLibHelper.GetExpectedPayloadType(type, path, model);
+                if (expectedPayloadType != null)
+                {
+                    // we are in typeless mode, get the deserializer using the edm type from the path.
+                    deserializer = deserializerProvider.GetEdmTypeDeserializer(expectedPayloadType);
+                }
             }
 
             return deserializer;

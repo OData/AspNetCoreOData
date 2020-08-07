@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -285,29 +286,28 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("request");
             }
 
-            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-            if (linkGenerator != null)
-            {
-             //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
-
-                Endpoint endPoint = request.HttpContext.GetEndpoint();
-                EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
-
-                string aUri = linkGenerator.GetUriByName(request.HttpContext, name?.EndpointName,
-                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
-
-                return new Uri(aUri);
-            }
-
-            //string baseAddress = request.GetUrlHelper().CreateODataLink();
-            //if (baseAddress == null)
+            //LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+            //if (linkGenerator != null)
             //{
-            //    throw new SerializationException(SRResources.UnableToDetermineBaseUrl);
+            // //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
+
+            //    Endpoint endPoint = request.HttpContext.GetEndpoint();
+            //    EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
+
+
+            //    string aUri = linkGenerator.GetUriByName(request.HttpContext, name?.EndpointName,
+            //        request.RouteValues, request.Scheme, request.Host, request.PathBase);
+
+            //    return new Uri(aUri);
             //}
 
-            //return baseAddress[baseAddress.Length - 1] != '/' ? new Uri(baseAddress + '/') : new Uri(baseAddress);
-            return null;
+            string baseAddress = request.CreateODataLink();
+            if (baseAddress == null)
+            {
+                throw new SerializationException(SRResources.UnableToDetermineBaseUrl);
+            }
+
+            return baseAddress[baseAddress.Length - 1] != '/' ? new Uri(baseAddress + '/') : new Uri(baseAddress);
         }
 
         internal static bool TryGetCharSet(MediaTypeHeaderValue mediaType, IEnumerable<string> acceptCharsetValues, out string charSet)

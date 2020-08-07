@@ -6,16 +6,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OData.UriParser;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers
 {
-    public class ProductsController : ControllerBase
+    public class ProductsController : ODataController/*ControllerBase*/
     {
+        private MyDataContext _context;
+
+        public ProductsController(MyDataContext context)
+        {
+            _context = context;
+
+            if (_context.Products.Count() == 0)
+            {
+                IList<Product> products = new List<Product>
+                {
+                    new Product
+                    {
+                        Category = "Goods",
+                        Color = Color.Red,
+                        Detail = new ProductDetail { Id = "3", Info = "Zhang" },
+                    },
+                    new Product
+                    {
+                        Category = "Magazine",
+                        Color = Color.Blue,
+                        Detail = new ProductDetail { Id = "4", Info = "Jinchan" },
+                    },
+                    new Product
+                    {
+                        Category = "Fiction",
+                        Color = Color.Green,
+                        Detail = new ProductDetail { Id = "5", Info = "Hollewye" },
+                    },
+                };
+
+                foreach (var product in products)
+                {
+                    _context.Products.Add(product);
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
         [HttpGet]
-        [EnableQuery]
+       // [EnableQuery]
         public IEnumerable<Product> Get(CancellationToken token)
         {
             var rng = new Random();
@@ -27,20 +67,39 @@ namespace ODataRoutingSample.Controllers
             .ToArray();
         }
 
-        //[HttpPost]
+        public IActionResult Get(int key)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == key);
+            if (product == null)
+            {
+                return NotFound($"Not found product with id = {key}");
+            }
 
-        //[EnableQuery]
-        //public IEnumerable<Product> Post(CancellationToken token)
-        //{
-        //    var rng = new Random();
-        //    return Enumerable.Range(1, 5).Select(index => new Product
-        //    {
-        //        Id = index,
-        //        Category = "Category + " + index
-        //    })
-        //    .ToArray();
-        //}
+            return Ok(product);
+        }
 
+        [HttpPost]
+       // [EnableQuery]
+        public IActionResult Post([FromBody]Product product, CancellationToken token)
+        {
+            _context.Products.Add(product);
+            return Created(product);
+        }
+
+        public IActionResult Put(int key, [FromBody]Product product)
+        {
+            return Ok();
+        }
+
+        public IActionResult Patch(int key, Delta<Product> product)
+        {
+            return Ok();
+        }
+
+        public IActionResult Delete(int key)
+        {
+            return Ok();
+        }
 
         [HttpGet]
         // ~/....(minSalary=4, maxSalary=5, aveSalary=9)

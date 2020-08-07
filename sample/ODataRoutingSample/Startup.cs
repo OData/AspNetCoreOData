@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 
 namespace ODataRoutingSample
 {
@@ -30,6 +31,8 @@ namespace ODataRoutingSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<MyDataContext>(opt => opt.UseLazyLoadingProxies().UseInMemoryDatabase("MyDataContextList"));
+
             IEdmModel model0 = EdmModelBuilder.GetEdmModel();
             IEdmModel model1 = EdmModelBuilder.GetEdmModelV1();
             IEdmModel model2 = EdmModelBuilder.GetEdmModelV2();

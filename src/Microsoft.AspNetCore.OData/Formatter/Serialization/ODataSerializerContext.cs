@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -140,6 +141,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Gets or sets the HTTP Request whose response is being serialized.
         /// </summary>
         public HttpRequest Request { get;set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public LinkGenerator LinkGenerator { get; set; }
 
         /// <summary>
         /// Gets or sets the root element name which is used when writing primitive and enum types

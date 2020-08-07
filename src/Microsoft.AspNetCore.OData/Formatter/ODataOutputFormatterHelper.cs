@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.OData.Formatter.MediaType;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -26,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             new ODataSerializerContext()
             {
                 Request = request,
+                LinkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>()
             };
         
 

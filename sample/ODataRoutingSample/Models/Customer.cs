@@ -10,6 +10,12 @@ namespace ODataRoutingSample.Models
         public int Id { get; set; }
 
         public string Name { get; set; }
+
+        public Color FavoriteColor { get; set; }
+
+        public virtual Address HomeAddress { get; set; }
+
+        public virtual IList<Address> FavoriteAddresses { get; set; }
     }
 
     public class VipCustomer : Customer

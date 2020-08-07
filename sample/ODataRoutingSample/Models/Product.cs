@@ -8,5 +8,25 @@ namespace ODataRoutingSample.Models
         public int Id { get; set; }
 
         public string Category { get; set; }
+
+        public Color Color { get; set; }
+
+        public virtual ProductDetail Detail { get; set; }
+    }
+
+    public class ProductDetail
+    {
+        public string Id { get; set; }
+
+        public string Info { get; set; }
+    }
+
+    public enum Color
+    {
+        Red,
+
+        Green,
+
+        Blue
     }
 }

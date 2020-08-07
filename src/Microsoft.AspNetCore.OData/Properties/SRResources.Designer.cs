@@ -88,6 +88,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The action &apos;{0}&apos; is not bound to the collection of entity. Only actions that are bound to entities can have action links..
+        /// </summary>
+        internal static string ActionNotBoundToCollectionOfEntity {
+            get {
+                return ResourceManager.GetString("ActionNotBoundToCollectionOfEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The action &apos;{0}&apos; is not bound to an entity. Only actions that are bound to entities can have action links..
+        /// </summary>
+        internal static string ActionNotBoundToEntity {
+            get {
+                return ResourceManager.GetString("ActionNotBoundToEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} type of aggregation is not supported..
         /// </summary>
         internal static string AggregateKindNotSupported {
@@ -507,6 +525,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string FormatterReadIsNotSupportedForType {
             get {
                 return ResourceManager.GetString("FormatterReadIsNotSupportedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
+        /// </summary>
+        internal static string FunctionNotBoundToCollectionOfEntity {
+            get {
+                return ResourceManager.GetString("FunctionNotBoundToCollectionOfEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The function &apos;{0}&apos; is not bound to an entity. Only functions that are bound to entities can have function links..
+        /// </summary>
+        internal static string FunctionNotBoundToEntity {
+            get {
+                return ResourceManager.GetString("FunctionNotBoundToEntity", resourceCulture);
             }
         }
         
@@ -1245,6 +1281,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string TypeOfDynamicPropertyNotSupported {
             get {
                 return ResourceManager.GetString("TypeOfDynamicPropertyNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
+        /// </summary>
+        internal static string UnableToDetermineBaseUrl {
+            get {
+                return ResourceManager.GetString("UnableToDetermineBaseUrl", resourceCulture);
             }
         }
         

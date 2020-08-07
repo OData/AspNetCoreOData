@@ -524,4 +524,19 @@
   <data name="ValueIsInvalid" xml:space="preserve">
     <value>The value '{0}' is invalid. {1}</value>
   </data>
+  <data name="ActionNotBoundToCollectionOfEntity" xml:space="preserve">
+    <value>The action '{0}' is not bound to the collection of entity. Only actions that are bound to entities can have action links.</value>
+  </data>
+  <data name="FunctionNotBoundToCollectionOfEntity" xml:space="preserve">
+    <value>The function '{0}' is not bound to the collection of entity. Only functions that are bound to entities can have function links.</value>
+  </data>
+  <data name="ActionNotBoundToEntity" xml:space="preserve">
+    <value>The action '{0}' is not bound to an entity. Only actions that are bound to entities can have action links.</value>
+  </data>
+  <data name="FunctionNotBoundToEntity" xml:space="preserve">
+    <value>The function '{0}' is not bound to an entity. Only functions that are bound to entities can have function links.</value>
+  </data>
+  <data name="UnableToDetermineBaseUrl" xml:space="preserve">
+    <value>The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response.</value>
+  </data>
 </root>

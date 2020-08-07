@@ -342,6 +342,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(List<Func<int, string>>), "List_1OfFunc_2OfInt32_String")]
         public void EdmFullName(Type clrType, string expectedName)
         {
+            // Arrange & Act & Assert
             Assert.Equal(expectedName, clrType.EdmName());
         }
 
