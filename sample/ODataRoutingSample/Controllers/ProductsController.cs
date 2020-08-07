@@ -56,15 +56,9 @@ namespace ODataRoutingSample.Controllers
 
         [HttpGet]
        // [EnableQuery]
-        public IEnumerable<Product> Get(CancellationToken token)
+        public IActionResult Get(CancellationToken token)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Product
-            {
-                Id = index,
-                Category = "Category + " + index
-            })
-            .ToArray();
+            return Ok(_context.Products);
         }
 
         public IActionResult Get(int key)
@@ -83,21 +77,50 @@ namespace ODataRoutingSample.Controllers
         public IActionResult Post([FromBody]Product product, CancellationToken token)
         {
             _context.Products.Add(product);
+
+            _context.SaveChanges();
+
             return Created(product);
         }
 
-        public IActionResult Put(int key, [FromBody]Product product)
+        public IActionResult Put(int key, [FromBody]Delta<Product> product)
         {
-            return Ok();
+            var original = _context.Products.FirstOrDefault(p => p.Id == key);
+            if (original == null)
+            {
+                return NotFound($"Not found product with id = {key}");
+            }
+
+            product.Put(original);
+            _context.SaveChanges();
+            return Updated(original);
         }
 
         public IActionResult Patch(int key, Delta<Product> product)
         {
-            return Ok();
+            var original = _context.Products.FirstOrDefault(p => p.Id == key);
+            if (original == null)
+            {
+                return NotFound($"Not found product with id = {key}");
+            }
+
+            product.Patch(original);
+
+            _context.SaveChanges();
+
+            return Updated(original);
         }
 
         public IActionResult Delete(int key)
         {
+            var original = _context.Products.FirstOrDefault(p => p.Id == key);
+            if (original == null)
+            {
+                return NotFound($"Not found product with id = {key}");
+            }
+
+            _context.Products.Remove(original);
+            _context.SaveChanges();
             return Ok();
         }
 
