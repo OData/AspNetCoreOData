@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
             }
 
-            Type clrType = EdmLibHelper.GetClrType(edmType, readContext.Model);
+            Type clrType = readContext.Model.GetClrType(edmType);
             return EnumDeserializationHelpers.ConvertEnumValue(item, clrType);
         }
     }

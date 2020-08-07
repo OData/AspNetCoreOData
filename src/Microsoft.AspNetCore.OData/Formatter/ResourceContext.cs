@@ -227,7 +227,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             //    return selectExpandWrapper.UntypedInstance;
             //}
 
-            Type clrType = EdmLibHelper.GetClrType(StructuredType, EdmModel);
+            Type clrType = EdmModel.GetClrType(StructuredType);
             if (clrType == null)
             {
                 throw new InvalidOperationException(Error.Format(SRResources.MappingDoesNotContainResourceType, StructuredType.FullTypeName()));

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter
+namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
     /// 

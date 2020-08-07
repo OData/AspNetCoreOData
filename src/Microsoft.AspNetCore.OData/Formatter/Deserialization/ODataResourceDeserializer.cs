@@ -225,7 +225,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                Type clrType = EdmLibHelper.GetClrType(structuredType, model);
+                Type clrType = model.GetClrType(structuredType);
                 if (clrType == null)
                 {
                     throw new ODataException(
@@ -506,7 +506,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                clrType = EdmLibHelper.GetClrType(structuredType, readContext.Model);
+                clrType = readContext.Model.GetClrType(structuredType);
 
                 if (clrType == null)
                 {
@@ -618,7 +618,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                Type clrType = EdmLibHelper.GetClrType(structuredType, readContext.Model);
+                Type clrType = readContext.Model.GetClrType(structuredType);
 
                 if (clrType == null)
                 {

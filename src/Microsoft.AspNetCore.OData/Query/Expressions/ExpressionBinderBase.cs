@@ -215,7 +215,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         case ExpressionType.NotEqual:
                             return Expression.MakeBinary(binaryExpressionType, left, right, liftToNull, method: Linq2ObjectsComparisonMethods.AreByteArraysNotEqualMethodInfo);
                         default:
-                            IEdmPrimitiveType binaryType = EdmHelpers.GetEdmPrimitiveType(typeof(byte[]));
+                            IEdmPrimitiveType binaryType = typeof(byte[]).GetEdmPrimitiveType();
                             throw new ODataException(Error.Format(SRResources.BinaryOperatorNotSupported, binaryType.FullName(), binaryType.FullName(), binaryOperator));
                     }
                 }
@@ -242,7 +242,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal Expression CreateConvertExpression(ConvertNode convertNode, Expression source)
         {
-            Type conversionType = EdmHelpers.GetClrType(convertNode.TypeReference, Model, InternalAssembliesResolver);
+            Type conversionType = Model.GetClrType(convertNode.TypeReference, InternalAssembliesResolver);
 
             if (conversionType == typeof(bool?) && source.Type == typeof(bool))
             {
@@ -307,7 +307,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal Expression ConvertNonStandardPrimitives(Expression source)
         {
             bool isNonstandardEdmPrimitive;
-            Type conversionType = EdmHelpers.IsNonstandardEdmPrimitive(source.Type, out isNonstandardEdmPrimitive);
+            Type conversionType = source.Type.IsNonstandardEdmPrimitive(out isNonstandardEdmPrimitive);
 
             if (isNonstandardEdmPrimitive)
             {
@@ -1380,7 +1380,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (targetEdmType != null)
             {
                 IEdmTypeReference targetEdmTypeReference = targetEdmType.ToEdmTypeReference(false);
-                targetClrType = EdmHelpers.GetClrType(targetEdmTypeReference, Model);
+                targetClrType = Model.GetClrType(targetEdmTypeReference);
 
                 if (source != NullConstant)
                 {
@@ -1390,7 +1390,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     }
 
                     if ((!targetEdmTypeReference.IsPrimitive() && !targetEdmTypeReference.IsEnum()) ||
-                        (EdmHelpers.GetEdmPrimitiveType(source.Type) == null && !TypeHelper.IsEnum(source.Type)))
+                        (source.Type.GetEdmPrimitiveType() == null && !TypeHelper.IsEnum(source.Type)))
                     {
                         // Cast fails and return null.
                         return NullConstant;
@@ -1528,7 +1528,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 // bool nullable = source.Type.IsNullable();
                 IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(false);
-                clrType = EdmHelpers.GetClrType(edmTypeReference, Model);
+                clrType = Model.GetClrType(edmTypeReference);
             }
 
             if (clrType == null)
@@ -1536,10 +1536,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return FalseConstant;
             }
 
-            bool isSourcePrimitiveOrEnum = EdmHelpers.GetEdmPrimitiveType(source.Type) != null ||
+            bool isSourcePrimitiveOrEnum = source.Type.GetEdmPrimitiveType() != null ||
                                            TypeHelper.IsEnum(source.Type);
 
-            bool isTargetPrimitiveOrEnum = EdmHelpers.GetEdmPrimitiveType(clrType) != null ||
+            bool isTargetPrimitiveOrEnum = clrType.GetEdmPrimitiveType() != null ||
                                            TypeHelper.IsEnum(clrType);
 
             if (isSourcePrimitiveOrEnum && isTargetPrimitiveOrEnum)
@@ -1925,7 +1925,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Type RetrieveClrTypeForConstant(IEdmTypeReference edmTypeReference, ref object value)
         {
-            Type constantType = EdmHelpers.GetClrType(edmTypeReference, Model, InternalAssembliesResolver);
+            Type constantType = Model.GetClrType(edmTypeReference, InternalAssembliesResolver);
 
             if (value != null && edmTypeReference != null && edmTypeReference.IsEnum())
             {

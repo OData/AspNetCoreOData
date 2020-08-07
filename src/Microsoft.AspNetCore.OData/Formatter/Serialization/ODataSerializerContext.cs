@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.AspNetCore.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {

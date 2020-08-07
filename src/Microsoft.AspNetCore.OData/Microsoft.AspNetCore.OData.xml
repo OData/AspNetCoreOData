@@ -767,6 +767,11 @@
             <param name="entityType">The EDM entity type.</param>
             <returns>A collection of operations bound to the feed.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.ClrTypeCache">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation">
             <summary>
             Allows client to tell OData which are the custom aggregation methods defined.
@@ -798,54 +803,107 @@
             <param name="methodInfo">The output of method info.</param>
             <returns>True if the method info was found, false otherwise.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
+        <member name="F:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions._builtInPrimitiveTypes">
             <summary>
-            Provides the functionalities related to the <see cref="T:System.Type"/> and Edm type.
+            The mapping between Edm primitive type and Clr primitive type.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetEdmPrimitiveType(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveTypeReference(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type for the given CLR type.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type for the given CLR type.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm primitive type.
+            </summary>
+            <param name="edmPrimitiveType">The given Edm primitive type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNonstandardEdmPrimitive(System.Type,System.Boolean@)">
+            <summary>
+            Figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
+            and returns the corresponding clr type to which we map like uint => long.
+            </summary>
+            <param name="clrType">The potential non-standard CLR type.</param>
+            <param name="isNonstandardEdmPrimitive">A boolean value out to indicate whether the input CLR type is standard OData primitive type.</param>
+            <returns>The standard CLR type or the input CLR type itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmType(Microsoft.OData.Edm.IEdmModel,System.Type)">
             <summary>
             
             </summary>
+            <param name="edmModel"></param>
             <param name="clrType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsNullable(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type reference.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmTypeReference">The Edm type reference.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type reference.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmTypeReference">The Edm type reference.</param>
+            <param name="assembliesResolver">The assembly resolver.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type reference.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Gets the corresponding CLR type for a given Edm type reference.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <param name="assembliesResolver">The assembly resolver.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetTypeMappingCache(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable(System.Type)">
             <summary>
             
             </summary>
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetEdmPrimitiveTypeReference(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable``1">
             <summary>
             
             </summary>
-            <param name="clrType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel)">
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
             <summary>
-            
+            Provides the functionalities related to the <see cref="T:System.Type"/> and Edm type.
             </summary>
-            <param name="edmTypeReference"></param>
-            <param name="edmModel"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsNonstandardEdmPrimitive(System.Type,System.Boolean@)">
-            <summary>
-            figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
-            and returns the corresponding clr type to which we map like uint => long.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetClrType(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
-            <summary>
-            
-            </summary>
-            <param name="edmTypeReference"></param>
-            <param name="edmModel"></param>
-            <param name="assembliesResolver"></param>
-            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.ToEdmTypeReference(Microsoft.OData.Edm.IEdmType,System.Boolean)">
             <summary>
@@ -853,6 +911,13 @@
             </summary>
             <param name="edmType"></param>
             <param name="isNullable"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsNullable(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="type"></param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsRelatedTo(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType)">
@@ -1283,11 +1348,6 @@
             Provides a key for the ErrorCode.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.ClrTypeCache">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="F:Microsoft.AspNetCore.OData.Formatter.DefaultODataETagHandler.NullLiteralInETag">
             <summary>null literal that needs to be return in ETag value when the value is null</summary>
         </member>
@@ -1622,13 +1682,6 @@
             <param name="path">The path to use.</param>
             <param name="model">The EdmModel to use.</param>
             <returns>The expected payload type of an OData path.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.EdmLibHelper.GetTypeMappingCache(Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.EdmLibHelper.TryGetInnerTypeForDelta(System.Type@)">
             <summary>

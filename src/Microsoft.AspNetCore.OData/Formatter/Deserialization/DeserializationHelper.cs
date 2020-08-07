@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(collection != null);
 
             Type resourceType = resource.GetType();
-            Type elementType = EdmLibHelper.GetClrType(edmPropertyType.ElementType(), model);
+            Type elementType = model.GetClrType(edmPropertyType.ElementType());
             Type propertyType = typeof(ICollection<>).MakeGenericType(elementType);
             IEnumerable newCollection;
             if (CollectionDeserializationHelpers.TryCreateInstance(propertyType, edmPropertyType, elementType,

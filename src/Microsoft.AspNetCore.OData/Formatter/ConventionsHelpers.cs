@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -59,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                Contract.Assert(EdmLibHelper.GetEdmPrimitiveTypeOrNull(type) != null);
+                Contract.Assert(type.GetEdmPrimitiveType() != null);
                 value = ConvertUnsupportedPrimitives(value);
             }
 
@@ -144,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                Contract.Assert(EdmLibHelper.GetEdmPrimitiveTypeOrNull(type) != null);
+                Contract.Assert(type.GetEdmPrimitiveType() != null);
                 value = ConvertUnsupportedPrimitives(value);
             }
 

@@ -325,7 +325,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (targetEdmType != null)
             {
-                targetClrType = EdmHelpers.GetClrType(targetEdmType.ToEdmTypeReference(false), Model);
+                targetClrType = Model.GetClrType(targetEdmType.ToEdmTypeReference(false));
             }
 
             if (arguments[0].Type == targetClrType)
@@ -358,7 +358,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IEdmStructuredTypeReference structured = node.StructuredTypeReference;
             Contract.Assert(structured != null, "NS casts can contain only structured types");
 
-            Type clrType = EdmHelpers.GetClrType(structured, Model);
+            Type clrType = Model.GetClrType(structured);
 
             Expression source = BindCastSourceNode(node.Source);
             return Expression.TypeAs(source, clrType);
@@ -375,7 +375,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IEdmStructuredTypeReference structured = node.ItemStructuredType;
             Contract.Assert(structured != null, "NS casts can contain only structured types");
 
-            Type clrType = EdmHelpers.GetClrType(structured, Model);
+            Type clrType = Model.GetClrType(structured);
 
             Expression source = BindCastSourceNode(node.Source);
             return OfType(source, clrType);
@@ -895,7 +895,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         }
                     }
 
-                    parameter = Expression.Parameter(EdmHelpers.GetClrType(edmTypeReference, Model, InternalAssembliesResolver), rangeVariable.Name);
+                    parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, InternalAssembliesResolver), rangeVariable.Name);
                     Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
                     lambdaIt = parameter;
                 }

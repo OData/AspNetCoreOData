@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.OData;
@@ -106,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
                 else
                 {
-                    Type elementClrType = EdmLibHelper.GetClrType(elementType, readContext.Model);
+                    Type elementClrType = readContext.Model.GetClrType(elementType);
                     IEnumerable castedResult =
                         CastMethodInfo.MakeGenericMethod(elementClrType).Invoke(null, new object[] { result }) as
                             IEnumerable;

@@ -128,8 +128,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // derived property using cast
             if (elementType != declaringType)
             {
-                Type originalType = EdmHelpers.GetClrType(elementType, _model);
-                Type castType = EdmHelpers.GetClrType(declaringType, _model);
+                Type originalType = _model.GetClrType(elementType);
+                Type castType = _model.GetClrType(declaringType);
                 if (castType == null)
                 {
                     throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, declaringType.FullTypeName()));
@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Expression: source = source as propertyDeclaringType
             if (elementType != property.DeclaringType)
             {
-                Type castType = EdmHelpers.GetClrType(property.DeclaringType, _model);
+                Type castType = _model.GetClrType(property.DeclaringType);
                 if (castType == null)
                 {
                     throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, property.DeclaringType.FullTypeName()));
@@ -181,7 +181,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 bool isCollection = property.Type.IsCollection();
 
                 IEdmTypeReference edmElementType = (isCollection ? property.Type.AsCollection().ElementType() : property.Type);
-                Type clrElementType = EdmHelpers.GetClrType(edmElementType, _model);
+                Type clrElementType = _model.GetClrType(edmElementType);
                 if (clrElementType == null)
                 {
                     throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, edmElementType.FullName()));
@@ -1097,7 +1097,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Expression expression = Expression.Constant(elementType.FullTypeName());
                 for (int i = 0; i < derivedTypes.Count; i++)
                 {
-                    Type clrType = EdmHelpers.GetClrType(derivedTypes[i], model);
+                    Type clrType = model.GetClrType(derivedTypes[i]);
                     if (clrType == null)
                     {
                         throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, derivedTypes[0].FullTypeName()));

@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             var customMethod = GetCustomMethod(expression);
-            var typeReference = EdmHelpers.GetEdmPrimitiveTypeReference(customMethod.ReturnType);
+            var typeReference = customMethod.ReturnType.GetEdmPrimitiveTypeReference();
             return new AggregateExpression(expression.Expression, expression.MethodDefinition, expression.Alias, typeReference);
         }
 

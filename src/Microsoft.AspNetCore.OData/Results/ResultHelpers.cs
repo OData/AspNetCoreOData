@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;

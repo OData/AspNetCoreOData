@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 
@@ -77,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         private static void AddToCollectionCore(this IEnumerable items, IEnumerable collection, Type elementType, IList list, MethodInfo addMethod)
         {
             bool isNonstandardEdmPrimitiveCollection;
-            EdmLibHelper.IsNonstandardEdmPrimitive(elementType, out isNonstandardEdmPrimitiveCollection);
+            elementType.IsNonstandardEdmPrimitive(out isNonstandardEdmPrimitiveCollection);
 
             foreach (object item in items)
             {

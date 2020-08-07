@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         IEdmStructuralProperty property = concurrencyProperties.SingleOrDefault(e => e.Name == nameValue.Key);
                         Contract.Assert(property != null);
 
-                        Type clrType = EdmHelpers.GetClrType(property.Type, model);
+                        Type clrType = model.GetClrType(property.Type);
                         Contract.Assert(clrType != null);
 
                         if (nameValue.Value != null)

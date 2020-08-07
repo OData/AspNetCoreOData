@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             if (type == typeof(Date) || type == typeof(Date?))
             {
                 EdmCoreModel model = EdmCoreModel.Instance;
-                IEdmPrimitiveTypeReference dateTypeReference = EdmHelpers.GetEdmPrimitiveTypeReference(type);
+                IEdmPrimitiveTypeReference dateTypeReference = type.GetEdmPrimitiveTypeReference();
                 return ODataUriUtils.ConvertFromUriLiteral(valueString, ODataVersion.V4, model, dateTypeReference);
             }
 
@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             bool isNonStandardEdmPrimitive;
-            EdmHelpers.IsNonstandardEdmPrimitive(type, out isNonStandardEdmPrimitive);
+            type.IsNonstandardEdmPrimitive(out isNonStandardEdmPrimitive);
 
             if (isNonStandardEdmPrimitive)
             {
@@ -291,8 +291,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 {
                     IEdmTypeReference elementTypeReference = collectionType.ElementType();
 
-                    Type elementClrType = EdmHelpers.GetClrType(elementTypeReference,
-                        readContext.Model);
+                    Type elementClrType = readContext.Model.GetClrType(elementTypeReference);
                     IEnumerable castedResult =
                         CastMethodInfo.MakeGenericMethod(elementClrType)
                             .Invoke(null, new object[] { newEnumerable }) as IEnumerable;

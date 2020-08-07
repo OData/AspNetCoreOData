@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.AspNetCore.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -145,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                             }
                             else
                             {
-                                Type elementClrType = EdmLibHelper.GetClrType(elementTypeReference, readContext.Model);
+                                Type elementClrType = readContext.Model.GetClrType(elementTypeReference);
                                 IEnumerable castedResult =
                                     _castMethodInfo.MakeGenericMethod(elementClrType)
                                         .Invoke(null, new[] { result }) as IEnumerable;
