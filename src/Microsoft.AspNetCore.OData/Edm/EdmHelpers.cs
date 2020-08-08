@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Annotations;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
@@ -315,6 +316,74 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return autoSelectProperties;
+        }
+
+        public static void GetPropertyAndStructuredTypeFromPath(IEnumerable<ODataPathSegment> segments,
+            out IEdmProperty property, out IEdmStructuredType structuredType, out string name)
+        {
+            property = null;
+            structuredType = null;
+            name = String.Empty;
+            string typeCast = String.Empty;
+            if (segments != null)
+            {
+                IEnumerable<ODataPathSegment> reverseSegments = segments.Reverse();
+                foreach (var segment in reverseSegments)
+                {
+                    NavigationPropertySegment navigationPathSegment = segment as NavigationPropertySegment;
+                    if (navigationPathSegment != null)
+                    {
+                        property = navigationPathSegment.NavigationProperty;
+                        if (structuredType == null)
+                        {
+                            structuredType = navigationPathSegment.NavigationProperty.ToEntityType();
+                        }
+
+                        name = navigationPathSegment.NavigationProperty.Name + typeCast;
+                        return;
+                    }
+
+                    PropertySegment propertyAccessPathSegment = segment as PropertySegment;
+                    if (propertyAccessPathSegment != null)
+                    {
+                        property = propertyAccessPathSegment.Property;
+                        if (structuredType == null)
+                        {
+                            structuredType = GetElementType(property.Type) as IEdmStructuredType;
+                        }
+                        name = property.Name + typeCast;
+                        return;
+                    }
+
+                    EntitySetSegment entitySetSegment = segment as EntitySetSegment;
+                    if (entitySetSegment != null)
+                    {
+                        if (structuredType == null)
+                        {
+                            structuredType = entitySetSegment.EntitySet.EntityType();
+                        }
+                        name = entitySetSegment.EntitySet.Name + typeCast;
+                        return;
+                    }
+
+                    TypeSegment typeSegment = segment as TypeSegment;
+                    if (typeSegment != null)
+                    {
+                        structuredType = GetElementType(typeSegment.EdmType.ToEdmTypeReference(false)) as IEdmStructuredType;
+                        typeCast = "/" + structuredType;
+                    }
+                }
+            }
+        }
+
+        public static IEdmType GetElementType(IEdmTypeReference edmTypeReference)
+        {
+            if (edmTypeReference.IsCollection())
+            {
+                return edmTypeReference.AsCollection().ElementType().Definition;
+            }
+
+            return edmTypeReference.Definition;
         }
 
         /// <summary>

@@ -5966,6 +5966,17 @@
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The internal request.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModelBoundPageSize(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext,System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Get the page size.
+            </summary>
+            <param name="actionExecutedContext">The response value.</param>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The request.</param>
+            <param name="createErrorAction">A function used to generate error response.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
             <summary>
             Create a BadRequestObjectResult.
@@ -6072,6 +6083,16 @@
             <param name="queryOptions">
             The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
             </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ContainsAutoSelectExpandProperty(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Determine if the 
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The OData path.</param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type,Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor)">
             <summary>

@@ -341,10 +341,10 @@ namespace Microsoft.AspNetCore.OData.Query
             //}
 
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
-            //if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
-            //{
-            //    result = Filter.ApplyTo(result, querySettings);
-            //}
+            if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
+            {
+                result = Filter.ApplyTo(result, querySettings);
+            }
 
             //if (IsAvailableODataQueryOption(Count, AllowedQueryOptions.Count))
             //{
@@ -363,7 +363,7 @@ namespace Microsoft.AspNetCore.OData.Query
             //    }
             //}
 
-            //OrderByQueryOption orderBy = OrderBy;
+            OrderByQueryOption orderBy = OrderBy;
 
             // $skip or $top require a stable sort for predictable results.
             // Result limits require a stable sort to be able to generate a next page link.
@@ -380,29 +380,29 @@ namespace Microsoft.AspNetCore.OData.Query
                 // Instead of failing early here if we cannot generate the OrderBy,
                 // let the IQueryable backend fail (if it has to).
 
-                //orderBy = GenerateStableOrder();
+                orderBy = GenerateStableOrder();
             }
 
-            //if (IsAvailableODataQueryOption(orderBy, AllowedQueryOptions.OrderBy))
-            //{
-            //    result = orderBy.ApplyTo(result, querySettings);
-            //}
+            if (IsAvailableODataQueryOption(orderBy, AllowedQueryOptions.OrderBy))
+            {
+                result = orderBy.ApplyTo(result, querySettings);
+            }
 
-            //if (IsAvailableODataQueryOption(SkipToken, AllowedQueryOptions.SkipToken))
-            //{
-            //    result = SkipToken.ApplyTo(result, querySettings, this);
-            //}
+            if (IsAvailableODataQueryOption(SkipToken, AllowedQueryOptions.SkipToken))
+            {
+                result = SkipToken.ApplyTo(result, querySettings, this);
+            }
 
             AddAutoSelectExpandProperties();
 
-            //if (SelectExpand != null)
-            //{
-            //    var tempResult = ApplySelectExpand(result, querySettings);
-            //    if (tempResult != default(IQueryable))
-            //    {
-            //        result = tempResult;
-            //    }
-            //}
+            if (SelectExpand != null)
+            {
+                var tempResult = ApplySelectExpand(result, querySettings);
+                if (tempResult != default(IQueryable))
+                {
+                    result = tempResult;
+                }
+            }
 
             if (IsAvailableODataQueryOption(Skip, AllowedQueryOptions.Skip))
             {
@@ -1053,7 +1053,8 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             Contract.Assert(context != null);
 
-            ODataUriResolver uriResolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
+            // ODataUriResolver uriResolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
+            ODataUriResolver uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
             if (uriResolver != null)
             {
                 _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
@@ -1073,7 +1074,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
             // Note: the context.RequestContainer must be set by the ODataQueryOptions constructor.
             Contract.Assert(context.RequestContainer != null);
-            _queryOptionParser.Resolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
+
+            if (uriResolver != null)
+            {
+                _queryOptionParser.Resolver = uriResolver;
+            }
 
             BuildQueryOptions(normalizedQueryParameters);
 

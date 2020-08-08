@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -85,7 +86,19 @@ namespace Microsoft.AspNetCore.OData.Query
 
         static void AddODataQueryServices(IServiceCollection services)
         {
+            services.AddSingleton<DefaultQuerySettings>();
 
+            // QueryValidators.
+            services.AddSingleton<CountQueryValidator>();
+            services.AddSingleton<FilterQueryValidator>();
+            services.AddSingleton<ODataQueryValidator>();
+            services.AddSingleton<OrderByQueryValidator>();
+            services.AddSingleton<SelectExpandQueryValidator>();
+            services.AddSingleton<SkipQueryValidator>();
+            services.AddSingleton<SkipTokenQueryValidator>();
+            services.AddSingleton<TopQueryValidator>();
+
+            services.AddScoped<ODataQuerySettings>();
         }
     }
 }

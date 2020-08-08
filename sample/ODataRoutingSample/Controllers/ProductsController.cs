@@ -55,7 +55,7 @@ namespace ODataRoutingSample.Controllers
         }
 
         [HttpGet]
-       // [EnableQuery]
+        [EnableQuery]
         public IActionResult Get(CancellationToken token)
         {
             return Ok(_context.Products);

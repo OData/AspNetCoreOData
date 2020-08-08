@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -20,6 +22,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -140,22 +143,21 @@ namespace Microsoft.AspNetCore.OData.Query
             ControllerActionDescriptor actionDescriptor,
             HttpRequest request)
         {
-            //if (!_querySettings.PageSize.HasValue && responseValue != null)
-            //{
-            //    GetModelBoundPageSize(responseValue, singleResultCollection, actionDescriptor, modelFunction, request.Context.Path, createErrorAction);
-            //}
+            if (!_querySettings.PageSize.HasValue && responseValue != null)
+            {
+                GetModelBoundPageSize(actionExecutedContext, responseValue, singleResultCollection, actionDescriptor, request);
+            }
 
-            //// Apply the query if there are any query options, if there is a page size set, in the case of
-            //// SingleResult or in the case of $count request.
-            bool shouldApplyQuery = true;
-            // bool shouldApplyQuery = responseValue != null &&
-            //    request.RequestUri != null &&
-            //    (!String.IsNullOrWhiteSpace(request.RequestUri.Query) ||
-            //    _querySettings.PageSize.HasValue ||
-            //    _querySettings.ModelBoundPageSize.HasValue ||
-            //    singleResultCollection != null ||
-            //    request.IsCountRequest() ||
-            //    ContainsAutoSelectExpandProperty(responseValue, singleResultCollection, actionDescriptor, modelFunction, request.Context.Path));
+            // Apply the query if there are any query options, if there is a page size set, in the case of
+            // SingleResult or in the case of $count request.
+            bool shouldApplyQuery = responseValue != null &&
+               request.GetEncodedUrl() != null &&
+               (!String.IsNullOrWhiteSpace(request.QueryString.Value) ||
+               _querySettings.PageSize.HasValue ||
+               _querySettings.ModelBoundPageSize.HasValue ||
+               singleResultCollection != null ||
+               request.IsCountRequest() ||
+               ContainsAutoSelectExpandProperty(responseValue, singleResultCollection, actionDescriptor, request));
 
             object returnValue = null;
             if (shouldApplyQuery)
@@ -195,6 +197,43 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return returnValue;
+        }
+
+        /// <summary>
+        /// Get the page size.
+        /// </summary>
+        /// <param name="actionExecutedContext">The response value.</param>
+        /// <param name="responseValue">The response value.</param>
+        /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <param name="request">The request.</param>
+        /// <param name="createErrorAction">A function used to generate error response.</param>
+        private void GetModelBoundPageSize(
+            ActionExecutedContext actionExecutedContext,
+            object responseValue,
+            IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor,
+            HttpRequest request)
+        {
+            ODataQueryContext queryContext;
+
+            try
+            {
+                queryContext = GetODataQueryContext(responseValue, singleResultCollection, actionDescriptor, request);
+            }
+            catch (InvalidOperationException e)
+            {
+                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                return;
+            }
+
+            ModelBoundQuerySettings querySettings = EdmHelpers.GetModelBoundQuerySettings(queryContext.TargetProperty,
+                queryContext.TargetStructuredType,
+                queryContext.Model);
+            if (querySettings != null && querySettings.PageSize.HasValue)
+            {
+                _querySettings.ModelBoundPageSize = querySettings.PageSize;
+            }
         }
 
         /// <summary>
@@ -524,6 +563,91 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Determine if the 
+        /// </summary>
+        /// <param name="responseValue">The response value.</param>
+        /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+        /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+        /// <param name="request">The OData path.</param>
+        /// <returns></returns>
+        private static bool ContainsAutoSelectExpandProperty(
+            object responseValue,
+            IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor,
+            HttpRequest request)
+        {
+            Type elementClrType = GetElementType(responseValue, singleResultCollection, actionDescriptor);
+
+            IEdmModel model = GetModel(elementClrType, request, actionDescriptor);
+            if (model == null)
+            {
+                throw Error.InvalidOperation(SRResources.QueryGetModelMustNotReturnNull);
+            }
+            ODataPath path = request.ODataFeature().Path;
+            IEdmType edmType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
+            IEdmEntityType baseEntityType = edmType as IEdmEntityType;
+            IEdmStructuredType structuredType = edmType as IEdmStructuredType;
+            IEdmProperty property = null;
+            if (path != null)
+            {
+                string name;
+                EdmHelpers.GetPropertyAndStructuredTypeFromPath(path, out property, out structuredType, out name);
+            }
+
+            if (baseEntityType != null)
+            {
+                List<IEdmEntityType> entityTypes = new List<IEdmEntityType>();
+                entityTypes.Add(baseEntityType);
+                entityTypes.AddRange(EdmHelpers.GetAllDerivedEntityTypes(baseEntityType, model));
+                foreach (var entityType in entityTypes)
+                {
+                    IEnumerable<IEdmNavigationProperty> navigationProperties = entityType == baseEntityType
+                        ? entityType.NavigationProperties()
+                        : entityType.DeclaredNavigationProperties();
+                    if (navigationProperties != null)
+                    {
+                        if (navigationProperties.Any(
+                                navigationProperty =>
+                                    EdmHelpers.IsAutoExpand(navigationProperty, property, entityType, model)))
+                        {
+                            return true;
+                        }
+                    }
+
+                    IEnumerable<IEdmStructuralProperty> properties = entityType == baseEntityType
+                        ? entityType.StructuralProperties()
+                        : entityType.DeclaredStructuralProperties();
+                    if (properties != null)
+                    {
+                        foreach (var edmProperty in properties)
+                        {
+                            if (EdmHelpers.IsAutoSelect(edmProperty, property, entityType, model))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (structuredType != null)
+            {
+                IEnumerable<IEdmStructuralProperty> properties = structuredType.StructuralProperties();
+                if (properties != null)
+                {
+                    foreach (var edmProperty in properties)
+                    {
+                        if (EdmHelpers.IsAutoSelect(edmProperty, property, structuredType, model))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
         /// querying.
         /// </summary>
@@ -531,7 +655,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name = "request" > The request message to retrieve a model for.</param>
         /// <param name = "actionDescriptor" > The action descriptor for the action being queried on.</param>
         /// <returns>The EDM model for the given type and request.</returns>
-        public virtual IEdmModel GetModel(
+        public static IEdmModel GetModel(
             Type elementClrType,
             HttpRequest request,
             ActionDescriptor actionDescriptor)

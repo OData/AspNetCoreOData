@@ -53,6 +53,8 @@ namespace ODataRoutingSample
 
             services.AddODataFormatter();
 
+            services.AddODataQuery();
+
             /*
             services.AddOData(opt => opt.UseODataRouting(model1).
                 opt.UseODataRouting("v1", model2).
