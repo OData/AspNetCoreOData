@@ -11,12 +11,13 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
+    ///  Contains context information about the resource currently being serialized.
     /// </summary>
     public class ResourceContext
     {
@@ -63,14 +64,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         public IEdmModel EdmModel
         {
-            get
-            {
-                return SerializerContext.Model;
-            }
-            set
-            {
-                SerializerContext.Model = value;
-            }
+            get => SerializerContext.Model;
+            set => SerializerContext.Model = value;
         }
 
         /// <summary>
@@ -78,14 +73,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         public IEdmNavigationSource NavigationSource
         {
-            get
-            {
-                return SerializerContext.NavigationSource;
-            }
-            set
-            {
-                SerializerContext.NavigationSource = value;
-            }
+            get => SerializerContext.NavigationSource;
+            set => SerializerContext.NavigationSource = value;
         }
 
         /// <summary>
@@ -112,10 +101,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 return _resourceInstance;
             }
-            set
-            {
-                _resourceInstance = value;
-            }
+            set => _resourceInstance = value;
         }
 
         /// <summary>
@@ -124,14 +110,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         public HttpRequest Request
         {
-            get
-            {
-                return SerializerContext.Request;
-            }
-            set
-            {
-                SerializerContext.Request = value;
-            }
+            get => SerializerContext.Request;
+            set => SerializerContext.Request = value;
         }
 
         ///// <summary>
@@ -155,14 +135,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </remarks>
         public bool SkipExpensiveAvailabilityChecks
         {
-            get
-            {
-                return SerializerContext.SkipExpensiveAvailabilityChecks;
-            }
-            set
-            {
-                SerializerContext.SkipExpensiveAvailabilityChecks = value;
-            }
+            get => SerializerContext.SkipExpensiveAvailabilityChecks;
+            set => SerializerContext.SkipExpensiveAvailabilityChecks = value;
         }
 
         /// <summary>
@@ -220,12 +194,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return edmStructruredObject.Instance;
             }
 
-            // TODO:
-            //SelectExpandWrapper selectExpandWrapper = EdmObject as SelectExpandWrapper;
-            //if (selectExpandWrapper != null && selectExpandWrapper.UntypedInstance != null)
-            //{
-            //    return selectExpandWrapper.UntypedInstance;
-            //}
+            SelectExpandWrapper selectExpandWrapper = EdmObject as SelectExpandWrapper;
+            if (selectExpandWrapper != null && selectExpandWrapper.UntypedInstance != null)
+            {
+                return selectExpandWrapper.UntypedInstance;
+            }
 
             Type clrType = EdmModel.GetClrType(StructuredType);
             if (clrType == null)

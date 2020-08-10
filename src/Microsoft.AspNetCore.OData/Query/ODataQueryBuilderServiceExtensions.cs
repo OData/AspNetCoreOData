@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.UriParser;
@@ -103,6 +104,8 @@ namespace Microsoft.AspNetCore.OData.Query
             services.AddSingleton<TopQueryValidator>();
 
             services.AddScoped<ODataQuerySettings>();
+
+            // services.AddTransient<FilterBinder>();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -137,10 +138,10 @@ namespace Microsoft.AspNetCore.OData.Query
             FilterClause filterClause = FilterClause;
             Contract.Assert(filterClause != null);
 
-            //ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
+            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
 
-            //Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
-            //query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
+            Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
+            query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
             return query;
         }
 

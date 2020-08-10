@@ -2364,7 +2364,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext">
             <summary>
-            
+             Contains context information about the resource currently being serialized.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext.#ctor">

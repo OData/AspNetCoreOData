@@ -97,14 +97,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private static FilterBinder GetOrCreateFilterBinder(ODataQueryContext context, ODataQuerySettings querySettings)
         {
             FilterBinder binder = null;
-            if (context.RequestContainer != null)
-            {
-                binder = context.RequestContainer.GetRequiredService<FilterBinder>();
-                if (binder != null && binder.Model != context.Model && binder.Model == EdmCoreModel.Instance)
-                {
-                    binder.Model = context.Model;
-                }
-            }
+            //if (context.RequestContainer != null)
+            //{
+            //    binder = context.RequestContainer.GetRequiredService<FilterBinder>();
+            //    if (binder != null && binder.Model != context.Model && binder.Model == EdmCoreModel.Instance)
+            //    {
+            //        binder.Model = context.Model;
+            //    }
+            //}
 
             return binder ?? new FilterBinder(querySettings, DefaultAssemblyResolver.Default, context.Model);
         }
