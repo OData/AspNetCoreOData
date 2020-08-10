@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.EntityFrameworkCore;
 using ODataRoutingSample.Models;
@@ -69,6 +70,7 @@ namespace ODataRoutingSample.Controllers.v1
         }
 
         [HttpGet]
+        [EnableQuery]
         public IEnumerable<Customer> Get()
         {
             var rng = new Random();
@@ -81,6 +83,7 @@ namespace ODataRoutingSample.Controllers.v1
         }
 
         [HttpGet]
+        [EnableQuery]
         public Customer Get(int key)
         {
             // Be noted: without the NoTracking setting, the query for $select=HomeAddress with throw exception:

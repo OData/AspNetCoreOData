@@ -49,11 +49,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             {
                 throw Error.ArgumentNull("edmType");
             }
-            //if (!edmType.ElementType().IsEnum())
-            //{
-            //    throw Error.Argument("edmType",
-            //        SRResources.UnexpectedElementType, edmType.ElementType().ToTraceString(), edmType.ToTraceString(), typeof(IEdmEnumType).Name);
-            //}
+            if (!edmType.ElementType().IsEnum())
+            {
+                throw Error.Argument("edmType",
+                    SRResources.UnexpectedElementType, edmType.ElementType().ToTraceString(), edmType.ToTraceString(), typeof(IEdmEnumType).Name);
+            }
 
             _edmType = edmType;
         }

@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             _context = context;
             _model = _context.Model;
-           // _modelID = ModelContainer.GetModelID(_model);
+            _modelID = ModelContainer.GetModelID(_model);
             _settings = settings;
         }
 

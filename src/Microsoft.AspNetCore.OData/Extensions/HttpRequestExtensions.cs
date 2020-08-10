@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
@@ -262,6 +263,18 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 request.ODataMinServiceVersion() ??
                 request.ODataServiceVersion() ??
                 ODataVersionConstraint.DefaultODataVersion;
+        }
+
+        internal static ODataQueryOptions GetQueryOptions(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            ODataFeature feature = request.ODataFeature() as ODataFeature;
+
+            return feature.QueryOptions;
         }
 
         internal static ODataVersion? ODataServiceVersion(this HttpRequest request)

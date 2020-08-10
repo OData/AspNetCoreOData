@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -34,22 +35,22 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </remarks>
         public ODataQueryContext(IEdmModel model, Type elementClrType, ODataPath path)
         {
-            //if (model == null)
-            //{
-            //    throw Error.ArgumentNull("model");
-            //}
+            if (model == null)
+            {
+                throw Error.ArgumentNull("model");
+            }
 
-            //if (elementClrType == null)
-            //{
-            //    throw Error.ArgumentNull("elementClrType");
-            //}
+            if (elementClrType == null)
+            {
+                throw Error.ArgumentNull("elementClrType");
+            }
 
-            //ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
+            ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
 
-            //if (ElementType == null)
-            //{
-            //    throw Error.Argument("elementClrType", SRResources.ClrTypeNotInModel, elementClrType.FullName);
-            //}
+            if (ElementType == null)
+            {
+                throw Error.Argument("elementClrType", SRResources.ClrTypeNotInModel, elementClrType.FullName);
+            }
 
             ElementClrType = elementClrType;
             Model = model;
@@ -67,14 +68,14 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
         public ODataQueryContext(IEdmModel model, IEdmType elementType, ODataPath path)
         {
-            //if (model == null)
-            //{
-            //    throw Error.ArgumentNull("model");
-            //}
-            //if (elementType == null)
-            //{
-            //    throw Error.ArgumentNull("elementType");
-            //}
+            if (model == null)
+            {
+                throw Error.ArgumentNull("model");
+            }
+            if (elementType == null)
+            {
+                throw Error.ArgumentNull("elementType");
+            }
 
             Model = model;
             ElementType = elementType;
@@ -176,25 +177,25 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private void GetPathContext()
         {
-            //if (Path != null)
-            //{
-            //    IEdmProperty property;
-            //    IEdmStructuredType structuredType;
-            //    string name;
-            //    EdmLibHelpers.GetPropertyAndStructuredTypeFromPath(
-            //        Path.Segments,
-            //        out property,
-            //        out structuredType,
-            //        out name);
+            if (Path != null)
+            {
+                IEdmProperty property;
+                IEdmStructuredType structuredType;
+                string name;
+                EdmHelpers.GetPropertyAndStructuredTypeFromPath(
+                    Path,
+                    out property,
+                    out structuredType,
+                    out name);
 
-            //    TargetProperty = property;
-            //    TargetStructuredType = structuredType;
-            //    TargetName = name;
-            //}
-            //else
-            //{
-            //    TargetStructuredType = ElementType as IEdmStructuredType;
-            //}
+                TargetProperty = property;
+                TargetStructuredType = structuredType;
+                TargetName = name;
+            }
+            else
+            {
+                TargetStructuredType = ElementType as IEdmStructuredType;
+            }
         }
     }
 }

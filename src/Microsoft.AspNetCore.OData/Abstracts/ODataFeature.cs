@@ -9,6 +9,7 @@ using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -91,6 +92,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the total count function for the OData response.
         /// </summary>
         public Func<long> TotalCountFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parsed OData <see cref="ApplyClause"/> of the request.
+        /// </summary>
+        public ApplyClause ApplyClause { get; set; }
 
         /// <summary>
         /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.

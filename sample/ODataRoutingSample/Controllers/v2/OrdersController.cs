@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
@@ -15,6 +16,7 @@ namespace ODataRoutingSample.Controllers.v2
     public class OrdersController : ControllerBase
     {
         [HttpGet]
+        [EnableQuery]
         public IEnumerable<Order> Get()
         {
             var rng = new Random();
@@ -27,6 +29,7 @@ namespace ODataRoutingSample.Controllers.v2
         }
 
         //[HttpGet] // ~/Oders({key})
+        [EnableQuery]
         public Order Get(int key)
         {
             return new Order

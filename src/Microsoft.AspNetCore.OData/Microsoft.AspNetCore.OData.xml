@@ -105,6 +105,11 @@
             </summary>
             <value><c>null</c> if no count should be sent back to the client.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause">
+            <summary>
+            Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause"/> of the request.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause">
             <summary>
             Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause"/> of the request.
@@ -209,6 +214,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCountFunc">
             <summary>
             Gets or sets the total count function for the OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.ApplyClause">
+            <summary>
+            Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.ApplyClause"/> of the request.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause">
@@ -2964,6 +2974,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause">
             <summary>
             Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.NavigationProperty">
+            <summary>
+            Gets or sets the navigation property being expanded.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider">

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.MediaType;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,27 +89,29 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw new SerializationException(SRResources.UnableToDetermineMetadataUrl);
             }
 
-            //Set this variable if the SelectExpandClause is different from the processed clause on the Query options
-            //SelectExpandClause selectExpandDifferentFromQueryOptions = null;
-            //if (internalRequest.Context.QueryOptions != null && internalRequest.Context.QueryOptions.SelectExpand != null)
-            //{
-            //    if (internalRequest.Context.QueryOptions.SelectExpand.ProcessedSelectExpandClause != internalRequest.Context.ProcessedSelectExpandClause)
-            //    {
-            //        selectExpandDifferentFromQueryOptions = internalRequest.Context.ProcessedSelectExpandClause;
-            //    }
-            //}
-            //else if (internalRequest.Context.ProcessedSelectExpandClause != null)
-            //{
-            //    selectExpandDifferentFromQueryOptions = internalRequest.Context.ProcessedSelectExpandClause;
-            //}
+            // Set this variable if the SelectExpandClause is different from the processed clause on the Query options
+            SelectExpandClause selectExpandDifferentFromQueryOptions = null;
+            ODataQueryOptions queryOptions = request.GetQueryOptions();
+            SelectExpandClause processedSelectExpandClause = request.ODataFeature().SelectExpandClause;
+            if (queryOptions != null && queryOptions.SelectExpand != null)
+            {
+                if (queryOptions.SelectExpand.ProcessedSelectExpandClause != processedSelectExpandClause)
+                {
+                    selectExpandDifferentFromQueryOptions = processedSelectExpandClause;
+                }
+            }
+            else if (processedSelectExpandClause != null)
+            {
+                selectExpandDifferentFromQueryOptions = processedSelectExpandClause;
+            }
 
             writerSettings.ODataUri = new ODataUri
             {
                 ServiceRoot = baseAddress,
 
                 // TODO: 1604 Convert webapi.odata's ODataPath to ODL's ODataPath, or use ODL's ODataPath.
-                //SelectAndExpand = internalRequest.Context.ProcessedSelectExpandClause,
-                //Apply = internalRequest.Context.ApplyClause,
+                SelectAndExpand = processedSelectExpandClause,
+                Apply = request.ODataFeature().ApplyClause,
                 //Path = (path == null || IsOperationPath(path)) ? null : path.Path,
                 Path = path
             };
@@ -128,16 +131,16 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.NavigationSource = targetNavigationSource;
                 writeContext.Model = model;
                 writeContext.RootElementName = GetRootElementName(path) ?? "root";
-                //writeContext.SkipExpensiveAvailabilityChecks = serializer.ODataPayloadKind == ODataPayloadKind.ResourceSet;
+                writeContext.SkipExpensiveAvailabilityChecks = serializer.ODataPayloadKind == ODataPayloadKind.ResourceSet;
                 writeContext.Path = path;
                 writeContext.MetadataLevel = metadataLevel;
-                //writeContext.QueryOptions = internalRequest.Context.QueryOptions;
+                writeContext.QueryOptions = queryOptions;
 
                 //Set the SelectExpandClause on the context if it was explicitly specified.
-                //if (selectExpandDifferentFromQueryOptions != null)
-                //{
-                //    writeContext.SelectExpandClause = selectExpandDifferentFromQueryOptions;
-                //}
+                if (selectExpandDifferentFromQueryOptions != null)
+                {
+                    writeContext.SelectExpandClause = selectExpandDifferentFromQueryOptions;
+                }
 
                 serializer.WriteObject(value, type, messageWriter, writeContext);
             }

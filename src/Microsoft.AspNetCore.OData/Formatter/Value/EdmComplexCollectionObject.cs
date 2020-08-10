@@ -49,11 +49,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
                 throw Error.ArgumentNull("edmType");
             }
 
-            //if (!edmType.ElementType().IsComplex())
-            //{
-            //    throw Error.Argument("edmType",
-            //        SRResources.UnexpectedElementType, edmType.ElementType().ToTraceString(), edmType.ToTraceString(), typeof(IEdmComplexType).Name);
-            //}
+            if (!edmType.ElementType().IsComplex())
+            {
+                throw Error.Argument("edmType",
+                    SRResources.UnexpectedElementType, edmType.ElementType().ToTraceString(), edmType.ToTraceString(), typeof(IEdmComplexType).Name);
+            }
 
             _edmType = edmType;
         }

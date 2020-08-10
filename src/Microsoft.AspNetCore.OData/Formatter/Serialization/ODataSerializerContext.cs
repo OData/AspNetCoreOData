@@ -20,6 +20,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     {
         private IDictionary<object, object> _items;
         private ODataQueryContext _queryContext;
+        private SelectExpandClause _selectExpandClause;
+        private bool _isSelectExpandClauseSet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
@@ -40,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public ODataSerializerContext(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
             : this(resource, edmProperty, null, null)
         {
-            //SelectExpandClause = selectExpandClause;
+            SelectExpandClause = selectExpandClause;
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ExpandedResource = resource; // parent resource
 
             CurrentSelectItem = currentSelectItem;
-/*
+
             var expandedNavigationSelectItem = currentSelectItem as ExpandedNavigationSelectItem;
             if (expandedNavigationSelectItem != null)
             {
@@ -114,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     NavigationSource = resource.NavigationSource;
                 }
-            }*/
+            }
         }
 
         /// <summary>
@@ -218,7 +220,51 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Gets or sets the <see cref="SelectExpandClause"/>.
         /// </summary>
-        public SelectExpandClause SelectExpandClause { get; set; }
+        public SelectExpandClause SelectExpandClause
+        {
+            get
+            {
+                // private backing field to be removed once public setter from ODataFeature is removed.
+                if (_isSelectExpandClauseSet)
+                {
+                    return _selectExpandClause;
+                }
+
+                if (QueryOptions != null)
+                {
+                    if (QueryOptions.SelectExpand != null)
+                    {
+                        return QueryOptions.SelectExpand.ProcessedSelectExpandClause;
+                    }
+
+                    return null;
+                }
+
+                ExpandedNavigationSelectItem expandedItem = CurrentSelectItem as ExpandedNavigationSelectItem;
+                if (expandedItem != null)
+                {
+                    return expandedItem.SelectAndExpand;
+                }
+
+                return null;
+            }
+            set
+            {
+                _isSelectExpandClauseSet = true;
+                _selectExpandClause = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the navigation property being expanded.
+        /// </summary>
+        public IEdmNavigationProperty NavigationProperty
+        {
+            get
+            {
+                return EdmProperty as IEdmNavigationProperty;
+            }
+        }
 
         internal IEdmTypeReference GetEdmType(object instance, Type type)
         {

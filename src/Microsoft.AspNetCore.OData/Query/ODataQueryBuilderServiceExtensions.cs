@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.UriParser;
 using System;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -86,6 +87,9 @@ namespace Microsoft.AspNetCore.OData.Query
 
         static void AddODataQueryServices(IServiceCollection services)
         {
+            services.AddSingleton<ODataUriResolver>(
+                sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
+
             services.AddSingleton<DefaultQuerySettings>();
 
             // QueryValidators.

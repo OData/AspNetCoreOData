@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -91,11 +92,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
                 {
                     throw Error.PropertyNull();
                 }
-                //if (!value.IsOrInheritsFrom(_expectedEdmType))
-                //{
-                //    throw Error.InvalidOperation(SRResources.DeltaEntityTypeNotAssignable,
-                //        value.ToTraceString(), _expectedEdmType.ToTraceString());
-                //}
+
+                if (!value.IsOrInheritsFrom(_expectedEdmType))
+                {
+                    throw Error.InvalidOperation(SRResources.DeltaEntityTypeNotAssignable,
+                        value.ToTraceString(), _expectedEdmType.ToTraceString());
+                }
 
                 _actualEdmType = value;
             }
@@ -204,9 +206,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <inheritdoc/>
         public IEdmTypeReference GetEdmType()
         {
-            // TODO:
-            return null;
-            // return EdmLibHelpers.ToEdmTypeReference(_actualEdmType, IsNullable);
+            return _actualEdmType.ToEdmTypeReference(IsNullable);
         }
 
         internal static object GetDefaultValue(IEdmTypeReference propertyType)

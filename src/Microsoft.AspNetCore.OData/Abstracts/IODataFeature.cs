@@ -4,8 +4,10 @@
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
@@ -44,6 +46,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <value><c>null</c> if no count should be sent back to the client.</value>
         long? TotalCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parsed OData <see cref="ApplyClause"/> of the request.
+        /// </summary>
+        ApplyClause ApplyClause { get; set; }
 
         /// <summary>
         /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.

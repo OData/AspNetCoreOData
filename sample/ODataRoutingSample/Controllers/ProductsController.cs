@@ -61,6 +61,7 @@ namespace ODataRoutingSample.Controllers
             return Ok(_context.Products);
         }
 
+        [EnableQuery]
         public IActionResult Get(int key)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == key);

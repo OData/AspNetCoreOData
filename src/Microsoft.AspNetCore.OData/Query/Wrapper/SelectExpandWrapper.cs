@@ -63,9 +63,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
 
             Type elementType = GetElementType();
 
-            // TODO
-            return null;
-          //  return model.GetTypeMappingCache().GetEdmType(elementType, model);
+            return model.GetTypeMappingCache().GetEdmType(elementType, model);
         }
 
         /// <inheritdoc />
@@ -158,8 +156,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         {
             Contract.Assert(ModelID != null);
 
-            return null;
-           // return ModelContainer.GetModel(ModelID);
+            return ModelContainer.GetModel(ModelID);
         }
     }
 }
