@@ -1162,19 +1162,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         //    return odataOperation;
         //}
 
-        //internal static void EmitTitle(IEdmModel model, IEdmOperation operation, ODataOperation odataOperation)
-        //{
-        //    // The title should only be emitted in full metadata.
-        //    OperationTitleAnnotation titleAnnotation = model.GetOperationTitleAnnotation(operation);
-        //    if (titleAnnotation != null)
-        //    {
-        //        odataOperation.Title = titleAnnotation.Title;
-        //    }
-        //    else
-        //    {
-        //        odataOperation.Title = operation.Name;
-        //    }
-        //}
+        internal static void EmitTitle(IEdmModel model, IEdmOperation operation, ODataOperation odataOperation)
+        {
+            // The title should only be emitted in full metadata.
+            OperationTitleAnnotation titleAnnotation = model.GetOperationTitleAnnotation(operation);
+            if (titleAnnotation != null)
+            {
+                odataOperation.Title = titleAnnotation.Title;
+            }
+            else
+            {
+                odataOperation.Title = operation.Name;
+            }
+        }
 
         internal static string CreateMetadataFragment(IEdmOperation operation)
         {

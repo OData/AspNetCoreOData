@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Validation;
@@ -62,6 +63,95 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             model.SetAnnotationValue(navigationSource, navigationSourceLinkBuilder);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="OperationLinkBuilder"/> to be used while generating operation links for the given action.
+        /// </summary>
+        /// <param name="model">The <see cref="IEdmModel"/> containing the operation.</param>
+        /// <param name="operation">The operation for which the link builder is needed.</param>
+        /// <returns>The <see cref="OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
+        /// <see cref="OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
+            Justification = "IEdmActionImport is more relevant here.")]
+        public static OperationLinkBuilder GetOperationLinkBuilder(this IEdmModel model, IEdmOperation operation)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull("model");
+            }
+            if (operation == null)
+            {
+                throw Error.ArgumentNull("operation");
+            }
+
+            OperationLinkBuilder linkBuilder = model.GetAnnotationValue<OperationLinkBuilder>(operation);
+            if (linkBuilder == null)
+            {
+                linkBuilder = GetDefaultOperationLinkBuilder(operation);
+                model.SetOperationLinkBuilder(operation, linkBuilder);
+            }
+
+            return linkBuilder;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="OperationLinkBuilder"/> to be used for generating the OData operation link for the given operation.
+        /// </summary>
+        /// <param name="model">The <see cref="IEdmModel"/> containing the entity set.</param>
+        /// <param name="operation">The operation for which the operation link is to be generated.</param>
+        /// <param name="operationLinkBuilder">The <see cref="OperationLinkBuilder"/> to set.</param>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
+            Justification = "IEdmActionImport is more relevant here.")]
+        public static void SetOperationLinkBuilder(this IEdmModel model, IEdmOperation operation, OperationLinkBuilder operationLinkBuilder)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull("model");
+            }
+
+            model.SetAnnotationValue(operation, operationLinkBuilder);
+        }
+
+        private static OperationLinkBuilder GetDefaultOperationLinkBuilder(IEdmOperation operation)
+        {
+            OperationLinkBuilder linkBuilder = null;
+            if (operation.Parameters != null)
+            {
+                if (operation.Parameters.First().Type.IsEntity())
+                {
+                    if (operation is IEdmAction)
+                    {
+                        linkBuilder = new OperationLinkBuilder(
+                            (ResourceContext resourceContext) =>
+                                resourceContext.GenerateActionLink(operation), followsConventions: true);
+                    }
+                    else
+                    {
+                        linkBuilder = new OperationLinkBuilder(
+                            (ResourceContext resourceContext) =>
+                                resourceContext.GenerateFunctionLink(operation), followsConventions: true);
+                    }
+                }
+                else if (operation.Parameters.First().Type.IsCollection())
+                {
+                    if (operation is IEdmAction)
+                    {
+                        linkBuilder =
+                            new OperationLinkBuilder(
+                                (ResourceSetContext reseourceSetContext) =>
+                                    reseourceSetContext.GenerateActionLink(operation), followsConventions: true);
+                    }
+                    else
+                    {
+                        linkBuilder =
+                            new OperationLinkBuilder(
+                                (ResourceSetContext reseourceSetContext) =>
+                                    reseourceSetContext.GenerateFunctionLink(operation), followsConventions: true);
+                    }
+                }
+            }
+            return linkBuilder;
         }
 
         public static IEdmProperty ResolveProperty(this IEdmStructuredType type, string propertyName, bool enableCaseInsensitive = false)

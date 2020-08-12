@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         private AllowedFunctions _allowedFunctions = AllowedFunctions.AllFunctions;
         private AllowedLogicalOperators _allowedLogicalOperators = AllowedLogicalOperators.All;
         private AllowedQueryOptions _allowedQueryParameters = AllowedQueryOptions.Supported;
-        private Collection<string> _allowedOrderByProperties = new Collection<string>();
+        private ISet<string> _allowedOrderByProperties = new HashSet<string>();
         private int? _maxSkip;
         private int? _maxTop;
         private int _maxAnyAllExpressionDepth = 1;
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// For example, having an empty collection means client can order the queryable result by any properties.
         /// Adding "Name" to this list means that it only allows queryable result to be ordered by Name property.
         /// </summary>
-        public ICollection<string> AllowedOrderByProperties { get => _allowedOrderByProperties; }
+        public ISet<string> AllowedOrderByProperties { get => _allowedOrderByProperties; }
 
         /// <summary>
         /// Gets or sets the query parameters that are allowed inside query. The default is all query options,
@@ -234,6 +234,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 {
                     throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, MinMaxExpansionDepth);
                 }
+
                 _maxExpansionDepth = value;
             }
         }

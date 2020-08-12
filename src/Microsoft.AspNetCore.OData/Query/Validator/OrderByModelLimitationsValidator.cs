@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -54,26 +55,26 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             {
                 if (nodeIn.Source.Kind == QueryNodeKind.SingleNavigationNode)
                 {
-                    //SingleNavigationNode singleNavigationNode = nodeIn.Source as SingleNavigationNode;
-                    //if (EdmLibHelpers.IsNotSortable(nodeIn.Property, singleNavigationNode.NavigationProperty,
-                    //    singleNavigationNode.NavigationProperty.ToEntityType(), _model, _enableOrderBy))
-                    //{
-                    //    return nodeIn;
-                    //}
+                    SingleNavigationNode singleNavigationNode = nodeIn.Source as SingleNavigationNode;
+                    if (EdmHelpers.IsNotSortable(nodeIn.Property, singleNavigationNode.NavigationProperty,
+                        singleNavigationNode.NavigationProperty.ToEntityType(), _model, _enableOrderBy))
+                    {
+                        return nodeIn;
+                    }
                 }
                 else if (nodeIn.Source.Kind == QueryNodeKind.SingleComplexNode)
                 {
-                    //SingleComplexNode singleComplexNode = nodeIn.Source as SingleComplexNode;
-                    //if (EdmLibHelpers.IsNotSortable(nodeIn.Property, singleComplexNode.Property,
-                    //    nodeIn.Property.DeclaringType, _model, _enableOrderBy))
-                    //{
-                    //    return nodeIn;
-                    //}
+                    SingleComplexNode singleComplexNode = nodeIn.Source as SingleComplexNode;
+                    if (EdmHelpers.IsNotSortable(nodeIn.Property, singleComplexNode.Property,
+                        nodeIn.Property.DeclaringType, _model, _enableOrderBy))
+                    {
+                        return nodeIn;
+                    }
                 }
-                //else if (EdmLibHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
-                //{
-                //    return nodeIn;
-                //}
+                else if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
+                {
+                    return nodeIn;
+                }
             }
 
             if (nodeIn.Source != null)
@@ -86,10 +87,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         public override SingleValueNode Visit(SingleComplexNode nodeIn)
         {
-            //if (EdmLibHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
-            //{
-            //    return nodeIn;
-            //}
+            if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
+            {
+                return nodeIn;
+            }
 
             if (nodeIn.Source != null)
             {
@@ -101,11 +102,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         public override SingleValueNode Visit(SingleNavigationNode nodeIn)
         {
-            //if (EdmLibHelpers.IsNotSortable(nodeIn.NavigationProperty, _property, _structuredType, _model,
-            //    _enableOrderBy))
-            //{
-            //    return nodeIn;
-            //}
+            if (EdmHelpers.IsNotSortable(nodeIn.NavigationProperty, _property, _structuredType, _model,
+                _enableOrderBy))
+            {
+                return nodeIn;
+            }
 
             if (nodeIn.Source != null)
             {

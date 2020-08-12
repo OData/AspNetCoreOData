@@ -4,7 +4,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -32,7 +34,19 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
+        public FilterQueryValidator(/*DefaultQuerySettings defaultQuerySettings*/ IOptions<ODataQueryableOptions> options)
+        {
+            // _defaultQuerySettings = defaultQuerySettings;
+
+            ODataQueryableOptions quableOptions = options.Value;
+
+            _defaultQuerySettings = new DefaultQuerySettings
+            {
+                EnableFilter = quableOptions.EnableFilter
+            };
+        }
+
+        internal FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
         {
             _defaultQuerySettings = defaultQuerySettings;
         }
@@ -347,12 +361,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
 
             // Check whether the property is not filterable
-            //if (EdmLibHelpers.IsNotFilterable(navigationProperty, _property, _structuredType, _model,
-            //    _defaultQuerySettings.EnableFilter))
-            //{
-            //    throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter,
-            //        navigationProperty.Name));
-            //}
+            if (EdmHelpers.IsNotFilterable(navigationProperty, _property, _structuredType, _model,
+                _defaultQuerySettings.EnableFilter))
+            {
+                throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter,
+                    navigationProperty.Name));
+            }
 
             // recursion
             if (sourceNode != null)
@@ -411,24 +425,24 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             bool notFilterable = false;
             if (propertyAccessNode.Source != null)
             {
-                //if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleNavigationNode)
-                //{
-                //    SingleNavigationNode singleNavigationNode = propertyAccessNode.Source as SingleNavigationNode;
-                //    notFilterable = EdmLibHelpers.IsNotFilterable(property, singleNavigationNode.NavigationProperty,
-                //        singleNavigationNode.NavigationProperty.ToEntityType(), _model,
-                //        _defaultQuerySettings.EnableFilter);
-                //}
-                //else if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleComplexNode)
-                //{
-                //    SingleComplexNode singleComplexNode = propertyAccessNode.Source as SingleComplexNode;
-                //    notFilterable = EdmLibHelpers.IsNotFilterable(property, singleComplexNode.Property,
-                //        property.DeclaringType, _model, _defaultQuerySettings.EnableFilter);
-                //}
-                //else
-                //{
-                //    notFilterable = EdmLibHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                //        _defaultQuerySettings.EnableFilter);
-                //}
+                if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleNavigationNode)
+                {
+                    SingleNavigationNode singleNavigationNode = propertyAccessNode.Source as SingleNavigationNode;
+                    notFilterable = EdmHelpers.IsNotFilterable(property, singleNavigationNode.NavigationProperty,
+                        singleNavigationNode.NavigationProperty.ToEntityType(), _model,
+                        _defaultQuerySettings.EnableFilter);
+                }
+                else if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleComplexNode)
+                {
+                    SingleComplexNode singleComplexNode = propertyAccessNode.Source as SingleComplexNode;
+                    notFilterable = EdmHelpers.IsNotFilterable(property, singleComplexNode.Property,
+                        property.DeclaringType, _model, _defaultQuerySettings.EnableFilter);
+                }
+                else
+                {
+                    notFilterable = EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
+                        _defaultQuerySettings.EnableFilter);
+                }
             }
 
             if (notFilterable)
@@ -462,11 +476,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             // Check whether the property is filterable.
             IEdmProperty property = singleComplexNode.Property;
-            //if (EdmLibHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-            //    _defaultQuerySettings.EnableFilter))
-            //{
-            //    throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
-            //}
+            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
+                _defaultQuerySettings.EnableFilter))
+            {
+                throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
+            }
 
             ValidateQueryNode(singleComplexNode.Source, settings);
         }
@@ -494,11 +508,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
-            //if (EdmLibHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-            //    _defaultQuerySettings.EnableFilter))
-            //{
-            //    throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
-            //}
+            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
+                _defaultQuerySettings.EnableFilter))
+            {
+                throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
+            }
 
             ValidateQueryNode(propertyAccessNode.Source, settings);
         }
@@ -526,11 +540,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             // Check whether the property is filterable.
             IEdmProperty property = collectionComplexNode.Property;
-            //if (EdmLibHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-            //    _defaultQuerySettings.EnableFilter))
-            //{
-            //    throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
-            //}
+            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
+                _defaultQuerySettings.EnableFilter))
+            {
+                throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
+            }
 
             ValidateQueryNode(collectionComplexNode.Source, settings);
         }
@@ -606,19 +620,19 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             ValidateQueryNode(unaryOperatorNode.Operand, settings);
 
-            //switch (unaryOperatorNode.OperatorKind)
-            //{
-            //    case UnaryOperatorKind.Negate:
-            //    case UnaryOperatorKind.Not:
-            //        if ((settings.AllowedLogicalOperators & AllowedLogicalOperators.Not) != AllowedLogicalOperators.Not)
-            //        {
-            //            throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, unaryOperatorNode.OperatorKind, "AllowedLogicalOperators"));
-            //        }
-            //        break;
+            switch (unaryOperatorNode.OperatorKind)
+            {
+                case UnaryOperatorKind.Negate:
+                case UnaryOperatorKind.Not:
+                    if ((settings.AllowedLogicalOperators & AllowedLogicalOperators.Not) != AllowedLogicalOperators.Not)
+                    {
+                        throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, unaryOperatorNode.OperatorKind, "AllowedLogicalOperators"));
+                    }
+                    break;
 
-            //    default:
-            //        throw Error.NotSupported(SRResources.UnaryNodeValidationNotSupported, unaryOperatorNode.OperatorKind, typeof(FilterQueryValidator).Name);
-            //}
+                default:
+                    throw Error.NotSupported(SRResources.UnaryNodeValidationNotSupported, unaryOperatorNode.OperatorKind, typeof(FilterQueryValidator).Name);
+            }
         }
 
         /// <summary>
@@ -702,10 +716,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         private void EnterLambda(ODataValidationSettings validationSettings)
         {
-            //if (_currentAnyAllExpressionDepth >= validationSettings.MaxAnyAllExpressionDepth)
-            //{
-            //    throw new ODataException(Error.Format(SRResources.MaxAnyAllExpressionLimitExceeded, validationSettings.MaxAnyAllExpressionDepth, "MaxAnyAllExpressionDepth"));
-            //}
+            if (_currentAnyAllExpressionDepth >= validationSettings.MaxAnyAllExpressionDepth)
+            {
+                throw new ODataException(Error.Format(SRResources.MaxAnyAllExpressionLimitExceeded, validationSettings.MaxAnyAllExpressionDepth, "MaxAnyAllExpressionDepth"));
+            }
 
             _currentAnyAllExpressionDepth++;
         }

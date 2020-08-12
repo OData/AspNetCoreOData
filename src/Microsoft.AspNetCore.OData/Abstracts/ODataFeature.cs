@@ -104,9 +104,24 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public SelectExpandClause SelectExpandClause { get; set; }
 
         /// <summary>
+        /// Gets or sets the next link for the OData response.
+        /// </summary>
+        public Uri NextLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the delta link for the OData response.
+        /// </summary>
+        public Uri DeltaLink { get; set; }
+
+        /// <summary>
         /// Gets or sets the parsed <see cref="ODataQueryOptions"/> of the request.
         /// </summary>
         internal ODataQueryOptions QueryOptions { get; set; }
+
+        /// <summary>
+        /// Page size to be used by skiptoken implementation for the top-level resource for the request. 
+        /// </summary>
+        internal int PageSize { get; set; }
 
         /// <summary>
         /// 

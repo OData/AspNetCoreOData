@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
@@ -34,20 +36,20 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     AllowedQueryOptions.Top, topQueryOption.Value));
             }
 
-            //int maxTop;
-            //IEdmProperty property = topQueryOption.Context.TargetProperty;
-            //IEdmStructuredType structuredType = topQueryOption.Context.TargetStructuredType;
+            int maxTop;
+            IEdmProperty property = topQueryOption.Context.TargetProperty;
+            IEdmStructuredType structuredType = topQueryOption.Context.TargetStructuredType;
 
-            //if (EdmLibHelpers.IsTopLimitExceeded(
-            //    property,
-            //    structuredType,
-            //    topQueryOption.Context.Model,
-            //    topQueryOption.Value, topQueryOption.Context.DefaultQuerySettings,
-            //    out maxTop))
-            //{
-            //    throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
-            //        AllowedQueryOptions.Top, topQueryOption.Value));
-            //}
+            if (EdmHelpers.IsTopLimitExceeded(
+                property,
+                structuredType,
+                topQueryOption.Context.Model,
+                topQueryOption.Value, topQueryOption.Context.DefaultQuerySettings,
+                out maxTop))
+            {
+                throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
+                    AllowedQueryOptions.Top, topQueryOption.Value));
+            }
         }
 
         internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)

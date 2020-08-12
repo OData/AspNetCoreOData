@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +49,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         long? TotalCount { get; set; }
 
         /// <summary>
+        /// Gets or sets the total count function for the OData response.
+        /// </summary>
+        Func<long> TotalCountFunc { get; set; }
+
+        /// <summary>
         /// Gets or sets the parsed OData <see cref="ApplyClause"/> of the request.
         /// </summary>
         ApplyClause ApplyClause { get; set; }
@@ -56,6 +62,16 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the parsed OData <see cref="SelectExpandClause"/> of the request.
         /// </summary>
         SelectExpandClause SelectExpandClause { get; set; }
+
+        /// <summary>
+        /// Gets or sets the next link for the OData response.
+        /// </summary>
+        Uri NextLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the delta link for the OData response.
+        /// </summary>
+        Uri DeltaLink { get; set; }
 
         /// <summary>
         /// 

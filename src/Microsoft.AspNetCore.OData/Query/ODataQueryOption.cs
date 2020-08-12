@@ -330,15 +330,16 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             IQueryable result = query;
+            IODataFeature odataFeature = Request.ODataFeature();
 
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
-            //if (IsAvailableODataQueryOption(Apply, AllowedQueryOptions.Apply))
-            //{
-            //    result = Apply.ApplyTo(result, querySettings);
-            //    InternalRequest.Context.ApplyClause = Apply.ApplyClause;
-            //    this.Context.ElementClrType = Apply.ResultClrType;
-            //}
+            if (IsAvailableODataQueryOption(Apply, AllowedQueryOptions.Apply))
+            {
+                result = Apply.ApplyTo(result, querySettings);
+                odataFeature.ApplyClause = Apply.ApplyClause;
+                this.Context.ElementClrType = Apply.ResultClrType;
+            }
 
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
             if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
@@ -346,22 +347,22 @@ namespace Microsoft.AspNetCore.OData.Query
                 result = Filter.ApplyTo(result, querySettings);
             }
 
-            //if (IsAvailableODataQueryOption(Count, AllowedQueryOptions.Count))
-            //{
-            //    if (InternalRequest.Context.TotalCountFunc == null)
-            //    {
-            //        Func<long> countFunc = Count.GetEntityCountFunc(result);
-            //        if (countFunc != null)
-            //        {
-            //            InternalRequest.Context.TotalCountFunc = countFunc;
-            //        }
-            //    }
+            if (IsAvailableODataQueryOption(Count, AllowedQueryOptions.Count))
+            {
+                if (odataFeature.TotalCountFunc == null)
+                {
+                    Func<long> countFunc = Count.GetEntityCountFunc(result);
+                    if (countFunc != null)
+                    {
+                        odataFeature.TotalCountFunc = countFunc;
+                    }
+                }
 
-            //    if (InternalRequest.IsCountRequest())
-            //    {
-            //        return result;
-            //    }
-            //}
+                if (Request.IsCountRequest())
+                {
+                    return result;
+                }
+            }
 
             OrderByQueryOption orderBy = OrderBy;
 

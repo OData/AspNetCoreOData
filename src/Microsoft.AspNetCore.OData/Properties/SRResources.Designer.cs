@@ -484,6 +484,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not supported by the ODataErrorSerializer. The type must be ODataError or HttpError..
+        /// </summary>
+        internal static string ErrorTypeMustBeODataErrorOrHttpError {
+            get {
+                return ResourceManager.GetString("ErrorTypeMustBeODataErrorOrHttpError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The ETag is not well-formed..
         /// </summary>
         internal static string ETagNotWellFormed {
@@ -651,6 +660,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string MappingDoesNotContainResourceType {
             get {
                 return ResourceManager.GetString("MappingDoesNotContainResourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataQuerySettings or EnableQueryAttribute..
+        /// </summary>
+        internal static string MaxAnyAllExpressionLimitExceeded {
+            get {
+                return ResourceManager.GetString("MaxAnyAllExpressionLimitExceeded", resourceCulture);
             }
         }
         
@@ -1299,6 +1317,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string UnableToDetermineMetadataUrl {
             get {
                 return ResourceManager.GetString("UnableToDetermineMetadataUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validating OData UnaryOperatorNode of kind {0} is not supported by {1}..
+        /// </summary>
+        internal static string UnaryNodeValidationNotSupported {
+            get {
+                return ResourceManager.GetString("UnaryNodeValidationNotSupported", resourceCulture);
             }
         }
         

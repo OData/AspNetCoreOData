@@ -7,8 +7,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -193,35 +199,36 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            //if (writeContext.ExpandedResource == null)
-            //{
-            //    // If we have more OData format specific information apply it now, only if we are the root feed.
-            //    PageResult odataResourceSetAnnotations = resourceSetInstance as PageResult;
-            //    if (odataResourceSetAnnotations != null)
-            //    {
-            //        resourceSet.Count = odataResourceSetAnnotations.Count;
-            //        resourceSet.NextPageLink = odataResourceSetAnnotations.NextPageLink;
-            //    }
-            //    else if (writeContext.Request != null)
-            //    {
-            //        resourceSet.NextPageLink = writeContext.InternalRequest.Context.NextLink;
-            //        resourceSet.DeltaLink = writeContext.InternalRequest.Context.DeltaLink;
+            IODataFeature odataFeature = writeContext.Request.ODataFeature();
+            if (writeContext.ExpandedResource == null)
+            {
+                // If we have more OData format specific information apply it now, only if we are the root feed.
+                PageResult odataResourceSetAnnotations = resourceSetInstance as PageResult;
+                if (odataResourceSetAnnotations != null)
+                {
+                    resourceSet.Count = odataResourceSetAnnotations.Count;
+                    resourceSet.NextPageLink = odataResourceSetAnnotations.NextPageLink;
+                }
+                else if (writeContext.Request != null)
+                {
+                    resourceSet.NextPageLink = odataFeature.NextLink;
+                    resourceSet.DeltaLink = odataFeature.DeltaLink;
 
-            //        long? countValue = writeContext.InternalRequest.Context.TotalCount;
-            //        if (countValue.HasValue)
-            //        {
-            //            resourceSet.Count = countValue.Value;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    ICountOptionCollection countOptionCollection = resourceSetInstance as ICountOptionCollection;
-            //    if (countOptionCollection != null && countOptionCollection.TotalCount != null)
-            //    {
-            //        resourceSet.Count = countOptionCollection.TotalCount;
-            //    }
-            //}
+                    long? countValue = odataFeature.TotalCount;
+                    if (countValue.HasValue)
+                    {
+                        resourceSet.Count = countValue.Value;
+                    }
+                }
+            }
+            else
+            {
+                ICountOptionCollection countOptionCollection = resourceSetInstance as ICountOptionCollection;
+                if (countOptionCollection != null && countOptionCollection.TotalCount != null)
+                {
+                    resourceSet.Count = countOptionCollection.TotalCount;
+                }
+            }
 
             return resourceSet;
         }
@@ -241,23 +248,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return (obj) => { return defaultUri; };
             }
 
-            //if (writeContext.ExpandedResource == null)
-            //{
-            //    if (writeContext.InternalRequest != null && writeContext.QueryContext != null)
-            //    {
-            //        SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
-            //        return (obj) => { return handler.GenerateNextPageLink(writeContext.InternalRequest.RequestUri, writeContext.InternalRequest.Context.PageSize, obj, writeContext); };
-            //    }
-            //}
-            //else
-            //{
-            //    // nested resourceSet
-            //    ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
-            //    if (truncatedCollection != null && truncatedCollection.IsTruncated)
-            //    {
-            //        return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
-            //    }
-            //}
+            if (writeContext.ExpandedResource == null)
+            {
+                if (writeContext.Request != null && writeContext.QueryContext != null)
+                {
+                    SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
+                    return (obj) => { return handler.GenerateNextPageLink(new System.Uri(writeContext.Request.GetEncodedUrl()),
+                        (writeContext.Request.ODataFeature() as ODataFeature).PageSize, obj, writeContext); };
+                }
+            }
+            else
+            {
+                // nested resourceSet
+                ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
+                if (truncatedCollection != null && truncatedCollection.IsTruncated)
+                {
+                    return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
+                }
+            }
 
             return (obj) => { return null; };
         }
@@ -295,46 +303,45 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            return null;
-            //OperationLinkBuilder builder;
-            //builder = model.GetOperationLinkBuilder(operation);
+            OperationLinkBuilder builder;
+            builder = model.GetOperationLinkBuilder(operation);
 
-            //if (builder == null)
-            //{
-            //    return null;
-            //}
+            if (builder == null)
+            {
+                return null;
+            }
 
-            //Uri target = builder.BuildLink(resourceSetContext);
-            //if (target == null)
-            //{
-            //    return null;
-            //}
+            Uri target = builder.BuildLink(resourceSetContext);
+            if (target == null)
+            {
+                return null;
+            }
 
-            //Uri baseUri = new Uri(writeContext.InternalUrlHelper.CreateODataLink(MetadataSegment.Instance));
-            //Uri metadata = new Uri(baseUri, "#" + operation.FullName());
+            Uri baseUri = new Uri(writeContext.Request.CreateODataLink(MetadataSegment.Instance));
+            Uri metadata = new Uri(baseUri, "#" + operation.FullName());
 
-            //ODataOperation odataOperation;
-            //IEdmAction action = operation as IEdmAction;
-            //if (action != null)
-            //{
-            //    odataOperation = new ODataAction();
-            //}
-            //else
-            //{
-            //    odataOperation = new ODataFunction();
-            //}
-            //odataOperation.Metadata = metadata;
+            ODataOperation odataOperation;
+            IEdmAction action = operation as IEdmAction;
+            if (action != null)
+            {
+                odataOperation = new ODataAction();
+            }
+            else
+            {
+                odataOperation = new ODataFunction();
+            }
+            odataOperation.Metadata = metadata;
 
-            //// Always omit the title in minimal/no metadata modes.
-            //ODataResourceSerializer.EmitTitle(model, operation, odataOperation);
+            // Always omit the title in minimal/no metadata modes.
+            ODataResourceSerializer.EmitTitle(model, operation, odataOperation);
 
-            //// Omit the target in minimal/no metadata modes unless it doesn't follow conventions.
-            //if (metadataLevel == ODataMetadataLevel.FullMetadata || !builder.FollowsConventions)
-            //{
-            //    odataOperation.Target = target;
-            //}
+            // Omit the target in minimal/no metadata modes unless it doesn't follow conventions.
+            if (metadataLevel == ODataMetadataLevel.Full || !builder.FollowsConventions)
+            {
+                odataOperation.Target = target;
+            }
 
-            //return odataOperation;
+            return odataOperation;
         }
 
         private IEnumerable<ODataOperation> CreateODataOperations(IEnumerable<IEdmOperation> operations, ResourceSetContext resourceSetContext, ODataSerializerContext writeContext)
@@ -357,69 +364,71 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext.ExpandedResource != null);
             IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedResource.NavigationSource;
-            //NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
-            //Uri navigationLink =
-            //    linkBuilder.BuildNavigationLink(writeContext.ExpandedResource, writeContext.NavigationProperty);
-            //Uri nestedNextLink = GenerateQueryFromExpandedItem(writeContext, navigationLink);
-            //SkipTokenHandler nextLinkGenerator = null;
-            //if (writeContext.QueryContext != null)
-            //{
-            //    nextLinkGenerator = writeContext.QueryContext.GetSkipTokenHandler();
-            //}
+            NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
+            Uri navigationLink =
+                linkBuilder.BuildNavigationLink(writeContext.ExpandedResource, writeContext.NavigationProperty);
+            Uri nestedNextLink = GenerateQueryFromExpandedItem(writeContext, navigationLink);
+            SkipTokenHandler nextLinkGenerator = null;
+            if (writeContext.QueryContext != null)
+            {
+                nextLinkGenerator = writeContext.QueryContext.GetSkipTokenHandler();
+            }
 
-            //if (nestedNextLink != null)
-            //{
-            //    if (nextLinkGenerator != null)
-            //    {
-            //        return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, pageSize, obj, writeContext);
-            //    }
+            if (nestedNextLink != null)
+            {
+                if (nextLinkGenerator != null)
+                {
+                    return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, pageSize, obj, writeContext);
+                }
 
-            //    return GetNextPageHelper.GetNextPageLink(nestedNextLink, pageSize);
-            //}
+                return GetNextPageHelper.GetNextPageLink(nestedNextLink, pageSize);
+            }
 
             return null;
         }
 
         private static Uri GenerateQueryFromExpandedItem(ODataSerializerContext writeContext, Uri navigationLink)
         {
-            return null;
             //IWebApiUrlHelper urlHelper = writeContext.InternalUrlHelper;
             //if (urlHelper == null)
             //{
             //    return navigationLink;
             //}
-            //string serviceRoot = urlHelper.CreateODataLink(
-            //    writeContext.InternalRequest.Context.RouteName,
-            //    writeContext.InternalRequest.PathHandler,
-            //    new List<ODataPathSegment>());
-            //Uri serviceRootUri = new Uri(serviceRoot);
-            //ODataUriParser parser = new ODataUriParser(writeContext.Model, serviceRootUri, navigationLink);
-            //ODataUri newUri = parser.ParseUri();
-            //newUri.SelectAndExpand = writeContext.SelectExpandClause;
-            //if (writeContext.CurrentExpandedSelectItem != null)
-            //{
-            //    newUri.OrderBy = writeContext.CurrentExpandedSelectItem.OrderByOption;
-            //    newUri.Filter = writeContext.CurrentExpandedSelectItem.FilterOption;
-            //    newUri.Skip = writeContext.CurrentExpandedSelectItem.SkipOption;
-            //    newUri.Top = writeContext.CurrentExpandedSelectItem.TopOption;
+            string serviceRoot = writeContext.Request.CreateODataLink(new List<ODataPathSegment>());
+            Uri serviceRootUri = new Uri(serviceRoot);
+            ODataUriParser parser = new ODataUriParser(writeContext.Model, serviceRootUri, navigationLink);
+            ODataUri newUri = parser.ParseUri();
+            newUri.SelectAndExpand = writeContext.SelectExpandClause;
+            if (writeContext.CurrentExpandedSelectItem != null)
+            {
+                newUri.OrderBy = writeContext.CurrentExpandedSelectItem.OrderByOption;
+                newUri.Filter = writeContext.CurrentExpandedSelectItem.FilterOption;
+                newUri.Skip = writeContext.CurrentExpandedSelectItem.SkipOption;
+                newUri.Top = writeContext.CurrentExpandedSelectItem.TopOption;
 
-            //    if (writeContext.CurrentExpandedSelectItem.CountOption != null)
-            //    {
-            //        if (writeContext.CurrentExpandedSelectItem.CountOption.HasValue)
-            //        {
-            //            newUri.QueryCount = writeContext.CurrentExpandedSelectItem.CountOption.Value;
-            //        }
-            //    }
+                if (writeContext.CurrentExpandedSelectItem.CountOption != null)
+                {
+                    if (writeContext.CurrentExpandedSelectItem.CountOption.HasValue)
+                    {
+                        newUri.QueryCount = writeContext.CurrentExpandedSelectItem.CountOption.Value;
+                    }
+                }
 
-            //    ExpandedNavigationSelectItem expandedNavigationItem = writeContext.CurrentExpandedSelectItem as ExpandedNavigationSelectItem;
-            //    if (expandedNavigationItem != null)
-            //    {
-            //        newUri.SelectAndExpand = expandedNavigationItem.SelectAndExpand;
-            //    }
-            //}
+                ExpandedNavigationSelectItem expandedNavigationItem = writeContext.CurrentExpandedSelectItem as ExpandedNavigationSelectItem;
+                if (expandedNavigationItem != null)
+                {
+                    newUri.SelectAndExpand = expandedNavigationItem.SelectAndExpand;
+                }
+            }
 
-            //ODataUrlKeyDelimiter keyDelimiter = writeContext.InternalRequest.Options.UrlKeyDelimiter == ODataUrlKeyDelimiter.Slash ? ODataUrlKeyDelimiter.Slash : ODataUrlKeyDelimiter.Parentheses;
-            //return newUri.BuildUri(keyDelimiter);
+            ODataUrlKeyDelimiter keyDelimiter = ODataUrlKeyDelimiter.Parentheses;
+            ODataOptions options = writeContext.Request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+            if (options != null)
+            {
+                keyDelimiter = options.UrlKeyDelimiter;
+            }
+
+            return newUri.BuildUri(keyDelimiter);
         }
 
         private static IEdmStructuredTypeReference GetResourceType(IEdmTypeReference resourceSetType)

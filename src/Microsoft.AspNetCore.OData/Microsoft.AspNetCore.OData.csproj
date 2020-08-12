@@ -42,6 +42,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>SRResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Query\Container\PropertyContainer.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PropertyContainer.generated.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +55,17 @@
       <LastGenOutput>SRResources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>Microsoft.AspNetCore.OData</CustomToolNamespace>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Query\Container\PropertyContainer.generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PropertyContainer.generated.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

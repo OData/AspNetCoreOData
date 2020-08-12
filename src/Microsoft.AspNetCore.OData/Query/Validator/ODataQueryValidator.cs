@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 
@@ -29,13 +30,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
 
             // Validate each query options
-            //if (options.Apply != null)
-            //{
-            //    if (options.Apply.ApplyClause != null)
-            //    {
-            //        ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
-            //    }
-            //}
+            if (options.Apply != null)
+            {
+                if (options.Apply.ApplyClause != null)
+                {
+                    ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
+                }
+            }
 
             if (options.Skip != null)
             {
@@ -49,63 +50,63 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 options.Top.Validate(validationSettings);
             }
 
-            //if (options.OrderBy != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.OrderBy, validationSettings.AllowedQueryOptions);
-            //    options.OrderBy.Validate(validationSettings);
-            //}
+            if (options.OrderBy != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.OrderBy, validationSettings.AllowedQueryOptions);
+                options.OrderBy.Validate(validationSettings);
+            }
 
-            //if (options.Filter != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.Filter, validationSettings.AllowedQueryOptions);
-            //    options.Filter.Validate(validationSettings);
-            //}
+            if (options.Filter != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Filter, validationSettings.AllowedQueryOptions);
+                options.Filter.Validate(validationSettings);
+            }
 
-            //if (options.Count != null || options.InternalRequest.IsCountRequest())
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions);
+            if (options.Count != null || options.Request.IsCountRequest())
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions);
 
-            //    if (options.Count != null)
-            //    {
-            //        options.Count.Validate(validationSettings);
-            //    }
-            //}
+                if (options.Count != null)
+                {
+                    options.Count.Validate(validationSettings);
+                }
+            }
 
-            //if (options.SkipToken != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions);
-            //    options.SkipToken.Validate(validationSettings);
-            //}
+            if (options.SkipToken != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions);
+                options.SkipToken.Validate(validationSettings);
+            }
 
-            //if (options.RawValues.Expand != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions);
-            //}
+            if (options.RawValues.Expand != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions);
+            }
 
-            //if (options.RawValues.Select != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions);
-            //}
+            if (options.RawValues.Select != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions);
+            }
 
-            //if (options.SelectExpand != null)
-            //{
-            //    options.SelectExpand.Validate(validationSettings);
-            //}
+            if (options.SelectExpand != null)
+            {
+                options.SelectExpand.Validate(validationSettings);
+            }
 
-            //if (options.RawValues.Format != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.Format, validationSettings.AllowedQueryOptions);
-            //}
+            if (options.RawValues.Format != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Format, validationSettings.AllowedQueryOptions);
+            }
 
-            //if (options.RawValues.SkipToken != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions);
-            //}
+            if (options.RawValues.SkipToken != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions);
+            }
 
-            //if (options.RawValues.DeltaToken != null)
-            //{
-            //    ValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions);
-            //}
+            if (options.RawValues.DeltaToken != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions);
+            }
         }
 
         internal static ODataQueryValidator GetODataQueryValidator(ODataQueryContext context)

@@ -256,6 +256,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="ExpandedNavigationSelectItem"/>.
+        /// </summary>
+        internal ExpandedReferenceSelectItem CurrentExpandedSelectItem
+        {
+            get
+            {
+                return CurrentSelectItem as ExpandedReferenceSelectItem;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the navigation property being expanded.
         /// </summary>
         public IEdmNavigationProperty NavigationProperty

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
     /// <summary>
@@ -27,11 +29,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             if (skipToken.Context != null)
             {
-                //DefaultQuerySettings defaultSetting = skipToken.Context.DefaultQuerySettings;
-                //if (!defaultSetting.EnableSkipToken)
-                //{
-                //    throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
-                //}
+                DefaultQuerySettings defaultSetting = skipToken.Context.DefaultQuerySettings;
+                if (!defaultSetting.EnableSkipToken)
+                {
+                    throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
+                }
             }
         }
     }

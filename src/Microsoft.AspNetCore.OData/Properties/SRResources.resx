@@ -539,4 +539,13 @@
   <data name="UnableToDetermineBaseUrl" xml:space="preserve">
     <value>The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response.</value>
   </data>
+  <data name="MaxAnyAllExpressionLimitExceeded" xml:space="preserve">
+    <value>The Any/All nesting limit of '{0}' has been exceeded. '{1}' can be configured on ODataQuerySettings or EnableQueryAttribute.</value>
+  </data>
+  <data name="UnaryNodeValidationNotSupported" xml:space="preserve">
+    <value>Validating OData UnaryOperatorNode of kind {0} is not supported by {1}.</value>
+  </data>
+  <data name="ErrorTypeMustBeODataErrorOrHttpError" xml:space="preserve">
+    <value>The type '{0}' is not supported by the ODataErrorSerializer. The type must be ODataError or HttpError.</value>
+  </data>
 </root>

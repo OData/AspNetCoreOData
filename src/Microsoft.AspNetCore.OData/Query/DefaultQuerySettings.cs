@@ -43,10 +43,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </value>
         public int? MaxTop
         {
-            get
-            {
-                return _maxTop;
-            }
+            get => _maxTop;
             set
             {
                 if (value.HasValue && value < 0)

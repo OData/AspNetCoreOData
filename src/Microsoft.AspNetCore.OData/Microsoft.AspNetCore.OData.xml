@@ -105,6 +105,11 @@
             </summary>
             <value><c>null</c> if no count should be sent back to the client.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCountFunc">
+            <summary>
+            Gets or sets the total count function for the OData response.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause">
             <summary>
             Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause"/> of the request.
@@ -113,6 +118,16 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause">
             <summary>
             Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause"/> of the request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.NextLink">
+            <summary>
+            Gets or sets the next link for the OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.DeltaLink">
+            <summary>
+            Gets or sets the delta link for the OData response.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
@@ -226,9 +241,24 @@
             Gets or sets the parsed OData <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause"/> of the request.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.NextLink">
+            <summary>
+            Gets or sets the next link for the OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.DeltaLink">
+            <summary>
+            Gets or sets the delta link for the OData response.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.QueryOptions">
             <summary>
             Gets or sets the parsed <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> of the request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PageSize">
+            <summary>
+            Page size to be used by skiptoken implementation for the top-level resource for the request. 
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BodyValues">
@@ -1008,6 +1038,23 @@
             <param name="navigationSource">The navigation source.</param>
             <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used while generating operation links for the given action.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the operation.</param>
+            <param name="operation">The operation for which the link builder is needed.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
+            <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.SetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder)">
+            <summary>
+            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used for generating the OData operation link for the given operation.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the entity set.</param>
+            <param name="operation">The operation for which the operation link is to be generated.</param>
+            <param name="operationLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to set.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Resolve the navigation source using the input identifier
@@ -1183,6 +1230,59 @@
             <summary>
             Constructs a NavigationLink for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" />, <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> can be used to annotate an action or a function.
+            This is how formatters create links to invoke bound actions or functions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Uri},System.Boolean)">
+            <summary>
+            Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on an entity link factory.
+            </summary>
+            <param name="linkFactory">The link factory this <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> should use when building links.</param>
+            <param name="followsConventions">
+            A value indicating whether the link factory generates links that follow OData conventions.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,System.Uri},System.Boolean)">
+            <summary>
+            Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on a feed link factory.
+            </summary>
+            <param name="linkFactory">The link factory this <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> should use when building links.</param>
+            <param name="followsConventions">
+            A value indicating whether the action link factory generates links that follow OData conventions.
+            </param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.LinkFactory">
+            <summary>
+            Gets the resource link factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.FeedLinkFactory">
+            <summary>
+            Gets the feed link factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.FollowsConventions">
+            <summary>
+            Gets a Boolean indicating whether the link factory follows OData conventions or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.BuildLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Builds the operation link for the given resource.
+            </summary>
+            <param name="context">An instance context wrapping the resource instance.</param>
+            <returns>The generated link.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.BuildLink(Microsoft.AspNetCore.OData.Formatter.ResourceSetContext)">
+            <summary>
+            Builds the operation link for the given feed.
+            </summary>
+            <param name="context">An feed context wrapping the feed instance.</param>
+            <returns>The generated link.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1">
             <summary>
@@ -2642,6 +2742,22 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.IsHttpError(System.Object)">
+            <summary>
+            Return true of the object is an HttpError.
+            </summary>
+            <param name="error">The error to test.</param>
+            <returns>true of the object is an HttpError</returns>
+            <remarks>This function uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.CreateODataError(System.Object)">
+            <summary>
+            Create an ODataError from an HttpError.
+            </summary>
+            <param name="error">The error to use.</param>
+            <returns>an ODataError.</returns>
+            <remarks>This function uses types that are AspNetCore-specific.</remarks>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing $metadata. 
@@ -2974,6 +3090,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause">
             <summary>
             Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CurrentExpandedSelectItem">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.UriParser.ExpandedNavigationSelectItem"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.NavigationProperty">
@@ -4641,6 +4762,11 @@
               Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ErrorTypeMustBeODataErrorOrHttpError">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is not supported by the ODataErrorSerializer. The type must be ODataError or HttpError..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ETagNotWellFormed">
             <summary>
               Looks up a localized string similar to The ETag is not well-formed..
@@ -4734,6 +4860,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MappingDoesNotContainResourceType">
             <summary>
               Looks up a localized string similar to The provided mapping does not contain a resource for the resource type &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxAnyAllExpressionLimitExceeded">
+            <summary>
+              Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataQuerySettings or EnableQueryAttribute..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxExpandDepthExceeded">
@@ -5094,6 +5225,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToDetermineMetadataUrl">
             <summary>
               Looks up a localized string similar to The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.UnaryNodeValidationNotSupported">
+            <summary>
+              Looks up a localized string similar to Validating OData UnaryOperatorNode of kind {0} is not supported by {1}..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnexpectedElementType">
@@ -6872,10 +7008,91 @@
             can be retrieved later.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions">
+            <summary>
+            This class describes the settings to use during query composition.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableExpand">
+            <summary>
+            Gets or sets a value indicating whether navigation property can be expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableSelect">
+            <summary>
+            Gets or sets a value indicating whether property can be selected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableCount">
+            <summary>
+            Gets or sets a value indicating whether entity set and property can apply $count.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableOrderBy">
+            <summary>
+            Gets or sets a value indicating whether property can apply $orderby.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableFilter">
             <summary>
             Gets or sets a value indicating whether property can apply $filter.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableSkipToken">
+            <summary>
+            Gets or sets a value indicating whether the service will use skiptoken or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+            <value>
+            The max value of $top that a client can request, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Expand">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Select">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Filter">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.OrderBy">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Count">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SkipToken">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SetMaxTop(System.Nullable{System.Int32})">
+            <summary>
+            
+            </summary>
+            <param name="maxTopValue"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions">
             <summary>
@@ -6902,6 +7119,14 @@
             
             </summary>
             <param name="services"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext">
@@ -8352,7 +8577,7 @@
             based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator" /> class based on
             the <see cref="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings" />.
@@ -8374,7 +8599,7 @@
             Please note this class is not thread safe.
             </remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.#ctor(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator" /> class based on
             the <see cref="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings" />.
@@ -8911,6 +9136,70 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.PageResult">
+            <summary>
+            Represents a feed of entities that includes additional information that OData formats support.
+            </summary>
+            <remarks>
+            Currently limited to:
+            <list type="bullet">
+            <item><description>The Count of all matching entities on the server (requested using $count=true).</description></item>
+            <item><description>The NextLink to retrieve the next page of results (added if the server enforces Server Driven Paging).</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult.#ctor(System.Uri,System.Nullable{System.Int64})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.PageResult"/> class.
+            </summary>
+            <param name="nextPageLink">The link for the next page of items in the feed.</param>
+            <param name="count">The total count of items in the feed.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.PageResult.NextPageLink">
+            <summary>
+            Gets the link for the next page of items in the feed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.PageResult.Count">
+            <summary>
+            Gets the total count of items in the feed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.PageResult`1">
+            <summary>Represents a feed of entities that includes additional information that OData formats support.</summary>
+            <remarks>
+            Currently limited to:
+            <list type="bullet">
+            <item><description>The Count of all matching entities on the server (requested using $count=true).</description></item>
+            <item><description>The NextLink to retrieve the next page of results (added if the server enforces Server Driven Paging).</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Uri,System.Nullable{System.Int64})">
+            <summary>
+            Creates a partial set of results - used when server driven paging is enabled.
+            </summary>
+            <param name="items">The subset of matching results that should be serialized in this page.</param>
+            <param name="nextPageLink">A link to the next page of matching results (if more exists).</param>
+            <param name="count">A total count of matching results so clients can know the number of matches on the server.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.PageResult`1.Items">
+            <summary>
+            Gets the collection of entities for this feed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult`1.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ResultHelpers.GenerateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.Object,System.Boolean)">
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>

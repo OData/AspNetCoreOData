@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -135,18 +136,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             if (topOption != null)
             {
                 Contract.Assert(topOption.Value <= Int32.MaxValue);
-                //int maxTop;
-                //if (EdmLibHelpers.IsTopLimitExceeded(
-                //    property,
-                //    structuredType,
-                //    edmModel,
-                //    (int)topOption.Value,
-                //    _defaultQuerySettings,
-                //    out maxTop))
-                //{
-                //    throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
-                //        AllowedQueryOptions.Top, topOption.Value));
-                //}
+                int maxTop;
+                if (EdmHelpers.IsTopLimitExceeded(
+                    property,
+                    structuredType,
+                    edmModel,
+                    (int)topOption.Value,
+                    _defaultQuerySettings,
+                    out maxTop))
+                {
+                    throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
+                        AllowedQueryOptions.Top, topOption.Value));
+                }
             }
         }
 
@@ -155,16 +156,16 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (countOption == true)
             {
-                //if (EdmLibHelpers.IsNotCountable(
-                //    property,
-                //    structuredType,
-                //    edmModel,
-                //    _defaultQuerySettings.EnableCount))
-                //{
-                //    throw new InvalidOperationException(Error.Format(
-                //        SRResources.NotCountablePropertyUsedForCount,
-                //        property.Name));
-                //}
+                if (EdmHelpers.IsNotCountable(
+                    property,
+                    structuredType,
+                    edmModel,
+                    _defaultQuerySettings.EnableCount))
+                {
+                    throw new InvalidOperationException(Error.Format(
+                        SRResources.NotCountablePropertyUsedForCount,
+                        property.Name));
+                }
             }
         }
 
@@ -197,23 +198,23 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 if (navigationPropertySegment != null)
                 {
                     IEdmNavigationProperty property = navigationPropertySegment.NavigationProperty;
-                    //if (EdmLibHelpers.IsNotNavigable(property, edmModel))
-                    //{
-                    //    throw new ODataException(Error.Format(SRResources.NotNavigablePropertyUsedInNavigation,
-                    //        property.Name));
-                    //}
+                    if (EdmHelpers.IsNotNavigable(property, edmModel))
+                    {
+                        throw new ODataException(Error.Format(SRResources.NotNavigablePropertyUsedInNavigation,
+                            property.Name));
+                    }
                 }
                 else
                 {
                     PropertySegment propertySegment = segment as PropertySegment;
                     if (propertySegment != null)
                     {
-                        //if (EdmLibHelpers.IsNotSelectable(propertySegment.Property, pathProperty, pathStructuredType, edmModel,
-                        //    _defaultQuerySettings.EnableSelect))
-                        //{
-                        //    throw new ODataException(Error.Format(SRResources.NotSelectablePropertyUsedInSelect,
-                        //        propertySegment.Property.Name));
-                        //}
+                        if (EdmHelpers.IsNotSelectable(propertySegment.Property, pathProperty, pathStructuredType, edmModel,
+                            _defaultQuerySettings.EnableSelect))
+                        {
+                            throw new ODataException(Error.Format(SRResources.NotSelectablePropertyUsedInSelect,
+                                propertySegment.Property.Name));
+                        }
                     }
                 }
             }
@@ -224,12 +225,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 {
                     foreach (var property in pathStructuredType.StructuralProperties())
                     {
-                        //if (EdmLibHelpers.IsNotSelectable(property, pathProperty, pathStructuredType, edmModel,
-                        //    _defaultQuerySettings.EnableSelect))
-                        //{
-                        //    throw new ODataException(Error.Format(SRResources.NotSelectablePropertyUsedInSelect,
-                        //        property.Name));
-                        //}
+                        if (EdmHelpers.IsNotSelectable(property, pathProperty, pathStructuredType, edmModel,
+                            _defaultQuerySettings.EnableSelect))
+                        {
+                            throw new ODataException(Error.Format(SRResources.NotSelectablePropertyUsedInSelect,
+                                property.Name));
+                        }
                     }
                 }
             }
@@ -238,35 +239,35 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         private void ValidateLevelsOption(LevelsClause levelsClause, int depth, int currentDepth,
             IEdmModel edmModel, IEdmNavigationProperty property)
         {
-            //ExpandConfiguration expandConfiguration;
-            //bool isExpandable = EdmLibHelpers.IsExpandable(property.Name,
-            //    property,
-            //    property.ToEntityType(),
-            //    edmModel,
-            //    out expandConfiguration);
-            //if (isExpandable)
-            //{
-            //    int maxDepth = expandConfiguration.MaxDepth;
-            //    if (maxDepth > 0 && maxDepth < depth)
-            //    {
-            //        depth = maxDepth;
-            //    }
+            ExpandConfiguration expandConfiguration;
+            bool isExpandable = EdmHelpers.IsExpandable(property.Name,
+                property,
+                property.ToEntityType(),
+                edmModel,
+                out expandConfiguration);
+            if (isExpandable)
+            {
+                int maxDepth = expandConfiguration.MaxDepth;
+                if (maxDepth > 0 && maxDepth < depth)
+                {
+                    depth = maxDepth;
+                }
 
-            //    if ((depth == 0 && levelsClause.IsMaxLevel) || (depth < levelsClause.Level))
-            //    {
-            //        throw new ODataException(
-            //            Error.Format(SRResources.MaxExpandDepthExceeded, currentDepth + depth, "MaxExpansionDepth"));
-            //    }
-            //}
-            //else
-            //{
-            //    if (!_defaultQuerySettings.EnableExpand ||
-            //        (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
-            //    {
-            //        throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
-            //            property.Name));
-            //    }
-            //}
+                if ((depth == 0 && levelsClause.IsMaxLevel) || (depth < levelsClause.Level))
+                {
+                    throw new ODataException(
+                        Error.Format(SRResources.MaxExpandDepthExceeded, currentDepth + depth, "MaxExpansionDepth"));
+                }
+            }
+            else
+            {
+                if (!_defaultQuerySettings.EnableExpand ||
+                    (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
+                {
+                    throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
+                        property.Name));
+                }
+            }
         }
 
         private void ValidateOtherQueryOptionInExpand(
@@ -318,40 +319,40 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     NavigationPropertySegment navigationSegment =
                         (NavigationPropertySegment)expandItem.PathToNavigationProperty.LastSegment;
                     IEdmNavigationProperty property = navigationSegment.NavigationProperty;
-                    //if (EdmLibHelpers.IsNotExpandable(property, edmModel))
-                    //{
-                    //    throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
-                    //        property.Name));
-                    //}
+                    if (EdmHelpers.IsNotExpandable(property, edmModel))
+                    {
+                        throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
+                            property.Name));
+                    }
 
-                    //if (edmModel != null)
-                    //{
-                    //    ValidateOtherQueryOptionInExpand(property, edmModel, expandItem, validationSettings);
-                    //    bool isExpandable;
-                    //    ExpandConfiguration expandConfiguration;
-                    //    isExpandable = EdmLibHelpers.IsExpandable(property.Name,
-                    //        pathProperty,
-                    //        pathStructuredType,
-                    //        edmModel,
-                    //        out expandConfiguration);
-                    //    if (isExpandable)
-                    //    {
-                    //        int maxDepth = expandConfiguration.MaxDepth;
-                    //        if (maxDepth > 0 && (remainDepth == null || maxDepth < remainDepth))
-                    //        {
-                    //            remainDepth = maxDepth;
-                    //        }
-                    //    }
-                    //    else if (!isExpandable)
-                    //    {
-                    //        if (!_defaultQuerySettings.EnableExpand ||
-                    //            (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
-                    //        {
-                    //            throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
-                    //                property.Name));
-                    //        }
-                    //    }
-                    //}
+                    if (edmModel != null)
+                    {
+                        ValidateOtherQueryOptionInExpand(property, edmModel, expandItem, validationSettings);
+                        bool isExpandable;
+                        ExpandConfiguration expandConfiguration;
+                        isExpandable = EdmHelpers.IsExpandable(property.Name,
+                            pathProperty,
+                            pathStructuredType,
+                            edmModel,
+                            out expandConfiguration);
+                        if (isExpandable)
+                        {
+                            int maxDepth = expandConfiguration.MaxDepth;
+                            if (maxDepth > 0 && (remainDepth == null || maxDepth < remainDepth))
+                            {
+                                remainDepth = maxDepth;
+                            }
+                        }
+                        else if (!isExpandable)
+                        {
+                            if (!_defaultQuerySettings.EnableExpand ||
+                                (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
+                            {
+                                throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand,
+                                    property.Name));
+                            }
+                        }
+                    }
 
                     if (remainDepth.HasValue)
                     {

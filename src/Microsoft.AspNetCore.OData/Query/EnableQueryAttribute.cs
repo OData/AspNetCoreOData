@@ -89,9 +89,6 @@ namespace Microsoft.AspNetCore.OData.Query
                     ObjectResult responseContent = actionExecutedContext.Result as ObjectResult;
                     if (responseContent != null)
                     {
-                        //throw Error.Argument("actionExecutedContext", SRResources.QueryingRequiresObjectContent,
-                        //    actionExecutedContext.Result.GetType().FullName);
-
                         // Get collection from SingleResult.
                         IQueryable singleResultCollection = null;
                         SingleResult singleResult = responseContent.Value as SingleResult;

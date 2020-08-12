@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -20,9 +23,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public CountQueryValidator(DefaultQuerySettings defaultQuerySettings)
+        public CountQueryValidator(/*DefaultQuerySettings defaultQuerySettings*/IOptions<ODataQueryableOptions> options)
         {
-            _defaultQuerySettings = defaultQuerySettings;
+            _defaultQuerySettings = new DefaultQuerySettings
+            {
+                EnableCount = options.Value.EnableCount
+            };
+
+            //_defaultQuerySettings = defaultQuerySettings;
         }
 
         /// <summary>
@@ -49,36 +57,38 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 IEdmProperty property = countQueryOption.Context.TargetProperty;
                 IEdmStructuredType structuredType = countQueryOption.Context.TargetStructuredType;
                 string name = countQueryOption.Context.TargetName;
-                //if (EdmLibHelpers.IsNotCountable(property, structuredType,
-                //    countQueryOption.Context.Model,
-                //    _defaultQuerySettings.EnableCount))
-                //{
-                //    if (property == null)
-                //    {
-                //        throw new InvalidOperationException(Error.Format(
-                //            SRResources.NotCountableEntitySetUsedForCount,
-                //            name));
-                //    }
-                //    else
-                //    {
-                //        throw new InvalidOperationException(Error.Format(
-                //            SRResources.NotCountablePropertyUsedForCount,
-                //            name));
-                //    }
-                //}
+                if (EdmHelpers.IsNotCountable(property, structuredType,
+                    countQueryOption.Context.Model,
+                    _defaultQuerySettings.EnableCount))
+                {
+                    if (property == null)
+                    {
+                        throw new InvalidOperationException(Error.Format(
+                            SRResources.NotCountableEntitySetUsedForCount,
+                            name));
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(Error.Format(
+                            SRResources.NotCountablePropertyUsedForCount,
+                            name));
+                    }
+                }
             }
         }
 
         internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            if (context == null)
-            {
-                return new CountQueryValidator(new DefaultQuerySettings());
-            }
+            //if (context == null)
+            //{
+            //    return new CountQueryValidator(new DefaultQuerySettings());
+            //}
 
-            return context.RequestContainer == null
-                ? new CountQueryValidator(context.DefaultQuerySettings)
-                : context.RequestContainer.GetRequiredService<CountQueryValidator>();
+            //return context.RequestContainer == null
+            //    ? new CountQueryValidator(context.DefaultQuerySettings)
+            //    : context.RequestContainer.GetRequiredService<CountQueryValidator>();
+
+            return context.RequestContainer.GetRequiredService<CountQueryValidator>();
         }
     }
 }
