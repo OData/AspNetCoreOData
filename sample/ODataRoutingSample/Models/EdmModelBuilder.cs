@@ -52,6 +52,15 @@ namespace ODataRoutingSample.Models
             action.Parameter<int>("age");
             action.Returns<string>();
 
+            // bound action
+            ActionConfiguration boundAction = builder.EntityType<Customer>().Action("BoundAction");
+            boundAction.Parameter<int>("p1");
+            boundAction.Parameter<Address>("p2");
+            boundAction.Parameter<Color?>("color");
+            boundAction.CollectionParameter<string>("p3");
+            boundAction.CollectionParameter<Address>("p4");
+            boundAction.CollectionParameter<Color?>("colors");
+
             return builder.GetEdmModel();
         }
 

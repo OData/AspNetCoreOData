@@ -98,15 +98,22 @@ namespace ODataRoutingSample.Controllers.v1
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]Customer newCustomer)
+        public IActionResult Post([FromBody] Customer newCustomer)
         {
             return Ok();
         }
 
         [HttpPost]
-        public string RateByName(int key, [FromODataBody]string name, [FromODataBody]int age)
+        public string RateByName(int key, [FromODataBody] string name, [FromODataBody] int age)
         {
             return key + name + ": " + age;
+        }
+
+        [HttpPost]
+        [EnableQuery]
+        public IActionResult BoundAction(int key, ODataActionParameters parameters)
+        {
+            return Ok($"BoundAction of Customers with key {key} : {System.Text.Json.JsonSerializer.Serialize(parameters)}");
         }
     }
 }
