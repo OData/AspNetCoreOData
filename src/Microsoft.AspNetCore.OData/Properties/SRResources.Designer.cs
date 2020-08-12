@@ -475,6 +475,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The related entity set could not be found from the OData path. The related entity set is required to serialize the payload..
+        /// </summary>
+        internal static string EntitySetMissingDuringSerialization {
+            get {
+                return ResourceManager.GetString("EntitySetMissingDuringSerialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
         /// </summary>
         internal static string EntityTypeMismatch {
