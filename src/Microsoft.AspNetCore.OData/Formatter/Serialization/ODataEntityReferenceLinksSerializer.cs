@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
@@ -51,10 +52,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         Links = uris.Select(uri => new ODataEntityReferenceLink { Url = uri })
                     };
 
-                    //if (writeContext.Request != null)
-                    //{
-                    //    entityReferenceLinks.Count = writeContext.InternalRequest.Context.TotalCount;
-                    //}
+                    if (writeContext.Request != null)
+                    {
+                        entityReferenceLinks.Count = writeContext.Request.ODataFeature().TotalCount;
+                    }
                 }
 
                 messageWriter.WriteEntityReferenceLinks(entityReferenceLinks);

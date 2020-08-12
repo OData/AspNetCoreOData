@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -34,24 +35,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 throw Error.ArgumentNull("writeContext");
             }
-            //if (writeContext.RootElementName == null)
-            //{
-            //    throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
-            //}
+            if (writeContext.RootElementName == null)
+            {
+                throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
+            }
 
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-          //  messageWriter.WriteProperty(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext));
+            messageWriter.WriteProperty(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext));
         }
 
         /// <inheritdoc/>
         public sealed override ODataValue CreateODataValue(object graph, IEdmTypeReference expectedType, ODataSerializerContext writeContext)
         {
-            //if (!expectedType.IsEnum())
-            //{
-            //    throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataEnumSerializer).Name, expectedType.FullName());
-            //}
+            if (!expectedType.IsEnum())
+            {
+                throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataEnumSerializer).Name, expectedType.FullName());
+            }
 
             ODataEnumValue value = CreateODataEnumValue(graph, expectedType.AsEnum(), writeContext);
             if (value == null)
@@ -91,15 +92,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // Enum member supports model alias case. So, try to use the Edm member name to create Enum value.
-            //var memberMapAnnotation = writeContext.Model.GetClrEnumMemberAnnotation(enumType.EnumDefinition());
-            //if (memberMapAnnotation != null)
-            //{
-            //    var edmEnumMember = memberMapAnnotation.GetEdmEnumMember((Enum)graph);
-            //    if (edmEnumMember != null)
-            //    {
-            //        value = edmEnumMember.Name;
-            //    }
-            //}
+            var memberMapAnnotation = writeContext.Model.GetClrEnumMemberAnnotation(enumType.EnumDefinition());
+            if (memberMapAnnotation != null)
+            {
+                var edmEnumMember = memberMapAnnotation.GetEdmEnumMember((Enum)graph);
+                if (edmEnumMember != null)
+                {
+                    value = edmEnumMember.Name;
+                }
+            }
 
             ODataEnumValue enumValue = new ODataEnumValue(value, enumType.FullName());
 

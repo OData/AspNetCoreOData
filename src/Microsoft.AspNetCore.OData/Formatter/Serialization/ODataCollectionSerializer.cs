@@ -6,6 +6,10 @@ using System.Collections;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -83,24 +87,25 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             ODataCollectionStart collectionStart = new ODataCollectionStart { Name = writeContext.RootElementName };
 
-            //if (writeContext.Request != null)
-            //{
-            //    if (writeContext.InternalRequest.Context.NextLink != null)
-            //    {
-            //        collectionStart.NextPageLink = writeContext.InternalRequest.Context.NextLink;
-            //    }
-            //    else if (writeContext.InternalRequest.Context.QueryOptions != null)
-            //    {
-            //        // Collection serializer is called only for collection of primitive values - A null object will be supplied since it is a non-entity value
-            //        SkipTokenHandler skipTokenHandler = writeContext.QueryOptions.Context.GetSkipTokenHandler();
-            //        collectionStart.NextPageLink = skipTokenHandler.GenerateNextPageLink(writeContext.InternalRequest.RequestUri, writeContext.InternalRequest.Context.PageSize, null, writeContext);
-            //    }
+            ODataFeature odataFeature = writeContext.Request.ODataFeature() as ODataFeature;
+            if (writeContext.Request != null)
+            {
+                if (odataFeature.NextLink != null)
+                {
+                    collectionStart.NextPageLink = odataFeature.NextLink;
+                }
+                else if (odataFeature.QueryOptions != null)
+                {
+                    // Collection serializer is called only for collection of primitive values - A null object will be supplied since it is a non-entity value
+                    SkipTokenHandler skipTokenHandler = writeContext.QueryOptions.Context.GetSkipTokenHandler();
+                    collectionStart.NextPageLink = skipTokenHandler.GenerateNextPageLink(new Uri(writeContext.Request.GetEncodedUrl()), odataFeature.PageSize, null, writeContext);
+                }
 
-            //    if (writeContext.InternalRequest.Context.TotalCount != null)
-            //    {
-            //        collectionStart.Count = writeContext.InternalRequest.Context.TotalCount;
-            //    }
-            //}
+                if (odataFeature.TotalCount != null)
+                {
+                    collectionStart.Count = odataFeature.TotalCount;
+                }
+            }
 
             writer.WriteStart(collectionStart);
 
@@ -168,8 +173,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     // ODataCollectionWriter expects the individual elements in the collection to be the underlying
                     // values and not ODataValues.
-                    //valueCollection.Add(
-                    //    itemSerializer.CreateODataValue(item, actualType, writeContext).GetInnerValue());
+                    valueCollection.Add(
+                        itemSerializer.CreateODataValue(item, actualType, writeContext).GetInnerValue());
                 }
             }
 

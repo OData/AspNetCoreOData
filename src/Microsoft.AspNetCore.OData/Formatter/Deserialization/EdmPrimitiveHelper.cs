@@ -7,7 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData.Edm;
 
@@ -61,12 +60,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
                 return str.ToCharArray();
             }
-#if NETFX // System.Data.Linq.Binary is only supported in the AspNet version.
-            else if (type == typeof(Binary))
-            {
-                return new Binary((byte[])value);
-            }
-#endif
             else if (type == typeof(XElement))
             {
                 if (str == null)

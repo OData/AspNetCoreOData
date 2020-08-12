@@ -3,7 +3,7 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -87,11 +87,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             IEdmModel model = request.GetModel();
-            IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
+            //IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
 
-            // ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            // IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
-            IEdmTypeReference edmType = typeMappingProvider.GetEdmType(model, type);
+            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
+            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
+            //IEdmTypeReference edmType = typeMappingProvider.GetEdmType(model, type);
 
             if (edmType == null)
             {

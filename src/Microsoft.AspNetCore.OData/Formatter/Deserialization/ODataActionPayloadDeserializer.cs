@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
-
     /// <summary>
     /// Represents an <see cref="ODataDeserializer"/> for reading OData action parameters.
     /// </summary>
@@ -34,12 +33,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         public ODataActionPayloadDeserializer(ODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Parameter)
         {
-            if (deserializerProvider == null)
-            {
-                throw Error.ArgumentNull("deserializerProvider");
-            }
-
-            DeserializerProvider = deserializerProvider;
+            DeserializerProvider = deserializerProvider ?? throw new ArgumentNullException(nameof(deserializerProvider));
         }
 
         /// <summary>

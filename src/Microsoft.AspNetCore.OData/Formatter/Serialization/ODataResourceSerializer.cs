@@ -12,7 +12,10 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -240,41 +243,41 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(dynamicTypeProperties != null);
 
             var properties = new List<ODataProperty>();
-            //var dynamicObject = graph as DynamicTypeWrapper;
-            //if (dynamicObject == null)
-            //{
-            //    var dynamicEnumerable = (graph as IEnumerable<DynamicTypeWrapper>);
-            //    if (dynamicEnumerable != null)
-            //    {
-            //        dynamicObject = dynamicEnumerable.SingleOrDefault();
-            //    }
-            //}
-            //if (dynamicObject != null)
-            //{
-            //    foreach (var prop in dynamicObject.Values)
-            //    {
-            //        if (prop.Value != null
-            //            && (prop.Value is DynamicTypeWrapper || (prop.Value is IEnumerable<DynamicTypeWrapper>)))
-            //        {
-            //            IEdmProperty edmProperty = entityType.Properties()
-            //                .FirstOrDefault(p => p.Name.Equals(prop.Key));
-            //            if (edmProperty != null)
-            //            {
-            //                dynamicTypeProperties.Add(edmProperty, prop.Value);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            var property = new ODataProperty
-            //            {
-            //                Name = prop.Key,
-            //                Value = prop.Value
-            //            };
+            var dynamicObject = graph as DynamicTypeWrapper;
+            if (dynamicObject == null)
+            {
+                var dynamicEnumerable = (graph as IEnumerable<DynamicTypeWrapper>);
+                if (dynamicEnumerable != null)
+                {
+                    dynamicObject = dynamicEnumerable.SingleOrDefault();
+                }
+            }
+            if (dynamicObject != null)
+            {
+                foreach (var prop in dynamicObject.Values)
+                {
+                    if (prop.Value != null
+                        && (prop.Value is DynamicTypeWrapper || (prop.Value is IEnumerable<DynamicTypeWrapper>)))
+                    {
+                        IEdmProperty edmProperty = entityType.Properties()
+                            .FirstOrDefault(p => p.Name.Equals(prop.Key));
+                        if (edmProperty != null)
+                        {
+                            dynamicTypeProperties.Add(edmProperty, prop.Value);
+                        }
+                    }
+                    else
+                    {
+                        var property = new ODataProperty
+                        {
+                            Name = prop.Key,
+                            Value = prop.Value
+                        };
 
-            //            properties.Add(property);
-            //        }
-            //    }
-            //}
+                        properties.Add(property);
+                    }
+                }
+            }
 
             return properties;
         }
@@ -328,11 +331,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext != null);
 
-            //if (EdmLibHelpers.IsDynamicTypeWrapper(graph.GetType()))
-            //{
-            //    WriteDynamicTypeResource(graph, writer, expectedType, writeContext);
-            //    return;
-            //}
+            if (EdmLibQueryHelpers.IsDynamicTypeWrapper(graph.GetType()))
+            {
+                WriteDynamicTypeResource(graph, writer, expectedType, writeContext);
+                return;
+            }
 
             IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
             ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
@@ -416,7 +419,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 return new ODataResource
                 {
-                    //Id = resourceContext.GenerateSelfLink(false)
+                    Id = resourceContext.GenerateSelfLink(false)
                 };
             }
 
@@ -475,24 +478,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 if (!(resourceContext.NavigationSource is IEdmContainedEntitySet))
                 {
-                    //IEdmModel model = resourceContext.SerializerContext.Model;
-                    //NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(resourceContext.NavigationSource);
-                    //EntitySelfLinks selfLinks = linkBuilder.BuildEntitySelfLinks(resourceContext, resourceContext.SerializerContext.MetadataLevel);
+                    IEdmModel model = resourceContext.SerializerContext.Model;
+                    NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(resourceContext.NavigationSource);
+                    EntitySelfLinks selfLinks = linkBuilder.BuildEntitySelfLinks(resourceContext, resourceContext.SerializerContext.MetadataLevel);
 
-                    //if (selfLinks.IdLink != null)
-                    //{
-                    //    resource.Id = selfLinks.IdLink;
-                    //}
+                    if (selfLinks.IdLink != null)
+                    {
+                        resource.Id = selfLinks.IdLink;
+                    }
 
-                    //if (selfLinks.ReadLink != null)
-                    //{
-                    //    resource.ReadLink = selfLinks.ReadLink;
-                    //}
+                    if (selfLinks.ReadLink != null)
+                    {
+                        resource.ReadLink = selfLinks.ReadLink;
+                    }
 
-                    //if (selfLinks.EditLink != null)
-                    //{
-                    //    resource.EditLink = selfLinks.EditLink;
-                    //}
+                    if (selfLinks.EditLink != null)
+                    {
+                        resource.EditLink = selfLinks.EditLink;
+                    }
                 }
 
                 string etag = CreateETag(resourceContext);
@@ -535,7 +538,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else if (resourceContext.Request != null)
             {
-                //nullDynamicPropertyEnabled = resourceContext.InternalRequest.Options.NullDynamicPropertyIsEnabled;
+                ODataOptions options = resourceContext.Request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+                if (options != null)
+                {
+                    nullDynamicPropertyEnabled = options.NullDynamicPropertyIsEnabled;
+                }
             }
 
             IEdmStructuredType structuredType = resourceContext.StructuredType;
@@ -922,9 +929,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 IEdmTypeReference propertyType = navigationProperty.Type;
                 IEdmModel model = writeContext.Model;
-                //NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(navigationSource);
-                //Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
-                Uri navigationUrl = null; // TODO
+                NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(navigationSource);
+                Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
 
                 navigationLink = new ODataNestedResourceInfo
                 {
@@ -1066,17 +1072,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("resourceContext");
             }
 
-            return null;
+            IEdmModel model = resourceContext.EdmModel;
+            OperationLinkBuilder builder = model.GetOperationLinkBuilder(action);
 
-            //IEdmModel model = resourceContext.EdmModel;
-            //OperationLinkBuilder builder = model.GetOperationLinkBuilder(action);
+            if (builder == null)
+            {
+                return null;
+            }
 
-            //if (builder == null)
-            //{
-            //    return null;
-            //}
-
-            //return CreateODataOperation(action, builder, resourceContext) as ODataAction;
+            return CreateODataOperation(action, builder, resourceContext) as ODataAction;
         }
 
         /// <summary>
@@ -1100,67 +1104,65 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("resourceContext");
             }
 
-            return null;
+            IEdmModel model = resourceContext.EdmModel;
+            OperationLinkBuilder builder = model.GetOperationLinkBuilder(function);
 
-            //IEdmModel model = resourceContext.EdmModel;
-            //OperationLinkBuilder builder = model.GetOperationLinkBuilder(function);
+            if (builder == null)
+            {
+                return null;
+            }
 
-            //if (builder == null)
-            //{
-            //    return null;
-            //}
-
-            //return CreateODataOperation(function, builder, resourceContext) as ODataFunction;
+            return CreateODataOperation(function, builder, resourceContext) as ODataFunction;
         }
 
-        //private static ODataOperation CreateODataOperation(IEdmOperation operation, OperationLinkBuilder builder, ResourceContext resourceContext)
-        //{
-        //    Contract.Assert(operation != null);
-        //    Contract.Assert(builder != null);
-        //    Contract.Assert(resourceContext != null);
+        private static ODataOperation CreateODataOperation(IEdmOperation operation, OperationLinkBuilder builder, ResourceContext resourceContext)
+        {
+            Contract.Assert(operation != null);
+            Contract.Assert(builder != null);
+            Contract.Assert(resourceContext != null);
 
-        //    ODataMetadataLevel metadataLevel = resourceContext.SerializerContext.MetadataLevel;
-        //    IEdmModel model = resourceContext.EdmModel;
+            ODataMetadataLevel metadataLevel = resourceContext.SerializerContext.MetadataLevel;
+            IEdmModel model = resourceContext.EdmModel;
 
-        //    if (ShouldOmitOperation(operation, builder, metadataLevel))
-        //    {
-        //        return null;
-        //    }
+            if (ShouldOmitOperation(operation, builder, metadataLevel))
+            {
+                return null;
+            }
 
-        //    Uri target = builder.BuildLink(resourceContext);
-        //    if (target == null)
-        //    {
-        //        return null;
-        //    }
+            Uri target = builder.BuildLink(resourceContext);
+            if (target == null)
+            {
+                return null;
+            }
 
-        //    Uri baseUri = new Uri(resourceContext.Request.CreateODataLink("", MetadataSegment.Instance));
-        //    Uri metadata = new Uri(baseUri, "#" + CreateMetadataFragment(operation));
+            Uri baseUri = new Uri(resourceContext.Request.CreateODataLink("", MetadataSegment.Instance));
+            Uri metadata = new Uri(baseUri, "#" + CreateMetadataFragment(operation));
 
-        //    ODataOperation odataOperation;
-        //    if (operation is IEdmAction)
-        //    {
-        //        odataOperation = new ODataAction();
-        //    }
-        //    else
-        //    {
-        //        odataOperation = new ODataFunction();
-        //    }
-        //    odataOperation.Metadata = metadata;
+            ODataOperation odataOperation;
+            if (operation is IEdmAction)
+            {
+                odataOperation = new ODataAction();
+            }
+            else
+            {
+                odataOperation = new ODataFunction();
+            }
+            odataOperation.Metadata = metadata;
 
-        //    // Always omit the title in minimal/no metadata modes.
-        //    if (metadataLevel == ODataMetadataLevel.Full)
-        //    {
-        //        EmitTitle(model, operation, odataOperation);
-        //    }
+            // Always omit the title in minimal/no metadata modes.
+            if (metadataLevel == ODataMetadataLevel.Full)
+            {
+                EmitTitle(model, operation, odataOperation);
+            }
 
-        //    // Omit the target in minimal/no metadata modes unless it doesn't follow conventions.
-        //    if (!builder.FollowsConventions || metadataLevel == ODataMetadataLevel.Full)
-        //    {
-        //        odataOperation.Target = target;
-        //    }
+            // Omit the target in minimal/no metadata modes unless it doesn't follow conventions.
+            if (!builder.FollowsConventions || metadataLevel == ODataMetadataLevel.Full)
+            {
+                odataOperation.Target = target;
+            }
 
-        //    return odataOperation;
-        //}
+            return odataOperation;
+        }
 
         internal static void EmitTitle(IEdmModel model, IEdmOperation operation, ODataOperation odataOperation)
         {
@@ -1321,22 +1323,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        //internal static bool ShouldOmitOperation(IEdmOperation operation, OperationLinkBuilder builder,
-        //    ODataMetadataLevel metadataLevel)
-        //{
-        //    Contract.Assert(builder != null);
+        internal static bool ShouldOmitOperation(IEdmOperation operation, OperationLinkBuilder builder,
+            ODataMetadataLevel metadataLevel)
+        {
+            Contract.Assert(builder != null);
 
-        //    switch (metadataLevel)
-        //    {
-        //        case ODataMetadataLevel.Minimal:
-        //        case ODataMetadataLevel.None:
-        //            return operation.IsBound && builder.FollowsConventions;
+            switch (metadataLevel)
+            {
+                case ODataMetadataLevel.Minimal:
+                case ODataMetadataLevel.None:
+                    return operation.IsBound && builder.FollowsConventions;
 
-        //        case ODataMetadataLevel.Full:
-        //        default: // All values already specified; just keeping the compiler happy.
-        //            return false;
-        //    }
-        //}
+                case ODataMetadataLevel.Full:
+                default: // All values already specified; just keeping the compiler happy.
+                    return false;
+            }
+        }
 
         internal static bool ShouldSuppressTypeNameSerialization(ODataResource resource, IEdmStructuredType edmType,
             ODataMetadataLevel metadataLevel)
