@@ -226,8 +226,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 // }
                 if (edmProperty.Type.IsCollection())
                 {
-                    //ODataDeltaFeedSerializer serializer = new ODataDeltaFeedSerializer(SerializerProvider);
-                    //serializer.WriteDeltaFeedInline(propertyValue, edmProperty.Type, writer, nestedWriteContext);
+                    ODataDeltaFeedSerializer serializer = new ODataDeltaFeedSerializer(SerializerProvider);
+                    serializer.WriteDeltaFeedInline(propertyValue, edmProperty.Type, writer, nestedWriteContext);
                 }
                 else
                 {

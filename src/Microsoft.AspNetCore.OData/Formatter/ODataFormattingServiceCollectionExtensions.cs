@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();
-         //   services.AddSingleton<ODataDeltaFeedSerializer>();
+            services.AddSingleton<ODataDeltaFeedSerializer>();
             services.AddSingleton<ODataResourceSetSerializer>();
             services.AddSingleton<ODataCollectionSerializer>();
             services.AddSingleton<ODataResourceSerializer>();
