@@ -60,6 +60,77 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         public bool EnableSkipToken { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings Expand()
+        {
+            EnableExpand = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings Select()
+        {
+            EnableSelect = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings Filter()
+        {
+            EnableFilter = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings OrderBy()
+        {
+            EnableOrderBy = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings Count()
+        {
+            EnableCount = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings SkipToken()
+        {
+            EnableSkipToken = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maxTopValue"></param>
+        /// <returns></returns>
+        public DefaultQuerySettings SetMaxTop(int? maxTopValue)
+        {
+            MaxTop = maxTopValue;
+            return this;
+        }
+
         internal void CopySettings(DefaultQuerySettings settings)
         {
             this.EnableCount = settings.EnableCount;

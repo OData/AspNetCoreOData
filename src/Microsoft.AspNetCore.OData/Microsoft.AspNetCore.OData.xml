@@ -5848,6 +5848,49 @@
             Gets or sets a value indicating whether the service will use skiptoken or not.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Expand">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Select">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Filter">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.OrderBy">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Count">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.SkipToken">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.SetMaxTop(System.Nullable{System.Int32})">
+            <summary>
+            
+            </summary>
+            <param name="maxTopValue"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler">
             <summary>
             Default implementation of SkipTokenHandler for the service. 
@@ -7121,7 +7164,15 @@
             <param name="services"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQuerySettings})">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <param name="setupAction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQueryServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQuerySettings})">
             <summary>
             
             </summary>
@@ -7160,6 +7211,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings">
             <summary>
             Gets the given <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.QueryableOptions">
+            <summary>
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model">
@@ -8577,7 +8633,7 @@
             based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator" /> class based on
             the <see cref="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings" />.
@@ -8599,7 +8655,7 @@
             Please note this class is not thread safe.
             </remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.#ctor(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator" /> class based on
             the <see cref="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings" />.

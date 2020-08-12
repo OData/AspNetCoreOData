@@ -34,22 +34,22 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public FilterQueryValidator(/*DefaultQuerySettings defaultQuerySettings*/ IOptions<ODataQueryableOptions> options)
+        public FilterQueryValidator(DefaultQuerySettings defaultQuerySettings/* IOptions<ODataQueryableOptions> options*/)
         {
-            // _defaultQuerySettings = defaultQuerySettings;
+             _defaultQuerySettings = defaultQuerySettings;
 
-            ODataQueryableOptions quableOptions = options.Value;
+            //ODataQueryableOptions quableOptions = options.Value;
 
-            _defaultQuerySettings = new DefaultQuerySettings
-            {
-                EnableFilter = quableOptions.EnableFilter
-            };
+            //_defaultQuerySettings = new DefaultQuerySettings
+            //{
+            //    EnableFilter = quableOptions.EnableFilter
+            //};
         }
 
-        internal FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
-        {
-            _defaultQuerySettings = defaultQuerySettings;
-        }
+        //internal FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
+        //{
+        //    _defaultQuerySettings = defaultQuerySettings;
+        //}
 
         /// <summary>
         /// Validates a <see cref="FilterQueryOption" />.

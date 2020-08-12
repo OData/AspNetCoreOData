@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -20,6 +21,7 @@ namespace Microsoft.AspNetCore.OData.Query
     public class ODataQueryContext
     {
         private DefaultQuerySettings _defaultQuerySettings;
+        private ODataQueryableOptions _queryableOptions;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -109,6 +111,24 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 return _defaultQuerySettings;
+            }
+        }
+
+        /// <summary>
+        /// Gets the given <see cref="ODataQueryableOptions"/>.
+        /// </summary>
+        public ODataQueryableOptions QueryableOptions
+        {
+            get
+            {
+                if (_queryableOptions == null)
+                {
+                    _queryableOptions = RequestContainer == null
+                        ? new ODataQueryableOptions()
+                        : RequestContainer.GetRequiredService<IOptions<ODataQueryableOptions>>().Value;
+                }
+
+                return _queryableOptions;
             }
         }
 

@@ -23,14 +23,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public CountQueryValidator(/*DefaultQuerySettings defaultQuerySettings*/IOptions<ODataQueryableOptions> options)
+        public CountQueryValidator(DefaultQuerySettings defaultQuerySettings /*IOptions<ODataQueryableOptions> options*/)
         {
-            _defaultQuerySettings = new DefaultQuerySettings
-            {
-                EnableCount = options.Value.EnableCount
-            };
+            //_defaultQuerySettings = new DefaultQuerySettings
+            //{
+            //    EnableCount = options.Value.EnableCount
+            //};
 
-            //_defaultQuerySettings = defaultQuerySettings;
+            _defaultQuerySettings = defaultQuerySettings;
         }
 
         /// <summary>
@@ -79,16 +79,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            //if (context == null)
-            //{
-            //    return new CountQueryValidator(new DefaultQuerySettings());
-            //}
+            if (context == null)
+            {
+                return new CountQueryValidator(new DefaultQuerySettings());
+            }
 
-            //return context.RequestContainer == null
-            //    ? new CountQueryValidator(context.DefaultQuerySettings)
-            //    : context.RequestContainer.GetRequiredService<CountQueryValidator>();
-
-            return context.RequestContainer.GetRequiredService<CountQueryValidator>();
+            return context.RequestContainer == null
+                ? new CountQueryValidator(context.DefaultQuerySettings)
+                : context.RequestContainer.GetRequiredService<CountQueryValidator>();
         }
     }
 }

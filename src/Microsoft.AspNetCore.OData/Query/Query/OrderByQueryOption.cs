@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -306,12 +308,12 @@ namespace Microsoft.AspNetCore.OData.Query
         private IQueryable AddOrderByQueryForProperty(IQueryable query, ODataQuerySettings querySettings,
             OrderByClause orderbyClause, IQueryable querySoFar, OrderByDirection direction, bool alreadyOrdered)
         {
-            //ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
+            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
 
-            //LambdaExpression orderByExpression =
-            //    FilterBinder.Bind(query, orderbyClause, Context.ElementClrType, Context, updatedSettings);
-            //querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
-            //    alreadyOrdered);
+            LambdaExpression orderByExpression =
+                FilterBinder.Bind(query, orderbyClause, Context.ElementClrType, Context, updatedSettings);
+            querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
+                alreadyOrdered);
             return querySoFar;
         }
 

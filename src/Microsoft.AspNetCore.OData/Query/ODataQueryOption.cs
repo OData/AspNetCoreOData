@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -432,24 +433,25 @@ namespace Microsoft.AspNetCore.OData.Query
                 pageSize = querySettings.ModelBoundPageSize.Value;
             }
 
-            //int preferredPageSize = -1;
-            //if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(InternalRequest.Headers, out preferredPageSize))
-            //{
-            //    pageSize = Math.Min(pageSize, preferredPageSize);
-            //}
+            int preferredPageSize = -1;
+            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+            {
+                pageSize = Math.Min(pageSize, preferredPageSize);
+            }
 
-            //if (pageSize > 0)
-            //{
-            //    bool resultsLimited;
-            //    result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-            //    if (resultsLimited && InternalRequest.RequestUri != null &&
-            //        InternalRequest.Context.NextLink == null)
-            //    {
-            //        InternalRequest.Context.PageSize = pageSize;
-            //    }
-            //}
+            ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
+            if (pageSize > 0)
+            {
+                bool resultsLimited;
+                result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
+                if (resultsLimited && Request.GetEncodedUrl() != null &&
+                    odataFeature.NextLink == null)
+                {
+                    odataFeature.PageSize = pageSize;
+                }
+            }
 
-            //InternalRequest.Context.QueryOptions = this;
+            odataFeature.QueryOptions = this;
 
             return result;
         }

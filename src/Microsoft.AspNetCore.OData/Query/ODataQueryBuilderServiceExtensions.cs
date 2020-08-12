@@ -71,24 +71,48 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="services"></param>
         /// <param name="setupAction"></param>
         /// <returns></returns>
-        public static IServiceCollection AddODataQuery(this IServiceCollection services, Action<ODataQueryableOptions> setupAction)
+        public static IServiceCollection AddODataQuery(this IServiceCollection services, Action<DefaultQuerySettings> setupAction)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            AddODataQueryServices(services);
-            services.Configure(setupAction);
+            AddODataQueryServices(services, setupAction);
+
+            // services.Configure(setupAction);
             return services;
         }
 
-        static void AddODataQueryServices(IServiceCollection services)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="setupAction"></param>
+        /// <returns></returns>
+        //public static IServiceCollection AddODataQuery(this IServiceCollection services, Action<ODataQueryableOptions> setupAction)
+        //{
+        //    if (services == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(services));
+        //    }
+
+        //    AddODataQueryServices(services);
+        //    services.Configure(setupAction);
+        //    return services;
+        //}
+
+        static void AddODataQueryServices(IServiceCollection services, Action<DefaultQuerySettings> setupAction)
         {
             services.AddSingleton<ODataUriResolver>(
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
-            services.AddSingleton<DefaultQuerySettings>();
+            services.AddSingleton(sp =>
+            {
+                DefaultQuerySettings settings = new DefaultQuerySettings();
+                setupAction(settings);
+                return settings;
+            });
 
             // QueryValidators.
             services.AddSingleton<CountQueryValidator>();
@@ -102,6 +126,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             services.AddScoped<ODataQuerySettings>();
 
+            services.AddSingleton<SkipTokenHandler, DefaultSkipTokenHandler>();
             // services.AddTransient<FilterBinder>();
         }
     }
