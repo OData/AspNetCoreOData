@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
@@ -82,6 +81,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets the data store used by routing conventions to store any custom route data.
         /// </summary>
         /// <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
-        IDictionary<string, object> RoutingConventionsStore { get; set; }
+        IDictionary<string, object> RoutingConventionsStore { get; }
     }
 }

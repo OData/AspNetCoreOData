@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
-    public class EntitySetSegmentTemplateTest
+    public class EntitySetSegmentTemplateTests
     {
         [Fact]
         public void Ctor_ThrowsArgumentNull_EntitySetSegment()

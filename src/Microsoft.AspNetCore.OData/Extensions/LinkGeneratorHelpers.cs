@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
@@ -34,6 +35,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <returns>The generated OData link.</returns>
         public static string CreateODataLink(this HttpRequest request, IList<ODataPathSegment> segments)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
             LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
 
             Endpoint endPoint = request.HttpContext.GetEndpoint();

@@ -1,12 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System;
-using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -24,29 +20,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="MetadataSegmentTemplate" /> class.
         /// </summary>
         private MetadataSegmentTemplate()
-        {
-        }
+        { }
 
         /// <inheritdoc />
         public override string Literal => "$metadata";
 
         /// <inheritdoc />
-        public override IEdmType EdmType => throw new NotSupportedException();
+        public override IEdmType EdmType => null;
+
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource => null;
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Metadata;
 
         /// <inheritdoc />
         public override bool IsSingle => true;
-
-        /// <inheritdoc />
-        //public override IEnumerable<string> Templates
-        //{
-        //    get
-        //    {
-        //        yield return "metadata";
-        //    }
-        //}
 
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)

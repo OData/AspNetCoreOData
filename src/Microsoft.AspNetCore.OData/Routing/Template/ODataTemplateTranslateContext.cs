@@ -17,6 +17,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
+        /// For Unit test only.
+        /// </summary>
+        internal ODataTemplateTranslateContext()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
         /// </summary>
         /// <param name="context">The HttpContext.</param>
         /// <param name="routeValues">The route values.</param>

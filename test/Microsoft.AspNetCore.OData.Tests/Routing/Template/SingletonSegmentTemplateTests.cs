@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -10,53 +9,50 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
-    public class SingletonSegmentTemplateTest
+    public class SingletonSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorThrowsArgumentNullSegment()
         {
             // Assert
             ExceptionAssert.ThrowsArgumentNull(() => new SingletonSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void TryMatch_ReturnsTrue()
+        public void SingletonCommonPropertiesReturnsAsExpected()
+        {
+            // Assert
+            EdmEntityType entityType = new EdmEntityType("NS", "entity");
+            IEdmEntityContainer container = new EdmEntityContainer("NS", "default");
+            IEdmSingleton singleton = new EdmSingleton(container, "singleton", entityType);
+            SingletonSegmentTemplate singletonSegment = new SingletonSegmentTemplate(singleton);
+
+            // Act & Assert
+            Assert.Equal("singleton", singletonSegment.Literal);
+            Assert.Equal(ODataSegmentKind.Singleton, singletonSegment.Kind);
+            Assert.True(singletonSegment.IsSingle);
+            Assert.Same(entityType, singletonSegment.EdmType);
+            Assert.Same(singleton, singletonSegment.NavigationSource);
+        }
+
+        [Fact]
+        public void TranslateValueTemplateReturnsAsExpected()
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
             IEdmEntityContainer container = new EdmEntityContainer("NS", "default");
             IEdmSingleton singleton = new EdmSingleton(container, "singleton", entityType);
 
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
             SingletonSegmentTemplate template = new SingletonSegmentTemplate(new SingletonSegment(singleton));
-            SingletonSegment segment = new SingletonSegment(singleton);
 
             // Act
-            //Dictionary<string, object> values = new Dictionary<string, object>();
-            //bool result = template.TryMatch(segment, values);
+            ODataPathSegment segment = template.Translate(context);
 
-            //// Assert
-            //Assert.True(result);
-            //Assert.Empty(values);
-        }
-
-        [Fact]
-        public void TryMatch_ReturnsFalse()
-        {
-            // Arrange
-            EdmEntityType entityType = new EdmEntityType("NS", "entity");
-            IEdmEntityContainer container = new EdmEntityContainer("NS", "default");
-            IEdmSingleton singleton1 = new EdmSingleton(container, "singleton1", entityType);
-            IEdmSingleton singleton2 = new EdmSingleton(container, "singleton2", entityType);
-
-            SingletonSegmentTemplate template = new SingletonSegmentTemplate(new SingletonSegment(singleton1));
-            SingletonSegment segment = new SingletonSegment(singleton2);
-
-            // Act
-            //Dictionary<string, object> values = new Dictionary<string, object>();
-            //bool result = template.TryMatch(segment, values);
-
-            //// Assert
-            //Assert.False(result);
+            // Assert
+            Assert.NotNull(segment);
+            SingletonSegment singletonTemplate = Assert.IsType<SingletonSegment>(segment);
+            Assert.Same(singleton, singletonTemplate.Singleton);
         }
     }
 }
