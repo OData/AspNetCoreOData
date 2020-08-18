@@ -12,7 +12,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Extensions
 {
     /// <summary>
-    /// 
+    /// Extensions to generator the Link.
     /// </summary>
     public static class LinkGeneratorHelpers
     {

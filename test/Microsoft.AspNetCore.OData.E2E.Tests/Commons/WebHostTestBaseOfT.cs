@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
     public abstract class WebHostTestBase<TTest> : IClassFixture<WebHostTestFixture<TTest>>, IDisposable where TTest: class
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebHostTestBase"/> class.
+        /// Initializes a new instance of the <see cref="WebHostTestBase{TTest}"/> class.
         /// </summary>
         /// <param name="fixture">The fixture used to initialize the web service.</param>
         protected WebHostTestBase(WebHostTestFixture<TTest> fixture)

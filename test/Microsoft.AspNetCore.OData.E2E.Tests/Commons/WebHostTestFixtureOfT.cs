@@ -40,6 +40,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="WebHostTestFixture{TTest}"/> class.
+        /// </summary>
+        ~WebHostTestFixture()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
         /// The base address of the server.
         /// </summary>
         public string BaseAddress { get; private set; }

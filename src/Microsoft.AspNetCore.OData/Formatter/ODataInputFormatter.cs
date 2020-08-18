@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     public class ODataInputFormatter : TextInputFormatter
     {
         /// <summary>
-        /// The set of payload kinds this formatter will accept in CanReadType.
+        /// The set of payload kinds this formatter will accept in CanRead.
         /// </summary>
         private readonly ISet<ODataPayloadKind> _payloadKinds;
 
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("type");
             }
 
-            ODataDeserializer deserializer = GetDeserializer(type, request, out _);
+            ODataDeserializer deserializer = GetDeserializer(request, type, out _);
             if (deserializer != null)
             {
                 return _payloadKinds.Contains(deserializer.ODataPayloadKind);
@@ -144,84 +144,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-       internal static object ReadFromStream(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
-        {
-            object result;
-            IEdmModel model = request.GetModel();
-            IEdmTypeReference expectedPayloadType;
-            ODataDeserializer deserializer = GetDeserializer(type, request, out expectedPayloadType);
-            if (deserializer == null)
-            {
-                throw Error.Argument("type", SRResources.FormatterReadIsNotSupportedForType, type.FullName, typeof(ODataInputFormatter).FullName);
-            }
-
-            try
-            {
-                ODataMessageReaderSettings oDataReaderSettings = request.GetReaderSettings();
-                oDataReaderSettings.BaseUri = baseAddress;
-                oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
-
-                IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(request.Body, request.Headers/*, request.GetODataContentIdMapping(), request.GetRequestContainer()*/);
-                ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
-                disposes.Add(oDataMessageReader);
-
-                ODataPath path = request.ODataFeature().Path;
-                ODataDeserializerContext readContext = GetODataDeserializerContext(request);
-                readContext.Path = path;
-                readContext.Model = model;
-                readContext.ResourceType = type;
-                readContext.ResourceEdmType = expectedPayloadType;
-
-                result = deserializer.Read(oDataMessageReader, type, readContext);
-            }
-            catch (Exception ex)
-            {
-                LoggerError(request.HttpContext, ex);
-                result = defaultValue;
-            }
-
-            return result;
-        }
-
-        private static ODataDeserializerContext GetODataDeserializerContext(HttpRequest request)
-        {
-            return new ODataDeserializerContext
-            {
-                Request = request,
-            };
-        }
-
-        private static void LoggerError(HttpContext context, Exception ex)
-        {
-            ILogger logger = context.RequestServices.GetService<ILogger>();
-            if (logger == null)
-            {
-                throw ex;
-            }
-
-            logger.LogError(ex, String.Empty);
-        }
-
-        /// <summary>
-        /// Internal method used for selecting the base address to be used with OData uris.
-        /// If the consumer has provided a delegate for overriding our default implementation,
-        /// we call that, otherwise we default to existing behavior below.
-        /// </summary>
-        /// <param name="request">The HttpRequest object for the given request.</param>
-        /// <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
-        private Uri GetBaseAddressInternal(HttpRequest request)
-        {
-            if (BaseAddressFactory != null)
-            {
-                return BaseAddressFactory(request);
-            }
-            else
-            {
-                return ODataInputFormatter.GetDefaultBaseAddress(request);
-            }
-        }
-
         /// <summary>
         /// Returns a base address to be used in the service root when reading or writing OData uris.
         /// </summary>
@@ -259,6 +181,82 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return null;
         }
 
+        internal static object ReadFromStream(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
+        {
+            object result;
+            IEdmModel model = request.GetModel();
+            IEdmTypeReference expectedPayloadType;
+            ODataDeserializer deserializer = GetDeserializer(request, type, out expectedPayloadType);
+            if (deserializer == null)
+            {
+                throw Error.Argument("type", SRResources.FormatterReadIsNotSupportedForType, type.FullName, typeof(ODataInputFormatter).FullName);
+            }
+
+            try
+            {
+                ODataMessageReaderSettings oDataReaderSettings = request.GetReaderSettings();
+                oDataReaderSettings.BaseUri = baseAddress;
+                oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
+
+                IODataRequestMessage oDataRequestMessage =
+                    ODataMessageWrapperHelper.Create(request.Body, request.Headers/*, request.GetODataContentIdMapping(), request.GetRequestContainer()*/);
+                ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
+                disposes.Add(oDataMessageReader);
+
+                ODataPath path = request.ODataFeature().Path;
+                ODataDeserializerContext readContext = new ODataDeserializerContext
+                {
+                    Request = request,
+                };
+
+                readContext.Path = path;
+                readContext.Model = model;
+                readContext.ResourceType = type;
+                readContext.ResourceEdmType = expectedPayloadType;
+
+                result = deserializer.Read(oDataMessageReader, type, readContext);
+            }
+            catch (Exception ex)
+            {
+                LoggerError(request.HttpContext, ex);
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        private static void LoggerError(HttpContext context, Exception ex)
+        {
+            ILogger logger = context.RequestServices.GetService<ILogger>();
+            if (logger == null)
+            {
+                throw ex;
+            }
+
+            logger.LogError(ex, String.Empty);
+        }
+
+        /// <summary>
+        /// Internal method used for selecting the base address to be used with OData uris.
+        /// If the consumer has provided a delegate for overriding our default implementation,
+        /// we call that, otherwise we default to existing behavior below.
+        /// </summary>
+        /// <param name="request">The HttpRequest object for the given request.</param>
+        /// <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
+        private Uri GetBaseAddressInternal(HttpRequest request)
+        {
+            if (BaseAddressFactory != null)
+            {
+                return BaseAddressFactory(request);
+            }
+            else
+            {
+                return ODataInputFormatter.GetDefaultBaseAddress(request);
+            }
+        }
+
+        
+
         internal static ODataVersion GetODataResponseVersion(HttpRequest request)
         {
             // OData protocol requires that you send the minimum version that the client needs to know to
@@ -273,7 +271,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataVersionConstraint.DefaultODataVersion;
         }
 
-        private static ODataDeserializer GetDeserializer(Type type, HttpRequest request,  out IEdmTypeReference expectedPayloadType)
+        /// <summary>
+        /// Gets the deserializer and the expected payload type.
+        /// </summary>
+        /// <param name="request">The HttpRequest.</param>
+        /// <param name="type">The input type.</param>
+        /// <param name="expectedPayloadType">Output the expected payload type.</param>
+        /// <returns>null or the OData deserializer</returns>
+        private static ODataDeserializer GetDeserializer(HttpRequest request, Type type,  out IEdmTypeReference expectedPayloadType)
         {
             Contract.Assert(request != null);
 
@@ -282,8 +287,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = odataFeature.Model;
             expectedPayloadType = null;
 
-            ODataDeserializerProvider deserializerProvider
-                = request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
+            ODataDeserializerProvider deserializerProvider = request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
 
             // Get the deserializer using the CLR type first from the deserializer provider.
             ODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);

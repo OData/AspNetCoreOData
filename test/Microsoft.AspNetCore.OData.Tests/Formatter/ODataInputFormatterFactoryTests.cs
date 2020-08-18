@@ -114,10 +114,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Arrange
             HttpRequest request = RequestFactory.Create(f => { f.Model = _edmModel; f.Path = new ODataPath(); });
             request.HttpContext.RequestServices = _serviceProvider;
-            var metadataDocumentFormatters = _formatters.Where(f => CanReadType(f, type, request));
+            IEnumerable<ODataInputFormatter> odataFormatters = _formatters.Where(f => CanReadType(f, type, request));
 
             // Act
-            IEnumerable<string> supportedMediaTypes = metadataDocumentFormatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
+            IEnumerable<string> supportedMediaTypes = odataFormatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
 
             // Assert
             Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
         private static bool CanReadType(ODataInputFormatter formatter, Type type, HttpRequest request)
         {
-            var context = new InputFormatterContext(
+            InputFormatterContext context = new InputFormatterContext(
                 request.HttpContext,
                 "modelName",
                 new ModelStateDictionary(),

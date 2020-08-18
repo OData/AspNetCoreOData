@@ -1548,7 +1548,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers">
             <summary>
-            
+            Extensions to generator the Link.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.OData.UriParser.ODataPathSegment[])">
@@ -2258,7 +2258,7 @@
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter._payloadKinds">
             <summary>
-            The set of payload kinds this formatter will accept in CanReadType.
+            The set of payload kinds this formatter will accept in CanRead.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.#ctor(System.Collections.Generic.IEnumerable{Microsoft.OData.ODataPayloadKind})">
@@ -2278,6 +2278,13 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.ReadRequestBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext,System.Text.Encoding)">
             <inheritdoc/>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Returns a base address to be used in the service root when reading or writing OData uris.
+            </summary>
+            <param name="request">The HttpRequest object for the given request.</param>
+            <returns>The base address to be used as part of the service root in the OData uri; must terminate with a trailing '/'.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetBaseAddressInternal(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Internal method used for selecting the base address to be used with OData uris.
@@ -2287,12 +2294,14 @@
             <param name="request">The HttpRequest object for the given request.</param>
             <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetDeserializer(Microsoft.AspNetCore.Http.HttpRequest,System.Type,Microsoft.OData.Edm.IEdmTypeReference@)">
             <summary>
-            Returns a base address to be used in the service root when reading or writing OData uris.
+            Gets the deserializer and the expected payload type.
             </summary>
-            <param name="request">The HttpRequest object for the given request.</param>
-            <returns>The base address to be used as part of the service root in the OData uri; must terminate with a trailing '/'.</returns>
+            <param name="request">The HttpRequest.</param>
+            <param name="type">The input type.</param>
+            <param name="expectedPayloadType">Output the expected payload type.</param>
+            <returns>null or the OData deserializer</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatterFactory">
             <summary>
