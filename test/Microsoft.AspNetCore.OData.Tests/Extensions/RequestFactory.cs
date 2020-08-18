@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
@@ -47,6 +48,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             IODataFeature odataFeature = context.ODataFeature();
             setupAction?.Invoke(odataFeature);
             return context.Request;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="uri"></param>
+        /// <param name="setupAction"></param>
+        /// <returns></returns>
+        public static HttpRequest Create(string method, string uri, Action<IODataFeature> setupAction)
+        {
+            HttpRequest request = Create(setupAction);
+
+            request.Method = method;
+            Uri requestUri = new Uri(uri);
+            request.Scheme = requestUri.Scheme;
+            request.Host = requestUri.IsDefaultPort ?
+                new HostString(requestUri.Host) :
+                new HostString(requestUri.Host, requestUri.Port);
+            request.QueryString = new QueryString(requestUri.Query);
+            request.Path = new PathString(requestUri.AbsolutePath);
+
+            return request;
+        }
+
+        public static HttpRequest Create(string method, string uri, IEdmModel model, ODataPath path)
+        {
+            return Create(method, uri, f => { f.Model = model; f.Path = path; });
         }
     }
 }

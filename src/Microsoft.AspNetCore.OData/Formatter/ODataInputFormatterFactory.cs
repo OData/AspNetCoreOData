@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     public static class ODataInputFormatterFactory
     {
         /// <summary>
-        /// Creates a list of media type formatters to handle OData.
+        /// Creates a list of media type formatters to handle OData deserialization.
         /// </summary>
         /// <returns>A list of media type formatters to handle OData.</returns>
         public static IList<ODataInputFormatter> Create()
@@ -26,19 +26,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 CreateApplicationXml(),
                 CreateRawValue()
             };
-        }
-
-        private static void AddSupportedEncodings(ODataInputFormatter formatter)
-        {
-            formatter.SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false,
-                throwOnInvalidBytes: true));
-            formatter.SupportedEncodings.Add(new UnicodeEncoding(bigEndian: false, byteOrderMark: true,
-                throwOnInvalidBytes: true));
-        }
-
-        private static ODataInputFormatter CreateRawValue()
-        {
-            return CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
         }
 
         private static ODataInputFormatter CreateApplicationJson()
@@ -83,11 +70,25 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return formatter;
         }
 
+        private static ODataInputFormatter CreateRawValue()
+        {
+            return CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
+        }
+
         private static ODataInputFormatter CreateFormatterWithoutMediaTypes(params ODataPayloadKind[] payloadKinds)
         {
             ODataInputFormatter formatter = new ODataInputFormatter(payloadKinds);
             AddSupportedEncodings(formatter);
             return formatter;
+        }
+
+        private static void AddSupportedEncodings(ODataInputFormatter formatter)
+        {
+            formatter.SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false,
+                throwOnInvalidBytes: true));
+
+            formatter.SupportedEncodings.Add(new UnicodeEncoding(bigEndian: false, byteOrderMark: true,
+                throwOnInvalidBytes: true));
         }
     }
 }

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -25,14 +24,14 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// <see cref="TextInputFormatter"/> class to handle OData.
+    /// The implementation of <see cref="TextInputFormatter"/> class to handle OData reading.
     /// </summary>
     public class ODataInputFormatter : TextInputFormatter
     {
         /// <summary>
         /// The set of payload kinds this formatter will accept in CanReadType.
         /// </summary>
-        private readonly IEnumerable<ODataPayloadKind> _payloadKinds;
+        private readonly ISet<ODataPayloadKind> _payloadKinds;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataInputFormatter"/> class.
@@ -40,7 +39,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <param name="payloadKinds">The kind of payloads this formatter supports.</param>
         public ODataInputFormatter(IEnumerable<ODataPayloadKind> payloadKinds)
         {
-            _payloadKinds = payloadKinds ?? throw new ArgumentNullException(nameof(payloadKinds));
+            if (payloadKinds == null)
+            {
+                throw new ArgumentNullException(nameof(payloadKinds));
+            }
+
+            _payloadKinds = new HashSet<ODataPayloadKind>(payloadKinds);
         }
 
         /// <summary>

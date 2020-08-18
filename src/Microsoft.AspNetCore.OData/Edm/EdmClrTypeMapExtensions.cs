@@ -17,6 +17,9 @@ using Microsoft.Spatial;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
+    /// <summary>
+    /// The extensions used to map between C# types and Edm types.
+    /// </summary>
     internal static class EdmClrTypeMapExtensions
     {
         #region PrimitiveTypeMapping
@@ -148,6 +151,12 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         #region ClrType -> EdmType
 
+        /// <summary>
+        /// Gets the Edm type reference from the CLR type.
+        /// </summary>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="clrType">The given CLR type.</param>
+        /// <returns>null or the Edm type reference.</returns>
         public static IEdmTypeReference GetEdmTypeReference(this IEdmModel edmModel, Type clrType)
         {
             IEdmType edmType = edmModel.GetEdmType(clrType);
@@ -161,21 +170,21 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Gets the Edm type from the CLR type.
         /// </summary>
-        /// <param name="edmModel"></param>
-        /// <param name="clrType"></param>
-        /// <returns></returns>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="clrType">The given CLR type.</param>
+        /// <returns>null or the Edm type.</returns>
         public static IEdmType GetEdmType(this IEdmModel edmModel, Type clrType)
         {
             if (edmModel == null)
             {
-                throw Error.ArgumentNull("edmModel");
+                throw new ArgumentNullException(nameof(edmModel));
             }
 
             if (clrType == null)
             {
-                throw Error.ArgumentNull("clrType");
+                throw new ArgumentNullException(nameof(clrType));
             }
 
             return GetEdmType(edmModel, clrType, testCollections: true);
@@ -332,7 +341,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             if (matchingTypes.Count() > 1)
             {
                 throw Error.Argument("edmTypeReference", SRResources.MultipleMatchingClrTypesForEdmType,
-                    typeName, String.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
+                    typeName, string.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
             }
 
             edmModel.SetAnnotationValue(edmSchemaType, new ClrTypeAnnotation(matchingTypes.SingleOrDefault()));
@@ -428,10 +437,10 @@ namespace Microsoft.AspNetCore.OData.Edm
             => new KeyValuePair<Type, IEdmPrimitiveTypeReference>(typeof(T), EdmCoreModel.Instance.GetPrimitive(primitiveKind, IsNullable<T>()));
 
         /// <summary>
-        /// 
+        /// Check the input type is nullable type or not.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="type">The input CLR type.</param>
+        /// <returns>True/False.</returns>
         private static bool IsNullable(Type type)
         {
             if (type == null)
@@ -443,9 +452,10 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Check the input type is nullable or not.
         /// </summary>
-        /// <returns></returns>
+        /// <typeparam name="T">The test CRL type.</typeparam>
+        /// <returns>True/False.</returns>
         private static bool IsNullable<T>()
         {
             Type type = typeof(T);

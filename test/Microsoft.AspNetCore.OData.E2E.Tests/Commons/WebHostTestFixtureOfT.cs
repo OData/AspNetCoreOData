@@ -11,6 +11,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
 {
+    // https://sourcegraph.com/github.com/dotnet/aspnetcore@bbb851e3ebf40f79531bc13dd5c1b56b332237fc/-/blob/src/Mvc/Mvc.Testing/src/WebApplicationFactory.cs#L24:1
+
     /// <summary>
     /// The WebHostTestFixture is create a web host to be used for a test.
     /// </summary>

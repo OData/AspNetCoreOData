@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.OData.Formatter.MediaType;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -33,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <summary>
         /// The set of payload kinds this formatter will accept in CanWriteType.
         /// </summary>
-        private readonly IEnumerable<ODataPayloadKind> _payloadKinds;
+        private readonly ISet<ODataPayloadKind> _payloadKinds;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataOutputFormatter"/> class.
@@ -43,10 +42,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (payloadKinds == null)
             {
-                throw Error.ArgumentNull("payloadKinds");
+                throw new ArgumentNullException(nameof(payloadKinds));
             }
 
-            _payloadKinds = payloadKinds;
+            _payloadKinds = new HashSet<ODataPayloadKind>(payloadKinds);
         }
 
         /// <summary>

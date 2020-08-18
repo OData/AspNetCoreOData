@@ -18,11 +18,11 @@ namespace Microsoft.AspNetCore.OData.Edm
     internal static class EdmHelpers
     {
         /// <summary>
-        /// 
+        /// Converts an Edm Type to Edm type reference.
         /// </summary>
-        /// <param name="edmType"></param>
-        /// <param name="isNullable"></param>
-        /// <returns></returns>
+        /// <param name="edmType">The Edm type.</param>
+        /// <param name="isNullable">Nullable value.</param>
+        /// <returns>The Edm type reference.</returns>
         public static IEdmTypeReference ToEdmTypeReference(this IEdmType edmType, bool isNullable)
         {
             Contract.Assert(edmType != null);
@@ -47,24 +47,15 @@ namespace Microsoft.AspNetCore.OData.Edm
                 case EdmTypeKind.Primitive:
                     return EdmCoreModel.Instance.GetPrimitive(((IEdmPrimitiveType)edmType).PrimitiveKind, isNullable);
 
+                case EdmTypeKind.Path:
+                    return new EdmPathTypeReference((IEdmPathType)edmType, isNullable);
+
+                case EdmTypeKind.TypeDefinition:
+                    return new EdmTypeDefinitionReference((IEdmTypeDefinition)edmType, isNullable);
+
                 default:
                     throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool IsNullable(Type type)
-        {
-            if (type == null)
-            {
-                return false;
-            }
-
-            return !type.IsValueType || Nullable.GetUnderlyingType(type) != null;
         }
 
         public static ModelBoundQuerySettings GetModelBoundQuerySettings(IEdmProperty property,

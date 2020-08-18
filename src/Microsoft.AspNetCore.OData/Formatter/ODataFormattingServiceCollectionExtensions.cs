@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // Configure MvcCore to use formatters. The OData formatters do go into the global service
             // provider and get picked up by the AspNetCore MVC framework. However, they ignore non-OData
             // requests so they won't be used for non-OData formatting.
-            services.AddMvcCore(options =>
+            services.AddControllers(options =>
             {
                 // Add OData input formatters at index 0, which overrides the built-in json and xml formatters.
                 // Add in reverse order at index 0 to preserve order from the factory in the final list.

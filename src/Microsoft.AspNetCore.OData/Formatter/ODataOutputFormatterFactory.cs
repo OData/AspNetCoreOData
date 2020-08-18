@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         private const string XmlFormat = "xml";
 
         /// <summary>
-        /// Creates a list of media type formatters to handle OData.
+        /// Creates a list of output formatters to handle OData serialization.
         /// </summary>
         /// <returns>A list of media type formatters to handle OData.</returns>
         public static IList<ODataOutputFormatter> Create()
@@ -33,24 +33,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 CreateApplicationXml(),
                 CreateRawValue()
             };
-        }
-
-        private static void AddSupportedEncodings(ODataOutputFormatter formatter)
-        {
-            formatter.SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false,
-                throwOnInvalidBytes: true));
-            formatter.SupportedEncodings.Add(new UnicodeEncoding(bigEndian: false, byteOrderMark: true,
-                throwOnInvalidBytes: true));
-        }
-
-        private static ODataOutputFormatter CreateRawValue()
-        {
-            ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
-            formatter.MediaTypeMappings.Add(new ODataPrimitiveValueMediaTypeMapping());
-            formatter.MediaTypeMappings.Add(new ODataEnumValueMediaTypeMapping());
-            formatter.MediaTypeMappings.Add(new ODataBinaryValueMediaTypeMapping());
-            formatter.MediaTypeMappings.Add(new ODataCountMediaTypeMapping());
-            return formatter;
         }
 
         private static ODataOutputFormatter CreateApplicationJson()
@@ -101,11 +83,29 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return formatter;
         }
 
+        private static ODataOutputFormatter CreateRawValue()
+        {
+            ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
+            formatter.MediaTypeMappings.Add(new ODataPrimitiveValueMediaTypeMapping());
+            formatter.MediaTypeMappings.Add(new ODataEnumValueMediaTypeMapping());
+            formatter.MediaTypeMappings.Add(new ODataBinaryValueMediaTypeMapping());
+            formatter.MediaTypeMappings.Add(new ODataCountMediaTypeMapping());
+            return formatter;
+        }
+
         private static ODataOutputFormatter CreateFormatterWithoutMediaTypes(params ODataPayloadKind[] payloadKinds)
         {
             ODataOutputFormatter formatter = new ODataOutputFormatter(payloadKinds);
             AddSupportedEncodings(formatter);
             return formatter;
+        }
+
+        private static void AddSupportedEncodings(ODataOutputFormatter formatter)
+        {
+            formatter.SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false,
+                throwOnInvalidBytes: true));
+            formatter.SupportedEncodings.Add(new UnicodeEncoding(bigEndian: false, byteOrderMark: true,
+                throwOnInvalidBytes: true));
         }
 
         private static void AddDollarFormatQueryStringMappings(this ODataOutputFormatter formatter)

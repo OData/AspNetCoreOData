@@ -843,6 +843,11 @@
             <param name="methodInfo">The output of method info.</param>
             <returns>True if the method info was found, false otherwise.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions">
+            <summary>
+            The extensions used to map between C# types and Edm types.
+            </summary>
+        </member>
         <member name="F:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions._builtInPrimitiveTypes">
             <summary>
             The mapping between Edm primitive type and Clr primitive type.
@@ -878,13 +883,21 @@
             <param name="isNonstandardEdmPrimitive">A boolean value out to indicate whether the input CLR type is standard OData primitive type.</param>
             <returns>The standard CLR type or the input CLR type itself.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the Edm type reference from the CLR type.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="clrType">The given CLR type.</param>
+            <returns>null or the Edm type reference.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmType(Microsoft.OData.Edm.IEdmModel,System.Type)">
             <summary>
-            
+            Gets the Edm type from the CLR type.
             </summary>
-            <param name="edmModel"></param>
-            <param name="clrType"></param>
-            <returns></returns>
+            <param name="edmModel">The Edm model.</param>
+            <param name="clrType">The given CLR type.</param>
+            <returns>null or the Edm type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
@@ -929,16 +942,17 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable(System.Type)">
             <summary>
-            
+            Check the input type is nullable type or not.
             </summary>
-            <param name="type"></param>
-            <returns></returns>
+            <param name="type">The input CLR type.</param>
+            <returns>True/False.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable``1">
             <summary>
-            
+            Check the input type is nullable or not.
             </summary>
-            <returns></returns>
+            <typeparam name="T">The test CRL type.</typeparam>
+            <returns>True/False.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
             <summary>
@@ -947,18 +961,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.ToEdmTypeReference(Microsoft.OData.Edm.IEdmType,System.Boolean)">
             <summary>
-            
+            Converts an Edm Type to Edm type reference.
             </summary>
-            <param name="edmType"></param>
-            <param name="isNullable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsNullable(System.Type)">
-            <summary>
-            
-            </summary>
-            <param name="type"></param>
-            <returns></returns>
+            <param name="edmType">The Edm type.</param>
+            <param name="isNullable">Nullable value.</param>
+            <returns>The Edm type reference.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsRelatedTo(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType)">
             <summary>
@@ -2246,7 +2253,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter">
             <summary>
-            <see cref="T:Microsoft.AspNetCore.Mvc.Formatters.TextInputFormatter"/> class to handle OData.
+            The implementation of <see cref="T:Microsoft.AspNetCore.Mvc.Formatters.TextInputFormatter"/> class to handle OData reading.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter._payloadKinds">
@@ -2294,7 +2301,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatterFactory.Create">
             <summary>
-            Creates a list of media type formatters to handle OData.
+            Creates a list of media type formatters to handle OData deserialization.
             </summary>
             <returns>A list of media type formatters to handle OData.</returns>
         </member>
@@ -2414,7 +2421,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatterFactory.Create">
             <summary>
-            Creates a list of media type formatters to handle OData.
+            Creates a list of output formatters to handle OData serialization.
             </summary>
             <returns>A list of media type formatters to handle OData.</returns>
         </member>
