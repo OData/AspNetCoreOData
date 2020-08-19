@@ -62,6 +62,12 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return entitySet.EntitySet;
             }
 
+            SingletonSegment singleton = lastSegment as SingletonSegment;
+            if (singleton != null)
+            {
+                return singleton.Singleton;
+            }
+
 
             // TODO
             return null;

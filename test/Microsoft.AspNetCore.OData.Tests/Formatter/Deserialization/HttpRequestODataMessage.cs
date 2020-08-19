@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
@@ -13,6 +14,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
     class HttpRequestODataMessage : IODataRequestMessage
     {
         public HttpRequestMessage _request;
+        public HttpRequest _httpRequest;
 
         public Dictionary<string, string> _headers;
 
@@ -22,6 +24,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             _headers = Enumerable
                 .Concat<KeyValuePair<string, IEnumerable<string>>>(request.Headers, request.Content.Headers)
                 .Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+
+        public HttpRequestODataMessage(HttpRequest request)
+        {
+            _httpRequest = request;
+            _headers = request.Headers.
+                Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 

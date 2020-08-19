@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         public void CreateODataLinkReturnsODataLinksAsExpectedForNonODataPath()
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost:8080/odata", null);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost:8080/odata", model: null);
             request.HttpContext.RequestServices = _serviceProvider;
             request.RouteValues = new RouteValueDictionary(new { controller = "Customers" });
 

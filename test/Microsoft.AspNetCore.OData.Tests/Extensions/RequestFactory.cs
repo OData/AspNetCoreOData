@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData.Edm;
@@ -73,9 +74,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             return request;
         }
 
+        public static HttpRequest Create(string method, string uri, IEdmModel model)
+        {
+            return Create(method, uri, f => { f.Model = model; });
+        }
+
         public static HttpRequest Create(string method, string uri, IEdmModel model, ODataPath path)
         {
             return Create(method, uri, f => { f.Model = model; f.Path = path; });
+        }
+
+        private static HttpRequest CreateRequest(IHeaderDictionary headers)
+        {
+            var context = new DefaultHttpContext();
+            context.Features.Get<IHttpRequestFeature>().Headers = headers;
+            return context.Request;
         }
     }
 }

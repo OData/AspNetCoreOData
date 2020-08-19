@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // If content length is 0 then return default value for this type
             RequestHeaders contentHeaders = request.GetTypedHeaders();
             object defaultValue = GetDefaultValueForType(type);
-            if (contentHeaders == null || contentHeaders.ContentLength == 0)
+            if (contentHeaders == null || contentHeaders.ContentLength == null || contentHeaders.ContentLength == 0)
             {
                 return Task.FromResult(InputFormatterResult.Success(defaultValue));
             }
