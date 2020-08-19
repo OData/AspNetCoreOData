@@ -23,4 +23,14 @@
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
+    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
+    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
+  </ItemGroup>
+  
 </Project>
