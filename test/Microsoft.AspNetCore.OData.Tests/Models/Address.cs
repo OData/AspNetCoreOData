@@ -9,21 +9,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
 
         public string City { get; set; }
 
+        public string Street { get; set; }
+
         public string State { get; set; }
 
-        public Address()
-        {
-        }
+        public int HouseNumber { get; set; }
 
-        //public Address(int index, ReferenceDepthContext context)
-        //{
-        //    Address sourceAddress = DataSource.Address[index];
-        //    this.StreetAddress = sourceAddress.StreetAddress;
-        //    this.City = sourceAddress.City;
-        //    this.State = sourceAddress.State;
-        //    this.ZipCode = sourceAddress.ZipCode;
-        //}
+        public ZipCode ZipCode { get; set; }
 
-        public int ZipCode { get; set; }
+        public string IgnoreThis { get; set; }
     }
 }
