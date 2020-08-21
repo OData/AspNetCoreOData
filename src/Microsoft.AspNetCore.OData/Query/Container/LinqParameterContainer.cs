@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query.Container
 {
     // wraps a constant value so that EntityFramework paramterizes the constant.
     internal abstract class LinqParameterContainer

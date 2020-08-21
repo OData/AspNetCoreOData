@@ -619,6 +619,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The last segment &apos;{0}&apos; of the select or expand query option is not supported..
+        /// </summary>
+        internal static string InvalidLastSegmentInSelectExpandPath {
+            get {
+                return ResourceManager.GetString("InvalidLastSegmentInSelectExpandPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
         /// </summary>
         internal static string InvalidODataRouteOnAction {
@@ -651,6 +660,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidPropertyMapping {
             get {
                 return ResourceManager.GetString("InvalidPropertyMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A segment &apos;{0}&apos; within the select or expand query option is not supported..
+        /// </summary>
+        internal static string InvalidSegmentInSelectExpandPath {
+            get {
+                return ResourceManager.GetString("InvalidSegmentInSelectExpandPath", resourceCulture);
             }
         }
         

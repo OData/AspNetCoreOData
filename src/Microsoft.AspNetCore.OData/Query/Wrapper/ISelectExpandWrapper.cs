@@ -3,9 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
     /// <summary>
     /// Represents the result of a $select and $expand query operation.

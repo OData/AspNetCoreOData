@@ -82,8 +82,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     // Last segment
                     if (!lastSegmentPredicte(segment))
                     {
-                        string message = $"The last segment '{segment.GetType().Name}' of the select or expand query option is not supported.";
-                        throw new ODataException(message);
+                        throw new ODataException(Error.Format(SRResources.InvalidLastSegmentInSelectExpandPath, segment.GetType().Name));
                     }
                 }
                 else
@@ -91,8 +90,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     // middle segment
                     if (!middleSegmentPredicte(segment))
                     {
-                        string message = $"A segment '{segment.GetType().Name}' within the select or expand query option is not supported.";
-                        throw new ODataException(message);
+                        throw new ODataException(Error.Format(SRResources.InvalidSegmentInSelectExpandPath, segment.GetType().Name));
                     }
                 }
 

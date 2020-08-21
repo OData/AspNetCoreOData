@@ -5,7 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query.Container
 {
     /// <summary>
     /// EntityFramework does not let you inject non primitive constant values (like IEdmModel) in Select queries. Primitives like strings and guids can be

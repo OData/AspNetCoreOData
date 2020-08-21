@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query.Container
 {
     /// <summary>
     /// The result of a $select and $expand projection is represented as an <see cref="ISelectExpandWrapper"/>
