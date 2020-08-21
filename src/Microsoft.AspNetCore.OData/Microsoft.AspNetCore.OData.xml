@@ -4605,6 +4605,35 @@
             <param name="setupAction"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataUriFunctions">
+            <summary>
+            OData UriFunctions helper.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
+            <summary>
+            This is a shortcut of adding the custom FunctionSignature through 'CustomUriFunctions' class and
+            binding the function name to it's MethodInfo through 'UriFunctionsBinder' class.
+            See these classes documentations.
+            In case of an exception, both operations(adding the signature and binding the function) will be undone.
+            </summary>
+            <param name="functionName">The uri function name that appears in the OData request uri.</param>
+            <param name="functionSignature">The new custom function signature.</param>
+            <param name="methodInfo">The MethodInfo to bind the given function name.</param>
+            <exception cref="T:System.Exception">Any exception thrown by 'CustomUriFunctions.AddCustomUriFunction' and 'UriFunctionBinder.BindUriFunctionName' methods.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
+            <summary>
+            This is a shortcut of removing the FunctionSignature through 'CustomUriFunctions' class and
+            unbinding the function name from it's MethodInfo through 'UriFunctionsBinder' class.
+            See these classes documentations.
+            </summary>
+            <param name="functionName">The uri function name that appears in the OData request uri.</param>
+            <param name="functionSignature">The new custom function signature.</param>
+            <param name="methodInfo">The MethodInfo to bind the given function name.</param>
+            <exception cref="T:System.Exception">Any exception thrown by 'CustomUriFunctions.RemoveCustomUriFunction' and 'UriFunctionsBinder.UnbindUriFunctionName' methods.</exception>
+            <returns>'True' if the fucntion signature has successfully removed and unbinded. 'False' otherwise.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.SRResources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
