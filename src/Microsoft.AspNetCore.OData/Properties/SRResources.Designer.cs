@@ -178,6 +178,42 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The batch request must have &apos;{0}&apos; or &apos;{1}&apos; as the media type..
+        /// </summary>
+        internal static string BatchRequestInvalidMediaType {
+            get {
+                return ResourceManager.GetString("BatchRequestInvalidMediaType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The batch request must have a boundary specification in the &quot;Content-Type&quot; header..
+        /// </summary>
+        internal static string BatchRequestMissingBoundary {
+            get {
+                return ResourceManager.GetString("BatchRequestMissingBoundary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Content&apos; property on the batch request cannot be null..
+        /// </summary>
+        internal static string BatchRequestMissingContent {
+            get {
+                return ResourceManager.GetString("BatchRequestMissingContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The batch request must have a &quot;Content-Type&quot; header..
+        /// </summary>
+        internal static string BatchRequestMissingContentType {
+            get {
+                return ResourceManager.GetString("BatchRequestMissingContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
         /// </summary>
         internal static string BinaryOperatorNotSupported {
@@ -606,6 +642,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InputKeyNotMatchEntityTypeKey {
             get {
                 return ResourceManager.GetString("InputKeyNotMatchEntityTypeKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current batch reader state &apos;{0}&apos; is invalid. The expected state is &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidBatchReaderState {
+            get {
+                return ResourceManager.GetString("InvalidBatchReaderState", resourceCulture);
             }
         }
         

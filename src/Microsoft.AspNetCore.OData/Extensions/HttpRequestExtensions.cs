@@ -40,6 +40,21 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the <see cref="IODataBatchFeature"/> from the services container.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The <see cref="IODataBatchFeature"/> from the services container.</returns>
+        public static IODataBatchFeature ODataBatchFeature(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            return request.HttpContext.ODataBatchFeature();
+        }
+
+        /// <summary>
         /// Gets the <see cref="IEdmModel"/> from the request container.
         /// </summary>
         /// <param name="request">The request.</param>

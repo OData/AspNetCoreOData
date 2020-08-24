@@ -59,6 +59,31 @@
             <param name="etagHeaderValue">The ETag header value.</param>
             <returns>Concurrency property names and values.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature">
+            <summary>
+            Provide the interface for the details of a given OData batch request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.BatchId">
+            <summary>
+            Gets or sets the batch id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ChangeSetId">
+            <summary>
+            Gets or sets the change set id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ContentId">
+            <summary>
+            Gets or sets the content id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ContentIdMapping">
+            <summary>
+            Gets or sets the content id mapping.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -97,6 +122,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.UrlHelper">
             <summary>
             Gets or sets the Url helper.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BatchRouteData">
+            <summary>
+            Gets or sets the batch route data.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCount">
@@ -183,6 +213,31 @@
             <param name="clrType">The CLR type.</param>
             <returns>Null or the corresponding Edm type.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature">
+            <summary>
+            Provide the interface for the details of a given OData batch request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature.BatchId">
+            <summary>
+            Gets or sets the batch id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature.ChangeSetId">
+            <summary>
+            Gets or sets the change set id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature.ContentId">
+            <summary>
+            Gets or sets the content id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature.ContentIdMapping">
+            <summary>
+            Gets or sets the content id mapping.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataFeature">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
@@ -218,6 +273,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
             <summary>
             Gets or sets the Url helper.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BatchRouteData">
+            <summary>
+            Gets or sets the batch route data.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCount">
@@ -377,6 +437,557 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem">
+            <summary>
+            Represents a ChangeSet request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.Http.HttpContext})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem"/> class.
+            </summary>
+            <param name="contexts">The request contexts in the ChangeSet.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.Contexts">
+            <summary>
+            Gets the request contexts in the ChangeSet.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Sends the ChangeSet request.
+            </summary>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem">
+            <summary>
+            Represents a ChangeSet response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.Http.HttpContext})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem"/> class.
+            </summary>
+            <param name="contexts">The response contexts for the ChangeSet requests.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.Contexts">
+            <summary>
+            Gets the response contexts for the ChangeSet.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
+            <summary>
+            Writes the responses as a ChangeSet.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.IsResponseSuccessful">
+            <summary>
+            Gets a value that indicates if the responses in this item are successful.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler">
+            <summary>
+            Default implementation of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/> for handling OData batch request.
+            </summary>
+            <remarks>
+            By default, it buffers the request content stream.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ExecuteRequestMessagesAsync(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem},Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Executes the OData batch requests.
+            </summary>
+            <param name="requests">The collection of OData batch requests.</param>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>A collection of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem"/> for the batch requests.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ParseBatchRequestsAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Converts the incoming OData batch request into a collection of request messages.
+            </summary>
+            <param name="context">The context containing the batch request messages.</param>
+            <returns>A collection of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.GetODataMessageReader(Microsoft.AspNetCore.Http.HttpRequest,System.IServiceProvider)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ODataMessageReader"/> for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> stream.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="requestContainer">The dependency injection container for the request.</param>
+            <returns>A task object that produces an <see cref="T:Microsoft.OData.ODataMessageReader"/> when completed.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.CopyAbsoluteUrl(Microsoft.AspNetCore.Http.HttpRequest,System.Uri)">
+            <summary>
+            Copy an absolute Uri to a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> stream.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="uri">The absolute uri to copy.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.CopyBatchRequestProperties(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Copies the properties from another <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
+            </summary>
+            <param name="subRequest">The sub-request.</param>
+            <param name="batchRequest">The batch request that contains the properties to copy.</param>
+            <remarks>
+            Currently, this method is unused but is retained to keep a similar API surface area
+            between the AspNet and AspNetCore versions of OData WebApi.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent">
+            <summary>
+            Encapsulates a collection of OData batch responses.
+            </summary>
+            <remarks>
+            In AspNet, <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> derives from <see cref="T:System.IDisposable"/>.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Responses">
+            <summary>
+            Gets the batch responses.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> class.
+            </summary>
+            <param name="responses">The batch responses.</param>
+            <param name="requestContainer">The dependency injection container for the request.</param>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> class.
+            </summary>
+            <param name="responses">The batch responses.</param>
+            <param name="requestContainer">The dependency injection container for the request.</param>
+            <param name="contentType">The response content type.</param>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Headers">
+            <summary>
+            Gets the Headers for the batch content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.SerializeToStreamAsync(System.IO.Stream)">
+            <summary>
+            Serialize the batch content to a stream.
+            </summary>
+            <param name="stream">The stream to serialize to.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be awaited.</returns>
+            <remarks>This function uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.WriteToResponseMessageAsync(Microsoft.OData.IODataResponseMessage)">
+            <summary>
+             Serialize the batch responses to an <see cref="T:Microsoft.OData.IODataResponseMessage"/>.
+            </summary>
+            <param name="responseMessage">The response message.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Initialize(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> class.
+            </summary>
+            <param name="responses">The batch responses.</param>
+            <param name="requestContainer">The dependency injection container for the request.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler">
+            <summary>
+            Defines the abstraction for handling OData batch requests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.MessageQuotas">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ODataMessageQuotas"/> used for reading/writing the batch request/response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Abstract method for processing a batch request.
+            </summary>
+            <param name="context">The http content.</param>
+            ><param name="nextHandler">The next handler in the middleware chain.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.CreateResponseMessageAsync(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Creates the batch response message.
+            </summary>
+            <param name="responses">The responses for the batch requests.</param>
+            <param name="request">The original request containing all the batch requests.</param>
+            <returns>The batch response message.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ValidateRequest(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Validates the incoming request that contains the batch request messages.
+            </summary>
+            <param name="request">The request containing the batch request messages.</param>
+            <returns>true if the request is valid, otherwise false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.GetBaseUri(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the base URI for the batched requests.
+            </summary>
+            <param name="request">The original request containing all the batch requests.</param>
+            <returns>The base URI.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ContinueOnError">
+            <summary>
+            Gets or sets if the continue-on-error header is enable or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.SetContinueOnError(Microsoft.AspNetCore.Http.IHeaderDictionary,System.Boolean)">
+            <summary>
+            Set ContinueOnError based on the request and headers.
+            </summary>
+            <param name="header">The request header.</param>
+            <param name="enableContinueOnErrorHeader">Flag indicating if continue on error header is enabled.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.IsODataBatchRequest(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Determine if the request is a batch request.
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataBatchId(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Retrieves the Batch ID associated with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The Batch ID associated with this request, or <c>null</c> if there isn't one.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetODataBatchId(Microsoft.AspNetCore.Http.HttpRequest,System.Guid)">
+            <summary>
+            Associates a given Batch ID with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="batchId">The Batch ID.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataChangeSetId(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Retrieves the ChangeSet ID associated with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The ChangeSet ID associated with this request, or <c>null</c> if there isn't one.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetODataChangeSetId(Microsoft.AspNetCore.Http.HttpRequest,System.Guid)">
+            <summary>
+            Associates a given ChangeSet ID with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="changeSetId">The ChangeSet ID.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataContentId(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Retrieves the Content-ID associated with the sub-request of a batch.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The Content-ID associated with this request, or <c>null</c> if there isn't one.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetODataContentId(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
+            <summary>
+            Associates a given Content-ID with the sub-request of a batch.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="contentId">The Content-ID.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataContentIdMapping(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Retrieves the Content-ID to Location mapping associated with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The Content-ID to Location mapping associated with this request, or <c>null</c> if there isn't one.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetODataContentIdMapping(Microsoft.AspNetCore.Http.HttpRequest,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Associates a given Content-ID to Location mapping with the request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="contentIdMapping">The Content-ID to Location mapping.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware">
+            <summary>
+            Defines the middleware for handling OData batch requests. This middleware essentially
+            acts like branching middleware, <see cref="T:Microsoft.AspNetCore.Builder.MapExtensions"/>, and redirects OData batch
+            requests to the appropriate ODataBatchHandler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping">
+            <summary>
+            A class for storing batch route names and prefixes used to determine if a route is a
+            batch route.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.IsEndpointRouting">
+            <summary>
+            Gets/sets a boolean value indicating whether it's endpoint routing.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.AddRoute(System.String,System.String)">
+            <summary>
+            Add a route name and template for batching.
+            </summary>
+            <param name="routeName">The route name.</param>
+            <param name="routeTemplate">The route template.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.TryGetRouteName(Microsoft.AspNetCore.Http.HttpContext,System.String@)">
+            <summary>
+            Try and get the batch handler for a given path.
+            </summary>
+            <param name="context">The http context.</param>
+            <param name="routeName">The route name if found or null.</param>
+            <returns>true if a route name is found, otherwise false.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.OData.ODataBatchReader"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Reads a ChangeSet request.
+            </summary>
+            <param name="reader">The <see cref="T:Microsoft.OData.ODataBatchReader"/>.</param>
+            <param name="context">The context containing the batch request messages.</param>
+            <param name="batchId">The Batch Id.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A collection of <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> in the ChangeSet.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Reads an Operation request.
+            </summary>
+            <param name="reader">The <see cref="T:Microsoft.OData.ODataBatchReader"/>.</param>
+            <param name="context">The context containing the batch request messages.</param>
+            <param name="batchId">The Batch ID.</param>
+            <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> representing the operation.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Guid,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Reads an Operation request in a ChangeSet.
+            </summary>
+            <param name="reader">The <see cref="T:Microsoft.OData.ODataBatchReader"/>.</param>
+            <param name="context">The context containing the batch request messages.</param>
+            <param name="batchId">The Batch ID.</param>
+            <param name="changeSetId">The ChangeSet ID.</param>
+            <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> representing a ChangeSet operation</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.GetPreferencesToInheritFromBatch(System.String)">
+            <summary>
+            Extract preferences that can be inherited from the overall batch request to
+            an individual request.
+            </summary>
+            <param name="batchPreferences">The value of the Prefer header from the batch request</param>
+            <returns>comma-separated preferences that can be passed down to an individual request</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.MergeIndividualAndBatchPreferences(System.String,System.String)">
+            <summary>
+            Merges the preferences from the batch request and an individual request inside the batch into one value.
+            If a given preference is defined in both the batch and individual request, the one from the individual
+            request is retained and the one from the batch is discarded.
+            </summary>
+            <param name="individualPreferences">The value of the Prefer header from the individual request inside the batch</param>
+            <param name="batchPreferences">The value of the Prefer header from the overall batch request</param>
+            <returns>Value containing the combined preferences</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.SplitPreferences(System.String)">
+            <summary>
+            Splits the value of a Prefer header into separate preferences
+            e.g. a value like 'a, b=c, foo="bar,baz"' will return an IEnumerable with
+            - a
+            - b=c
+            - foo="bar,baz"
+            </summary>
+            <param name="preferences"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem">
+            <summary>
+            Represents an OData batch request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Routes a single OData batch request.
+            </summary>
+            <param name="handler">The handler for processing a message.</param>
+            <param name="context">The context.</param>
+            <param name="contentIdToLocationMapping">The Content-ID to Location mapping.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Routes the request.
+            </summary>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem">
+            <summary>
+            Represents an OData batch response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter,Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Writes a single OData batch response using a synchronous writer.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+            <param name="context">The message context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter,Microsoft.AspNetCore.Http.HttpContext,System.Boolean)">
+            <summary>
+            Writes a single OData batch response.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+            <param name="context">The message context.</param>
+            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter)">
+            <summary>
+            Writes the response to a synchronous writer.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
+            <summary>
+            Writes the response.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+            <param name="asyncWriter">Whether or not the writer is writing asynchronously.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.IsResponseSuccessful">
+            <summary>
+            Gets a value that indicates if the responses in this item are successful.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchStream.InternalDispose">
+            <summary>
+            Dispose the batch stream and underlying resources
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchStream.InternalDisposeAsync">
+            <summary>
+            Dispose the batch stream and underlying resources
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchStream.Close">
+            <summary>
+            Override Close() in order to hold the stream open until we are able to
+            copy it to the batch response stream.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.OperationRequestItem">
+            <summary>
+            Represents an Operation request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationRequestItem.#ctor(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.OperationRequestItem"/> class.
+            </summary>
+            <param name="context">The Operation request context.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.OperationRequestItem.Context">
+            <summary>
+            Gets the Operation request context.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Sends the Operation request.
+            </summary>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.OperationResponseItem"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.OperationResponseItem">
+            <summary>
+            Represents an Operation response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.#ctor(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.OperationResponseItem"/> class.
+            </summary>
+            <param name="context">The response context for the Operation request.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.Context">
+            <summary>
+            Gets the response messages for the Operation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
+            <summary>
+            Writes the response as an Operation.
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
+            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.IsResponseSuccessful">
+            <summary>
+            Gets a value that indicates if the responses in this item are successful.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler">
+            <summary>
+            An implementation of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/> that doesn't buffer the request content stream.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.ExecuteOperationAsync(Microsoft.OData.ODataBatchReader,System.Guid,Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Executes the operation.
+            </summary>
+            <param name="batchReader">The batch reader.</param>
+            <param name="batchId">The batch id.</param>
+            <param name="originalRequest">The original request containing all the batch requests.</param>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>The response for the operation.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.ExecuteChangeSetAsync(Microsoft.OData.ODataBatchReader,System.Guid,Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Executes the ChangeSet.
+            </summary>
+            <param name="batchReader">The batch reader.</param>
+            <param name="batchId">The batch id.</param>
+            <param name="originalRequest">The original request containing all the batch requests.</param>
+            <param name="handler">The handler for processing a message.</param>
+            <returns>The response for the ChangeSet.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.CollectionExtensions">
             <summary>
@@ -1434,6 +2045,13 @@
             <param name="httpContext">The Http context.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            </summary>
+            <param name="httpContext">The Http context.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.GetUrlHelper(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
@@ -1459,6 +2077,13 @@
             </summary>
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataBatchFeature(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the services container.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the services container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
@@ -1545,6 +2170,18 @@
             </summary>
             <param name="request"></param>
             <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions">
+            <summary>
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions.IsSuccessStatusCode(Microsoft.AspNetCore.Http.HttpResponse)">
+            <summary>
+            Determine if the response has a success status code.
+            </summary>
+            <param name="response">The response.</param>
+            <returns>True if the response has a success status code; false otherwise.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers">
             <summary>
@@ -4715,6 +5352,26 @@
               Looks up a localized string similar to The argument must be of type &apos;{0}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestInvalidMediaType">
+            <summary>
+              Looks up a localized string similar to The batch request must have &apos;{0}&apos; or &apos;{1}&apos; as the media type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingBoundary">
+            <summary>
+              Looks up a localized string similar to The batch request must have a boundary specification in the &quot;Content-Type&quot; header..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingContent">
+            <summary>
+              Looks up a localized string similar to The &apos;Content&apos; property on the batch request cannot be null..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingContentType">
+            <summary>
+              Looks up a localized string similar to The batch request must have a &quot;Content-Type&quot; header..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BinaryOperatorNotSupported">
             <summary>
               Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
@@ -4953,6 +5610,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InputKeyNotMatchEntityTypeKey">
             <summary>
               Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidBatchReaderState">
+            <summary>
+              Looks up a localized string similar to The current batch reader state &apos;{0}&apos; is invalid. The expected state is &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidExpansionDepthValue">
@@ -5832,12 +6494,12 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper">
             <summary>
-            The result of a $select and $expand projection is represented as an <see cref="!:ISelectExpandWrapper"/>
+            The result of a $select and $expand projection is represented as an <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/>
             instance. That instance can be projected into an <see cref="T:System.Collections.Generic.IDictionary`2"/> instance by calling
             <see cref="!:ISelectExpandWrapper.ToDictionary(Func&lt;IEdmModel,IEdmStructuredType,IPropertyMapper&gt;)"/>. 
             That method will use the function to construct an <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper"/> that will map the property 
             names in that projection to the keys in the returned <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-            The main purpose of converting an <see cref="!:ISelectExpandWrapper"/> instance into an 
+            The main purpose of converting an <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> instance into an 
             <see cref="T:System.Collections.Generic.IDictionary`2"/> (using the method mentioned above) is to allow changing the names of the 
             properties in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that will be used during the serialization of the $select 
             and $expand projection by a given formatter. For example, to support custom serialization attributes of a
@@ -5848,15 +6510,15 @@
             <summary>
             Defines a mapping between the name of an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> of an <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>
             and the name that should be used in other contexts, for example, when projecting an instance of an 
-            <see cref="!:ISelectExpandWrapper"/> into an instance of an <see cref="T:System.Collections.Generic.IDictionary`2"/>
+            <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> into an instance of an <see cref="T:System.Collections.Generic.IDictionary`2"/>
             </summary>
             <param name="propertyName">
             The name of the property in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType" /> represented
-            by this instance of <see cref="!:ISelectExpandWrapper"/>.
+            by this instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/>.
             </param>
             <returns>
             The value that will be used as the key for this property in the <see cref="T:System.Collections.Generic.IDictionary`2" />
-            resulting from calling ToDictionary on an <see cref="!:ISelectExpandWrapper"/> instance.
+            resulting from calling ToDictionary on an <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> instance.
             </returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection">
@@ -9829,9 +10491,9 @@
             <summary>
             Process the operation candidates using the information.
             </summary>
-            <param name="context"></param>
-            <param name="entityType"></param>
-            <param name="navigationSource"></param>
+            <param name="context">The controller and action context.</param>
+            <param name="entityType">The Edm entity type.</param>
+            <param name="navigationSource">The Edm navigation source.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.SplitActionName(System.String,System.String@,System.Boolean@)">
             <summary>
@@ -9970,28 +10632,29 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">
             <summary>
+             Extension methods for <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetEdmType(Microsoft.OData.UriParser.ODataPath)">
             <summary>
-            
+            Computes the <see cref="T:Microsoft.OData.Edm.IEdmType"/> of the resource identified by this <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
             </summary>
-            <param name="path"></param>
-            <returns></returns>
+            <param name="path">Path to compute the type for.</param>
+            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmType"/> of the resource, or null if the path does not identify a resource with a type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetNavigationSource(Microsoft.OData.UriParser.ODataPath)">
             <summary>
-            
+            Computes the <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> of the resource identified by this <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
             </summary>
-            <param name="path"></param>
-            <returns></returns>
+            <param name="path">Path to compute the set for.</param>
+            <returns>The <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> of the resource, or null if the path does not identify a resource that is part of a set.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPathString(System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
             <summary>
-            
+            Get the string representation of <see cref="T:Microsoft.OData.UriParser.ODataPath"/> mainly translate Context Url path.
             </summary>
-            <param name="segments"></param>
-            <returns></returns>
+            <param name="segments">The path segments.</param>
+            <returns>The string representation of the Context Url path.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler">
             <summary>
@@ -10129,8 +10792,17 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
             <summary>
-            Use for debug  for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
+            Use for debug for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.Order">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider">
             <summary>

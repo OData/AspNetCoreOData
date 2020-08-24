@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
@@ -40,6 +41,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the Url helper.
         /// </summary>
         IUrlHelper UrlHelper { get; set; }
+
+        /// <summary>
+        /// Gets or sets the batch route data.
+        /// </summary>
+        RouteValueDictionary BatchRouteData { get; set; }
 
         /// <summary>
         /// Gets or sets the total count for the OData response.
