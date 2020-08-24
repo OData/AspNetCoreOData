@@ -3,25 +3,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
+    ///  Extension methods for <see cref="ODataPath"/>.
     /// </summary>
     public static class ODataPathExtensions
     {
-        
         /// <summary>
-        /// 
+        /// Computes the <see cref="IEdmType"/> of the resource identified by this <see cref="ODataPath"/>.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Path to compute the type for.</param>
+        /// <returns>The <see cref="IEdmType"/> of the resource, or null if the path does not identify a resource with a type.</returns>
         public static IEdmType GetEdmType(this ODataPath path)
         {
             if (path == null)
@@ -43,10 +39,10 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// 
+        /// Computes the <see cref="IEdmNavigationSource"/> of the resource identified by this <see cref="ODataPath"/>.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Path to compute the set for.</param>
+        /// <returns>The <see cref="IEdmNavigationSource"/> of the resource, or null if the path does not identify a resource that is part of a set.</returns>
         public static IEdmNavigationSource GetNavigationSource(this ODataPath path)
         {
             if (path == null)
@@ -74,10 +70,10 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// 
+        /// Get the string representation of <see cref="ODataPath"/> mainly translate Context Url path.
         /// </summary>
-        /// <param name="segments"></param>
-        /// <returns></returns>
+        /// <param name="segments">The path segments.</param>
+        /// <returns>The string representation of the Context Url path.</returns>
         public static string GetPathString(this IList<ODataPathSegment> segments)
         {
             if (segments == null)

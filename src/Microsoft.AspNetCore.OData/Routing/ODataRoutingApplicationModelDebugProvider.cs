@@ -3,22 +3,21 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
-    /// Use for debug  for OData convention action discovery on <see cref="ApplicationModel" />.
+    /// Use for debug for OData convention action discovery on <see cref="ApplicationModel" />.
     /// </summary>
     internal class ODataRoutingApplicationModelDebugProvider : IApplicationModelProvider
     {
+        /// <inheritdoc />
         public int Order => -100;
 
+        /// <inheritdoc />
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
-            Console.WriteLine("OnProvidersExecuted of ODataEndpointModelDebugProvider <==");
-
             foreach (var controller in context.Result.Controllers)
             {
                 foreach (var action in controller.Actions)
@@ -40,9 +39,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
+        /// <inheritdoc />
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
         {
-            Console.WriteLine("OnProvidersExecuting of ODataEndpointModelDebugProvider ==>");
         }
     }
 }

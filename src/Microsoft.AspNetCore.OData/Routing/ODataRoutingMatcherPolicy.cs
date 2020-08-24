@@ -1,17 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -86,15 +85,15 @@ namespace Microsoft.AspNetCore.OData.Routing
                 ODataTemplateTranslateContext translatorContext =
                     new ODataTemplateTranslateContext(httpContext, candidate.Values, oDataMetadata.Model);
 
-                var odataPath = _translator.Translate(oDataMetadata.Template, translatorContext);
+                ODataPath odataPath = _translator.Translate(oDataMetadata.Template, translatorContext);
                 if (odataPath != null)
                 {
-                    var odata = httpContext.ODataFeature();
+                    IODataFeature odata = httpContext.ODataFeature();
                     odata.Model = oDataMetadata.Model;
                     odata.Path = odataPath;
 
                     // Double confirm whether it's required or not?
-                    //candidates.SetValidity(i, true); 
+                    //candidates.SetValidity(i, true);
                 }
                 else
                 {
@@ -103,36 +102,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             return Task.CompletedTask;
-        }
-
-        private static string Test(HttpRequest request)
-        {
-            // We need to call Uri.GetLeftPart(), which returns an encoded Url.
-            // The ODL parser does not like raw values.
-            Uri requestUri = new Uri(request.GetEncodedUrl());
-            string requestLeftPart = requestUri.GetLeftPart(UriPartial.Path);
-
-
-            return requestLeftPart;
-        }
-
-        private string Test2(Endpoint endPoint, HttpRequest request)
-        {
-            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-            if (linkGenerator != null)
-            {
-                //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
-
-               // Endpoint endPoint = request.HttpContext.GetEndpoint();
-                EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
-                string aUri = linkGenerator.GetUriByName(request.HttpContext, name.EndpointName,
-                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
-
-                return aUri;
-            }
-
-            return null;
         }
     }
 }

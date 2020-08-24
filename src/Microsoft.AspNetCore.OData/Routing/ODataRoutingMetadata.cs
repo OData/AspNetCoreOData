@@ -2,23 +2,11 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
-    internal class ODataHttpMethodMetadata
-    {
-        public ODataHttpMethodMetadata(params string[] httpMethods)
-        {
-            Methods = new HashSet<string>(httpMethods, StringComparer.OrdinalIgnoreCase);
-        }
-
-        public ISet<string> Methods { get; }
-    }
-
     /// <summary>
     /// Represents OData Endpoint metadata used during routing.
     /// </summary>
@@ -33,9 +21,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         public ODataRoutingMetadata(string prefix, IEdmModel model, ODataPathTemplate template)
         {
             Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
-
             Model = model ?? throw new ArgumentNullException(nameof(model));
-
             Template = template ?? throw new ArgumentNullException(nameof(template));
         }
 

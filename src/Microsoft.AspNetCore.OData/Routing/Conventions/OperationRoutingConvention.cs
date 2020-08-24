@@ -38,9 +38,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// Process the operation candidates using the information.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="entityType"></param>
-        /// <param name="navigationSource"></param>
+        /// <param name="context">The controller and action context.</param>
+        /// <param name="entityType">The Edm entity type.</param>
+        /// <param name="navigationSource">The Edm navigation source.</param>
         protected void ProcessOperations(ODataControllerActionContext context, IEdmEntityType entityType,  IEdmNavigationSource navigationSource)
         {
             Contract.Assert(context != null);

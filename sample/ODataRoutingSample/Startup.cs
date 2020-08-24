@@ -20,6 +20,7 @@ namespace ODataRoutingSample
     public class Startup
     {
         private IEdmModel model;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

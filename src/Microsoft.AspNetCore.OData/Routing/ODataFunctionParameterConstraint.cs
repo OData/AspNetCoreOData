@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// <summary>
     /// 
     /// </summary>
-    public class ODataFunctionParameterConstraint : IRouteConstraint
+    internal class ODataFunctionParameterConstraint : IRouteConstraint
     {
         private IEdmModel _model;
         private IEdmFunction _function;
