@@ -93,5 +93,12 @@ namespace Microsoft.AspNetCore.OData
             Models[name] = model;
             return this;
         }
+
+
+        public ODataOptions AddModel(string modelName, IEdmModel model, Action<IContainerBuilder> setupAction)
+        {
+
+            return this;
+        }
     }
 }

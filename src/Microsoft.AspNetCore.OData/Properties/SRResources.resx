@@ -572,4 +572,7 @@
   <data name="BatchRequestMissingContent" xml:space="preserve">
     <value>The 'Content' property on the batch request cannot be null.</value>
   </data>
+  <data name="NullContainerBuilder" xml:space="preserve">
+    <value>The container builder created by the container builder factory must not be null.</value>
+  </data>
 </root>

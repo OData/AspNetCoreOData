@@ -997,6 +997,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The container builder created by the container builder factory must not be null..
+        /// </summary>
+        internal static string NullContainerBuilder {
+            get {
+                return ResourceManager.GetString("NullContainerBuilder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collections cannot contain null elements..
         /// </summary>
         internal static string NullElementInCollection {

@@ -84,24 +84,6 @@ namespace Microsoft.AspNetCore.OData.Query
             return services;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        //public static IServiceCollection AddODataQuery(this IServiceCollection services, Action<ODataQueryableOptions> setupAction)
-        //{
-        //    if (services == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(services));
-        //    }
-
-        //    AddODataQueryServices(services);
-        //    services.Configure(setupAction);
-        //    return services;
-        //}
-
         static void AddODataQueryServices(IServiceCollection services, Action<DefaultQuerySettings> setupAction)
         {
             services.AddSingleton<ODataUriResolver>(
