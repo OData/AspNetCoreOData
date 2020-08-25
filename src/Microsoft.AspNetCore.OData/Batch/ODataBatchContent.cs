@@ -18,10 +18,7 @@ namespace Microsoft.AspNetCore.OData.Batch
     /// <summary>
     /// Encapsulates a collection of OData batch responses.
     /// </summary>
-    /// <remarks>
-    /// In AspNet, <see cref="ODataBatchContent"/> derives from <see cref="IDisposable"/>.
-    /// </remarks>
-    public partial class ODataBatchContent
+    public class ODataBatchContent
     {
         private IServiceProvider _requestContainer;
         private ODataMessageWriterSettings _writerSettings;
@@ -41,6 +38,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             : this(responses, requestContainer, null/*contentType*/)
         {
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataBatchContent"/> class.
         /// </summary>
@@ -111,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (responses == null)
             {
-                throw Error.ArgumentNull("responses");
+                throw new ArgumentNullException(nameof(responses));
             }
 
             Responses = responses;

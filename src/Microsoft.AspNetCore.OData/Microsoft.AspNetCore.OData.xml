@@ -550,9 +550,6 @@
             <summary>
             Encapsulates a collection of OData batch responses.
             </summary>
-            <remarks>
-            In AspNet, <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> derives from <see cref="T:System.IDisposable"/>.
-            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Responses">
             <summary>

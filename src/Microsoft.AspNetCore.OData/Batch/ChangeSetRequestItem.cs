@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -19,12 +20,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="contexts">The request contexts in the ChangeSet.</param>
         public ChangeSetRequestItem(IEnumerable<HttpContext> contexts)
         {
-            if (contexts == null)
-            {
-                throw Error.ArgumentNull("contexts");
-            }
-
-            Contexts = contexts;
+            Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
         }
 
         /// <summary>
@@ -41,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (handler == null)
             {
-                throw Error.ArgumentNull("handler");
+                throw new ArgumentNullException(nameof(handler));
             }
 
             Dictionary<string, string> contentIdToLocationMapping = new Dictionary<string, string>();
@@ -49,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             foreach (HttpContext context in Contexts)
             {
-                await SendRequestAsync(handler, context, contentIdToLocationMapping);
+                await SendRequestAsync(handler, context, contentIdToLocationMapping).ConfigureAwait(false);
 
                 HttpResponse response = context.Response;
                 if (response.IsSuccessStatusCode())

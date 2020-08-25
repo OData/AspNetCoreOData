@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,18 +22,13 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="contexts">The response contexts for the ChangeSet requests.</param>
         public ChangeSetResponseItem(IEnumerable<HttpContext> contexts)
         {
-            if (contexts == null)
-            {
-                throw Error.ArgumentNull("contexts");
-            }
-
-            Contexts = contexts;
+            Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
         }
 
         /// <summary>
         /// Gets the response contexts for the ChangeSet.
         /// </summary>
-        public IEnumerable<HttpContext> Contexts { get; private set; }
+        public IEnumerable<HttpContext> Contexts { get; }
 
         /// <summary>
         /// Writes the responses as a ChangeSet.
@@ -43,19 +39,19 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw new ArgumentNullException(nameof(writer));
             }
 
             if (asyncWriter)
             {
-                await writer.WriteStartChangesetAsync();
+                await writer.WriteStartChangesetAsync().ConfigureAwait(false);
 
                 foreach (HttpContext context in Contexts)
                 {
-                    await WriteMessageAsync(writer, context, asyncWriter);
+                    await WriteMessageAsync(writer, context, asyncWriter).ConfigureAwait(false);
                 }
 
-                await writer.WriteEndChangesetAsync();
+                await writer.WriteEndChangesetAsync().ConfigureAwait(false);
             }
             else
             {
@@ -63,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
                 foreach (HttpContext context in Contexts)
                 {
-                    await WriteMessageAsync(writer, context, asyncWriter);
+                    await WriteMessageAsync(writer, context, asyncWriter).ConfigureAwait(false);
                 }
 
                 writer.WriteEndChangeset();

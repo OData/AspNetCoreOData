@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Batch
     /// <summary>
     /// Defines the abstraction for handling OData batch requests.
     /// </summary>
-    public abstract partial class ODataBatchHandler
+    public abstract class ODataBatchHandler
     {
         // Maxing out the received message size as we depend on the hosting layer to enforce this limit.
         private readonly ODataMessageQuotas _messageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue };
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.CreateODataBatchResponseAsync(responses, MessageQuotas);
