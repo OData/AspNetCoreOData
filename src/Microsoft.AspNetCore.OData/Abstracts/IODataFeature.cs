@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
@@ -41,6 +42,16 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the Url helper.
         /// </summary>
         IUrlHelper UrlHelper { get; set; }
+
+        /// <summary>
+        /// Gets or sets the request scope.
+        /// </summary>
+        IServiceScope RequestScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the request container.
+        /// </summary>
+        IServiceProvider SubServiceProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the batch route data.

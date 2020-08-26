@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.OData;
 
 namespace ODataRoutingSample
 {
@@ -45,7 +47,7 @@ namespace ODataRoutingSample
             });
 
             services.AddConvention<MyConvention>();
-
+            /*
             services.AddOData()
                 .AddODataRouting(options => options
                     .AddModel(EdmModelBuilder.GetEdmModel())
@@ -53,24 +55,21 @@ namespace ODataRoutingSample
                     .AddModel("v2{data}", EdmModelBuilder.GetEdmModelV2()));
 
             services.AddODataFormatter();
-
-            // services.AddODataQuery(/*options => options.EnableFilter = true*/);
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
-
-            /*
-            services.AddOData(opt => opt.UseODataRouting(model1).
-                opt.UseODataRouting("v1", model2).
-                opt.UseODataRouting("v2{data}", model3).
-                opt.UseODataFormatter().
-                opt.UseODataQuery()
-                );
             */
-            //services.AddOData(opt => opt.UseModel(model0)
-            //    .UseModel("v1", model1)
-            //    .UseModel("v2{data}", model2))
+
+            //services.AddOData(opt => opt.AddModel(model0)
+            //    .AddModel("v1", model1)
+            //    .AddModel("v2{data}", model2))
             //    .AddODataRouting()
             //    .AddFormatter()
             //    .AddODataQuery();
+
+            services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                .AddModel(model0)
+                .AddModel("v1", model1)
+                .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,6 +79,9 @@ namespace ODataRoutingSample
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // Add the OData Batch middleware to support OData $Batch
+            app.UseODataBatching();
 
             app.UseRouting();
 

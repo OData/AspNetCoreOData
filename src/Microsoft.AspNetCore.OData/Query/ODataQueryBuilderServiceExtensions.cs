@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddODataQuery(this IServiceCollection services/*, Action<ODataRoutingOptions> setupAction*/)
+        public static IServiceCollection AddODataQuery(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -89,12 +89,12 @@ namespace Microsoft.AspNetCore.OData.Query
             services.AddSingleton<ODataUriResolver>(
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
-            services.AddSingleton(sp =>
-            {
-                DefaultQuerySettings settings = new DefaultQuerySettings();
-                setupAction(settings);
-                return settings;
-            });
+            //services.AddSingleton(sp =>
+            //{
+            //    DefaultQuerySettings settings = new DefaultQuerySettings();
+            //    setupAction(settings);
+            //    return settings;
+            //});
 
             // QueryValidators.
             services.AddSingleton<CountQueryValidator>();

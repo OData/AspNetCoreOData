@@ -267,6 +267,104 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the dependency injection container for the OData request.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>The dependency injection container.</returns>
+        public static IServiceProvider GetSubServiceProvider(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull("request");
+            }
+
+            IServiceProvider requestContainer = request.ODataFeature().SubServiceProvider;
+            if (requestContainer != null)
+            {
+                return requestContainer;
+            }
+
+            // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
+            return request.CreateSubServiceProvider(request.ODataFeature().RouteName);
+        }
+
+        /// <summary>
+        /// Creates a request container that associates with the <paramref name="request"/>.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="routeName">The name of the route.</param>
+        /// <returns>The request container created.</returns>
+        public static IServiceProvider CreateSubServiceProvider(this HttpRequest request, string routeName)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull("request");
+            }
+
+            if (request.ODataFeature().SubServiceProvider != null)
+            {
+                throw Error.InvalidOperation(SRResources.SubRequestServiceProviderAlreadyExists);
+            }
+
+            IServiceScope requestScope = request.CreateRequestScope(routeName);
+            IServiceProvider requestContainer = requestScope.ServiceProvider;
+
+            request.ODataFeature().RequestScope = requestScope;
+            request.ODataFeature().SubServiceProvider = requestContainer;
+
+            return requestContainer;
+        }
+
+        /// <summary>
+        /// Deletes the request container from the <paramref name="request"/> and disposes
+        /// the container if <paramref name="dispose"/> is <c>true</c>.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="dispose">
+        /// Returns <c>true</c> to dispose the request container after deletion; <c>false</c> otherwise.
+        /// </param>
+        public static void DeleteSubRequestProvider(this HttpRequest request, bool dispose)
+        {
+            if (request.ODataFeature().RequestScope != null)
+            {
+                IServiceScope requestScope = request.ODataFeature().RequestScope;
+                request.ODataFeature().RequestScope = null;
+                request.ODataFeature().SubServiceProvider = null;
+
+                if (dispose)
+                {
+                    requestScope.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create a scoped request.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="routeName">The route name.</param>
+        /// <returns></returns>
+        private static IServiceScope CreateRequestScope(this HttpRequest request, string routeName)
+        {
+            IPerRouteContainer perRouteContainer = request.HttpContext.RequestServices.GetRequiredService<IPerRouteContainer>();
+            if (perRouteContainer == null)
+            {
+                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(IPerRouteContainer));
+            }
+
+            IServiceProvider rootContainer = perRouteContainer.GetServiceProvider(routeName);
+            IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+            // Bind scoping request into the OData container.
+            //if (!string.IsNullOrEmpty(routeName))
+            //{
+            //    scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
+            //}
+
+            return scope;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="request"></param>

@@ -7,7 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Batch
@@ -39,7 +41,8 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             IList<ODataBatchRequestItem> subRequests = await ParseBatchRequestsAsync(context);
 
-            ODataOptions options = context.RequestServices.GetRequiredService<ODataOptions>();
+            // ODataOptions options = context.RequestServices.GetRequiredService<ODataOptions>();
+            ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
             bool enableContinueOnErrorHeader = (options != null)
                 ? options.EnableContinueOnErrorHeader
                 : false;
@@ -98,8 +101,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             HttpRequest request = context.Request;
-            //IServiceProvider requestContainer = request.CreateRequestContainer(ODataRouteName);
-            IServiceProvider requestContainer = request.HttpContext.RequestServices;
+            IServiceProvider requestContainer = request.CreateSubServiceProvider(RouteName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             ODataMessageReader reader = request.GetODataMessageReader(requestContainer);
@@ -116,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                     foreach (HttpContext changeSetContext in changeSetContexts)
                     {
                         changeSetContext.Request.CopyBatchRequestProperties(request);
-                        //changeSetContext.Request.DeleteRequestContainer(false);
+                        changeSetContext.Request.DeleteSubRequestProvider(false);
                     }
                     requests.Add(new ChangeSetRequestItem(changeSetContexts));
                 }
@@ -124,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 {
                     HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, true, cancellationToken);
                     operationContext.Request.CopyBatchRequestProperties(request);
-                    //operationContext.Request.DeleteRequestContainer(false);
+                    operationContext.Request.DeleteSubRequestProvider(false);
                     requests.Add(new OperationRequestItem(operationContext));
                 }
             }

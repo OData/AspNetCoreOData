@@ -4,6 +4,9 @@
 using System;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -45,7 +48,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="services"></param>
         /// <param name="setupAction"></param>
         /// <returns></returns>
-        public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
+        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
         {
             if (services == null)
             {
@@ -58,36 +61,7 @@ namespace Microsoft.AspNetCore.OData
             }
 
             services.AddCoreOData();
-            // services.AddSingleton<ODataOptions>();
-
             services.Configure(setupAction);
-
-            return new DefaultODataBuilder(services);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptionsBuilder> setupAction)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
-
-            services.AddCoreOData();
-            // services.AddSingleton<ODataOptions>();
-
-            services.Configure(setupAction);
-
             return services;
         }
 
@@ -141,17 +115,35 @@ namespace Microsoft.AspNetCore.OData
             return builder;
         }
 
-
         private static void AddCoreOData(this IServiceCollection services)
         {
-            services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+            services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+            services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
-            services.AddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
+            // Setup per-route dependency injection. When routes are added, additional
+            // per-route classes will be injected, such as IEdmModel and IODataRoutingConventions.
+            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
 
-            // services.AddSingleton(typeof(ODataClrTypeCache));
+            // Add the batch path mapping class to store batch route names and prefixes.
+            services.AddSingleton<ODataBatchPathMapping>();
+
+            // Formatter
+            services.AddODataFormatter();
+
+            // Routing related services
+            services.AddODataRoutingServices();
+
+            // Query
+            services.AddODataQuery();
+
+            services.AddSingleton(sp =>
+            {
+                ODataOptions options = sp.GetRequiredService<IOptions<ODataOptions>>().Value;
+                return options.BuildDefaultQuerySettings();
+            });
         }
 
-        static void AddODataRoutingServices(IServiceCollection services)
+        static void AddODataRoutingServices(this IServiceCollection services)
         {
             if (services == null)
             {

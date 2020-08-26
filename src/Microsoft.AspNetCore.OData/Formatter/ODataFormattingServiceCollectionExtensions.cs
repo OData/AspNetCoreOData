@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IODataBuilder AddFormatter(this IODataBuilder builder/*, Action<ODataRoutingOptions> setupAction*/)
+        public static IODataBuilder AddFormatter(this IODataBuilder builder)
         {
             if (builder == null)
             {
@@ -29,7 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             AddODataFormatterServices(builder.Services);
-            // services.Configure(setupAction);
             return builder;
         }
 
@@ -39,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddODataFormatter(this IServiceCollection services/*, Action<ODataRoutingOptions> setupAction*/)
+        public static IServiceCollection AddODataFormatter(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -47,7 +46,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             AddODataFormatterServices(services);
-           // services.Configure(setupAction);
             return services;
         }
 

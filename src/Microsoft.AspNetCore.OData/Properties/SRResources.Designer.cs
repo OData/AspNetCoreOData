@@ -1321,6 +1321,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A request container already exists on the request..
+        /// </summary>
+        internal static string SubRequestServiceProviderAlreadyExists {
+            get {
+                return ResourceManager.GetString("SubRequestServiceProviderAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
         /// </summary>
         internal static string TypeCannotBeDeserialized {

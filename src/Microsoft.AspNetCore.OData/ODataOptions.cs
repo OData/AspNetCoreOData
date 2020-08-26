@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.OData;
-using Microsoft.OData.Edm;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.OData;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -53,6 +54,11 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// 
         /// </summary>
+        public IDictionary<string, Action<IContainerBuilder>> PreRoutePrividers { get; } = new Dictionary<string, Action<IContainerBuilder>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="useAttributeRouting"></param>
         /// <returns></returns>
         public ODataOptions UseAttributeRouting(bool useAttributeRouting)
@@ -61,15 +67,14 @@ namespace Microsoft.AspNetCore.OData
             return this;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public ODataOptions UseModel(IEdmModel model)
+        public ODataOptions AddModel(IEdmModel model)
         {
-            return UseModel(string.Empty, model);
+            return AddModel(string.Empty, model);
         }
 
         /// <summary>
@@ -78,7 +83,20 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="name"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public ODataOptions UseModel(string name, IEdmModel model)
+        public ODataOptions AddModel(string name, IEdmModel model)
+        {
+            return AddModel(name, model, null);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="model"></param>
+        /// <param name="configureAction"></param>
+        /// <returns></returns>
+        public ODataOptions AddModel(string name, IEdmModel model, Action<IContainerBuilder> configureAction)
         {
             if (model == null)
             {
@@ -91,14 +109,153 @@ namespace Microsoft.AspNetCore.OData
             }
 
             Models[name] = model;
+            PreRoutePrividers[name] = configureAction;
             return this;
         }
 
+        #region Globle Query settings
 
-        public ODataOptions AddModel(string modelName, IEdmModel model, Action<IContainerBuilder> setupAction)
+        private int? _maxTop = 0;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether navigation property can be expanded.
+        /// </summary>
+        public bool EnableExpand { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether property can be selected.
+        /// </summary>
+        public bool EnableSelect { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether entity set and property can apply $count.
+        /// </summary>
+        public bool EnableCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether property can apply $orderby.
+        /// </summary>
+        public bool EnableOrderBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether property can apply $filter.
+        /// </summary>
+        public bool EnableFilter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max value of $top that a client can request.
+        /// </summary>
+        /// <value>
+        /// The max value of $top that a client can request, or <c>null</c> if there is no limit.
+        /// </value>
+        public int? MaxTop
         {
+            get => _maxTop;
+            set
+            {
+                if (value.HasValue && value < 0)
+                {
+                    throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, 0);
+                }
 
+                _maxTop = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the service will use skiptoken or not.
+        /// </summary>
+        public bool EnableSkipToken { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions Expand()
+        {
+            EnableExpand = true;
             return this;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions Select()
+        {
+            EnableSelect = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions Filter()
+        {
+            EnableFilter = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions OrderBy()
+        {
+            EnableOrderBy = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions Count()
+        {
+            EnableCount = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ODataOptions SkipToken()
+        {
+            EnableSkipToken = true;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maxTopValue"></param>
+        /// <returns></returns>
+        public ODataOptions SetMaxTop(int? maxTopValue)
+        {
+            MaxTop = maxTopValue;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DefaultQuerySettings BuildDefaultQuerySettings()
+        {
+            DefaultQuerySettings settings = new DefaultQuerySettings();
+
+            settings.EnableCount = EnableCount;
+            settings.EnableExpand = EnableExpand;
+            settings.EnableFilter = EnableFilter;
+            settings.EnableOrderBy = EnableOrderBy;
+            settings.EnableSelect = EnableSelect;
+            settings.EnableSkipToken = EnableSkipToken;
+            settings.MaxTop = MaxTop;
+
+            return settings;
+        }
+        #endregion
     }
 }

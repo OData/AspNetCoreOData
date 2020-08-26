@@ -2,6 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
@@ -15,6 +17,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets a function to build an <see cref="IContainerBuilder"/>
         /// </summary>
         Func<IContainerBuilder> BuilderFactory { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        IDictionary<string, IServiceProvider> Services { get; }
 
         /// <summary>
         /// Create a root container for a given route name.

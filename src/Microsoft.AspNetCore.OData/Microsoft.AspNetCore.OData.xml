@@ -20,6 +20,36 @@
             
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder">
+            <summary>
+            The default container builder implementation based on the Microsoft dependency injection framework.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.AddService(Microsoft.OData.ServiceLifetime,System.Type,System.Type)">
+            <summary>
+            Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationType"/>.
+            </summary>
+            <param name="lifetime">The lifetime of the service to register.</param>
+            <param name="serviceType">The type of the service to register.</param>
+            <param name="implementationType">The implementation type of the service.</param>
+            <returns>The <see cref="T:Microsoft.OData.IContainerBuilder"/> instance itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.AddService(Microsoft.OData.ServiceLifetime,System.Type,System.Func{System.IServiceProvider,System.Object})">
+            <summary>
+            Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationFactory"/>.
+            </summary>
+            <param name="lifetime">The lifetime of the service to register.</param>
+            <param name="serviceType">The type of the service to register.</param>
+            <param name="implementationFactory">The factory that creates the service.</param>
+            <returns>The <see cref="T:Microsoft.OData.IContainerBuilder"/> instance itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.BuildContainer">
+            <summary>
+            Builds a container which implements <see cref="T:System.IServiceProvider"/> and contains
+            all the services registered.
+            </summary>
+            <returns>The container built by this builder.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultODataBuilder">
             <summary>
             An interface for configuring essential OData services.
@@ -124,6 +154,16 @@
             Gets or sets the Url helper.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RequestScope">
+            <summary>
+            Gets or sets the request scope.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SubServiceProvider">
+            <summary>
+            Gets or sets the request container.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BatchRouteData">
             <summary>
             Gets or sets the batch route data.
@@ -213,6 +253,36 @@
             <param name="clrType">The CLR type.</param>
             <returns>Null or the corresponding Edm type.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer">
+            <summary>
+            An interface for managing per-route service containers.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.BuilderFactory">
+            <summary>
+            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.Services">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.CreateServiceProvider(System.String,System.Action{Microsoft.OData.IContainerBuilder})">
+            <summary>
+            Create a root container for a given route name.
+            </summary>
+            <param name="routeName">The route name.</param>
+            <param name="configureAction">The configuration actions to apply to the container.</param>
+            <returns>An instance of <see cref="T:System.IServiceProvider"/> to manage services for a route.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.GetServiceProvider(System.String)">
+            <summary>
+            Get the root container for a given route name.
+            </summary>
+            <param name="routeName">The route name.</param>
+            <returns>The root container for the route name.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature">
             <summary>
             Provide the interface for the details of a given OData batch request.
@@ -273,6 +343,16 @@
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
             <summary>
             Gets or sets the Url helper.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope">
+            <summary>
+            Gets or sets the request scope.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SubServiceProvider">
+            <summary>
+            Gets or sets the request container.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BatchRouteData">
@@ -426,6 +506,48 @@
             <summary>
             The mapping between Edm primitive type and Clr primitive type.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer">
+            <summary>
+            A class for managing per-route service containers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.ODataOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer"/> class.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.BuilderFactory">
+            <summary>
+            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.Services">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.CreateServiceProvider(System.String,System.Action{Microsoft.OData.IContainerBuilder})">
+            <summary>
+            Create a root container for a given route name.
+            </summary>
+            <param name="routeName">The route name.</param>
+            <param name="configureAction">The configuration actions to apply to the container.</param>
+            <returns>An instance of <see cref="T:System.IServiceProvider"/> to manage services for a route.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.GetServiceProvider(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="routeName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.CreateContainerBuilderWithCoreServices">
+            <summary>
+            Create a container builder with the default OData services.
+            </summary>
+            <returns>An instance of <see cref="T:Microsoft.OData.IContainerBuilder"/> to manage services.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
             <summary>
@@ -610,6 +732,11 @@
             Gets the <see cref="T:Microsoft.OData.ODataMessageQuotas"/> used for reading/writing the batch request/response.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.RouteName">
+            <summary>
+            Gets or sets the OData route associated with this batch handler.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             Abstract method for processing a batch request.
@@ -722,19 +849,22 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware">
             <summary>
-            Defines the middleware for handling OData batch requests. This middleware essentially
-            acts like branching middleware, <see cref="T:Microsoft.AspNetCore.Builder.MapExtensions"/>, and redirects OData batch
+            Defines the middleware for handling OData $batch requests.
+            This middleware essentially acts like branching middleware and redirects OData $batch
             requests to the appropriate ODataBatchHandler.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer,Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping)">
             <summary>
             Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware"/>.
             </summary>
+            <param name="next">The next middleware.</param>
+            <param name="perRouteContainer">The next middleware.</param>
+            <param name="batchMapping">The next middleware.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
-            Invoke the middleware.
+            Invoke the OData $Batch middleware.
             </summary>
             <param name="context">The http context.</param>
             <returns>A task that can be awaited.</returns>
@@ -2160,6 +2290,39 @@
             </summary>
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the dependency injection container for the OData request.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>The dependency injection container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
+            <summary>
+            Creates a request container that associates with the <paramref name="request"/>.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="routeName">The name of the route.</param>
+            <returns>The request container created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(Microsoft.AspNetCore.Http.HttpRequest,System.Boolean)">
+            <summary>
+            Deletes the request container from the <paramref name="request"/> and disposes
+            the container if <paramref name="dispose"/> is <c>true</c>.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="dispose">
+            Returns <c>true</c> to dispose the request container after deletion; <c>false</c> otherwise.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateRequestScope(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
+            <summary>
+            Create a scoped request.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="routeName">The route name.</param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
@@ -5105,6 +5268,18 @@
             Gets the inner nested resource infos.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
+            <summary>
+            Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataBatching(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Use OData batching middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
@@ -5146,6 +5321,11 @@
             
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.PreRoutePrividers">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseAttributeRouting(System.Boolean)">
             <summary>
             
@@ -5153,19 +5333,115 @@
             <param name="useAttributeRouting"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseModel(Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseModel(System.String,Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
             
             </summary>
             <param name="name"></param>
             <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="model"></param>
+            <param name="configureAction"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableExpand">
+            <summary>
+            Gets or sets a value indicating whether navigation property can be expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableSelect">
+            <summary>
+            Gets or sets a value indicating whether property can be selected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableCount">
+            <summary>
+            Gets or sets a value indicating whether entity set and property can apply $count.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableOrderBy">
+            <summary>
+            Gets or sets a value indicating whether property can apply $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableFilter">
+            <summary>
+            Gets or sets a value indicating whether property can apply $filter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+            <value>
+            The max value of $top that a client can request, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableSkipToken">
+            <summary>
+            Gets or sets a value indicating whether the service will use skiptoken or not.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Expand">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Select">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Filter">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.OrderBy">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Count">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SkipToken">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(System.Nullable{System.Int32})">
+            <summary>
+            
+            </summary>
+            <param name="maxTopValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildDefaultQuerySettings">
+            <summary>
+            
+            </summary>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder">
@@ -5201,14 +5477,6 @@
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
-            <summary>
-            
-            </summary>
-            <param name="services"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptionsBuilder})">
             <summary>
             
             </summary>
@@ -5804,6 +6072,11 @@
               Looks up a localized string similar to The container built by the container builder must not be null..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.NullContainerBuilder">
+            <summary>
+              Looks up a localized string similar to The container builder created by the container builder factory must not be null..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NullElementInCollection">
             <summary>
               Looks up a localized string similar to Collections cannot contain null elements..
@@ -5977,6 +6250,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTopLimitExceeded">
             <summary>
               Looks up a localized string similar to The limit of &apos;{0}&apos; for {1} query has been exceeded. The value from the incoming request is &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.SubRequestServiceProviderAlreadyExists">
+            <summary>
+              Looks up a localized string similar to A request container already exists on the request..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeCannotBeDeserialized">
@@ -7919,14 +8197,6 @@
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQuerySettings})">
-            <summary>
-            
-            </summary>
-            <param name="services"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQueryServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQuerySettings})">
             <summary>
             
             </summary>
@@ -10806,7 +11076,7 @@
             Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for OData convention action discovery.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.ODataOptions})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider" /> class.
             </summary>

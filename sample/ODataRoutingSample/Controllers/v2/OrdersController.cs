@@ -4,28 +4,60 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v2
 {
     [ODataModel("v2{data}")]
-    public class OrdersController : ControllerBase
+    public class OrdersController : ODataController
     {
+        private MyDataContext _context;
+
+        public OrdersController(MyDataContext context)
+        {
+            _context = context;
+
+            if (_context.Orders.Count() == 0)
+            {
+                IList<Order> orders = new List<Order>
+                {
+                    new Order
+                    {
+                        Title = "Goods",
+                        Category = new Category { },
+                    },
+                    new Order
+                    {
+                        Title = "Magazine",
+                        Category = new Category { },
+                    },
+                    new Order
+                    {
+                        Title = "Fiction",
+                        Category = new Category { },
+                    },
+                };
+
+                foreach (var order in orders)
+                {
+                    _context.Orders.Add(order);
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
         [HttpGet]
         [EnableQuery]
         public IEnumerable<Order> Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Order
-            {
-                Id = index,
-                Title = "Title + " + index
-            })
-            .ToArray();
+            return _context.Orders;
         }
 
         //[HttpGet] // ~/Oders({key})
@@ -37,6 +69,15 @@ namespace ODataRoutingSample.Controllers.v2
                 Id = key,
                 Title = "Title + " + key
             };
+        }
+
+        [HttpPost]
+        [EnableQuery]
+        public IActionResult Post([FromBody] Order order, CancellationToken token)
+        {
+            _context.Orders.Add(order);
+            _context.SaveChanges();
+            return Created(order);
         }
 
         [HttpDelete] // ~/Oders({key})
@@ -100,3 +141,77 @@ namespace ODataRoutingSample.Controllers.v2
         }
     }
 }
+
+// Request using the $batch
+/*
+{
+  "requests":[
+      {
+      "id": "2",
+      "atomicityGroup": "transaction",
+      "method": "post",
+      "url": "/v2bla/Orders",
+      "headers": { "content-type": "application/json", "Accept": "application/json", "odata-version": "4.0" },
+      "body": {"Title":"MyName11"}
+      },
+      {
+      "id": "3",
+      "atomicityGroup": "transaction",
+      "method": "post",
+      "url": "/v2bla/Orders",
+      "headers": { "content-type": "application/json", "Accept": "application/json", "odata-version": "4.0" },
+      "body": {"Title":"MyName12"}
+      },
+      {
+      "id": "4",
+      "atomicityGroup": "transaction",
+      "method": "post",
+      "url": "/v2bla/Orders",
+      "headers": { "content-type": "application/json", "Accept": "application/json", "odata-version": "4.0" },
+      "body": {"Title":"MyName13"}
+      }
+  ]
+}
+*/
+
+// Response
+/*
+--batchresponse_abbbc5f4-f310-4f28-ae2f-ebd787f78a16
+Content-Type: multipart/mixed; boundary=changesetresponse_ca691c38-cf02-45d9-b789-a909cdf1c72b
+
+--changesetresponse_ca691c38-cf02-45d9-b789-a909cdf1c72b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 2
+
+HTTP/1.1 201 Created
+Location: http://localhost:5000/v2bla/Orders/Orders(4)
+Content-Type: application/json; odata.metadata=minimal; odata.streaming=true
+OData-Version: 4.0
+
+{"@odata.context":"http://localhost:5000/v2bla/Orders/$metadata#Orders/$entity","Id":4,"Title":"MyName11"}
+--changesetresponse_ca691c38-cf02-45d9-b789-a909cdf1c72b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 3
+
+HTTP/1.1 201 Created
+Location: http://localhost:5000/v2bla/Orders/Orders(5)
+Content-Type: application/json; odata.metadata=minimal; odata.streaming=true
+OData-Version: 4.0
+
+{"@odata.context":"http://localhost:5000/v2bla/Orders/$metadata#Orders/$entity","Id":5,"Title":"MyName12"}
+--changesetresponse_ca691c38-cf02-45d9-b789-a909cdf1c72b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 4
+
+HTTP/1.1 201 Created
+Location: http://localhost:5000/v2bla/Orders/Orders(6)
+Content-Type: application/json; odata.metadata=minimal; odata.streaming=true
+OData-Version: 4.0
+
+{"@odata.context":"http://localhost:5000/v2bla/Orders/$metadata#Orders/$entity","Id":6,"Title":"MyName13"}
+--changesetresponse_ca691c38-cf02-45d9-b789-a909cdf1c72b--
+--batchresponse_abbbc5f4-f310-4f28-ae2f-ebd787f78a16--
+*/
