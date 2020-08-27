@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="context">The message context.</param>
         public static async Task WriteMessageAsync(ODataBatchWriter writer, HttpContext context)
         {
-            await WriteMessageAsync(writer, context, false);
+            await WriteMessageAsync(writer, context, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -36,17 +36,18 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw new ArgumentNullException(nameof(writer));
             }
+
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             string contentId = (context.Request != null) ? context.Request.GetODataContentId() : String.Empty;
 
             ODataBatchOperationResponseMessage batchResponse = asyncWriter ?
-                await writer.CreateOperationResponseMessageAsync(contentId) :
+                await writer.CreateOperationResponseMessageAsync(contentId).ConfigureAwait(false) :
                 writer.CreateOperationResponseMessage(contentId);
 
             batchResponse.StatusCode = context.Response.StatusCode;
@@ -58,11 +59,11 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             if (context.Response.Body != null && context.Response.Body.Length != 0)
             {
-                using (Stream stream = asyncWriter ? await batchResponse.GetStreamAsync() : batchResponse.GetStream())
+                using (Stream stream = asyncWriter ? await batchResponse.GetStreamAsync().ConfigureAwait(false) : batchResponse.GetStream())
                 {
                     context.RequestAborted.ThrowIfCancellationRequested();
                     context.Response.Body.Seek(0L, SeekOrigin.Begin);
-                    await context.Response.Body.CopyToAsync(stream);
+                    await context.Response.Body.CopyToAsync(stream).ConfigureAwait(false);
 
                     // Close and release the stream for the individual response
                     ODataBatchStream batchStream = context.Response.Body as ODataBatchStream;
@@ -70,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                     {
                         if (asyncWriter)
                         {
-                            await batchStream.InternalDisposeAsync();
+                            await batchStream.InternalDisposeAsync().ConfigureAwait(false);
                         }
                         else
                         {

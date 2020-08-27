@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-#if false // TODO #939: Enable these test on AspNetCore.
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using Microsoft.AspNet.OData.Batch;
-using Microsoft.AspNet.OData.Test.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Test.Batch
@@ -16,35 +15,46 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
     public class ODataBatchRequestItemTest
     {
         [Fact]
-        public async Task SendMessageAsync_Throws_WhenInvokerIsNull()
+        public async Task SendRequestAsync_Throws_WhenInvokerIsNull()
         {
+            // Arrange
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+
+            // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchRequestItem.SendMessageAsync(null, new HttpRequestMessage(), CancellationToken.None, null),
-                "invoker");
+                () => ODataBatchRequestItem.SendRequestAsync(null, httpContext.Object, null),
+                "handler");
         }
 
         [Fact]
-        public async Task SendMessageAsync_Throws_WhenRequestIsNull()
+        public async Task SendRequestAsync_Throws_WhenRequestIsNull()
         {
+            // Arrange
+            Mock<RequestDelegate> handler = new Mock<RequestDelegate>();
+
+            // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchRequestItem.SendMessageAsync(new HttpMessageInvoker(new HttpServer()), null, CancellationToken.None, null),
-                "request");
+                () => ODataBatchRequestItem.SendRequestAsync(handler.Object, null, null),
+                "context");
         }
 
         [Fact]
-        public async Task SendMessageAsync_CallsInvoker()
+        public async Task SendRequestAsync_CallsHandler()
         {
-            HttpResponseMessage response = new HttpResponseMessage();
+            // Arrange
+            HttpContext context = HttpContextHelper.Create("Get", "http://example.com");
 
-            HttpMessageInvoker invoker = new HttpMessageInvoker(new MockHttpServer((request) =>
-                {
-                    return response;
-                }));
+            RequestDelegate handler = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status201Created;
+                return Task.FromResult(context.Response);
+            };
 
-            var result = await ODataBatchRequestItem.SendMessageAsync(invoker, new HttpRequestMessage(HttpMethod.Get, "http://example.com"), CancellationToken.None, new Dictionary<string, string>());
+            // Act
+            await ODataBatchRequestItem.SendRequestAsync(handler, context, new Dictionary<string, string>());
 
-            Assert.Same(response, result);
+            // Assert
+            Assert.Equal(StatusCodes.Status201Created, context.Response.StatusCode);
         }
     }
 }
-#endif

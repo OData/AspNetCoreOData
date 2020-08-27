@@ -33,10 +33,6 @@ namespace Microsoft.AspNetCore.OData.Batch
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ODataBatchHttpRequestExtensions
     {
-        private const string BatchIdKey = "BatchId";
-        private const string ChangeSetIdKey = "ChangesetId";
-        private const string ContentIdKey = "ContentId";
-        private const string ContentIdMappingKey = "ContentIdMapping";
         private const string BatchMediaTypeMime = "multipart/mixed";
         private const string BatchMediaTypeJson = "application/json";
         private const string Boundary = "boundary";
@@ -50,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return (request.ContentType != null &&
@@ -60,13 +56,13 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <summary>
         /// Retrieves the Batch ID associated with the request.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The Http request.</param>
         /// <returns>The Batch ID associated with this request, or <c>null</c> if there isn't one.</returns>
         public static Guid? GetODataBatchId(this HttpRequest request)
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.ODataBatchFeature().BatchId;
@@ -81,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             request.ODataBatchFeature().BatchId = batchId;
@@ -96,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.ODataBatchFeature().ChangeSetId;
@@ -111,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             request.ODataBatchFeature().ChangeSetId = changeSetId;
@@ -126,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.ODataBatchFeature().ContentId;
@@ -141,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             request.ODataBatchFeature().ContentId = contentId;
@@ -156,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.ODataBatchFeature().ContentIdMapping;
@@ -171,7 +167,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             request.ODataBatchFeature().ContentIdMapping = contentIdMapping;
@@ -213,7 +209,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 responseContentType = ODataBatchHttpRequestExtensions.BatchMediaTypeJson;
             }
 
-            response.StatusCode = (int)HttpStatusCode.OK;
+            response.StatusCode = StatusCodes.Status200OK;
             ODataBatchContent batchContent = new ODataBatchContent(responses, requestContainer, responseContentType);
             foreach (var header in batchContent.Headers)
             {

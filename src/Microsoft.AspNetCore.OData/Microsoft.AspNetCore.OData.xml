@@ -614,10 +614,8 @@
         <member name="T:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler">
             <summary>
             Default implementation of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/> for handling OData batch request.
-            </summary>
-            <remarks>
             By default, it buffers the request content stream.
-            </remarks>
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.RequestDelegate)">
             <inheritdoc/>
@@ -673,18 +671,12 @@
             Encapsulates a collection of OData batch responses.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Responses">
-            <summary>
-            Gets the batch responses.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> class.
             </summary>
             <param name="responses">The batch responses.</param>
             <param name="requestContainer">The dependency injection container for the request.</param>
-            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider,System.String)">
             <summary>
@@ -693,7 +685,11 @@
             <param name="responses">The batch responses.</param>
             <param name="requestContainer">The dependency injection container for the request.</param>
             <param name="contentType">The response content type.</param>
-            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Responses">
+            <summary>
+            Gets the batch responses.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Headers">
             <summary>
@@ -714,13 +710,6 @@
             </summary>
             <param name="responseMessage">The response message.</param>
             <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchContent.Initialize(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem},System.IServiceProvider)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent"/> class.
-            </summary>
-            <param name="responses">The batch responses.</param>
-            <param name="requestContainer">The dependency injection container for the request.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler">
             <summary>
@@ -795,7 +784,7 @@
             <summary>
             Retrieves the Batch ID associated with the request.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The Http request.</param>
             <returns>The Batch ID associated with this request, or <c>null</c> if there isn't one.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetODataBatchId(Microsoft.AspNetCore.Http.HttpRequest,System.Guid)">
@@ -972,7 +961,7 @@
             Routes a single OData batch request.
             </summary>
             <param name="handler">The handler for processing a message.</param>
-            <param name="context">The context.</param>
+            <param name="context">The http context.</param>
             <param name="contentIdToLocationMapping">The Content-ID to Location mapping.</param>
             <returns></returns>
         </member>
@@ -1046,7 +1035,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Batch.OperationRequestItem"/> class.
             </summary>
-            <param name="context">The Operation request context.</param>
+            <param name="context">The Operation http context.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Batch.OperationRequestItem.Context">
             <summary>
@@ -1057,7 +1046,7 @@
             <summary>
             Sends the Operation request.
             </summary>
-            <param name="handler">The handler for processing a message.</param>
+            <param name="handler">The handler for processing a Http request.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.OperationResponseItem"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.OperationResponseItem">
@@ -5350,12 +5339,12 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>
-            
+            Adds OData model.
             </summary>
-            <param name="name"></param>
-            <param name="model"></param>
-            <param name="configureAction"></param>
-            <returns></returns>
+            <param name="name">The model name and prefix.</param>
+            <param name="model">The Edm model.</param>
+            <param name="configureAction">The sub service configuration action.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableExpand">
             <summary>

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Batch
@@ -24,16 +23,10 @@ namespace Microsoft.AspNetCore.OData.Batch
         private ODataMessageWriterSettings _writerSettings;
 
         /// <summary>
-        /// Gets the batch responses.
-        /// </summary>
-        public IEnumerable<ODataBatchResponseItem> Responses { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ODataBatchContent"/> class.
         /// </summary>
         /// <param name="responses">The batch responses.</param>
         /// <param name="requestContainer">The dependency injection container for the request.</param>
-        /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         public ODataBatchContent(IEnumerable<ODataBatchResponseItem> responses, IServiceProvider requestContainer)
             : this(responses, requestContainer, null/*contentType*/)
         {
@@ -45,11 +38,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="responses">The batch responses.</param>
         /// <param name="requestContainer">The dependency injection container for the request.</param>
         /// <param name="contentType">The response content type.</param>
-        /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        public ODataBatchContent(IEnumerable<ODataBatchResponseItem> responses, IServiceProvider requestContainer,
-           string contentType)
+        public ODataBatchContent(IEnumerable<ODataBatchResponseItem> responses, IServiceProvider requestContainer, string contentType)
         {
-            Initialize(responses, requestContainer);
+            Responses = responses ?? throw new ArgumentNullException(nameof(responses));
+
+            _requestContainer = requestContainer;
+            _writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
 
             // Set the Content-Type header for existing batch formats
             if (contentType == null)
@@ -58,15 +52,21 @@ namespace Microsoft.AspNetCore.OData.Batch
                     CultureInfo.InvariantCulture, "multipart/mixed;boundary=batchresponse_{0}", Guid.NewGuid());
             }
 
-            Headers[HeaderNames.ContentType] = contentType;
+            Headers = new HeaderDictionary();
+            Headers["Content-Type"] = contentType;
             ODataVersion version = _writerSettings.Version ?? ODataVersionConstraint.DefaultODataVersion;
             Headers.Add(ODataVersionConstraint.ODataServiceVersionHeader, ODataUtils.ODataVersionToString(version));
         }
 
         /// <summary>
+        /// Gets the batch responses.
+        /// </summary>
+        public IEnumerable<ODataBatchResponseItem> Responses { get; }
+
+        /// <summary>
         /// Gets the Headers for the batch content.
         /// </summary>
-        public HeaderDictionary Headers { get; } = new HeaderDictionary();
+        public IHeaderDictionary Headers { get; }
 
         /// <summary>
         /// Serialize the batch content to a stream.
@@ -88,33 +88,17 @@ namespace Microsoft.AspNetCore.OData.Batch
         private async Task WriteToResponseMessageAsync(IODataResponseMessage responseMessage)
         {
             ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, _writerSettings);
-            ODataBatchWriter writer = await messageWriter.CreateODataBatchWriterAsync();
 
-            await writer.WriteStartBatchAsync();
+            ODataBatchWriter writer = await messageWriter.CreateODataBatchWriterAsync().ConfigureAwait(false);
+
+            await writer.WriteStartBatchAsync().ConfigureAwait(false);
 
             foreach (ODataBatchResponseItem response in Responses)
             {
-                await response.WriteResponseAsync(writer, /*asyncWriter*/ true);
+                await response.WriteResponseAsync(writer, /*asyncWriter*/ true).ConfigureAwait(false);
             }
 
-            await writer.WriteEndBatchAsync();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataBatchContent"/> class.
-        /// </summary>
-        /// <param name="responses">The batch responses.</param>
-        /// <param name="requestContainer">The dependency injection container for the request.</param>
-        private void Initialize(IEnumerable<ODataBatchResponseItem> responses, IServiceProvider requestContainer)
-        {
-            if (responses == null)
-            {
-                throw new ArgumentNullException(nameof(responses));
-            }
-
-            Responses = responses;
-            _requestContainer = requestContainer;
-            _writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
+            await writer.WriteEndBatchAsync().ConfigureAwait(false);
         }
     }
 }

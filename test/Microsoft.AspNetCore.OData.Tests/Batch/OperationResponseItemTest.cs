@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-#if false // TODO #939: Enable these test on AspNetCore.
 using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.OData.Batch;
-using Microsoft.AspNet.OData.Formatter;
-using Microsoft.AspNet.OData.Test.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Test.Batch
@@ -20,66 +19,76 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public void Parameter_Constructor()
         {
-            HttpResponseMessage response = new HttpResponseMessage();
-            OperationResponseItem responseItem = new OperationResponseItem(response);
+            // Arrange & Act
+            Mock<HttpContext> context = new Mock<HttpContext>();
+            OperationResponseItem responseItem = new OperationResponseItem(context.Object);
 
-            Assert.Same(response, responseItem.Response);
+            // Assert
+            Assert.Same(context.Object, responseItem.Context);
         }
 
         [Fact]
-        public void Constructor_NullResponse_Throws()
+        public void Constructor_NullContext_Throws()
         {
-            ExceptionAssert.ThrowsArgumentNull(
-                () => new OperationResponseItem(null),
-                "response");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new OperationResponseItem(null), "context");
         }
 
         [Fact]
         public async Task WriteResponseAsync_NullWriter_Throws()
         {
-            OperationResponseItem responseItem = new OperationResponseItem(new HttpResponseMessage());
+            // Arrange & Act
+            Mock<HttpContext> context = new Mock<HttpContext>();
+            OperationResponseItem responseItem = new OperationResponseItem(context.Object);
 
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => responseItem.WriteResponseAsync(null, CancellationToken.None),
-                "writer");
+            // Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => responseItem.WriteResponseAsync(null, false), "writer");
         }
 
         [Fact]
         public async Task WriteResponseAsync_SynchronouslyWritesOperation()
         {
-            OperationResponseItem responseItem = new OperationResponseItem(new HttpResponseMessage(HttpStatusCode.Accepted));
+            // Arrange
+            HttpContext context = HttpContextHelper.Create(StatusCodes.Status202Accepted);
+
+            OperationResponseItem responseItem = new OperationResponseItem(context);
             MemoryStream memoryStream = new MemoryStream();
             IODataResponseMessage responseMessage = new ODataMessageWrapper(memoryStream);
             ODataMessageWriter writer = new ODataMessageWriter(responseMessage);
+
+            // Act
             ODataBatchWriter batchWriter = writer.CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
-
-            // For backward compatibility, default is to write to use a synchronous batchWriter.
-            await responseItem.WriteResponseAsync(batchWriter, CancellationToken.None);
-
+            await responseItem.WriteResponseAsync(batchWriter, false);
             batchWriter.WriteEndBatch();
             memoryStream.Position = 0;
             string responseString = new StreamReader(memoryStream).ReadToEnd();
 
+            // Assert
             Assert.Contains("Accepted", responseString);
         }
 
         [Fact]
         public async Task WriteResponseAsync_AsynchronouslyWritesOperation()
         {
-            OperationResponseItem responseItem = new OperationResponseItem(new HttpResponseMessage(HttpStatusCode.Accepted));
+            // Arrange
+            HttpContext context = HttpContextHelper.Create(StatusCodes.Status202Accepted);
+
+            OperationResponseItem responseItem = new OperationResponseItem(context);
             MemoryStream memoryStream = new MemoryStream();
             IODataResponseMessage responseMessage = new ODataMessageWrapper(memoryStream);
             ODataMessageWriter writer = new ODataMessageWriter(responseMessage);
+
+            // Act
             ODataBatchWriter batchWriter = await writer.CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
-
-            await responseItem.WriteResponseAsync(batchWriter, CancellationToken.None, /*writeAsync*/ true);
+            await responseItem.WriteResponseAsync(batchWriter, true);
 
             await batchWriter.WriteEndBatchAsync();
             memoryStream.Position = 0;
             string responseString = new StreamReader(memoryStream).ReadToEnd();
 
+            // Assert
             Assert.Contains("Accepted", responseString);
         }
 
@@ -87,23 +96,12 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public void IsResponseSucess_TestResponse()
         {
             // Arrange
-            OperationResponseItem successResponseItem = new OperationResponseItem(new HttpResponseMessage(HttpStatusCode.OK));
-            OperationResponseItem errorResponseItem = new OperationResponseItem(new HttpResponseMessage(HttpStatusCode.Ambiguous));
+            OperationResponseItem successResponseItem = new OperationResponseItem(HttpContextHelper.Create(StatusCodes.Status200OK));
+            OperationResponseItem errorResponseItem = new OperationResponseItem(HttpContextHelper.Create(StatusCodes.Status300MultipleChoices));
 
             // Act & Assert
             Assert.True(successResponseItem.IsResponseSuccessful());
             Assert.False(errorResponseItem.IsResponseSuccessful());
         }
-
-        [Fact]
-        public void Dispose_DisposesHttpResponseMessage()
-        {
-            OperationResponseItem responseItem = new OperationResponseItem(new MockHttpResponseMessage());
-
-            responseItem.Dispose();
-
-            Assert.True(((MockHttpResponseMessage)responseItem.Response).IsDisposed);
-        }
     }
 }
-#endif

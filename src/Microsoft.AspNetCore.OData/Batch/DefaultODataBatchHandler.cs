@@ -16,10 +16,8 @@ namespace Microsoft.AspNetCore.OData.Batch
 {
     /// <summary>
     /// Default implementation of <see cref="ODataBatchHandler"/> for handling OData batch request.
-    /// </summary>
-    /// <remarks>
     /// By default, it buffers the request content stream.
-    /// </remarks>
+    /// </summary>
     public class DefaultODataBatchHandler : ODataBatchHandler
     {
         /// <inheritdoc/>
@@ -34,12 +32,12 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw Error.ArgumentNull("nextHandler");
             }
 
-            if (!await ValidateRequest(context.Request))
+            if (!await ValidateRequest(context.Request).ConfigureAwait(false))
             {
                 return;
             }
 
-            IList<ODataBatchRequestItem> subRequests = await ParseBatchRequestsAsync(context);
+            IList<ODataBatchRequestItem> subRequests = await ParseBatchRequestsAsync(context).ConfigureAwait(false);
 
             // ODataOptions options = context.RequestServices.GetRequiredService<ODataOptions>();
             ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
@@ -49,8 +47,9 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             SetContinueOnError(context.Request.Headers, enableContinueOnErrorHeader);
 
-            IList<ODataBatchResponseItem> responses = await ExecuteRequestMessagesAsync(subRequests, nextHandler);
-            await CreateResponseMessageAsync(responses, context.Request);
+            IList<ODataBatchResponseItem> responses = await ExecuteRequestMessagesAsync(subRequests, nextHandler).ConfigureAwait(false);
+
+            await CreateResponseMessageAsync(responses, context.Request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -75,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             foreach (ODataBatchRequestItem request in requests)
             {
-                ODataBatchResponseItem responseItem = await request.SendRequestAsync(handler);
+                ODataBatchResponseItem responseItem = await request.SendRequestAsync(handler).ConfigureAwait(false);
                 responses.Add(responseItem);
 
                 if (responseItem != null && responseItem.IsResponseSuccessful() == false && ContinueOnError == false)
@@ -108,13 +107,13 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             CancellationToken cancellationToken = context.RequestAborted;
             List<ODataBatchRequestItem> requests = new List<ODataBatchRequestItem>();
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync();
+            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
             Guid batchId = Guid.NewGuid();
-            while (await batchReader.ReadAsync())
+            while (await batchReader.ReadAsync().ConfigureAwait(false))
             {
                 if (batchReader.State == ODataBatchReaderState.ChangesetStart)
                 {
-                    IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken);
+                    IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
                     foreach (HttpContext changeSetContext in changeSetContexts)
                     {
                         changeSetContext.Request.CopyBatchRequestProperties(request);
@@ -124,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 }
                 else if (batchReader.State == ODataBatchReaderState.Operation)
                 {
-                    HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, true, cancellationToken);
+                    HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, true, cancellationToken).ConfigureAwait(false);
                     operationContext.Request.CopyBatchRequestProperties(request);
                     operationContext.Request.DeleteSubRequestProvider(false);
                     requests.Add(new OperationRequestItem(operationContext));

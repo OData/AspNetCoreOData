@@ -22,14 +22,15 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
-            }
-            if (nextHandler == null)
-            {
-                throw Error.ArgumentNull("nextHandler");
+                throw new ArgumentNullException(nameof(context));
             }
 
-            if (!await ValidateRequest(context.Request))
+            if (nextHandler == null)
+            {
+                throw new ArgumentNullException(nameof(nextHandler));
+            }
+
+            if (!await ValidateRequest(context.Request).ConfigureAwait(false))
             {
                 return;
             }
@@ -41,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             ODataMessageReader reader = request.GetODataMessageReader(requestContainer);
 
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync();
+            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
             List<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
             Guid batchId = Guid.NewGuid();
 
@@ -52,16 +53,16 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             SetContinueOnError(request.Headers, enableContinueOnErrorHeader);
 
-            while (await batchReader.ReadAsync())
+            while (await batchReader.ReadAsync().ConfigureAwait(false))
             {
                 ODataBatchResponseItem responseItem = null;
                 if (batchReader.State == ODataBatchReaderState.ChangesetStart)
                 {
-                    responseItem = await ExecuteChangeSetAsync(batchReader, batchId, request, nextHandler);
+                    responseItem = await ExecuteChangeSetAsync(batchReader, batchId, request, nextHandler).ConfigureAwait(false);
                 }
                 else if (batchReader.State == ODataBatchReaderState.Operation)
                 {
-                    responseItem = await ExecuteOperationAsync(batchReader, batchId, request, nextHandler);
+                    responseItem = await ExecuteOperationAsync(batchReader, batchId, request, nextHandler).ConfigureAwait(false);
                 }
                 if (responseItem != null)
                 {
@@ -73,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 }
             }
 
-            await CreateResponseMessageAsync(responses, request);
+            await CreateResponseMessageAsync(responses, request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -88,26 +89,28 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (batchReader == null)
             {
-                throw Error.ArgumentNull("batchReader");
+                throw new ArgumentNullException(nameof(batchReader));
             }
+
             if (originalRequest == null)
             {
-                throw Error.ArgumentNull("originalRequest");
+                throw new ArgumentNullException(nameof(originalRequest));
             }
+
             if (handler == null)
             {
-                throw Error.ArgumentNull("handler");
+                throw new ArgumentNullException(nameof(handler));
             }
 
             CancellationToken cancellationToken = originalRequest.HttpContext.RequestAborted;
             cancellationToken.ThrowIfCancellationRequested();
-            HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, false, cancellationToken);
+            HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, false, cancellationToken).ConfigureAwait(false);
 
             operationContext.Request.CopyBatchRequestProperties(originalRequest);
-            // operationContext.Request.DeleteRequestContainer(false);
+            operationContext.Request.DeleteSubRequestProvider(false);
             OperationRequestItem operation = new OperationRequestItem(operationContext);
 
-            ODataBatchResponseItem responseItem = await operation.SendRequestAsync(handler);
+            ODataBatchResponseItem responseItem = await operation.SendRequestAsync(handler).ConfigureAwait(false);
 
             return responseItem;
         }
@@ -138,16 +141,16 @@ namespace Microsoft.AspNetCore.OData.Batch
             Guid changeSetId = Guid.NewGuid();
             List<HttpContext> changeSetResponse = new List<HttpContext>();
             Dictionary<string, string> contentIdToLocationMapping = new Dictionary<string, string>();
-            while (await batchReader.ReadAsync() && batchReader.State != ODataBatchReaderState.ChangesetEnd)
+            while (await batchReader.ReadAsync().ConfigureAwait(false) && batchReader.State != ODataBatchReaderState.ChangesetEnd)
             {
                 if (batchReader.State == ODataBatchReaderState.Operation)
                 {
                     CancellationToken cancellationToken = originalRequest.HttpContext.RequestAborted;
-                    HttpContext changeSetOperationContext = await batchReader.ReadChangeSetOperationRequestAsync(originalRequest.HttpContext, batchId, changeSetId, false, cancellationToken);
+                    HttpContext changeSetOperationContext = await batchReader.ReadChangeSetOperationRequestAsync(originalRequest.HttpContext, batchId, changeSetId, false, cancellationToken).ConfigureAwait(false);
                     changeSetOperationContext.Request.CopyBatchRequestProperties(originalRequest);
                     //changeSetOperationContext.Request.DeleteRequestContainer(false);
 
-                    await ODataBatchRequestItem.SendRequestAsync(handler, changeSetOperationContext, contentIdToLocationMapping);
+                    await ODataBatchRequestItem.SendRequestAsync(handler, changeSetOperationContext, contentIdToLocationMapping).ConfigureAwait(false);
                     if (changeSetOperationContext.Response.IsSuccessStatusCode())
                     {
                         changeSetResponse.Add(changeSetOperationContext);

@@ -55,11 +55,11 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             Guid changeSetId = Guid.NewGuid();
             List<HttpContext> contexts = new List<HttpContext>();
-            while (await reader.ReadAsync() && reader.State != ODataBatchReaderState.ChangesetEnd)
+            while (await reader.ReadAsync().ConfigureAwait(false) && reader.State != ODataBatchReaderState.ChangesetEnd)
             {
                 if (reader.State == ODataBatchReaderState.Operation)
                 {
-                    contexts.Add(await ReadOperationInternalAsync(reader, context, batchId, changeSetId, cancellationToken));
+                    contexts.Add(await ReadOperationInternalAsync(reader, context, batchId, changeSetId, cancellationToken).ConfigureAwait(false));
                 }
             }
 
@@ -126,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         private static async Task<HttpContext> ReadOperationInternalAsync(
             ODataBatchReader reader, HttpContext originalContext, Guid batchId, Guid? changeSetId, CancellationToken cancellationToken, bool bufferContentStream = true)
         {
-            ODataBatchOperationRequestMessage batchRequest = await reader.CreateOperationRequestMessageAsync();
+            ODataBatchOperationRequestMessage batchRequest = await reader.CreateOperationRequestMessageAsync().ConfigureAwait(false);
 
             HttpContext context = CreateHttpContext(originalContext);
             HttpRequest request = context.Request;
@@ -137,11 +137,11 @@ namespace Microsoft.AspNetCore.OData.Batch
             // Not using bufferContentStream. Unlike AspNet, AspNetCore cannot guarantee the disposal
             // of the stream in the context of execution so there is no choice but to copy the stream
             // from the batch reader.
-            using (Stream stream = await batchRequest.GetStreamAsync())
+            using (Stream stream = await batchRequest.GetStreamAsync().ConfigureAwait(false))
             {
                 MemoryStream bufferedStream = new MemoryStream();
                 // Passing in the default buffer size of 81920 so that we can also pass in a cancellation token
-                await stream.CopyToAsync(bufferedStream, bufferSize: 81920, cancellationToken: cancellationToken);
+                await stream.CopyToAsync(bufferedStream, bufferSize: 81920, cancellationToken: cancellationToken).ConfigureAwait(false);
                 bufferedStream.Position = 0;
                 request.Body = bufferedStream;
                 request.Headers.ContentLength = bufferedStream.Length;

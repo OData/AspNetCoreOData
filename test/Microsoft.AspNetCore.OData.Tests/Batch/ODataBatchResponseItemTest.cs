@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-#if false // TODO #939: Enable these test on AspNetCore.
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.OData.Batch;
-using Microsoft.AspNet.OData.Test.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Test.Batch
@@ -21,46 +21,56 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public async Task WriteMessageAsync_NullWriter_Throws()
         {
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchResponseItem.WriteMessageAsync(null, new HttpResponseMessage(), CancellationToken.None),
-                "writer");
+            // Arrange
+            HttpContext context = new Mock<HttpContext>().Object;
+            
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => ODataBatchResponseItem.WriteMessageAsync(null, context), "writer");
         }
 
         [Fact]
-        public async Task WriteMessageAsync_NullResponse_Throws()
+        public async Task WriteMessageAsync_NullContext_Throws()
         {
-            HttpContent content = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(new MemoryStream(), content.Headers);
+            // Arrange
+            HeaderDictionary headers = new HeaderDictionary
+            {
+                { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
+            };
+            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(new MemoryStream(), headers);
             ODataMessageWriter messageWriter = new ODataMessageWriter(odataResponse);
 
+            // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchResponseItem.WriteMessageAsync(messageWriter.CreateODataBatchWriter(), null, CancellationToken.None),
-                "response");
+                () => ODataBatchResponseItem.WriteMessageAsync(messageWriter.CreateODataBatchWriter(), null), "context");
         }
 
         [Fact]
         public async Task WriteMessage_SynchronouslyWritesResponseMessage()
         {
-            MemoryStream ms = new MemoryStream();
-            HttpContent content = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, content.Headers);
-            var batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
-            HttpResponseMessage response = new HttpResponseMessage()
+            HeaderDictionary headers = new HeaderDictionary
             {
-                Content = new StringContent("example content", Encoding.UTF8, "text/example")
+                { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
-            response.Headers.Add("customHeader", "bar");
 
+            MemoryStream ms = new MemoryStream();
+            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+
+            HeaderDictionary responseHeaders = new HeaderDictionary
+            {
+                { "customHeader", "bar" }
+            };
+            HttpResponse response = CreateResponse("example content", responseHeaders, "text/example");
+
+            // Act
+            ODataBatchWriter batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
-            // For backward compatibility, default is to write to a synchronous batchWriter
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response, CancellationToken.None);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext);
             batchWriter.WriteEndBatch();
 
             ms.Position = 0;
             string result = new StreamReader(ms).ReadToEnd();
 
+            // Assert
             Assert.Contains("example content", result);
             Assert.Contains("text/example", result);
             Assert.Contains("customHeader", result);
@@ -70,24 +80,30 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public async Task WriteMessageAsync_AsynchronouslyWritesResponseMessage()
         {
-            MemoryStream ms = new MemoryStream();
-            HttpContent content = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, content.Headers);
-            var batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
-            HttpResponseMessage response = new HttpResponseMessage()
+            // Arrange
+            HeaderDictionary headers = new HeaderDictionary
             {
-                Content = new StringContent("example content", Encoding.UTF8, "text/example")
+                { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
-            response.Headers.Add("customHeader", "bar");
+            MemoryStream ms = new MemoryStream();
+            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
 
+            HeaderDictionary responseHeaders = new HeaderDictionary
+            {
+                { "customHeader", "bar" }
+            };
+            HttpResponse response = CreateResponse("example content", responseHeaders, "text/example");
+
+            // Act
+            ODataBatchWriter batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response, CancellationToken.None, /*asyncWriter*/ true);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext, /*asyncWriter*/ true);
             await batchWriter.WriteEndBatchAsync();
 
             ms.Position = 0;
             string result = new StreamReader(ms).ReadToEnd();
 
+            // Assert
             Assert.Contains("example content", result);
             Assert.Contains("text/example", result);
             Assert.Contains("customHeader", result);
@@ -97,29 +113,31 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public async Task WriteMessageAsync_SynchronousResponseContainsContentId_IfHasContentIdInRequestChangeSet()
         {
-            MemoryStream ms = new MemoryStream();
-            HttpContent content = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, content.Headers);
-            var batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
-            HttpResponseMessage response = new HttpResponseMessage
+            // Arrange
+            HeaderDictionary headers = new HeaderDictionary
             {
-                Content = new StringContent("any", Encoding.UTF8, "text/example")
+                { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
-            var request = new HttpRequestMessage();
-            var contentId = Guid.NewGuid().ToString();
-            request.SetODataContentId(contentId);
-            response.RequestMessage = request;
 
+            MemoryStream ms = new MemoryStream();
+            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+
+            string contentId = Guid.NewGuid().ToString();
+            HttpResponse httpResponse = CreateResponse("any", new HeaderDictionary(), "text/example;charset=utf-8");
+            httpResponse.HttpContext.Request.SetODataContentId(contentId);
+
+            // Act
+            ODataBatchWriter batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
             batchWriter.WriteStartChangeset();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response, CancellationToken.None);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext);
             batchWriter.WriteEndChangeset();
             batchWriter.WriteEndBatch();
 
             ms.Position = 0;
             string result = new StreamReader(ms).ReadToEnd();
 
+            // Assert
             Assert.Contains("any", result);
             Assert.Contains("text/example", result);
             Assert.Contains("Content-ID", result);
@@ -129,34 +147,45 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public async Task WriteMessageAsync_ResponseContainsContentId_IfHasContentIdInRequestChangeSet()
         {
-            MemoryStream ms = new MemoryStream();
-            HttpContent content = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, content.Headers);
-            var batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
-            HttpResponseMessage response = new HttpResponseMessage
+            // Arrange
+            HeaderDictionary headers = new HeaderDictionary
             {
-                Content = new StringContent("any", Encoding.UTF8, "text/example")
+                { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
-            var request = new HttpRequestMessage();
-            var contentId = Guid.NewGuid().ToString();
-            request.SetODataContentId(contentId);
-            response.RequestMessage = request;
 
+            MemoryStream ms = new MemoryStream();
+            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+
+            string contentId = Guid.NewGuid().ToString();
+            HttpResponse httpResponse = CreateResponse("any", new HeaderDictionary(), "text/example;charset=utf-8");
+            httpResponse.HttpContext.Request.SetODataContentId(contentId);
+
+            // Act
+            ODataBatchWriter batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
             await batchWriter.WriteStartChangesetAsync();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response, CancellationToken.None, /*asyncWriter*/ true);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext, /*asyncWriter*/ true);
             await batchWriter.WriteEndChangesetAsync();
             await batchWriter.WriteEndBatchAsync();
 
             ms.Position = 0;
             string result = new StreamReader(ms).ReadToEnd();
 
+            // Assert
             Assert.Contains("any", result);
             Assert.Contains("text/example", result);
             Assert.Contains("Content-ID", result);
             Assert.Contains(contentId, result);
         }
+
+        private static HttpResponse CreateResponse(string body, IHeaderDictionary headers, string contextType)
+        {
+            HttpContext httpContext = new DefaultHttpContext();
+            httpContext.Features.Get<IHttpResponseFeature>().Headers = headers;
+            httpContext.Response.ContentType = contextType;
+            byte[] contentBytes = Encoding.UTF8.GetBytes(body);
+            httpContext.Response.Body = new MemoryStream(contentBytes);
+            return httpContext.Response;
+        }
     }
 }
-#endif

@@ -19,18 +19,19 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// Routes a single OData batch request.
         /// </summary>
         /// <param name="handler">The handler for processing a message.</param>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The http context.</param>
         /// <param name="contentIdToLocationMapping">The Content-ID to Location mapping.</param>
         /// <returns></returns>
         public static async Task SendRequestAsync(RequestDelegate handler, HttpContext context, Dictionary<string, string> contentIdToLocationMapping)
         {
             if (handler == null)
             {
-                throw Error.ArgumentNull("handler");
+                throw new ArgumentNullException(nameof(handler));
             }
+
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             if (contentIdToLocationMapping != null)
@@ -55,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             try
             {
-                await handler(context);
+                await handler(context).ConfigureAwait(false);
 
                 string contentId = context.Request.GetODataContentId();
 

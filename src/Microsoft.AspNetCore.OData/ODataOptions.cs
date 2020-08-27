@@ -90,12 +90,12 @@ namespace Microsoft.AspNetCore.OData
 
 
         /// <summary>
-        /// 
+        /// Adds OData model.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="model"></param>
-        /// <param name="configureAction"></param>
-        /// <returns></returns>
+        /// <param name="name">The model name and prefix.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="configureAction">The sub service configuration action.</param>
+        /// <returns>The calling itself.</returns>
         public ODataOptions AddModel(string name, IEdmModel model, Action<IContainerBuilder> configureAction)
         {
             if (model == null)

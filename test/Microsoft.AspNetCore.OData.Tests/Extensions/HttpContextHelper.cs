@@ -41,5 +41,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             request.Path = new PathString(requestUri.AbsolutePath);
             return httpContext;
         }
+
+        public static HttpContext Create(int statusCode)
+        {
+            HttpContext httpContext = new DefaultHttpContext();
+            httpContext.Response.StatusCode = statusCode;
+            return httpContext;
+        }
     }
 }

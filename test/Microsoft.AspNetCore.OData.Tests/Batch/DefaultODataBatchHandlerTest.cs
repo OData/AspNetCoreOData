@@ -33,6 +33,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act & Assert
             Assert.False(batchHandler.ContinueOnError);
             Assert.NotNull(batchHandler.MessageQuotas);
+            Assert.Null(batchHandler.RouteName);
         }
 
         [Fact]

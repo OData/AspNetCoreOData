@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-#if false // TODO #939: Enable these test on AspNetCore.
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.OData.Common;
-using Microsoft.AspNet.OData.Test.Abstraction;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Test.Batch
@@ -25,8 +27,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         /// <param name="content">The <see cref="HttpContent"/>.</param>
         /// <param name="settings">The <see cref="ODataMessageReaderSettings"/>.</param>
         /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
-        public static Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content,
-            ODataMessageReaderSettings settings)
+        public static Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content, ODataMessageReaderSettings settings)
         {
             return GetODataMessageReaderAsync(content, settings, CancellationToken.None);
         }
@@ -49,10 +50,15 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             cancellationToken.ThrowIfCancellationRequested();
             Stream contentStream = await content.ReadAsStreamAsync();
 
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(contentStream, content.Headers, new MockContainer());
+            HeaderDictionary headerDict = new HeaderDictionary();
+            foreach (var head in content.Headers)
+            {
+                headerDict[head.Key] = new StringValues(head.Value.ToArray());
+            }
+
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(contentStream, headerDict/*, new MockServiceProvider()*/);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
             return oDataMessageReader;
         }
     }
 }
-#endif

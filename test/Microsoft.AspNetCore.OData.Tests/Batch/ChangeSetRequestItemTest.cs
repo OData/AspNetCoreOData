@@ -49,10 +49,10 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         {
             // Arrange
             HttpContext[] contexts = new HttpContext[]
-                {
-                    HttpContextHelper.Create("Get", "http://example.com"),
-                    HttpContextHelper.Create("Post", "http://example.com")
-                };
+            {
+                HttpContextHelper.Create("Get", "http://example.com"),
+                HttpContextHelper.Create("Post", "http://example.com")
+            };
             ChangeSetRequestItem requestItem = new ChangeSetRequestItem(contexts);
 
             RequestDelegate handler = context => Task.FromResult(context.Response);

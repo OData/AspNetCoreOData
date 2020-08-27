@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
 using Xunit;
 
@@ -47,8 +48,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public async Task WriteResponse_SynchronouslyWritesChangeSet()
         {
             // Arrange
-            HttpContext context1 = BuildHttpContext(StatusCodes.Status202Accepted);
-            HttpContext context2 = BuildHttpContext(StatusCodes.Status204NoContent);
+            HttpContext context1 = HttpContextHelper.Create(StatusCodes.Status202Accepted);
+            HttpContext context2 = HttpContextHelper.Create(StatusCodes.Status204NoContent);
 
             ChangeSetResponseItem responseItem = new ChangeSetResponseItem(new[] { context1, context2 });
             MemoryStream memoryStream = new MemoryStream();
@@ -74,8 +75,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public async Task WriteResponseAsync_WritesChangeSet()
         {
             // Arrange
-            HttpContext context1 = BuildHttpContext(StatusCodes.Status202Accepted);
-            HttpContext context2 = BuildHttpContext(StatusCodes.Status204NoContent);
+            HttpContext context1 = HttpContextHelper.Create(StatusCodes.Status202Accepted);
+            HttpContext context2 = HttpContextHelper.Create(StatusCodes.Status204NoContent);
 
             ChangeSetResponseItem responseItem = new ChangeSetResponseItem(new[] { context1, context2 });
             MemoryStream memoryStream = new MemoryStream();
@@ -103,16 +104,16 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Arrange
             HttpContext[] successResponses = new HttpContext[]
             {
-                BuildHttpContext(StatusCodes.Status202Accepted),
-                BuildHttpContext(StatusCodes.Status201Created),
-                BuildHttpContext(StatusCodes.Status200OK)
+                HttpContextHelper.Create(StatusCodes.Status202Accepted),
+                HttpContextHelper.Create(StatusCodes.Status201Created),
+                HttpContextHelper.Create(StatusCodes.Status200OK)
             };
 
             HttpContext[] errorResponses = new HttpContext[]
             {
-                BuildHttpContext(StatusCodes.Status201Created),
-                BuildHttpContext(StatusCodes.Status502BadGateway),
-                BuildHttpContext(StatusCodes.Status300MultipleChoices)
+                HttpContextHelper.Create(StatusCodes.Status201Created),
+                HttpContextHelper.Create(StatusCodes.Status502BadGateway),
+                HttpContextHelper.Create(StatusCodes.Status300MultipleChoices)
             };
 
             ChangeSetResponseItem successResponseItem = new ChangeSetResponseItem(successResponses);
@@ -121,13 +122,6 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act & Assert
             Assert.True(successResponseItem.IsResponseSuccessful());
             Assert.False(errorResponseItem.IsResponseSuccessful());
-        }
-
-        private static HttpContext BuildHttpContext(int statusCode)
-        {
-            HttpContext httpContext = new DefaultHttpContext();
-            httpContext.Response.StatusCode = statusCode;
-            return httpContext;
         }
     }
 }
