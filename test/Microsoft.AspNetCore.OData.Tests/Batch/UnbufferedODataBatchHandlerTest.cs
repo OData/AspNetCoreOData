@@ -3,10 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,6 +14,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +22,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
-using System.Net.Http;
+
 namespace Microsoft.AspNetCore.OData.Test.Batch
 {
     public class UnbufferedODataBatchHandlerTest
@@ -57,14 +55,6 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                 "responses");
         }
 
-        private static IServiceProvider BuildServiceProvider(Action<ODataOptions> setupAction)
-        {
-            IServiceCollection services = new ServiceCollection();
-            services.Configure(setupAction);
-            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
-            return services.BuildServiceProvider();
-        }
-
         [Fact]
         public async Task ProcessBatchAsync_Throws_IfContextIsNull()
         {
@@ -76,393 +66,483 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.ProcessBatchAsync(null, next), "context");
         }
 
-#if false
-        [Fact]
-        public async Task ProcessBatchAsync_CallsRegisterForDispose()
-        {
-            // Arrange
-            List<IDisposable> expectedResourcesForDisposal = new List<IDisposable>();
-            MockHttpServer server = new MockHttpServer(request =>
-            {
-                var tmpContent = new StringContent(String.Empty);
-                request.RegisterForDispose(tmpContent);
-                expectedResourcesForDisposal.Add(tmpContent);
-                return new HttpResponseMessage { Content = new StringContent(request.RequestUri.AbsoluteUri) };
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
-            HttpContext context = HttpContextHelper.Create("Post", "http://example.com/$batch");
-
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/"))
-                    }
-                }
-            };
-            batchRequest.EnableHttpDependencyInjectionSupport();
-
-            RequestDelegate next = context => Task.FromResult(context.Response);
-
-            // Act
-            await batchHandler.ProcessBatchAsync(context, next);
-            var resourcesForDisposal = batchRequest.GetResourcesForDisposal();
-
-            // Assert
-            foreach (var expectedResource in expectedResourcesForDisposal)
-            {
-                Assert.Contains(expectedResource, resourcesForDisposal);
-            }
-        }
-
-
-
         [Fact]
         public async Task ProcessBatchAsync_CallsInvokerForEachRequest()
         {
             // Arrange
-            RequestDelegate next = context =>
+            RequestDelegate next = async context =>
             {
                 HttpRequest request = context.Request;
                 string responseContent = request.GetDisplayUrl();
-                if (request.Body != null)
+                string content = request.ReadBody();
+                if (!string.IsNullOrEmpty(content))
                 {
-                    string content = ReadStream(request.Body);
-                    if (!string.IsNullOrEmpty(content))
-                    {
-                        responseContent += "," + content;
-                    }
+                    responseContent += "," + content;
                 }
 
-                byte[] contentBytes = Encoding.UTF8.GetBytes(responseContent);
-                context.Response.Body = new MemoryStream(contentBytes);
-                return Task.FromResult(context.Response);
+                await context.Response.WriteAsync(responseContent);
             };
 
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
-            HttpContext context = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            string batchRequest = @"--2d958200-beb1-4437-97c5-9d19f7a1d538
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1301336816
 
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                        {
-                            Content = new StringContent("foo")
-                        })
-                    }
-                }
-            };
+GET / HTTP/1.1
+Host: example.com
 
-            MultipartContent content = new MultipartContent("mixed");
-            await content.ReadAsStreamAsync();
 
-            batchRequest.EnableHttpDependencyInjectionSupport();
+--2d958200-beb1-4437-97c5-9d19f7a1d538
+Content-Type: multipart/mixed; boundary=""6aef4f89-41ba-4da5-b733-9100d2318dfa""
+
+--6aef4f89-41ba-4da5-b733-9100d2318dfa
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1557260198
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+foo
+--6aef4f89-41ba-4da5-b733-9100d2318dfa--
+
+--2d958200-beb1-4437-97c5-9d19f7a1d538--
+";
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed; boundary=\"2d958200-beb1-4437-97c5-9d19f7a1d538\"";
+            httpContext.Request.ContentLength = 603;
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.Response.Body = new MemoryStream();
 
             // Act
-            await batchHandler.ProcessBatchAsync(context, next);
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            batchHandler.RouteName = "odata";
+            await batchHandler.ProcessBatchAsync(httpContext, next);
 
             // Assert
-            var batchContent = Assert.IsType<ODataBatchContent>(response.Content);
-            var batchResponses = batchContent.Responses.ToArray();
-            Assert.Equal(2, batchResponses.Length);
-            var response0 = (OperationResponseItem)batchResponses[0];
-            var response1 = (ChangeSetResponseItem)batchResponses[1];
-            Assert.Equal("http://example.com/", await response0.Response.Content.ReadAsStringAsync());
-            Assert.Equal("http://example.com/values,foo", await response1.Responses.First().Content.ReadAsStringAsync());
-        }
+            string responseBody = httpContext.Response.ReadBody();
 
-        public static HttpMessageContent CreateODataRequestContent(HttpRequest request)
-        {
-            var changeSetMessageContent = new HttpMessageContent(request);
-            changeSetMessageContent.Headers.ContentType.Parameters.Clear();
-            changeSetMessageContent.Headers.TryAddWithoutValidation("Content-Transfer-Encoding", "binary");
-            changeSetMessageContent.Headers.TryAddWithoutValidation(
-                "Content-ID",
-                Guid.NewGuid().GetHashCode().ToString(CultureInfo.InvariantCulture));
-            return changeSetMessageContent;
-        }
-
-        private static string ReadStream(Stream stream)
-        {
-            using (var reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
+            Assert.Contains("http://example.com/", responseBody);
+            Assert.Contains("http://example.com/values,foo", responseBody);
         }
 
         [Fact]
         public async Task ProcessBatchAsync_DisposesResponseInCaseOfException()
         {
             // Arrange
-            List<MockHttpResponseMessage> responses = new List<MockHttpResponseMessage>();
-            MockHttpServer server = new MockHttpServer(request =>
+            RequestDelegate handler = context =>
             {
-                if (request.Method == HttpMethod.Put)
+                HttpRequest request = context.Request;
+                if (request.Method.ToLowerInvariant() == "put")
                 {
-                    throw new InvalidOperationException();
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 }
-                var response = new MockHttpResponseMessage();
-                responses.Add(response);
-                return response;
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
+                else
                 {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")),
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Put, "http://example.com/values"))
-                    }
+                    context.Response.WriteAsync(request.Method);
                 }
+
+                return Task.FromResult(context.Response);
             };
-            batchRequest.EnableHttpDependencyInjectionSupport();
+
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            string batchRequest = @"
+--97a4482b-26c6-4551-aed3-85f8b500bbbf
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 794393547
+
+GET / HTTP/1.1
+Host: example.com
+
+
+--97a4482b-26c6-4551-aed3-85f8b500bbbf
+Content-Type: multipart/mixed;boundary=""be13321d-3c7b-4126-aa20-958b2c7a87e0""
+
+--be13321d-3c7b-4126-aa20-958b2c7a87e0
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -583046506
+
+POST /values HTTP/1.1
+Host: example.com
+
+
+--be13321d-3c7b-4126-aa20-958b2c7a87e0
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -811158921
+
+PUT /values HTTP/1.1
+Host: example.com
+
+
+--be13321d-3c7b-4126-aa20-958b2c7a87e0--
+
+--97a4482b-26c6-4551-aed3-85f8b500bbbf--
+";
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"be13321d-3c7b-4126-aa20-958b2c7a87e0\"";
+            httpContext.Request.ContentLength = 736;
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.RouteName = "odata";
 
             // Act & Assert
-            await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
-                () => batchHandler.ProcessBatchAsync(batchRequest, CancellationToken.None));
-
-            Assert.Equal(2, responses.Count);
-            foreach (var response in responses)
-            {
-                Assert.True(response.IsDisposed);
-            }
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+            string responseBody = httpContext.Response.ReadBody();
+            Assert.Empty(responseBody);
         }
 
         [Theory]
-        [InlineData(true, "", 2)]
-        [InlineData(true, "odata.continue-on-error", 3)]
-        [InlineData(true, "odata.continue-on-error=true", 3)]
-        [InlineData(true, "odata.continue-on-error=false", 2)]
-        [InlineData(true, "continue-on-error", 3)]
-        [InlineData(true, "continue-on-error=true", 3)]
-        [InlineData(true, "continue-on-error=false", 2)]
-        [InlineData(false, "", 3)]
-        [InlineData(false, "odata.continue-on-error", 3)]
-        [InlineData(false, "odata.continue-on-error=true", 3)]
-        [InlineData(false, "odata.continue-on-error=false", 3)]
-        [InlineData(false, "continue-on-error", 3)]
-        [InlineData(false, "continue-on-error=true", 3)]
-        [InlineData(false, "continue-on-error=false", 3)]
-        public async Task ProcessBatchAsync_ContinueOnError(bool enableContinueOnError, string preferenceHeader, int expectedResponses)
+        [InlineData(true, null, false)]
+        [InlineData(true, "odata.continue-on-error", true)]
+        [InlineData(true, "odata.continue-on-error=true", true)]
+        [InlineData(true, "odata.continue-on-error=false", false)]
+        [InlineData(true, "continue-on-error", true)]
+        [InlineData(true, "continue-on-error=true", true)]
+        [InlineData(true, "continue-on-error=false", false)]
+        [InlineData(false, null, true)]
+        [InlineData(false, "odata.continue-on-error", true)]
+        [InlineData(false, "odata.continue-on-error=true", true)]
+        [InlineData(false, "odata.continue-on-error=false", true)]
+        [InlineData(false, "continue-on-error", true)]
+        [InlineData(false, "continue-on-error=true", true)]
+        [InlineData(false, "continue-on-error=false", true)]
+        public async Task ProcessBatchAsync_ContinueOnError(bool enableContinueOnError, string preferenceHeader, bool hasThirdResponse)
         {
             // Arrange
-            MockHttpServer server = new MockHttpServer(async request =>
+            RequestDelegate handler = async context =>
             {
-                string responseContent = request.RequestUri.AbsoluteUri;
-                string content = "";
-                if (request.Content != null)
+                HttpRequest request = context.Request;
+                string responseContent = request.GetDisplayUrl();
+                string content = request.ReadBody();
+                if (!string.IsNullOrEmpty(content))
                 {
-                    content = await request.Content.ReadAsStringAsync();
-                    if (!String.IsNullOrEmpty(content))
-                    {
-                        responseContent += "," + content;
-                    }
+                    responseContent += "," + content;
                 }
-                HttpResponseMessage responseMessage = new HttpResponseMessage { Content = new StringContent(responseContent) };
+
+                HttpResponse response = context.Response;
                 if (content.Equals("foo"))
                 {
-                    responseMessage.StatusCode = HttpStatusCode.BadRequest;
+                    response.StatusCode = StatusCodes.Status400BadRequest;
                 }
-                return responseMessage;
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                        {
-                            Content = new StringContent("foo")
-                        })
-                    },
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                    {
-                        Content = new StringContent("bar")
-                    }),
-                }
+                await response.WriteAsync(responseContent);
             };
-            var enableContinueOnErrorconfig = new HttpConfiguration();
-            enableContinueOnErrorconfig.EnableODataDependencyInjectionSupport();
-            enableContinueOnErrorconfig.EnableContinueOnErrorHeader();
-            if (enableContinueOnError)
-                batchRequest.SetConfiguration(enableContinueOnErrorconfig);
-            if (!string.IsNullOrEmpty(preferenceHeader))
-                batchRequest.Headers.Add("prefer", preferenceHeader);
-            batchRequest.EnableHttpDependencyInjectionSupport();
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            string batchRequest = @"--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1948857409
+
+GET / HTTP/1.1
+Host: example.com
+
+
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: multipart/mixed; boundary=""3c4d5753-d325-4806-8c80-38f4a5fbe523""
+
+--3c4d5753-d325-4806-8c80-38f4a5fbe523
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1856004745
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+foo
+--3c4d5753-d325-4806-8c80-38f4a5fbe523--
+
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -2010824035
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+bar
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e--
+";
+
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
+            httpContext.Request.ContentLength = 827;
+
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
+
+            if (preferenceHeader != null)
+            {
+                httpContext.Request.Headers.Add("prefer", preferenceHeader);
+            }
+
+            httpContext.Response.Body = new MemoryStream();
+
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            batchHandler.RouteName = "odata";
 
             // Act
-            var response = await batchHandler.ProcessBatchAsync(batchRequest, CancellationToken.None);
-            var batchContent = Assert.IsType<ODataBatchContent>(response.Content);
-            var batchResponses = batchContent.Responses.ToArray();
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+            string responseBody = httpContext.Response.ReadBody();
 
             // Assert
-            Assert.Equal(expectedResponses, batchResponses.Length);
+            Assert.NotNull(responseBody);
+
+            // #1 response
+            Assert.Contains("http://example.com/", responseBody);
+
+            // #2 bad response
+            Assert.Contains("Bad Request", responseBody);
+            Assert.Contains("http://example.com/values,foo", responseBody);
+
+            // #3 response
+            if (hasThirdResponse)
+            {
+                Assert.Contains("http://example.com/values,bar", responseBody);
+            }
+            else
+            {
+                Assert.DoesNotContain("http://example.com/values,bar", responseBody);
+            }
         }
 
         [Fact]
         public void ValidateRequest_Throws_IfResponsesIsNull()
         {
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(new HttpServer());
-            ExceptionAssert.ThrowsArgumentNull(
-                () => batchHandler.ValidateRequest(null),
-                "request");
+            // Arrange
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => batchHandler.ValidateRequest(null), "request");
         }
 
         [Fact]
         public async Task ExecuteChangeSet_Throws_IfReaderIsNull()
         {
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(new HttpServer());
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => batchHandler.ExecuteChangeSetAsync(null, Guid.NewGuid(), new HttpRequestMessage(), CancellationToken.None),
+            // Arrange
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            HttpContext httpContext = new DefaultHttpContext();
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.ExecuteChangeSetAsync(null, Guid.NewGuid(), httpContext.Request, null),
                 "batchReader");
         }
 
         [Fact]
         public async Task ExecuteChangeSet_Throws_IfRequestIsNull()
         {
-            var httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            var reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(new HttpServer());
+            // Arrange
+            ODataMessageInfo messageInfo = new ODataMessageInfo();
+            ODataMessageReaderSettings settings = new ODataMessageReaderSettings();
+            Mock<ODataInputContext> inputContext = new Mock<ODataInputContext>(ODataFormat.Batch, messageInfo, settings);
+            Mock<ODataBatchReader> batchReader = new Mock<ODataBatchReader>(inputContext.Object, false);
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
 
+            // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => batchHandler.ExecuteChangeSetAsync(reader.CreateODataBatchReader(), Guid.NewGuid(), null, CancellationToken.None),
+                () => batchHandler.ExecuteChangeSetAsync(batchReader.Object, Guid.NewGuid(), null, null),
                 "originalRequest");
         }
 
         [Fact]
         public async Task ExecuteChangeSetAsync_CopiesPropertiesFromRequest_WithoutExcludedProperties()
         {
-            MockHttpServer server = new MockHttpServer(request =>
+            // Arrange
+            RequestDelegate handler = context =>
             {
-                return new HttpResponseMessage
-                {
-                    RequestMessage = request
-                };
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                        {
-                            Content = new StringContent("foo")
-                        })
-                    }
-                }
+                return Task.FromResult(context.Response);
             };
-            batchRequest.Properties.Add("foo", "bar");
-            batchRequest.SetRouteData(new HttpRouteData(new HttpRoute()));
-            batchRequest.RegisterForDispose(new StringContent(String.Empty));
-            ODataMessageReader reader = await batchRequest.Content
-                .GetODataMessageReaderAsync(new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") }, CancellationToken.None);
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync();
+
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+
+            string batchRequest = @"--cb7bb9ee-dce2-4c94-bf11-b742b2bc6072
+Content-Type: multipart/mixed; boundary=""09f27d33-41ea-4334-8ace-1738bd2793a9""
+
+--09f27d33-41ea-4334-8ace-1738bd2793a9
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1328966982
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+foo
+--09f27d33-41ea-4334-8ace-1738bd2793a9--
+
+--cb7bb9ee-dce2-4c94-bf11-b742b2bc6072--
+";
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
+            httpContext.Request.ContentLength = 431;
+            httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+
+            HeaderDictionary headerDict = new HeaderDictionary();
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, headerDict/*, new MockServiceProvider()*/);
+            ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
+
+            ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();
             List<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
             Guid batchId = Guid.NewGuid();
             await batchReader.ReadAsync();
 
-            var response = await batchHandler.ExecuteChangeSetAsync(batchReader, Guid.NewGuid(), batchRequest, CancellationToken.None);
+            // Act
+            var response = await batchHandler.ExecuteChangeSetAsync(batchReader, Guid.NewGuid(), httpContext.Request, handler);
 
-            var changeSetResponses = ((ChangeSetResponseItem)response).Responses;
-            foreach (var changeSetResponse in changeSetResponses)
+            // Arrange
+            var changeSetContexts = ((ChangeSetResponseItem)response).Contexts;
+            foreach (var changeSetContext in changeSetContexts)
             {
-                var changeSetRequest = changeSetResponse.RequestMessage;
-                Assert.Equal("bar", changeSetRequest.Properties["foo"]);
-                Assert.Null(changeSetRequest.GetRouteData());
-                Assert.Same(changeSetRequest, changeSetRequest.GetUrlHelper().Request);
-                Assert.Empty(changeSetRequest.GetResourcesForDisposal());
+                var changeSetRequest = changeSetContext.Features;
+                Assert.Equal("bar", changeSetContext.Features[typeof(UnbufferedODataBatchHandlerTest)]);
             }
         }
 
         [Fact]
         public async Task ExecuteChangeSetAsync_ReturnsSingleErrorResponse()
         {
-            MockHttpServer server = new MockHttpServer(request =>
+            // Arrange
+            RequestDelegate handler = context =>
             {
-                if (request.Method == HttpMethod.Post)
+                if (context.Request.Method.ToUpperInvariant() == "POST")
                 {
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest));
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    return Task.FromResult(context.Response);
                 }
-                return Task.FromResult(new HttpResponseMessage());
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Put, "http://example.com/values")),
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")),
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Delete, "http://example.com/values")),
-                    }
-                }
+
+                return Task.FromResult(context.Response);
             };
-            ODataMessageReader reader = await batchRequest.Content
-                .GetODataMessageReaderAsync(new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") }, CancellationToken.None);
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync();
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            string batchRequest = @"--86aef3eb-4af6-4750-a66d-df65e3f31ab0
+Content-Type: multipart/mixed; boundary=""7a61b8c1-a80e-4e6b-bac7-2f65564e3fd6""
 
-            var response = await batchHandler.ExecuteChangeSetAsync(batchReader, Guid.NewGuid(), batchRequest, CancellationToken.None);
+--7a61b8c1-a80e-4e6b-bac7-2f65564e3fd6
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -1233709575
 
+PUT /values HTTP/1.1
+Host: example.com
+
+
+--7a61b8c1-a80e-4e6b-bac7-2f65564e3fd6
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -1854117385
+
+POST /values HTTP/1.1
+Host: example.com
+
+
+--7a61b8c1-a80e-4e6b-bac7-2f65564e3fd6
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -1665098746
+
+DELETE /values HTTP/1.1
+Host: example.com
+
+
+--7a61b8c1-a80e-4e6b-bac7-2f65564e3fd6--
+
+--86aef3eb-4af6-4750-a66d-df65e3f31ab0--";
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
+            httpContext.Request.ContentLength = 431;
+            httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+
+            HeaderDictionary headerDict = new HeaderDictionary();
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, headerDict/*, new MockServiceProvider()*/);
+            ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
+
+            ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();
+
+            // Act
+            var response = await batchHandler.ExecuteChangeSetAsync(batchReader, Guid.NewGuid(), httpContext.Request, handler);
+
+            // Assert
             var changesetResponse = Assert.IsType<ChangeSetResponseItem>(response);
-            Assert.Single(changesetResponse.Responses);
-            Assert.Equal(HttpStatusCode.BadRequest, changesetResponse.Responses.First().StatusCode);
+            var returnContext = Assert.Single(changesetResponse.Contexts);
+            Assert.Equal(StatusCodes.Status400BadRequest, returnContext.Response.StatusCode);
         }
 
         [Fact]
         public async Task ExecuteOperationAsync_CopiesPropertiesFromRequest_WithoutExcludedProperties()
         {
-            MockHttpServer server = new MockHttpServer(request =>
+            // Arrange
+            RequestDelegate handler = context =>
             {
-                return new HttpResponseMessage
-                {
-                    RequestMessage = request
-                };
-            });
-            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                }
+                return Task.FromResult(context.Response);
             };
-            batchRequest.Properties.Add("foo", "bar");
-            batchRequest.SetRouteData(new HttpRouteData(new HttpRoute()));
-            batchRequest.RegisterForDispose(new StringContent(String.Empty));
-            ODataMessageReader reader = await batchRequest.Content
-                .GetODataMessageReaderAsync(new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") }, CancellationToken.None);
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync();
+            UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
+            string batchRequest = @"--75148e61-e67a-4bb7-ac0f-78fa30d0da30
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 318941389
+
+GET / HTTP/1.1
+Host: example.com
+
+
+--75148e61-e67a-4bb7-ac0f-78fa30d0da30--
+";
+
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"75148e61-e67a-4bb7-ac0f-78fa30d0da30\"";
+            httpContext.Request.ContentLength = 431;
+            httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+
+            HeaderDictionary headerDict = new HeaderDictionary();
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, headerDict/*, new MockServiceProvider()*/);
+            ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
+
+            ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();
             List<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
             Guid batchId = Guid.NewGuid();
             await batchReader.ReadAsync();
 
-            var response = await batchHandler.ExecuteOperationAsync(batchReader, Guid.NewGuid(), batchRequest, CancellationToken.None);
+            // Act
+            var response = await batchHandler.ExecuteOperationAsync(batchReader, Guid.NewGuid(), httpContext.Request, handler);
 
-            var operationResponse = ((OperationResponseItem)response).Response;
-            var operationRequest = operationResponse.RequestMessage;
-            Assert.Equal("bar", operationRequest.Properties["foo"]);
-            Assert.Null(operationRequest.GetRouteData());
-            Assert.Same(operationRequest, operationRequest.GetUrlHelper().Request);
-            Assert.Empty(operationRequest.GetResourcesForDisposal());
+            // Assert
+            var operationContext = ((OperationResponseItem)response).Context;
+            Assert.Equal("bar", operationContext.Features[typeof(UnbufferedODataBatchHandlerTest)]);
         }
-#endif
+
         [Fact]
         public async Task ExecuteOperation_Throws_IfReaderIsNull()
         {
@@ -490,6 +570,14 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             await ExceptionAssert.ThrowsArgumentNullAsync(
                 () => batchHandler.ExecuteOperationAsync(reader.CreateODataBatchReader(), Guid.NewGuid(), null, null),
                 "originalRequest");
+        }
+
+        private static IServiceProvider BuildServiceProvider(Action<ODataOptions> setupAction)
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.Configure(setupAction);
+            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
+            return services.BuildServiceProvider();
         }
     }
 }

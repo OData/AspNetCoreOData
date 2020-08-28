@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Batch
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             List<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
             Guid batchId = Guid.NewGuid();
 
-            ODataOptions options = context.RequestServices.GetRequiredService<ODataOptions>();
+            ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
             bool enableContinueOnErrorHeader = (options != null)
                 ? options.EnableContinueOnErrorHeader
                 : false;
@@ -127,15 +128,17 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (batchReader == null)
             {
-                throw Error.ArgumentNull("batchReader");
+                throw new ArgumentNullException(nameof(batchReader));
             }
+
             if (originalRequest == null)
             {
-                throw Error.ArgumentNull("originalRequest");
+                throw new ArgumentNullException(nameof(originalRequest));
             }
+
             if (handler == null)
             {
-                throw Error.ArgumentNull("handler");
+                throw new ArgumentNullException(nameof(handler));
             }
 
             Guid changeSetId = Guid.NewGuid();
