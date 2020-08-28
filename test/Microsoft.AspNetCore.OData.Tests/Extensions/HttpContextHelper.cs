@@ -2,6 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.IO;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
@@ -39,6 +41,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
                 new HostString(requestUri.Host, requestUri.Port);
             request.QueryString = new QueryString(requestUri.Query);
             request.Path = new PathString(requestUri.AbsolutePath);
+            return httpContext;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static HttpContext Create(string requestMethod, string uri, string requestBody, string contentType = "application/json")
+        {
+            HttpContext httpContext = Create(requestMethod, uri);
+            byte[] body = Encoding.UTF8.GetBytes(requestBody);
+            httpContext.Request.Body = new MemoryStream(body);
+            httpContext.Request.ContentType = contentType;
+            httpContext.Request.ContentLength = body.Length;
             return httpContext;
         }
 

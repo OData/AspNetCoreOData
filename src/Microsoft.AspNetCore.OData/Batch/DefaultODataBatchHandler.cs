@@ -25,11 +25,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
+
             if (nextHandler == null)
             {
-                throw Error.ArgumentNull("nextHandler");
+                throw new ArgumentNullException(nameof(nextHandler));
             }
 
             if (!await ValidateRequest(context.Request).ConfigureAwait(false))
@@ -63,11 +64,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (requests == null)
             {
-                throw Error.ArgumentNull("requests");
+                throw new ArgumentNullException(nameof(requests));
             }
+
             if (handler == null)
             {
-                throw Error.ArgumentNull("handler");
+                throw new ArgumentNullException(nameof(handler));
             }
 
             IList<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
@@ -96,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             HttpRequest request = context.Request;

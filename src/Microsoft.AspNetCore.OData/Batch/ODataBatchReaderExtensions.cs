@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (reader == null)
             {
-                throw Error.ArgumentNull("reader");
+                throw new ArgumentNullException(nameof(reader));
             }
 
             if (reader.State != ODataBatchReaderState.ChangesetStart)
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (reader == null)
             {
-                throw Error.ArgumentNull("reader");
+                throw new ArgumentNullException(nameof(reader));
             }
 
             if (reader.State != ODataBatchReaderState.Operation)
@@ -109,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (reader == null)
             {
-                throw Error.ArgumentNull("reader");
+                throw new ArgumentNullException(nameof(reader));
             }
 
             if (reader.State != ODataBatchReaderState.Operation)
@@ -238,7 +238,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             // Create a context from the factory or use the default context.
             HttpContext context = null;
-            IHttpContextFactory httpContextFactory = originalContext.RequestServices.GetRequiredService<IHttpContextFactory>();
+            IHttpContextFactory httpContextFactory = originalContext.RequestServices.GetService<IHttpContextFactory>();
             if (httpContextFactory != null)
             {
                 context = httpContextFactory.Create(features);

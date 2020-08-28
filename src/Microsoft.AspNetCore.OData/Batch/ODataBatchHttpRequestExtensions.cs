@@ -230,29 +230,28 @@ namespace Microsoft.AspNetCore.OData.Batch
             if (request.Body == null)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await response.WriteAsync(SRResources.BatchRequestMissingContent);
+                await response.WriteAsync(SRResources.BatchRequestMissingBody).ConfigureAwait(false);
                 return false;
             }
 
             RequestHeaders headers = request.GetTypedHeaders();
             MediaTypeHeaderValue contentType = headers.ContentType;
-
             if (contentType == null)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await response.WriteAsync(SRResources.BatchRequestMissingContentType);
+                await response.WriteAsync(SRResources.BatchRequestMissingContentType).ConfigureAwait(false);
                 return false;
             }
 
             string mediaType = contentType.MediaType.ToString();
-            bool isMimeBatch = String.Equals(mediaType, BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase);
-            bool isJsonBatch = String.Equals(mediaType, BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase);
+            bool isMimeBatch = string.Equals(mediaType, BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase);
+            bool isJsonBatch = string.Equals(mediaType, BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase);
 
             if (!isMimeBatch && !isJsonBatch)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await response.WriteAsync(Error.Format(SRResources.BatchRequestInvalidMediaType,
-                    BatchMediaTypeMime, BatchMediaTypeJson));
+                    BatchMediaTypeMime, BatchMediaTypeJson)).ConfigureAwait(false);
                 return false;
             }
 
@@ -262,7 +261,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 if (boundary == null || String.IsNullOrEmpty(boundary.Value.ToString()))
                 {
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    await response.WriteAsync(SRResources.BatchRequestMissingBoundary);
+                    await response.WriteAsync(SRResources.BatchRequestMissingBoundary).ConfigureAwait(false);
                     return false;
                 }
             }

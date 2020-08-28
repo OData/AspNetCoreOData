@@ -578,7 +578,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
-            Sends the ChangeSet request.
+            Sends the ChangeSet request to the request delegate.
             </summary>
             <param name="handler">The handler for processing a message.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem"/>.</returns>
@@ -843,13 +843,12 @@
             requests to the appropriate ODataBatchHandler.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer,Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer,Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware"/>.
             </summary>
-            <param name="next">The next middleware.</param>
             <param name="perRouteContainer">The next middleware.</param>
-            <param name="batchMapping">The next middleware.</param>
+            <param name="next">The next middleware.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
@@ -5611,14 +5610,14 @@
               Looks up a localized string similar to The batch request must have &apos;{0}&apos; or &apos;{1}&apos; as the media type..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingBody">
+            <summary>
+              Looks up a localized string similar to The &apos;Body&apos; property on the batch request cannot be null..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingBoundary">
             <summary>
               Looks up a localized string similar to The batch request must have a boundary specification in the &quot;Content-Type&quot; header..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingContent">
-            <summary>
-              Looks up a localized string similar to The &apos;Content&apos; property on the batch request cannot be null..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingContentType">

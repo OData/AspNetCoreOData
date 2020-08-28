@@ -124,9 +124,6 @@ namespace Microsoft.AspNetCore.OData
             // per-route classes will be injected, such as IEdmModel and IODataRoutingConventions.
             services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
 
-            // Add the batch path mapping class to store batch route names and prefixes.
-            services.AddSingleton<ODataBatchPathMapping>();
-
             // Formatter
             services.AddODataFormatter();
 

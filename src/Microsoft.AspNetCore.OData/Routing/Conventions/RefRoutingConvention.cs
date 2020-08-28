@@ -118,6 +118,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             else
             {
                 //TODO: Add the navigation template segment template
+                return false;
             }
 
             IEdmEntityType navigationPropertyType = navigationProperty.Type.AsEntity().EntityDefinition();

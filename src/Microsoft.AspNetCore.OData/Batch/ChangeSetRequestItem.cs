@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         public IEnumerable<HttpContext> Contexts { get; }
 
         /// <summary>
-        /// Sends the ChangeSet request.
+        /// Sends the ChangeSet request to the request delegate.
         /// </summary>
         /// <param name="handler">The handler for processing a message.</param>
         /// <returns>A <see cref="ChangeSetResponseItem"/>.</returns>

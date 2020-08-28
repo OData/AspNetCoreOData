@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.ValidateODataBatchRequest();
@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             return request.GetODataBatchBaseUri(null, null/*ODataRouteName, ODataRoute*/);

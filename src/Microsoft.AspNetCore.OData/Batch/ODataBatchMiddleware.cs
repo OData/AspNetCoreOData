@@ -18,21 +18,17 @@ namespace Microsoft.AspNetCore.OData.Batch
     {
         private readonly RequestDelegate _next;
         private readonly IPerRouteContainer _perRouteContainer;
-        private readonly ODataBatchPathMapping _batchMapping;
+        private ODataBatchPathMapping _batchMapping;
 
         /// <summary>
         /// Instantiates a new instance of <see cref="ODataBatchMiddleware"/>.
         /// </summary>
-        /// <param name="next">The next middleware.</param>
         /// <param name="perRouteContainer">The next middleware.</param>
-        /// <param name="batchMapping">The next middleware.</param>
-        public ODataBatchMiddleware(RequestDelegate next,
-            IPerRouteContainer perRouteContainer,
-            ODataBatchPathMapping batchMapping)
+        /// <param name="next">The next middleware.</param>
+        public ODataBatchMiddleware(IPerRouteContainer perRouteContainer, RequestDelegate next)
         {
-            _next = next;
             _perRouteContainer = perRouteContainer;
-            _batchMapping = batchMapping;
+            _next = next;
             Initialize();
         }
 
@@ -48,22 +44,9 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // Attempt to match the path to a bach route.
-            ODataBatchPathMapping batchMapping = context.RequestServices.GetRequiredService<ODataBatchPathMapping>();
-
             string routeName;
-            if (batchMapping.TryGetRouteName(context, out routeName))
+            if (_batchMapping != null && _batchMapping.TryGetRouteName(context, out routeName))
             {
-                // Get the per-route continer and retrieve the batch handler.
-                //IPerRouteContainer perRouteContainer = context.RequestServices.GetRequiredService<IPerRouteContainer>();
-                //if (perRouteContainer == null)
-                //{
-                //    throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(IPerRouteContainer));
-                //}
-
-                //IServiceProvider rootContainer = perRouteContainer.GetODataRootContainer(routeName);
-                // IServiceProvider serviceProvider = context.RequestServices;
-
                 IServiceProvider serviceProvider = _perRouteContainer.GetServiceProvider(routeName);
                 ODataBatchHandler batchHandler = serviceProvider.GetRequiredService<ODataBatchHandler>();
 
@@ -71,7 +54,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
             else
             {
-                await _next(context);
+                await _next(context).ConfigureAwait(false);
             }
         }
 
@@ -83,11 +66,16 @@ namespace Microsoft.AspNetCore.OData.Batch
                 // by the batching middleware to handle the batch request. Batching still requires the injection
                 // of the batching middleware via UseODataBatching().
                 ODataBatchHandler batchHandler = service.Value.GetService<ODataBatchHandler>();
-
                 if (batchHandler != null)
                 {
                     batchHandler.RouteName = service.Key;
                     string batchPath = String.IsNullOrEmpty(service.Key)  ? "/$batch" : $"/{service.Key}/$batch";
+
+                    if (_batchMapping == null)
+                    {
+                        _batchMapping = new ODataBatchPathMapping();
+                    }
+
                     _batchMapping.AddRoute(service.Key, batchPath);
                 }
             }

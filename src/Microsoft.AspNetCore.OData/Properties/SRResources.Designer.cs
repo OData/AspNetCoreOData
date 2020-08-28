@@ -187,20 +187,20 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Body&apos; property on the batch request cannot be null..
+        /// </summary>
+        internal static string BatchRequestMissingBody {
+            get {
+                return ResourceManager.GetString("BatchRequestMissingBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The batch request must have a boundary specification in the &quot;Content-Type&quot; header..
         /// </summary>
         internal static string BatchRequestMissingBoundary {
             get {
                 return ResourceManager.GetString("BatchRequestMissingBoundary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;Content&apos; property on the batch request cannot be null..
-        /// </summary>
-        internal static string BatchRequestMissingContent {
-            get {
-                return ResourceManager.GetString("BatchRequestMissingContent", resourceCulture);
             }
         }
         

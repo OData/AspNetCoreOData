@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (!isDisposed)
             {
-                await base.FlushAsync();
+                await base.FlushAsync().ConfigureAwait(false);
                 base.Close();
                 base.Dispose();
                 isDisposed = true;

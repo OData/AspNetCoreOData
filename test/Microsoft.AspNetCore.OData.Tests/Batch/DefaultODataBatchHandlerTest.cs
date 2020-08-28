@@ -3,18 +3,34 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -52,8 +68,10 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [Fact]
         public async Task CreateResponseMessageAsync_Throws_IfRequestIsNull()
         {
-            // Arrange & Act & Assert
+            // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+
+            // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.CreateResponseMessageAsync(new ODataBatchResponseItem[0], null), "request");
         }
 
@@ -84,417 +102,535 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             httpContext.Response.StatusCode = statusCode;
             return httpContext;
         }
-#if false
-        [Fact]
-        public async Task ProcessBatchAsync_Throws_IfRequestIsNull()
-        {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => batchHandler.ProcessBatchAsync(null, CancellationToken.None),
-                "request");
-        }
 
         [Fact]
-        public async Task ProcessBatchAsync_CallsRegisterForDispose()
+        public async Task ProcessBatchAsync_Throws_IfContextIsNull()
         {
             // Arrange
-            List<IDisposable> expectedResourcesForDisposal = new List<IDisposable>();
-            MockHttpServer server = new MockHttpServer(request =>
-            {
-                var tmpContent = new StringContent(String.Empty);
-                request.RegisterForDispose(tmpContent);
-                expectedResourcesForDisposal.Add(tmpContent);
-                return new HttpResponseMessage { Content = new StringContent(request.RequestUri.AbsoluteUri) };
-            });
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/"))
-                }
-            };
-            batchRequest.EnableHttpDependencyInjectionSupport();
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
 
-            // Act
-            var response = await batchHandler.ProcessBatchAsync(batchRequest, CancellationToken.None);
-            var resourcesForDisposal = batchRequest.GetResourcesForDisposal();
-
-            // Assert
-            foreach (var expectedResource in expectedResourcesForDisposal)
-            {
-                Assert.Contains(expectedResource, resourcesForDisposal);
-            }
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.ProcessBatchAsync(null, null), "context");
         }
+
 
         [Theory]
-        [InlineData(true, "", 2)]
-        [InlineData(true, "odata.continue-on-error", 3)]
-        [InlineData(true, "odata.continue-on-error=true", 3)]
-        [InlineData(true, "odata.continue-on-error=false", 2)]
-        [InlineData(true, "continue-on-error", 3)]
-        [InlineData(true, "continue-on-error=true", 3)]
-        [InlineData(true, "continue-on-error=false", 2)]
-        [InlineData(false, "", 3)]
-        [InlineData(false, "odata.continue-on-error", 3)]
-        [InlineData(false, "odata.continue-on-error=true", 3)]
-        [InlineData(false, "odata.continue-on-error=false", 3)]
-        [InlineData(false, "continue-on-error", 3)]
-        [InlineData(false, "continue-on-error=true", 3)]
-        [InlineData(false, "continue-on-error=false", 3)]
-        public async Task ProcessBatchAsync_ContinueOnError(bool enableContinueOnError, string preferenceHeader, int expectedResponses)
+        [InlineData(true, null, false)]
+        [InlineData(true, "odata.continue-on-error", true)]
+        [InlineData(true, "odata.continue-on-error=true", true)]
+        [InlineData(true, "odata.continue-on-error=false", false)]
+        [InlineData(true, "continue-on-error", true)]
+        [InlineData(true, "continue-on-error=true", true)]
+        [InlineData(true, "continue-on-error=false", false)]
+        [InlineData(false, null, true)]
+        [InlineData(false, "odata.continue-on-error", true)]
+        [InlineData(false, "odata.continue-on-error=true", true)]
+        [InlineData(false, "odata.continue-on-error=false", true)]
+        [InlineData(false, "continue-on-error", true)]
+        [InlineData(false, "continue-on-error=true", true)]
+        [InlineData(false, "continue-on-error=false", true)]
+        public async Task ProcessBatchAsync_ContinueOnError(bool enableContinueOnError, string preferenceHeader, bool hasThirdResponse)
         {
             // Arrange
-            MockHttpServer server = new MockHttpServer(async request =>
+            RequestDelegate handler = async context =>
             {
-                string responseContent = request.RequestUri.AbsoluteUri;
-                string content = "";
-                if (request.Content != null)
+                HttpRequest request = context.Request;
+                string responseContent = request.GetDisplayUrl();
+                string content = request.ReadBody();
+                if (!string.IsNullOrEmpty(content))
                 {
-                    content = await request.Content.ReadAsStringAsync();
-                    if (!String.IsNullOrEmpty(content))
-                    {
-                        responseContent += "," + content;
-                    }
+                    responseContent += "," + content;
                 }
-                HttpResponseMessage responseMessage = new HttpResponseMessage { Content = new StringContent(responseContent) };
+
+                HttpResponse response = context.Response;
                 if (content.Equals("foo"))
                 {
-                    responseMessage.StatusCode = HttpStatusCode.BadRequest;
+                    response.StatusCode = StatusCodes.Status400BadRequest;
                 }
-                return responseMessage;
-            });
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                        {
-                            Content = new StringContent("foo")
-                        })
-                    },
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                    {
-                        Content = new StringContent("bar")
-                    }),
-                }
+
+                await response.WriteAsync(responseContent);
             };
-            var enableContinueOnErrorconfig = new HttpConfiguration();
-            enableContinueOnErrorconfig.EnableODataDependencyInjectionSupport();
-            enableContinueOnErrorconfig.EnableContinueOnErrorHeader();
-            if(enableContinueOnError)
-                batchRequest.SetConfiguration(enableContinueOnErrorconfig);
-            if (!string.IsNullOrEmpty(preferenceHeader))
-                batchRequest.Headers.Add("prefer", preferenceHeader);
-            batchRequest.EnableHttpDependencyInjectionSupport();
+
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+
+            string batchRequest = @"--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1948857409
+
+GET / HTTP/1.1
+Host: example.com
+
+
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: multipart/mixed; boundary=""3c4d5753-d325-4806-8c80-38f4a5fbe523""
+
+--3c4d5753-d325-4806-8c80-38f4a5fbe523
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1856004745
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+foo
+--3c4d5753-d325-4806-8c80-38f4a5fbe523--
+
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: -2010824035
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+bar
+--d3df74a8-8212-4c2a-b4fb-d713a4ba383e--
+";
+
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
+            httpContext.Request.ContentLength = 827;
+
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
+
+            if (preferenceHeader != null)
+            {
+                httpContext.Request.Headers.Add("prefer", preferenceHeader);
+            }
+
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.RouteName = "odata";
 
             // Act
-            var response = await batchHandler.ProcessBatchAsync(batchRequest, CancellationToken.None);
-            var batchContent = Assert.IsType<ODataBatchContent>(response.Content);
-            var batchResponses = batchContent.Responses.ToArray();
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+            string responseBody = httpContext.Response.ReadBody();
 
             // Assert
-            Assert.Equal(expectedResponses, batchResponses.Length);
+            Assert.NotNull(responseBody);
+
+            // #1 response
+            Assert.Contains("http://example.com/", responseBody);
+
+            // #2 bad response
+            Assert.Contains("Bad Request", responseBody);
+            Assert.Contains("http://example.com/values,foo", responseBody);
+
+            // #3 response
+            if (hasThirdResponse)
+            {
+                Assert.Contains("http://example.com/values,bar", responseBody);
+            }
+            else
+            {
+                Assert.DoesNotContain("http://example.com/values,bar", responseBody);
+            }
         }
 
         [Fact]
         public async Task ProcessBatchAsync_DoesNotCopyContentHeadersToGetAndDelete()
         {
-            MockHttpServer server = new MockHttpServer(request =>
+            // Arrange
+            string batchRequest = @"
+--40e2c6b6-e6ce-43aa-9985-ddc12dc4bb9b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 483818399
+
+GET / HTTP/1.1
+Host: example.com
+
+
+--40e2c6b6-e6ce-43aa-9985-ddc12dc4bb9b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1035669256
+
+DELETE / HTTP/1.1
+Host: example.com
+
+
+--40e2c6b6-e6ce-43aa-9985-ddc12dc4bb9b
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 632310651
+
+POST /values HTTP/1.1
+Host: example.com
+Content-Type: text/plain; charset=utf-8
+
+bar
+--40e2c6b6-e6ce-43aa-9985-ddc12dc4bb9b--
+";
+
+            RequestDelegate handler = async context =>
             {
-                string responseContent = $"{request.Method},{request.Content?.Headers.ContentLength},{request.Content?.Headers.ContentType}";
-                return new HttpResponseMessage { Content = new StringContent(responseContent) };
-            });
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(server);
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Delete, "http://example.com/")),
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                    {
-                        Content = new StringContent("bar")
-                    }),
-                }
+                HttpRequest request = context.Request;
+                string responseContent = $"{request.Method},{request.ContentLength},{request.ContentType}";
+                await context.Response.WriteAsync(responseContent);
             };
-            batchRequest.EnableHttpDependencyInjectionSupport();
 
-            var response = await batchHandler.ProcessBatchAsync(batchRequest, CancellationToken.None);
-            var batchContent = Assert.IsType<ODataBatchContent>(response.Content);
-            var subResponses = batchContent.Responses.ToArray();
-            var getResponse = (OperationResponseItem)subResponses[0];
-            var deleteResponse = (OperationResponseItem)subResponses[1];
-            var postResponse = (OperationResponseItem)subResponses[2];
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=40e2c6b6-e6ce-43aa-9985-ddc12dc4bb9b";
+            httpContext.Request.ContentLength = requestBytes.Length;
 
-            Assert.Equal(3, subResponses.Length);
-            Assert.Equal("GET,0,", await getResponse.Response.Content.ReadAsStringAsync());
-            Assert.Equal("DELETE,0,", await deleteResponse.Response.Content.ReadAsStringAsync());
-            Assert.Equal("POST,3,text/plain; charset=utf-8", await postResponse.Response.Content.ReadAsStringAsync());
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.RouteName = "odata";
+
+            // Act
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+            string responseBody = httpContext.Response.ReadBody();
+
+            // Assert
+            Assert.NotNull(responseBody);
+            Assert.Contains("GET,0,", responseBody);
+            Assert.Contains("DELETE,0,", responseBody);
+            Assert.Contains("POST,3,text/plain; charset=utf-8", responseBody);
         }
 
         [Fact]
         public async Task ExecuteRequestMessagesAsync_CallsInvokerForEachRequest()
         {
-            MockHttpServer server = new MockHttpServer(async request =>
+            // Arrange
+            RequestDelegate handler = async context =>
             {
-                string responseContent = request.RequestUri.AbsoluteUri;
-                if (request.Content != null)
+                HttpRequest request = context.Request;
+                string responseContent = request.GetDisplayUrl();
+                string content = request.ReadBody();
+                if (!string.IsNullOrEmpty(content))
                 {
-                    string content = await request.Content.ReadAsStringAsync();
-                    if (!String.IsNullOrEmpty(content))
-                    {
-                        responseContent += "," + content;
-                    }
+                    responseContent += "," + content;
                 }
-                return new HttpResponseMessage { Content = new StringContent(responseContent) };
-            });
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(server);
+
+                context.Response.Body = new MemoryStream();
+                await context.Response.WriteAsync(responseContent);
+            };
+
             ODataBatchRequestItem[] requests = new ODataBatchRequestItem[]
             {
-                new OperationRequestItem(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                new ChangeSetRequestItem(new HttpRequestMessage[]
+                new OperationRequestItem(HttpContextHelper.Create("Get", "http://example.com/")),
+                new ChangeSetRequestItem(new HttpContext[]
                 {
-                    new HttpRequestMessage(HttpMethod.Post, "http://example.com/values")
-                    {
-                        Content = new StringContent("foo")
-                    }
+                    HttpContextHelper.Create("Post", "http://example.com/values", "foo", "text/plan")
                 })
             };
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
 
-            var responses = await batchHandler.ExecuteRequestMessagesAsync(requests, CancellationToken.None);
-            var response0 = (OperationResponseItem)responses[0];
-            var response1 = (ChangeSetResponseItem)responses[1];
+            // Act
+            IList<ODataBatchResponseItem> responses = await batchHandler.ExecuteRequestMessagesAsync(requests, handler);
 
+            // Assert
             Assert.Equal(2, responses.Count);
-            Assert.Equal("http://example.com/", await response0.Response.Content.ReadAsStringAsync());
-            Assert.Equal("http://example.com/values,foo", await response1.Responses.First().Content.ReadAsStringAsync());
+
+            // #1
+            OperationResponseItem response0 = Assert.IsType<OperationResponseItem>(responses[0]);
+            Assert.Equal("http://example.com/", response0.Context.Response.ReadBody());
+
+            // #2
+            ChangeSetResponseItem response1 = Assert.IsType<ChangeSetResponseItem>(responses[1]);
+            HttpContext subContext = Assert.Single(response1.Contexts);
+            Assert.Equal("http://example.com/values,foo", response1.Contexts.First().Response.ReadBody());
         }
 
-        [Fact]
-        public async Task ExecuteRequestMessagesAsync_DisposesResponseInCaseOfException()
+        private static IServiceProvider BuildServiceProvider(Action<ODataOptions> setupAction)
         {
-            List<MockHttpResponseMessage> responses = new List<MockHttpResponseMessage>();
-            MockHttpServer server = new MockHttpServer(request =>
-            {
-                if (request.Method == HttpMethod.Put)
-                {
-                    throw new InvalidOperationException();
-                }
-                var response = new MockHttpResponseMessage();
-                responses.Add(response);
-                return response;
-            });
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(server);
-            ODataBatchRequestItem[] requests = new ODataBatchRequestItem[]
-            {
-                new OperationRequestItem(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                new OperationRequestItem(new HttpRequestMessage(HttpMethod.Post, "http://example.com/")),
-                new OperationRequestItem(new HttpRequestMessage(HttpMethod.Put, "http://example.com/")),
-            };
-
-            await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
-                () => batchHandler.ExecuteRequestMessagesAsync(requests, CancellationToken.None));
-
-            Assert.Equal(2, responses.Count);
-            foreach (var response in responses)
-            {
-                Assert.True(response.IsDisposed);
-            }
+            IServiceCollection services = new ServiceCollection();
+            services.Configure(setupAction);
+            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
+            return services.BuildServiceProvider();
         }
 
         [Fact]
         public async Task ExecuteRequestMessagesAsync_Throws_IfRequestsIsNull()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => batchHandler.ExecuteRequestMessagesAsync(null, CancellationToken.None),
-                "requests");
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.ExecuteRequestMessagesAsync(null, null), "requests");
         }
 
         [Fact]
         public async Task ParseBatchRequestsAsync_Throws_IfRequestIsNull()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => batchHandler.ParseBatchRequestsAsync(null, CancellationToken.None),
-                "request");
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.ParseBatchRequestsAsync(null), "context");
         }
 
         [Fact]
         public async Task ParseBatchRequestsAsync_Returns_RequestsFromMultipartContent()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values"))
-                    }
-                }
-            };
-            batchRequest.EnableHttpDependencyInjectionSupport();
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            string batchRequest = @"
+--7289e6c2-adbd-4dd8-bfb1-f36099442947
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1430195875
 
-            IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(batchRequest, CancellationToken.None);
+GET / HTTP/1.1
+Host: example.com
 
+
+--7289e6c2-adbd-4dd8-bfb1-f36099442947
+Content-Type: multipart/mixed;boundary=e58fa556-67f1-4180-b04e-e28df22ac4d9
+
+--e58fa556-67f1-4180-b04e-e28df22ac4d9
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 675766617
+
+POST /values HTTP/1.1
+Host: example.com
+
+
+--e58fa556-67f1-4180-b04e-e28df22ac4d9--
+
+--7289e6c2-adbd-4dd8-bfb1-f36099442947--
+";
+
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=7289e6c2-adbd-4dd8-bfb1-f36099442947";
+            httpContext.Request.ContentLength = requestBytes.Length;
+
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.RouteName = "odata";
+
+            // Act
+            IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
+
+            // Assert
             Assert.Equal(2, requests.Count);
 
-            var operationRequest = ((OperationRequestItem)requests[0]).Request;
-            Assert.Equal(HttpMethod.Get, operationRequest.Method);
-            Assert.Equal("http://example.com/", operationRequest.RequestUri.AbsoluteUri);
+            var operationContext = Assert.IsType<OperationRequestItem>(requests[0]).Context;
+            Assert.Equal("GET", operationContext.Request.Method);
+            Assert.Equal("http://example.com/", operationContext.Request.GetDisplayUrl());
 
-            var changeSetRequest = ((ChangeSetRequestItem)requests[1]).Requests.First();
-            Assert.Equal(HttpMethod.Post, changeSetRequest.Method);
-            Assert.Equal("http://example.com/values", changeSetRequest.RequestUri.AbsoluteUri);
+            var changeSetContexts = Assert.IsType<ChangeSetRequestItem>(requests[1]).Contexts;
+            var changeSetContext = Assert.Single(changeSetContexts);
+            Assert.Equal("POST", changeSetContext.Request.Method);
+            Assert.Equal("http://example.com/values", changeSetContext.Request.GetDisplayUrl());
         }
 
         [Fact]
         public async Task ParseBatchRequestsAsync_CopiesPropertiesFromRequest_WithoutExcludedProperties()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage batchRequest = new HttpRequestMessage(HttpMethod.Post, "http://example.com/$batch")
-            {
-                Content = new MultipartContent("mixed")
-                {
-                    ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Get, "http://example.com/")),
-                    new MultipartContent("mixed") // ChangeSet
-                    {
-                        ODataBatchRequestHelper.CreateODataRequestContent(new HttpRequestMessage(HttpMethod.Post, "http://example.com/values"))
-                    }
-                }
-            };
-            batchRequest.Properties.Add("foo", "bar");
-            batchRequest.SetRouteData(new HttpRouteData(new HttpRoute()));
-            batchRequest.RegisterForDispose(new StringContent(String.Empty));
-            batchRequest.EnableHttpDependencyInjectionSupport();
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            string batchRequest = @"
+--7289e6c2-adbd-4dd8-bfb1-f36099442947
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1430195875
 
-            IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(batchRequest, CancellationToken.None);
+GET / HTTP/1.1
+Host: example.com
 
+
+--7289e6c2-adbd-4dd8-bfb1-f36099442947
+Content-Type: multipart/mixed;boundary=e58fa556-67f1-4180-b04e-e28df22ac4d9
+
+--e58fa556-67f1-4180-b04e-e28df22ac4d9
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 675766617
+
+POST /values HTTP/1.1
+Host: example.com
+
+
+--e58fa556-67f1-4180-b04e-e28df22ac4d9--
+
+--7289e6c2-adbd-4dd8-bfb1-f36099442947--
+";
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=7289e6c2-adbd-4dd8-bfb1-f36099442947";
+            httpContext.Request.ContentLength = requestBytes.Length;
+
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.RouteName = "odata";
+
+            httpContext.Features[typeof(DefaultODataBatchHandlerTest)] = "bar";
+
+            // Act
+            IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
+
+            // Assert
             Assert.Equal(2, requests.Count);
 
-            var operationRequest = ((OperationRequestItem)requests[0]).Request;
-            Assert.Equal(HttpMethod.Get, operationRequest.Method);
-            Assert.Equal("http://example.com/", operationRequest.RequestUri.AbsoluteUri);
-            Assert.Equal("bar", operationRequest.Properties["foo"]);
-            Assert.Null(operationRequest.GetRouteData());
-            Assert.Same(operationRequest, operationRequest.GetUrlHelper().Request);
-            Assert.Empty(operationRequest.GetResourcesForDisposal());
+            var operationContext = ((OperationRequestItem)requests[0]).Context;
+            Assert.Equal("GET", operationContext.Request.Method);
+            Assert.Equal("http://example.com/", operationContext.Request.GetDisplayUrl());
+            Assert.Equal("bar", operationContext.Features[typeof(DefaultODataBatchHandlerTest)]);
 
-            var changeSetRequest = ((ChangeSetRequestItem)requests[1]).Requests.First();
-            Assert.Equal(HttpMethod.Post, changeSetRequest.Method);
-            Assert.Equal("http://example.com/values", changeSetRequest.RequestUri.AbsoluteUri);
-            Assert.Equal("bar", changeSetRequest.Properties["foo"]);
-            Assert.Null(changeSetRequest.GetRouteData());
-            Assert.Same(operationRequest, operationRequest.GetUrlHelper().Request);
-            Assert.Empty(changeSetRequest.GetResourcesForDisposal());
+            var changeSetContext = ((ChangeSetRequestItem)requests[1]).Contexts.First();
+            Assert.Equal("POST", changeSetContext.Request.Method);
+            Assert.Equal("http://example.com/values", changeSetContext.Request.GetDisplayUrl());
+            Assert.Equal("bar", operationContext.Features[typeof(DefaultODataBatchHandlerTest)]);
         }
 
         [Fact]
-        public void ValidateRequest_Throws_IfResponsesIsNull()
+        public void ValidateRequest_Throws_IfRequestIsNull()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            ExceptionAssert.ThrowsArgumentNull(
-                () => batchHandler.ValidateRequest(null),
-                "request");
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => batchHandler.ValidateRequest(null), "request");
         }
 
         [Fact]
-        public async Task ValidateRequest_Throws_IfRequestContentIsNull()
+        public async Task ValidateRequest_GetBadResponse_IfRequestContentIsNull()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage request = new HttpRequestMessage();
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            HttpContext context = new DefaultHttpContext();
+            HttpRequest request = context.Request;
+            request.Body = null;
+            context.Response.Body = new MemoryStream();
 
-            HttpResponseException errorResponse = ExceptionAssert.Throws<HttpResponseException>(
-                () => batchHandler.ValidateRequest(request));
-            Assert.Equal(HttpStatusCode.BadRequest, errorResponse.Response.StatusCode);
-            Assert.Equal("The 'Content' property on the batch request cannot be null.",
-                (await errorResponse.Response.Content.ReadAsAsync<HttpError>()).Message);
+            // Act
+            await batchHandler.ValidateRequest(request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.Equal("The 'Body' property on the batch request cannot be null.", context.Response.ReadBody());
         }
 
         [Fact]
-        public async Task ValidateRequest_Throws_IfRequestContentTypeIsNull()
+        public async Task ValidateRequest_GetBadResponse_IfRequestContentTypeIsNull()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage request = new HttpRequestMessage();
-            request.Content = new StringContent(String.Empty);
-            request.Content.Headers.ContentType = null;
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            HttpContext context = new DefaultHttpContext();
+            HttpRequest request = context.Request;
+            request.Body = new MemoryStream();
+            request.ContentType = null;
+            context.Response.Body = new MemoryStream();
 
-            HttpResponseException errorResponse = ExceptionAssert.Throws<HttpResponseException>(
-                () => batchHandler.ValidateRequest(request));
-            Assert.Equal(HttpStatusCode.BadRequest, errorResponse.Response.StatusCode);
-            Assert.Equal("The batch request must have a \"Content-Type\" header.",
-                (await errorResponse.Response.Content.ReadAsAsync<HttpError>()).Message);
+            // Act
+            await batchHandler.ValidateRequest(request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.Equal("The batch request must have a \"Content-Type\" header.", context.Response.ReadBody());
         }
 
         [Fact]
         public async Task ValidateRequest_Throws_IfRequestMediaTypeIsWrong()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage request = new HttpRequestMessage();
-            request.Content = new StringContent(String.Empty);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("text/json");
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            HttpContext context = new DefaultHttpContext();
+            context.Request.Body = new MemoryStream();
+            context.Request.ContentType = "text/json";
+            context.Response.Body = new MemoryStream();
 
-            HttpResponseException errorResponse = ExceptionAssert.Throws<HttpResponseException>(
-                () => batchHandler.ValidateRequest(request));
-            Assert.Equal(HttpStatusCode.BadRequest, errorResponse.Response.StatusCode);
-            Assert.Equal("The batch request must have 'multipart/mixed' or 'application/json' as the media type.",
-                (await errorResponse.Response.Content.ReadAsAsync<HttpError>()).Message);
+            // Act
+            await batchHandler.ValidateRequest(context.Request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.Equal("The batch request must have 'multipart/mixed' or 'application/json' as the media type.", context.Response.ReadBody());
         }
 
         [Fact]
         public async Task ValidateRequest_Throws_IfRequestContentTypeDoesNotHaveBoundary()
         {
-            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler(new HttpServer());
-            HttpRequestMessage request = new HttpRequestMessage();
-            request.Content = new StringContent(String.Empty);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("multipart/mixed");
+            // Arrange
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            HttpContext context = new DefaultHttpContext();
+            context.Request.Body = new MemoryStream();
+            context.Request.ContentType = "multipart/mixed";
+            context.Response.Body = new MemoryStream();
 
-            HttpResponseException errorResponse = ExceptionAssert.Throws<HttpResponseException>(
-                () => batchHandler.ValidateRequest(request));
-            Assert.Equal(HttpStatusCode.BadRequest, errorResponse.Response.StatusCode);
-            Assert.Equal("The batch request must have a boundary specification in the \"Content-Type\" header.",
-                (await errorResponse.Response.Content.ReadAsAsync<HttpError>()).Message);
+            // Act
+            await batchHandler.ValidateRequest(context.Request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.Equal("The batch request must have a boundary specification in the \"Content-Type\" header.", context.Response.ReadBody());
         }
 
         [Fact]
         public async Task SendAsync_Works_ForBatchRequestWithInsertedEntityReferencedInAnotherRequest()
         {
+            // Arrange
+            Type[] controllers = new[] { typeof(BatchTestCustomersController), typeof(BatchTestOrdersController), };
+            var builder = new WebHostBuilder()
+                .ConfigureServices(services =>
+                {
+                    var builder = new ODataConventionModelBuilder();
+                    builder.EntitySet<BatchTestCustomer>("BatchTestCustomers");
+                    builder.EntitySet<BatchTestOrder>("BatchTestOrders");
+                    IEdmModel model = builder.GetEdmModel();
+                    services.AddOData(opt => opt.AddModel("odata", model, b => b.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton)).Expand());
+                })
+                .Configure(app =>
+                {
+                    ApplicationPartManager applicationPartManager = app.ApplicationServices.GetRequiredService<ApplicationPartManager>();
+                    applicationPartManager.ApplicationParts.Clear();
+
+                    if (controllers != null)
+                    {
+                        AssemblyPart part = new AssemblyPart(new MockAssembly(controllers));
+                        applicationPartManager.ApplicationParts.Add(part);
+                    }
+
+                    app.UseODataBatching();
+                    app.UseRouting();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    });
+                });
+
+            var server = new TestServer(builder);
+
             const string acceptJsonFullMetadata = "application/json;odata.metadata=minimal";
             const string acceptJson = "application/json";
 
-            Type[] controllers = new[] { typeof(BatchTestCustomersController), typeof(BatchTestOrdersController), };
-            var server = TestServerFactory.Create(controllers, (config) =>
-            {
-                var builder = ODataConventionModelBuilderFactory.Create(config);
-                builder.EntitySet<BatchTestCustomer>("BatchTestCustomers");
-                builder.EntitySet<BatchTestOrder>("BatchTestOrders");
+            var client = server.CreateClient();
 
-                config.MapODataServiceRoute("odata", null, builder.GetEdmModel(), new DefaultODataBatchHandler());
-                config.Expand();
-                config.EnableDependencyInjection();
-            });
-
-            var client = TestServerFactory.CreateClient(server);
-
-            var endpoint = "http://localhost";
+            var endpoint = "http://localhost/odata";
 
             var batchRef = $"batch_{Guid.NewGuid()}";
             var changesetRef = $"changeset_{Guid.NewGuid()}";
 
             var orderId = 2;
-            var createOrderPayload = $@"{{""@odata.type"":""Microsoft.AspNet.OData.Test.Batch.BatchTestOrder"",""Id"":{orderId},""Amount"":50}}";
+            var createOrderPayload = $@"{{""@odata.type"":""Microsoft.AspNetCore.OData.Test.Batch.BatchTestOrder"",""Id"":{orderId},""Amount"":50}}";
             var createRefPayload = @"{""@odata.id"":""$3""}";
 
             var batchRequest = new HttpRequestMessage(HttpMethod.Post, $"{endpoint}/$batch");
             batchRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
-            HttpContent httpContent = new StringContent($@"
+            StringContent httpContent = new StringContent($@"
 --{batchRef}
 Content-Type: multipart/mixed; boundary={changesetRef}
 
@@ -639,22 +775,41 @@ Accept-Charset: UTF-8
         {
             var batchRef = $"batch_{Guid.NewGuid()}";
             var changesetRef = $"changeset_{Guid.NewGuid()}";
-            var endpoint = "http://localhost";
+            var endpoint = "http://localhost/odata";
             var acceptJsonFullMetadata = "application/json;odata.metadata=minimal";
             var postPayload = "Bar";
 
+
             Type[] controllers = new[] { typeof(BatchTestHeadersCustomersController) };
-            var server = TestServerFactory.Create(controllers, (config) =>
-            {
-                var builder = ODataConventionModelBuilderFactory.Create(config);
-                builder.EntitySet<BatchTestHeadersCustomer>("BatchTestHeadersCustomers");
+            var builder = new WebHostBuilder()
+                .ConfigureServices(services =>
+                {
+                    var builder = new ODataConventionModelBuilder();
+                    builder.EntitySet<BatchTestHeadersCustomer>("BatchTestHeadersCustomers");
+                    IEdmModel model = builder.GetEdmModel();
+                    services.AddOData(opt => opt.AddModel("odata", model, b => b.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton)).Expand());
+                })
+                .Configure(app =>
+                {
+                    ApplicationPartManager applicationPartManager = app.ApplicationServices.GetRequiredService<ApplicationPartManager>();
+                    applicationPartManager.ApplicationParts.Clear();
 
-                config.MapODataServiceRoute("odata", null, builder.GetEdmModel(), new DefaultODataBatchHandler());
-                config.Expand();
-                config.EnableDependencyInjection();
-            });
+                    if (controllers != null)
+                    {
+                        AssemblyPart part = new AssemblyPart(new MockAssembly(controllers));
+                        applicationPartManager.ApplicationParts.Add(part);
+                    }
 
-            var client = TestServerFactory.CreateClient(server);
+                    app.UseODataBatching();
+                    app.UseRouting();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    });
+                });
+
+            var server = new TestServer(builder);
+            var client = server.CreateClient();
 
             var batchRequest = new HttpRequestMessage(HttpMethod.Post, $"{endpoint}/$batch");
             batchRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
@@ -713,6 +868,21 @@ Accept-Charset: UTF-8
             Assert.Contains(postRequest, responseContent);
         }
 
+        private static IServiceProvider BuildServiceProvider()
+        {
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddSingleton(new ODataMessageWriterSettings
+            {
+                EnableMessageStreamDisposal = false,
+                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+            });
+
+            services.AddSingleton<ODataMediaTypeResolver>();
+            services.AddSingleton<ODataMessageInfo>();
+
+            return services.BuildServiceProvider();
+        }
     }
 
     public class BatchTestCustomer
@@ -763,7 +933,7 @@ Accept-Charset: UTF-8
         public decimal Amount { get; set; }
     }
 
-    public class BatchTestCustomersController : TestODataController
+    public class BatchTestCustomersController : ODataController
     {
         [EnableQuery]
         public IEnumerable<BatchTestCustomer> Get()
@@ -772,40 +942,40 @@ Accept-Charset: UTF-8
         }
 
         [EnableQuery]
-        public SingleResult<BatchTestCustomer> Get([FromODataUri]int key)
+        public SingleResult<BatchTestCustomer> Get([FromODataUri] int key)
         {
             return SingleResult.Create(BatchTestCustomer.Customers.Where(d => d.Id.Equals(key)).AsQueryable());
         }
 
-        public ITestActionResult CreateRef([FromODataUri]int key, [FromODataUri]string navigationProperty, [FromBody]Uri link)
+        public IActionResult CreateRef([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
         {
             var customer = BatchTestCustomer.Customers.FirstOrDefault(d => d.Id.Equals(key));
             if (customer == null)
                 return NotFound();
 
-            switch (navigationProperty)
-            {
-                case "Orders":
-                    var orderId = GetKeyFromLinkUri<int>(Request, link);
-                    var order = BatchTestOrder.Orders.FirstOrDefault(d => d.Id.Equals(orderId));
+            //switch (navigationProperty)
+            //{
+            //    case "Orders":
+            //        var orderId = GetKeyFromLinkUri<int>(Request, link);
+            //        var order = BatchTestOrder.Orders.FirstOrDefault(d => d.Id.Equals(orderId));
 
-                    if (order == null)
-                        return NotFound();
+            //        if (order == null)
+            //            return NotFound();
 
-                    if (customer.Orders == null)
-                        customer.Orders = new List<BatchTestOrder>();
-                    if (customer.Orders.FirstOrDefault(d => d.Id.Equals(orderId)) == null)
-                        customer.Orders.Add(order);
-                    break;
-                default:
-                    return BadRequest();
-            }
+            //        if (customer.Orders == null)
+            //            customer.Orders = new List<BatchTestOrder>();
+            //        if (customer.Orders.FirstOrDefault(d => d.Id.Equals(orderId)) == null)
+            //            customer.Orders.Add(order);
+            //        break;
+            //    default:
+            //        return BadRequest();
+            //}
 
             return NoContent();
         }
     }
 
-    public class BatchTestOrdersController : TestODataController
+    public class BatchTestOrdersController : ODataController
     {
         [EnableQuery]
         public IEnumerable<BatchTestOrder> Get()
@@ -813,7 +983,7 @@ Accept-Charset: UTF-8
             return BatchTestOrder.Orders;
         }
 
-        public ITestActionResult Post([FromBody]BatchTestOrder order)
+        public IActionResult Post([FromBody] BatchTestOrder order)
         {
             BatchTestOrder.Orders.Add(order);
 
@@ -821,8 +991,7 @@ Accept-Charset: UTF-8
         }
     }
 
-
-    public class BatchTestHeadersCustomersController : TestODataController
+    public class BatchTestHeadersCustomersController : ODataController
     {
         private string GetResponseString(string method)
         {
@@ -844,24 +1013,7 @@ Accept-Charset: UTF-8
             return GetResponseString("POST");
         }
     }
-#endif
 
-        private static IServiceProvider BuildServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddSingleton(new ODataMessageWriterSettings
-            {
-                EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
-            });
-
-            services.AddSingleton<ODataMediaTypeResolver>();
-            services.AddSingleton<ODataMessageInfo>();
-
-            return services.BuildServiceProvider();
-        }
-    }
     public class BatchTestHeadersCustomer
     {
         public int Id { get; set; }

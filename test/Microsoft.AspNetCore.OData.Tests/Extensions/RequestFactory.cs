@@ -2,6 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -14,8 +17,36 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
     /// <summary>
     /// A class to create HttpRequest.
     /// </summary>
-    public class RequestFactory
+    public static class RequestFactory
     {
+        public static string ReadBody(this HttpRequest request, bool multipleRead = false)
+        {
+            if (request.Body == null)
+            {
+                return "";
+            }
+
+            // Allows using several time the stream in ASP.Net Core
+            if (multipleRead)
+            {
+                request.EnableBuffering();
+            }
+
+            string requestBody = "";
+            using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+            {
+                requestBody = reader.ReadToEnd();
+            }
+
+            // Rewind, so the core is not lost when it looks the body for the request
+            if (multipleRead)
+            {
+                request.Body.Position = 0;
+            }
+
+            return requestBody;
+        }
+
         /// <summary>
         /// 
         /// </summary>
