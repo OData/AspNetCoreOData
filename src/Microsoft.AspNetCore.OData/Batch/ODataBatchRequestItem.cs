@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="context">The http context.</param>
         /// <param name="contentIdToLocationMapping">The Content-ID to Location mapping.</param>
         /// <returns></returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public static async Task SendRequestAsync(RequestDelegate handler, HttpContext context, Dictionary<string, string> contentIdToLocationMapping)
         {
             if (handler == null)
@@ -71,14 +73,18 @@ namespace Microsoft.AspNetCore.OData.Batch
                 // so we need to trap exceptions on our own. This code is similar to the
                 // ExceptionHandlerMiddleware class in AspNetCore.
                 context.Response.Clear();
-                context.Response.StatusCode = 500;
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             }
         }
 
-        private static void AddLocationHeaderToMapping(
-            HttpResponse response,
-            IDictionary<string, string> contentIdToLocationMapping,
-            string contentId)
+        /// <summary>
+        /// Routes the request.
+        /// </summary>
+        /// <param name="handler">The handler for processing a message.</param>
+        /// <returns>A <see cref="ODataBatchResponseItem"/>.</returns>
+        public abstract Task<ODataBatchResponseItem> SendRequestAsync(RequestDelegate handler);
+
+        private static void AddLocationHeaderToMapping(HttpResponse response, IDictionary<string, string> contentIdToLocationMapping, string contentId)
         {
             Contract.Assert(response != null);
             Contract.Assert(response.Headers != null);
@@ -91,12 +97,5 @@ namespace Microsoft.AspNetCore.OData.Batch
                 contentIdToLocationMapping.Add(contentId, headers.Location.AbsoluteUri);
             }
         }
-
-        /// <summary>
-        /// Routes the request.
-        /// </summary>
-        /// <param name="handler">The handler for processing a message.</param>
-        /// <returns>A <see cref="ODataBatchResponseItem"/>.</returns>
-        public abstract Task<ODataBatchResponseItem> SendRequestAsync(RequestDelegate handler);
     }
 }

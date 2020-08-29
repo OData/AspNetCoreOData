@@ -8,7 +8,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
-    /// 
+    /// CLR type cache
     /// </summary>
     internal class ClrTypeCache
     {

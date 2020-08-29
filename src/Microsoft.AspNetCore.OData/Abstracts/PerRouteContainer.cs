@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     public class PerRouteContainer : IPerRouteContainer
     {
-        private ConcurrentDictionary<string, IServiceProvider> _perRouteContainers;
+        private ConcurrentDictionary<string, IServiceProvider> _perPrefixContainers;
         private readonly IOptions<ODataOptions> _options;
 
         /// <summary>
@@ -26,7 +26,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public PerRouteContainer(IOptions<ODataOptions> options)
         {
             _options = options;
-            _perRouteContainers = new ConcurrentDictionary<string, IServiceProvider>();
             Initialize();
         }
 
@@ -38,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// 
         /// </summary>
-        public virtual IDictionary<string, IServiceProvider> Services => _perRouteContainers;
+        public virtual IDictionary<string, IServiceProvider> Services => _perPrefixContainers;
 
         /// <summary>
         /// Create a root container for a given route name.
@@ -58,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw Error.InvalidOperation(SRResources.NullContainer);
             }
 
-            _perRouteContainers.AddOrUpdate(routeName, serviceProvider, (k, v) => serviceProvider);
+            _perPrefixContainers.AddOrUpdate(routeName, serviceProvider, (k, v) => serviceProvider);
 
             return serviceProvider;
         }
@@ -71,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public virtual IServiceProvider GetServiceProvider(string routeName)
         {
             IServiceProvider rootContainer;
-            if (_perRouteContainers.TryGetValue(routeName, out rootContainer))
+            if (_perPrefixContainers.TryGetValue(routeName, out rootContainer))
             {
                 return rootContainer;
             }
@@ -112,11 +111,13 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
         internal void Initialize()
         {
-            var models = _options.Value.Models;
-            var perRoutes = _options.Value.PreRoutePrividers;
+            _perPrefixContainers = new ConcurrentDictionary<string, IServiceProvider>();
 
-            foreach (var config in perRoutes)
+            foreach (var config in _options.Value.Models)
             {
+                IEdmModel model = config.Value.Item1;
+                var serviceBuilder = config.Value.Item2;
+
                 IContainerBuilder odataContainerBuilder = null;
                 //if (_serviceProvider != null)
                 //{
@@ -143,21 +144,16 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
                 odataContainerBuilder.AddDefaultODataServices();
 
-                // RegisterDefaultConventions(odataContainerBuilder);
-
-                config.Value?.Invoke(odataContainerBuilder);
+                serviceBuilder?.Invoke(odataContainerBuilder);
 
                 // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-                odataContainerBuilder.AddService(
-                   Microsoft.OData.ServiceLifetime.Singleton,
+                odataContainerBuilder.AddService(ServiceLifetime.Singleton,
                     typeof(ODataUriResolver),
                     sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
-                IEdmModel model = models[config.Key];
-
                 odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
 
-                _perRouteContainers[config.Key] = odataContainerBuilder.BuildContainer();
+                _perPrefixContainers[config.Key] = odataContainerBuilder.BuildContainer();
             }
         }
     }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
@@ -14,104 +15,174 @@ namespace Microsoft.AspNetCore.OData
     /// Contains the details of a given OData request. These properties should all be mutable.
     /// None of these properties should ever be set to null.
     /// </summary>
-    /// <summary>
-    /// Provides programmatic configuration for the OData service.
-    /// </summary>
     public class ODataOptions
     {
+        #region Settings
         /// <summary>
         /// Gets or Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
-        /// whether to recognize keys as segments or not in DefaultODataPathHandler.
+        /// whether to recognize keys as segments or not.
+        /// By default, it supports key as segment only if the key is single key.
         /// </summary>
-        /// <remarks>Default value is unspecified (null).</remarks>
-        public ODataUrlKeyDelimiter UrlKeyDelimiter { get; set; }
+        public ODataUrlKeyDelimiter UrlKeyDelimiter { get; set; } = ODataUrlKeyDelimiter.Slash;
 
         /// <summary>
-        /// Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
+        /// Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically whether to recognize keys as segments or not.
         /// </summary>
-        public bool NullDynamicPropertyIsEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or Sets a value indicating if batch requests should continue on error.
-        /// </summary>
-        public bool EnableContinueOnErrorHeader { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the set of flags that have options for backward compatibility
-        /// </summary>
-        public CompatibilityOptions CompatibilityOptions { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool EnableAttributeRouting { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IDictionary<string, IEdmModel> Models { get; } = new Dictionary<string, IEdmModel>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IDictionary<string, Action<IContainerBuilder>> PreRoutePrividers { get; } = new Dictionary<string, Action<IContainerBuilder>>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="useAttributeRouting"></param>
-        /// <returns></returns>
-        public ODataOptions UseAttributeRouting(bool useAttributeRouting)
+        /// <param name="keyDelimiter">The key demimiter.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetUrlKeyDelimiter(ODataUrlKeyDelimiter keyDelimiter)
         {
-            EnableAttributeRouting = useAttributeRouting;
+            UrlKeyDelimiter = keyDelimiter;
             return this;
         }
 
         /// <summary>
-        /// 
+        /// Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
+        /// By default, it's true;
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        public bool OmitNullDynamicProperty { get; set; } = true;
+
+        /// <summary>
+        ///Sets a value indicating if value should be emitted for dynamic properties which are null.
+        /// </summary>
+        /// <param name="enabled">The boolean value.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetNullDynamicProperty(bool enabled)
+        {
+            OmitNullDynamicProperty = enabled;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or Sets a value indicating if batch requests should continue on error.
+        /// By default, it's false.
+        /// </summary>
+        public bool EnableContinueOnErrorHeader { get; set; }
+
+        /// <summary>
+        /// Sets a value indicating if batch requests should continue on error.
+        /// </summary>
+        /// <param name="enableContinueOnError">The boolean value.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetContinueOnErrorHeader(bool enableContinueOnError)
+        {
+            EnableContinueOnErrorHeader = enableContinueOnError;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or Sets the set of flags that have options for backward compatibility.
+        /// </summary>
+        public CompatibilityOptions CompatibilityOptions { get; set; }
+
+        /// <summary>
+        /// Sets the set of flags that have options for backward compatibility.
+        /// </summary>
+        /// <param name="enabled">The boolean value.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetCompatibilityOptions(bool enabled)
+        {
+            EnableAttributeRouting = enabled;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or Sets a value indicating if attribute routing is enabled or not.
+        /// By default, it's enabled.
+        /// </summary>
+        public bool EnableAttributeRouting { get; set; } = true;
+
+        /// <summary>
+        /// Sets a value indicating if attribute routing is enabled or not.
+        /// </summary>
+        /// <param name="enabled">The boolean value.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetAttributeRouting(bool enabled)
+        {
+            EnableAttributeRouting = enabled;
+            return this;
+        }
+        #endregion
+
+        #region Models
+
+        /// <summary>
+        /// Gets the configured Edm models.
+        /// </summary>
+        public IDictionary<string, (IEdmModel, Action<IContainerBuilder>)> Models { get; } = new Dictionary<string, (IEdmModel, Action<IContainerBuilder>)>();
+
+        /// <summary>
+        /// Gets the configured service builder.
+        /// </summary>
+        public IDictionary<string, Action<IContainerBuilder>> PrePrefixPrividers { get; } = new Dictionary<string, Action<IContainerBuilder>>();
+
+        /// <summary>
+        /// Add an Edm model without prefix.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <returns>The calling itself.</returns>
         public ODataOptions AddModel(IEdmModel model)
         {
-            return AddModel(string.Empty, model);
+            return AddModel(string.Empty, model, configureAction: null);
         }
 
         /// <summary>
-        /// 
+        /// Add a model without prefix using given batch handler.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        public ODataOptions AddModel(string name, IEdmModel model)
+        /// <param name="model">The Edm model.</param>
+        /// <param name="batchHandler">The batch handler <see cref="ODataBatchHandler"/>.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions AddModel(IEdmModel model, ODataBatchHandler batchHandler)
         {
-            return AddModel(name, model, null);
+            return AddModel(string.Empty, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
         }
 
+        /// <summary>
+        /// Add a model with prefix.
+        /// </summary>
+        /// <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions AddModel(string prefix, IEdmModel model)
+        {
+            return AddModel(prefix, model, configureAction: null);
+        }
 
         /// <summary>
-        /// Adds OData model.
+        /// Add a model with prefix using given batch handler.
         /// </summary>
-        /// <param name="name">The model name and prefix.</param>
+        /// <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="batchHandler">The $batch handler <see cref="ODataBatchHandler"/>.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions AddModel(string prefix, IEdmModel model, ODataBatchHandler batchHandler)
+        {
+            return AddModel(prefix, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
+        }
+
+        /// <summary>
+        /// Adds OData model using the service configuration.
+        /// </summary>
+        /// <param name="prefix">The model related prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="configureAction">The sub service configuration action.</param>
         /// <returns>The calling itself.</returns>
-        public ODataOptions AddModel(string name, IEdmModel model, Action<IContainerBuilder> configureAction)
+        public ODataOptions AddModel(string prefix, IEdmModel model, Action<IContainerBuilder> configureAction)
         {
             if (model == null)
             {
                 throw new ArgumentNullException(nameof(model));
             }
 
-            if (Models.ContainsKey(name))
+            if (Models.ContainsKey(prefix))
             {
-                throw new Exception($"Contains the same name for the model: {name}");
+                throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, prefix);
             }
 
-            Models[name] = model;
-            PreRoutePrividers[name] = configureAction;
+            Models[prefix] = (model, configureAction);
             return this;
         }
+        #endregion
 
         #region Globle Query settings
 
@@ -168,9 +239,9 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableSkipToken { get; set; }
 
         /// <summary>
-        /// 
+        /// Enable $expand query options.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions Expand()
         {
             EnableExpand = true;
@@ -178,9 +249,9 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Enable $select query options.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions Select()
         {
             EnableSelect = true;
@@ -188,9 +259,9 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Enable $filter query options.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions Filter()
         {
             EnableFilter = true;
@@ -198,9 +269,9 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Enable $orderby query options.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions OrderBy()
         {
             EnableOrderBy = true;
@@ -208,9 +279,9 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Enable $count query options.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions Count()
         {
             EnableCount = true;
@@ -218,9 +289,9 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Enable $skiptop query option.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The calling itself.</returns>
         public ODataOptions SkipToken()
         {
             EnableSkipToken = true;
@@ -228,21 +299,26 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// 
+        /// Setup the max top value.
         /// </summary>
-        /// <param name="maxTopValue"></param>
-        /// <returns></returns>
+        /// <param name="maxTopValue">The max top value.</param>
+        /// <returns>The calling itself.</returns>
         public ODataOptions SetMaxTop(int? maxTopValue)
         {
+            if (maxTopValue.HasValue && maxTopValue.Value < 0)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxTopValue), maxTopValue, 0);
+            }
+
             MaxTop = maxTopValue;
             return this;
         }
 
         /// <summary>
-        /// 
+        /// Build the default QueryOption settings
         /// </summary>
-        /// <returns></returns>
-        public DefaultQuerySettings BuildDefaultQuerySettings()
+        /// <returns>The default query options settings.</returns>
+        internal DefaultQuerySettings BuildDefaultQuerySettings()
         {
             DefaultQuerySettings settings = new DefaultQuerySettings();
 

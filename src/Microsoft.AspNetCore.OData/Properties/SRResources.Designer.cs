@@ -817,6 +817,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The prefix &apos;{0}&apos; was already used for other Edm model..
+        /// </summary>
+        internal static string ModelPrefixAlreadyUsed {
+            get {
+                return ResourceManager.GetString("ModelPrefixAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
         /// </summary>
         internal static string MultipleMatchingClrTypesForEdmType {
@@ -1146,6 +1155,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string PropertyMustBeTimeOfDay {
             get {
                 return ResourceManager.GetString("PropertyMustBeTimeOfDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The PropertyInfo provided must have public &apos;get&apos; and &apos;set&apos; accessor methods..
+        /// </summary>
+        internal static string PropertyMustHavePublicGetterAndSetter {
+            get {
+                return ResourceManager.GetString("PropertyMustHavePublicGetterAndSetter", resourceCulture);
             }
         }
         

@@ -217,16 +217,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
         }
-
-        private static bool HasHttpMethod(ActionModel action)
-        {
-            if (action.Attributes.Any(a => a as HttpMethodAttribute != null))
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }
 

@@ -440,6 +440,9 @@
   <data name="FunctionNotSupportedOnEnum" xml:space="preserve">
     <value>The '{0}' function cannot be applied to an enumeration-typed argument.</value>
   </data>
+  <data name="PropertyMustHavePublicGetterAndSetter" xml:space="preserve">
+    <value>The PropertyInfo provided must have public 'get' and 'set' accessor methods.</value>
+  </data>
   <data name="ConvertToEnumFailed" xml:space="preserve">
     <value>Cannot compare an enum of type '{0}' to an expression of type '{1}'.</value>
   </data>
@@ -577,5 +580,8 @@
   </data>
   <data name="SubRequestServiceProviderAlreadyExists" xml:space="preserve">
     <value>A request container already exists on the request.</value>
+  </data>
+  <data name="ModelPrefixAlreadyUsed" xml:space="preserve">
+    <value>The prefix '{0}' was already used for other Edm model.</value>
   </data>
 </root>

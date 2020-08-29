@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -538,10 +539,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else if (resourceContext.Request != null)
             {
-                ODataOptions options = resourceContext.Request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+                ODataOptions options = resourceContext.Request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
                 if (options != null)
                 {
-                    nullDynamicPropertyEnabled = options.NullDynamicPropertyIsEnabled;
+                    nullDynamicPropertyEnabled = options.OmitNullDynamicProperty;
                 }
             }
 

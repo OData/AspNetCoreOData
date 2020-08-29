@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 
 namespace Microsoft.AspNetCore.OData.Common
 {
@@ -28,6 +29,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 _setter = PropertyHelper.MakeFastPropertySetter<TStructuralType>(property);
             }
+
             _getter = PropertyHelper.MakeFastPropertyGetter(property);
         }
 
@@ -47,15 +49,15 @@ namespace Microsoft.AspNetCore.OData.Common
                 throw Error.ArgumentNull("instance");
             }
 
-            //if (_isCollection)
-            //{
-            //    DeserializationHelpers.SetCollectionProperty(instance, _property.Name, edmPropertyType: null,
-            //        value: value, clearCollection: true);
-            //}
-            //else
-            //{
-            //    _setter(instance, value);
-            //}
+            if (_isCollection)
+            {
+                DeserializationHelpers.SetCollectionProperty(instance, _property.Name, edmPropertyType: null,
+                    value: value, clearCollection: true);
+            }
+            else
+            {
+                _setter(instance, value);
+            }
         }
     }
 }

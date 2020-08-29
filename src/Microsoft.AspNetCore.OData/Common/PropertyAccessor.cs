@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Reflection;
 
 namespace Microsoft.AspNetCore.OData.Common
@@ -15,14 +16,15 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (property == null)
             {
-                throw Error.ArgumentNull("property");
+                throw new ArgumentNullException(nameof(property));
             }
+
             Property = property;
-            //if (Property.GetGetMethod() == null ||
-            //    (!TypeHelper.IsCollection(property.PropertyType) && Property.GetSetMethod() == null))
-            //{
-            //    throw Error.Argument("property", SRResources.PropertyMustHavePublicGetterAndSetter);
-            //}
+            if (Property.GetGetMethod() == null ||
+                (!TypeHelper.IsCollection(property.PropertyType) && Property.GetSetMethod() == null))
+            {
+                throw Error.Argument("property", SRResources.PropertyMustHavePublicGetterAndSetter);
+            }
         }
 
         public PropertyInfo Property
@@ -35,12 +37,14 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (from == null)
             {
-                throw Error.ArgumentNull("from");
+                throw new ArgumentNullException(nameof(from));
             }
+
             if (to == null)
             {
-                throw Error.ArgumentNull("to");
+                throw new ArgumentNullException(nameof(to));
             }
+
             SetValue(to, GetValue(from));
         }
 

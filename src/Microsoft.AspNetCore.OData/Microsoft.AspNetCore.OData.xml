@@ -1535,7 +1535,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.ClrTypeCache">
             <summary>
-            
+            CLR type cache
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation">
@@ -5273,74 +5273,119 @@
             Contains the details of a given OData request. These properties should all be mutable.
             None of these properties should ever be set to null.
             </summary>
-            <summary>
-            Provides programmatic configuration for the OData service.
-            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter">
             <summary>
             Gets or Sets the <see cref="T:Microsoft.OData.ODataUrlKeyDelimiter"/> to use while parsing, specifically
-            whether to recognize keys as segments or not in DefaultODataPathHandler.
+            whether to recognize keys as segments or not.
+            By default, it supports key as segment only if the key is single key.
             </summary>
-            <remarks>Default value is unspecified (null).</remarks>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.NullDynamicPropertyIsEnabled">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetUrlKeyDelimiter(Microsoft.OData.ODataUrlKeyDelimiter)">
+            <summary>
+            Sets the <see cref="T:Microsoft.OData.ODataUrlKeyDelimiter"/> to use while parsing, specifically whether to recognize keys as segments or not.
+            </summary>
+            <param name="keyDelimiter">The key demimiter.</param>
+            <returns>The calling itself.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.OmitNullDynamicProperty">
             <summary>
             Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
+            By default, it's true;
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetNullDynamicProperty(System.Boolean)">
+             <summary>
+            Sets a value indicating if value should be emitted for dynamic properties which are null.
+             </summary>
+             <param name="enabled">The boolean value.</param>
+             <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader">
             <summary>
             Gets or Sets a value indicating if batch requests should continue on error.
+            By default, it's false.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetContinueOnErrorHeader(System.Boolean)">
+            <summary>
+            Sets a value indicating if batch requests should continue on error.
+            </summary>
+            <param name="enableContinueOnError">The boolean value.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.CompatibilityOptions">
             <summary>
-            Gets or Sets the set of flags that have options for backward compatibility
+            Gets or Sets the set of flags that have options for backward compatibility.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetCompatibilityOptions(System.Boolean)">
+            <summary>
+            Sets the set of flags that have options for backward compatibility.
+            </summary>
+            <param name="enabled">The boolean value.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting">
             <summary>
-            
+            Gets or Sets a value indicating if attribute routing is enabled or not.
+            By default, it's enabled.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetAttributeRouting(System.Boolean)">
+            <summary>
+            Sets a value indicating if attribute routing is enabled or not.
+            </summary>
+            <param name="enabled">The boolean value.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
             <summary>
-            
+            Gets the configured Edm models.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.PreRoutePrividers">
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.PrePrefixPrividers">
             <summary>
-            
+            Gets the configured service builder.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.UseAttributeRouting(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="useAttributeRouting"></param>
-            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            
+            Add an Edm model without prefix.
             </summary>
-            <param name="model"></param>
-            <returns></returns>
+            <param name="model">The Edm model.</param>
+            <returns>The calling itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
+            <summary>
+            Add a model without prefix using given batch handler.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="batchHandler">The batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            
+            Add a model with prefix.
             </summary>
-            <param name="name"></param>
-            <param name="model"></param>
-            <returns></returns>
+            <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+            <param name="model">The Edm model.</param>
+            <returns>The calling itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
+            <summary>
+            Add a model with prefix using given batch handler.
+            </summary>
+            <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+            <param name="model">The Edm model.</param>
+            <param name="batchHandler">The $batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>
-            Adds OData model.
+            Adds OData model using the service configuration.
             </summary>
-            <param name="name">The model name and prefix.</param>
+            <param name="prefix">The model related prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="configureAction">The sub service configuration action.</param>
             <returns>The calling itself.</returns>
@@ -5385,52 +5430,52 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Expand">
             <summary>
-            
+            Enable $expand query options.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Select">
             <summary>
-            
+            Enable $select query options.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Filter">
             <summary>
-            
+            Enable $filter query options.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.OrderBy">
             <summary>
-            
+            Enable $orderby query options.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Count">
             <summary>
-            
+            Enable $count query options.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SkipToken">
             <summary>
-            
+            Enable $skiptop query option.
             </summary>
-            <returns></returns>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(System.Nullable{System.Int32})">
             <summary>
-            
+            Setup the max top value.
             </summary>
-            <param name="maxTopValue"></param>
-            <returns></returns>
+            <param name="maxTopValue">The max top value.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildDefaultQuerySettings">
             <summary>
-            
+            Build the default QueryOption settings
             </summary>
-            <returns></returns>
+            <returns>The default query options settings.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder">
             <summary>
@@ -5960,6 +6005,11 @@
               Looks up a localized string similar to The EDM model is missing on the read context. The model is required on the read context to deserialize the payload..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelPrefixAlreadyUsed">
+            <summary>
+              Looks up a localized string similar to The prefix &apos;{0}&apos; was already used for other Edm model..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleMatchingClrTypesForEdmType">
             <summary>
               Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
@@ -6143,6 +6193,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeTimeOfDay">
             <summary>
               Looks up a localized string similar to The value must be a Edm.TimeOfDay..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustHavePublicGetterAndSetter">
+            <summary>
+              Looks up a localized string similar to The PropertyInfo provided must have public &apos;get&apos; and &apos;set&apos; accessor methods..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyNotFound">

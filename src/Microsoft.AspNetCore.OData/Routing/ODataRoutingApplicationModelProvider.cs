@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             var routes = _options.Models;
             foreach (var route in routes)
             {
-                IEdmModel model = route.Value;
+                IEdmModel model = route.Value.Item1;
                 if (model == null || model.EntityContainer == null)
                 {
                     continue;
