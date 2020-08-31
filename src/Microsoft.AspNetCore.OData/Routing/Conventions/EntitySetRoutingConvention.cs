@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(CountSegmentTemplate.Instance);
 
                 template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, "Get", model, template);
+                action.AddSelector("Get", prefix, model, template);
                 return true;
             }
             else if (actionName == "Post" || actionName == $"Post{entitySet.EntityType().Name}")
@@ -128,7 +128,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castType));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, "Post", model, template);
+                action.AddSelector("Post", prefix, model, template);
                 return true;
             }
 

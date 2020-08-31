@@ -3017,24 +3017,17 @@
             type are dissimilar enough making a common version more complex than separate versions.
             </remarks>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataFormattingServiceCollectionExtensions">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions">
             <summary>
-            
+            Adds the OData formatter related services into builder.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataFormattingServiceCollectionExtensions.AddFormatter(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions.AddODataFormatter(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
             <summary>
-            
+            Adds the odata formatter related services.
             </summary>
-            <param name="builder"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataFormattingServiceCollectionExtensions.AddODataFormatter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            
-            </summary>
-            <param name="services"></param>
-            <returns></returns>
+            <param name="builder">The OData builder.</param>
+            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter">
             <summary>
@@ -8179,38 +8172,15 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions">
             <summary>
-            
+            Adds the OData query related services into the builder.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
             <summary>
-            
+            Adds the OData query related services into the odata builder.
             </summary>
-            <param name="builder"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.OData.Query.ODataQueryableOptions})">
-            <summary>
-            
-            </summary>
-            <param name="builder"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            
-            </summary>
-            <param name="services"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQuerySettings})">
-            <summary>
-            
-            </summary>
-            <param name="services"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
+            <param name="builder">The OData builder.</param>
+            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext">
             <summary>
@@ -11212,6 +11182,18 @@
             <param name="name"></param>
             <param name="model"></param>
             <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataBuilderRoutingServicesExtensions">
+            <summary>
+            Extension methods to add odata routing services to the OData builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataBuilderRoutingServicesExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+            <summary>
+            Adds the core odata routing services.
+            </summary>
+            <param name="builder">The OData builder.</param>
+            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds">
             <summary>

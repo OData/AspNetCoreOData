@@ -1,25 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.UriParser;
-using System;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
-    /// 
+    /// Adds the OData query related services into the builder.
     /// </summary>
-    public static class ODataQueryBuilderServiceExtensions
+    internal static class ODataQueryBuilderServiceExtensions
     {
         /// <summary>
-        /// 
+        /// Adds the OData query related services into the odata builder.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
+        /// <param name="builder">The OData builder.</param>
+        /// <returns>The IODataBuilder itself.</returns>
         public static IODataBuilder AddODataQuery(this IODataBuilder builder)
         {
             if (builder == null)
@@ -27,65 +26,14 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            //AddODataRoutingServices(builder.Services);
-            //builder.Services.Configure(setupAction);
+            AddODataQueryServices(builder.Services);
+
             return builder;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static IODataBuilder AddODataQuery(this IODataBuilder builder, Action<ODataQueryableOptions> setupAction)
+        static void AddODataQueryServices(IServiceCollection services)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            //AddODataRoutingServices(builder.Services);
-            //builder.Services.Configure(setupAction);
-            return builder;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddODataQuery(this IServiceCollection services)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            return services.AddODataQuery(options => { });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddODataQuery(this IServiceCollection services, Action<DefaultQuerySettings> setupAction)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            AddODataQueryServices(services, setupAction);
-
-            // services.Configure(setupAction);
-            return services;
-        }
-
-        static void AddODataQueryServices(IServiceCollection services, Action<DefaultQuerySettings> setupAction)
-        {
+            // need this?
             services.AddSingleton<ODataUriResolver>(
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 

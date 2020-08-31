@@ -12,16 +12,16 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
+    /// Adds the OData formatter related services into builder.
     /// </summary>
-    public static class ODataFormattingServiceCollectionExtensions
+    internal static class ODataFormatterServiceCollectionExtensions
     {
         /// <summary>
-        /// 
+        /// Adds the odata formatter related services.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IODataBuilder AddFormatter(this IODataBuilder builder)
+        /// <param name="builder">The OData builder.</param>
+        /// <returns>The IODataBuilder itself.</returns>
+        public static IODataBuilder AddODataFormatter(this IODataBuilder builder)
         {
             if (builder == null)
             {
@@ -30,23 +30,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             AddODataFormatterServices(builder.Services);
             return builder;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddODataFormatter(this IServiceCollection services)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            AddODataFormatterServices(services);
-            return services;
         }
 
         static void AddODataFormatterServices(IServiceCollection services)

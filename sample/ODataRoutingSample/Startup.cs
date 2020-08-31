@@ -46,8 +46,8 @@ namespace ODataRoutingSample
             //    options.Conventions.Add(new MetadataActionModelConvention());
             });
 
-            services.AddConvention<MyConvention>();
-            /*
+            /*services.AddConvention<MyConvention>();
+            
             services.AddOData()
                 .AddODataRouting(options => options
                     .AddModel(EdmModelBuilder.GetEdmModel())
