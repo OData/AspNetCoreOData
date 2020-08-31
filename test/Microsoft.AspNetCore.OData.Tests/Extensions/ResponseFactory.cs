@@ -38,5 +38,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             HttpContext context = new DefaultHttpContext();
             return context.Response;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static HttpResponse Create(int statusCode)
+        {
+            HttpContext context = new DefaultHttpContext();
+            context.Response.StatusCode = statusCode;
+            return context.Response;
+        }
     }
 }

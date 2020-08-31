@@ -72,6 +72,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="model"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static HttpRequest Create(IEdmModel model, ODataPath path)
+        {
+            HttpContext context = new DefaultHttpContext();
+            context.ODataFeature().Model = model;
+            context.ODataFeature().Path = path;
+            return context.Request;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="setupAction"></param>
         /// <returns></returns>
         public static HttpRequest Create(Action<IODataFeature> setupAction)

@@ -58,6 +58,7 @@ namespace Microsoft.AspNetCore.OData.Results
                 {
                     throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value.Value, 0);
                 }
+
                 _count = value;
             }
         }

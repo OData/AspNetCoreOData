@@ -26,12 +26,7 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <param name="entity">The updated entity.</param>
         public UpdatedODataResult(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            this._innerResult = entity;
+            this._innerResult = entity ?? throw new ArgumentNullException(nameof(entity));
         }
 
         /// <summary>
