@@ -10849,32 +10849,6 @@
             Gets the OData path template
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataFunctionParameterConstraint">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataFunctionParameterConstraint.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions},System.String,System.String,System.Boolean,System.String)">
-            <summary>
-            
-            </summary>
-            <param name="options"></param>
-            <param name="modelName"></param>
-            <param name="fullFunctionName"></param>
-            <param name="isBound"></param>
-            <param name="parameters"></param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataFunctionParameterConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
-            <summary>
-            
-            </summary>
-            <param name="httpContext"></param>
-            <param name="route"></param>
-            <param name="routeKey"></param>
-            <param name="values"></param>
-            <param name="routeDirection"></param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">
             <summary>
              Extension methods for <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
@@ -11078,17 +11052,6 @@
             </summary>
             <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingConstraintConfiguration">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingConstraintConfiguration.Configure(Microsoft.AspNetCore.Routing.RouteOptions)">
-            <summary>
-            
-            </summary>
-            <param name="options"></param>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
             <summary>
             Defines a policy that applies behaviors to the OData Uri matcher.
@@ -11147,41 +11110,6 @@
             <summary>
             Gets the OData path template
             </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptionsBuilder">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions.EnableAttributeRouting">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions.Models">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            
-            </summary>
-            <param name="name"></param>
-            <param name="model"></param>
-            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataBuilderRoutingServicesExtensions">
             <summary>
