@@ -33,10 +33,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
         protected static void UpdateServices(IServiceCollection services)
         {
             IEdmModel model = IsofEdmModel.GetEdmModel();
-            services.AddOData()
-                .AddODataRouting(options => options.AddModel("odata", model));
-
-            services.AddODataFormatter();
+            services.AddOData(options => options.AddModel("odata", model));
         }
 
         protected static void UpdateConfigure(IApplicationBuilder app)

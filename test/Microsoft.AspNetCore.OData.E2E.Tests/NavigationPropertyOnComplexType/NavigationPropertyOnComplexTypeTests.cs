@@ -30,10 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         protected static void UpdateServices(IServiceCollection services)
         {
             IEdmModel model = ModelGenerator.GetConventionalEdmModel();
-            services.AddOData()
-                .AddODataRouting(options => options.AddModel("odata", model));
-
-            services.AddODataFormatter();
+            services.AddOData(options => options.AddModel("odata", model));
         }
 
         protected static void UpdateConfigure(IApplicationBuilder app)

@@ -4,7 +4,6 @@
 using System;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
@@ -20,7 +19,7 @@ using Microsoft.OData.ModelBuilder;
 namespace Microsoft.AspNetCore.OData
 {
     /// <summary>
-    /// Provides extension methods to add odata services.
+    /// Provides extension methods to add OData services.
     /// </summary>
     public static class ODataServiceCollectionExtensions
     {
@@ -31,24 +30,16 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>An <see cref="IODataBuilder"/> that can be used to further configure the OData services.</returns>
         public static IODataBuilder AddOData(this IServiceCollection services)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddCoreOData();
-            // services.AddSingleton<ODataOptions>();
-
-            return new DefaultODataBuilder(services);
+            return services.AddOData(opt => { });
         }
 
         /// <summary>
-        /// 
+        /// Adds services required for OData requests.
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with.</param>
+        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
+        public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
         {
             if (services == null)
             {
@@ -60,92 +51,72 @@ namespace Microsoft.AspNetCore.OData
                 throw new ArgumentNullException(nameof(setupAction));
             }
 
-            services.AddCoreOData();
-            services.Configure(setupAction);
-            return services;
+            IODataBuilder builder = new DefaultODataBuilder(services);
+            builder.AddCoreOData();
+            builder.Services.Configure(setupAction);
+
+            return builder;
         }
 
         /// <summary>
-        /// 
+        /// Adds OData routing convention.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddConvention<T>(this IServiceCollection services)
+        /// <typeparam name="T">The routing convention type.</typeparam>
+        /// <param name="builder">The OData service builder.</param>
+        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
+        public static IODataBuilder AddConvention<T>(this IODataBuilder builder)
             where T : class, IODataControllerActionConvention
         {
-            services.TryAddEnumerable(
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.Services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, T>());
 
-            return services;
+            return builder;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IODataBuilder AddODataRouting(this IODataBuilder builder)
+        private static void AddCoreOData(this IODataBuilder builder)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            //AddODataRoutingServices(builder.Services);
-            //builder.Services.Configure(setupAction);
-            return builder;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static IODataBuilder AddODataRouting(this IODataBuilder builder, Action<ODataRoutingOptions> setupAction)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            AddODataRoutingServices(builder.Services);
-            builder.Services.Configure(setupAction);
-            return builder;
-        }
-
-        private static void AddCoreOData(this IServiceCollection services)
-        {
+            IServiceCollection services = builder.Services;
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
             services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
             // Setup per-route dependency injection. When routes are added, additional
             // per-route classes will be injected, such as IEdmModel and IODataRoutingConventions.
-            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
+            services.TryAddSingleton<IPerRouteContainer, PerRouteContainer>();
 
             // Formatter
             services.AddODataFormatter();
 
             // Routing related services
-            services.AddODataRoutingServices();
+            builder.AddODataRoutingServices();
 
             // Query
             services.AddODataQuery();
 
-            services.AddSingleton(sp =>
+            services.TryAddSingleton(sp =>
             {
                 ODataOptions options = sp.GetRequiredService<IOptions<ODataOptions>>().Value;
                 return options.BuildDefaultQuerySettings();
             });
         }
 
-        static void AddODataRoutingServices(this IServiceCollection services)
+        static void AddODataRoutingServices(this IODataBuilder builder)
         {
-            if (services == null)
+            if (builder == null)
             {
-                throw new ArgumentNullException(nameof(services));
+                throw new ArgumentNullException(nameof(builder));
             }
+
+            IServiceCollection services = builder.Services;
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<RouteOptions>, ODataRoutingConstraintConfiguration>());
@@ -207,8 +178,8 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IODataControllerActionConvention, AttributeRoutingConvention>());
 
-            services.AddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
-            services.AddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
+            services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
+            services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
         }
     }
 }

@@ -5477,29 +5477,9 @@
             </summary>
             <returns>The default query options settings.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder">
-            <summary>
-            Contains the details of a given OData request. These properties should all be mutable.
-            None of these properties should ever be set to null.
-            </summary>
-            <summary>
-            Provides programmatic configuration for the OData service.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptionsBuilder.#ctor(Microsoft.AspNetCore.OData.ODataOptions)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.ODataOptionsBuilder" /> class.
-            </summary>
-            <param name="options"> The options to be configured. </param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptionsBuilder.Options">
-            <summary>
-            Gets the options being configured.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
             <summary>
-            Provides extension methods to add odata services.
+            Provides extension methods to add OData services.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
@@ -5511,34 +5491,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
             <summary>
-            
+            Adds services required for OData requests.
             </summary>
-            <param name="services"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
+            <param name="setupAction">The OData options to configure the services with.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddConvention``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddConvention``1(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
             <summary>
-            
+            Adds OData routing convention.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="services"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            
-            </summary>
-            <param name="builder"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.OData.Routing.ODataRoutingOptions})">
-            <summary>
-            
-            </summary>
-            <param name="builder"></param>
-            <param name="setupAction"></param>
-            <returns></returns>
+            <typeparam name="T">The routing convention type.</typeparam>
+            <param name="builder">The OData service builder.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataUriFunctions">
             <summary>
