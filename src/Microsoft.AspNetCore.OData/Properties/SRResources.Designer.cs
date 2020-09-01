@@ -583,6 +583,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The input function &apos;{0}&apos; is not a bound function..
+        /// </summary>
+        internal static string FunctionIsNotBound {
+            get {
+                return ResourceManager.GetString("FunctionIsNotBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
         /// </summary>
         internal static string FunctionNotBoundToCollectionOfEntity {
@@ -1263,6 +1272,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string RequestNotActionInvocation {
             get {
                 return ResourceManager.GetString("RequestNotActionInvocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The input parameters &apos;{0}&apos; is not subset of function parameters &apos;{1}&apos;..
+        /// </summary>
+        internal static string RequiredParametersNotSubsetOfFunctionParameters {
+            get {
+                return ResourceManager.GetString("RequiredParametersNotSubsetOfFunctionParameters", resourceCulture);
             }
         }
         

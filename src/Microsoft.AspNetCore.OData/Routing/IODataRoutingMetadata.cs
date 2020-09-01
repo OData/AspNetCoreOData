@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -21,6 +22,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the Edm model.
         /// </summary>
         IEdmModel Model { get; }
+
+        /// <summary>
+        /// Gets the supported Http methods.
+        /// </summary>
+        ISet<string> HttpMethods { get; }
 
         /// <summary>
         /// Gets the OData path template

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <summary>
         /// Gets a value that determines the order of this policy.
         /// </summary>
-        public override int Order => 1000 - 102;
+        public override int Order => 900;
 
         /// <summary>
         /// Returns a value that indicates whether the matcher applies to any endpoint in endpoints.
@@ -53,6 +54,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>The task.</returns>
         public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
         {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
             // The goal of this method is to perform the final matching:
             // Map between route values matched by the template and the ones we want to expose to the action for binding. 
             // (tweaking the route values is fine here)
@@ -60,40 +66,34 @@ namespace Microsoft.AspNetCore.OData.Routing
             // Perform overload resolution for functions by looking at the candidates and their metadata.
             for (var i = 0; i < candidates.Count; i++)
             {
-                ref var candidate = ref candidates[i];
+                ref CandidateState candidate = ref candidates[i];
                 if (!candidates.IsValidCandidate(i))
                 {
                     continue;
                 }
 
-                var oDataMetadata = candidate.Endpoint.Metadata.OfType<IODataRoutingMetadata>().FirstOrDefault();
-                if (oDataMetadata == null)
+                IODataRoutingMetadata metadata = candidate.Endpoint.Metadata.OfType<IODataRoutingMetadata>().FirstOrDefault();
+                if (metadata == null)
                 {
                     continue;
                 }
 
-                ODataHttpMethodMetadata httpMethodMetadata = candidate.Endpoint.Metadata.OfType<ODataHttpMethodMetadata>().FirstOrDefault();
-                if (httpMethodMetadata != null)
+                // Check the http method
+                if (metadata.HttpMethods != null && !metadata.HttpMethods.Contains(httpContext.Request.Method))
                 {
-                    if (!httpMethodMetadata.Methods.Contains(httpContext.Request.Method))
-                    {
-                        candidates.SetValidity(i, false);
-                        continue;
-                    }
+                    candidates.SetValidity(i, false);
+                    continue;
                 }
 
                 ODataTemplateTranslateContext translatorContext =
-                    new ODataTemplateTranslateContext(httpContext, candidate.Values, oDataMetadata.Model);
+                    new ODataTemplateTranslateContext(httpContext, candidate.Values, metadata.Model);
 
-                ODataPath odataPath = _translator.Translate(oDataMetadata.Template, translatorContext);
+                ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                 if (odataPath != null)
                 {
-                    IODataFeature odata = httpContext.ODataFeature();
-                    odata.Model = oDataMetadata.Model;
-                    odata.Path = odataPath;
-
-                    // Double confirm whether it's required or not?
-                    //candidates.SetValidity(i, true);
+                    IODataFeature odataFeature = httpContext.ODataFeature();
+                    odataFeature.Model = metadata.Model;
+                    odataFeature.Path = odataPath;
                 }
                 else
                 {

@@ -18,6 +18,22 @@ namespace Microsoft.AspNetCore.OData.Edm
     internal static class EdmHelpers
     {
         /// <summary>
+        /// Converts the <see cref="IEdmType"/> to <see cref="IEdmCollectionType"/>.
+        /// </summary>
+        /// <param name="edmType">The given Edm type.</param>
+        /// <param name="isNullable">Nullable or not.</param>
+        /// <returns>The collection type.</returns>
+        public static IEdmCollectionType ToCollection(this IEdmType edmType, bool isNullable)
+        {
+            if (edmType == null)
+            {
+                throw new ArgumentNullException(nameof(edmType));
+            }
+
+            return new EdmCollectionType(edmType.ToEdmTypeReference(isNullable));
+        }
+
+        /// <summary>
         /// Converts an Edm Type to Edm type reference.
         /// </summary>
         /// <param name="edmType">The Edm type.</param>

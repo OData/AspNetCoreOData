@@ -89,6 +89,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (actionName == "Get" || actionName == $"Get{entitySet.Name}")
             {
+                IEdmCollectionType castCollectionType = castType.ToCollection(true);
+                IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+
                 // GET ~/Customers or GET ~/Customers/Ns.VipCustomer
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
                 {
@@ -96,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 };
                 if (castType != null)
                 {
-                    segments.Add(new CastSegmentTemplate(castType));
+                    segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector(prefix, model, template);
@@ -108,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 };
                 if (castType != null)
                 {
-                    segments.Add(new CastSegmentTemplate(castType));
+                    segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 segments.Add(CountSegmentTemplate.Instance);
 
@@ -125,7 +128,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 };
                 if (castType != null)
                 {
-                    segments.Add(new CastSegmentTemplate(castType));
+                    IEdmCollectionType castCollectionType = castType.ToCollection(true);
+                    IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+                    segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector("Post", prefix, model, template);

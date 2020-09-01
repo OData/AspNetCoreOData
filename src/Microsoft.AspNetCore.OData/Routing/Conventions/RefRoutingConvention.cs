@@ -54,14 +54,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
+            IEdmNavigationSource navigationSource;
             IEdmEntityType entityType;
             if (context.EntitySet != null)
             {
                 entityType = context.EntitySet.EntityType();
+                navigationSource = context.EntitySet;
             }
             else
             {
                 entityType = context.Singleton.EntityType();
+                navigationSource = context.Singleton;
             }
 
             // For entity set, we should have the key parameter
@@ -108,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             if (entityType != declaringType)
             {
-                segments.Add(new CastSegmentTemplate(declaringType));
+                segments.Add(new CastSegmentTemplate(declaringType, entityType, navigationSource));
             }
 
             if (navigationProperty != null)

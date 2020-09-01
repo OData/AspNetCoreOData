@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -13,48 +12,50 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class EntitySetSegmentTemplateTests
     {
         [Fact]
+        public void Ctor_ThrowsArgumentNull_EntitySet()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new EntitySetSegmentTemplate(entitySet: null), "entitySet");
+        }
+
+        [Fact]
         public void Ctor_ThrowsArgumentNull_EntitySetSegment()
         {
-            // Assert
+            // Assert & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new EntitySetSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void TryMatch_ReturnsTrue()
+        public void KindProperty_ReturnsEntitySet()
+        {
+            // Assert
+            EdmEntityType entityType = new EdmEntityType("NS", "entity");
+            EdmEntityContainer container = new EdmEntityContainer("NS", "default");
+            EdmEntitySet entityset = new EdmEntitySet(container, "entities", entityType);
+            EntitySetSegmentTemplate template = new EntitySetSegmentTemplate(new EntitySetSegment(entityset));
+
+            // Act & Assert
+            Assert.Equal(ODataSegmentKind.EntitySet, template.Kind);
+        }
+
+        [Fact]
+        public void Translate_ReturnsODataEntitySetSegment()
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
             EdmEntityContainer container = new EdmEntityContainer("NS", "default");
             EdmEntitySet entityset = new EdmEntitySet(container, "entities", entityType);
             EntitySetSegmentTemplate template = new EntitySetSegmentTemplate(new EntitySetSegment(entityset));
-            EntitySetSegment segment = new EntitySetSegment(entityset);
+
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            //Dictionary<string, object> values = new Dictionary<string, object>();
-            //bool result = template.TryMatch(segment, values);
+            ODataPathSegment actual = template.Translate(context);
 
-            //// Assert
-            //Assert.True(result);
-            //Assert.Empty(values);
-        }
-
-        [Fact]
-        public void TryMatch_ReturnsFalse()
-        {
-            // Arrange
-            EdmEntityType entityType = new EdmEntityType("NS", "entity");
-            EdmEntityContainer container = new EdmEntityContainer("NS", "default");
-            EdmEntitySet entityset1 = new EdmEntitySet(container, "entities1", entityType);
-            EdmEntitySet entityset2 = new EdmEntitySet(container, "entities2", entityType);
-            EntitySetSegmentTemplate template = new EntitySetSegmentTemplate(new EntitySetSegment(entityset1));
-            EntitySetSegment segment = new EntitySetSegment(entityset2);
-
-            // Act
-            //Dictionary<string, object> values = new Dictionary<string, object>();
-            //bool result = template.TryMatch(segment, values);
-
-            //// Assert
-            //Assert.False(result);
+            // Assert
+            Assert.NotNull(actual);
+            EntitySetSegment setSegment = Assert.IsType<EntitySetSegment>(actual);
+            Assert.Same(entityset, setSegment.EntitySet);
         }
     }
 }

@@ -10,6 +10,22 @@ namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class OperationHelper
     {
+        /// <summary>
+        /// Gets the function parameter sets.
+        /// </summary>
+        /// <param name="function">The input function.</param>
+        /// <returns>The set of parameter name.</returns>
+        public static ISet<string> GetFunctionParamters(this IEdmFunction function)
+        {
+            if (function == null)
+            {
+                throw new ArgumentNullException(nameof(function));
+            }
+
+            int skip = function.IsBound ? 1 : 0;
+            return new HashSet<string>(function.Parameters.Skip(skip).Select(p => p.Name));
+        }
+
         public static (IList<IEdmActionImport>, IList<IEdmFunctionImport>) Split(this IEnumerable<IEdmOperationImport> operationImports)
         {
             IList<IEdmActionImport> actions = new List<IEdmActionImport>();

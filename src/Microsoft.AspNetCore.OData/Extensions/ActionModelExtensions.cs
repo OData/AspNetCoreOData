@@ -200,18 +200,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
                 string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
 
-                string modelName = model.GetModelName();
-
-                templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
-
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-                selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
 
-               // if (!HasHttpMethod(action))
-                {
-                    //selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(new[] { httpMethod }));
-                    selectorModel.EndpointMetadata.Add(new ODataHttpMethodMetadata(httpMethod));
-                }
+                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
+                selectorModel.EndpointMetadata.Add(odataMetadata);
+
+                odataMetadata.HttpMethods.Add(httpMethod);
 
                 // Check with .NET Team whether the "Endpoint name metadata"
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));

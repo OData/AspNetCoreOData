@@ -138,13 +138,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
 
                     // ~/Customers({key})/Ns.Customer
-                    segments.Add(new CastSegmentTemplate(entityType));
+                    segments.Add(new CastSegmentTemplate(castType, entityType, entitySet));
                     action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
                 }
                 else
                 {
                     // ~/Customers({key})/Ns.VipCustomer
-                    segments.Add(new CastSegmentTemplate(castType));
+                    segments.Add(new CastSegmentTemplate(castType, entityType, entitySet));
                     action.AddSelector(httpMethod, prefix, model, new ODataPathTemplate(segments));
                 }
             }

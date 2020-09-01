@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
@@ -25,53 +26,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="function">The Edm function, it should be bound function..</param>
         /// <param name="navigationSource">The Edm navigation source of this function return.</param>
         public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource)
+            : this(function, navigationSource, function?.GetFunctionParamters())
         {
-            Function = function ?? throw new ArgumentNullException(nameof(function));
-
-            NavigationSource = navigationSource;
-
-            if (!function.IsBound)
-            {
-                // TODO: shall we need this check?
-                throw new InvalidOperationException($"The input function {function.Name} is not a bound function.");
-            }
-
-            int skip = function.IsBound ? 1 : 0;
-
-            IDictionary<string, string> parametersMappings = new Dictionary<string, string>();
-            foreach (var parameter in function.Parameters.Skip(skip))
-            {
-                parametersMappings[parameter.Name] = $"{{{parameter.Name}}}";
-
-                if (parameter is IEdmOptionalParameter)
-                {
-                    HasOptional = true;
-                }
-            }
-
-            if (HasOptional)
-            {
-                string parameters = string.Join(";", parametersMappings.Select(a => a.Key));
-                string constaint = $"({{parameters:OdataFunctionParameters(MODELNAME,{function.FullName()},true,{parameters})}})";
-
-               // string constaint = "({parameters:OdataFunctionParameters(abc,efg,true,ijk)})";
-                UnqualifiedIdentifier = function.Name + constaint;
-                Literal = function.FullName() + constaint;
-            }
-            else
-            {
-                string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
-                UnqualifiedIdentifier = function.Name + parameters;
-                Literal = function.FullName() + parameters;
-            }
-/* 
-            string parameters = "(" + string.Join(",", parametersMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
-            UnqualifiedIdentifier = function.Name + parameters;
-            Literal = function.FullName() + parameters;
-*/
-            IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-            RequiredParameters = new HashSet<string>(parametersMappings.Select(e => e.Key));
         }
 
         /// <summary>
@@ -79,14 +35,35 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="function">The Edm function.</param>
         /// <param name="navigationSource">Unqualified function call boolean value.</param>
-        internal FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource, ISet<string> requiredParameters)
-            : this (function, navigationSource)
+        /// <param name="requiredParameters">The required parameters.</param>
+        public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource, ISet<string> requiredParameters)
         {
-            RequiredParameters = requiredParameters;
+            Function = function ?? throw new ArgumentNullException(nameof(function));
+
+            NavigationSource = navigationSource;
+
+            RequiredParameters = requiredParameters ?? throw new ArgumentNullException(nameof(requiredParameters));
+
+            if (!function.IsBound)
+            {
+                throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.FunctionIsNotBound, function.Name));
+            }
+
+            ISet<string> functionParameters = function.GetFunctionParamters();
+            if (!requiredParameters.IsSubsetOf(functionParameters))
+            {
+                string required = string.Join(",", requiredParameters);
+                string actual = string.Join(",", functionParameters);
+                throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.RequiredParametersNotSubsetOfFunctionParameters, required, actual));
+            }
 
             string parameters = "(" + string.Join(",", requiredParameters.Select(a => $"{a}={{{a}}}")) + ")";
+
             UnqualifiedIdentifier = function.Name + parameters;
+
             Literal = function.FullName() + parameters;
+
+            IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <inheritdoc />
@@ -116,7 +93,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
-        internal ISet<string> RequiredParameters { get; set; }
+        /// <summary>
+        /// Gets the required parameter names.
+        /// </summary>
+        public ISet<string> RequiredParameters { get; }
 
         internal bool IsAllParameters(RouteValueDictionary routeValue)
         {
@@ -162,7 +142,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     {
                         return null;
                     }
-
                 }
             }
 
@@ -196,8 +175,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     }
                 }
             }
-
-       //     IEdmNavigationSource targetset = Function.GetTargetEntitySet(previous, model);
 
             return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
         }

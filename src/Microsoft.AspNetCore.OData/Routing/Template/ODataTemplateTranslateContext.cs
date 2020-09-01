@@ -24,6 +24,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
+        /// For Unit test only.
+        /// </summary>
+        /// <param name="context">The HttpContext.</param>
+        internal ODataTemplateTranslateContext(HttpContext context)
+        {
+            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
         /// </summary>
         /// <param name="context">The HttpContext.</param>
         /// <param name="routeValues">The route values.</param>
@@ -35,16 +45,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             RouteValues = routeValues ?? throw new ArgumentNullException(nameof(routeValues));
 
             Model = model ?? throw new ArgumentNullException(nameof(model));
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
-        /// For Unit test only.
-        /// </summary>
-        /// <param name="context">The HttpContext.</param>
-        internal ODataTemplateTranslateContext(HttpContext context)
-        {
-            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         /// <summary>

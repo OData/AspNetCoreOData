@@ -36,6 +36,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 IsSingle = action.ReturnType.TypeKind() != EdmTypeKind.Collection;
                 EdmType = action.ReturnType.Definition;
             }
+
+            Segment = new OperationSegment(Action, NavigationSource as IEdmEntitySetBase);
         }
 
         /// <inheritdoc />
@@ -58,10 +60,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
+        /// <summary>
+        /// Gets the action segment.
+        /// </summary>
+        public OperationSegment Segment { get; }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
-            return new OperationSegment(Action, NavigationSource as IEdmEntitySetBase);
+            return Segment;
         }
     }
 }

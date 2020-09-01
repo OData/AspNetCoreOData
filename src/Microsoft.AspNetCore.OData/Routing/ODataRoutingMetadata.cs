@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
@@ -26,6 +27,14 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRoutingMetadata"/> class.
+        /// For unit test only
+        /// </summary>
+        internal ODataRoutingMetadata()
+        {
+        }
+
+        /// <summary>
         /// Gets the prefix string.
         /// </summary>
         public string Prefix { get; }
@@ -39,5 +48,10 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the OData path template
         /// </summary>
         public ODataPathTemplate Template { get; }
+
+        /// <summary>
+        /// Gets the supported Http methods.
+        /// </summary>
+        public ISet<string> HttpMethods { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 }

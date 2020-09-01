@@ -15,17 +15,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="castType">The actual structured type.</param>
-        public CastSegmentTemplate(IEdmStructuredType castType)
+        /// <param name="castType">The cast Edm type.</param>
+        /// <param name="expectedType">The expected Edm type.</param>
+        /// <param name="navigationSource">The target navigation source. it could be null.</param>
+        public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
+            : this(new TypeSegment(castType, expectedType, navigationSource))
         {
-            CastType = castType ?? throw new ArgumentNullException(nameof(castType));
-
-            // TODO:
-            IsSingle = castType.TypeKind != EdmTypeKind.Collection;
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
         /// </summary>
         /// <param name="typeSegment"></param>
         public CastSegmentTemplate(TypeSegment typeSegment)
@@ -36,43 +35,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             IsSingle = typeSegment.EdmType.TypeKind != EdmTypeKind.Collection;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="castType">The cast Edm type.</param>
-        /// <param name="expectedType">The expected Edm type.</param>
-        /// <param name="navigationSource">The target navigation source. it could be null.</param>
-        public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
-            : this(new TypeSegment(castType, expectedType, navigationSource))
-        {
-            //EdmType = castType ?? throw new ArgumentNullException(nameof(castType));
-            //ExpectedType = expectedType ?? throw new ArgumentNullException(nameof(expectedType));
-            //NavigationSource = navigationSource;
-
-            //if (castType.TypeKind != expectedType.TypeKind)
-            //{
-            //    throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.InputCastTypeKindNotMatch, castType.TypeKind, expectedType.TypeKind));
-            //}
-
-            //IsSingle = true;
-            //if (expectedType.TypeKind == EdmTypeKind.Collection)
-            //{
-            //    IsSingle = false;
-            //    ExpectedType = expectedType.AsElementType();
-            //}
-
-            //if (EdmHelpers.IsRelatedTo(EdmType, ExpectedType))
-            //{
-            //    throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.TypeMustBeRelated, EdmType.FullTypeName(), ExpectedType.FullTypeName()));
-            //}
-
-            //TypeSegment = new TypeSegment(castType, expectedType, navigationSource);
-
-            //Literal = castType.AsElementType().FullTypeName();
-        }
-
-        internal TypeSegment TypeSegment { get; }
 
         /// <inheritdoc />
         public override string Literal { get; }
@@ -98,6 +60,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <inheritdoc />
         public override bool IsSingle { get; }
+
+        /// <summary>
+        /// Gets the expected type.
+        /// </summary>
+        public TypeSegment TypeSegment { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)

@@ -584,4 +584,10 @@
   <data name="ModelPrefixAlreadyUsed" xml:space="preserve">
     <value>The prefix '{0}' was already used for other Edm model.</value>
   </data>
+  <data name="FunctionIsNotBound" xml:space="preserve">
+    <value>The input function '{0}' is not a bound function.</value>
+  </data>
+  <data name="RequiredParametersNotSubsetOfFunctionParameters" xml:space="preserve">
+    <value>The input parameters '{0}' is not subset of function parameters '{1}'.</value>
+  </data>
 </root>

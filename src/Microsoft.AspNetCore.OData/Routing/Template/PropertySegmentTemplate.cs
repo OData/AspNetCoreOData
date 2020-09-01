@@ -17,10 +17,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="property">The wrapped Edm property.</param>
         public PropertySegmentTemplate(IEdmStructuralProperty property)
+            : this (new PropertySegment(property))
         {
-            Property = property ?? throw new ArgumentNullException(nameof(property));
+        }
 
-            IsSingle = !property.Type.IsCollection();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertySegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="segment">The property segment.</param>
+        public PropertySegmentTemplate(PropertySegment segment)
+        {
+            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+
+            IsSingle = !segment.Property.Type.IsCollection();
         }
 
         /// <inheritdoc />
@@ -32,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the wrapped Edm property.
         /// </summary>
-        public IEdmStructuralProperty Property { get; }
+        public IEdmStructuralProperty Property => Segment.Property;
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Property;
@@ -40,10 +49,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
+        /// <summary>
+        /// Gets the property segment.
+        /// </summary>
+        public PropertySegment Segment { get; }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
-            return new PropertySegment(Property);
+            return Segment;
         }
     }
 }

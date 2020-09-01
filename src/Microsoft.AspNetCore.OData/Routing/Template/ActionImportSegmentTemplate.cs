@@ -29,6 +29,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             NavigationSource = navigationSource;
+            Segment = new OperationImportSegment(ActionImport, NavigationSource as IEdmEntitySetBase);
         }
 
         /// <inheritdoc />
@@ -51,10 +52,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
+        /// <summary>
+        /// Gets the action import segment.
+        /// </summary>
+        public OperationImportSegment Segment { get; }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
-            return new OperationImportSegment(ActionImport, null);
+            return Segment;
         }
     }
 }

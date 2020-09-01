@@ -7,30 +7,32 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
-    public class MetadataSegmentTemplateTests
+    public class CountSegmentTemplateTests
     {
         [Fact]
-        public void MetadataCommonPropertiesReturnsAsExpected()
+        public void CountCommonPropertiesReturnsAsExpected()
         {
             // Assert & Act & Assert
-            Assert.Equal("$metadata", MetadataSegmentTemplate.Instance.Literal);
-            Assert.Equal(ODataSegmentKind.Metadata, MetadataSegmentTemplate.Instance.Kind);
+            Assert.Equal("$count", MetadataSegmentTemplate.Instance.Literal);
+            Assert.Equal(ODataSegmentKind.Count, MetadataSegmentTemplate.Instance.Kind);
             Assert.True(MetadataSegmentTemplate.Instance.IsSingle);
             Assert.Null(MetadataSegmentTemplate.Instance.EdmType);
             Assert.Null(MetadataSegmentTemplate.Instance.NavigationSource);
         }
 
         [Fact]
-        public void TranslateMetadataTemplateReturnsAsExpected()
+        public void Translate_ReturnsODataActionImportSegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment segment = MetadataSegmentTemplate.Instance.Translate(context);
+            ODataPathSegment actual = CountSegmentTemplate.Instance.Translate(context);
 
             // Assert
-            Assert.Same(MetadataSegment.Instance, segment);
+            Assert.NotNull(actual);
+            CountSegment countSegment = Assert.IsType<CountSegment>(actual);
+            Assert.Same(CountSegment.Instance, countSegment);
         }
     }
 }
