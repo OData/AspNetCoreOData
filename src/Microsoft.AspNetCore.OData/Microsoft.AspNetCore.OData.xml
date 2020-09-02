@@ -10647,10 +10647,15 @@
             <summary>
             A context object for <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention"/>.
             </summary>
+            <remarks>
+            Why do i design "ControllerActionContext", not "ControllerContext" and "ActionContext".
+            It's because a controller may have a bound of actions, and i don't want to create an ActionContext for all of these actions.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
+            For unit test only
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
@@ -10716,11 +10721,6 @@
             <summary>
             Gets the related action model in this context
             We guarentee that this property should never be "null" when calling "AppliesToAction"
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.RoutePrefixes">
-            <summary>
-            
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
@@ -11063,7 +11063,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider" /> class.
             </summary>
             <param name="conventions">The registered OData routing conventions.</param>
-            <param name="options">The registered OData routing options.</param>
+            <param name="options">The registered OData options.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.Order">
             <summary>

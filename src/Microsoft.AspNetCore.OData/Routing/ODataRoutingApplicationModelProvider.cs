@@ -18,14 +18,13 @@ namespace Microsoft.AspNetCore.OData.Routing
     internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
         private readonly IODataControllerActionConvention[] _controllerActionConventions;
-        // private readonly ODataRoutingOptions _options;
         private readonly ODataOptions _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataRoutingApplicationModelProvider" /> class.
         /// </summary>
         /// <param name="conventions">The registered OData routing conventions.</param>
-        /// <param name="options">The registered OData routing options.</param>
+        /// <param name="options">The registered OData options.</param>
         public ODataRoutingApplicationModelProvider(
             IEnumerable<IODataControllerActionConvention> conventions,
             IOptions<ODataOptions> options)

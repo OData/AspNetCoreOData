@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OData.Edm;
 
@@ -11,14 +10,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// A context object for <see cref="IODataControllerActionConvention"/>.
     /// </summary>
+    /// <remarks>
+    /// Why do i design "ControllerActionContext", not "ControllerContext" and "ActionContext".
+    /// It's because a controller may have a bound of actions, and i don't want to create an ActionContext for all of these actions.
+    /// </remarks>
     public class ODataControllerActionContext
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ODataControllerActionContext" /> class.
+        /// For unit test only
         /// </summary>
-        public ODataControllerActionContext()
+        internal ODataControllerActionContext()
         {
-
         }
 
         /// <summary>
@@ -100,10 +103,5 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// We guarentee that this property should never be "null" when calling "AppliesToAction"
         /// </summary>
         public ActionModel Action { get; internal set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        internal IEnumerable<string> RoutePrefixes { get; set; }
     }
 }

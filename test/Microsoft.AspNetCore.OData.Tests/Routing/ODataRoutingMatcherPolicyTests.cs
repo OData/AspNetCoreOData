@@ -117,8 +117,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
         private static ODataRoutingMatcherPolicy CreatePolicy()
         {
-            //IODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
-
             var translator = new Mock<IODataTemplateTranslator>();
             translator
                 .Setup(a => a.Translate(It.IsAny<ODataPathTemplate>(), It.IsAny<ODataTemplateTranslateContext>()))

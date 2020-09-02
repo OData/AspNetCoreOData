@@ -89,7 +89,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (actionName == "Get" || actionName == $"Get{entitySet.Name}")
             {
-                IEdmCollectionType castCollectionType = castType.ToCollection(true);
+                IEdmCollectionType castCollectionType = null;
+                if (castType != null)
+                {
+                    castCollectionType = castType.ToCollection(true);
+                }
+
                 IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
 
                 // GET ~/Customers or GET ~/Customers/Ns.VipCustomer
