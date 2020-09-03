@@ -2,14 +2,13 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
-    /// An interface for managing per-route service containers.
+    /// An interface for managing per-route (prefix) service containers.
     /// </summary>
     public interface IPerRouteContainer
     {
@@ -19,23 +18,15 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         Func<IContainerBuilder> BuilderFactory { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets the services dictionary.
         /// </summary>
         IDictionary<string, IServiceProvider> Services { get; }
 
         /// <summary>
-        /// Create a root container for a given route name.
+        /// Get the root service provider for a given route (prefix) name.
         /// </summary>
-        /// <param name="routeName">The route name.</param>
-        /// <param name="configureAction">The configuration actions to apply to the container.</param>
-        /// <returns>An instance of <see cref="IServiceProvider"/> to manage services for a route.</returns>
-        IServiceProvider CreateServiceProvider(string routeName, Action<IContainerBuilder> configureAction);
-
-        /// <summary>
-        /// Get the root container for a given route name.
-        /// </summary>
-        /// <param name="routeName">The route name.</param>
-        /// <returns>The root container for the route name.</returns>
+        /// <param name="routeName">The route name (the route prefix name).</param>
+        /// <returns>The root service provider for the route (prefix) name.</returns>
         IServiceProvider GetServiceProvider(string routeName);
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {

@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.UriParser;
 

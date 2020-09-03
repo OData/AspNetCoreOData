@@ -9,7 +9,7 @@ using Microsoft.OData.ModelBuilder;
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
-    /// 
+    /// Default implementation of <see cref="IAssemblyResolver"/>
     /// </summary>
     internal class DefaultAssemblyResolver : IAssemblyResolver
     {
@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public static readonly IAssemblyResolver Default = new DefaultAssemblyResolver();
 
         /// <summary>
-        /// 
+        /// Gets the assemblies.
         /// </summary>
         public IEnumerable<Assembly> Assemblies => _assemblies;
 

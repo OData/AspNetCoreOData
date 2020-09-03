@@ -141,14 +141,14 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         internal int PageSize { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets the body values from OData request.
         /// </summary>
         public IDictionary<string, object> BodyValues { get; set; }
 
         /// <summary>
-        /// Gets the data store used by <see cref="IODataRoutingConvention"/>s to store any custom route data.
+        /// Gets the data store used routing conventions to store any custom route data.
         /// </summary>
         /// <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
-        public IDictionary<string, object> RoutingConventionsStore { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> RoutingConventionsStore { get; } = new Dictionary<string, object>();
     }
 }

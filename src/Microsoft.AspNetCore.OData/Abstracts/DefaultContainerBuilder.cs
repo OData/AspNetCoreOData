@@ -21,19 +21,18 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="serviceType">The type of the service to register.</param>
         /// <param name="implementationType">The implementation type of the service.</param>
         /// <returns>The <see cref="IContainerBuilder"/> instance itself.</returns>
-        public virtual IContainerBuilder AddService(
-            Microsoft.OData.ServiceLifetime lifetime,
+        public virtual IContainerBuilder AddService(Microsoft.OData.ServiceLifetime lifetime,
             Type serviceType,
             Type implementationType)
         {
             if (serviceType == null)
             {
-                throw Error.ArgumentNull("serviceType");
+                throw new ArgumentNullException(nameof(serviceType));
             }
 
             if (implementationType == null)
             {
-                throw Error.ArgumentNull("implementationType");
+                throw new ArgumentNullException(nameof(implementationType));
             }
 
             services.Add(new ServiceDescriptor(
@@ -49,19 +48,18 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <param name="serviceType">The type of the service to register.</param>
         /// <param name="implementationFactory">The factory that creates the service.</param>
         /// <returns>The <see cref="Microsoft.OData.IContainerBuilder"/> instance itself.</returns>
-        public Microsoft.OData.IContainerBuilder AddService(
-            Microsoft.OData.ServiceLifetime lifetime,
+        public virtual IContainerBuilder AddService(Microsoft.OData.ServiceLifetime lifetime,
             Type serviceType,
             Func<IServiceProvider, object> implementationFactory)
         {
             if (serviceType == null)
             {
-                throw Error.ArgumentNull("serviceType");
+                throw new ArgumentNullException(nameof(serviceType));
             }
 
             if (implementationFactory == null)
             {
-                throw Error.ArgumentNull("implementationFactory");
+                throw new ArgumentNullException(nameof(implementationFactory));
             }
 
             services.Add(new ServiceDescriptor(

@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Initializes a new instance of the <see cref="PerRouteContainer"/> class.
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The global OData options.</param>
         public PerRouteContainer(IOptions<ODataOptions> options)
         {
             _options = options;
@@ -32,103 +32,39 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets a function to build an <see cref="IContainerBuilder"/>
         /// </summary>
+        /// <remarks>
+        /// Consider to move this into service collection.
+        /// </remarks>
         public Func<IContainerBuilder> BuilderFactory { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets the services dictionary.
         /// </summary>
         public virtual IDictionary<string, IServiceProvider> Services => _perPrefixContainers;
 
         /// <summary>
-        /// Create a root container for a given route name.
+        /// Get the root service provider for a given route (prefix) name.
         /// </summary>
-        /// <param name="routeName">The route name.</param>
-        /// <param name="configureAction">The configuration actions to apply to the container.</param>
-        /// <returns>An instance of <see cref="IServiceProvider"/> to manage services for a route.</returns>
-        public virtual IServiceProvider CreateServiceProvider(string routeName, Action<IContainerBuilder> configureAction)
-        {
-            IContainerBuilder builder = CreateContainerBuilderWithCoreServices();
-
-            configureAction?.Invoke(builder);
-
-            IServiceProvider serviceProvider = builder.BuildContainer();
-            if (serviceProvider == null)
-            {
-                throw Error.InvalidOperation(SRResources.NullContainer);
-            }
-
-            _perPrefixContainers.AddOrUpdate(routeName, serviceProvider, (k, v) => serviceProvider);
-
-            return serviceProvider;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="routeName"></param>
-        /// <returns></returns>
+        /// <param name="routeName">The route name (the route prefix name).</param>
+        /// <returns>The root service provider for the route (prefix) name.</returns>
         public virtual IServiceProvider GetServiceProvider(string routeName)
         {
-            IServiceProvider rootContainer;
-            if (_perPrefixContainers.TryGetValue(routeName, out rootContainer))
-            {
-                return rootContainer;
-            }
-
-            return null;
+            return _perPrefixContainers.GetValueOrDefault(routeName);
         }
 
         /// <summary>
-        /// Create a container builder with the default OData services.
+        /// Initalize the per-route container.
         /// </summary>
-        /// <returns>An instance of <see cref="IContainerBuilder"/> to manage services.</returns>
-        protected IContainerBuilder CreateContainerBuilderWithCoreServices()
-        {
-            IContainerBuilder builder;
-            if (this.BuilderFactory != null)
-            {
-                builder = this.BuilderFactory();
-                if (builder == null)
-                {
-                    throw Error.InvalidOperation(SRResources.NullContainerBuilder);
-                }
-            }
-            else
-            {
-                builder = new DefaultContainerBuilder();
-            }
-
-            builder.AddDefaultODataServices();
-
-            // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-            builder.AddService(
-                ServiceLifetime.Singleton,
-                typeof(ODataUriResolver),
-                sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
-
-            return builder;
-        }
-
-        internal void Initialize()
+        private void Initialize()
         {
             _perPrefixContainers = new ConcurrentDictionary<string, IServiceProvider>();
 
             foreach (var config in _options.Value.Models)
             {
                 IEdmModel model = config.Value.Item1;
-                var serviceBuilder = config.Value.Item2;
+                Action<IContainerBuilder> serviceBuilder = config.Value.Item2;
 
                 IContainerBuilder odataContainerBuilder = null;
-                //if (_serviceProvider != null)
-                //{
-                //    odataContainerBuilder = _serviceProvider.GetService<IContainerBuilder>();
-                //}
-
-                //if (odataContainerBuilder == null)
-                //{
-                //    odataContainerBuilder = new DefaultContainerBuilder();
-                //}
-
                 if (this.BuilderFactory != null)
                 {
                     odataContainerBuilder = this.BuilderFactory();

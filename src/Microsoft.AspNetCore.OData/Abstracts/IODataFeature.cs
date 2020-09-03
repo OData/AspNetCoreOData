@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         Uri DeltaLink { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets the body values from OData request.
         /// </summary>
         IDictionary<string, object> BodyValues { get; set; }
 

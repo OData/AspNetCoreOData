@@ -29,6 +29,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the content id mapping.
         /// </summary>
-        IDictionary<string, string> ContentIdMapping { get; set; }
+        IDictionary<string, string> ContentIdMapping { get; }
     }
 }

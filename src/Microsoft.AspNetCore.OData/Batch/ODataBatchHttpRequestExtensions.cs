@@ -170,7 +170,16 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(request));
             }
 
-            request.ODataBatchFeature().ContentIdMapping = contentIdMapping;
+            IDictionary<string, string> old = request.ODataBatchFeature().ContentIdMapping;
+            old.Clear();
+
+            if (contentIdMapping != null)
+            {
+                foreach (var idMap in contentIdMapping)
+                {
+                    old.Add(idMap);
+                }
+            }
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing the object.")]

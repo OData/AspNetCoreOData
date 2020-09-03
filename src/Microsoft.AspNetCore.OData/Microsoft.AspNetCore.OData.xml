@@ -6,7 +6,7 @@
     <members>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
             <summary>
-            
+            Default implementation of <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Default">
@@ -17,7 +17,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Assemblies">
             <summary>
-            
+            Gets the assemblies.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder">
@@ -202,7 +202,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
             <summary>
-            
+            Gets the body values from OData request.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutingConventionsStore">
@@ -255,7 +255,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer">
             <summary>
-            An interface for managing per-route service containers.
+            An interface for managing per-route (prefix) service containers.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.BuilderFactory">
@@ -265,23 +265,15 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.Services">
             <summary>
-            
+            Gets the services dictionary.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.CreateServiceProvider(System.String,System.Action{Microsoft.OData.IContainerBuilder})">
-            <summary>
-            Create a root container for a given route name.
-            </summary>
-            <param name="routeName">The route name.</param>
-            <param name="configureAction">The configuration actions to apply to the container.</param>
-            <returns>An instance of <see cref="T:System.IServiceProvider"/> to manage services for a route.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.GetServiceProvider(System.String)">
             <summary>
-            Get the root container for a given route name.
+            Get the root service provider for a given route (prefix) name.
             </summary>
-            <param name="routeName">The route name.</param>
-            <returns>The root container for the route name.</returns>
+            <param name="routeName">The route name (the route prefix name).</param>
+            <returns>The root service provider for the route (prefix) name.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature">
             <summary>
@@ -403,12 +395,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BodyValues">
             <summary>
-            
+            Gets the body values from OData request.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutingConventionsStore">
             <summary>
-            Gets the data store used by <see cref="!:IODataRoutingConvention"/>s to store any custom route data.
+            Gets the data store used routing conventions to store any custom route data.
             </summary>
             <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         </member>
@@ -516,38 +508,32 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer"/> class.
             </summary>
-            <param name="options"></param>
+            <param name="options">The global OData options.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.BuilderFactory">
             <summary>
             Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>
             </summary>
+            <remarks>
+            Consider to move this into service collection.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.Services">
             <summary>
-            
+            Gets the services dictionary.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.CreateServiceProvider(System.String,System.Action{Microsoft.OData.IContainerBuilder})">
-            <summary>
-            Create a root container for a given route name.
-            </summary>
-            <param name="routeName">The route name.</param>
-            <param name="configureAction">The configuration actions to apply to the container.</param>
-            <returns>An instance of <see cref="T:System.IServiceProvider"/> to manage services for a route.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.GetServiceProvider(System.String)">
             <summary>
-            
+            Get the root service provider for a given route (prefix) name.
             </summary>
-            <param name="routeName"></param>
-            <returns></returns>
+            <param name="routeName">The route name (the route prefix name).</param>
+            <returns>The root service provider for the route (prefix) name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.CreateContainerBuilderWithCoreServices">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.Initialize">
             <summary>
-            Create a container builder with the default OData services.
+            Initalize the per-route container.
             </summary>
-            <returns>An instance of <see cref="T:Microsoft.OData.IContainerBuilder"/> to manage services.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
             <summary>
