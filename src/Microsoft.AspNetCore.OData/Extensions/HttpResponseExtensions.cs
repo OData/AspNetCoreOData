@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 namespace Microsoft.AspNetCore.OData.Extensions
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="HttpRequest"/>.
+    /// Provides extension methods for the <see cref="HttpResponse"/>.
     /// </summary>
     public static class HttpResponseExtensions
     {

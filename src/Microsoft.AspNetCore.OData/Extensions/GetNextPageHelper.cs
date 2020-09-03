@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
     /// </summary>
     internal static partial class GetNextPageHelper
     {
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
         internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null, CompatibilityOptions options = CompatibilityOptions.None)
         {
             Contract.Assert(requestUri != null);
@@ -90,11 +92,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             if (useDefaultSkip)
             {
-                queryBuilder.AppendFormat("$skip={0}", nextPageSkip);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, "$skip={0}", nextPageSkip);
             }
             else
             {
-                queryBuilder.AppendFormat("$skiptoken={0}", skipTokenValue);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, "$skiptoken={0}", skipTokenValue);
             }
 
             UriBuilder uriBuilder = new UriBuilder(requestUri)

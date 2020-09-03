@@ -25,23 +25,23 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (actionDescriptor == null)
             {
-                throw Error.ArgumentNull("actionDescriptor");
+                throw new ArgumentNullException(nameof(actionDescriptor));
             }
 
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (entityClrType == null)
             {
-                throw Error.ArgumentNull("entityClrType");
+                throw new ArgumentNullException(nameof(entityClrType));
             }
 
-            IEdmModel model = null;
+            IEdmModel model;
 
             string key = ModelKeyPrefix + entityClrType.FullName;
-            object modelAsObject = null;
+            object modelAsObject;
             if (actionDescriptor.Properties.TryGetValue(key, out modelAsObject))
             {
                 model = modelAsObject as IEdmModel;

@@ -139,21 +139,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Gets the <see cref="IODataBatchFeature"/> from the services container.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>The <see cref="IODataBatchFeature"/> from the services container.</returns>
-        //public static IODataBatchFeature ODataBatchFeature(this HttpRequest request)
-        //{
-        //    if (request == null)
-        //    {
-        //        throw Error.ArgumentNull("request");
-        //    }
-
-        //    return request.HttpContext.ODataBatchFeature();
-        //}
-
-        /// <summary>
         /// get the deserializer provider associated with the request.
         /// </summary>
         /// <returns></returns>
@@ -179,8 +164,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull("request");
             }
 
-            return null;
-            // return request.ODataBatchFeature().ContentIdMapping;
+            return request.ODataBatchFeature().ContentIdMapping;
         }
 
         /// <summary>
@@ -365,10 +349,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Gets thes OData version for the response.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">The request.</param>
+        /// <returns>The OData version.</returns>
         public static ODataVersion GetODataResponseVersion(this HttpRequest request)
         {
             Contract.Assert(request != null, "GetODataResponseVersion called with a null request");

@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
     public enum CompatibilityOptions
     {
         /// <summary>
-        /// No compatibility options are selected. 
+        /// No compatibility options are selected.
         /// </summary>
         None = 0x0,
 
