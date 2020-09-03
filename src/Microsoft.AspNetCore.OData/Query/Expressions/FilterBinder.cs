@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;

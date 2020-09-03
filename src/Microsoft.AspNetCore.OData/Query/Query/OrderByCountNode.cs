@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -17,18 +18,13 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="orderByClause">The orderby clause representing property access.</param>
         public OrderByCountNode(OrderByClause orderByClause)
         {
-            if (orderByClause == null)
-            {
-                throw Error.ArgumentNull("orderByClause");
-            }
-
-            OrderByClause = orderByClause;
+            OrderByClause = orderByClause ?? throw new ArgumentNullException(nameof(orderByClause));
             Direction = orderByClause.Direction;
         }
 
         /// <summary>
         /// Gets the <see cref="OrderByClause"/> of this node.
         /// </summary>
-        public OrderByClause OrderByClause { get; private set; }
+        public OrderByClause OrderByClause { get; }
     }
 }

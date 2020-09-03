@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (orderByClause == null)
             {
-                throw Error.ArgumentNull("orderByClause");
+                throw new ArgumentNullException(nameof(orderByClause));
             }
 
             Direction = orderByClause.Direction;
@@ -89,10 +89,10 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (expression == null)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
-            string propertyName = String.Empty;
+            string propertyName = string.Empty;
             SingleValueNode source = null;
 
             var accessNode = expression as SingleValuePropertyAccessNode;
@@ -121,13 +121,13 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             var parentPath = RestorePropertyPath(source);
-            if (String.IsNullOrEmpty(parentPath))
+            if (string.IsNullOrEmpty(parentPath))
             {
                 return propertyName;
             }
             else
             {
-                return String.Format(CultureInfo.CurrentCulture, "{0}/{1}", parentPath, propertyName);
+                return string.Format(CultureInfo.CurrentCulture, "{0}/{1}", parentPath, propertyName);
             }
         }
     }

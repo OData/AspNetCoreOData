@@ -6,7 +6,6 @@ using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -34,22 +33,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public FilterQueryValidator(DefaultQuerySettings defaultQuerySettings/* IOptions<ODataQueryableOptions> options*/)
+        public FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
         {
              _defaultQuerySettings = defaultQuerySettings;
-
-            //ODataQueryableOptions quableOptions = options.Value;
-
-            //_defaultQuerySettings = new DefaultQuerySettings
-            //{
-            //    EnableFilter = quableOptions.EnableFilter
-            //};
         }
-
-        //internal FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
-        //{
-        //    _defaultQuerySettings = defaultQuerySettings;
-        //}
 
         /// <summary>
         /// Validates a <see cref="FilterQueryOption" />.

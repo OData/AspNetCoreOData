@@ -4,7 +4,6 @@
 using System;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -23,13 +22,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// the <see cref="DefaultQuerySettings" />.
         /// </summary>
         /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public CountQueryValidator(DefaultQuerySettings defaultQuerySettings /*IOptions<ODataQueryableOptions> options*/)
+        public CountQueryValidator(DefaultQuerySettings defaultQuerySettings)
         {
-            //_defaultQuerySettings = new DefaultQuerySettings
-            //{
-            //    EnableCount = options.Value.EnableCount
-            //};
-
             _defaultQuerySettings = defaultQuerySettings;
         }
 

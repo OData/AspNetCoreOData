@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
@@ -18,12 +19,7 @@ namespace Microsoft.AspNetCore.OData.Query
         public OrderByOpenPropertyNode(OrderByClause orderByClause)
             : base(orderByClause)
         {
-            if (orderByClause == null)
-            {
-                throw Error.ArgumentNull("orderByClause");
-            }
-
-            OrderByClause = orderByClause;
+            OrderByClause = orderByClause ?? throw new ArgumentNullException(nameof(orderByClause));
 
             var openPropertyExpression = orderByClause.Expression as SingleValueOpenPropertyAccessNode;
             if (openPropertyExpression == null)
@@ -37,11 +33,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// The order by clause
         /// </summary>
-        public OrderByClause OrderByClause { get; private set; }
+        public OrderByClause OrderByClause { get; }
 
         /// <summary>
         /// The name of the dynamic property
         /// </summary>
-        public string PropertyName { get; private set; }
+        public string PropertyName { get; }
     }
 }
