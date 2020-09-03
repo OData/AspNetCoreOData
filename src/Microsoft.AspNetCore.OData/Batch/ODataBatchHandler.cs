@@ -102,7 +102,9 @@ namespace Microsoft.AspNetCore.OData.Batch
         internal void SetContinueOnError(IHeaderDictionary header, bool enableContinueOnErrorHeader)
         {
             string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(header);
-            if ((preferHeader != null && preferHeader.Contains(PreferenceContinueOnError) && !preferHeader.Contains(PreferenceContinueOnErrorFalse))
+            if ((preferHeader != null &&
+                preferHeader.Contains(PreferenceContinueOnError, StringComparison.OrdinalIgnoreCase) &&
+                !preferHeader.Contains(PreferenceContinueOnErrorFalse, StringComparison.OrdinalIgnoreCase))
                 || (!enableContinueOnErrorHeader))
             {
                 ContinueOnError = true;

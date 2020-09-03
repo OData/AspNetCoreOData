@@ -49,8 +49,9 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return (request.ContentType != null &&
-                (request.ContentType.StartsWith(BatchMediaTypeMime) || request.ContentType.StartsWith(BatchMediaTypeJson)));
+            return request.ContentType != null &&
+                (request.ContentType.StartsWith(BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase) ||
+                request.ContentType.StartsWith(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -204,18 +205,18 @@ namespace Microsoft.AspNetCore.OData.Batch
                 // Note that, if responseContentType is not set, then it will default to multipart/mixed
                 // when constructing the BatchContent, so we don't need to handle that case here
                 if (!String.IsNullOrEmpty(request.ContentType)
-                && request.ContentType.IndexOf(ODataBatchHttpRequestExtensions.BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1)
+                && request.ContentType.IndexOf(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1)
                 {
-                    responseContentType = ODataBatchHttpRequestExtensions.BatchMediaTypeJson;
+                    responseContentType = BatchMediaTypeJson;
                 }
             }
-            else if (acceptHeader.Any(h => h.Equals(ODataBatchHttpRequestExtensions.BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase)))
+            else if (acceptHeader.Any(h => h.Equals(BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase)))
             {
                 responseContentType = String.Format(CultureInfo.InvariantCulture, "multipart/mixed;boundary=batchresponse_{0}", Guid.NewGuid());
             }
-            else if (acceptHeader.Any(h => h.IndexOf(ODataBatchHttpRequestExtensions.BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1))
+            else if (acceptHeader.Any(h => h.IndexOf(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1))
             {
-                responseContentType = ODataBatchHttpRequestExtensions.BatchMediaTypeJson;
+                responseContentType = BatchMediaTypeJson;
             }
 
             response.StatusCode = StatusCodes.Status200OK;

@@ -105,6 +105,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             IServiceProvider requestContainer = request.CreateSubServiceProvider(RouteName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
+            // How to dispose it?
             ODataMessageReader reader = request.GetODataMessageReader(requestContainer);
 
             CancellationToken cancellationToken = context.RequestAborted;

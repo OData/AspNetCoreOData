@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 if (batchHandler != null)
                 {
                     batchHandler.RouteName = service.Key;
-                    string batchPath = String.IsNullOrEmpty(service.Key)  ? "/$batch" : $"/{service.Key}/$batch";
+                    string batchPath = string.IsNullOrEmpty(service.Key)  ? "/$batch" : $"/{service.Key}/$batch";
 
                     if (_batchMapping == null)
                     {

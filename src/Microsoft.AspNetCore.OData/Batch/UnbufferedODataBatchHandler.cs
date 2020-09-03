@@ -41,6 +41,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             IServiceProvider requestContainer = request.CreateSubServiceProvider(RouteName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
+            // How to dispose it?
             ODataMessageReader reader = request.GetODataMessageReader(requestContainer);
 
             ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);

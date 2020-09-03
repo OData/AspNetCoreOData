@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -25,14 +26,19 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <summary>
         /// Add a route name and template for batching.
         /// </summary>
-        /// <param name="routeName">The route name.</param>
+        /// <param name="prefixName">The route prefix name.</param>
         /// <param name="routeTemplate">The route template.</param>
-        public void AddRoute(string routeName, string routeTemplate)
+        public void AddRoute(string prefixName, string routeTemplate)
         {
-            string newRouteTemplate = routeTemplate.StartsWith("/") ? routeTemplate.Substring(1) : routeTemplate;
+            if (routeTemplate == null)
+            {
+                throw Error.ArgumentNull(nameof(routeTemplate));
+            }
+
+            string newRouteTemplate = routeTemplate.StartsWith("/", StringComparison.Ordinal) ? routeTemplate.Substring(1) : routeTemplate;
             RouteTemplate parsedTemplate = TemplateParser.Parse(newRouteTemplate);
             TemplateMatcher matcher = new TemplateMatcher(parsedTemplate, new RouteValueDictionary());
-            templateMappings[matcher] = routeName;
+            templateMappings[matcher] = prefixName;
         }
 
         /// <summary>

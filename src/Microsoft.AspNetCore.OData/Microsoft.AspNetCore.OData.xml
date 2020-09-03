@@ -858,7 +858,7 @@
             <summary>
             Add a route name and template for batching.
             </summary>
-            <param name="routeName">The route name.</param>
+            <param name="prefixName">The route prefix name.</param>
             <param name="routeTemplate">The route template.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.TryGetRouteName(Microsoft.AspNetCore.Http.HttpContext,System.String@)">

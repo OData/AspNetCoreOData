@@ -76,6 +76,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         public Task SerializeToStreamAsync(Stream stream)
         {
+            // how to dispose it?
             IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(stream, Headers, _requestContainer);
             return WriteToResponseMessageAsync(responseMessage);
         }
@@ -87,6 +88,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <returns></returns>
         private async Task WriteToResponseMessageAsync(IODataResponseMessage responseMessage)
         {
+            // how to dispose it?
             ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, _writerSettings);
 
             ODataBatchWriter writer = await messageWriter.CreateODataBatchWriterAsync().ConfigureAwait(false);

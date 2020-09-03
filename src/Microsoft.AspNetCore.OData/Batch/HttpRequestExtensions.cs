@@ -29,6 +29,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(request));
             }
 
+            // how to dispose it?
             IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(request.Body, request.Headers, requestContainer);
             ODataMessageReaderSettings settings = requestContainer.GetRequiredService<ODataMessageReaderSettings>();
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
@@ -42,6 +43,16 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="uri">The absolute uri to copy.</param>
         public static void CopyAbsoluteUrl(this HttpRequest request, Uri uri)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
             request.Scheme = uri.Scheme;
             request.Host = uri.IsDefaultPort ?
                 new HostString(uri.Host) :

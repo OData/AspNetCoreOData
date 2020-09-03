@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 string headerName = header.Key;
                 string headerValue = header.Value;
 
-                if (headerName.Trim().ToLowerInvariant() == "prefer")
+                if (headerName.Trim().ToUpperInvariant() == "PREFER")
                 {
                     // in the case of Prefer header, we don't want to overwrite,
                     // instead we merge preferences defined in the individual request with those inherited from the batch
@@ -293,7 +293,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 .Where(value =>
                     !nonInheritablePreferences.Any(
                         prefToIgnore =>
-                        value.ToLowerInvariant().StartsWith(prefToIgnore)
+                        value.ToLowerInvariant().StartsWith(prefToIgnore, StringComparison.OrdinalIgnoreCase)
                     )
                 );
             return string.Join(",", preferencesToInherit);
