@@ -6717,32 +6717,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ExpandConfiguration.ExpandType">
             <summary>
-            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandType"/>.
+            Gets or sets the <see cref="T:Microsoft.OData.ModelBuilder.SelectExpandType"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ExpandConfiguration.MaxDepth">
             <summary>
             Gets or sets the maximum depth.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.SelectExpandType">
-            <summary>
-            Represents the type of expand and select.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Allowed">
-            <summary>
-            Allowed to be expanded and selected.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Automatic">
-            <summary>
-            Automatic expanded and selected.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandType.Disabled">
-            <summary>
-            Disallowed to be expanded and selected.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer">
@@ -8037,7 +8017,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultExpandType">
             <summary>
-            Gets or sets the default <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandType"/> of navigation properties.
+            Gets or sets the default <see cref="T:Microsoft.OData.ModelBuilder.SelectExpandType"/> of navigation properties.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultMaxDepth">
@@ -8085,7 +8065,7 @@
             Copy the $orderby configuration of properties.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopySelectConfigurations(System.Collections.Generic.Dictionary{System.String,Microsoft.AspNetCore.OData.Query.SelectExpandType})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.CopySelectConfigurations(System.Collections.Generic.Dictionary{System.String,Microsoft.OData.ModelBuilder.SelectExpandType})">
             <summary>
             Copy the $select configuration of properties.
             </summary>

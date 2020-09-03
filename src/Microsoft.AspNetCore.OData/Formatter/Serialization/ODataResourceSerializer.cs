@@ -18,8 +18,10 @@ using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -480,7 +482,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (!(resourceContext.NavigationSource is IEdmContainedEntitySet))
                 {
                     IEdmModel model = resourceContext.SerializerContext.Model;
-                    NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(resourceContext.NavigationSource);
+                    NavigationSourceLinkBuilderAnnotation linkBuilder = Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(model, resourceContext.NavigationSource);
                     EntitySelfLinks selfLinks = linkBuilder.BuildEntitySelfLinks(resourceContext, resourceContext.SerializerContext.MetadataLevel);
 
                     if (selfLinks.IdLink != null)
@@ -930,7 +932,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 IEdmTypeReference propertyType = navigationProperty.Type;
                 IEdmModel model = writeContext.Model;
-                NavigationSourceLinkBuilderAnnotation linkBuilder = model.GetNavigationSourceLinkBuilder(navigationSource);
+                NavigationSourceLinkBuilderAnnotation linkBuilder = Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(model, navigationSource);
                 Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
 
                 navigationLink = new ODataNestedResourceInfo
