@@ -26,11 +26,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <summary>
         /// Gets the navigation link factory for creating navigation links.
         /// </summary>
-        public Func<ResourceContext, IEdmNavigationProperty, Uri> Factory { get; private set; }
+        public Func<ResourceContext, IEdmNavigationProperty, Uri> Factory { get; }
 
         /// <summary>
         /// Gets a value representing whether this factory follows OData conventions or not.
         /// </summary>
-        public bool FollowsConventions { get; private set; }
+        public bool FollowsConventions { get; }
     }
 }

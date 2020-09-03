@@ -19,53 +19,50 @@ namespace Microsoft.AspNetCore.OData.Edm
             {
                 return true;
             }
-            /*
-                        int pathIndex = paths.Count - 2; // Skip the last segment which is navigation property name.
 
-                        // Match from tail to head.
-                        for (int segmentIndex = parsedSegments.Count - 1; segmentIndex >= 0; segmentIndex--)
+            int pathIndex = paths.Count - 2; // Skip the last segment which is navigation property name.
+
+            // Match from tail to head.
+            for (int segmentIndex = parsedSegments.Count - 1; segmentIndex >= 0; segmentIndex--)
+            {
+                ODataSegmentTemplate segment = parsedSegments[segmentIndex];
+
+                bool segmentIsNavigationPropertySegment = segment is NavigationSegmentTemplate;
+
+                // Containment navigation property or complex property in binding path.
+                if (segment is PropertySegmentTemplate || (segmentIsNavigationPropertySegment && segment.NavigationSource is IEdmContainedEntitySet))
+                {
+                    if (pathIndex < 0 || string.CompareOrdinal(paths[pathIndex], segment.Literal) != 0)
+                    {
+                        return false;
+                    }
+
+                    pathIndex--;
+                }
+                else if (segment is CastSegmentTemplate)
+                {
+                    // May need match type if the binding path contains type cast.
+                    if (pathIndex >= 0 && paths[pathIndex].Contains(".", System.StringComparison.Ordinal))
+                    {
+                        if (string.CompareOrdinal(paths[pathIndex], segment.EdmType.AsElementType().FullTypeName()) != 0)
                         {
-                            ODataSegmentTemplate segment = parsedSegments[segmentIndex];
-
-                            bool segmentIsNavigationPropertySegment = segment is NavigationSegment;
-
-                            // Containment navigation property or complex property in binding path.
-                            if (segment is PropertySegmentTemplate || (segmentIsNavigationPropertySegment && segment.NavigationSource is IEdmContainedEntitySet))
-                            {
-                                if (pathIndex < 0 || string.CompareOrdinal(paths[pathIndex], segment.Identifier) != 0)
-                                {
-                                    return false;
-                                }
-
-                                pathIndex--;
-                            }
-                            else if (segment is CastSegmentTemplate)
-                            {
-                                // May need match type if the binding path contains type cast.
-                                if (pathIndex >= 0 && paths[pathIndex].Contains("."))
-                                {
-                                    if (string.CompareOrdinal(paths[pathIndex], segment.EdmType.AsElementType().FullTypeName()) != 0)
-                                    {
-                                        return false;
-                                    }
-
-                                    pathIndex--;
-                                }
-                            }
-                            else if (segment is EntitySetSegmentTemplate
-                                  || segment is SingletonSegmentTemplate
-                                  || segmentIsNavigationPropertySegment)
-                            {
-                                // Containment navigation property in first if statement for NavigationPropertySegment.
-                                break;
-                            }
+                            return false;
                         }
 
-                        // Return true if all the segments in binding path have been matched.
-                        return pathIndex == -1 ? true : false;
-            */
+                        pathIndex--;
+                    }
+                }
+                else if (segment is EntitySetSegmentTemplate
+                        || segment is SingletonSegmentTemplate
+                        || segmentIsNavigationPropertySegment)
+                {
+                    // Containment navigation property in first if statement for NavigationPropertySegment.
+                    break;
+                }
+            }
 
-            return false;
+            // Return true if all the segments in binding path have been matched.
+            return pathIndex == -1 ? true : false;
         }
     }
 }

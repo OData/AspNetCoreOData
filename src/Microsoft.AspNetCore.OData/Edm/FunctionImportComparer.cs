@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return 0;
             }
 
-            return functionImport.Function.Name == null ? 0 : functionImport.Function.Name.GetHashCode();
+            return functionImport.Function.Name == null ? 0 : functionImport.Function.Name.GetHashCode(StringComparison.Ordinal);
         }
     }
 }

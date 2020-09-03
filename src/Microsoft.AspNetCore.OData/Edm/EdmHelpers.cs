@@ -14,7 +14,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
-    /// Provides the functionalities related to the <see cref="Type"/> and Edm type.
+    /// Provides the functionalities related to the Edm type.
     /// </summary>
     internal static class EdmHelpers
     {
@@ -561,7 +561,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             return false;
         }
-
 
         internal static void SetOperationTitleAnnotation(this IEdmModel model, IEdmOperation action, OperationTitleAnnotation title)
         {

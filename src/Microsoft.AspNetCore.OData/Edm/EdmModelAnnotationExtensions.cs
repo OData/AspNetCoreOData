@@ -19,11 +19,11 @@ namespace Microsoft.AspNetCore.OData.Edm
     public static class EmdModelAnnotationExtensions
     {
         /// <summary>
-        /// 
+        /// Get concurrency properties.
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="navigationSource"></param>
-        /// <returns></returns>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="navigationSource">The navigation source.</param>
+        /// <returns>The concurrency properties.</returns>
         public static IEnumerable<IEdmStructuralProperty> GetConcurrencyProperties(this IEdmModel model, IEdmNavigationSource navigationSource)
         {
             Contract.Assert(model != null);
@@ -80,11 +80,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Gets the Enum member annotations.
         /// </summary>
-        /// <param name="edmModel"></param>
-        /// <param name="enumType"></param>
-        /// <returns></returns>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="enumType">The Enum Type.</param>
+        /// <returns>The Enum member annotation.</returns>
         public static ClrEnumMemberAnnotation GetClrEnumMemberAnnotation(this IEdmModel edmModel, IEdmEnumType enumType)
         {
             if (edmModel == null)
@@ -107,11 +107,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Get the CLR property name.
         /// </summary>
-        /// <param name="edmModel"></param>
-        /// <param name="edmProperty"></param>
-        /// <returns></returns>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="edmProperty">The Edm property.</param>
+        /// <returns>The property name.</returns>
         public static string GetClrPropertyName(this IEdmModel edmModel, IEdmProperty edmProperty)
         {
             if (edmModel == null)
@@ -139,11 +139,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Gets the dynamic property container name.
         /// </summary>
-        /// <param name="edmModel"></param>
-        /// <param name="edmType"></param>
-        /// <returns></returns>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="edmType">The Edm type.</param>
+        /// <returns>The dynamic property container property info.</returns>
         public static PropertyInfo GetDynamicPropertyDictionary(this IEdmModel edmModel, IEdmStructuredType edmType)
         {
             if (edmModel == null)
@@ -167,10 +167,10 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Gets the model name.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="model">The Edm model.</param>
+        /// <returns>The Edm model name.</returns>
         public static string GetModelName(this IEdmModel model)
         {
             if (model == null)
@@ -189,9 +189,9 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
-        /// 
+        /// Sets the Edm model name.
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="model">The Edm model.</param>
         public static string SetModelName(this IEdmModel model)
         {
             if (model == null)

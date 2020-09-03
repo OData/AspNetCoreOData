@@ -41,6 +41,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 array = values.ToArray();
             }
+
             return array;
         }
 
@@ -63,6 +64,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 list = new List<T>(enumerable);
             }
+
             return new Collection<T>(list);
         }
 
@@ -78,6 +80,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 return list;
             }
+
             return new List<T>(enumerable);
         }
 
@@ -100,6 +103,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 return listWrapper.ItemsList;
             }
+
             return new List<T>(enumerable);
         }
 
@@ -163,6 +167,7 @@ namespace Microsoft.AspNetCore.OData.Common
                     }
                 }
             }
+
             return result;
         }
 
@@ -183,6 +188,7 @@ namespace Microsoft.AspNetCore.OData.Common
                     count++;
                 }
             }
+
             if (count == collection.Count)
             {
                 return result;
@@ -209,6 +215,7 @@ namespace Microsoft.AspNetCore.OData.Common
                 TValue value = array[i];
                 dictionary.Add(keySelector(value), value);
             }
+
             return dictionary;
         }
 
@@ -225,6 +232,7 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 return ToDictionaryFast(array, keySelector, comparer);
             }
+
             return ToDictionaryFastNoCheck(list, keySelector, comparer);
         }
 
@@ -241,11 +249,13 @@ namespace Microsoft.AspNetCore.OData.Common
             {
                 return ToDictionaryFast(array, keySelector, comparer);
             }
+
             IList<TValue> list = enumerable as IList<TValue>;
             if (list != null)
             {
                 return ToDictionaryFastNoCheck(list, keySelector, comparer);
             }
+
             Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(comparer);
             foreach (TValue value in enumerable)
             {
@@ -269,6 +279,7 @@ namespace Microsoft.AspNetCore.OData.Common
                 TValue value = list[i];
                 dictionary.Add(keySelector(value), value);
             }
+
             return dictionary;
         }
 

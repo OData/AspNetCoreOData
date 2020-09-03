@@ -12,8 +12,7 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// </summary>
     internal class ClrTypeCache
     {
-        private ConcurrentDictionary<Type, IEdmTypeReference> _cache =
-            new ConcurrentDictionary<Type, IEdmTypeReference>();
+        private ConcurrentDictionary<Type, IEdmTypeReference> _cache = new ConcurrentDictionary<Type, IEdmTypeReference>();
 
         public IEdmTypeReference GetEdmType(Type clrType, IEdmModel model)
         {

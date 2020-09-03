@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Common
@@ -119,7 +118,6 @@ namespace Microsoft.AspNetCore.OData.Common
                 return (input.Substring(start, j - start), j);
             }
         }
-
 
         /// <summary>
         /// Each key/value pair is separated using ",".

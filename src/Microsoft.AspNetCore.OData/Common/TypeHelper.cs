@@ -13,9 +13,9 @@ using Microsoft.OData.ModelBuilder;
 namespace Microsoft.AspNetCore.OData.Common
 {
     /// <summary>
-    /// 
+    /// The type related helper methods.
     /// </summary>
-    public static class TypeHelper
+    internal static class TypeHelper
     {
         /// <summary>
         /// Return the collection element type.

@@ -12,9 +12,6 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// </summary>
     public class OperationLinkBuilder
     {
-        private Func<ResourceContext, Uri> _linkFactory; // bound to entity
-        private readonly Func<ResourceSetContext, Uri> _feedLinkFactory; // bound to collection of entity
-
         /// <summary>
         /// Create a new <see cref="OperationLinkBuilder"/> based on an entity link factory.
         /// </summary>
@@ -26,10 +23,10 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (linkFactory == null)
             {
-                throw Error.ArgumentNull("linkFactory");
+                throw new ArgumentNullException(nameof(linkFactory));
             }
 
-            _linkFactory = linkFactory;
+            LinkFactory = linkFactory;
             FollowsConventions = followsConventions;
         }
 
@@ -44,33 +41,27 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (linkFactory == null)
             {
-                throw Error.ArgumentNull("linkFactory");
+                throw new ArgumentNullException(nameof(linkFactory));
             }
 
-            _feedLinkFactory = linkFactory;
+            FeedLinkFactory = linkFactory;
             FollowsConventions = followsConventions;
         }
 
         /// <summary>
         /// Gets the resource link factory.
         /// </summary>
-        internal Func<ResourceContext, Uri> LinkFactory
-        {
-            get { return _linkFactory; }
-        }
+        internal Func<ResourceContext, Uri> LinkFactory { get; }
 
         /// <summary>
         /// Gets the feed link factory.
         /// </summary>
-        internal Func<ResourceSetContext, Uri> FeedLinkFactory
-        {
-            get { return _feedLinkFactory; }
-        }
+        internal Func<ResourceSetContext, Uri> FeedLinkFactory { get; }
 
         /// <summary>
         /// Gets a Boolean indicating whether the link factory follows OData conventions or not.
         /// </summary>
-        public bool FollowsConventions { get; private set; }
+        public bool FollowsConventions { get; }
 
         /// <summary>
         /// Builds the operation link for the given resource.
@@ -79,12 +70,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>The generated link.</returns>
         public virtual Uri BuildLink(ResourceContext context)
         {
-            if (_linkFactory == null)
+            if (LinkFactory == null)
             {
                 return null;
             }
 
-            return _linkFactory(context);
+            return LinkFactory(context);
         }
 
         /// <summary>
@@ -94,12 +85,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>The generated link.</returns>
         public virtual Uri BuildLink(ResourceSetContext context)
         {
-            if (_feedLinkFactory == null)
+            if (FeedLinkFactory == null)
             {
                 return null;
             }
 
-            return _feedLinkFactory(context);
+            return FeedLinkFactory(context);
         }
     }
 }

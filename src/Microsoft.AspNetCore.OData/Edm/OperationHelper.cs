@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     skip = 1;
                 }
 
-                return function.Name + "(" + String.Join(",", function.Parameters.Skip(skip).Select(p => p.Name)) + ")";
+                return function.Name + "(" + string.Join(",", function.Parameters.Skip(skip).Select(p => p.Name)) + ")";
             }
             else
                 return operation.Name; ;
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             // If parameter count is zero and there is one function import whoese parameter count is zero, return this function import.
             if (candidates.Count() > 1 && parameterNames.Count == 0)
             {
-                candidates = candidates.Where(operationImport => operationImport.Operation.Parameters.Count() == 0);
+                candidates = candidates.Where(operationImport => !operationImport.Operation.Parameters.Any());
             }
 
             if (!candidates.Any())

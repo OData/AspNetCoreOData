@@ -26,11 +26,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <summary>
         /// Gets the factory for generating links.
         /// </summary>
-        public Func<ResourceContext, T> Factory { get; private set; }
+        public Func<ResourceContext, T> Factory { get; }
 
         /// <summary>
         /// Gets a boolean indicating whether the link factory follows OData conventions or not.
         /// </summary>
-        public bool FollowsConventions { get; private set; }
+        public bool FollowsConventions { get; }
     }
 }

@@ -39,12 +39,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (navigationSource == null)
             {
-                throw Error.ArgumentNull("navigationSource");
+                throw new ArgumentNullException(nameof(navigationSource));
             }
 
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw new ArgumentNullException(nameof(model));
             }
 
             IEdmEntityType elementType = navigationSource.EntityType();
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (navigationSource == null)
             {
-                throw Error.ArgumentNull("navigationSource");
+                throw new ArgumentNullException(nameof(navigationSource));
             }
 
             _idLinkBuilder = idLinkBuilder;
@@ -126,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw Error.ArgumentNull("instanceContext");
+                throw new ArgumentNullException(nameof(instanceContext));
             }
 
             if (_idLinkBuilder != null &&
@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw Error.ArgumentNull("instanceContext");
+                throw new ArgumentNullException(nameof(instanceContext));
             }
 
             if (_editLinkBuilder != null &&
@@ -182,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw Error.ArgumentNull("instanceContext");
+                throw new ArgumentNullException(nameof(instanceContext));
             }
 
             if (_readLinkBuilder != null &&
@@ -211,12 +211,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw Error.ArgumentNull("instanceContext");
+                throw new ArgumentNullException(nameof(instanceContext));
             }
 
             if (navigationProperty == null)
             {
-                throw Error.ArgumentNull("navigationProperty");
+                throw new ArgumentNullException(nameof(navigationProperty));
             }
 
             NavigationLinkBuilder navigationLinkBuilder;
@@ -236,12 +236,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw Error.ArgumentNull("instanceContext");
+                throw new ArgumentNullException(nameof(instanceContext));
             }
 
             if (navigationProperty == null)
             {
-                throw Error.ArgumentNull("navigationProperty");
+                throw new ArgumentNullException(nameof(navigationProperty));
             }
 
             NavigationLinkBuilder navigationLinkBuilder;

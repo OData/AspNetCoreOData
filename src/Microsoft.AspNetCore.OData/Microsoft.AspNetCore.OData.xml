@@ -1184,7 +1184,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.ODataVersionConstraint">
             <summary>
-            
+            OData Version constants.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.PropertyAccessor`1">
