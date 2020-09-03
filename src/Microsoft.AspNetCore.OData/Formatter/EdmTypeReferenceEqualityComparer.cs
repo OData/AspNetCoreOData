@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
@@ -31,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                return fullName.GetHashCode();
+                return fullName.GetHashCode(StringComparison.Ordinal);
             }
         }
     }

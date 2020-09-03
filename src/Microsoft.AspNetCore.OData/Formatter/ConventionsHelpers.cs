@@ -225,7 +225,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             public int GetHashCode(PropertyInfo obj)
             {
                 Contract.Assert(obj != null);
-                return obj.Name.GetHashCode();
+                return obj.Name.GetHashCode(StringComparison.Ordinal);
             }
         }
     }

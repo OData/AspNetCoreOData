@@ -7,7 +7,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
+    /// OData parameter value used for function parameter binding.
     /// </summary>
     public class ODataParameterValue
     {
@@ -17,10 +17,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
         public const string ParameterValuePrefix = "DF908045-6922-46A0-82F2-2F6E7F43D1B1_";
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ODataParameterValue"/> class.
         /// </summary>
-        /// <param name="paramValue"></param>
-        /// <param name="paramType"></param>
+        /// <param name="paramValue">The parameter value.</param>
+        /// <param name="paramType">The parameter type.</param>
         public ODataParameterValue(object paramValue, IEdmTypeReference paramType)
         {
             if (paramType == null)
@@ -33,13 +33,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         /// <summary>
-        /// 
+        /// Gets the parameter type.
         /// </summary>
-        public IEdmTypeReference EdmType { get; private set; }
+        public IEdmTypeReference EdmType { get; }
 
         /// <summary>
-        /// 
+        /// Gets the paraemter value.
         /// </summary>
-        public object Value { get; private set; }
+        public object Value { get; }
     }
 }

@@ -30,13 +30,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw new ArgumentNullException(nameof(resourceContext));
             }
-
-            //if (resourceContext.InternalUrlHelper == null)
-            //{
-            //    throw Error.Argument("resourceContext", SRResources.UrlHelperNull, typeof(ResourceContext).Name);
-            //}
 
             IList<ODataPathSegment> idLinkPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
@@ -68,12 +63,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw new ArgumentNullException(nameof(resourceContext));
             }
-            //if (resourceContext.InternalUrlHelper == null)
-            //{
-            //    throw Error.Argument("resourceContext", SRResources.UrlHelperNull, typeof(ResourceContext).Name);
-            //}
 
             IList<ODataPathSegment> navigationPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
@@ -104,12 +95,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceSetContext == null)
             {
-                throw Error.ArgumentNull("resourceSetContext");
+                throw new ArgumentNullException(nameof(resourceSetContext));
             }
 
             if (action == null)
             {
-                throw Error.ArgumentNull("action");
+                throw new ArgumentNullException(nameof(action));
             }
 
             IEdmOperationParameter bindingParameter = action.Parameters.FirstOrDefault();
@@ -187,12 +178,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceSetContext == null)
             {
-                throw Error.ArgumentNull("resourceSetContext");
+                throw new ArgumentNullException(nameof(resourceSetContext));
             }
 
             if (function == null)
             {
-                throw Error.ArgumentNull("function");
+                throw new ArgumentNullException(nameof(function));
             }
 
             IEdmOperationParameter bindingParameter = function.Parameters.FirstOrDefault();
@@ -279,11 +270,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw new ArgumentNullException(nameof(resourceContext));
             }
             if (action == null)
             {
-                throw Error.ArgumentNull("action");
+                throw new ArgumentNullException(nameof(action));
             }
 
             IEdmOperationParameter bindingParameter = action.Parameters.FirstOrDefault();
@@ -351,11 +342,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw new ArgumentNullException(nameof(resourceContext));
             }
             if (function == null)
             {
-                throw Error.ArgumentNull("function");
+                throw new ArgumentNullException(nameof(function));
             }
 
             IEdmOperationParameter bindingParameter = function.Parameters.FirstOrDefault();

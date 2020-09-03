@@ -26,11 +26,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw new ArgumentNullException(nameof(messageWriter));
             }
+
             if (graph == null)
             {
-                throw Error.ArgumentNull("graph");
+                throw new ArgumentNullException(nameof(graph));
             }
 
             if (TypeHelper.IsEnum(graph.GetType()))

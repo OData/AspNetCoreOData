@@ -241,7 +241,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     request.GetODataResponseVersion(),
                     baseAddress,
                     contentType,
-                    request.GetUrlHelper(),
                     request,
                     request.Headers,
                     serializerProvider);
@@ -285,21 +284,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("request");
             }
 
-            //LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-            //if (linkGenerator != null)
-            //{
-            // //   string uri = linkGenerator.GetUriByAction(request.HttpContext);
-
-            //    Endpoint endPoint = request.HttpContext.GetEndpoint();
-            //    EndpointNameMetadata name = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
-
-            //    string aUri = linkGenerator.GetUriByName(request.HttpContext, name?.EndpointName,
-            //        request.RouteValues, request.Scheme, request.Host, request.PathBase);
-
-            //    return new Uri(aUri);
-            //}
-
             string baseAddress = request.CreateODataLink();
             if (baseAddress == null)
             {
@@ -326,7 +310,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             return false;
         }
-
 
         internal static bool TryGetContentHeader(Type type, MediaTypeHeaderValue mediaType, out MediaTypeHeaderValue newMediaType)
         {
@@ -379,10 +362,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataPayloadKind? GetEdmObjectPayloadKind(Type type, HttpRequest request)
         {
-            //if (internalRequest.IsCountRequest())
-            //{
-            //    return ODataPayloadKind.Value;
-            //}
+            if (request.IsCountRequest())
+            {
+                return ODataPayloadKind.Value;
+            }
 
             Type elementType;
             if (TypeHelper.IsCollection(type, out elementType))

@@ -26,34 +26,5 @@ namespace Microsoft.AspNetCore.OData.Formatter
             string path = segmentList.GetPathString();
             return baseAddress + "/" + path;
         }
-
-        /// <summary>
-        /// Generates an OData link using the request's OData route name and path handler and given segments.
-        /// </summary>
-        /// <param name="segments">The OData path segments.</param>
-        /// <returns>The generated OData link.</returns>
-        public static string CreateODataLink(this IUrlHelper urlHelper, params ODataPathSegment[] segments)
-        {
-            return urlHelper.CreateODataLink(segments as IList<ODataPathSegment>);
-        }
-
-        /// <summary>
-        /// Generates an OData link using the request's OData route name and path handler and given segments.
-        /// </summary>
-        /// <param name="segments">The OData path segments.</param>
-        /// <returns>The generated OData link.</returns>
-        public static string CreateODataLink(this IUrlHelper urlHelper, IList<ODataPathSegment> segments)
-        {
-            //string routeName = this.innerHelper.ActionContext.HttpContext.Request.ODataFeature().RouteName;
-            //if (String.IsNullOrEmpty(routeName))
-            //{
-            //    throw Error.InvalidOperation(SRResources.RequestMustHaveODataRouteName);
-            //}
-
-            //IODataPathHandler pathHandler = this.innerHelper.ActionContext.HttpContext.Request.GetPathHandler();
-            //return CreateODataLink(routeName, pathHandler, segments);
-
-            return "";
-        }
     }
 }

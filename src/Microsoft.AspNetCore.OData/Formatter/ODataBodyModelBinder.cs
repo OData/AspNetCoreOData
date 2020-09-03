@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (bindingContext == null)
             {
-                throw Error.ArgumentNull("bindingContext");
+                throw new ArgumentNullException(nameof(bindingContext));
             }
 
             if (bindingContext.ModelMetadata == null)
@@ -60,96 +61,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return Task.CompletedTask;
             }
 
-            //    ValueProviderResult valueProviderResult = ValueProviderResult.None;
-            //    string modelName = ODataParameterValue.ParameterValuePrefix + bindingContext.ModelName;
-            //    try
-            //    {
-            //        // Look in route data for a ODataParameterValue.
-            //        object valueAsObject = null;
-            //        if (!bindingContext.HttpContext.Request.ODataFeature().RoutingConventionsStore.TryGetValue(modelName, out valueAsObject))
-            //        {
-            //            bindingContext.ActionContext.RouteData.Values.TryGetValue(modelName, out valueAsObject);
-            //        }
-
-            //        if (valueAsObject != null)
-            //        {
-            //            StringValues stringValues = new StringValues(valueAsObject.ToString());
-            //            valueProviderResult = new ValueProviderResult(stringValues);
-            //            bindingContext.ModelState.SetModelValue(bindingContext.ModelName, valueProviderResult);
-
-            //            ODataParameterValue paramValue = valueAsObject as ODataParameterValue;
-            //            if (paramValue != null)
-            //            {
-            //                HttpRequest request = bindingContext.HttpContext.Request;
-            //                object model = ConvertTo(paramValue, bindingContext, request.GetRequestContainer());
-            //                bindingContext.Result = ModelBindingResult.Success(model);
-            //                return Task.CompletedTask;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            // If not in the route data, ask the value provider.
-            //            valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
-            //            if (valueProviderResult == ValueProviderResult.None)
-            //            {
-            //                valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
-            //            }
-
-            //            if (valueProviderResult != ValueProviderResult.None)
-            //            {
-            //                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, valueProviderResult);
-
-            //                object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType);
-            //                if (model != null)
-            //                {
-            //                    bindingContext.Result = ModelBindingResult.Success(model);
-            //                    return Task.CompletedTask;
-            //                }
-            //            }
-            //        }
-
-            //        // No matches, binding failed.
-            //        bindingContext.Result = ModelBindingResult.Failed();
-            //    }
-            //    catch (ODataException ex)
-            //    {
-            //        bindingContext.ModelState.AddModelError(bindingContext.ModelName, ex.Message);
-            //        bindingContext.Result = ModelBindingResult.Failed();
-            //    }
-            //    catch (ValidationException ex)
-            //    {
-            //        bindingContext.ModelState.AddModelError(bindingContext.ModelName, Error.Format(SRResources.ValueIsInvalid, valueProviderResult.FirstValue, ex.Message));
-            //        bindingContext.Result = ModelBindingResult.Failed();
-            //    }
-            //    catch (FormatException ex)
-            //    {
-            //        bindingContext.ModelState.AddModelError(bindingContext.ModelName, Error.Format(SRResources.ValueIsInvalid, valueProviderResult.FirstValue, ex.Message));
-            //        bindingContext.Result = ModelBindingResult.Failed();
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        bindingContext.ModelState.AddModelError(bindingContext.ModelName, e.Message);
-            //        bindingContext.Result = ModelBindingResult.Failed();
-            //    }
-
             return Task.CompletedTask;
         }
-
-        //internal static object ConvertTo(ODataParameterValue parameterValue, ModelBindingContext bindingContext, IServiceProvider requestContainer)
-        //{
-        //    Contract.Assert(parameterValue != null && parameterValue.EdmType != null);
-
-        //    object oDataValue = parameterValue.Value;
-        //    if (oDataValue == null || oDataValue is ODataNullValue)
-        //    {
-        //        return null;
-        //    }
-
-        //    IEdmTypeReference edmTypeReference = parameterValue.EdmType;
-        //    ODataDeserializerContext readContext = BuildDeserializerContext(bindingContext, edmTypeReference);
-        //    return ODataModelBinderConverter.Convert(oDataValue, edmTypeReference, bindingContext.ModelType,
-        //        bindingContext.ModelName, readContext, requestContainer);
-        //}
 
         internal static ODataDeserializerContext BuildDeserializerContext(ModelBindingContext bindingContext/*, IEdmTypeReference edmTypeReference*/)
         {
@@ -178,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataDeserializerContext context = BuildDeserializerContext(bindingContext);
             HttpRequest request = bindingContext.HttpContext.Request;
 
-            var body = request.HttpContext.Features.Get<AspNetCore.Http.Features.IHttpBodyControlFeature>();
+            var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
             if (body != null)
             {
                 body.AllowSynchronousIO = true;

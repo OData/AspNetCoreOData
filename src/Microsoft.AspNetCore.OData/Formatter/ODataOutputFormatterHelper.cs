@@ -41,7 +41,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataVersion version,
             Uri baseAddress,
             MediaTypeHeaderValue contentType,
-            IUrlHelper urlHelper,
             HttpRequest request,
             IHeaderDictionary requestHeaders,
             ODataSerializerProvider serializerProvider)
@@ -60,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // serialize a response
             string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(requestHeaders);
             string annotationFilter = null;
-            if (!String.IsNullOrEmpty(preferHeader))
+            if (!string.IsNullOrEmpty(preferHeader))
             {
                 ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(response.Body, response.Headers);
                 messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
@@ -78,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             writerSettings.Version = version;
             writerSettings.Validations = writerSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
-            string metadataLink = urlHelper.CreateODataLink(MetadataSegment.Instance);
+            string metadataLink = request.CreateODataLink(MetadataSegment.Instance);
             if (metadataLink == null || metadataLink == "")
             {
                 metadataLink = request.CreateODataLink(baseAddress.OriginalString, MetadataSegment.Instance);
@@ -170,13 +169,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                //var applyClause = request.Context.ApplyClause;
+                var applyClause = request.ODataFeature().ApplyClause;
 
-                //// get the most appropriate serializer given that we support inheritance.
-                //if (applyClause == null)
-                //{
-                //    type = value == null ? type : value.GetType();
-                //}
+                // get the most appropriate serializer given that we support inheritance.
+                if (applyClause == null)
+                {
+                    type = value == null ? type : value.GetType();
+                }
                 type = value == null ? type : value.GetType();
 
                 serializer = serializerProvider.GetODataPayloadSerializer(type, request);

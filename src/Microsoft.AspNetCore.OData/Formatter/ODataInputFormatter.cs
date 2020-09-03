@@ -255,8 +255,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        
-
         internal static ODataVersion GetODataResponseVersion(HttpRequest request)
         {
             // OData protocol requires that you send the minimum version that the client needs to know to
