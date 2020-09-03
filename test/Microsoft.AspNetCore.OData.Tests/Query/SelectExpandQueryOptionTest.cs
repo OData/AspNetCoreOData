@@ -266,7 +266,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             if (autoSelect)
             {
                 var modelBound = model.GetAnnotationValue<ModelBoundQuerySettings>(entityType) ?? new ModelBoundQuerySettings();
-                modelBound.DefaultSelectType = OData.Query.SelectExpandType.Automatic;
+                modelBound.DefaultSelectType = SelectExpandType.Automatic;
                 model.SetAnnotationValue(entityType, modelBound);
             }
 
