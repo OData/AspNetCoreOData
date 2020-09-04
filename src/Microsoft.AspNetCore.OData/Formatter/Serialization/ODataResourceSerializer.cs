@@ -263,7 +263,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         && (prop.Value is DynamicTypeWrapper || (prop.Value is IEnumerable<DynamicTypeWrapper>)))
                     {
                         IEdmProperty edmProperty = entityType.Properties()
-                            .FirstOrDefault(p => p.Name.Equals(prop.Key));
+                            .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
                         if (edmProperty != null)
                         {
                             dynamicTypeProperties.Add(edmProperty, prop.Value);

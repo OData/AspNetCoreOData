@@ -1163,7 +1163,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else
             {
                 return GetFlattenedPropertyExpression(propertyPath)
-                    ?? ConvertNonStandardPrimitives(ExpressionBinderBase.GetPropertyExpression(source, (this.HasInstancePropertyContainer && !propertyPath.Contains("\\") ? "Instance\\" : String.Empty) + propertyName));
+                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (this.HasInstancePropertyContainer && !propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName));
             }
         }
 

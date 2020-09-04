@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
             if (serviceDocument == null)
             {
-                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type.Name));
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type?.Name));
             }
 
             messageWriter.WriteServiceDocument(serviceDocument);

@@ -1,23 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData.UriParser;
-using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {
     /// <summary>
-    /// 
+    /// Extensions.
     /// </summary>
-    public static class UrlHelperExtensions
+    internal static class UrlHelperExtensions
     {
         /// <summary>
-        /// 
+        /// Creates the OData link
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The request.</param>
+        /// <param name="baseAddress">The base address.</param>
+        /// <param name="segments">The segments.</param>
         /// <returns></returns>
         public static string CreateODataLink(this HttpRequest request,
             string baseAddress, params ODataPathSegment[] segments)

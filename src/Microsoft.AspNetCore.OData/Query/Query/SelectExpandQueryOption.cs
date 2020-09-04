@@ -669,7 +669,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 ExpandedNavigationSelectItem expandItem = autoExpandItems[i] as ExpandedNavigationSelectItem;
                 IEdmNavigationProperty autoExpandNavigationProperty =
                     (expandItem.PathToNavigationProperty.LastSegment as NavigationPropertySegment).NavigationProperty;
-                if (navigationProperty.Name.Equals(autoExpandNavigationProperty.Name))
+                if (navigationProperty.Name.Equals(autoExpandNavigationProperty.Name, StringComparison.Ordinal))
                 {
                     autoExpandItems.RemoveAt(i);
                     return;

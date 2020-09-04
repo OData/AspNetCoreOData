@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             writerSettings.Validations = writerSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
             string metadataLink = request.CreateODataLink(MetadataSegment.Instance);
-            if (metadataLink == null || metadataLink == "")
+            if (string.IsNullOrEmpty(metadataLink)) // TODO: check it again? do I need this?
             {
                 metadataLink = request.CreateODataLink(baseAddress.OriginalString, MetadataSegment.Instance);
             }

@@ -1233,7 +1233,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.TypeHelper">
             <summary>
-            
+            The type related helper methods.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetInnerElementType(System.Type)">
@@ -1668,7 +1668,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
             <summary>
-            Provides the functionalities related to the <see cref="T:System.Type"/> and Edm type.
+            Provides the functionalities related to the Edm type.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.ToCollection(Microsoft.OData.Edm.IEdmType,System.Boolean)">
@@ -1702,48 +1702,48 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
-            
+            Get concurrency properties.
             </summary>
-            <param name="model"></param>
-            <param name="navigationSource"></param>
-            <returns></returns>
+            <param name="model">The Edm model.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <returns>The concurrency properties.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrEnumMemberAnnotation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEnumType)">
             <summary>
-            
+            Gets the Enum member annotations.
             </summary>
-            <param name="edmModel"></param>
-            <param name="enumType"></param>
-            <returns></returns>
+            <param name="edmModel">The Edm model.</param>
+            <param name="enumType">The Enum Type.</param>
+            <returns>The Enum member annotation.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrPropertyName(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmProperty)">
             <summary>
-            
+            Get the CLR property name.
             </summary>
-            <param name="edmModel"></param>
-            <param name="edmProperty"></param>
-            <returns></returns>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmProperty">The Edm property.</param>
+            <returns>The property name.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetDynamicPropertyDictionary(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
             <summary>
-            
+            Gets the dynamic property container name.
             </summary>
-            <param name="edmModel"></param>
-            <param name="edmType"></param>
-            <returns></returns>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>The dynamic property container property info.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            
+            Gets the model name.
             </summary>
-            <param name="model"></param>
-            <returns></returns>
+            <param name="model">The Edm model.</param>
+            <returns>The Edm model name.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            
+            Sets the Edm model name.
             </summary>
-            <param name="model"></param>
+            <param name="model">The Edm model.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
@@ -1863,14 +1863,14 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation">
             <summary>
-            
+            The Edm model name annotation.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.#ctor(System.String)">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation"/> class.
             </summary>
-            <param name="name"></param>
+            <param name="name">The model name.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelName">
             <summary>
@@ -2105,7 +2105,7 @@
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.None">
             <summary>
-            No compatibility options are selected. 
+            No compatibility options are selected.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.AllowNextLinkWithNonPositiveTopValue">
@@ -2315,14 +2315,14 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            
+            Gets thes OData version for the response.
             </summary>
-            <param name="request"></param>
-            <returns></returns>
+            <param name="request">The request.</param>
+            <returns>The OData version.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions">
             <summary>
-            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
+            Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpResponse"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions.IsSuccessStatusCode(Microsoft.AspNetCore.Http.HttpResponse)">
@@ -2767,6 +2767,10 @@
             <summary>
             An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
             </summary>
+            <remarks>
+            I'd like to use this attribute for the action parameters whose value are from request body.
+            It's not finished yet.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.FromODataBodyAttribute.#ctor">
             <summary>
@@ -3215,7 +3219,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue">
             <summary>
-            
+            OData parameter value used for function parameter binding.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.ParameterValuePrefix">
@@ -3225,19 +3229,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.#ctor(System.Object,Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue"/> class.
             </summary>
-            <param name="paramValue"></param>
-            <param name="paramType"></param>
+            <param name="paramValue">The parameter value.</param>
+            <param name="paramType">The parameter type.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.EdmType">
             <summary>
-            
+            Gets the parameter type.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.Value">
             <summary>
-            
+            Gets the paraemter value.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters">
@@ -4206,29 +4210,17 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions">
             <summary>
-            
+            Extensions.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.String,Microsoft.OData.UriParser.ODataPathSegment[])">
             <summary>
-            
+            Creates the OData link
             </summary>
-            <param name="request"></param>
+            <param name="request">The request.</param>
+            <param name="baseAddress">The base address.</param>
+            <param name="segments">The segments.</param>
             <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Mvc.IUrlHelper,Microsoft.OData.UriParser.ODataPathSegment[])">
-            <summary>
-            Generates an OData link using the request's OData route name and path handler and given segments.
-            </summary>
-            <param name="segments">The OData path segments.</param>
-            <returns>The generated OData link.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Mvc.IUrlHelper,System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
-            <summary>
-            Generates an OData link using the request's OData route name and path handler and given segments.
-            </summary>
-            <param name="segments">The OData path segments.</param>
-            <returns>The generated OData link.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta">
             <summary>

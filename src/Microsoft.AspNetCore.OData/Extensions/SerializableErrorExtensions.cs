@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             var result = builder.ToString();
 
-            return !result.EndsWith(Environment.NewLine) ? result : result.Substring(0, result.Length - Environment.NewLine.Length);
+            return !result.EndsWith(Environment.NewLine, StringComparison.Ordinal) ? result : result.Substring(0, result.Length - Environment.NewLine.Length);
         }
 
         private static ICollection<ODataErrorDetail> CreateErrorDetails(this IReadOnlyDictionary<string, object> errors)

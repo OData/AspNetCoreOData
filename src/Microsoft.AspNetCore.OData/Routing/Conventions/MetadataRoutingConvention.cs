@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName == "GetMetadata")
             {
                 ODataPathTemplate template = new ODataPathTemplate(MetadataSegmentTemplate.Instance);
-                action.AddSelector(context.Prefix, context.Model, template);
+                action.AddSelector("Get", context.Prefix, context.Model, template);
                 return true;
             }
 
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName == "GetServiceDocument")
             {
                 ODataPathTemplate template = new ODataPathTemplate();
-                action.AddSelector(context.Prefix, context.Model, template);
+                action.AddSelector("Get", context.Prefix, context.Model, template);
                 return true;
             }
 

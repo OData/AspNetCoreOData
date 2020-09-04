@@ -337,7 +337,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (deltaLink != null)
             {
-                writer.WriteDeltaLink(deltaLink);
+                writer?.WriteDeltaLink(deltaLink);
             }
         }
 

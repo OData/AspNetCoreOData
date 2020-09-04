@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             // only action import, without (...)
-            if (parameterNames == null)
+            if (parameterNames == null) // TODO: wrong here?
             {
                 candidates = candidates.Where(i => i.IsActionImport());
                 if (candidates.Count() > 1)
