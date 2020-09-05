@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <summary>
         /// Gets or sets the OData route associated with this batch handler.
         /// </summary>
-        public string RouteName { get; set; }
+        public string PrefixName { get; set; }
 
         /// <summary>
         /// Abstract method for processing a batch request.

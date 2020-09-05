@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act & Assert
             Assert.False(batchHandler.ContinueOnError);
             Assert.NotNull(batchHandler.MessageQuotas);
-            Assert.Null(batchHandler.RouteName);
+            Assert.Null(batchHandler.PrefixName);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
             HttpContext context = new DefaultHttpContext();
 
-            context.ODataFeature().RouteName = "odata";
+            context.ODataFeature().PrefixName = "odata";
             context.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             // Act & Assert
@@ -116,13 +116,13 @@ foo
             httpContext.Request.ContentType = "multipart/mixed; boundary=\"2d958200-beb1-4437-97c5-9d19f7a1d538\"";
             httpContext.Request.ContentLength = 603;
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
             httpContext.Response.Body = new MemoryStream();
 
             // Act
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
             await batchHandler.ProcessBatchAsync(httpContext, next);
 
             // Assert
@@ -193,10 +193,10 @@ Host: example.com
             httpContext.Request.ContentType = "multipart/mixed;boundary=\"be13321d-3c7b-4126-aa20-958b2c7a87e0\"";
             httpContext.Request.ContentLength = 736;
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
             httpContext.Response.Body = new MemoryStream();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             // Act & Assert
             await batchHandler.ProcessBatchAsync(httpContext, handler);
@@ -284,7 +284,7 @@ bar
             httpContext.Request.ContentLength = 827;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
 
             if (preferenceHeader != null)
@@ -295,7 +295,7 @@ bar
             httpContext.Response.Body = new MemoryStream();
 
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             // Act
             await batchHandler.ProcessBatchAsync(httpContext, handler);
@@ -396,7 +396,7 @@ foo
             httpContext.Request.ContentLength = 431;
             httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             HeaderDictionary headerDict = new HeaderDictionary();
@@ -476,7 +476,7 @@ Host: example.com
             httpContext.Request.ContentLength = 431;
             httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             HeaderDictionary headerDict = new HeaderDictionary();
@@ -523,7 +523,7 @@ Host: example.com
             httpContext.Request.ContentLength = 431;
             httpContext.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             HeaderDictionary headerDict = new HeaderDictionary();

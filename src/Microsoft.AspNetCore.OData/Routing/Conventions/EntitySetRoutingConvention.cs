@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector(prefix, model, template);
+                action.AddSelector("Get", prefix, model, template);
 
                 // GET ~/Customers/$count or GET ~/Customers/Ns.VipCustomer/$count
                 segments = new List<ODataSegmentTemplate>

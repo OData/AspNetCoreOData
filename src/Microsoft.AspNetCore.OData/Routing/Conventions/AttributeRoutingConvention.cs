@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
@@ -68,13 +69,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                         try
                         {
                             string routeTemplate = GetODataPathTemplateString(routePrefix, routeAttribute.PathTemplate);
-                            ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate);
+
+                            ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate, context.ServiceProvider);
+
+                            // Add the httpMethod?
                             action.AddSelector(context.Prefix, context.Model, pathTemplate);
                         }
-                        catch(ODataException ex)
+                        catch (ODataException ex)
                         {
                             // use the logger to log the wrong odata attribute template. Shall we log the others?
-                            string warning = String.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
+                            string warning = string.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
                                 routeAttribute.PathTemplate, action.ActionMethod.Name, context.Controller.ControllerName, ex.Message);
 
                             _logger.LogWarning(warning);

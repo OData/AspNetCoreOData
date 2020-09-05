@@ -139,9 +139,9 @@
             Gets or sets the OData path.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RouteName">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.PrefixName">
             <summary>
-            Gets/sets the route name
+            Gets/sets the route prefix name
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Endpoint">
@@ -327,9 +327,9 @@
             Maybe it's unnecessary later.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RouteName">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PrefixName">
             <summary>
-            Gets or sets the route name.
+            Gets or sets the route prefix name.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
@@ -707,7 +707,7 @@
             Gets the <see cref="T:Microsoft.OData.ODataMessageQuotas"/> used for reading/writing the batch request/response.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.RouteName">
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.PrefixName">
             <summary>
             Gets or sets the OData route associated with this batch handler.
             </summary>
@@ -829,11 +829,11 @@
             requests to the appropriate ODataBatchHandler.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer,Microsoft.AspNetCore.Http.RequestDelegate)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.#ctor(System.IServiceProvider,Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware"/>.
             </summary>
-            <param name="perRouteContainer">The next middleware.</param>
+            <param name="serviceProvider">The service provider, we don't inject the ODataOptions.</param>
             <param name="next">The next middleware.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
@@ -854,19 +854,21 @@
             Gets/sets a boolean value indicating whether it's endpoint routing.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.AddRoute(System.String,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.AddRoute(System.String,System.String,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
             <summary>
             Add a route name and template for batching.
             </summary>
             <param name="prefixName">The route prefix name.</param>
             <param name="routeTemplate">The route template.</param>
+            <param name="handler">The batch handler.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.TryGetRouteName(Microsoft.AspNetCore.Http.HttpContext,System.String@)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.TryGetPrefixName(Microsoft.AspNetCore.Http.HttpContext,System.String@,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler@)">
             <summary>
             Try and get the batch handler for a given path.
             </summary>
             <param name="context">The http context.</param>
-            <param name="routeName">The route name if found or null.</param>
+            <param name="prefixName">The route/prefix name if found or null.</param>
+            <param name="handler">The batch handler.</param>
             <returns>true if a route name is found, otherwise false.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions">
@@ -2292,7 +2294,7 @@
             Creates a request container that associates with the <paramref name="request"/>.
             </summary>
             <param name="request">The request.</param>
-            <param name="routeName">The name of the route.</param>
+            <param name="prefixName">The name of the route.</param>
             <returns>The request container created.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(Microsoft.AspNetCore.Http.HttpRequest,System.Boolean)">
@@ -2310,7 +2312,7 @@
             Create a scoped request.
             </summary>
             <param name="request">The request.</param>
-            <param name="routeName">The route name.</param>
+            <param name="prefixName">The prefix name.</param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
@@ -5325,14 +5327,22 @@
             <param name="enabled">The boolean value.</param>
             <returns>The calling itself.</returns>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory">
+            <summary>
+            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>.
+            Please call it before the "AddModel".
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetBuilderFactory(System.Func{Microsoft.OData.IContainerBuilder})">
+            <summary>
+            Sets the builder factory. Please call it before the "AddModel".
+            </summary>
+            <param name="factory">The builder factory.</param>
+            <returns>The calling itself.</returns>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
             <summary>
             Gets the configured Edm models.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.PrePrefixPrividers">
-            <summary>
-            Gets the configured service builder.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
@@ -5375,6 +5385,13 @@
             <param name="model">The Edm model.</param>
             <param name="configureAction">The sub service configuration action.</param>
             <returns>The calling itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(System.String)">
+            <summary>
+            Get the root service provider for a given route (prefix) name.
+            </summary>
+            <param name="prefix">The route name (the route prefix name).</param>
+            <returns>The root service provider for the route (prefix) name.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableExpand">
             <summary>
@@ -5462,6 +5479,11 @@
             Build the default QueryOption settings
             </summary>
             <returns>The default query options settings.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainBuilder(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
+            <summary>
+            Initalize the per-route container.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
             <summary>
@@ -5781,6 +5803,16 @@
               Looks up a localized string similar to The property &apos;ElementClrType&apos; of {0} cannot be null..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.EmptyKeyTemplate">
+            <summary>
+              Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; is empty..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.EmptyParameterAlias">
+            <summary>
+              Looks up a localized string similar to Parameter alias &apos;{0}&apos; in segment &apos;{1}&apos; is empty..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityReferenceMustHasKeySegment">
             <summary>
               Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
@@ -5866,6 +5898,11 @@
               Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidAttributeRoutingTemplateSegment">
+            <summary>
+              Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidBatchReaderState">
             <summary>
               Looks up a localized string similar to The current batch reader state &apos;{0}&apos; is invalid. The expected state is &apos;{1}&apos;..
@@ -5904,6 +5941,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidSegmentInSelectExpandPath">
             <summary>
               Looks up a localized string similar to A segment &apos;{0}&apos; within the select or expand query option is not supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.KeyTemplateMustBeInCurlyBraces">
+            <summary>
+              Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.KeyValueCannotBeNull">
@@ -6259,6 +6301,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SubRequestServiceProviderAlreadyExists">
             <summary>
               Looks up a localized string similar to A request container already exists on the request..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TargetKindNotImplemented">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; of kind &apos;{1}&apos; is not implemented..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeCannotBeDeserialized">
@@ -10681,6 +10728,11 @@
             We guarentee that this property should never be "null" when calling "AppliesToAction"
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ServiceProvider">
+            <summary>
+            Gets/sets the odata service provider, used for the attribute routing parser or others.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmOperationImport"/>.
@@ -10862,6 +10914,14 @@
             </summary>
             <param name="segments">The path segments.</param>
             <returns>The string representation of the Context Url path.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.TranslatePathTemplateSegment(Microsoft.OData.UriParser.PathTemplateSegment,System.String@)">
+            <summary>
+            
+            </summary>
+            <param name="pathTemplatesegment"></param>
+            <param name="value"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler">
             <summary>
@@ -11227,6 +11287,16 @@
             Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String,System.IServiceProvider)">
+            <summary>
+            Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
+            to segments
+            </summary>
+            <param name="model">the Edm model.</param>
+            <param name="odataPath">the setting.</param>
+            <param name="requestProvider">The service provider.</param>
+            <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String)">
             <summary>
             Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
@@ -11303,13 +11373,130 @@
             Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String,System.IServiceProvider)">
             <summary>
             Parses the specified OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             </summary>
             <param name="model">The Edm model.</param>
             <param name="odataPath">The OData path template to parse.</param>
+            <param name="requestProvider">The OData service provider.</param>
             <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator">
+            <summary>
+            Translator an OData path to a path segment templates.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.TypeSegment)">
+            <summary>
+            Translate a TypeSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.NavigationPropertySegment)">
+            <summary>
+            Translate a NavigationPropertySegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.EntitySetSegment)">
+            <summary>
+            Translate an EntitySetSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.SingletonSegment)">
+            <summary>
+            Translate an SingletonSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.KeySegment)">
+            <summary>
+            Translate a KeySegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.PropertySegment)">
+            <summary>
+            Translate a PropertySegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.PathTemplateSegment)">
+            <summary>
+            Handle a PropertySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Translate a OperationImportSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.OperationSegment)">
+            <summary>
+            Translate a OperationSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.DynamicPathSegment)">
+            <summary>
+            Translate an OpenPropertySegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
+            <summary>
+            Visit a NavigationPropertyLinkSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.CountSegment)">
+            <summary>
+            Translate a CountSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.ValueSegment)">
+            <summary>
+            Translate a ValueSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.BatchSegment)">
+            <summary>
+            Translate a BatchSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.MetadataSegment)">
+            <summary>
+            Translate a MetadataSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.BatchReferenceSegment)">
+            <summary>
+            Translate a BatchReferenceSegment
+            </summary>
+            <param name="segment">the segment to Translate</param>
+            <returns>Translated the path segment template.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate">
             <summary>
@@ -11322,6 +11509,12 @@
             </summary>
             <param name="actionImport">The wrapper action import.</param>
             <param name="navigationSource">The target navigation source. it could be null.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.#ctor(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate" /> class.
+            </summary>
+            <param name="segment">The operation import segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Literal">
             <inheritdoc />
@@ -11487,6 +11680,47 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate">
+            <summary>
+            Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.DynamicPathSegment"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.#ctor(Microsoft.OData.UriParser.DynamicPathSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate"/> class.
+            </summary>
+            <param name="segment">The open property segment</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Literal">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.EdmType">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Segment">
+            <summary>
+            Gets or sets the open property segment.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.PropertyName">
+            <summary>
+            The parameter name of the dynamic property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.TreatPropertyNameAsParameterName">
+            <summary>
+            Indicates whether the template should match the name, or treat it as a parameter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate">
             <summary>
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/>.
@@ -11565,6 +11799,11 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.IsSingle">
             <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Segment">
+            <summary>
+            Gets the function import segment.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
@@ -11742,6 +11981,37 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate">
+            <summary>
+            Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.NavigationPropertyLinkSegment"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.#ctor(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate"/> class.
+            </summary>
+            <param name="segment">The navigation property link segment</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.Literal">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.EdmType">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.Segment">
+            <summary>
+            Gets or sets the navigation property link segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate">
             <summary>
             Represents a template that could match a $ref segment.
@@ -11806,6 +12076,12 @@
             <param name="navigation">The Edm navigation property.</param>
             <param name="targetNavigationSource">The target navigation source.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.#ctor(Microsoft.OData.UriParser.NavigationPropertySegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate" /> class.
+            </summary>
+            <param name="segment">The navigation property segment.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Literal">
             <inheritdoc />
         </member>
@@ -11827,6 +12103,11 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.IsSingle">
             <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Segment">
+            <summary>
+            Gets the navigation property segment.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
@@ -12040,6 +12321,16 @@
             $count segment.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.PathTemplate">
+            <summary>
+            Path segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Dynamic">
+            <summary>
+            Dynamic segment.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate">
             <summary>
             Represents an OData segment template that could match an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate"/>.
@@ -12124,6 +12415,52 @@
             </summary>
             <param name="key">The query string key.</param>
             <returns>Null or the string value of the query.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate">
+            <summary>
+             Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.PathTemplateSegment"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.#ctor(Microsoft.OData.UriParser.PathTemplateSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate"/> class.
+            </summary>
+            <param name="segment">The path template segment to be parsed as a template.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Literal">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.EdmType">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.PropertyName">
+            <summary>
+            The parameter name of the dynamic property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.SegmentName">
+            <summary>
+            Gets the segment name
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.TreatPropertyNameAsParameterName">
+            <summary>
+            Indicates whether the template should match the name, or treat it as a parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Segment">
+            <summary>
+            The parameter name of the dynamic property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate">
             <summary>

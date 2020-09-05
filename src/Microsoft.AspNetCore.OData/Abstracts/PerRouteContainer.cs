@@ -57,40 +57,40 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         private void Initialize()
         {
-            _perPrefixContainers = new ConcurrentDictionary<string, IServiceProvider>();
+            //_perPrefixContainers = new ConcurrentDictionary<string, IServiceProvider>();
 
-            foreach (var config in _options.Value.Models)
-            {
-                IEdmModel model = config.Value.Item1;
-                Action<IContainerBuilder> serviceBuilder = config.Value.Item2;
+            //foreach (var config in _options.Value.Models)
+            //{
+            //    IEdmModel model = config.Value.Item1;
+            //    Action<IContainerBuilder> serviceBuilder = config.Value.Item2;
 
-                IContainerBuilder odataContainerBuilder = null;
-                if (this.BuilderFactory != null)
-                {
-                    odataContainerBuilder = this.BuilderFactory();
-                    if (odataContainerBuilder == null)
-                    {
-                        throw Error.InvalidOperation(SRResources.NullContainerBuilder);
-                    }
-                }
-                else
-                {
-                    odataContainerBuilder = new DefaultContainerBuilder();
-                }
+            //    IContainerBuilder odataContainerBuilder = null;
+            //    if (this.BuilderFactory != null)
+            //    {
+            //        odataContainerBuilder = this.BuilderFactory();
+            //        if (odataContainerBuilder == null)
+            //        {
+            //            throw Error.InvalidOperation(SRResources.NullContainerBuilder);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        odataContainerBuilder = new DefaultContainerBuilder();
+            //    }
 
-                odataContainerBuilder.AddDefaultODataServices();
+            //    odataContainerBuilder.AddDefaultODataServices();
 
-                serviceBuilder?.Invoke(odataContainerBuilder);
+            //    serviceBuilder?.Invoke(odataContainerBuilder);
 
-                // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-                odataContainerBuilder.AddService(ServiceLifetime.Singleton,
-                    typeof(ODataUriResolver),
-                    sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
+            //    // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
+            //    odataContainerBuilder.AddService(ServiceLifetime.Singleton,
+            //        typeof(ODataUriResolver),
+            //        sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
-                odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
+            //    odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
 
-                _perPrefixContainers[config.Key] = odataContainerBuilder.BuildContainer();
-            }
+            //    _perPrefixContainers[config.Key] = odataContainerBuilder.BuildContainer();
+            //}
         }
     }
 }

@@ -61,6 +61,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
+        /// <summary>
+        /// Gets the function import segment.
+        /// </summary>
+        public OperationImportSegment Segment { get; }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {

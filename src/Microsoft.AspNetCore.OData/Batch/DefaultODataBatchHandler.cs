@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             HttpRequest request = context.Request;
-            IServiceProvider requestContainer = request.CreateSubServiceProvider(RouteName);
+            IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             // How to dispose it?

@@ -590,4 +590,19 @@
   <data name="RequiredParametersNotSubsetOfFunctionParameters" xml:space="preserve">
     <value>The input parameters '{0}' is not subset of function parameters '{1}'.</value>
   </data>
+  <data name="TargetKindNotImplemented" xml:space="preserve">
+    <value>'{0}' of kind '{1}' is not implemented.</value>
+  </data>
+  <data name="InvalidAttributeRoutingTemplateSegment" xml:space="preserve">
+    <value>The attribute routing template contains invalid segment '{0}'.</value>
+  </data>
+  <data name="EmptyParameterAlias" xml:space="preserve">
+    <value>Parameter alias '{0}' in segment '{1}' is empty.</value>
+  </data>
+  <data name="KeyTemplateMustBeInCurlyBraces" xml:space="preserve">
+    <value>Key template value '{0}' for key segment '{1}' does not start with '{{' or ends with '}}'.</value>
+  </data>
+  <data name="EmptyKeyTemplate" xml:space="preserve">
+    <value>Key template value '{0}' for key segment '{1}' is empty.</value>
+  </data>
 </root>

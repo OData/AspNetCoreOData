@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -18,18 +19,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="actionImport">The wrapper action import.</param>
         /// <param name="navigationSource">The target navigation source. it could be null.</param>
         public ActionImportSegmentTemplate(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
+            : this(new OperationImportSegment(actionImport, navigationSource as IEdmEntitySetBase))
         {
-            ActionImport = actionImport ?? throw new ArgumentNullException(nameof(actionImport));
+        }
 
-            if (actionImport.Action.ReturnType != null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ActionImportSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="segment">The operation import segment.</param>
+        internal ActionImportSegmentTemplate(OperationImportSegment segment)
+        {
+            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+
+            ActionImport = segment.OperationImports.First() as IEdmActionImport;
+
+            if (ActionImport.Action.ReturnType != null)
             {
-                IsSingle = actionImport.Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
+                IsSingle = ActionImport.Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
 
-                EdmType = actionImport.Action.ReturnType.Definition;
+                EdmType = ActionImport.Action.ReturnType.Definition;
             }
 
-            NavigationSource = navigationSource;
-            Segment = new OperationImportSegment(ActionImport, NavigationSource as IEdmEntitySetBase);
+            NavigationSource = segment.EntitySet;
         }
 
         /// <inheritdoc />

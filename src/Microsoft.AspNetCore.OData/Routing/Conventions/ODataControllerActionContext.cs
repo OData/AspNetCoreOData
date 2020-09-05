@@ -103,5 +103,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// We guarentee that this property should never be "null" when calling "AppliesToAction"
         /// </summary>
         public ActionModel Action { get; internal set; }
+
+        /// <summary>
+        /// Gets/sets the odata service provider, used for the attribute routing parser or others.
+        /// </summary>
+        public IServiceProvider ServiceProvider { get; set; }
     }
 }

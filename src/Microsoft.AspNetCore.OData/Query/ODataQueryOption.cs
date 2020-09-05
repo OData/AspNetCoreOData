@@ -77,7 +77,8 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Contract.Assert(context.RequestContainer == null);
-            context.RequestContainer = request.HttpContext.RequestServices;
+            context.RequestContainer = request.GetSubServiceProvider();
+            context.Request = request;
 
             Context = context;
             Request = request;

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,35 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="segment">The key segment.</param>
         public KeySegmentTemplate(KeySegment segment)
         {
+            if (segment == null)
+            {
+                throw new ArgumentNullException(nameof(segment));
+            }
+
+            NavigationSource = segment.NavigationSource;
+            EntityType = segment.EdmType as IEdmEntityType;
+
+            var keys = BuildKeyMappings(segment.Keys);
+            if (keys.Count == 1)
+            {
+                var first = keys.First();
+                // {key}
+                Literal = first.Value;
+                var firstKey = EntityType.Key().First();
+
+                _keyMappings[firstKey.Name] = (Literal, firstKey.Type);
+            }
+            else
+            {
+                // Id1={keyId1},Id2={keyId2}
+                foreach (var key in keys)
+                {
+                    var entityKey = EntityType.Key().First(e => e.Name == key.Key);
+                    _keyMappings[entityKey.Name] = (key.Value, entityKey.Type);
+                }
+
+                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={{{a.Value.Item1}}}"));
+            }
         }
 
         /// <summary>
@@ -190,6 +220,53 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             return new KeySegment(keysValues, EntityType, NavigationSource);
+        }
+
+        internal static IDictionary<string, string> BuildKeyMappings(IEnumerable<KeyValuePair<string, object>> keys)
+        {
+            Contract.Assert(keys != null);
+
+            Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
+
+            foreach (KeyValuePair<string, object> key in keys)
+            {
+                string nameInRouteData;
+
+                UriTemplateExpression uriTemplateExpression = key.Value as UriTemplateExpression;
+                if (uriTemplateExpression != null)
+                {
+                    nameInRouteData = uriTemplateExpression.LiteralText.Trim();
+                }
+                else
+                {
+                    // just for easy construct the key segment template
+                    // it must start with "{" and end with "}"
+                    nameInRouteData = key.Value as string;
+                }
+
+                if (nameInRouteData == null || !IsRouteParameter(nameInRouteData))
+                {
+                    throw new ODataException(
+                        Error.Format(SRResources.KeyTemplateMustBeInCurlyBraces, key.Value, key.Key));
+                }
+
+                //nameInRouteData = nameInRouteData.Substring(1, nameInRouteData.Length - 2);
+                //if (String.IsNullOrEmpty(nameInRouteData))
+                //{
+                //    throw new ODataException(
+                //            Error.Format(SRResources.EmptyKeyTemplate, key.Value, key.Key));
+                //}
+
+                parameterMappings[key.Key] = nameInRouteData;
+            }
+
+            return parameterMappings;
+        }
+
+        private static bool IsRouteParameter(string parameterName)
+        {
+            return parameterName.StartsWith("{", StringComparison.Ordinal) &&
+                    parameterName.EndsWith("}", StringComparison.Ordinal);
         }
     }
 }

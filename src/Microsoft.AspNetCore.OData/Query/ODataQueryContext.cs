@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -165,6 +166,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// use in stand-alone scenarios.
         /// </remarks>
         public IServiceProvider RequestContainer { get; internal set; }
+
+        internal HttpRequest Request { get; set; }
 
         internal IEdmProperty TargetProperty { get; private set; }
 

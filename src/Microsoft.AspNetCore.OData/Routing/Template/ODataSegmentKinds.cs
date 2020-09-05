@@ -77,5 +77,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// $count segment.
         /// </summary>
         Count,
+
+        /// <summary>
+        /// Path segment.
+        /// </summary>
+        PathTemplate,
+
+        /// <summary>
+        /// Dynamic segment.
+        /// </summary>
+        Dynamic,
     }
 }

@@ -50,10 +50,6 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
             services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
-            // Setup per-route dependency injection. When routes are added, additional
-            // per-route classes will be injected, such as IEdmModel and IODataRoutingConventions.
-            services.TryAddSingleton<IPerRouteContainer, PerRouteContainer>();
-
             services.TryAddSingleton(sp =>
             {
                 ODataOptions options = sp.GetRequiredService<IOptions<ODataOptions>>().Value;

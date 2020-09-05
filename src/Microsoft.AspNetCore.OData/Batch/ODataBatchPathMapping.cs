@@ -14,9 +14,9 @@ namespace Microsoft.AspNetCore.OData.Batch
     /// A class for storing batch route names and prefixes used to determine if a route is a
     /// batch route.
     /// </summary>
-    public class ODataBatchPathMapping
+    internal class ODataBatchPathMapping
     {
-        private Dictionary<TemplateMatcher, string> templateMappings = new Dictionary<TemplateMatcher, string>();
+        private Dictionary<TemplateMatcher, (string, ODataBatchHandler)> templateMappings = new Dictionary<TemplateMatcher, (string, ODataBatchHandler)>();
 
         /// <summary>
         /// Gets/sets a boolean value indicating whether it's endpoint routing.
@@ -28,7 +28,8 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// </summary>
         /// <param name="prefixName">The route prefix name.</param>
         /// <param name="routeTemplate">The route template.</param>
-        public void AddRoute(string prefixName, string routeTemplate)
+        /// <param name="handler">The batch handler.</param>
+        public void AddRoute(string prefixName, string routeTemplate, ODataBatchHandler handler)
         {
             if (routeTemplate == null)
             {
@@ -38,30 +39,33 @@ namespace Microsoft.AspNetCore.OData.Batch
             string newRouteTemplate = routeTemplate.StartsWith("/", StringComparison.Ordinal) ? routeTemplate.Substring(1) : routeTemplate;
             RouteTemplate parsedTemplate = TemplateParser.Parse(newRouteTemplate);
             TemplateMatcher matcher = new TemplateMatcher(parsedTemplate, new RouteValueDictionary());
-            templateMappings[matcher] = prefixName;
+            templateMappings[matcher] = (prefixName, handler);
         }
 
         /// <summary>
         /// Try and get the batch handler for a given path.
         /// </summary>
         /// <param name="context">The http context.</param>
-        /// <param name="routeName">The route name if found or null.</param>
+        /// <param name="prefixName">The route/prefix name if found or null.</param>
+        /// <param name="handler">The batch handler.</param>
         /// <returns>true if a route name is found, otherwise false.</returns>
-        public bool TryGetRouteName(HttpContext context, out string routeName)
+        public bool TryGetPrefixName(HttpContext context, out string prefixName, out ODataBatchHandler handler)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            routeName = null;
+            prefixName = null;
+            handler = null;
             string path = context.Request.Path;
             foreach (var item in templateMappings)
             {
                 RouteValueDictionary routeData = new RouteValueDictionary();
                 if (item.Key.TryMatch(path, routeData))
                 {
-                    routeName = item.Value;
+                    prefixName = item.Value.Item1;
+                    handler = item.Value.Item2;
                     if (routeData.Count > 0)
                     {
                         context.ODataFeature().BatchRouteData = routeData;

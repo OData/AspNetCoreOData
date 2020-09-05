@@ -52,9 +52,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public EndPoint Endpoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the route name.
+        /// Gets or sets the route prefix name.
         /// </summary>
-        public string RouteName { get; set; }
+        public string PrefixName { get; set; }
 
         /// <summary>
         /// Gets or sets the Url helper.

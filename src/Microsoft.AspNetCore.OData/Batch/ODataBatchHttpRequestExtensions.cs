@@ -308,7 +308,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 context.Request.Host = request.Host;
             }
 
-            context.Request.ODataFeature().RouteName = oDataRouteName;
+            context.Request.ODataFeature().PrefixName = oDataRouteName;
 
             // The IActionContextAccessor and ActionContext will be present after routing but not before
             // GetUrlHelper only uses the HttpContext and the Router, which we have so construct a dummy

@@ -10,6 +10,7 @@ using Microsoft.OData.Edm;
 using System.Diagnostics.Contracts;
 using Microsoft.OData;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Parser
 {
@@ -18,6 +19,54 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
     /// </summary>
     public class DefaultODataPathTemplateParser : IODataPathTemplateParser
     {
+        /// <summary>
+        /// Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
+        /// to segments
+        /// </summary>
+        /// <param name="model">the Edm model.</param>
+        /// <param name="odataPath">the setting.</param>
+        /// <param name="requestProvider">The service provider.</param>
+        /// <returns>Null or <see cref="ODataPathTemplate"/>.</returns>
+        public virtual ODataPathTemplate Parse(IEdmModel model, string odataPath, IServiceProvider requestProvider)
+        {
+            if (model == null || string.IsNullOrEmpty(odataPath))
+            {
+                return null;
+            }
+
+            ODataUriParser uriParser;
+            if (requestProvider == null)
+            {
+                uriParser = new ODataUriParser(model, new Uri(odataPath, UriKind.Relative));
+            }
+            else
+            {
+                uriParser = new ODataUriParser(model, new Uri(odataPath, UriKind.Relative), requestProvider);
+            }
+
+            uriParser.EnableUriTemplateParsing = true;
+
+            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in paraenthese and key as segment.
+
+            ODataPath path = uriParser.ParsePath();
+
+            return Templatify(path);
+        }
+
+        private static ODataPathTemplate Templatify(ODataPath path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            ODataPathSegmentTemplateTranslator translator = new ODataPathSegmentTemplateTranslator();
+
+            var templates = path.WalkWith(translator);
+
+            return new ODataPathTemplate(templates);
+        }
+
         /// <summary>
         /// Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
         /// to segments

@@ -2,10 +2,11 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.OData.Batch
 {
@@ -17,19 +18,23 @@ namespace Microsoft.AspNetCore.OData.Batch
     public class ODataBatchMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IPerRouteContainer _perRouteContainer;
         private ODataBatchPathMapping _batchMapping;
 
         /// <summary>
         /// Instantiates a new instance of <see cref="ODataBatchMiddleware"/>.
         /// </summary>
-        /// <param name="perRouteContainer">The next middleware.</param>
+        /// <param name="serviceProvider">The service provider, we don't inject the ODataOptions.</param>
         /// <param name="next">The next middleware.</param>
-        public ODataBatchMiddleware(IPerRouteContainer perRouteContainer, RequestDelegate next)
+        public ODataBatchMiddleware(IServiceProvider serviceProvider, RequestDelegate next)
         {
-            _perRouteContainer = perRouteContainer;
             _next = next;
-            Initialize();
+
+            // We inject the service provider to let the middel ware pass without inject the ODataOptions.
+            IOptions<ODataOptions> odataOptionsOptions = serviceProvider?.GetService<IOptions<ODataOptions>>();
+            if (odataOptionsOptions != null && odataOptionsOptions.Value != null)
+            {
+                Initialize(odataOptionsOptions.Value);
+            }
         }
 
         /// <summary>
@@ -44,12 +49,11 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(context));
             }
 
-            string routeName;
-            if (_batchMapping != null && _batchMapping.TryGetRouteName(context, out routeName))
+            string prefixName;
+            ODataBatchHandler batchHandler;
+            if (_batchMapping != null && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
             {
-                IServiceProvider serviceProvider = _perRouteContainer.GetServiceProvider(routeName);
-                ODataBatchHandler batchHandler = serviceProvider.GetRequiredService<ODataBatchHandler>();
-
+                Contract.Assert(batchHandler != null);
                 await batchHandler.ProcessBatchAsync(context, _next).ConfigureAwait(false);
             }
             else
@@ -58,25 +62,33 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
         }
 
-        private void Initialize()
+        private void Initialize(ODataOptions options)
         {
-            foreach (var service in _perRouteContainer.Services)
+            Contract.Assert(options != null);
+
+            foreach (var model in options.Models)
             {
+                IServiceProvider subServiceProvider = model.Value.Item2;
+                if (subServiceProvider == null)
+                {
+                    continue;
+                }
+
                 // If a batch handler is present, register the route with the batch path mapper. This will be used
                 // by the batching middleware to handle the batch request. Batching still requires the injection
                 // of the batching middleware via UseODataBatching().
-                ODataBatchHandler batchHandler = service.Value.GetService<ODataBatchHandler>();
+                ODataBatchHandler batchHandler = subServiceProvider.GetService<ODataBatchHandler>();
                 if (batchHandler != null)
                 {
-                    batchHandler.RouteName = service.Key;
-                    string batchPath = string.IsNullOrEmpty(service.Key)  ? "/$batch" : $"/{service.Key}/$batch";
+                    batchHandler.PrefixName = model.Key;
+                    string batchPath = string.IsNullOrEmpty(model.Key)  ? "/$batch" : $"/{model.Key}/$batch";
 
                     if (_batchMapping == null)
                     {
                         _batchMapping = new ODataBatchPathMapping();
                     }
 
-                    _batchMapping.AddRoute(service.Key, batchPath);
+                    _batchMapping.AddRoute(model.Key, batchPath, batchHandler);
                 }
             }
         }

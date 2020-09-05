@@ -1138,7 +1138,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            Uri baseUri = new Uri(resourceContext.Request.CreateODataLink("", MetadataSegment.Instance));
+            Uri baseUri = new Uri(resourceContext.Request.CreateODataLink(MetadataSegment.Instance));
             Uri metadata = new Uri(baseUri, "#" + CreateMetadataFragment(operation));
 
             ODataOperation odataOperation;

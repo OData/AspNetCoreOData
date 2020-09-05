@@ -502,6 +502,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; is empty..
+        /// </summary>
+        internal static string EmptyKeyTemplate {
+            get {
+                return ResourceManager.GetString("EmptyKeyTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter alias &apos;{0}&apos; in segment &apos;{1}&apos; is empty..
+        /// </summary>
+        internal static string EmptyParameterAlias {
+            get {
+                return ResourceManager.GetString("EmptyParameterAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
         /// </summary>
         internal static string EntityReferenceMustHasKeySegment {
@@ -655,6 +673,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidAttributeRoutingTemplateSegment {
+            get {
+                return ResourceManager.GetString("InvalidAttributeRoutingTemplateSegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current batch reader state &apos;{0}&apos; is invalid. The expected state is &apos;{1}&apos;..
         /// </summary>
         internal static string InvalidBatchReaderState {
@@ -723,6 +750,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidSegmentInSelectExpandPath {
             get {
                 return ResourceManager.GetString("InvalidSegmentInSelectExpandPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
+        /// </summary>
+        internal static string KeyTemplateMustBeInCurlyBraces {
+            get {
+                return ResourceManager.GetString("KeyTemplateMustBeInCurlyBraces", resourceCulture);
             }
         }
         
@@ -1362,6 +1398,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SubRequestServiceProviderAlreadyExists {
             get {
                 return ResourceManager.GetString("SubRequestServiceProviderAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; of kind &apos;{1}&apos; is not implemented..
+        /// </summary>
+        internal static string TargetKindNotImplemented {
+            get {
+                return ResourceManager.GetString("TargetKindNotImplemented", resourceCulture);
             }
         }
         

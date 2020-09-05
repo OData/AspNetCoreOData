@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
             IODataPathTemplateParser parser = new DefaultODataPathTemplateParser();
 
             // Act
-            ODataPathTemplate path = parser.Parse(model, template);
+            ODataPathTemplate path = parser.Parse(model, template, null);
 
             // Assert
             Assert.NotNull(path);

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -88,6 +89,44 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             return handler.PathLiteral;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pathTemplatesegment"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string TranslatePathTemplateSegment(this PathTemplateSegment pathTemplatesegment, out string value)
+        {
+            if (pathTemplatesegment == null)
+            {
+                throw Error.ArgumentNull("pathTemplatesegment");
+            }
+
+            string pathTemplateSegmentLiteralText = pathTemplatesegment.LiteralText;
+            if (pathTemplateSegmentLiteralText == null)
+            {
+                throw new ODataException(Error.Format(SRResources.InvalidAttributeRoutingTemplateSegment, string.Empty));
+            }
+
+            if (pathTemplateSegmentLiteralText.StartsWith("{", StringComparison.Ordinal)
+                && pathTemplateSegmentLiteralText.EndsWith("}", StringComparison.Ordinal))
+            {
+                string[] keyValuePair = pathTemplateSegmentLiteralText.Substring(1,
+                    pathTemplateSegmentLiteralText.Length - 2).Split(':');
+                if (keyValuePair.Length != 2)
+                {
+                    throw new ODataException(Error.Format(
+                        SRResources.InvalidAttributeRoutingTemplateSegment,
+                        pathTemplateSegmentLiteralText));
+                }
+                value = "{" + keyValuePair[0] + "}";
+                return keyValuePair[1];
+            }
+
+            value = string.Empty;
+            return string.Empty;
         }
     }
 }

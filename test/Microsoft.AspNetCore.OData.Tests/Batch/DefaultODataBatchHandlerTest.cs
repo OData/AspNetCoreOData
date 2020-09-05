@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act & Assert
             Assert.False(batchHandler.ContinueOnError);
             Assert.NotNull(batchHandler.MessageQuotas);
-            Assert.Null(batchHandler.RouteName);
+            Assert.Null(batchHandler.PrefixName);
         }
 
         [Fact]
@@ -198,7 +198,7 @@ bar
             httpContext.Request.ContentLength = 827;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
 
             if (preferenceHeader != null)
@@ -207,7 +207,7 @@ bar
             }
 
             httpContext.Response.Body = new MemoryStream();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             // Act
             await batchHandler.ProcessBatchAsync(httpContext, handler);
@@ -284,12 +284,12 @@ bar
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
             httpContext.Response.Body = new MemoryStream();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             // Act
             await batchHandler.ProcessBatchAsync(httpContext, handler);
@@ -413,10 +413,10 @@ Host: example.com
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
             httpContext.Response.Body = new MemoryStream();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             // Act
             IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
@@ -472,10 +472,10 @@ Host: example.com
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().RouteName = "odata";
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
             httpContext.Response.Body = new MemoryStream();
-            batchHandler.RouteName = "odata";
+            batchHandler.PrefixName = "odata";
 
             httpContext.Features[typeof(DefaultODataBatchHandlerTest)] = "bar";
 

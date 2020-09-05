@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             // This container is for the overall batch request.
             HttpRequest request = context.Request;
-            IServiceProvider requestContainer = request.CreateSubServiceProvider(RouteName);
+            IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             // How to dispose it?

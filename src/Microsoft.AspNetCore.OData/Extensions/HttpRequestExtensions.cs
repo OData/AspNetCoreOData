@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -269,16 +270,16 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
-            return request.CreateSubServiceProvider(request.ODataFeature().RouteName);
+            return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
         }
 
         /// <summary>
         /// Creates a request container that associates with the <paramref name="request"/>.
         /// </summary>
         /// <param name="request">The request.</param>
-        /// <param name="routeName">The name of the route.</param>
+        /// <param name="prefixName">The name of the route.</param>
         /// <returns>The request container created.</returns>
-        public static IServiceProvider CreateSubServiceProvider(this HttpRequest request, string routeName)
+        public static IServiceProvider CreateSubServiceProvider(this HttpRequest request, string prefixName)
         {
             if (request == null)
             {
@@ -290,7 +291,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.InvalidOperation(SRResources.SubRequestServiceProviderAlreadyExists);
             }
 
-            IServiceScope requestScope = request.CreateRequestScope(routeName);
+            IServiceScope requestScope = request.CreateRequestScope(prefixName);
             IServiceProvider requestContainer = requestScope.ServiceProvider;
 
             request.ODataFeature().RequestScope = requestScope;
@@ -326,17 +327,36 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Create a scoped request.
         /// </summary>
         /// <param name="request">The request.</param>
-        /// <param name="routeName">The route name.</param>
+        /// <param name="prefixName">The prefix name.</param>
         /// <returns></returns>
-        private static IServiceScope CreateRequestScope(this HttpRequest request, string routeName)
+        private static IServiceScope CreateRequestScope(this HttpRequest request, string prefixName)
         {
-            IPerRouteContainer perRouteContainer = request.HttpContext.RequestServices.GetRequiredService<IPerRouteContainer>();
-            if (perRouteContainer == null)
+            //IPerRouteContainer perRouteContainer = request.HttpContext.RequestServices.GetRequiredService<IPerRouteContainer>();
+            //if (perRouteContainer == null)
+            //{
+            //    throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(IPerRouteContainer));
+            //}
+
+            //IServiceProvider rootContainer = perRouteContainer.GetServiceProvider(routeName);
+            //IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+            //// Bind scoping request into the OData container.
+            ////if (!string.IsNullOrEmpty(routeName))
+            ////{
+            ////    scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
+            ////}
+
+            //return scope;
+
+            IOptions<ODataOptions> odataOptionsOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
+            if (odataOptionsOptions == null)
             {
-                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(IPerRouteContainer));
+                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(ODataOptions));
             }
 
-            IServiceProvider rootContainer = perRouteContainer.GetServiceProvider(routeName);
+            ODataOptions options = odataOptionsOptions.Value;
+
+            IServiceProvider rootContainer = options.GetODataServiceProvider(prefixName);
             IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
             // Bind scoping request into the OData container.

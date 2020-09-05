@@ -29,9 +29,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         ODataPath Path { get; set; }
 
         /// <summary>
-        /// Gets/sets the route name
+        /// Gets/sets the route prefix name
         /// </summary>
-        string RouteName { get; set; }
+        string PrefixName { get; set; }
 
         /// <summary>
         /// Gets/sets the endpoint selected

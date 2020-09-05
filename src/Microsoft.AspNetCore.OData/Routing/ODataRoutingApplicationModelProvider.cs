@@ -76,6 +76,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     }
 
                     ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
+                    odataContext.ServiceProvider = route.Value.Item2;
 
                     // consider to replace the Linq with others?
                     IODataControllerActionConvention[] conventions =

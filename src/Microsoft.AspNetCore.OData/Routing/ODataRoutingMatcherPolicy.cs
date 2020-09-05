@@ -78,11 +78,15 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                // Check the http method
-                if (metadata.HttpMethods != null && !metadata.HttpMethods.Contains(httpContext.Request.Method))
+                IHttpMethodMetadata httpMetadata = candidate.Endpoint.Metadata.GetMetadata<IHttpMethodMetadata>();
+                if (httpMetadata == null)
                 {
-                    candidates.SetValidity(i, false);
-                    continue;
+                    // Check the http method
+                    if (metadata.HttpMethods != null && !metadata.HttpMethods.Contains(httpContext.Request.Method))
+                    {
+                        candidates.SetValidity(i, false);
+                        continue;
+                    }
                 }
 
                 ODataTemplateTranslateContext translatorContext =
@@ -92,6 +96,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 if (odataPath != null)
                 {
                     IODataFeature odataFeature = httpContext.ODataFeature();
+                    odataFeature.PrefixName = metadata.Prefix;
                     odataFeature.Model = metadata.Model;
                     odataFeature.Path = odataPath;
                 }

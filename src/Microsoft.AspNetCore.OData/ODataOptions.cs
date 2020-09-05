@@ -3,11 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -102,6 +105,23 @@ namespace Microsoft.AspNetCore.OData
             EnableAttributeRouting = enabled;
             return this;
         }
+
+        /// <summary>
+        /// Gets or sets a function to build an <see cref="IContainerBuilder"/>.
+        /// Please call it before the "AddModel".
+        /// </summary>
+        public Func<IContainerBuilder> BuilderFactory { get; set; }
+
+        /// <summary>
+        /// Sets the builder factory. Please call it before the "AddModel".
+        /// </summary>
+        /// <param name="factory">The builder factory.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetBuilderFactory(Func<IContainerBuilder> factory)
+        {
+            BuilderFactory = factory;
+            return this;
+        }
         #endregion
 
         #region Models
@@ -109,12 +129,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Gets the configured Edm models.
         /// </summary>
-        public IDictionary<string, (IEdmModel, Action<IContainerBuilder>)> Models { get; } = new Dictionary<string, (IEdmModel, Action<IContainerBuilder>)>();
-
-        /// <summary>
-        /// Gets the configured service builder.
-        /// </summary>
-        public IDictionary<string, Action<IContainerBuilder>> PrePrefixPrividers { get; } = new Dictionary<string, Action<IContainerBuilder>>();
+        public IDictionary<string, (IEdmModel, IServiceProvider)> Models { get; } = new Dictionary<string, (IEdmModel, IServiceProvider)>();
 
         /// <summary>
         /// Add an Edm model without prefix.
@@ -179,8 +194,24 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, prefix);
             }
 
-            Models[prefix] = (model, configureAction);
+            IServiceProvider serviceProvider = BuildContainBuilder(model, configureAction);
+            Models[prefix] = (model, serviceProvider);
             return this;
+        }
+
+        /// <summary>
+        /// Get the root service provider for a given route (prefix) name.
+        /// </summary>
+        /// <param name="prefix">The route name (the route prefix name).</param>
+        /// <returns>The root service provider for the route (prefix) name.</returns>
+        public IServiceProvider GetODataServiceProvider(string prefix)
+        {
+            if (Models.ContainsKey(prefix))
+            {
+                return Models[prefix].Item2;
+            }
+
+            return null;
         }
         #endregion
 
@@ -333,5 +364,47 @@ namespace Microsoft.AspNetCore.OData
             return settings;
         }
         #endregion
+
+        /// <summary>
+        /// Initalize the per-route container.
+        /// </summary>
+        private IServiceProvider BuildContainBuilder(IEdmModel model, Action<IContainerBuilder> setupAction)
+        {
+            //if (setupAction == null)
+            //{
+            //    return null;
+            //}
+
+            IContainerBuilder odataContainerBuilder = null;
+            if (this.BuilderFactory != null)
+            {
+                odataContainerBuilder = this.BuilderFactory();
+                if (odataContainerBuilder == null)
+                {
+                    throw Error.InvalidOperation(SRResources.NullContainerBuilder);
+                }
+            }
+            else
+            {
+                odataContainerBuilder = new DefaultContainerBuilder();
+            }
+
+            odataContainerBuilder.AddDefaultODataServices();
+
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => BuildDefaultQuerySettings());
+
+            odataContainerBuilder.AddDefaultWebApiServices();
+
+            setupAction?.Invoke(odataContainerBuilder);
+
+            // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton,
+                typeof(ODataUriResolver),
+                sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
+
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
+
+            return odataContainerBuilder.BuildContainer();
+        }
     }
 }

@@ -1,12 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
+using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -16,12 +23,73 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
-    public class EnumsTest : WebApplicationTestBase<EnumsTest.EnumsTestStartup>
+    public class WebODataControllerFeatureProvider1 : ControllerFeatureProvider
+    {
+        private ISet<Type> _controllers;
+
+        public WebODataControllerFeatureProvider1()
+        {
+            _controllers = null;
+        }
+
+        public WebODataControllerFeatureProvider1(params Type[] controllers)
+        {
+            _controllers = new HashSet<Type>(controllers);
+        }
+
+        // Override IsController method and configure custom 
+        protected override bool IsController(TypeInfo typeInfo)
+        {
+            bool isController = base.IsController(typeInfo);
+            if (!isController)
+            {
+                return false;
+            }
+
+            if (_controllers == null)
+            {
+                return true;
+            }
+
+            if (typeInfo.Name == "MetadataController")
+            {
+                return true;
+            }
+
+            return _controllers.Contains(typeInfo);
+        }
+    }
+
+    public class EnumsTest : WebODataTestBase<EnumsTest.EnumsTestStartup>
     {
         public class EnumsTestStartup
         {
             public void ConfigureServices(IServiceCollection services)
             {
+                services.AddControllers()
+                    .ConfigureApplicationPartManager(pm =>
+                    {
+                        var controllers = new[] { typeof(EmployeesController), typeof(MetadataController) };
+
+                        //IList<ApplicationPart> parts = pm.ApplicationParts;
+                        //IList<ApplicationPart> nonAssemblyParts = parts.Where(p => p.GetType() != typeof(IApplicationPartTypeProvider)).ToList();
+                        //pm.ApplicationParts.Clear();
+                        //pm.ApplicationParts.Concat(nonAssemblyParts);
+
+                        //// Add a new AssemblyPart with the controllers.
+                        //AssemblyPart part = new AssemblyPart(new TestAssembly(controllers));
+                        //pm.ApplicationParts.Add(part);
+
+                        //ControllerFeatureProvider provider = pm.FeatureProviders.OfType<ControllerFeatureProvider>().FirstOrDefault();
+                        //if (provider != null)
+                        //{
+                        //    pm.FeatureProviders.Remove(provider);
+                        //}
+
+                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(controllers));
+                      //  pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(EmployeesController), typeof(MetadataController)));
+                    });
+
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
@@ -33,12 +101,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
             public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             {
-                app.AddControllers(new[] { typeof(EmployeesController), typeof(MetadataController) });
-
                 app.UseRouting();
                 app.UseEndpoints(endpoints =>
                 {
-
                     endpoints.MapControllers();
                 });
             }
@@ -58,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             string requestUri = string.Format("{0}/$metadata", modelMode);
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await Client.GetAsync(requestUri);
             var stream = await response.Content.ReadAsStreamAsync();
 
             IODataResponseMessage message = new ODataMessageWrapper(stream, response.Content.Headers);
@@ -132,9 +197,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
         #endregion
 
-#if false
-#region Query
-
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -142,9 +204,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEntitySet(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees?$format=" + format;
+            string requestUri = "/convention/Employees?$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            string test = await response.Content.ReadAsStringAsync();
             Assert.True(response.IsSuccessStatusCode);
 
             var json = await response.Content.ReadAsObject<JObject>();
@@ -153,13 +216,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             if (format == "application/json;odata.metadata=full")
             {
                 var typeOfAccessLevel = results[0]["AccessLevel@odata.type"].ToString();
-                Assert.Equal("#Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel", typeOfAccessLevel);
+                Assert.Equal("#Microsoft.AspNetCore.OData.E2E.Tests.Enums.AccessLevel", typeOfAccessLevel);
 
                 var typeOfSkillSet = results[0]["SkillSet@odata.type"].ToString();
-                Assert.Equal("#Collection(Microsoft.Test.E2E.AspNet.OData.Enums.Skill)", typeOfSkillSet);
+                Assert.Equal("#Collection(Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill)", typeOfSkillSet);
             }
         }
-
+#if false
         [Theory]
         [InlineData("/convention/Employees/$count", 3)]
         [InlineData("/convention/Employees/$count?$filter=Name eq 'Name1'", 1)]
@@ -379,9 +442,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(3, secondEmployee["ID"]);
         }
 
-#endregion
-
-#region Update
+        #region Update
 
         [Fact]
         public async Task AddEntity()
@@ -558,9 +619,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-#endregion
+        #endregion
 
-#region Delete
+        #region Delete
 
         [Fact]
         public async Task DeleteEntity()
@@ -593,9 +654,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-#endregion
+        #endregion
 
-#region Enum with action
+        #region Enum with action
 
         [Fact]
         public async Task EnumInActionParameter()
@@ -626,9 +687,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal("Read, Execute", value);
         }
 
-#endregion
+        #endregion
 
-#region Enum with function
+        #region Enum with function
 
         [Fact]
         public async Task EnumInFunctionOutput()
@@ -659,15 +720,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(expectedValue, actualValue);
         }
 
-#endregion
+        #endregion
 
+#endif
         private async Task<HttpResponseMessage> ResetDatasource()
         {
-            var uriReset = this.BaseAddress + "/convention/ResetDataSource";
-            var response = await this.Client.PostAsync(uriReset, null);
+            var response = await this.Client.PostAsync("convention/ResetDataSource", null);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
         }
-#endif
     }
 }
