@@ -4,7 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
+namespace Microsoft.AspNetCore.OData.TestCommon
 {
     /// <summary>
     /// Base class for <c>TheoryDataSet</c> classes.

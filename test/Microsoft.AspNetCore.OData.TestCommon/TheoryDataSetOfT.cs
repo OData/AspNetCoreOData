@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
+namespace Microsoft.AspNetCore.OData.TestCommon
 {
     /// <summary>
     /// Helper class for generating test data for XUnit's <see cref="TheoryDataSet"/>-based tests.

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
 {
-    public class WebApiODataTestFixture<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+    public class WebODataTestFixture<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

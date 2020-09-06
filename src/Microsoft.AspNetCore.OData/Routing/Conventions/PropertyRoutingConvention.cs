@@ -143,22 +143,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
+            AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
 
             if (CanApplyDollarCount(edmProperty, method))
             {
-                AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
+                AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
             }
 
             if (CanApplyDollarValue(edmProperty, method))
             {
-                AddSelector(context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
+                AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
             }
 
             return true;
         }
 
-        private static void AddSelector(string prefix, IEdmModel model, ActionModel action,
+        private static void AddSelector(string httpMethod, string prefix, IEdmModel model, ActionModel action,
             IEdmNavigationSource navigationSource,
             IEdmStructuralProperty edmProperty,
             IEdmType cast, IEdmEntityType declaringType, bool dollarValue, bool dollarCount)
@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(prefix, model, template);
+            action.AddSelector(httpMethod, prefix, model, template);
         }
 
         // Split the property such as "GetCityOfSubAddressFromVipCustomer"

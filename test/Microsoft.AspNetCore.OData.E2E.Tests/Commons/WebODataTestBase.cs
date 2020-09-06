@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
     /// <summary>
     /// The WebODataTestBase used for the test base class.
     /// </summary>
-    public abstract class WebODataTestBase<TStartup> : IClassFixture<WebApiODataTestFixture<TStartup>> where TStartup : class
+    public abstract class WebODataTestBase<TStartup> : IClassFixture<WebODataTestFixture<TStartup>> where TStartup : class
     {
         private HttpClient _client;
 
@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         /// Initializes a new instance of the <see cref="WebODataTestBase{TStartup}"/> class.
         /// </summary>
         /// <param name="factory">The factory used to initialize the web service client.</param>
-        protected WebODataTestBase(WebApiODataTestFixture<TStartup> factory)
+        protected WebODataTestBase(WebODataTestFixture<TStartup> factory)
         {
             Factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
@@ -43,6 +43,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         /// <summary>
         /// Gets the factory.
         /// </summary>
-        public WebApiODataTestFixture<TStartup> Factory { get; }
+        public WebODataTestFixture<TStartup> Factory { get; }
     }
 }

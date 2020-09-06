@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.E2E.Tests", "test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj", "{E428817E-A93C-4C1F-9D20-F5CA8C3627C1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.TestCommon", "test\Microsoft.AspNetCore.OData.TestCommon\Microsoft.AspNetCore.OData.TestCommon.csproj", "{9DB7ACCB-79CC-495C-A145-BC50A7733A21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E428817E-A93C-4C1F-9D20-F5CA8C3627C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E428817E-A93C-4C1F-9D20-F5CA8C3627C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E428817E-A93C-4C1F-9D20-F5CA8C3627C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DB7ACCB-79CC-495C-A145-BC50A7733A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DB7ACCB-79CC-495C-A145-BC50A7733A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DB7ACCB-79CC-495C-A145-BC50A7733A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DB7ACCB-79CC-495C-A145-BC50A7733A21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{02F8B058-E703-4BF4-A7BB-96FF68355F14} = {2F0E102B-EB33-4025-BE56-7B8F9D2C4B8A}
 		{FF17DFD5-7ED0-433F-8DD9-4576E0CFFFBA} = {F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}
 		{E428817E-A93C-4C1F-9D20-F5CA8C3627C1} = {F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}
+		{9DB7ACCB-79CC-495C-A145-BC50A7733A21} = {F994C269-55BA-44F0-9DA7-6D5A3CFA79EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {540C9752-AAC0-49EA-BA60-78490C90FF86}

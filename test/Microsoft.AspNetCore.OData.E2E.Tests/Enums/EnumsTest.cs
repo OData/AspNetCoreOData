@@ -2,16 +2,14 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -23,71 +21,16 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
-    public class WebODataControllerFeatureProvider1 : ControllerFeatureProvider
-    {
-        private ISet<Type> _controllers;
-
-        public WebODataControllerFeatureProvider1()
-        {
-            _controllers = null;
-        }
-
-        public WebODataControllerFeatureProvider1(params Type[] controllers)
-        {
-            _controllers = new HashSet<Type>(controllers);
-        }
-
-        // Override IsController method and configure custom 
-        protected override bool IsController(TypeInfo typeInfo)
-        {
-            bool isController = base.IsController(typeInfo);
-            if (!isController)
-            {
-                return false;
-            }
-
-            if (_controllers == null)
-            {
-                return true;
-            }
-
-            if (typeInfo.Name == "MetadataController")
-            {
-                return true;
-            }
-
-            return _controllers.Contains(typeInfo);
-        }
-    }
-
     public class EnumsTest : WebODataTestBase<EnumsTest.EnumsTestStartup>
     {
-        public class EnumsTestStartup
+        public class EnumsTestStartup : TestStartupBase
         {
-            public void ConfigureServices(IServiceCollection services)
+            public override void ConfigureServices(IServiceCollection services)
             {
                 services.AddControllers()
                     .ConfigureApplicationPartManager(pm =>
                     {
-                        var controllers = new[] { typeof(EmployeesController), typeof(MetadataController) };
-
-                        //IList<ApplicationPart> parts = pm.ApplicationParts;
-                        //IList<ApplicationPart> nonAssemblyParts = parts.Where(p => p.GetType() != typeof(IApplicationPartTypeProvider)).ToList();
-                        //pm.ApplicationParts.Clear();
-                        //pm.ApplicationParts.Concat(nonAssemblyParts);
-
-                        //// Add a new AssemblyPart with the controllers.
-                        //AssemblyPart part = new AssemblyPart(new TestAssembly(controllers));
-                        //pm.ApplicationParts.Add(part);
-
-                        //ControllerFeatureProvider provider = pm.FeatureProviders.OfType<ControllerFeatureProvider>().FirstOrDefault();
-                        //if (provider != null)
-                        //{
-                        //    pm.FeatureProviders.Remove(provider);
-                        //}
-
-                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(controllers));
-                      //  pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(EmployeesController), typeof(MetadataController)));
+                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(EmployeesController), typeof(MetadataController)));
                     });
 
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
@@ -98,32 +41,26 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 .AddModel("explicit", model2)
                 );
             }
-
-            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-            {
-                app.UseRouting();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
-            }
         }
 
-        public EnumsTest(WebApiODataTestFixture<EnumsTestStartup> factory)
+        public EnumsTest(WebODataTestFixture<EnumsTestStartup> factory)
             : base(factory)
         {
         }
 
         #region ModelBuilder
-
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
         public async Task ModelBuilderTest(string modelMode)
         {
+            // Arrange
             string requestUri = string.Format("{0}/$metadata", modelMode);
 
+            // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
+
+            // Assert
             var stream = await response.Content.ReadAsStreamAsync();
 
             IODataResponseMessage message = new ODataMessageWrapper(stream, response.Content.Headers);
@@ -196,7 +133,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         #endregion
-
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -222,15 +158,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.Equal("#Collection(Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill)", typeOfSkillSet);
             }
         }
-#if false
+
         [Theory]
         [InlineData("/convention/Employees/$count", 3)]
         [InlineData("/convention/Employees/$count?$filter=Name eq 'Name1'", 1)]
-        public async Task QueryEntitySetCount(string url, int expectedCount)
+        public async Task QueryEntitySetCount(string requestUri, int expectedCount)
         {
             // Arrange
             await ResetDatasource();
-            string requestUri = this.BaseAddress + url;
 
             // Act
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
@@ -244,11 +179,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         [Theory]
         [InlineData("/convention/Employees(1)/SkillSet/$count", 2)]
         [InlineData("/convention/Employees(1)/SkillSet/$count?$filter=$it eq Microsoft.Test.E2E.AspNet.OData.Enums.Skill'Sql'", 1)]
-        public async Task QuerySkillSetCount(string url, int expectedCount)
+        public async Task QuerySkillSetCount(string requestUri, int expectedCount)
         {
             // Arrange
             await ResetDatasource();
-            string requestUri = this.BaseAddress + url;
 
             // Act
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
@@ -266,7 +200,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEnumPropertyInEntityType(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees(1)/AccessLevel?$format=" + format;
+            string requestUri = "/convention/Employees(1)/AccessLevel?$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
@@ -280,7 +214,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.True(context.IndexOf("/$metadata#Employees(1)/AccessLevel") > 0);
             }
 
-            requestUri = this.BaseAddress + "/convention/Employees(1)/SkillSet?$format=" + format;
+            requestUri = "/convention/Employees(1)/SkillSet?$format=" + format;
             response = await this.Client.GetAsync(requestUri);
             json = await response.Content.ReadAsObject<JObject>();
             JArray skillSet = json["value"] as JArray;
@@ -302,7 +236,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEnumPropertyValueInEntityType(string format)
         {
             await ResetDatasource();
-            var requestUri = this.BaseAddress + "/convention/Employees(1)/AccessLevel/$value?$format=" + format;
+            var requestUri = "/convention/Employees(1)/AccessLevel/$value?$format=" + format;
             var response = await this.Client.GetAsync(requestUri);
             response.EnsureSuccessStatusCode();
 
@@ -319,7 +253,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEnumPropertyInComplexType(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees(1)/FavoriteSports?$format=" + format;
+            string requestUri = "/convention/Employees(1)/FavoriteSports?$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
@@ -335,7 +269,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.True(context.IndexOf("/$metadata#Employees(1)/FavoriteSports") > 0);
             }
 
-            requestUri = this.BaseAddress + "/convention/Employees(1)/FavoriteSports/LikeMost?$format=" + format;
+            requestUri = "/convention/Employees(1)/FavoriteSports/LikeMost?$format=" + format;
             response = await this.Client.GetAsync(requestUri);
             result = await response.Content.ReadAsObject<JObject>();
             value = result.GetValue("value").ToString();
@@ -349,7 +283,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEntity(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees(1)?$format=" + format;
+            string requestUri = "/convention/Employees(1)?$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
@@ -373,7 +307,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             await ResetDatasource();
             // in the template {0}: operation, {1}: typename, {2}: enum value, {3}: format
-            string uriTemplate = this.BaseAddress + "/convention/Employees?$filter=AccessLevel {0} {1}'{2}'&$format={3}";
+            string uriTemplate = "/convention/Employees?$filter=AccessLevel {0} {1}'{2}'&$format={3}";
             string uriEq = string.Format(uriTemplate, "eq", typeof(AccessLevel).FullName, AccessLevel.Read.ToString(), format);
             string uriHas = string.Format(uriTemplate, "has", typeof(AccessLevel).FullName, AccessLevel.Read.ToString(), format);
 
@@ -407,7 +341,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInSelect(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees?$select=AccessLevel,SkillSet,FavoriteSports&$format=" + format;
+            string requestUri = "/convention/Employees?$select=AccessLevel,SkillSet,FavoriteSports&$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
@@ -425,7 +359,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInOrderBy(string format)
         {
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees?$orderby=AccessLevel,FavoriteSports/LikeMost&$format=" + format;
+            string requestUri = "/convention/Employees?$orderby=AccessLevel,FavoriteSports/LikeMost&$format=" + format;
 
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
@@ -444,53 +378,53 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
         #region Update
 
-        [Fact]
-        public async Task AddEntity()
-        {
-            await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees?$format=application/json;odata.metadata=none";
+        //[Fact]
+        //public async Task AddEntity()
+        //{
+        //    await ResetDatasource();
+        //    string requestUri = "/convention/Employees?$format=application/json;odata.metadata=none";
 
-            using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
-            {
-                response.EnsureSuccessStatusCode();
+        //    using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
+        //    {
+        //        response.EnsureSuccessStatusCode();
 
-                var json = await response.Content.ReadAsObject<JObject>();
-                var result = json.GetValue("value") as JArray;
-                Assert.Equal<int>(3, result.Count);
-            }
+        //        var json = await response.Content.ReadAsObject<JObject>();
+        //        var result = json.GetValue("value") as JArray;
+        //        Assert.Equal<int>(3, result.Count);
+        //    }
 
-            var postUri = this.BaseAddress + "/convention/Employees";
+        //    var postUri = "/convention/Employees";
 
-            var postContent = JObject.Parse(@"{""ID"":1,
-                    ""Name"":""Name2"",
-                    ""SkillSet"":[""Sql""],
-                    ""Gender"":""Female"",
-                    ""AccessLevel"":""Read,Write"",
-                    ""FavoriteSports"":{
-                            ""LikeMost"":""Pingpong"",
-                            ""Like"":[""Pingpong"",""Basketball""]
-                    }}");
-            using (HttpResponseMessage response = await this.Client.PostAsJsonAsync(postUri, postContent))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            }
+        //    var postContent = JObject.Parse(@"{""ID"":1,
+        //            ""Name"":""Name2"",
+        //            ""SkillSet"":[""Sql""],
+        //            ""Gender"":""Female"",
+        //            ""AccessLevel"":""Read,Write"",
+        //            ""FavoriteSports"":{
+        //                    ""LikeMost"":""Pingpong"",
+        //                    ""Like"":[""Pingpong"",""Basketball""]
+        //            }}");
+        //    using (HttpResponseMessage response = await this.Client.PostAsJsonAsync(postUri, postContent))
+        //    {
+        //        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        //    }
 
-            using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
-            {
-                response.EnsureSuccessStatusCode();
+        //    using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
+        //    {
+        //        response.EnsureSuccessStatusCode();
 
-                var json = await response.Content.ReadAsObject<JObject>();
-                var result = json.GetValue("value") as JArray;
-                Assert.Equal<int>(4, result.Count);
-            }
-        }
+        //        var json = await response.Content.ReadAsObject<JObject>();
+        //        var result = json.GetValue("value") as JArray;
+        //        Assert.Equal<int>(4, result.Count);
+        //    }
+        //}
 
         [Fact]
         public async Task PostToEnumCollection()
         {
             //Arrange
             await ResetDatasource();
-            string requestUri = this.BaseAddress + "/convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
+            string requestUri = "/convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
             //Get the count before the post
             int count = 0;
             using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
@@ -533,7 +467,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task UpdateEntity()
         {
             await ResetDatasource();
-            string getUri = this.BaseAddress + "/convention/Employees(2)?$format=application/json;odata.metadata=none";
+            string getUri = "/convention/Employees(2)?$format=application/json;odata.metadata=none";
 
             using (HttpResponseMessage response = await Client.GetAsync(getUri))
             {
@@ -553,7 +487,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.Equal(@"[""Pingpong"",""Basketball""]", sports.Replace("\r\n", "").Replace(" ", ""));
             }
 
-            var putUri = this.BaseAddress + "/convention/Employees(2)";
+            var putUri = "/convention/Employees(2)";
             var putContent = JObject.Parse(@"{""ID"":2,
                     ""Name"":""Name2"",
                     ""SkillSet"":[""Sql""],
@@ -595,7 +529,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             await ResetDatasource();
 
-            var requestUri = this.BaseAddress + "/convention/Employees(20)";
+            var requestUri = "/convention/Employees(20)";
             var requestContent = JObject.Parse(@"{""ID"":20,
                     ""Name"":""Name2"",
                     ""SkillSet"":[""Sql""],
@@ -627,7 +561,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task DeleteEntity()
         {
             await ResetDatasource();
-            string uriGet = this.BaseAddress + "/convention/Employees?$format=application/json;odata.metadata=none";
+            string uriGet = "/convention/Employees?$format=application/json;odata.metadata=none";
 
             using (HttpResponseMessage response = await Client.GetAsync(uriGet))
             {
@@ -638,7 +572,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.Equal<int>(3, values.Count);
             }
 
-            var uriDelete = this.BaseAddress + "/convention/Employees(1)";
+            var uriDelete = "/convention/Employees(1)";
             using (HttpResponseMessage response = await Client.DeleteAsync(uriDelete))
             {
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -662,7 +596,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInActionParameter()
         {
             await ResetDatasource();
-            var postUri = this.BaseAddress + "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.AddSkill";
+            var postUri = "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.AddSkill";
             var postContent = new StringContent(@"{""skill"":""Sql""}");
             postContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
             var response = await Client.PostAsync(postUri, postContent);
@@ -674,7 +608,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInActionOutput()
         {
             await ResetDatasource();
-            var postUri = this.BaseAddress + "/convention/SetAccessLevel";
+            var postUri = "/convention/SetAccessLevel";
             var postContent = JObject.Parse(@"{""accessLevel"":""Read,Execute"",""ID"":1}");
 
             var response = await Client.PostAsJsonAsync(postUri, postContent);
@@ -695,7 +629,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInFunctionOutput()
         {
             await ResetDatasource();
-            var getUri = this.BaseAddress + "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.GetAccessLevel";
+            var getUri = "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.GetAccessLevel";
             var response = await this.Client.GetAsync(getUri);
             response.EnsureSuccessStatusCode();
 
@@ -707,10 +641,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         [Theory]
         [InlineData("/convention/HasAccessLevel(ID=1,AccessLevel=Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'Read')", false)]
         [InlineData("/convention/HasAccessLevel(ID=2,AccessLevel=Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'1')", true)]
-        public async Task EnumInFunctionParameter(string url, bool expectedValue)
+        public async Task EnumInFunctionParameter(string requestUri, bool expectedValue)
         {
             await ResetDatasource();
-            var requestUri = this.BaseAddress + url;
             var response = await this.Client.GetAsync(requestUri);
 
             response.EnsureSuccessStatusCode();
@@ -722,7 +655,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
         #endregion
 
-#endif
         private async Task<HttpResponseMessage> ResetDatasource()
         {
             var response = await this.Client.PostAsync("convention/ResetDataSource", null);
