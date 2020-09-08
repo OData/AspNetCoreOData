@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             // See if the request satisfies any mappings.
             IEnumerable<MediaTypeMapping> matchedMappings = (MediaTypeMappings == null) ? null : MediaTypeMappings
-                .Where(m => (m.TryMatchMediaType(request) > 0));
+                .Where(m => m.TryMatchMediaType(request) > 0);
 
             // Now pick the best content type. If a media mapping was found, use that and override the
             // value specified by the controller, if any. Otherwise, let the base class decide.
@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             type = TypeHelper.GetTaskInnerTypeOrSelf(type);
 
-            ODataSerializerProvider serializerProvider = request.HttpContext.RequestServices.GetRequiredService<ODataSerializerProvider>();
+            ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
 
             // See if this type is a SingleResult or is derived from SingleResult.
             bool isSingleResult = false;
@@ -136,19 +136,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return payloadKind == null ? false : _payloadKinds.Contains(payloadKind.Value);
-        }
-
-        private static ODataPayloadKind? GetClrObjectResponsePayloadKind(Type type, bool isGenericSingleResult, ODataSerializerProvider serializerProvider
-            , HttpRequest request)
-        {
-            // SingleResult<T> should be serialized as T.
-            if (isGenericSingleResult)
-            {
-                type = type.GetGenericArguments()[0];
-            }
-
-            ODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
-            return serializer == null ? null : (ODataPayloadKind?)serializer.ODataPayloadKind;
         }
 
         /// <inheritdoc/>
@@ -207,6 +194,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull("context");
+            }
+
             Type type = context.ObjectType;
             if (type == null)
             {
@@ -222,7 +214,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             try
             {
-                var body = request.HttpContext.Features.Get<AspNetCore.Http.Features.IHttpBodyControlFeature>();
+                var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
                 if (body != null)
                 {
                     body.AllowSynchronousIO = true;
@@ -232,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Uri baseAddress = GetBaseAddressInternal(request);
                 MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
-                ODataSerializerProvider serializerProvider = request.HttpContext.RequestServices.GetRequiredService<ODataSerializerProvider>();
+                ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
 
                 ODataOutputFormatterHelper.WriteToStream(
                     type,
@@ -250,25 +242,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             catch (Exception ex)
             {
                 return Task.FromException(ex);
-            }
-        }
-
-        /// <summary>
-        /// Internal method used for selecting the base address to be used with OData uris.
-        /// If the consumer has provided a delegate for overriding our default implementation,
-        /// we call that, otherwise we default to existing behavior below.
-        /// </summary>
-        /// <param name="request">The HttpRequest object for the given request.</param>
-        /// <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
-        private Uri GetBaseAddressInternal(HttpRequest request)
-        {
-            if (BaseAddressFactory != null)
-            {
-                return BaseAddressFactory(request);
-            }
-            else
-            {
-                return ODataOutputFormatter.GetDefaultBaseAddress(request);
             }
         }
 
@@ -311,6 +284,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return false;
         }
 
+        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         internal static bool TryGetContentHeader(Type type, MediaTypeHeaderValue mediaType, out MediaTypeHeaderValue newMediaType)
         {
             if (type == null)
@@ -349,6 +323,39 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
+        private static ODataPayloadKind? GetClrObjectResponsePayloadKind(Type type, bool isGenericSingleResult,
+            ODataSerializerProvider serializerProvider, HttpRequest request)
+        {
+            // SingleResult<T> should be serialized as T.
+            if (isGenericSingleResult)
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            ODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
+            return serializer == null ? null : (ODataPayloadKind?)serializer.ODataPayloadKind;
+        }
+
+        /// <summary>
+        /// Internal method used for selecting the base address to be used with OData uris.
+        /// If the consumer has provided a delegate for overriding our default implementation,
+        /// we call that, otherwise we default to existing behavior below.
+        /// </summary>
+        /// <param name="request">The HttpRequest object for the given request.</param>
+        /// <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
+        private Uri GetBaseAddressInternal(HttpRequest request)
+        {
+            if (BaseAddressFactory != null)
+            {
+                return BaseAddressFactory(request);
+            }
+            else
+            {
+                return ODataOutputFormatter.GetDefaultBaseAddress(request);
+            }
+        }
+
+        [SuppressMessage("Performance", "CA1806:Do not ignore method results", Justification = "<Pending>")]
         private MediaTypeHeaderValue GetContentType(string contentTypeValue)
         {
             MediaTypeHeaderValue contentType = null;

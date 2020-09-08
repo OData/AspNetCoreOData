@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -423,7 +424,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             ODataUrlKeyDelimiter keyDelimiter = ODataUrlKeyDelimiter.Parentheses;
-            ODataOptions options = writeContext.Request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+            ODataOptions options = writeContext.Request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
             if (options != null)
             {
                 keyDelimiter = options.UrlKeyDelimiter;

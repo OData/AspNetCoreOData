@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 // get the etag handler, and parse the etag
-                IETagHandler etagHandler = request.HttpContext.RequestServices.GetRequiredService<IETagHandler>();
+                IETagHandler etagHandler = request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
                 IDictionary<string, object> properties = etagHandler.ParseETag(entityTagHeaderValue) ?? new Dictionary<string, object>();
                 IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
 

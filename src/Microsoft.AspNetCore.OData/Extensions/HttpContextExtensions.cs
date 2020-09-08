@@ -66,29 +66,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="httpContext">The Http context.</param>
         /// <returns>The <see cref="IUrlHelper"/>.</returns>
-        public static IUrlHelper GetUrlHelper(this HttpContext httpContext)
-        {
-            if (httpContext == null)
-            {
-                throw new ArgumentNullException(nameof(httpContext));
-            }
-
-            IActionContextAccessor accessor = httpContext.RequestServices.GetService<IActionContextAccessor>();
-            if (accessor == null)
-            {
-                return null;
-            }
-
-            // Get an IUrlHelper from the global service provider.
-            ActionContext actionContext = accessor.ActionContext;
-            return httpContext.RequestServices.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(actionContext);
-        }
-
-        /// <summary>
-        /// Extension method to return the <see cref="IUrlHelper"/> from the <see cref="HttpContext"/>.
-        /// </summary>
-        /// <param name="httpContext">The Http context.</param>
-        /// <returns>The <see cref="IUrlHelper"/>.</returns>
         public static LinkGenerator GetLinkGenerator(this HttpContext httpContext)
         {
             if (httpContext == null)

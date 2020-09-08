@@ -2170,13 +2170,6 @@
             <param name="httpContext">The Http context.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.GetUrlHelper(Microsoft.AspNetCore.Http.HttpContext)">
-            <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-            <param name="httpContext">The Http context.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.GetLinkGenerator(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
@@ -2215,13 +2208,6 @@
             Gets a value indicating if this is a count request.
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetUrlHelper(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
-            </summary>
-            <param name="request">The Http request.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IUrlHelper"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetReaderSettings(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
@@ -3192,6 +3178,13 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext,System.Text.Encoding)">
             <inheritdoc/>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Returns a base address to be used in the service root when reading or writing OData uris.
+            </summary>
+            <param name="request">The HttpRequest object for the given request.</param>
+            <returns>The base address to be used as part of the service root in the OData uri; must terminate with a trailing '/'.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetBaseAddressInternal(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Internal method used for selecting the base address to be used with OData uris.
@@ -3200,13 +3193,6 @@
             </summary>
             <param name="request">The HttpRequest object for the given request.</param>
             <returns>The base address to be used as part of the service root; must terminate with a trailing '/'.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Returns a base address to be used in the service root when reading or writing OData uris.
-            </summary>
-            <param name="request">The HttpRequest object for the given request.</param>
-            <returns>The base address to be used as part of the service root in the OData uri; must terminate with a trailing '/'.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatterFactory">
             <summary>

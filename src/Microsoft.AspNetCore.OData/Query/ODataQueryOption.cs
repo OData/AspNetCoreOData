@@ -263,7 +263,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             ODataUriResolver resolver = _queryOptionParser != null
                 ? _queryOptionParser.Resolver
-                : Request.HttpContext.RequestServices.GetRequiredService<ODataUriResolver>();
+                : Request.GetSubServiceProvider().GetRequiredService<ODataUriResolver>();
 
             if (!resolver.EnableCaseInsensitive)
             {

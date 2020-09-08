@@ -34,6 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         
 
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable")]
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         internal static void WriteToStream(
             Type type,
             object value,
@@ -66,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers/*, request.HttpContext.RequestServices*/);
+            IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, request.GetSubServiceProvider());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -78,11 +79,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             writerSettings.Validations = writerSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
             string metadataLink = request.CreateODataLink(MetadataSegment.Instance);
-            if (string.IsNullOrEmpty(metadataLink)) // TODO: check it again? do I need this?
-            {
-                metadataLink = request.CreateODataLink(baseAddress.OriginalString, MetadataSegment.Instance);
-            }
-
             if (metadataLink == null)
             {
                 throw new SerializationException(SRResources.UnableToDetermineMetadataUrl);
@@ -213,6 +209,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     }
                 }
             }
+
             return null;
         }
     }

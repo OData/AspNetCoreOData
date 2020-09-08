@@ -86,28 +86,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Extension method to return the <see cref="IUrlHelper"/> from the <see cref="HttpRequest"/>.
-        /// </summary>
-        /// <param name="request">The Http request.</param>
-        /// <returns>The <see cref="IUrlHelper"/>.</returns>
-        public static IUrlHelper GetUrlHelper(this HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            IODataFeature feature = request.ODataFeature();
-            if (feature.UrlHelper == null)
-            {
-                // if not set, get it from global.
-                feature.UrlHelper = request.HttpContext.GetUrlHelper();
-            }
-
-            return feature.UrlHelper;
-        }
-
-        /// <summary>
         /// Gets the <see cref="ODataMessageWriterSettings"/> from the request container.
         /// </summary>
         /// <param name="request">The request.</param>
@@ -119,8 +97,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            // TODO Maybe clone one???
-            return request.HttpContext.RequestServices.GetRequiredService<ODataMessageReaderSettings>();
+            return request.GetSubServiceProvider().GetRequiredService<ODataMessageReaderSettings>();
         }
 
         /// <summary>
@@ -135,8 +112,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            // TODO Maybe clone one???
-            return request.HttpContext.RequestServices.GetRequiredService<ODataMessageWriterSettings>();
+            return request.GetSubServiceProvider().GetRequiredService<ODataMessageWriterSettings>();
         }
 
         /// <summary>
@@ -150,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
+            return request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
         }
 
         /// <summary>
@@ -215,14 +191,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return CompatibilityOptions.None;
             }
 
-            ODataOptions options = request.HttpContext.RequestServices.GetRequiredService<ODataOptions>();
+            IOptions<ODataOptions> options = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
 
             if (options == null)
             {
                 return CompatibilityOptions.None;
             }
 
-            return options.CompatibilityOptions;
+            return options.Value.CompatibilityOptions;
         }
 
         /// <summary>
@@ -248,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return request.HttpContext.RequestServices.GetRequiredService<IETagHandler>();
+            return request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
         }
 
         /// <summary>
@@ -331,23 +307,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <returns></returns>
         private static IServiceScope CreateRequestScope(this HttpRequest request, string prefixName)
         {
-            //IPerRouteContainer perRouteContainer = request.HttpContext.RequestServices.GetRequiredService<IPerRouteContainer>();
-            //if (perRouteContainer == null)
-            //{
-            //    throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(IPerRouteContainer));
-            //}
-
-            //IServiceProvider rootContainer = perRouteContainer.GetServiceProvider(routeName);
-            //IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
-
-            //// Bind scoping request into the OData container.
-            ////if (!string.IsNullOrEmpty(routeName))
-            ////{
-            ////    scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
-            ////}
-
-            //return scope;
-
             IOptions<ODataOptions> odataOptionsOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
             if (odataOptionsOptions == null)
             {

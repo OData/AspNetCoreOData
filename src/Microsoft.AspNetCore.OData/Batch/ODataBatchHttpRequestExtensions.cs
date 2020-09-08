@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
@@ -188,7 +189,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             Contract.Assert(request != null);
 
-            ODataVersion odataVersion = ODataInputFormatter.GetODataResponseVersion(request);
+            ODataVersion odataVersion = GetODataResponseVersion(request);
 
             IServiceProvider requestContainer = request.GetSubServiceProvider();
             ODataMessageWriterSettings writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
@@ -279,68 +280,66 @@ namespace Microsoft.AspNetCore.OData.Batch
             return true;
         }
 
-        internal static Uri GetODataBatchBaseUri(this HttpRequest request, string oDataRouteName, IRouter route)
+        internal static Uri GetODataBatchBaseUri(this HttpRequest request, string oDataPrefixName)
         {
             Contract.Assert(request != null);
 
-            if (oDataRouteName == null)
+            if (oDataPrefixName == null)
             {
                 // Return request's base address.
                 return new Uri(request.GetDisplayUrl());
             }
 
-            HttpContext context = request.HttpContext;
-
-            // Here's workaround to help "EndpointLinkGenerator" to generator
-            ODataBatchPathMapping batchMapping = request.HttpContext.RequestServices.GetRequiredService<ODataBatchPathMapping>();
-            if (batchMapping.IsEndpointRouting)
+            string requestUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, request.Path);
+            return new Uri(requestUri);
+            /*
+            HttpContext context = new DefaultHttpContext
             {
-                context = new DefaultHttpContext
-                {
-                    RequestServices = request.HttpContext.RequestServices,
-                };
-
-                IEndpointFeature endpointFeature = new ODataEndpointFeature();
-                endpointFeature.Endpoint = new Endpoint((d) => null, null, "anything");
-                context.Features.Set(endpointFeature);
-
-                context.Request.Scheme = request.Scheme;
-                context.Request.Host = request.Host;
-            }
-
-            context.Request.ODataFeature().PrefixName = oDataRouteName;
-
-            // The IActionContextAccessor and ActionContext will be present after routing but not before
-            // GetUrlHelper only uses the HttpContext and the Router, which we have so construct a dummy
-            // action context.
-            ActionContext actionContext = new ActionContext
-            {
-                HttpContext = context,
-                RouteData = new RouteData(),
-                ActionDescriptor = new ActionDescriptor()
+                RequestServices = request.HttpContext.RequestServices,
             };
 
-            actionContext.RouteData.Routers.Add(route);
-            IUrlHelperFactory factory = request.HttpContext.RequestServices.GetRequiredService<IUrlHelperFactory>();
-            IUrlHelper helper = factory.GetUrlHelper(actionContext);
+            IEndpointFeature endpointFeature = new ODataEndpointFeature();
+            endpointFeature.Endpoint = new Endpoint((d) => null, null, "anything");
+            context.Features.Set(endpointFeature);
+            context.SetEndpoint(endpointFeature.Endpoint);
 
-            //RouteValueDictionary routeData = new RouteValueDictionary() { { ODataRouteConstants.ODataPath, String.Empty } };
+            context.Request.Scheme = request.Scheme;
+            context.Request.Host = request.Host;
+
+            context.Request.ODataFeature().PrefixName = oDataPrefixName;
+
             RouteValueDictionary routeData = new RouteValueDictionary();
             RouteValueDictionary batchRouteData = request.ODataFeature().BatchRouteData;
             if (batchRouteData != null && batchRouteData.Any())
             {
                 foreach (var data in batchRouteData)
                 {
-                    routeData.Add(data.Key, data.Value);
+                    context.Request.RouteValues.Add(data.Key, data.Value);
                 }
             }
 
-            string baseAddress = helper.Link(oDataRouteName, routeData);
+            //string baseAddress = helper.Link(oDataRouteName, routeData);
+            string baseAddress = request.CreateODataLink();
             if (baseAddress == null)
             {
                 throw new InvalidOperationException(SRResources.UnableToDetermineBaseUrl);
             }
-            return new Uri(baseAddress);
+
+            return new Uri(baseAddress);*/
+        }
+
+        internal static ODataVersion GetODataResponseVersion(HttpRequest request)
+        {
+            // OData protocol requires that you send the minimum version that the client needs to know to
+            // understand the response. There is no easy way we can figure out the minimum version that the client
+            // needs to understand our response. We send response headers much ahead generating the response. So if
+            // the requestMessage has a OData-MaxVersion, tell the client that our response is of the same
+            // version; else use the DataServiceVersionHeader. Our response might require a higher version of the
+            // client and it might fail. If the client doesn't send these headers respond with the default version
+            // (V4).
+            return request.ODataMaxServiceVersion() ??
+                request.ODataServiceVersion() ??
+                ODataVersionConstraint.DefaultODataVersion;
         }
 
         internal class ODataEndpointFeature : IEndpointFeature

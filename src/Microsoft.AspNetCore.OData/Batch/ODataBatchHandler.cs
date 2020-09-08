@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return request.GetODataBatchBaseUri(null, null/*ODataRouteName, ODataRoute*/);
+            return request.GetODataBatchBaseUri(PrefixName);
         }
 
         /// <summary>

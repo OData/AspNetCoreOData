@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public static IDictionary<string, object> ReadODataBody(ModelBindingContext bindingContext)
         {
-            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.RequestServices.GetService<ODataActionPayloadDeserializer>();
+            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();
             if (deserializer == null)
             {
                 return null;

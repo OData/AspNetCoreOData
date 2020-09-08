@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.Routing;
@@ -111,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // If content length is 0 then return default value for this type
             RequestHeaders contentHeaders = request.GetTypedHeaders();
             object defaultValue = GetDefaultValueForType(type);
-            if (contentHeaders == null || contentHeaders.ContentLength == null /*|| contentHeaders.ContentLength == 0*/)
+            if (contentHeaders == null || contentHeaders.ContentLength == null)
             {
                 return Task.FromResult(InputFormatterResult.Success(defaultValue));
             }
@@ -181,6 +180,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return null;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is sent to the logger, which may throw it.")]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "oDataMessageReader mis registered for disposal.")]
         internal static object ReadFromStream(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
         {
             object result;
@@ -199,7 +200,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
                 IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(request.Body, request.Headers/*, request.GetODataContentIdMapping(), request.GetRequestContainer()*/);
+                    ODataMessageWrapperHelper.Create(request.Body, request.Headers, request.GetODataContentIdMapping(), request.GetSubServiceProvider());
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
                 disposes.Add(oDataMessageReader);
 
@@ -255,20 +256,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        internal static ODataVersion GetODataResponseVersion(HttpRequest request)
-        {
-            // OData protocol requires that you send the minimum version that the client needs to know to
-            // understand the response. There is no easy way we can figure out the minimum version that the client
-            // needs to understand our response. We send response headers much ahead generating the response. So if
-            // the requestMessage has a OData-MaxVersion, tell the client that our response is of the same
-            // version; else use the DataServiceVersionHeader. Our response might require a higher version of the
-            // client and it might fail. If the client doesn't send these headers respond with the default version
-            // (V4).
-            return request.ODataMaxServiceVersion() ??
-                request.ODataServiceVersion() ??
-                ODataVersionConstraint.DefaultODataVersion;
-        }
-
         /// <summary>
         /// Gets the deserializer and the expected payload type.
         /// </summary>
@@ -285,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = odataFeature.Model;
             expectedPayloadType = null;
 
-            ODataDeserializerProvider deserializerProvider = request.HttpContext.RequestServices.GetRequiredService<ODataDeserializerProvider>();
+            ODataDeserializerProvider deserializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
 
             // Get the deserializer using the CLR type first from the deserializer provider.
             ODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);

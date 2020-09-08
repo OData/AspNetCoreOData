@@ -13,17 +13,17 @@ namespace Microsoft.AspNetCore.OData.Formatter
     {
         internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers)
         {
-            return ODataMessageWrapperHelper.Create(stream, headers, contentIdMapping: null);
+            return Create(stream, headers, contentIdMapping: null);
         }
 
         internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IServiceProvider container)
         {
-            return ODataMessageWrapperHelper.Create(stream, headers, null, container);
+            return Create(stream, headers, null, container);
         }
 
         internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider container)
         {
-            ODataMessageWrapper responseMessageWrapper = ODataMessageWrapperHelper.Create(stream, headers, contentIdMapping);
+            ODataMessageWrapper responseMessageWrapper = Create(stream, headers, contentIdMapping);
             responseMessageWrapper.Container = container;
 
             return responseMessageWrapper;
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             return new ODataMessageWrapper(
                 stream,
-                headers.ToDictionary(kvp => kvp.Key, kvp => String.Join(";", kvp.Value)),
+                headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value)),
                 contentIdMapping);
         }
     }
