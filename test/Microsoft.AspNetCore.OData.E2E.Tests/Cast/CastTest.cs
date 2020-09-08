@@ -22,8 +22,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         {
             public override void ConfigureServices(IServiceCollection services)
             {
+                // Use the sql server got the access error.
                 // services.AddDbContext<ProductsContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=CastProductsContext;Trusted_Connection=True;"));
-                services.AddDbContext<ProductsContext>(opt => opt.UseInMemoryDatabase("CastProductsContext"));
+                //services.AddDbContext<ProductsContext>(opt => opt.UseInMemoryDatabase("CastProductsContext"));
 
                 services.AddControllers()
                     .ConfigureApplicationPartManager(pm =>

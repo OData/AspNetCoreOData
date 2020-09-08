@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         public ProductsController(ProductsContext context)
         {
             _context = context;
+            context.Database.EnsureCreated();
 
             if (!_context.Products.Any())
             {
