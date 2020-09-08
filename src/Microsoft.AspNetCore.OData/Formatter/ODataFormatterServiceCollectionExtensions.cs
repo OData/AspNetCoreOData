@@ -57,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 // options.ValueProviderFactories.Insert(0, new ODataValueProviderFactory());
             });
 
+            /*
             services.AddSingleton<IETagHandler, DefaultODataETagHandler>();
 
             // SerializerProvider and DeserializerProvider.
@@ -100,6 +101,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             services.AddSingleton<ODataMediaTypeResolver>();
             services.AddSingleton<ODataMessageInfo>();
+            */
         }
     }
 }

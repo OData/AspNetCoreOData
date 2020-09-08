@@ -33,6 +33,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         static void AddODataQueryServices(IServiceCollection services)
         {
+            /*
             // need this?
             services.AddSingleton<ODataUriResolver>(
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
@@ -57,6 +58,7 @@ namespace Microsoft.AspNetCore.OData.Query
             services.AddScoped<ODataQuerySettings>();
 
             services.AddSingleton<SkipTokenHandler, DefaultSkipTokenHandler>();
+            */
             // services.AddTransient<FilterBinder>();
         }
     }

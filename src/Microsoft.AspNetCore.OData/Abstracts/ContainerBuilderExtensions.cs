@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
@@ -17,6 +16,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 {
     internal static class ContainerBuilderExtensions
     {
+        /// <summary>
+        /// Injects the default Web API OData services.
+        /// </summary>
+        /// <param name="builder">The container builder.</param>
+        /// <returns>The calling itself.</returns>
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "DI services")]
         public static IContainerBuilder AddDefaultWebApiServices(this IContainerBuilder builder)
         {
@@ -36,6 +40,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 EnableMessageStreamDisposal = false,
                 MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
             });
+
             builder.AddServicePrototype(new ODataMessageWriterSettings
             {
                 EnableMessageStreamDisposal = false,

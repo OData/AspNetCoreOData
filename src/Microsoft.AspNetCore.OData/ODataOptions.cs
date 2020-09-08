@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -193,6 +194,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, prefix);
             }
 
+            // Consider to use Lazy<IServiceProvider> ?
             IServiceProvider serviceProvider = BuildContainBuilder(model, configureAction);
             Models[prefix] = (model, serviceProvider);
             return this;
@@ -365,14 +367,14 @@ namespace Microsoft.AspNetCore.OData
         #endregion
 
         /// <summary>
-        /// Initalize the per-route container.
+        /// Build the container.
         /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="setupAction">The setup config.</param>
+        /// <returns>The built service provider.</returns>
         private IServiceProvider BuildContainBuilder(IEdmModel model, Action<IContainerBuilder> setupAction)
         {
-            //if (setupAction == null)
-            //{
-            //    return null;
-            //}
+            Contract.Assert(model != null);
 
             IContainerBuilder odataContainerBuilder = null;
             if (this.BuilderFactory != null)
@@ -388,12 +390,16 @@ namespace Microsoft.AspNetCore.OData
                 odataContainerBuilder = new DefaultContainerBuilder();
             }
 
+            // Inject the core odata services.
             odataContainerBuilder.AddDefaultODataServices();
 
+            // Inject the default query setting from this options.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => BuildDefaultQuerySettings());
 
+            // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();
 
+            // Inject the customized services.
             setupAction?.Invoke(odataContainerBuilder);
 
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
@@ -401,6 +407,7 @@ namespace Microsoft.AspNetCore.OData
                 typeof(ODataUriResolver),
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
+            // Inject the Edm model.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
 
             return odataContainerBuilder.BuildContainer();

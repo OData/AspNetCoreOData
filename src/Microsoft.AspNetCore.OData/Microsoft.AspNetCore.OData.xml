@@ -4,6 +4,13 @@
         <name>Microsoft.AspNetCore.OData</name>
     </assembly>
     <members>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ContainerBuilderExtensions.AddDefaultWebApiServices(Microsoft.OData.IContainerBuilder)">
+            <summary>
+            Injects the default Web API OData services.
+            </summary>
+            <param name="builder">The container builder.</param>
+            <returns>The calling itself.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
             <summary>
             Default implementation of <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>
@@ -5468,8 +5475,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainBuilder(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>
-            Initalize the per-route container.
+            Build the container.
             </summary>
+            <param name="model">The Edm model.</param>
+            <param name="setupAction">The setup config.</param>
+            <returns>The built service provider.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
             <summary>
@@ -5498,6 +5508,13 @@
             <typeparam name="T">The routing convention type.</typeparam>
             <param name="builder">The OData service builder.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds the core odata routing services.
+            </summary>
+            <param name="services">The service collection.</param>
+            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataUriFunctions">
             <summary>
