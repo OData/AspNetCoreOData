@@ -27,11 +27,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (graph == null)
             {
-                throw Error.ArgumentNull("graph");
+                throw Error.ArgumentNull(nameof(graph));
             }
+
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             ODataError oDataError = graph as ODataError;
@@ -48,16 +49,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
+            // TODO: Call Async version?
             bool includeDebugInformation = oDataError.InnerError != null;
             messageWriter.WriteError(oDataError, includeDebugInformation);
         }
 
         /// <summary>
-        /// Return true of the object is an HttpError.
+        /// Return true if the object is an HttpError.
         /// </summary>
         /// <param name="error">The error to test.</param>
-        /// <returns>true of the object is an HttpError</returns>
-        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
+        /// <returns>true if the object is an HttpError</returns>
         internal static bool IsHttpError(object error)
         {
             return error is SerializableError;
@@ -68,7 +69,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// </summary>
         /// <param name="error">The error to use.</param>
         /// <returns>an ODataError.</returns>
-        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         internal static ODataError CreateODataError(object error)
         {
             SerializableError serializableError = error as SerializableError;

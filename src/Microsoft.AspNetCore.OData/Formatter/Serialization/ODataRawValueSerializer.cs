@@ -24,23 +24,26 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <inheritdoc/>
         public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
-            if (messageWriter == null)
-            {
-                throw new ArgumentNullException(nameof(messageWriter));
-            }
-
             if (graph == null)
             {
                 throw new ArgumentNullException(nameof(graph));
             }
 
+            if (messageWriter == null)
+            {
+                throw new ArgumentNullException(nameof(messageWriter));
+            }
+
+            // TODO: Call Async version?
+            // TODO: Make the enum alias working
             if (TypeHelper.IsEnum(graph.GetType()))
             {
                 messageWriter.WriteValue(graph.ToString());
             }
             else
             {
-                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph));
+                TimeZoneInfo timeZone = ODataPrimitiveSerializer.GetTimeZone(writeContext);
+                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, timeZone));
             }
         }
     }

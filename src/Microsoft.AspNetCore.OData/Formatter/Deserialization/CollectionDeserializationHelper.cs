@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 if (isNonstandardEdmPrimitiveCollection && element != null)
                 {
                     // convert non-standard edm primitives if required.
-                    element = EdmPrimitiveHelpers.ConvertPrimitiveValue(element, elementType);
+                    element = EdmPrimitiveHelper.ConvertPrimitiveValue(element, elementType);
                 }
 
                 if (list != null)

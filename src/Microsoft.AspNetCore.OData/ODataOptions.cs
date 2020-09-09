@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
@@ -120,6 +121,27 @@ namespace Microsoft.AspNetCore.OData
         public ODataOptions SetBuilderFactory(Func<IContainerBuilder> factory)
         {
             BuilderFactory = factory;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or sets a TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.Local;
+
+        /// <summary>
+        /// Sets the <see cref="TimeZoneInfo"/> in route builder.
+        /// </summary>
+        /// <param name="timeZoneInfo">The <see cref="TimeZoneInfo"/></param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions SetTimeZoneInfo(TimeZoneInfo timeZoneInfo)
+        {
+            if (timeZoneInfo == null)
+            {
+                throw Error.ArgumentNull(nameof(timeZoneInfo));
+            }
+
+            TimeZone = timeZoneInfo;
             return this;
         }
         #endregion

@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             if (edmTypeReference.IsPrimitive())
             {
                 ConstantNode node = graph as ConstantNode;
-                return EdmPrimitiveHelpers.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType);
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType);
             }
 
             // Resource, ResourceSet, Entity Reference or collection of entity reference
@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             if (isNonStandardEdmPrimitive)
             {
-                return EdmPrimitiveHelpers.ConvertPrimitiveValue(value, type);
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(value, type);
             }
             else
             {

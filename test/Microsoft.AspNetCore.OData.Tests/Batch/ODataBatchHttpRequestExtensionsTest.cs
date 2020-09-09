@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             IEdmModel model = new EdmModel();
             HttpContext context = new DefaultHttpContext();
             HttpRequest request = context.Request;
-            context.ODataFeature().RouteName = "odata";
+            context.ODataFeature().PrefixName = "odata";
             context.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
 
             ODataBatchResponseItem[] responses = new ODataBatchResponseItem[] { };

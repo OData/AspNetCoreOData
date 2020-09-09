@@ -10,9 +10,9 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Edm
 {
-    internal static class EdmPrimitiveHelpers
+    internal static class EdmPrimitiveHelper
     {
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
         public static object ConvertPrimitiveValue(object value, Type type)

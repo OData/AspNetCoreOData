@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Edm;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Moq;
@@ -18,14 +21,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 {
     public class ODataPrimitiveSerializerTests
     {
-#if false
         public static IEnumerable<object[]> NonEdmPrimitiveConversionData
         {
             get
             {
-                return EdmPrimitiveHelpersTest
-                    .ConvertPrimitiveValue_NonStandardPrimitives_Data
-                    .Select(data => new[] { data[1], data[0] });
+                return EdmPrimitiveHelperTests.ConvertPrimitiveValue_NonStandardPrimitives_Data.Select(data => new[] { data[1], data[0] });
             }
         }
 
@@ -58,9 +58,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     { (UInt64)1, "Edm.Int64", "1" },
                     //(Stream) new MemoryStream(new byte[] { 1 }), // TODO: Enable once we have support for streams
                     { new XElement(XName.Get("element","namespace")), "Edm.String", "\"<element xmlns=\\\"namespace\\\" />\"" },
-#if NETFX // Binary only supported on Net Framework
-                    { new Binary(new byte[] {1}), "Edm.Binary", "\"AQ==\"" },
-#endif
                 };
             }
         }
@@ -94,16 +91,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void Property_ODataPayloadKind()
         {
+            // Arrange
             var serializer = new ODataPrimitiveSerializer();
+
+            // Act & Assert
             Assert.Equal(ODataPayloadKind.Property, serializer.ODataPayloadKind);
         }
 
         [Fact]
         public void WriteObject_Throws_RootElementNameMissing()
         {
+            // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
 
+            // Act & Assert
             ExceptionAssert.Throws<ArgumentException>(
                 () => serializer.WriteObject(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext),
                 "The 'RootElementName' property is required on 'ODataSerializerContext'. (Parameter 'writeContext')");
@@ -112,6 +114,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObject_Calls_CreateODataPrimitiveValue()
         {
+            // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "Property", Model = EdmCoreModel.Instance };
             Mock<ODataPrimitiveSerializer> serializer = new Mock<ODataPrimitiveSerializer>();
             serializer.CallBase = true;
@@ -119,18 +122,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     42, It.Is<IEdmPrimitiveTypeReference>(t => t.PrimitiveKind() == EdmPrimitiveTypeKind.Int32), writeContext))
                 .Returns(new ODataPrimitiveValue(42)).Verifiable();
 
+            // Act
             serializer.Object.WriteObject(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext);
 
+            // Assert
             serializer.Verify();
         }
 
         [Fact]
         public void CreateODataValue_PrimitiveValue()
         {
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(int));
+            // Arrange
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(int).GetEdmPrimitiveTypeReference();
             var serializer = new ODataPrimitiveSerializer();
 
+            // Act
             var odataValue = serializer.CreateODataValue(20, edmPrimitiveType, writeContext: null);
+
+            // Assert
             Assert.NotNull(odataValue);
             ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(odataValue);
             Assert.Equal(20, primitiveValue.Value);
@@ -139,10 +148,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void CreateODataValue_ReturnsODataNullValue_ForNullValue()
         {
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(string));
+            // Arrange
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(string).GetEdmPrimitiveTypeReference();
             var serializer = new ODataPrimitiveSerializer();
+
+            // Act
             var odataValue = serializer.CreateODataValue(null, edmPrimitiveType, new ODataSerializerContext());
 
+            // Assert
             Assert.IsType<ODataNullValue>(odataValue);
         }
 
@@ -150,11 +163,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsDateTimeOffset_ForDateTime_ByDefault()
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType =
-                EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(DateTime));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(DateTime).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = new DateTime(2014, 10, 27);
-            TimeZoneInfoHelper.TimeZone = null;
 
             // Act
             ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, new ODataSerializerContext());
@@ -171,21 +182,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsDateTimeOffsetMinValue_ForDateTimeMinValue(string timeZoneId)
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType =
-                EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(DateTime));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(DateTime).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = DateTime.MinValue;
-            TimeZoneInfoHelper.TimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(timeZone));
+            ODataSerializerContext context = new ODataSerializerContext { Request = request };
 
             // Act
-            ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, new ODataSerializerContext());
+            ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, context);
 
             // Assert
             ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(odataValue);
 
-            if (TimeZoneInfoHelper.TimeZone.BaseUtcOffset.Hours < 0)
+            if (timeZone.BaseUtcOffset.Hours < 0)
             {
-                Assert.Equal(new DateTimeOffset(dt, TimeZoneInfoHelper.TimeZone.GetUtcOffset(dt)), primitiveValue.Value);
+                Assert.Equal(new DateTimeOffset(dt, timeZone.GetUtcOffset(dt)), primitiveValue.Value);
             }
             else
             {
@@ -200,21 +212,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsDateTimeOffsetMaxValue_ForDateTimeMaxValue(string timeZoneId)
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType =
-                EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(DateTime));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(DateTime).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = DateTime.MaxValue;
-            TimeZoneInfoHelper.TimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(timeZone));
+            ODataSerializerContext context = new ODataSerializerContext { Request = request };
 
             // Act
-            ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, new ODataSerializerContext());
+            ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, context);
 
             // Assert
             ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(odataValue);
 
-            if (TimeZoneInfoHelper.TimeZone.BaseUtcOffset.Hours > 0)
+            if (timeZone.BaseUtcOffset.Hours > 0)
             {
-                Assert.Equal(new DateTimeOffset(dt, TimeZoneInfoHelper.TimeZone.GetUtcOffset(dt)), primitiveValue.Value);
+                Assert.Equal(new DateTimeOffset(dt, timeZone.GetUtcOffset(dt)), primitiveValue.Value);
             }
             else
             {
@@ -227,21 +240,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsDateTimeOffset_ForDateTime_WithDifferentTimeZone(DateTime value)
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType =
-                EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(DateTime));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(DateTime).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
 
             TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            var configuration = RoutingConfigurationFactory.CreateWithRootContainer("OData");
-            configuration.SetTimeZoneInfo(tzi);
-
-            var request = RequestFactory.Create(configuration, "OData");
+            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(tzi));
 
             ODataSerializerContext context = new ODataSerializerContext { Request = request };
 
             DateTimeOffset expected = value.Kind == DateTimeKind.Unspecified
-                ? new DateTimeOffset(value, TimeZoneInfoHelper.TimeZone.GetUtcOffset(value))
-                : TimeZoneInfo.ConvertTime(new DateTimeOffset(value), TimeZoneInfoHelper.TimeZone);
+                ? new DateTimeOffset(value, tzi.GetUtcOffset(value))
+                : TimeZoneInfo.ConvertTime(new DateTimeOffset(value), tzi);
 
             // Act
             ODataValue odataValue = serializer.CreateODataValue(value, edmPrimitiveType, context);
@@ -255,7 +264,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsDate_ForDateTime()
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(Date));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(Date).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = new DateTime(2014, 10, 27);
 
@@ -272,7 +281,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ReturnsTimeOfDay_ForTimeSpan()
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(TimeOfDay));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(TimeOfDay).GetEdmPrimitiveTypeReference();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             TimeSpan ts = new TimeSpan(0, 10, 11, 12, 13);
 
@@ -330,7 +339,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void AddTypeNameAnnotationAsNeeded_AddsAnnotation_InJsonLightMetadataMode()
         {
             // Arrange
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(short));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(short).GetEdmPrimitiveTypeReference();
             ODataPrimitiveValue primitive = new ODataPrimitiveValue((short)1);
 
             // Act
@@ -364,7 +373,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreatePrimitive_ReturnsNull_ForNullValue()
         {
             // Act
-            IEdmPrimitiveTypeReference edmPrimitiveType = EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(typeof(int));
+            IEdmPrimitiveTypeReference edmPrimitiveType = typeof(int).GetEdmPrimitiveTypeReference();
             ODataValue value = ODataPrimitiveSerializer.CreatePrimitive(null, edmPrimitiveType, writeContext: null);
 
             // Assert
@@ -375,20 +384,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [MemberData(nameof(EdmPrimitiveData))]
         public void ConvertUnsupportedPrimitives_DoesntChangeStandardEdmPrimitives(object graph, string type, string value)
         {
+            // Arrange & Act & Assert
             Assert.NotNull(type);
             Assert.NotNull(value);
-            Assert.Equal(
-                graph,
-                ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph));
+            Assert.Equal(graph, ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, timeZoneInfo: null));
         }
 
         [Theory]
         [MemberData(nameof(NonEdmPrimitiveConversionData))]
         public void ConvertUnsupportedPrimitives_NonStandardEdmPrimitives(object graph, object result)
         {
-            Assert.Equal(
-                result,
-                ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph));
+            // Arrange & Act & Assert
+            Assert.Equal(result, ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, timeZoneInfo: null));
         }
 
         [Theory]
@@ -396,12 +403,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void ConvertUnsupportedDateTime_NonStandardEdmPrimitives(DateTime graph)
         {
             // Arrange & Act
-            TimeZoneInfoHelper.TimeZone = null;
-            object value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph);
+            TimeZoneInfo timeZone = TimeZoneInfo.Local;
+            object value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, timeZoneInfo: null);
 
             DateTimeOffset expected = graph.Kind == DateTimeKind.Unspecified
-                ? new DateTimeOffset(graph, TimeZoneInfoHelper.TimeZone.GetUtcOffset(graph))
-                : TimeZoneInfo.ConvertTime(new DateTimeOffset(graph), TimeZoneInfoHelper.TimeZone);
+                ? new DateTimeOffset(graph, timeZone.GetUtcOffset(graph))
+                : TimeZoneInfo.ConvertTime(new DateTimeOffset(graph), timeZone);
 
             // Assert
             DateTimeOffset actual = Assert.IsType<DateTimeOffset>(value);
@@ -415,14 +422,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            TimeZoneInfoHelper.TimeZone = tzi;
 
             DateTimeOffset expected = graph.Kind == DateTimeKind.Unspecified
-                ? new DateTimeOffset(graph, TimeZoneInfoHelper.TimeZone.GetUtcOffset(graph))
-                : TimeZoneInfo.ConvertTime(new DateTimeOffset(graph), TimeZoneInfoHelper.TimeZone);
+                ? new DateTimeOffset(graph, tzi.GetUtcOffset(graph))
+                : TimeZoneInfo.ConvertTime(new DateTimeOffset(graph), tzi);
 
             // Act
-            object value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph);
+            object value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, tzi);
 
             // Assert
             DateTimeOffset actual = Assert.IsType<DateTimeOffset>(value);
@@ -438,29 +444,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             bool expectedResult)
         {
             // Act
-            bool actualResult = ODataPrimitiveSerializer.ShouldSuppressTypeNameSerialization(value,
-                (ODataMetadataLevel)metadataLevel);
+            bool actualResult = ODataPrimitiveSerializer.ShouldSuppressTypeNameSerialization(value, metadataLevel);
 
             // Assert
             Assert.Equal(expectedResult, actualResult);
         }
-
-        public static TheoryDataSet<EdmPrimitiveTypeKind> EdmPrimitiveKinds
-        {
-            get
-            {
-                TheoryDataSet<EdmPrimitiveTypeKind> dataset = new TheoryDataSet<EdmPrimitiveTypeKind>();
-                var primitiveKinds = Enum.GetValues(typeof(EdmPrimitiveTypeKind))
-                                        .OfType<EdmPrimitiveTypeKind>()
-                                        .Where(primitiveKind => primitiveKind != EdmPrimitiveTypeKind.None);
-
-                foreach (var primitiveKind in primitiveKinds)
-                {
-                    dataset.Add(primitiveKind);
-                }
-                return dataset;
-            }
-        }
-#endif
     }
 }

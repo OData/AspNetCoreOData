@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -28,12 +30,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw new ArgumentNullException(nameof(messageWriter));
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             if (writeContext == null)
             {
-                throw new ArgumentNullException(nameof(writeContext));
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             if (writeContext.RootElementName == null)
@@ -84,7 +86,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // null when values should not be serialized. The TypeName property is different and should always be
             // provided to ODataLib to enable model validation. A separate annotation is used to decide whether or not
             // to serialize the type name (a null value prevents serialization).
-
             Contract.Assert(primitive != null);
 
             object value = primitive.Value;
@@ -107,7 +108,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            object supportedValue = ConvertPrimitiveValue(value, primitiveType);
+            TimeZoneInfo timeZoneInfo = GetTimeZone(writeContext);
+            object supportedValue = ConvertPrimitiveValue(value, primitiveType, timeZoneInfo);
             ODataPrimitiveValue primitive = new ODataPrimitiveValue(supportedValue);
 
             if (writeContext != null)
@@ -118,7 +120,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return primitive;
         }
 
-        internal static object ConvertPrimitiveValue(object value, IEdmPrimitiveTypeReference primitiveType)
+        internal static TimeZoneInfo GetTimeZone(ODataSerializerContext writeContext)
+        {
+            TimeZoneInfo timeZone = TimeZoneInfo.Local;
+            if (writeContext == null || writeContext.Request == null)
+            {
+                return timeZone;
+            }
+
+            IOptions<ODataOptions> odataOptions = writeContext.Request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions == null || odataOptions.Value == null)
+            {
+                return timeZone;
+            }
+
+            return odataOptions.Value.TimeZone;
+        }
+
+        internal static object ConvertPrimitiveValue(object value, IEdmPrimitiveTypeReference primitiveType, TimeZoneInfo timeZoneInfo)
         {
             if (value == null)
             {
@@ -138,10 +157,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return tod;
             }
 
-            return ConvertUnsupportedPrimitives(value);
+            return ConvertUnsupportedPrimitives(value, timeZoneInfo);
         }
 
-        internal static object ConvertUnsupportedPrimitives(object value)
+        internal static object ConvertUnsupportedPrimitives(object value, TimeZoneInfo timeZoneInfo)
         {
             if (value != null)
             {
@@ -151,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 switch (Type.GetTypeCode(type))
                 {
                     case TypeCode.Char:
-                        return new String((char)value, 1);
+                        return new string((char)value, 1);
 
                     case TypeCode.UInt16:
                         return (int)(ushort)value;
@@ -164,12 +183,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     case TypeCode.DateTime:
                         DateTime dateTime = (DateTime)value;
-                        return TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime);
+                        return TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime, timeZoneInfo);
 
                     default:
                         if (type == typeof(char[]))
                         {
-                            return new String(value as char[]);
+                            return new string(value as char[]);
                         }
                         else if (type == typeof(XElement))
                         {
@@ -200,7 +219,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 case TypeCode.Double:
                     double doubleValue = (double)value;
                     // ... except for NaN or Infinity (positive or negative).
-                    if (Double.IsNaN(doubleValue) || Double.IsInfinity(doubleValue))
+                    if (double.IsNaN(doubleValue) || double.IsInfinity(doubleValue))
                     {
                         return false;
                     }

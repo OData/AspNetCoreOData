@@ -35,12 +35,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             IEdmTypeReference collectionType = writeContext.GetEdmType(graph, type);
@@ -58,12 +58,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEnumerable enumerable = graph as IEnumerable;
             if (enumerable == null && graph != null)
             {
-                throw Error.Argument("graph", SRResources.ArgumentMustBeOfType, typeof(IEnumerable).Name);
+                throw Error.Argument(nameof(graph), SRResources.ArgumentMustBeOfType, typeof(IEnumerable).Name);
             }
 
             if (expectedType == null)
             {
-                throw Error.ArgumentNull("expectedType");
+                throw Error.ArgumentNull(nameof(expectedType));
             }
 
             IEdmTypeReference elementType = GetElementType(expectedType);
@@ -77,19 +77,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="graph">The collection to write.</param>
         /// <param name="collectionType">The EDM type of the collection.</param>
         /// <param name="writeContext">The serializer context.</param>
-        public void WriteCollection(ODataCollectionWriter writer, object graph, IEdmTypeReference collectionType,
+        public virtual void WriteCollection(ODataCollectionWriter writer, object graph, IEdmTypeReference collectionType,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw Error.ArgumentNull(nameof(writer));
+            }
+
+            if (writeContext == null)
+            {
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             ODataCollectionStart collectionStart = new ODataCollectionStart { Name = writeContext.RootElementName };
 
-            ODataFeature odataFeature = writeContext.Request.ODataFeature() as ODataFeature;
             if (writeContext.Request != null)
             {
+                ODataFeature odataFeature = writeContext.Request.ODataFeature() as ODataFeature;
                 if (odataFeature.NextLink != null)
                 {
                     collectionStart.NextPageLink = odataFeature.NextLink;
@@ -134,13 +139,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public virtual ODataCollectionValue CreateODataCollectionValue(IEnumerable enumerable, IEdmTypeReference elementType,
             ODataSerializerContext writeContext)
         {
-            if (writeContext == null)
-            {
-                throw Error.ArgumentNull("writeContext");
-            }
             if (elementType == null)
             {
-                throw Error.ArgumentNull("elementType");
+                throw Error.ArgumentNull(nameof(elementType));
+            }
+
+            if (writeContext == null)
+            {
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             ArrayList valueCollection = new ArrayList();
@@ -226,7 +232,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // null when values should not be serialized. The TypeName property is different and should always be
             // provided to ODataLib to enable model validation. A separate annotation is used to decide whether or not
             // to serialize the type name (a null value prevents serialization).
-
             Contract.Assert(value != null);
 
             // Only add an annotation if we want to override ODataLib's default type name serialization behavior.

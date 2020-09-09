@@ -29,18 +29,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         protected ODataEdmTypeSerializer(ODataPayloadKind payloadKind, ODataSerializerProvider serializerProvider)
             : this(payloadKind)
         {
-            if (serializerProvider == null)
-            {
-                throw Error.ArgumentNull("serializerProvider");
-            }
-
-            SerializerProvider = serializerProvider;
+            SerializerProvider = serializerProvider ?? throw Error.ArgumentNull(nameof(serializerProvider));
         }
 
         /// <summary>
         /// Gets the <see cref="ODataSerializerProvider"/> that can be used to write inner objects.
         /// </summary>
-        public ODataSerializerProvider SerializerProvider { get; private set; }
+        public ODataSerializerProvider SerializerProvider { get; }
 
         /// <summary>
         /// Writes the given object specified by the parameter graph as a part of an existing OData message using the given

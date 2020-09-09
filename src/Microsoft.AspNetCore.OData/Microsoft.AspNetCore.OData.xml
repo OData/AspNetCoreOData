@@ -3616,11 +3616,10 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.IsHttpError(System.Object)">
             <summary>
-            Return true of the object is an HttpError.
+            Return true if the object is an HttpError.
             </summary>
             <param name="error">The error to test.</param>
-            <returns>true of the object is an HttpError</returns>
-            <remarks>This function uses types that are AspNetCore-specific.</remarks>
+            <returns>true if the object is an HttpError</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.CreateODataError(System.Object)">
             <summary>
@@ -3628,7 +3627,6 @@
             </summary>
             <param name="error">The error to use.</param>
             <returns>an ODataError.</returns>
-            <remarks>This function uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer">
             <summary>
@@ -3829,12 +3827,12 @@
             <remarks>
             Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
             the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
-            Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
+            Uri[] which maps to ODataReferenceLinks payload, etc.
             </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.#ctor(Microsoft.OData.ODataPayloadKind)">
             <summary>
-            Constructs an ODataSerializer that can generate OData payload of the specified kind.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> class.
             </summary>
             <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         </member>
@@ -5331,6 +5329,18 @@
             Sets the builder factory. Please call it before the "AddModel".
             </summary>
             <param name="factory">The builder factory.</param>
+            <returns>The calling itself.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.TimeZone">
+            <summary>
+            Gets or sets a TimeZoneInfo for the <see cref="T:System.DateTime"/> serialization and deserialization.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetTimeZoneInfo(System.TimeZoneInfo)">
+            <summary>
+            Sets the <see cref="T:System.TimeZoneInfo"/> in route builder.
+            </summary>
+            <param name="timeZoneInfo">The <see cref="T:System.TimeZoneInfo"/></param>
             <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">

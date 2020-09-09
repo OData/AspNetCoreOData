@@ -25,7 +25,16 @@ namespace Microsoft.AspNetCore.OData.Common
 
         public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime)
         {
-            TimeZoneInfo timeZone = TimeZoneInfoHelper.TimeZone;
+            return ConvertToDateTimeOffset(dateTime, TimeZoneInfoHelper.TimeZone);
+        }
+
+        public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime, TimeZoneInfo timeZone)
+        {
+            if (timeZone == null)
+            {
+                timeZone = TimeZoneInfo.Local;
+            }
+
             TimeSpan utcOffset = timeZone.GetUtcOffset(dateTime);
             if (utcOffset >= TimeSpan.Zero)
             {

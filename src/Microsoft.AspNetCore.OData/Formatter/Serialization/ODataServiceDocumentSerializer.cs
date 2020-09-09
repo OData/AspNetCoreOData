@@ -23,14 +23,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <inheritdoc/>
         public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
-            if (messageWriter == null)
-            {
-                throw new ArgumentNullException(nameof(messageWriter));
-            }
-
             if (graph == null)
             {
                 throw new ArgumentNullException(nameof(graph));
+            }
+
+            if (messageWriter == null)
+            {
+                throw new ArgumentNullException(nameof(messageWriter));
             }
 
             ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
@@ -39,6 +39,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type?.Name));
             }
 
+            // TODO: Call Async version?
+            // messageWriter.WriteServiceDocumentAsync(serviceDocument);
             messageWriter.WriteServiceDocument(serviceDocument);
         }
     }

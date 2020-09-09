@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 {
                     if (propertyKind == EdmTypeKind.Primitive)
                     {
-                        propertyValue = EdmPrimitiveHelpers.ConvertPrimitiveValue(propertyValue,
+                        propertyValue = EdmPrimitiveHelper.ConvertPrimitiveValue(propertyValue,
                             GetPropertyType(resource, propertyName));
                     }
                 }

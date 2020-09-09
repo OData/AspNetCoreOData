@@ -27,23 +27,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [InlineData('t')]
         public void SerializesPrimitiveTypes(object value)
         {
+            // Arrange
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
             Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
             Stream stream = new MemoryStream();
             mockRequest.Setup(r => r.GetStream()).Returns(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
+            // Act
             serializer.WriteObject(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
             string result = reader.ReadToEnd();
 
+            // Assert
             Assert.Equal(value.ToString(), result, ignoreCase: true);
         }
 
         [Fact]
         public void SerializesNullablePrimitiveTypes()
         {
+            // Arrange
             int? value = 5;
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
             Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
@@ -51,10 +55,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             mockRequest.Setup(r => r.GetStream()).Returns(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
+            // Act
             serializer.WriteObject(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
 
+            // Assert
             Assert.Equal(value.ToString(), reader.ReadToEnd());
         }
 
@@ -102,6 +108,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void SerializesEnumType()
         {
+            // Arrange
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
             Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
             Stream stream = new MemoryStream();
@@ -109,11 +116,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
             object value = Color.Red | Color.Blue;
 
+            // Act
             serializer.WriteObject(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
             string result = reader.ReadToEnd();
 
+            // Assert
             Assert.Equal(value.ToString(), result, ignoreCase: true);
         }
 
