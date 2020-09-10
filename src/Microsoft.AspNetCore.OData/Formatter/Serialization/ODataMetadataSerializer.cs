@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             // NOTE: ODataMessageWriter doesn't have a way to set the IEdmModel. So, there is an underlying assumption here that

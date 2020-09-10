@@ -7,17 +7,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
-using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.AspNetCore.OData.Tests.Formatter.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -37,7 +37,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         IEdmCollectionTypeReference _customersType;
         IEdmCollectionTypeReference _addressesType;
         ODataSerializerContext _writeContext;
-        ODataSerializerProvider _serializerProvider;
 
         public ODataResourceSetSerializerTests()
         {
@@ -50,74 +49,82 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _customers = new[] {
                 new Customer()
                 {
-                    //FirstName = "Foo",
-                    //LastName = "Bar",
-                    //ID = 10,
+                    FirstName = "Foo",
+                    LastName = "Bar",
+                    ID = 10,
                 },
                 new Customer()
                 {
-                    //FirstName = "Foo",
-                    //LastName = "Bar",
-                    //ID = 42,
+                    FirstName = "Foo",
+                    LastName = "Bar",
+                    ID = 42,
                 }
             };
 
             _customersType = _model.GetEdmTypeReference(typeof(Customer[])).AsCollection();
             _addressesType = _model.GetEdmTypeReference(typeof(Address[])).AsCollection();
             _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model };
-            //_serializerProvider = ODataSerializerProviderFactory.Create();
         }
 
         [Fact]
         public void Ctor_ThrowsArgumentNull_SerializerProvider()
         {
-            ExceptionAssert.ThrowsArgumentNull(
-                () => new ODataResourceSetSerializer(serializerProvider: null),
-                "serializerProvider");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ODataResourceSetSerializer(serializerProvider: null), "serializerProvider");
         }
 
         [Fact]
         public void WriteObject_ThrowsArgumentNull_MessageWriter()
         {
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.WriteObject(graph: null, type: null, messageWriter: null, writeContext: new ODataSerializerContext()),
                 "messageWriter");
         }
 
-        //[Fact]
-        //public void WriteObject_ThrowsArgumentNull_WriteContext()
-        //{
-        //    ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
-        //    ExceptionAssert.ThrowsArgumentNull(
-        //        () => serializer.WriteObject(graph: null, type: null, messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
-        //        "writeContext");
-        //}
+        [Fact]
+        public void WriteObject_ThrowsArgumentNull_WriteContext()
+        {
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
-        //[Fact]
-        //public void WriteObject_Calls_WriteObjectInline()
-        //{
-        //    // Arrange
-        //    object graph = new object();
-        //    Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
-        //    serializer.CallBase = true;
-        //    serializer
-        //        .Setup(s => s.WriteObjectInline(graph, It.Is<IEdmTypeReference>(e => _customersType.IsEquivalentTo(e)),
-        //            It.IsAny<ODataWriter>(), _writeContext))
-        //        .Verifiable();
+            // Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.WriteObject(graph: null, type: null, messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
+                "writeContext");
+        }
 
-        //    // Act
-        //    serializer.Object.WriteObject(graph, typeof(Customer[]), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
+        [Fact]
+        public void WriteObject_Calls_WriteObjectInline()
+        {
+            // Arrange
+            object graph = new object();
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
+            serializer.CallBase = true;
+            serializer
+                .Setup(s => s.WriteObjectInline(graph, It.Is<IEdmTypeReference>(e => _customersType.IsEquivalentTo(e)),
+                    It.IsAny<ODataWriter>(), _writeContext))
+                .Verifiable();
 
-        //    // Assert
-        //    serializer.Verify();
-        //}
+            // Act
+            serializer.Object.WriteObject(graph, typeof(Customer[]), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
+
+            // Assert
+            serializer.Verify();
+        }
 
         [Fact]
         public void WriteObject_CanWriteTopLevelResourceSetContainsNullComplexElement()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            ODataSerializerProvider serializerProvider = GetServiceProvider().GetService<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
             MemoryStream stream = new MemoryStream();
             IODataResponseMessage message = new ODataMessageWrapper(stream);
 
@@ -155,7 +162,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void WriteObject_CanWrite_TopLevelResourceSet_ContainsEmptyCollectionOfDynamicComplexElement()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            ODataSerializerProvider serializerProvider = GetServiceProvider().GetService<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
             MemoryStream stream = new MemoryStream();
             IODataResponseMessage message = new ODataMessageWrapper(stream);
 
@@ -192,13 +200,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Equal(@"{
-  ""@odata.context"": ""http://any/$metadata#Collection(Microsoft.AspNet.OData.Test.Common.SimpleOpenAddress)"",
+  ""@odata.context"": ""http://any/$metadata#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
   ""value"": [
     {
       ""Street"": ""Microsoft Rd"",
       ""City"": ""Redmond"",
       ""StringProp"": ""abc"",
-      ""Locations@odata.type"": ""#Collection(Microsoft.AspNet.OData.Test.Common.SimpleOpenAddress)"",
+      ""Locations@odata.type"": ""#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
       ""Locations"": []
     }
   ]
@@ -208,7 +216,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObjectInline_ThrowsArgumentNull_Writer()
         {
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
                 "writer");
@@ -217,7 +229,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObjectInline_ThrowsArgumentNull_WriteContext()
         {
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
                 "writeContext");
@@ -226,7 +242,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObjectInline_ThrowsSerializationException_CannotSerializerNull()
         {
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
                 () => serializer.WriteObjectInline(graph: null, expectedType: _customersType,
                     writer: new Mock<ODataWriter>().Object, writeContext: _writeContext),
@@ -236,7 +256,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObjectInline_ThrowsSerializationException_IfGraphIsNotEnumerable()
         {
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
                 () => serializer.WriteObjectInline(graph: 42, expectedType: _customersType,
                     writer: new Mock<ODataWriter>().Object, writeContext: _writeContext),
@@ -248,7 +272,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[] { null };
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
@@ -261,35 +288,41 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[] { null };
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             ODataSerializerContext writeContext = new ODataSerializerContext { NavigationSource = null, Model = _model };
 
             // Act & Assert
             ExceptionAssert.DoesNotThrow(() => serializer.WriteObjectInline(instance, _addressesType, new Mock<ODataWriter>().Object, writeContext));
         }
 
-        //[Fact]
-        //public void WriteObjectInline_Throws_TypeCannotBeSerialized_IfResourceSetContainsEntityThatCannotBeSerialized()
-        //{
-        //    // Arrange
-        //    Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
-        //    var request = RequestFactory.Create();
-        //    serializerProvider.Setup(s => s.GetODataPayloadSerializer(typeof(int), request)).Returns<ODataSerializer>(null);
-        //    IEnumerable instance = new object[] { 42 };
-        //    ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+        [Fact]
+        public void WriteObjectInline_Throws_TypeCannotBeSerialized_IfResourceSetContainsEntityThatCannotBeSerialized()
+        {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            var request = RequestFactory.Create();
+            serializerProvider.Setup(s => s.GetODataPayloadSerializer(typeof(int), request)).Returns<ODataSerializer>(null);
+            IEnumerable instance = new object[] { 42 };
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
-        //    // Act & Assert
-        //    ExceptionAssert.Throws<SerializationException>(
-        //        () => serializer.WriteObjectInline(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
-        //        "'Default.Customer' cannot be serialized using the ODataMediaTypeFormatter.");
-        //}
+            // Act & Assert
+            ExceptionAssert.Throws<SerializationException>(
+                () => serializer.WriteObjectInline(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
+                "'Default.Customer' cannot be serialized using the OData output formatter.");
+        }
 
         [Fact]
         public void WriteObjectInline_Calls_CreateResourceSet()
         {
             // Arrange
             IEnumerable instance = new object[0];
-            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateResourceSet(instance, _customersType, _writeContext)).Returns(new ODataResourceSet()).Verifiable();
 
@@ -305,7 +338,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[0];
-            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateResourceSet(instance, _customersType, _writeContext)).Returns<ODataResourceSet>(null);
             ODataWriter writer = new Mock<ODataWriter>().Object;
@@ -322,7 +356,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataResourceSet resourceSet = new ODataResourceSet();
-            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateResourceSet(instance, _customersType, _writeContext)).Returns(resourceSet);
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
@@ -335,51 +372,51 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             writer.Verify();
         }
 
-        //[Fact]
-        //public void WriteObjectInline_WritesEachEntityInstance()
-        //{
-        //    // Arrange
-        //    Mock<ODataEdmTypeSerializer> customerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-        //    ODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
-        //    var mockWriter = new Mock<ODataWriter>();
+        [Fact]
+        public void WriteObjectInline_WritesEachEntityInstance()
+        {
+            // Arrange
+            Mock<ODataEdmTypeSerializer> customerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
+            ODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
+            var mockWriter = new Mock<ODataWriter>();
 
-        //    customerSerializer.Setup(s => s.WriteObjectInline(_customers[0], _customersType.ElementType(), mockWriter.Object, _writeContext)).Verifiable();
-        //    customerSerializer.Setup(s => s.WriteObjectInline(_customers[1], _customersType.ElementType(), mockWriter.Object, _writeContext)).Verifiable();
+            customerSerializer.Setup(s => s.WriteObjectInline(_customers[0], _customersType.ElementType(), mockWriter.Object, _writeContext)).Verifiable();
+            customerSerializer.Setup(s => s.WriteObjectInline(_customers[1], _customersType.ElementType(), mockWriter.Object, _writeContext)).Verifiable();
 
-        //    _serializer = new ODataResourceSetSerializer(provider);
+            _serializer = new ODataResourceSetSerializer(provider);
 
-        //    // Act
-        //    _serializer.WriteObjectInline(_customers, _customersType, mockWriter.Object, _writeContext);
+            // Act
+            _serializer.WriteObjectInline(_customers, _customersType, mockWriter.Object, _writeContext);
 
-        //    // Assert
-        //    customerSerializer.Verify();
-        //}
+            // Assert
+            customerSerializer.Verify();
+        }
 
-        //[Fact]
-        //public void WriteObjectInline_Can_WriteCollectionOfIEdmObjects()
-        //{
-        //    // Arrange
-        //    IEdmTypeReference edmType = new EdmEntityTypeReference(new EdmEntityType("NS", "Name"), isNullable: false);
-        //    IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(edmType));
-        //    Mock<IEdmObject> edmObject = new Mock<IEdmObject>();
-        //    edmObject.Setup(e => e.GetEdmType()).Returns(edmType);
+        [Fact]
+        public void WriteObjectInline_Can_WriteCollectionOfIEdmObjects()
+        {
+            // Arrange
+            IEdmTypeReference edmType = new EdmEntityTypeReference(new EdmEntityType("NS", "Name"), isNullable: false);
+            IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(edmType));
+            Mock<IEdmObject> edmObject = new Mock<IEdmObject>();
+            edmObject.Setup(e => e.GetEdmType()).Returns(edmType);
 
-        //    var mockWriter = new Mock<ODataWriter>();
+            var mockWriter = new Mock<ODataWriter>();
 
-        //    Mock<ODataEdmTypeSerializer> customSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-        //    customSerializer.Setup(s => s.WriteObjectInline(edmObject.Object, edmType, mockWriter.Object, _writeContext)).Verifiable();
+            Mock<ODataEdmTypeSerializer> customSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
+            customSerializer.Setup(s => s.WriteObjectInline(edmObject.Object, edmType, mockWriter.Object, _writeContext)).Verifiable();
 
-        //    Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
-        //    serializerProvider.Setup(s => s.GetEdmTypeSerializer(edmType)).Returns(customSerializer.Object);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(edmType)).Returns(customSerializer.Object);
 
-        //    ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
-        //    // Act
-        //    serializer.WriteObjectInline(new[] { edmObject.Object }, collectionType, mockWriter.Object, _writeContext);
+            // Act
+            serializer.WriteObjectInline(new[] { edmObject.Object }, collectionType, mockWriter.Object, _writeContext);
 
-        //    // Assert
-        //    customSerializer.Verify();
-        //}
+            // Assert
+            customSerializer.Verify();
+        }
 
         [Fact]
         public void WriteObjectInline_Sets_CountQueryOption_OnWriteStart()
@@ -387,7 +424,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataResourceSet resourceSet = new ODataResourceSet { Count = 1000 };
-            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateResourceSet(instance, _customersType, _writeContext)).Returns(resourceSet);
             var mockWriter = new Mock<ODataWriter>();
@@ -407,7 +447,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataResourceSet resourceSet = new ODataResourceSet { NextPageLink = new Uri("http://nextlink.com/") };
-            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+            Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateResourceSet(instance, _customersType, _writeContext)).Returns(resourceSet);
             var mockWriter = new Mock<ODataWriter>();
@@ -432,7 +475,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResource_Sets_CountValueForPageResult()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             Uri expectedNextLink = new Uri("http://nextlink.com");
             const long ExpectedCountValue = 1000;
 
@@ -449,7 +493,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResource_Sets_NextPageLinkForPageResult()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             Uri expectedNextLink = new Uri("http://nextlink.com");
             const long ExpectedCountValue = 1000;
 
@@ -466,7 +511,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResourceSet_Sets_CountValueFromContext()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             const long ExpectedCountValue = 1000;
             var request = RequestFactory.Create();
             request.ODataFeature().TotalCount = ExpectedCountValue;
@@ -483,7 +529,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResourceSet_Sets_NextPageLinkFromContext()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             Uri expectedNextLink = new Uri("http://nextlink.com");
             var request = RequestFactory.Create();
             request.ODataFeature().NextLink = expectedNextLink;
@@ -500,7 +547,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataFeed_Sets_DeltaLinkFromContext()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             Uri expectedDeltaLink = new Uri("http://deltalink.com");
             var request = RequestFactory.Create();
             request.ODataFeature().DeltaLink = expectedDeltaLink;
@@ -517,7 +565,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResource_Ignores_NextPageLink_ForInnerResourceSets()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             Uri nextLink = new Uri("http://somelink");
             var request = RequestFactory.Create();
             request.ODataFeature().NextLink = nextLink;
@@ -542,7 +591,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResourceSet_Ignores_CountValue_ForInnerResourceSets()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             var request = RequestFactory.Create();
             request.ODataFeature().TotalCount = 42;
             var result = new object[0];
@@ -562,39 +612,102 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(resourceSet.Count);
         }
 
-        //[Fact]
-        //public void CreateResourceSet_SetsODataOperations()
-        //{
-        //    // Arrange
-        //    var config = RoutingConfigurationFactory.CreateWithRootContainer("OData");
-        //    var request = RequestFactory.Create(config, "OData");
-        //    CustomersModelWithInheritance model = new CustomersModelWithInheritance();
-        //    IEdmCollectionTypeReference customersType = new EdmCollectionTypeReference(new EdmCollectionType(model.Customer.AsReference()));
-        //    ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
-        //    ODataSerializerContext context = new ODataSerializerContext
-        //    {
-        //        NavigationSource = model.Customers,
-        //        Request = request,
-        //        Model = model.Model,
-        //        MetadataLevel = ODataMetadataLevel.Full,
-        //        Url = CreateMetadataLinkFactory("http://IgnoreMetadataPath", request)
-        //    };
+        [Fact]
+        public void CreateResourceSet_SetsODataOperations()
+        {
+            // Arrange
+            var request = RequestFactory.Create(method: "get", uri: "http://IgnoreMetadataPath", setupAction: null);
 
-        //    var result = new object[0];
+            IEdmModel model = GetEdmModelWithOperations(out IEdmEntityType customerType, out IEdmEntitySet customers);
+            IEdmCollectionTypeReference customersType = new EdmCollectionTypeReference(new EdmCollectionType(customerType.AsReference()));
 
-        //    // Act
-        //    ODataResourceSet resourceSet = serializer.CreateResourceSet(result, customersType, context);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
-        //    // Assert
-        //    Assert.Single(resourceSet.Actions);
-        //    Assert.Equal(3, resourceSet.Functions.Count());
-        //}
+           // Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
+            ODataSerializerContext context = new ODataSerializerContext
+            {
+                NavigationSource = customers,
+                Request = request,
+                Model = model,
+                MetadataLevel = ODataMetadataLevel.Full,
+            };
+            var result = new object[0];
+
+            // Act
+            ODataResourceSet resourceSet = serializer.CreateResourceSet(result, customersType, context);
+
+            // Assert
+            Assert.Single(resourceSet.Actions);
+            Assert.Equal(3, resourceSet.Functions.Count());
+        }
+
+        private IEdmModel GetEdmModelWithOperations(out IEdmEntityType customerType, out IEdmEntitySet customers)
+        {
+            EdmModel model = new EdmModel();
+            EdmEntityType customer = new EdmEntityType("NS", "Customer");
+            customerType = customer;
+            customer.AddKeys(customer.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+            model.AddElement(customer);
+
+            EdmAction upgradeAll = new EdmAction("NS", "UpgradeAll", returnType: null, isBound: true, entitySetPathExpression: null);
+            upgradeAll.AddParameter("entityset",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            model.AddElement(upgradeAll);
+
+            IEdmTypeReference returnType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Boolean, isNullable: false);
+            IEdmTypeReference stringType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, isNullable: false);
+            IEdmTypeReference intType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
+
+            EdmFunction IsAnyUpgraded = new EdmFunction(
+                "NS",
+                "IsAnyUpgraded",
+                returnType,
+                isBound: true,
+                entitySetPathExpression: null,
+                isComposable: false);
+            EdmCollectionType edmCollectionType = new EdmCollectionType(new EdmEntityTypeReference(customer, false));
+            IsAnyUpgraded.AddParameter("entityset", new EdmCollectionTypeReference(edmCollectionType));
+            model.AddElement(IsAnyUpgraded);
+
+            EdmFunction isCustomerUpgradedWithParam = new EdmFunction(
+                "NS",
+                "IsUpgradedWithParam",
+                returnType,
+                isBound: true,
+                entitySetPathExpression: null,
+                isComposable: false);
+            isCustomerUpgradedWithParam.AddParameter("entity", new EdmEntityTypeReference(customer, false));
+            isCustomerUpgradedWithParam.AddParameter("city", EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, isNullable: false));
+            model.AddElement(isCustomerUpgradedWithParam);
+
+            EdmFunction isAllUpgraded = new EdmFunction("NS", "IsAllUpgraded", returnType, isBound: true,
+                entitySetPathExpression: null, isComposable: false);
+            isAllUpgraded.AddParameter("entityset",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            isAllUpgraded.AddParameter("param", intType);
+            model.AddElement(isAllUpgraded);
+
+            EdmFunction getSalaray = new EdmFunction("NS", "GetWholeSalary", intType, isBound: true, entitySetPathExpression: null, isComposable: false);
+            getSalaray.AddParameter("entityset", new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            getSalaray.AddParameter("minSalary", intType);
+            getSalaray.AddOptionalParameter("maxSalary", intType);
+            getSalaray.AddOptionalParameter("aveSalary", intType, "129");
+            model.AddElement(getSalaray);
+
+            EdmEntityContainer container = new EdmEntityContainer("NS", "ModelWithInheritance");
+            model.AddElement(container);
+            customers = container.AddEntitySet("Customers", customer);
+
+            return model;
+        }
 
         [Fact]
         public void SetODataFeatureTotalCountValueNull()
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
             var request = RequestFactory.Create();
             request.ODataFeature().TotalCount = null;
 
@@ -613,7 +726,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataOperation_OmitsOperations_WhenNonFullMetadata(ODataMetadataLevel metadataLevel)
         {
             // Arrange
-            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
 
             IEdmTypeReference returnType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Boolean, isNullable: false);
             IEdmFunction function = new EdmFunction("NS", "Function", returnType, isBound: true, entitySetPathExpression: null, isComposable: false);
@@ -631,57 +745,58 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(operation);
         }
 
-        //[Theory]
-        //[InlineData(true)]
-        //[InlineData(false)]
-        //public void CreateODataOperations_CreateOperations(bool followConventions)
-        //{
-        //    // Arrange
-        //    // Arrange
-        //    string expectedTarget = "aa://Target";
-        //    ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(_serializerProvider);
-        //    var builder = new ODataConventionModelBuilder();
-        //    builder.EntitySet<FeedCustomer>("Customers");
-        //    var function = builder.EntityType<FeedCustomer>().Collection.Function("MyFunction").Returns<int>();
-        //    function.HasFeedFunctionLink(a => new Uri(expectedTarget), followConventions);
-        //    IEdmModel model = builder.GetEdmModel();
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CreateODataOperations_CreateOperations(bool followConventions)
+        {
+            // Arrange
+            string expectedTarget = "aa://Target";
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<FeedCustomer>("Customers");
+            var function = builder.EntityType<FeedCustomer>().Collection.Function("MyFunction").Returns<int>();
+            IEdmModel model = builder.GetEdmModel();
 
-        //    IEdmEntitySet customers = model.EntityContainer.FindEntitySet("Customers");
-        //    IEdmFunction edmFunction = model.SchemaElements.OfType<IEdmFunction>().First(f => f.Name == "MyFunction");
-        //    string expectedMetadataPrefix = "http://Metadata";
+            IEdmEntitySet customers = model.EntityContainer.FindEntitySet("Customers");
+            IEdmFunction edmFunction = model.SchemaElements.OfType<IEdmFunction>().First(f => f.Name == "MyFunction");
 
-        //    var request = RequestFactory.Create();
-        //    ResourceSetContext resourceSetContext = new ResourceSetContext
-        //    {
-        //        EntitySetBase = customers,
-        //        Request = request,
-        //        Url = CreateMetadataLinkFactory(expectedMetadataPrefix, request)
-        //    };
+            Func<ResourceSetContext, Uri> functionLinkFactory = a => new Uri(expectedTarget);
+            var operationLinkBuilder = new OperationLinkBuilder(functionLinkFactory, followConventions);
+            model.SetOperationLinkBuilder(edmFunction, operationLinkBuilder);
 
-        //    ODataSerializerContext serializerContext = new ODataSerializerContext
-        //    {
-        //        NavigationSource = customers,
-        //        Request = request,
-        //        Model = model,
-        //        MetadataLevel = ODataMetadataLevel.Full,
-        //        Url = resourceSetContext.Url
-        //    };
+            var request = RequestFactory.Create(method: "get", uri: "http://any", setupAction: null);
+            ResourceSetContext resourceSetContext = new ResourceSetContext
+            {
+                EntitySetBase = customers,
+                Request = request,
+            };
 
-        //    // Act
-        //    ODataOperation actualOperation = serializer.CreateODataOperation(edmFunction, resourceSetContext, serializerContext);
+            ODataSerializerContext serializerContext = new ODataSerializerContext
+            {
+                NavigationSource = customers,
+                Request = request,
+                Model = model,
+                MetadataLevel = ODataMetadataLevel.Full,
+            };
+            string expectedMetadataPrefix = "http://any/$metadata";
 
-        //    // Assert
-        //    Assert.NotNull(actualOperation);
-        //    string expectedMetadata = expectedMetadataPrefix + "#Default.MyFunction";
-        //    ODataOperation expectedFunction = new ODataFunction
-        //    {
-        //        Metadata = new Uri(expectedMetadata),
-        //        Target = new Uri(expectedTarget),
-        //        Title = "MyFunction"
-        //    };
+            // Act
+            ODataOperation actualOperation = serializer.CreateODataOperation(edmFunction, resourceSetContext, serializerContext);
 
-        //    AssertEqual(expectedFunction, actualOperation);
-        //}
+            // Assert
+            Assert.NotNull(actualOperation);
+            string expectedMetadata = expectedMetadataPrefix + "#Default.MyFunction";
+            ODataOperation expectedFunction = new ODataFunction
+            {
+                Metadata = new Uri(expectedMetadata),
+                Target = new Uri(expectedTarget),
+                Title = "MyFunction"
+            };
+
+            AssertEqual(expectedFunction, actualOperation);
+        }
 
         private static void AssertEqual(ODataOperation expected, ODataOperation actual)
         {
@@ -709,34 +824,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(expected.AbsoluteUri, actual.AbsoluteUri);
         }
 
-        public class MyUrlHelper : IUrlHelper
+        private static IServiceProvider GetServiceProvider()
         {
-            private string _link;
+            IServiceCollection services = new ServiceCollection();
 
-            public MyUrlHelper(string metadataPath, ActionContext context)
-            {
-                _link = metadataPath;
-                ActionContext = context;
-            }
+            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
 
-            public ActionContext ActionContext { get; set; }
+            // Serializers.
+            services.AddSingleton<ODataEnumSerializer>();
+            services.AddSingleton<ODataPrimitiveSerializer>();
+            services.AddSingleton<ODataResourceSetSerializer>();
+            services.AddSingleton<ODataCollectionSerializer>();
+            services.AddSingleton<ODataResourceSerializer>();
 
-            public string Action(UrlActionContext actionContext) => throw new NotImplementedException();
-
-            public string Content(string contentPath) => throw new NotImplementedException();
-
-            public bool IsLocalUrl(string url) => throw new NotImplementedException();
-
-            public string Link(string routeName, object values) => _link;
-
-            public string RouteUrl(UrlRouteContext routeContext) => throw new NotImplementedException();
-        }
-
-        private static IUrlHelper CreateMetadataLinkFactory(string metadataPath, HttpRequest request)
-        {
-            ActionContext context = new ActionContext();
-            context.HttpContext = request.HttpContext;
-            return new MyUrlHelper(metadataPath, context);
+            return services.BuildServiceProvider();
         }
 
         public class FeedCustomer

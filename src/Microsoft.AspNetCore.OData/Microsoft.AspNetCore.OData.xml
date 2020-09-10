@@ -6323,12 +6323,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeCannotBeDeserialized">
             <summary>
-              Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
+              Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the OData input formatter..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeCannotBeSerialized">
             <summary>
-              Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the ODataMediaTypeFormatter..
+              Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the OData output formatter..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeEntity">
@@ -6358,12 +6358,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToDetermineBaseUrl">
             <summary>
-              Looks up a localized string similar to The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
+              Looks up a localized string similar to The OData formatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToDetermineMetadataUrl">
             <summary>
-              Looks up a localized string similar to The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response..
+              Looks up a localized string similar to The OData formatter must be able to determine the metadata URL for a request in order to serialize the response..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnaryNodeValidationNotSupported">

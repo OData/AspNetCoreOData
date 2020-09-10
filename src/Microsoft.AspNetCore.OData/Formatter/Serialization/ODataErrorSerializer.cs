@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     /// <summary>
     /// Represents an <see cref="ODataSerializer"/> to serialize <see cref="ODataError"/>s.
     /// </summary>
-    public partial class ODataErrorSerializer : ODataSerializer
+    public class ODataErrorSerializer : ODataSerializer
     {
         /// <summary>
         /// Initializes a new instance of the class <see cref="ODataSerializer"/>.

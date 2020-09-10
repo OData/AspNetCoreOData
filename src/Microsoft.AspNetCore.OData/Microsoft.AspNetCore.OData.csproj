@@ -30,7 +30,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.3" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.4-Nightly202009092118" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.7.0" />
     <PackageReference Include="Microsoft.OData.Edm" Version="7.7.0" />
     <PackageReference Include="Microsoft.Spatial" Version="7.7.0" />
@@ -67,6 +67,10 @@
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Builder\" />
   </ItemGroup>
 
 </Project>

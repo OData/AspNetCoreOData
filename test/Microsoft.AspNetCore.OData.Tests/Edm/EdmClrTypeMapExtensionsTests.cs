@@ -378,38 +378,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             return model;
         }
+
+        public class Customer
+        { }
+
+        public class Address
+        {
+            public string City { get; set; }
+        }
+
+        public class CnAddress : Address
+        {
+            public string Zipcode { get; set; }
+        }
+
+        public enum Color
+        {
+            Red
+        }
+
+        public class BaseType
+        { }
+
+        public class Derived1Type : BaseType
+        { }
+
+        public class Derived2Type : BaseType
+        { }
+
+        public class SubDerivedType : Derived1Type
+        { }
+
+        public class TypeNotInModel
+        { }
     }
-
-    public class Customer
-    { }
-
-    public class Address
-    {
-        public string City { get; set; }
-    }
-
-    public class CnAddress : Address
-    {
-        public string Zipcode { get; set; }
-    }
-
-    public enum Color
-    {
-        Red
-    }
-
-    public class BaseType
-    { }
-
-    public class Derived1Type : BaseType
-    { }
-
-    public class Derived2Type : BaseType
-    { }
-
-    public class SubDerivedType : Derived1Type
-    { }
-
-    public class TypeNotInModel
-    { }
 }

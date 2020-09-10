@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <summary>
         /// Gets or sets the HTTP request that caused this instance to be generated.
         /// </summary>
-        public HttpRequest Request { get; private set; }
+        public HttpRequest Request { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IEdmModel"/> to which this instance belongs.

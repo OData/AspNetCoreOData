@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,27 +41,35 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-
-            Endpoint endPoint = request.HttpContext.GetEndpoint();
-            EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
             string aUriString = null;
-            if (endpointName != null)
+            LinkGenerator linkGenerator = request.HttpContext.RequestServices?.GetService<LinkGenerator>();
+            if (linkGenerator == null)
             {
-                aUriString = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
-                    request.RouteValues, request.Scheme, request.Host, request.PathBase);
+                aUriString = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase);
             }
-
-            if (aUriString == null)
+            else
             {
-                RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
-                if (routeName != null)
+                Endpoint endPoint = request.HttpContext.GetEndpoint();
+                EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
+
+                if (endpointName != null)
                 {
-                    aUriString = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
+                    aUriString = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
                         request.RouteValues, request.Scheme, request.Host, request.PathBase);
                 }
+
+                if (aUriString == null)
+                {
+                    RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
+                    if (routeName != null)
+                    {
+                        aUriString = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
+                            request.RouteValues, request.Scheme, request.Host, request.PathBase);
+                    }
+                }
             }
+
+            aUriString = aUriString[aUriString.Length - 1] == '/' ? aUriString.Substring(0, aUriString.Length - 1) : aUriString;
 
             string odataPath = segments.GetPathString();
 

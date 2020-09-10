@@ -1411,7 +1411,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the ODataMediaTypeFormatter..
+        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be deserialized using the OData input formatter..
         /// </summary>
         internal static string TypeCannotBeDeserialized {
             get {
@@ -1420,7 +1420,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the ODataMediaTypeFormatter..
+        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be serialized using the OData output formatter..
         /// </summary>
         internal static string TypeCannotBeSerialized {
             get {
@@ -1474,7 +1474,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
+        ///   Looks up a localized string similar to The OData formatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response..
         /// </summary>
         internal static string UnableToDetermineBaseUrl {
             get {
@@ -1483,7 +1483,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response..
+        ///   Looks up a localized string similar to The OData formatter must be able to determine the metadata URL for a request in order to serialize the response..
         /// </summary>
         internal static string UnableToDetermineMetadataUrl {
             get {

@@ -195,7 +195,7 @@
     <value>{0} does not support CreateODataValue.</value>
   </data>
   <data name="TypeCannotBeSerialized" xml:space="preserve">
-    <value>'{0}' cannot be serialized using the ODataMediaTypeFormatter.</value>
+    <value>'{0}' cannot be serialized using the OData output formatter.</value>
   </data>
   <data name="NullElementInCollection" xml:space="preserve">
     <value>Collections cannot contain null elements.</value>
@@ -219,7 +219,7 @@
     <value>Type '{0}' does not support ReadInline.</value>
   </data>
   <data name="TypeCannotBeDeserialized" xml:space="preserve">
-    <value>'{0}' cannot be deserialized using the ODataMediaTypeFormatter.</value>
+    <value>'{0}' cannot be deserialized using the OData input formatter.</value>
   </data>
   <data name="CollectionShouldHaveAddMethod" xml:space="preserve">
     <value>The type '{0}' of the property '{1}' on type '{2}' does not have an Add method. Consider using a collection type that does have an Add method - for example IList&lt;T&gt; or ICollection&lt;T&gt;.</value>
@@ -288,7 +288,7 @@
     <value>The EDM type of the object of type '{0}' is null. The EDM type of an {1} cannot be null.</value>
   </data>
   <data name="UnableToDetermineMetadataUrl" xml:space="preserve">
-    <value>The ODataMediaTypeFormatter must be able to determine the metadata URL for a request in order to serialize the response.</value>
+    <value>The OData formatter must be able to determine the metadata URL for a request in order to serialize the response.</value>
   </data>
   <data name="CannotSerializerNull" xml:space="preserve">
     <value>Cannot serialize a null '{0}'.</value>
@@ -540,7 +540,7 @@
     <value>The function '{0}' is not bound to an entity. Only functions that are bound to entities can have function links.</value>
   </data>
   <data name="UnableToDetermineBaseUrl" xml:space="preserve">
-    <value>The ODataMediaTypeFormatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response.</value>
+    <value>The OData formatter was unable to determine the base URI for the request. The request must be processed by an OData route for the OData formatter to serialize the response.</value>
   </data>
   <data name="MaxAnyAllExpressionLimitExceeded" xml:space="preserve">
     <value>The Any/All nesting limit of '{0}' has been exceeded. '{1}' can be configured on ODataQuerySettings or EnableQueryAttribute.</value>

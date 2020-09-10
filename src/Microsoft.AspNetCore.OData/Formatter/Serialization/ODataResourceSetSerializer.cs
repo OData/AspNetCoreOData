@@ -44,12 +44,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
@@ -68,16 +68,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw Error.ArgumentNull(nameof(writer));
             }
+
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
+
             if (expectedType == null)
             {
-                throw Error.ArgumentNull("expectedType");
+                throw Error.ArgumentNull(nameof(expectedType));
             }
+
             if (graph == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, ResourceSet));
@@ -175,6 +178,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public virtual ODataResourceSet CreateResourceSet(IEnumerable resourceSetInstance, IEdmCollectionTypeReference resourceSetType,
             ODataSerializerContext writeContext)
         {
+            if (writeContext == null)
+            {
+                throw Error.ArgumentNull(nameof(writeContext));
+            }
+
             ODataResourceSet resourceSet = new ODataResourceSet
             {
                 TypeName = resourceSetType.FullName()
@@ -201,7 +209,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            IODataFeature odataFeature = writeContext.Request.ODataFeature();
             if (writeContext.ExpandedResource == null)
             {
                 // If we have more OData format specific information apply it now, only if we are the root feed.
@@ -213,6 +220,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else if (writeContext.Request != null)
                 {
+                    IODataFeature odataFeature = writeContext.Request.ODataFeature();
                     resourceSet.NextPageLink = odataFeature.NextLink;
                     resourceSet.DeltaLink = odataFeature.DeltaLink;
 
@@ -242,7 +250,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
         /// <param name="writeContext">The serializer context.</param>
         /// <returns>The function that generates the NextLink from an object.</returns>
-        internal static Func<Object, Uri> GetNextLinkGenerator(ODataResourceSetBase resourceSet, IEnumerable resourceSetInstance, ODataSerializerContext writeContext)
+        internal static Func<object, Uri> GetNextLinkGenerator(ODataResourceSetBase resourceSet, IEnumerable resourceSetInstance, ODataSerializerContext writeContext)
         {
             if (resourceSet != null && resourceSet.NextPageLink != null)
             {
@@ -284,17 +292,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (operation == null)
             {
-                throw Error.ArgumentNull("operation");
+                throw Error.ArgumentNull(nameof(operation));
             }
 
             if (resourceSetContext == null)
             {
-                throw Error.ArgumentNull("resourceSetContext");
+                throw Error.ArgumentNull(nameof(resourceSetContext));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             ODataMetadataLevel metadataLevel = writeContext.MetadataLevel;
@@ -391,11 +399,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
         private static Uri GenerateQueryFromExpandedItem(ODataSerializerContext writeContext, Uri navigationLink)
         {
-            //IWebApiUrlHelper urlHelper = writeContext.InternalUrlHelper;
-            //if (urlHelper == null)
-            //{
-            //    return navigationLink;
-            //}
             string serviceRoot = writeContext.Request.CreateODataLink(new List<ODataPathSegment>());
             Uri serviceRootUri = new Uri(serviceRoot);
             ODataUriParser parser = new ODataUriParser(writeContext.Model, serviceRootUri, navigationLink);
