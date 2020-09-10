@@ -18,7 +18,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObject_ThrowsArgumentNull_MessageWriter()
         {
+            // Arrange
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.WriteObject(42, typeof(IEdmModel), messageWriter: null, writeContext: null),
                 "messageWriter");

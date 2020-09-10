@@ -45,12 +45,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
@@ -67,12 +67,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw Error.ArgumentNull(nameof(writer));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             if (graph == null || graph is NullEdmComplexObject)
@@ -98,12 +98,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (writer == null)
             {
-                throw Error.ArgumentNull("writer");
+                throw Error.ArgumentNull(nameof(writer));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             if (graph == null)
@@ -381,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
@@ -410,12 +410,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (selectExpandNode == null)
             {
-                throw Error.ArgumentNull("selectExpandNode");
+                throw Error.ArgumentNull(nameof(selectExpandNode));
             }
 
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             if (resourceContext.SerializerContext.ExpandReference)
@@ -581,7 +581,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 dynamicPropertyDictionary.Where(x => selectExpandNode.SelectedDynamicProperties == null || selectExpandNode.SelectedDynamicProperties.Contains(x.Key));
             foreach (KeyValuePair<string, object> dynamicProperty in dynamicPropertiesToSelect)
             {
-                if (String.IsNullOrEmpty(dynamicProperty.Key))
+                if (string.IsNullOrEmpty(dynamicProperty.Key))
                 {
                     continue;
                 }
@@ -651,6 +651,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <returns>The created ETag.</returns>
         public virtual string CreateETag(ResourceContext resourceContext)
         {
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceContext));
+            }
+
             if (resourceContext.Request != null)
             {
                 IEdmModel model = resourceContext.EdmModel;
@@ -916,12 +921,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (navigationProperty == null)
             {
-                throw Error.ArgumentNull("navigationProperty");
+                throw Error.ArgumentNull(nameof(navigationProperty));
             }
 
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
@@ -990,11 +995,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (structuralProperty == null)
             {
-                throw Error.ArgumentNull("structuralProperty");
+                throw Error.ArgumentNull(nameof(structuralProperty));
             }
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
@@ -1067,12 +1072,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (action == null)
             {
-                throw Error.ArgumentNull("action");
+                throw Error.ArgumentNull(nameof(action));
             }
 
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             IEdmModel model = resourceContext.EdmModel;
@@ -1099,12 +1104,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (function == null)
             {
-                throw Error.ArgumentNull("function");
+                throw Error.ArgumentNull(nameof(function));
             }
 
             if (resourceContext == null)
             {
-                throw Error.ArgumentNull("resourceContext");
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             IEdmModel model = resourceContext.EdmModel;
@@ -1362,7 +1367,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         pathTypeName = edmType.FullTypeName();
                     }
                     string resourceTypeName = resource.TypeName;
-                    return String.Equals(resourceTypeName, pathTypeName, StringComparison.Ordinal);
+                    return string.Equals(resourceTypeName, pathTypeName, StringComparison.Ordinal);
             }
         }
 

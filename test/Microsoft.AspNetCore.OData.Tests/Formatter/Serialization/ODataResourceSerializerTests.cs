@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -71,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _orderType = _model.GetEdmTypeReference(typeof(Order)).AsEntity();
             _specialCustomerType = _model.GetEdmTypeReference(typeof(SpecialCustomer)).AsEntity();
             _specialOrderType = _model.GetEdmTypeReference(typeof(SpecialOrder)).AsEntity();
-            _serializer = new ODataResourceSerializer(_serializerProvider);
+        //    _serializer = new ODataResourceSerializer(_serializerProvider);
             _path = new ODataPath(new EntitySetSegment(_customerSet));
             _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
             _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType().AsReference(), _customer);
@@ -80,58 +78,74 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void Ctor_ThrowsArgumentNull_SerializerProvider()
         {
-            ExceptionAssert.ThrowsArgumentNull(
-                () => new ODataResourceSerializer(serializerProvider: null),
-                "serializerProvider");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ODataResourceSerializer(serializerProvider: null), "serializerProvider");
         }
 
         [Fact]
         public void WriteObject_ThrowsArgumentNull_MessageWriter()
         {
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: null, writeContext: null),
+                () => serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
         public void WriteObject_ThrowsArgumentNull_WriteContext()
         {
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             ODataMessageWriter messageWriter = new ODataMessageWriter(new Mock<IODataRequestMessage>().Object);
+
+            // Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: messageWriter, writeContext: null),
+                () => serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: messageWriter, writeContext: null),
                 "writeContext");
         }
 
-        //[Fact]
-        //public void WriteObject_Calls_WriteObjectInline_WithRightEntityType()
-        //{
-        //    // Arrange
-        //    Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
-        //    serializer
-        //        .Setup(s => s.WriteObjectInline(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
-        //            It.IsAny<ODataWriter>(), _writeContext))
-        //        .Verifiable();
-        //    serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(new SelectExpandNode());
-        //    serializer.CallBase = true;
+        [Fact]
+        public void WriteObject_Calls_WriteObjectInline_WithRightEntityType()
+        {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializer
+                .Setup(s => s.WriteObjectInline(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
+                    It.IsAny<ODataWriter>(), _writeContext))
+                .Verifiable();
+            serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(new SelectExpandNode());
+            serializer.CallBase = true;
 
-        //    // Act
-        //    serializer.Object.WriteObject(_customer, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
+            // Act
+            serializer.Object.WriteObject(_customer, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
 
-        //    // Assert
-        //    serializer.Verify();
-        //}
+            // Assert
+            serializer.Verify();
+        }
 
         [Fact]
         public void WriteObjectInline_ThrowsArgumentNull_Writer()
         {
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.WriteObjectInline(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
+                () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
                 "writer");
         }
 
         [Fact]
         public void WriteObjectInline_ThrowsArgumentNull_WriteContext()
         {
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => _serializer.WriteObjectInline(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
                 "writeContext");
@@ -140,9 +154,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void WriteObjectInline_ThrowsSerializationException_WhenGraphIsNull()
         {
+            // Arrange & Act
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             ODataWriter messageWriter = new Mock<ODataWriter>().Object;
+
+            // Assert
             ExceptionAssert.Throws<SerializationException>(
-                () => _serializer.WriteObjectInline(graph: null, expectedType: null, writer: messageWriter, writeContext: new ODataSerializerContext()),
+                () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: messageWriter, writeContext: new ODataSerializerContext()),
                 "Cannot serialize a null 'Resource'.");
         }
 
