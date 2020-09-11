@@ -5,7 +5,7 @@ using System;
 using System.Net.Http;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
+namespace Microsoft.AspNetCore.OData.TestCommon
 {
     /// <summary>
     /// The WebODataTestBase used for the test base class.

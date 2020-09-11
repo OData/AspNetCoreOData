@@ -53,7 +53,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                         applicationPartManager.ApplicationParts.Add(part);
                     }
 
-                    app.UseODataBatching();
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {

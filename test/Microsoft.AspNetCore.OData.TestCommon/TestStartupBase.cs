@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
+namespace Microsoft.AspNetCore.OData.TestCommon
 {
+    /// <summary>
+    /// The startup base class
+    /// </summary>
     public class TestStartupBase
     {
         public virtual void ConfigureServices(IServiceCollection services)

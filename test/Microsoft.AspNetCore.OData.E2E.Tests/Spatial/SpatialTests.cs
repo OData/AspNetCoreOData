@@ -1,20 +1,15 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -23,56 +18,31 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
 {
-    public class SpatialTests : WebHostTestBase<SpatialTests>
+    public class SpatialTests : WebODataTestBase<SpatialTests.SpatialTestsStartup>
     {
-        public SpatialTests(WebHostTestFixture<SpatialTests> fixture)
-            : base(fixture)
+        public class SpatialTestsStartup : TestStartupBase
         {
-        }
-
-        protected static void UpdateServices(IServiceCollection services)
-        {
-            IEdmModel model = IsofEdmModel.GetEdmModel();
-            services.AddOData(options => options.AddModel("odata", model));
-        }
-
-        protected static void UpdateConfigure(IApplicationBuilder app)
-        {
-            var controllers = new[] { typeof(SpatialCustomersController), typeof(MetadataController) };
-            AddControllers(app, controllers);
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            public override void ConfigureServices(IServiceCollection services)
             {
-                endpoints.MapControllers();
-            });
+                services.ConfigureControllers(typeof(SpatialCustomersController), typeof(MetadataController));
+
+                IEdmModel model = IsofEdmModel.GetEdmModel();
+                services.AddOData(options => options.AddModel("odata", model));
+            }
         }
 
-        /// <summary>
-        /// Add a list of controllers to be discovered by the application.
-        /// </summary>
-        /// <param name="controllers"></param>
-        protected static void AddControllers(IApplicationBuilder app, params Type[] controllers)
+        public SpatialTests(WebODataTestFixture<SpatialTestsStartup> factory)
+            : base(factory)
         {
-            // Strip out all the IApplicationPartTypeProvider parts.
-            ApplicationPartManager scopedPartManager = app.ApplicationServices.GetRequiredService<ApplicationPartManager>();
-            IList<ApplicationPart> parts = scopedPartManager.ApplicationParts;
-            IList<ApplicationPart> nonAssemblyParts = parts.Where(p => p.GetType() != typeof(IApplicationPartTypeProvider)).ToList();
-            scopedPartManager.ApplicationParts.Clear();
-            scopedPartManager.ApplicationParts.Concat(nonAssemblyParts);
-
-            // Add a new AssemblyPart with the controllers.
-            AssemblyPart part = new AssemblyPart(new TestAssembly(controllers));
-            scopedPartManager.ApplicationParts.Add(part);
         }
 
         [Fact]
         public async Task SpatialModelMetadataTest()
         {
-            string requestUri = string.Format("{0}/odata/$metadata", this.BaseAddress);
+            // Arrange & Act
+            HttpResponseMessage response = await this.Client.GetAsync("odata/$metadata");
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
-
+            // Assert
             var stream = await response.Content.ReadAsStreamAsync();
             IODataResponseMessage message = new ODataMessageWrapper(stream, response.Content.Headers);
             var reader = new ODataMessageReader(message);
@@ -94,11 +64,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
         [Fact]
         public async Task QuerySpatialEntity()
         {
-            // Arrange
-            var requestUri = string.Format("{0}/odata/SpatialCustomers(2)", this.BaseAddress);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync("odata/SpatialCustomers(2)");
             JObject responseString = await response.Content.ReadAsObject<JObject>();
 
             // Assert
@@ -123,8 +90,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
         public async Task PostSpatialEntity()
         {
             // Arrange
-            var requestUri = string.Format("{0}/odata/SpatialCustomers", this.BaseAddress);
-
             const string payload = @"{
   ""Location"":{
     ""type"":""Point"",""coordinates"":[
@@ -168,9 +133,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
 }";
 
             // Act
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/SpatialCustomers");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
             HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
@@ -181,8 +147,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
         public async Task UpdateSpatialEntity()
         {
             // Arrange
-            var requestUri = string.Format("{0}/odata/SpatialCustomers(3)", this.BaseAddress);
-
             const string payload = @"{
   ""Location"":{
     ""type"":""Point"",""coordinates"":[
@@ -196,9 +160,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
 }";
 
             // Act
-            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("Patch"), requestUri);
+            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("Patch"), "odata/SpatialCustomers(3)");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
             HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert

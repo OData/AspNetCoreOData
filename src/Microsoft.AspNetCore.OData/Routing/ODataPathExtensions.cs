@@ -23,20 +23,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (path == null)
             {
-                return null;
+                throw Error.ArgumentNull(nameof(path));
             }
 
             ODataPathSegment lastSegment = path.LastSegment;
-
-            EntitySetSegment entitySet = lastSegment as EntitySetSegment;
-            if (entitySet != null)
-            {
-                return entitySet.EdmType;
-            }
-
-
-            // TODO
-            return null;
+            return lastSegment.EdmType;
         }
 
         /// <summary>
@@ -48,26 +39,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (path == null)
             {
-                return null;
+                throw Error.ArgumentNull(nameof(path));
             }
 
-            ODataPathSegment lastSegment = path.LastSegment;
-
-            EntitySetSegment entitySet = lastSegment as EntitySetSegment;
-            if (entitySet != null)
-            {
-                return entitySet.EntitySet;
-            }
-
-            SingletonSegment singleton = lastSegment as SingletonSegment;
-            if (singleton != null)
-            {
-                return singleton.Singleton;
-            }
-
-
-            // TODO
-            return null;
+            ODataPathNavigationSourceHandler handler = new ODataPathNavigationSourceHandler();
+            path.WalkWith(handler);
+            return handler.NavigationSource;
         }
 
         /// <summary>
@@ -79,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (segments == null)
             {
-                throw new ArgumentNullException(nameof(segments));
+                throw Error.ArgumentNull(nameof(segments));
             }
 
             ODataPathSegmentHandler handler = new ODataPathSegmentHandler();

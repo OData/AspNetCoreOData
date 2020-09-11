@@ -8,9 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +16,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {

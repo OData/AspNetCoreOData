@@ -10931,6 +10931,122 @@
             <param name="value"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler">
+            <summary>
+            A handler used to calculate some values based on the odata path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.NavigationSource">
+            <summary>
+            Gets the path navigation source.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Path">
+            <summary>
+            Gets the path template.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.EntitySetSegment)">
+            <summary>
+            Handle a EntitySetSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.KeySegment)">
+            <summary>
+            Handle a KeySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
+            <summary>
+            Handle a NavigationPropertyLinkSegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.NavigationPropertySegment)">
+            <summary>
+            Handle a NavigationPropertySegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.DynamicPathSegment)">
+            <summary>
+            Handle a OpenPropertySegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Handle a OperationImportSegment
+            </summary>
+            <param name="segment">the segment to Handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.OperationSegment)">
+            <summary>
+            Handle an OperationSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.PathTemplateSegment)">
+            <summary>
+            Handle a PropertySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.PropertySegment)">
+            <summary>
+            Handle a PropertySegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.SingletonSegment)">
+            <summary>
+            Handle a SingletonSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.TypeSegment)">
+            <summary>
+            Handle a TypeSegment, we use "cast" for type segment.
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.ValueSegment)">
+            <summary>
+            Handle a ValueSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.CountSegment)">
+            <summary>
+            Handle a CountSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.BatchSegment)">
+            <summary>
+            Handle a BatchSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.MetadataSegment)">
+            <summary>
+            Handle a MetadataSegment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.ODataPathSegment)">
+            <summary>
+            Handle a general path segment
+            </summary>
+            <param name="segment">the segment to handle</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler">
             <summary>
             A handler used to calculate some values based on the odata path.
