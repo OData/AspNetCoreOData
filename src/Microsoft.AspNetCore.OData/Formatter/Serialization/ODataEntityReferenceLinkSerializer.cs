@@ -26,12 +26,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
 
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
 
             if (graph != null)

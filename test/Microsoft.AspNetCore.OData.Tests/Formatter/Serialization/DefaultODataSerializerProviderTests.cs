@@ -7,7 +7,11 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.AspNetCore.OData.Tests.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -140,7 +144,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(ODataPayloadKind.Value, rawValueSerializer.ODataPayloadKind);
         }
 
-#if false
         [Theory]
         [InlineData("DollarCountEntities/$count", typeof(ODataCountTest.DollarCountEntity))]
         [InlineData("DollarCountEntities(5)/StringCollectionProp/$count", typeof(string))]
@@ -164,10 +167,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEdmModel model = ODataCountTest.GetEdmModel();
             Type type = typeof(ICollection<>).MakeGenericType(elementType);
-            var pathHandler = new DefaultODataPathHandler();
-            var path = pathHandler.Parse(model, "http://localhost/", uri);
-            var request = RequestFactory.CreateFromModel(model);
-            request.ODataContext().Path = path;
+            ODataUriParser parser = new ODataUriParser(model, new Uri(uri, UriKind.Relative));
+            var path = parser.ParsePath();
+
+            var request = RequestFactory.Create(model);
+            request.ODataFeature().Path = path;
 
             // Act
             var serializer = _serializerProvider.GetODataPayloadSerializer(type, request);
@@ -177,7 +181,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             var rawValueSerializer = Assert.IsType<ODataRawValueSerializer>(serializer);
             Assert.Equal(ODataPayloadKind.Value, rawValueSerializer.ODataPayloadKind);
         }
-#endif
 
         [Fact]
         public void GetODataSerializer_Resource_ForEntity()
@@ -217,7 +220,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [InlineData(typeof(ICollection<Product>))]
         [InlineData(typeof(IList<Product>))]
         [InlineData(typeof(List<Product>))]
-      //  [InlineData(typeof(PageResult<Product>))]
+        [InlineData(typeof(PageResult<Product>))]
         public void GetODataSerializer_ResourceSet_ForEntityCollection(Type collectionType)
         {
             // Arrange
@@ -239,7 +242,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [InlineData(typeof(ICollection<Address>))]
         [InlineData(typeof(IList<Address>))]
         [InlineData(typeof(List<Address>))]
-        //[InlineData(typeof(PageResult<Address>))]
+        [InlineData(typeof(PageResult<Address>))]
         public void GetODataSerializer_ResourceSet_ForComplexCollection(Type collectionType)
         {
             // Arrange
@@ -321,7 +324,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();
-            //   services.AddSingleton<ODataDeltaFeedSerializer>();
+            services.AddSingleton<ODataDeltaFeedSerializer>();
             services.AddSingleton<ODataResourceSetSerializer>();
             services.AddSingleton<ODataCollectionSerializer>();
             services.AddSingleton<ODataResourceSerializer>();

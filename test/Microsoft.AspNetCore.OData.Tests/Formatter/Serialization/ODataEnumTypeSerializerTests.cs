@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.NotNull(annotation);
             Assert.Null(annotation.TypeName);
         }
-
+ 
         [Fact]
         public void CreateODataEnumValue_ReturnsCorrectEnumMember()
         {

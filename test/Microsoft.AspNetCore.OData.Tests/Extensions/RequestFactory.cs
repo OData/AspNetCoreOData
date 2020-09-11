@@ -139,6 +139,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             return request;
         }
 
+        public static HttpRequest CreateWitContainer(string method, string uri, Action<ODataOptions> setupAction)
+        {
+            HttpRequest request = Create(setupAction);
+
+            request.Method = method;
+            Uri requestUri = new Uri(uri);
+            request.Scheme = requestUri.Scheme;
+            request.Host = requestUri.IsDefaultPort ?
+                new HostString(requestUri.Host) :
+                new HostString(requestUri.Host, requestUri.Port);
+            request.QueryString = new QueryString(requestUri.Query);
+            request.Path = new PathString(requestUri.AbsolutePath);
+
+            return request;
+        }
+
         private static HttpRequest CreateRequest(IHeaderDictionary headers)
         {
             var context = new DefaultHttpContext();

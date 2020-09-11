@@ -933,7 +933,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmNavigationSource navigationSource = writeContext.NavigationSource;
             ODataNestedResourceInfo navigationLink = null;
 
-            if (navigationSource != null)
+            if (navigationSource != null && navigationProperty.Type != null)
             {
                 IEdmTypeReference propertyType = navigationProperty.Type;
                 IEdmModel model = writeContext.Model;

@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -13,6 +15,9 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
@@ -20,6 +25,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
+using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 {
@@ -63,13 +69,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 ID = 20,
             };
 
-            // TODO:
-       //     _serializerProvider = ODataSerializerProviderFactory.Create();
+            _serializerProvider = GetServiceProvider().GetService<ODataSerializerProvider>();
             _customerType = _model.GetEdmTypeReference(typeof(Customer)).AsEntity();
             _orderType = _model.GetEdmTypeReference(typeof(Order)).AsEntity();
             _specialCustomerType = _model.GetEdmTypeReference(typeof(SpecialCustomer)).AsEntity();
             _specialOrderType = _model.GetEdmTypeReference(typeof(SpecialOrder)).AsEntity();
-        //    _serializer = new ODataResourceSerializer(_serializerProvider);
+            _serializer = new ODataResourceSerializer(_serializerProvider);
             _path = new ODataPath(new EntitySetSegment(_customerSet));
             _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
             _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType().AsReference(), _customer);
@@ -169,7 +174,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void WriteObjectInline_Calls_CreateSelectExpandNode()
         {
             // Arrange
-            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             ODataWriter writer = new Mock<ODataWriter>().Object;
 
             serializer.Setup(s => s.CreateSelectExpandNode(It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
@@ -187,7 +194,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode();
-            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             ODataWriter writer = new Mock<ODataWriter>().Object;
 
             serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
@@ -202,11 +210,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObjectInline_WritesODataEntryFrom_CreateResource()
+        public void WriteObjectInline_WritesODataResourceFrom_CreateResource()
         {
             // Arrange
             ODataResource entry = new ODataResource();
-            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
             serializer.Setup(s => s.CreateResource(It.IsAny<SelectExpandNode>(), It.IsAny<ResourceContext>())).Returns(entry);
@@ -608,16 +617,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void CreateResource_ThrowsArgumentNull_SelectExpandNode()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateResource(selectExpandNode: null, resourceContext: _entityContext),
+                () => serializer.CreateResource(selectExpandNode: null, resourceContext: _entityContext),
                 "selectExpandNode");
         }
 
         [Fact]
         public void CreateResource_ThrowsArgumentNull_EntityContext()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateResource(new SelectExpandNode(), resourceContext: null),
+                () => serializer.CreateResource(new SelectExpandNode(), resourceContext: null),
                 "resourceContext");
         }
 
@@ -682,89 +701,89 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(entry.ETag);
         }
 
-        //[Fact]
-        //public void CreateResource_SetsETagToNull_IfModelDontHaveConcurrencyProperty()
-        //{
-        //    // Arrange
-        //    IEdmEntitySet orderSet = _model.EntityContainer.FindEntitySet("Orders");
-        //    Order order = new Order()
-        //    {
-        //        Name = "Foo",
-        //        Shipment = "Bar",
-        //        ID = 10,
-        //    };
+        [Fact]
+        public void CreateResource_SetsETagToNull_IfModelDontHaveConcurrencyProperty()
+        {
+            // Arrange
+            IEdmEntitySet orderSet = _model.EntityContainer.FindEntitySet("Orders");
+            Order order = new Order()
+            {
+                Name = "Foo",
+                Shipment = "Bar",
+                ID = 10,
+            };
 
-        //    _writeContext.NavigationSource = orderSet;
-        //    _entityContext = new ResourceContext(_writeContext, orderSet.EntityType().AsReference(), order);
+            _writeContext.NavigationSource = orderSet;
+            _entityContext = new ResourceContext(_writeContext, orderSet.EntityType().AsReference(), order);
 
-        //    SelectExpandNode selectExpandNode = new SelectExpandNode
-        //    {
-        //        SelectedStructuralProperties = new HashSet<IEdmStructuralProperty>
-        //        {
-        //            new Mock<IEdmStructuralProperty>().Object, new Mock<IEdmStructuralProperty>().Object
-        //        }
-        //    };
-        //    ODataProperty[] properties = new[] { new ODataProperty(), new ODataProperty() };
-        //    Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
-        //    serializer.CallBase = true;
+            SelectExpandNode selectExpandNode = new SelectExpandNode
+            {
+                SelectedStructuralProperties = new HashSet<IEdmStructuralProperty>
+                {
+                    new Mock<IEdmStructuralProperty>().Object, new Mock<IEdmStructuralProperty>().Object
+                }
+            };
+            ODataProperty[] properties = new[] { new ODataProperty(), new ODataProperty() };
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
 
-        //    serializer
-        //        .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(0), _entityContext))
-        //        .Returns(properties[0]);
-        //    serializer
-        //        .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(1), _entityContext))
-        //        .Returns(properties[1]);
+            serializer
+                .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(0), _entityContext))
+                .Returns(properties[0]);
+            serializer
+                .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(1), _entityContext))
+                .Returns(properties[1]);
 
-        //    var config = RoutingConfigurationFactory.CreateWithRootContainer("Route");
-        //    var request = RequestFactory.Create(config, "Route");
-        //    _entityContext.Request = request;
+            //var config = RoutingConfigurationFactory.CreateWithRootContainer("Route");
+            var request = RequestFactory.Create(opt => opt.AddModel("route", _model));
+            request.ODataFeature().PrefixName = "route";
+            _entityContext.Request = request;
 
-        //    // Act
-        //    ODataResource entry = serializer.Object.CreateResource(selectExpandNode, _entityContext);
+            // Act
+            ODataResource entry = serializer.Object.CreateResource(selectExpandNode, _entityContext);
 
-        //    // Assert
-        //    Assert.Null(entry.ETag);
-        //}
+            // Assert
+            Assert.Null(entry.ETag);
+        }
 
-        //[Fact]
-        //public void CreateResource_SetsEtagToNotNull_IfWithConcurrencyProperty()
-        //{
-        //    // Arrange
-        //    Mock<IEdmStructuralProperty> mockConcurrencyProperty = new Mock<IEdmStructuralProperty>();
-        //    mockConcurrencyProperty.SetupGet(s => s.Name).Returns("City");
-        //    SelectExpandNode selectExpandNode = new SelectExpandNode
-        //    {
-        //        SelectedStructuralProperties = new HashSet<IEdmStructuralProperty> { new Mock<IEdmStructuralProperty>().Object, mockConcurrencyProperty.Object }
-        //    };
-        //    ODataProperty[] properties = new[] { new ODataProperty(), new ODataProperty() };
-        //    Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
-        //    serializer.CallBase = true;
-        //    serializer
-        //        .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(0), _entityContext))
-        //        .Returns(properties[0]);
-        //    serializer
-        //        .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(1), _entityContext))
-        //        .Returns(properties[1]);
+        [Fact]
+        public void CreateResource_SetsEtagToNotNull_IfWithConcurrencyProperty()
+        {
+            // Arrange
+            Mock<IEdmStructuralProperty> mockConcurrencyProperty = new Mock<IEdmStructuralProperty>();
+            mockConcurrencyProperty.SetupGet(s => s.Name).Returns("City");
+            SelectExpandNode selectExpandNode = new SelectExpandNode
+            {
+                SelectedStructuralProperties = new HashSet<IEdmStructuralProperty> { new Mock<IEdmStructuralProperty>().Object, mockConcurrencyProperty.Object }
+            };
+            ODataProperty[] properties = new[] { new ODataProperty(), new ODataProperty() };
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
+            serializer
+                .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(0), _entityContext))
+                .Returns(properties[0]);
+            serializer
+                .Setup(s => s.CreateStructuralProperty(selectExpandNode.SelectedStructuralProperties.ElementAt(1), _entityContext))
+                .Returns(properties[1]);
 
-        //    Mock<IETagHandler> mockETagHandler = new Mock<IETagHandler>();
-        //    string tag = "\"'anycity'\"";
-        //    EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
-        //    mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>())).Returns(etagHeaderValue);
+            Mock<IETagHandler> mockETagHandler = new Mock<IETagHandler>();
+            string tag = "\"'anycity'\"";
+            EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
+            mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>())).Returns(etagHeaderValue);
 
-        //    var configuration = RoutingConfigurationFactory.CreateWithRootContainer("Route", (config) =>
-        //    {
-        //        config.AddService<IETagHandler>(ServiceLifetime.Singleton, (services) => mockETagHandler.Object);
-        //    });
+            var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
+            {
+                config.AddService<IETagHandler>(ServiceLifetime.Singleton, (services) => mockETagHandler.Object);
+            }));
+            request.ODataFeature().PrefixName = "route";
+            _entityContext.Request = request;
 
-        //    var request = RequestFactory.Create(configuration, "Route");
-        //    _entityContext.Request = request;
+            // Act
+            ODataResource resource = serializer.Object.CreateResource(selectExpandNode, _entityContext);
 
-        //    // Act
-        //    ODataResource resource = serializer.Object.CreateResource(selectExpandNode, _entityContext);
-
-        //    // Assert
-        //    Assert.Equal(etagHeaderValue.ToString(), resource.ETag);
-        //}
+            // Assert
+            Assert.Equal(etagHeaderValue.ToString(), resource.ETag);
+        }
 
         [Fact]
         public void CreateResource_IgnoresProperty_IfCreateStructuralPropertyReturnsNull()
@@ -933,10 +952,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            //var config = RoutingConfigurationFactory.CreateWithRootContainer("Route");
-            //config.SetSerializeNullDynamicProperty(enableNullDynamicProperty);
-            //var request = RequestFactory.Create(config, "Route");
-            var request = RequestFactory.Create(); // TODO
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model).SetNullDynamicProperty(enableNullDynamicProperty));
+            request.ODataFeature().PrefixName = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1000,18 +1017,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void CreateStructuralProperty_ThrowsArgumentNull_StructuralProperty()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateStructuralProperty(structuralProperty: null, resourceContext: null),
+                () => serializer.CreateStructuralProperty(structuralProperty: null, resourceContext: null),
                 "structuralProperty");
         }
 
         [Fact]
         public void CreateStructuralProperty_ThrowsArgumentNull_EntityContext()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
 
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateStructuralProperty(property.Object, resourceContext: null),
+                () => serializer.CreateStructuralProperty(property.Object, resourceContext: null),
                 "resourceContext");
         }
 
@@ -1032,7 +1058,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
                 () => serializer.CreateStructuralProperty(property.Object, new ResourceContext { EdmObject = entity }),
-                "'Namespace.Name' cannot be serialized using the ODataMediaTypeFormatter.");
+                "'Namespace.Name' cannot be serialized using the OData output formatter.");
         }
 
         [Fact]
@@ -1070,26 +1096,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(writeContext.NavigationSource, instanceContext.NavigationSource);
             Assert.Equal(writeContext.Request, instanceContext.Request);
             Assert.Equal(writeContext.SkipExpensiveAvailabilityChecks, instanceContext.SkipExpensiveAvailabilityChecks);
-#if NETFX // Only AspNet version has Url property
-            Assert.Equal(writeContext.Url, instanceContext.Url);
-#endif
             return true;
         }
 
         [Fact]
         public void CreateNavigationLink_ThrowsArgumentNull_NavigationProperty()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateNavigationLink(navigationProperty: null, resourceContext: _entityContext),
+                () => serializer.CreateNavigationLink(navigationProperty: null, resourceContext: _entityContext),
                 "navigationProperty");
         }
 
         [Fact]
         public void CreateNavigationLink_ThrowsArgumentNull_EntityContext()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             IEdmNavigationProperty navigationProperty = new Mock<IEdmNavigationProperty>().Object;
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateNavigationLink(navigationProperty, resourceContext: null),
+                () => serializer.CreateNavigationLink(navigationProperty, resourceContext: null),
                 "resourceContext");
         }
 
@@ -1135,18 +1168,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void CreateODataAction_ThrowsArgumentNull_Action()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateODataAction(action: null, resourceContext: null),
+                () => serializer.CreateODataAction(action: null, resourceContext: null),
                 "action");
         }
 
         [Fact]
         public void CreateODataAction_ThrowsArgumentNull_EntityContext()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             IEdmAction action = new Mock<IEdmAction>().Object;
 
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateODataAction(action, resourceContext: null),
+                () => serializer.CreateODataAction(action, resourceContext: null),
                 "resourceContext");
         }
 
@@ -1250,8 +1292,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Fact]
         public void CreateSelectExpandNode_ThrowsArgumentNull_EntityContext()
         {
+            // Arrange
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
             ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.CreateSelectExpandNode(resourceContext: null),
+                () => serializer.CreateSelectExpandNode(resourceContext: null),
                 "resourceContext");
         }
 
@@ -1312,8 +1358,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEntityType edmType = CreateEntityTypeWithName(entitySetType);
 
             // Act
-            bool actualResult = ODataResourceSerializer.ShouldSuppressTypeNameSerialization(resource, edmType,
-                (ODataMetadataLevel)metadataLevel);
+            bool actualResult = ODataResourceSerializer.ShouldSuppressTypeNameSerialization(resource, edmType, metadataLevel);
 
             // Assert
             Assert.Equal(expectedResult, actualResult);
@@ -1891,12 +1936,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         private static ResourceContext CreateContext(IEdmModel model, string expectedMetadataPrefix)
         {
-            // TODO:
-            //var config = RoutingConfigurationFactory.CreateWithRootContainer("OData");
+            var request = RequestFactory.CreateWitContainer("get", expectedMetadataPrefix, opt => opt.AddModel("OData", model));
+            request.ODataFeature().PrefixName = "OData";
+            request.ODataFeature().Model = model;
             return new ResourceContext
             {
                 EdmModel = model,
-              //  Request = RequestFactory.Create(HttpMethod.Get, expectedMetadataPrefix, config, "OData"),
+                Request = request
             };
         }
 
@@ -1987,6 +2033,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<IEdmModel> model = new Mock<IEdmModel>();
             model.Setup(m => m.DirectValueAnnotationsManager).Returns(annotationsManager);
             return model.Object;
+        }
+
+        private static IServiceProvider GetServiceProvider()
+        {
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
+
+            // Serializers.
+            services.AddSingleton<ODataEnumSerializer>();
+            services.AddSingleton<ODataPrimitiveSerializer>();
+            services.AddSingleton<ODataResourceSetSerializer>();
+            services.AddSingleton<ODataCollectionSerializer>();
+            services.AddSingleton<ODataResourceSerializer>();
+
+            return services.BuildServiceProvider();
         }
 
         private class Customer

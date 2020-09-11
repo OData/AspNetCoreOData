@@ -145,11 +145,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public HttpRequest Request { get;set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public LinkGenerator LinkGenerator { get; set; }
-
-        /// <summary>
         /// Gets or sets the root element name which is used when writing primitive and enum types
         /// </summary>
         public string RootElementName { get; set; }
