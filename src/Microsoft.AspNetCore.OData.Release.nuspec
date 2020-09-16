@@ -17,26 +17,26 @@
     <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
     <dependencies>
       <group targetFramework=".netcoreapp3.1">
-          <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
-		  <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
-		  <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
-          <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
-          <dependency id="System.Text.Json" version="$SystemTextJsonPackageDependency$" />
-        </group>
-		<group targetFramework=".net5.0">
-          <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
-		  <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
-		  <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
-          <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
-          <dependency id="System.Text.Json" version="$SystemTextJsonPackageDependency$" />
-        </group>
+        <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
+        <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
+        <dependency id="System.Text.Json" version="$SystemTextJsonPackageDependency$" />
+      </group>
+        <group targetFramework=".net5.0">
+        <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
+        <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
+        <dependency id="System.Text.Json" version="$SystemTextJsonPackageDependency$" />
+      </group>
     </dependencies>
   </metadata>
   <files>
     <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.dll" target="lib\netcoreapp3.1" />
     <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.xml" target="lib\netcoreapp3.1" />
     <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.pdb" target="lib\netcoreapp3.1" />
-	<file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.dll" target="lib\net5.0" />
+    <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.dll" target="lib\net5.0" />
     <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.xml" target="lib\net5.0" />
     <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.pdb" target="lib\net5.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
