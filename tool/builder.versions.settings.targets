@@ -1,16 +1,16 @@
 <Project>
   <!-- Set the version number: major, minor, build and release (i.e. alpha, beta or blank for RTM)-->
   <PropertyGroup>
-    <VersionMajor Condition="'$(VersionMajor)' == ''">1</VersionMajor>
+    <VersionMajor Condition="'$(VersionMajor)' == ''">8</VersionMajor>
     <VersionMinor Condition="'$(VersionMinor)' == ''">0</VersionMinor>
     <VersionBuild Condition="'$(VersionBuild)' == ''">0</VersionBuild>
-    <VersionRelease Condition="'$(VersionRelease)' == ''">beta</VersionRelease>
+    <VersionRelease Condition="'$(VersionRelease)' == ''">beta1</VersionRelease>
   </PropertyGroup>
   
     <!-- For NuGet Package Dependencies -->
   <PropertyGroup>
     <ODataLibPackageDependency>[7.6.1, 8.0.0)</ODataLibPackageDependency>
-    <SystemComponentPackageDependency>[4.6.0, 5.0.0)</SystemComponentPackageDependency>
+    <SystemTextJsonPackageDependency>[4.7.2, 5.0.0)</SystemTextJsonPackageDependency>
   </PropertyGroup>
 
   <!--
