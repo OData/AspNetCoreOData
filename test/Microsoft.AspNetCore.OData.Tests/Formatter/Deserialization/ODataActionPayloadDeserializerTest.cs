@@ -9,8 +9,10 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -33,8 +35,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             _model = GetModel();
             _container = _model.EntityContainer;
 
-            // TODO:
-            //_deserializerProvider = ODataDeserializerProviderFactory.Create();
+            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
             _deserializer = new ODataActionPayloadDeserializer(_deserializerProvider);
         }
 

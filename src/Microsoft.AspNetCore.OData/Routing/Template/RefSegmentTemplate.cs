@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="navigation">The Edm navigation property.</param>
         public RefSegmentTemplate(IEdmNavigationProperty navigation)
         {
-            Navigation = navigation;
+            Navigation = navigation ?? throw Error.ArgumentNull(nameof(navigation));
 
             IsSingle = !navigation.Type.IsCollection();
         }

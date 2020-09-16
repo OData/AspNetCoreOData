@@ -2,7 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
-using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData;
 using Xunit;
 

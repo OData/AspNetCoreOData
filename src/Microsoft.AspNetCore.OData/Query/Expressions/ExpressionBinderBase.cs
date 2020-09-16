@@ -546,6 +546,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>Returns CLR property for dynamic properties container.</returns>
         protected PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode)
         {
+            if (openNode == null)
+            {
+                throw Error.ArgumentNull(nameof(openNode));
+            }
+
             IEdmStructuredType edmStructuredType;
             IEdmTypeReference edmTypeReference = openNode.Source.TypeReference;
             if (edmTypeReference.IsEntity())
@@ -1233,6 +1238,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         Justification = "These are simple binding functions and cannot be split up.")]
         public virtual Expression BindSingleValueFunctionCallNode(SingleValueFunctionCallNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             switch (node.Name)
             {
                 case ClrCanonicalFunctions.StartswithFunctionName:
@@ -1322,6 +1332,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindCollectionConstantNode(CollectionConstantNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             // It's fine if the collection is empty; the returned value will be an empty list.
             ConstantNode firstNode = node.Collection.FirstOrDefault();
             object value = null;

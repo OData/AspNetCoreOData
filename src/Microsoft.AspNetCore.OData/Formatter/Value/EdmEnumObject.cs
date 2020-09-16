@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
 
@@ -40,6 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// </summary>
         /// <param name="edmType">The <see cref="IEdmEnumTypeReference"/> of this object.</param>
         /// <param name="value">The value of the enumeration type.</param>
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "EnumDefinition checks the nullable.")]
         public EdmEnumObject(IEdmEnumTypeReference edmType, string value)
             : this(edmType.EnumDefinition(), value, edmType.IsNullable)
         {

@@ -204,7 +204,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The request.</param>
-        /// <param name="createErrorAction">A function used to generate error response.</param>
         private void GetModelBoundPageSize(
             ActionExecutedContext actionExecutedContext,
             object responseValue,
@@ -463,7 +462,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The OData path.</param>
         /// <returns></returns>
-        private ODataQueryContext GetODataQueryContext(
+        private static ODataQueryContext GetODataQueryContext(
             object responseValue,
             IQueryable singleResultCollection,
             ControllerActionDescriptor actionDescriptor,

@@ -4,11 +4,15 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    internal class ComputeWrapper<T> : GroupByWrapper/*, IEdmEntityObject*/
+    internal class ComputeWrapper<T> : GroupByWrapper, IEdmEntityObject
     {
         public T Instance { get; set; }
 
@@ -33,7 +37,6 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             {
                 // Base properties available via Instance can be real OData properties or generated in previous transformations
 
-                /*
                 var instanceContainer = this.Instance as DynamicTypeWrapper;
                 if (instanceContainer != null)
                 {
@@ -68,24 +71,23 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                     }
                 }
 
-                */
                 this._merged = true;
             }
         }
 
-        //private TypedEdmStructuredObject _typedEdmStructuredObject;
+        private TypedEdmStructuredObject _typedEdmStructuredObject;
 
-        //private IEdmModel GetModel()
-        //{
-        //    Contract.Assert(ModelID != null);
+        private IEdmModel GetModel()
+        {
+            Contract.Assert(ModelID != null);
 
-        //    return ModelContainer.GetModel(ModelID);
-        //}
+            return ModelContainer.GetModel(ModelID);
+        }
 
-        //public IEdmTypeReference GetEdmType()
-        //{
-        //    IEdmModel model = GetModel();
-        //    return model.GetEdmTypeReference(typeof(T));
-        //}
+        public IEdmTypeReference GetEdmType()
+        {
+            IEdmModel model = GetModel();
+            return model.GetEdmTypeReference(typeof(T));
+        }
     }
 }

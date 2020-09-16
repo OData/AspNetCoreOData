@@ -251,7 +251,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         private static string Match(string text, out string declared)
         {
             declared = null;
-            int index = text.IndexOf("From");
+            int index = text.IndexOf("From", StringComparison.Ordinal);
             if (index > 0)
             {
                 declared = text.Substring(index + 4);

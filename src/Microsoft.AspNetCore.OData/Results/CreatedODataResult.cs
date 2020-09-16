@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (entity == null)
             {
-                throw Error.ArgumentNull("entity");
+                throw Error.ArgumentNull(nameof(entity));
             }
 
             this._innerResult = entity;
@@ -50,6 +50,11 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <inheritdoc/>
         public async virtual Task ExecuteResultAsync(ActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             HttpRequest request = context.HttpContext.Request;
             HttpResponse response = context.HttpContext.Response;
             IActionResult result = GetInnerActionResult(request);

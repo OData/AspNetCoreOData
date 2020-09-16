@@ -31,17 +31,17 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (String.IsNullOrEmpty(rawValue))
             {
-                throw Error.ArgumentNullOrEmpty("rawValue");
+                throw Error.ArgumentNullOrEmpty(nameof(rawValue));
             }
 
             if (queryOptionParser == null)
             {
-                throw Error.ArgumentNull("queryOptionParser");
+                throw Error.ArgumentNull(nameof(queryOptionParser));
             }
 
             Context = context;
@@ -55,12 +55,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (String.IsNullOrEmpty(rawValue))
             {
-                throw Error.ArgumentNullOrEmpty("rawValue");
+                throw Error.ArgumentNullOrEmpty(nameof(rawValue));
             }
 
             Context = context;
@@ -146,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (Validator != null)
@@ -157,6 +157,16 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
         {
+            if (query == null)
+            {
+                throw Error.ArgumentNull(nameof(query));
+            }
+
+            if (querySettings == null)
+            {
+                throw Error.ArgumentNull(nameof(querySettings));
+            }
+
             if (Context.ElementClrType == null)
             {
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");

@@ -156,7 +156,6 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         {
             IServiceCollection services = new ServiceCollection();
             services.Configure(setupAction);
-            services.AddSingleton<IPerRouteContainer, PerRouteContainer>();
             return services.BuildServiceProvider();
         }
     }

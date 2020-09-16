@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Common
@@ -17,6 +18,16 @@ namespace Microsoft.AspNetCore.OData.Common
     /// </summary>
     internal static class TypeHelper
     {
+        /// <summary>
+        /// Test whether the input type is <see cref="DynamicTypeWrapper"/>
+        /// </summary>
+        /// <param name="type">The test type.</param>
+        /// <returns>true/false</returns>
+        public static bool IsDynamicTypeWrapper(this Type type)
+        {
+            return (type != null && typeof(DynamicTypeWrapper).IsAssignableFrom(type));
+        }
+
         /// <summary>
         /// Return the collection element type.
         /// </summary>

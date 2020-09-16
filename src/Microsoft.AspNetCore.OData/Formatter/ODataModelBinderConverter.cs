@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -30,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// </summary>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
         Justification = "Relies on many ODataLib classes.")]
-    public static class ODataModelBinderConverter
+    internal static class ODataModelBinderConverter
     {
         private static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
             .Single(m => m.Name == "TryParse" && m.GetParameters().Length == 2);
@@ -215,6 +216,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return null;
         }
 
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         private static object ConvertResourceOrResourceSet(object oDataValue, IEdmTypeReference edmTypeReference,
             ODataDeserializerContext readContext)
         {
@@ -233,7 +235,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             {
                 stream.Seek(0, SeekOrigin.Begin);
 
-                IODataRequestMessage oDataRequestMessage = new ODataMessageWrapper(stream, null /*request.ODataContentIdMapping*/);
+                // Do we need to dispose it?
+                IODataRequestMessage oDataRequestMessage = new ODataMessageWrapper(stream, null, request.GetODataContentIdMapping());
                 using (
                     ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage,
                         oDataReaderSettings, readContext.Model))

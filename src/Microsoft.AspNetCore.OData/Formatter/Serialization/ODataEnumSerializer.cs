@@ -29,15 +29,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (messageWriter == null)
             {
-                throw Error.ArgumentNull("messageWriter");
+                throw Error.ArgumentNull(nameof(messageWriter));
             }
+
             if (writeContext == null)
             {
-                throw Error.ArgumentNull("writeContext");
+                throw Error.ArgumentNull(nameof(writeContext));
             }
+
             if (writeContext.RootElementName == null)
             {
-                throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
+                throw Error.Argument(nameof(writeContext), SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
             }
 
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
@@ -92,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // Enum member supports model alias case. So, try to use the Edm member name to create Enum value.
-            var memberMapAnnotation = writeContext.Model.GetClrEnumMemberAnnotation(enumType.EnumDefinition());
+            var memberMapAnnotation = writeContext?.Model.GetClrEnumMemberAnnotation(enumType.EnumDefinition());
             if (memberMapAnnotation != null)
             {
                 var edmEnumMember = memberMapAnnotation.GetEdmEnumMember((Enum)graph);
@@ -104,9 +106,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             ODataEnumValue enumValue = new ODataEnumValue(value, enumType.FullName());
 
-            ODataMetadataLevel metadataLevel = writeContext != null
-                ? writeContext.MetadataLevel
-                : ODataMetadataLevel.Minimal;
+            ODataMetadataLevel metadataLevel = writeContext != null ? writeContext.MetadataLevel : ODataMetadataLevel.Minimal;
             AddTypeNameAnnotationAsNeeded(enumValue, enumType, metadataLevel);
 
             return enumValue;

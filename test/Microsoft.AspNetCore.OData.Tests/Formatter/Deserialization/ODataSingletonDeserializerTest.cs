@@ -4,6 +4,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -50,8 +51,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(EmployeeModel)
             };
 
-            // TODO:
-           // _deserializerProvider = ODataDeserializerProviderFactory.Create();
+             _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
         }
 
         [Fact]

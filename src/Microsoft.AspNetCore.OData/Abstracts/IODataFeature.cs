@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the batch route data.
         /// </summary>
-        RouteValueDictionary BatchRouteData { get; set; }
+        RouteValueDictionary BatchRouteData { get; }
 
         /// <summary>
         /// Gets or sets the total count for the OData response.
@@ -87,11 +87,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Gets or sets the delta link for the OData response.
         /// </summary>
         Uri DeltaLink { get; set; }
-
-        /// <summary>
-        /// Gets the body values from OData request.
-        /// </summary>
-        IDictionary<string, object> BodyValues { get; set; }
 
         /// <summary>
         /// Gets the data store used by routing conventions to store any custom route data.

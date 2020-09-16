@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.UriParser.Aggregation;
 using Microsoft.AspNetCore.Routing;
@@ -74,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the batch route data.
         /// </summary>
-        public RouteValueDictionary BatchRouteData { get; set; }
+        public RouteValueDictionary BatchRouteData { get; } = new RouteValueDictionary();
 
         /// <summary>
         /// Gets or sets the total count for the OData response.
@@ -143,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets the body values from OData request.
         /// </summary>
-        public IDictionary<string, object> BodyValues { get; set; }
+        internal IDictionary<string, object> BodyValues { get; set; }
 
         /// <summary>
         /// Gets the data store used routing conventions to store any custom route data.

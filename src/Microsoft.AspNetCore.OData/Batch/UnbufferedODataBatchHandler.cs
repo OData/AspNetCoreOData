@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,7 @@ namespace Microsoft.AspNetCore.OData.Batch
     public class UnbufferedODataBatchHandler : ODataBatchHandler
     {
         /// <inheritdoc/>
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public override async Task ProcessBatchAsync(HttpContext context, RequestDelegate nextHandler)
         {
             if (context == null)
@@ -106,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             CancellationToken cancellationToken = originalRequest.HttpContext.RequestAborted;
             cancellationToken.ThrowIfCancellationRequested();
-            HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, false, cancellationToken).ConfigureAwait(false);
+            HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, cancellationToken).ConfigureAwait(false);
 
             operationContext.Request.CopyBatchRequestProperties(originalRequest);
             operationContext.Request.DeleteSubRequestProvider(false);
@@ -150,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 if (batchReader.State == ODataBatchReaderState.Operation)
                 {
                     CancellationToken cancellationToken = originalRequest.HttpContext.RequestAborted;
-                    HttpContext changeSetOperationContext = await batchReader.ReadChangeSetOperationRequestAsync(originalRequest.HttpContext, batchId, changeSetId, false, cancellationToken).ConfigureAwait(false);
+                    HttpContext changeSetOperationContext = await batchReader.ReadChangeSetOperationRequestAsync(originalRequest.HttpContext, batchId, changeSetId, cancellationToken).ConfigureAwait(false);
                     changeSetOperationContext.Request.CopyBatchRequestProperties(originalRequest);
                     //changeSetOperationContext.Request.DeleteRequestContainer(false);
 

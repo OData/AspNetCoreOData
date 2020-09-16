@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +41,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             HttpContext httpContext = bindingContext.HttpContext;
 
-            IDictionary<string, object> values = httpContext.ODataFeature().BodyValues;
+            ODataFeature odataFeature = httpContext.ODataFeature() as ODataFeature;
+            IDictionary<string, object> values = odataFeature?.BodyValues;
             if (values == null)
             {
                 values = ReadODataBody(bindingContext);
@@ -49,7 +51,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     values = new Dictionary<string, object>();
                 }
 
-                httpContext.ODataFeature().BodyValues = values;
+                if (odataFeature != null)
+                {
+                    odataFeature.BodyValues = values;
+                }
             }
 
             if (values.TryGetValue(bindingContext.ModelMetadata.Name, out object result))
@@ -80,6 +85,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             };
         }
 
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public static IDictionary<string, object> ReadODataBody(ModelBindingContext bindingContext)
         {
             ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();

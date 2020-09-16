@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query

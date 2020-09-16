@@ -207,11 +207,6 @@
             Gets or sets the delta link for the OData response.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BodyValues">
-            <summary>
-            Gets the body values from OData request.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutingConventionsStore">
             <summary>
             Gets the data store used by routing conventions to store any custom route data.
@@ -259,28 +254,6 @@
             <param name="model">The Edm model.</param>
             <param name="clrType">The CLR type.</param>
             <returns>Null or the corresponding Edm type.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer">
-            <summary>
-            An interface for managing per-route (prefix) service containers.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.BuilderFactory">
-            <summary>
-            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.Services">
-            <summary>
-            Gets the services dictionary.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.IPerRouteContainer.GetServiceProvider(System.String)">
-            <summary>
-            Get the root service provider for a given route (prefix) name.
-            </summary>
-            <param name="routeName">The route name (the route prefix name).</param>
-            <returns>The root service provider for the route (prefix) name.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ODataBatchFeature">
             <summary>
@@ -504,42 +477,6 @@
         <member name="F:Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.BuiltInPrimitiveTypes">
             <summary>
             The mapping between Edm primitive type and Clr primitive type.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer">
-            <summary>
-            A class for managing per-route service containers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.ODataOptions})">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer"/> class.
-            </summary>
-            <param name="options">The global OData options.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.BuilderFactory">
-            <summary>
-            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>
-            </summary>
-            <remarks>
-            Consider to move this into service collection.
-            </remarks>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.Services">
-            <summary>
-            Gets the services dictionary.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.GetServiceProvider(System.String)">
-            <summary>
-            Get the root service provider for a given route (prefix) name.
-            </summary>
-            <param name="routeName">The route name (the route prefix name).</param>
-            <returns>The root service provider for the route (prefix) name.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.PerRouteContainer.Initialize">
-            <summary>
-            Initalize the per-route container.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
@@ -893,18 +830,17 @@
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>A collection of <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> in the ChangeSet.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Threading.CancellationToken)">
             <summary>
             Reads an Operation request.
             </summary>
             <param name="reader">The <see cref="T:Microsoft.OData.ODataBatchReader"/>.</param>
             <param name="context">The context containing the batch request messages.</param>
             <param name="batchId">The Batch ID.</param>
-            <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> representing the operation.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Guid,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(Microsoft.OData.ODataBatchReader,Microsoft.AspNetCore.Http.HttpContext,System.Guid,System.Guid,System.Threading.CancellationToken)">
             <summary>
             Reads an Operation request in a ChangeSet.
             </summary>
@@ -912,7 +848,6 @@
             <param name="context">The context containing the batch request messages.</param>
             <param name="batchId">The Batch ID.</param>
             <param name="changeSetId">The ChangeSet ID.</param>
-            <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> representing a ChangeSet operation</returns>
         </member>
@@ -1244,6 +1179,13 @@
             <summary>
             The type related helper methods.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDynamicTypeWrapper(System.Type)">
+            <summary>
+            Test whether the input type is <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>
+            </summary>
+            <param name="type">The test type.</param>
+            <returns>true/false</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetInnerElementType(System.Type)">
             <summary>
@@ -2235,13 +2177,6 @@
             get the deserializer provider associated with the request.
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataContentIdMapping(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Retrieves the Content-ID to Location mapping associated with the request.
-            </summary>
-            <param name="request">The request.</param>
-            <returns>The Content-ID to Location mapping associated with this request, or <c>null</c> if there isn't one.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(Microsoft.AspNetCore.Http.HttpRequest,System.Int32,System.Object,System.Func{System.Object,System.String})">
             <summary>
@@ -6141,6 +6076,11 @@
               Looks up a localized string similar to The operation cannot be completed because no ODataPath is available for the request..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.OnlySingleValueNodeSupported">
+            <summary>
+              Looks up a localized string similar to Only SingleValueNode supported..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByClauseNotSupported">
             <summary>
               Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
@@ -6815,12 +6755,12 @@
             <summary>
             The result of a $select and $expand projection is represented as an <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/>
             instance. That instance can be projected into an <see cref="T:System.Collections.Generic.IDictionary`2"/> instance by calling
-            <see cref="!:ISelectExpandWrapper.ToDictionary(Func&lt;IEdmModel,IEdmStructuredType,IPropertyMapper&gt;)"/>. 
-            That method will use the function to construct an <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper"/> that will map the property 
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary(System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper})"/>.
+            That method will use the function to construct an <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper"/> that will map the property
             names in that projection to the keys in the returned <see cref="T:System.Collections.Generic.IDictionary`2"/>.
             The main purpose of converting an <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> instance into an 
-            <see cref="T:System.Collections.Generic.IDictionary`2"/> (using the method mentioned above) is to allow changing the names of the 
-            properties in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that will be used during the serialization of the $select 
+            <see cref="T:System.Collections.Generic.IDictionary`2"/> (using the method mentioned above) is to allow changing the names of the
+            properties in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that will be used during the serialization of the $select
             and $expand projection by a given formatter. For example, to support custom serialization attributes of a
             particular formatter.
             </summary>
@@ -7324,7 +7264,6 @@
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The request.</param>
-            <param name="createErrorAction">A function used to generate error response.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
             <summary>
@@ -8212,18 +8151,6 @@
             </summary>
             <param name="maxTopValue"></param>
             <returns></returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions">
-            <summary>
-            Adds the OData query related services into the builder.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryBuilderServiceExtensions.AddODataQuery(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            Adds the OData query related services into the odata builder.
-            </summary>
-            <param name="builder">The OData builder.</param>
-            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext">
             <summary>
@@ -10066,7 +9993,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.ModelID">
             <summary>
-            An ID to uniquely identify the model in the <see cref="!:ModelContainer"/>.
+            An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.ModelContainer"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper">
@@ -11432,77 +11359,6 @@
             <param name="odataPath">the setting.</param>
             <param name="requestProvider">The service provider.</param>
             <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel,System.String)">
-            <summary>
-            Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
-            to segments
-            </summary>
-            <param name="model">the Edm model.</param>
-            <param name="odataPath">the setting.</param>
-            <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.CreateFirstSegment(System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Process the first segment in the request uri.
-            The first segment could be only singleton/entityset/operationimport, doesn't consider the $metadata, $batch
-            </summary>
-            <param name="identifier">the whole identifier of this segment</param>
-            <param name="model">The Edm model.</param>
-            <param name="path">The out put of the path, because it may include the key segment.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.CreateNextSegment(System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Create the next segment for the request uri.
-            </summary>
-            <param name="identifier">The request segment uri literal</param>
-            <param name="model">The Edm model.</param>
-            <param name="path">The out of the path</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindNavigationSource(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind the idenfier as navigation source segment,
-            Append it into path.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindOperationImport(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind the identifier as operation import (function import or action import) segment,
-            Append it into path.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindPropertySegment(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind the idenfier as property segment,
-            Append it into path.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindKeySegment(System.String,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind the parenthesisExpressions as key,
-            parenthesisExpressions should have '(' and ')' wrapped.
-            </summary>
-            <param name="parenthesisExpressions">'(' and ')' wrapped string.</param>
-            <param name="path">the decorated path.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindTypeCastSegment(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind namespace-qualified type cast segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.TryBindOperations(System.String,System.String,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate})">
-            <summary>
-            Try to bind the idenfier as bound operation segment,
-            Append it into path.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.IdentifierIs(System.String,System.String)">
-            <summary>
-            Check whether identifiers matches according to case in sensitive option.
-            </summary>
-            <param name="expected">The expected identifier.</param>
-            <param name="identifier">Identifier to be evaluated.</param>
-            <returns>Whether the identifier matches.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser">
             <summary>

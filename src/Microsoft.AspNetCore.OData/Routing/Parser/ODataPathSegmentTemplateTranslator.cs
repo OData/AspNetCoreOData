@@ -90,6 +90,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <returns>Translated the path segment template.</returns>
         public override ODataSegmentTemplate Translate(OperationImportSegment segment)
         {
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
             if (segment.OperationImports.First().IsActionImport())
             {
                 return new ActionImportSegmentTemplate(segment);
@@ -108,6 +113,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <returns>Translated the path segment template.</returns>
         public override ODataSegmentTemplate Translate(OperationSegment segment)
         {
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
             IEdmOperation operation = segment.Operations.First();
             if (operation.IsAction())
             {

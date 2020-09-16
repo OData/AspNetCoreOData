@@ -22,6 +22,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation;
+using Microsoft.AspNetCore.OData.Common;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -334,7 +335,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext != null);
 
-            if (EdmLibQueryHelpers.IsDynamicTypeWrapper(graph.GetType()))
+            if (graph.GetType().IsDynamicTypeWrapper())
             {
                 WriteDynamicTypeResource(graph, writer, expectedType, writeContext);
                 return;

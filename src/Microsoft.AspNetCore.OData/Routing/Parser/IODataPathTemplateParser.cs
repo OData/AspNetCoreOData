@@ -12,14 +12,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
     /// </summary>
     public interface IODataPathTemplateParser
     {
-        ///// <summary>
-        ///// Parses the specified OData path template as an <see cref="ODataPathTemplate"/>.
-        ///// </summary>
-        ///// <param name="model">The Edm model.</param>
-        ///// <param name="odataPath">The OData path template to parse.</param>
-        ///// <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
-        //ODataPathTemplate Parse(IEdmModel model, string odataPath);
-
         /// <summary>
         /// Parses the specified OData path template as an <see cref="ODataPathTemplate"/>.
         /// </summary>

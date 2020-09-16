@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -158,7 +159,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 var encodedUriLiteral = WebUtility.UrlEncode(uriLiteral);
 
-                skipTokenBuilder.Append(edmProperty.Name).Append(propertyDelimiter).Append(encodedUriLiteral).Append(islast ? String.Empty : CommaDelimiter.ToString());
+                skipTokenBuilder
+                    .Append(edmProperty.Name)
+                    .Append(propertyDelimiter)
+                    .Append(encodedUriLiteral)
+                    .Append(islast ? String.Empty : CommaDelimiter.ToString(CultureInfo.CurrentCulture));
                 count++;
             }
 
@@ -216,6 +221,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns></returns>
         private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryContext context, string skipTokenRawValue)
         {
+            if (query == null)
+            {
+                throw Error.ArgumentNull(nameof(query));
+            }
+
             if (context.ElementClrType == null)
             {
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");

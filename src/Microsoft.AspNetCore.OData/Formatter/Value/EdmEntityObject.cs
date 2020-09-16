@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
 
@@ -26,6 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// Initializes a new instance of the <see cref="EdmEntityObject"/> class.
         /// </summary>
         /// <param name="edmType">The <see cref="IEdmEntityTypeReference"/> of this object.</param>
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "EntityDefinition checks the nullable.")]
         public EdmEntityObject(IEdmEntityTypeReference edmType)
             : this(edmType.EntityDefinition(), edmType.IsNullable)
         {

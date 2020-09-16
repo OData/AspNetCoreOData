@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                     handler = item.Value.Item2;
                     if (routeData.Count > 0)
                     {
-                        context.ODataFeature().BatchRouteData = routeData;
+                        Merge(context.ODataFeature().BatchRouteData, routeData);
                     }
 
                     return true;
@@ -76,6 +76,14 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             return false;
+        }
+
+        private static void Merge(RouteValueDictionary batchRouteData, RouteValueDictionary routeData)
+        {
+            foreach (var item in routeData)
+            {
+                batchRouteData.Add(item.Key, item.Value);
+            }
         }
     }
 }

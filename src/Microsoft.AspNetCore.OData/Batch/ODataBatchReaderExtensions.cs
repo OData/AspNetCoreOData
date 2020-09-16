@@ -25,6 +25,7 @@ namespace Microsoft.AspNetCore.OData.Batch
     public static class ODataBatchReaderExtensions
     {
         private static readonly string[] nonInheritableHeaders = new string[] { "content-length", "content-type" };
+
         // do not inherit respond-async and continue-on-error (odata.continue-on-error in OData 4.0) from Prefer header
         private static readonly string[] nonInheritablePreferences = new string[] { "respond-async", "continue-on-error", "odata.continue-on-error" };
 
@@ -36,7 +37,6 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="batchId">The Batch Id.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A collection of <see cref="HttpRequest"/> in the ChangeSet.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need to return a collection of request messages asynchronously.")]
         public static async Task<IList<HttpContext>> ReadChangeSetRequestAsync(
             this ODataBatchReader reader, HttpContext context, Guid batchId, CancellationToken cancellationToken)
         {
@@ -72,11 +72,10 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="reader">The <see cref="ODataBatchReader"/>.</param>
         /// <param name="context">The context containing the batch request messages.</param>
         /// <param name="batchId">The Batch ID.</param>
-        /// <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A <see cref="HttpRequest"/> representing the operation.</returns>
         public static Task<HttpContext> ReadOperationRequestAsync(
-            this ODataBatchReader reader, HttpContext context, Guid batchId, bool bufferContentStream, CancellationToken cancellationToken)
+            this ODataBatchReader reader, HttpContext context, Guid batchId, CancellationToken cancellationToken)
         {
             if (reader == null)
             {
@@ -91,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                     ODataBatchReaderState.Operation.ToString());
             }
 
-            return ReadOperationInternalAsync(reader, context, batchId, null, cancellationToken, bufferContentStream);
+            return ReadOperationInternalAsync(reader, context, batchId, null, cancellationToken);
         }
 
         /// <summary>
@@ -101,11 +100,10 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="context">The context containing the batch request messages.</param>
         /// <param name="batchId">The Batch ID.</param>
         /// <param name="changeSetId">The ChangeSet ID.</param>
-        /// <param name="bufferContentStream">if set to <c>true</c> then the request content stream will be buffered.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A <see cref="HttpRequest"/> representing a ChangeSet operation</returns>
         public static Task<HttpContext> ReadChangeSetOperationRequestAsync(
-            this ODataBatchReader reader, HttpContext context, Guid batchId, Guid changeSetId, bool bufferContentStream, CancellationToken cancellationToken)
+            this ODataBatchReader reader, HttpContext context, Guid batchId, Guid changeSetId, CancellationToken cancellationToken)
         {
             if (reader == null)
             {
@@ -120,11 +118,11 @@ namespace Microsoft.AspNetCore.OData.Batch
                     ODataBatchReaderState.Operation.ToString());
             }
 
-            return ReadOperationInternalAsync(reader, context, batchId, changeSetId, cancellationToken, bufferContentStream);
+            return ReadOperationInternalAsync(reader, context, batchId, changeSetId, cancellationToken);
         }
 
         private static async Task<HttpContext> ReadOperationInternalAsync(
-            ODataBatchReader reader, HttpContext originalContext, Guid batchId, Guid? changeSetId, CancellationToken cancellationToken, bool bufferContentStream = true)
+            ODataBatchReader reader, HttpContext originalContext, Guid batchId, Guid? changeSetId, CancellationToken cancellationToken)
         {
             ODataBatchOperationRequestMessage batchRequest = await reader.CreateOperationRequestMessageAsync().ConfigureAwait(false);
 
@@ -177,6 +175,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             return context;
         }
 
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
         private static HttpContext CreateHttpContext(HttpContext originalContext)
         {
             // Clone the features so that a new set is used for each context.
@@ -281,12 +280,14 @@ namespace Microsoft.AspNetCore.OData.Batch
             return context;
         }
 
+
         /// <summary>
         /// Extract preferences that can be inherited from the overall batch request to
         /// an individual request.
         /// </summary>
         /// <param name="batchPreferences">The value of the Prefer header from the batch request</param>
         /// <returns>comma-separated preferences that can be passed down to an individual request</returns>
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
         private static string GetPreferencesToInheritFromBatch(string batchPreferences)
         {
             IEnumerable<string> preferencesToInherit = SplitPreferences(batchPreferences)

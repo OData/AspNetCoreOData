@@ -93,7 +93,6 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// </summary>
         /// <param name="context">The context containing the batch request messages.</param>
         /// <returns>A collection of <see cref="ODataBatchRequestItem"/>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need to return a collection of request messages asynchronously.")]
         public virtual async Task<IList<ODataBatchRequestItem>> ParseBatchRequestsAsync(HttpContext context)
         {
             if (context == null)
@@ -105,35 +104,35 @@ namespace Microsoft.AspNetCore.OData.Batch
             IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
-            // How to dispose it?
-            ODataMessageReader reader = request.GetODataMessageReader(requestContainer);
-
-            CancellationToken cancellationToken = context.RequestAborted;
-            List<ODataBatchRequestItem> requests = new List<ODataBatchRequestItem>();
-            ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
-            Guid batchId = Guid.NewGuid();
-            while (await batchReader.ReadAsync().ConfigureAwait(false))
+            using (ODataMessageReader reader = request.GetODataMessageReader(requestContainer))
             {
-                if (batchReader.State == ODataBatchReaderState.ChangesetStart)
+                CancellationToken cancellationToken = context.RequestAborted;
+                List<ODataBatchRequestItem> requests = new List<ODataBatchRequestItem>();
+                ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
+                Guid batchId = Guid.NewGuid();
+                while (await batchReader.ReadAsync().ConfigureAwait(false))
                 {
-                    IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
-                    foreach (HttpContext changeSetContext in changeSetContexts)
+                    if (batchReader.State == ODataBatchReaderState.ChangesetStart)
                     {
-                        changeSetContext.Request.CopyBatchRequestProperties(request);
-                        changeSetContext.Request.DeleteSubRequestProvider(false);
+                        IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
+                        foreach (HttpContext changeSetContext in changeSetContexts)
+                        {
+                            changeSetContext.Request.CopyBatchRequestProperties(request);
+                            changeSetContext.Request.DeleteSubRequestProvider(false);
+                        }
+                        requests.Add(new ChangeSetRequestItem(changeSetContexts));
                     }
-                    requests.Add(new ChangeSetRequestItem(changeSetContexts));
+                    else if (batchReader.State == ODataBatchReaderState.Operation)
+                    {
+                        HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
+                        operationContext.Request.CopyBatchRequestProperties(request);
+                        operationContext.Request.DeleteSubRequestProvider(false);
+                        requests.Add(new OperationRequestItem(operationContext));
+                    }
                 }
-                else if (batchReader.State == ODataBatchReaderState.Operation)
-                {
-                    HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, true, cancellationToken).ConfigureAwait(false);
-                    operationContext.Request.CopyBatchRequestProperties(request);
-                    operationContext.Request.DeleteSubRequestProvider(false);
-                    requests.Add(new OperationRequestItem(operationContext));
-                }
-            }
 
             return requests;
+            }
         }
     }
 }

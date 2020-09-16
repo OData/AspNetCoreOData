@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <param name="structuredType">The EDM structured type of this instance context.</param>
         /// <param name="resourceInstance">The object representing the instance of this context.</param>
         public ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, object resourceInstance)
-            : this(serializerContext, structuredType, AsEdmResourceObject(resourceInstance, structuredType, serializerContext.Model))
+            : this(serializerContext, structuredType, AsEdmResourceObject(serializerContext, resourceInstance, structuredType))
         {
         }
 
@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (serializerContext == null)
             {
-                throw Error.ArgumentNull("serializerContext");
+                throw Error.ArgumentNull(nameof(serializerContext));
             }
 
             SerializerContext = serializerContext;
@@ -228,12 +228,19 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return resource;
         }
 
-        private static IEdmStructuredObject AsEdmResourceObject(object resourceInstance, IEdmStructuredTypeReference structuredType, IEdmModel model)
+        private static IEdmStructuredObject AsEdmResourceObject(ODataSerializerContext serializerContext, object resourceInstance, IEdmStructuredTypeReference structuredType)
         {
+            if (serializerContext == null)
+            {
+                throw Error.ArgumentNull(nameof(serializerContext));
+            }
+
             if (structuredType == null)
             {
-                throw Error.ArgumentNull("structuredType");
+                throw Error.ArgumentNull(nameof(structuredType));
             }
+
+            IEdmModel model = serializerContext.Model;
 
             IEdmStructuredObject edmStructuredObject = resourceInstance as IEdmStructuredObject;
             if (edmStructuredObject != null)

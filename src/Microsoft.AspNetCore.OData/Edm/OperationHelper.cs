@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (candidates.Count() > 1)
             {
-                throw new Exception("TODO:");
+                throw new Exception($"Multiple function overloads for '{identifer}' were found.");
             }
 
             return candidates.First();

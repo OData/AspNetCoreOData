@@ -280,7 +280,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             EdmDeltaDeletedEntityObject edmDeltaDeletedEntity = graph as EdmDeltaDeletedEntityObject;
             if (edmDeltaDeletedEntity == null)
             {
-                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));
             }
 
             Uri id = StringToUri(edmDeltaDeletedEntity.Id);
@@ -319,7 +319,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             EdmDeltaDeletedLink edmDeltaDeletedLink = graph as EdmDeltaDeletedLink;
             if (edmDeltaDeletedLink == null)
             {
-                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));
             }
 
             ODataDeltaDeletedLink deltaDeletedLink = new ODataDeltaDeletedLink(
@@ -342,6 +342,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
         public virtual void WriteDeltaLink(object graph, ODataWriter writer, ODataSerializerContext writeContext)
         {
+            if (graph == null)
+            {
+                throw Error.ArgumentNull(nameof(graph));
+            }
+
             if (writer == null)
             {
                 throw Error.ArgumentNull(nameof(writer));

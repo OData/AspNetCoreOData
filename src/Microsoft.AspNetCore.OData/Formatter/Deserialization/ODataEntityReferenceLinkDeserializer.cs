@@ -3,10 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
-using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -28,12 +27,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw Error.ArgumentNull("messageReader");
+                throw Error.ArgumentNull(nameof(messageReader));
             }
 
             if (readContext == null)
             {
-                throw Error.ArgumentNull("readContext");
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             ODataEntityReferenceLink entityReferenceLink = messageReader.ReadEntityReferenceLink();
@@ -50,19 +49,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (uri != null)
             {
-                //IDictionary<string, string> contentIDToLocationMapping = readContext.InternalRequest.ODataContentIdMapping;
-                //if (contentIDToLocationMapping != null)
-                //{
-                //    Uri baseAddress = new Uri(readContext.InternalUrlHelper.CreateODataLink());
-                //    string relativeUrl = uri.IsAbsoluteUri ? baseAddress.MakeRelativeUri(uri).OriginalString : uri.OriginalString;
-                //    string resolvedUrl = ContentIdHelpers.ResolveContentId(relativeUrl, contentIDToLocationMapping);
-                //    Uri resolvedUri = new Uri(resolvedUrl, UriKind.RelativeOrAbsolute);
-                //    if (!resolvedUri.IsAbsoluteUri)
-                //    {
-                //        resolvedUri = new Uri(baseAddress, uri);
-                //    }
-                //    return resolvedUri;
-                //}
+                IDictionary<string, string> contentIDToLocationMapping = readContext.Request.GetODataContentIdMapping();
+                if (contentIDToLocationMapping != null)
+                {
+                    Uri baseAddress = new Uri(readContext.Request.CreateODataLink());
+                    string relativeUrl = uri.IsAbsoluteUri ? baseAddress.MakeRelativeUri(uri).OriginalString : uri.OriginalString;
+                    string resolvedUrl = ContentIdHelpers.ResolveContentId(relativeUrl, contentIDToLocationMapping);
+                    Uri resolvedUri = new Uri(resolvedUrl, UriKind.RelativeOrAbsolute);
+                    if (!resolvedUri.IsAbsoluteUri)
+                    {
+                        resolvedUri = new Uri(baseAddress, uri);
+                    }
+                    return resolvedUri;
+                }
             }
 
             return uri;

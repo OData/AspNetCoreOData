@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -433,8 +434,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 
         public FilterQueryValidatorTests()
         {
-        //    _context = ValidationTestHelper.CreateCustomerContext();
-        //    _productContext = ValidationTestHelper.CreateDerivedProductsContext();
+            _context = ValidationTestHelper.CreateCustomerContext();
+            _productContext = ValidationTestHelper.CreateDerivedProductsContext();
             _validator = new MyFilterValidator(_productContext.DefaultQuerySettings);
         }
 

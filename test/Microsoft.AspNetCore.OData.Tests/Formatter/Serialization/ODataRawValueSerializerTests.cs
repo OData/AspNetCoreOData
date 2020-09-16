@@ -6,7 +6,7 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
-using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Moq;

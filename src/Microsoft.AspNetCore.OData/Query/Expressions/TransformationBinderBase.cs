@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return BindAccessor(singleValueNode);
             }
 
-            throw new ArgumentException("Only SigleValueNode supported", nameof(node));
+            throw Error.Argument(nameof(node), SRResources.OnlySingleValueNodeSupported);
         }
 
         protected override ParameterExpression Parameter

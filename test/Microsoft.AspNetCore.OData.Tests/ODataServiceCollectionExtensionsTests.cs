@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests
@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             services.AddOData();
 
             // Assert
-            var registerd = services.Where(s => s.ServiceType == typeof(IPerRouteContainer));
+            var registerd = services.Where(s => s.ServiceType == typeof(IAssemblyResolver));
             Assert.Single(registerd);
         }
 

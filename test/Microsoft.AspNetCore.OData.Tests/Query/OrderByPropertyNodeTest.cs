@@ -123,6 +123,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.ModelAliasingEnabled = modelAliasing;
             builder.EntitySet<PropertyAlias>("entityset");
 
             IEdmModel model = builder.GetEdmModel();

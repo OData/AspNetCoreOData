@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.OData.Edm;
@@ -36,6 +37,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// Initializes a new instance of the <see cref="EdmStructuredObject"/> class.
         /// </summary>
         /// <param name="edmType">The <see cref="IEdmStructuredTypeReference"/> of this object.</param>
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "StructuredDefinition checks the nullable.")]
         protected EdmStructuredObject(IEdmStructuredTypeReference edmType)
             : this(edmType.StructuredDefinition(), edmType.IsNullable)
         {

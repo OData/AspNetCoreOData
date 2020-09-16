@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
 
             // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), false, CancellationToken.None),
+                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), CancellationToken.None),
                 "reader");
         }
 
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
 
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(
-                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), false, CancellationToken.None),
+                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), CancellationToken.None),
                 "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
         }
 
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), Guid.NewGuid(), false, CancellationToken.None),
+                () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
                 "reader");
         }
 
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(
                 () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object,
-                    Guid.NewGuid(), Guid.NewGuid(), false, CancellationToken.None),
+                    Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
                 "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
         }
     }

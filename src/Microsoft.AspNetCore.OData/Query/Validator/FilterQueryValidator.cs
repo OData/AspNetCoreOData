@@ -50,12 +50,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (filterQueryOption == null)
             {
-                throw Error.ArgumentNull("filterQueryOption");
+                throw Error.ArgumentNull(nameof(filterQueryOption));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             if (filterQueryOption.Context.Path != null)
@@ -78,6 +78,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         public virtual void Validate(FilterClause filterClause, ODataValidationSettings settings, IEdmModel model)
         {
+            if (filterClause == null)
+            {
+                throw Error.ArgumentNull(nameof(filterClause));
+            }
+
             _currentAnyAllExpressionDepth = 0;
             _currentNodeCount = 0;
             _model = model;
@@ -106,12 +111,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (allNode == null)
             {
-                throw Error.ArgumentNull("allNode");
+                throw Error.ArgumentNull(nameof(allNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             ValidateFunction("all", settings);
@@ -142,12 +147,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (anyNode == null)
             {
-                throw Error.ArgumentNull("anyNode");
+                throw Error.ArgumentNull(nameof(anyNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             ValidateFunction("any", settings);
@@ -181,12 +186,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (binaryOperatorNode == null)
             {
-                throw Error.ArgumentNull("binaryOperatorNode");
+                throw Error.ArgumentNull(nameof(binaryOperatorNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // base case goes
@@ -226,12 +231,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (binaryNode == null)
             {
-                throw Error.ArgumentNull("binaryNode");
+                throw Error.ArgumentNull(nameof(binaryNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             AllowedLogicalOperators logicalOperator = ToLogicalOperator(binaryNode);
@@ -260,12 +265,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (binaryNode == null)
             {
-                throw Error.ArgumentNull("binaryNode");
+                throw Error.ArgumentNull(nameof(binaryNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             AllowedArithmeticOperators arithmeticOperator = ToArithmeticOperator(binaryNode);
@@ -294,12 +299,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (constantNode == null)
             {
-                throw Error.ArgumentNull("constantNode");
+                throw Error.ArgumentNull(nameof(constantNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // No default validation logic here.
@@ -318,12 +323,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (convertNode == null)
             {
-                throw Error.ArgumentNull("convertNode");
+                throw Error.ArgumentNull(nameof(convertNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // Validate child nodes but not the ConvertNode itself.
@@ -342,9 +347,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="settings"></param>
         public virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
         {
+            if (navigationProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(navigationProperty));
+            }
+
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // Check whether the property is not filterable
@@ -375,12 +385,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (rangeVariable == null)
             {
-                throw Error.ArgumentNull("rangeVariable");
+                throw Error.ArgumentNull(nameof(rangeVariable));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // No default validation logic here.
@@ -399,12 +409,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (propertyAccessNode == null)
             {
-                throw Error.ArgumentNull("propertyAccessNode");
+                throw Error.ArgumentNull(nameof(propertyAccessNode));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             // Check whether the property is filterable.
@@ -579,12 +589,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (node == null)
             {
-                throw Error.ArgumentNull("node");
+                throw Error.ArgumentNull(nameof(node));
             }
 
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
 
             ValidateFunction(node.Name, settings);
@@ -605,6 +615,16 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="settings"></param>
         public virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings settings)
         {
+            if (unaryOperatorNode == null)
+            {
+                throw Error.ArgumentNull(nameof(unaryOperatorNode));
+            }
+
+            if (settings == null)
+            {
+                throw Error.ArgumentNull(nameof(settings));
+            }
+
             ValidateQueryNode(unaryOperatorNode.Operand, settings);
 
             switch (unaryOperatorNode.OperatorKind)
@@ -633,6 +653,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="settings"></param>
         public virtual void ValidateQueryNode(QueryNode node, ODataValidationSettings settings)
         {
+            if (settings == null)
+            {
+                throw Error.ArgumentNull(nameof(settings));
+            }
+
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
@@ -664,7 +689,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (collectionResourceCastNode == null)
             {
-                throw Error.ArgumentNull("collectionResourceCastNode");
+                throw Error.ArgumentNull(nameof(collectionResourceCastNode));
             }
 
             ValidateQueryNode(collectionResourceCastNode.Source, settings);
@@ -683,7 +708,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (singleResourceCastNode == null)
             {
-                throw Error.ArgumentNull("singleResourceCastNode");
+                throw Error.ArgumentNull(nameof(singleResourceCastNode));
             }
 
             ValidateQueryNode(singleResourceCastNode.Source, settings);

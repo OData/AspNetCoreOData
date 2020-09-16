@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
 
@@ -27,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// Initializes a new instance of the <see cref="EdmDeltaComplexObject"/> class.
         /// </summary>
         /// <param name="edmType">The <see cref="IEdmComplexTypeReference"/> of this object.</param>
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "ComplexDefinition checks the nullable.")]
         public EdmDeltaComplexObject(IEdmComplexTypeReference edmType)
             : this(edmType.ComplexDefinition(), edmType.IsNullable)
         {

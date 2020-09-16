@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -34,6 +35,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// Initializes a new instance of the <see cref="EdmDeltaDeletedEntityObject"/> class.
         /// </summary>
         /// <param name="entityTypeReference">The <see cref="IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "EntityDefinition checks the nullable.")]
         public EdmDeltaDeletedEntityObject(IEdmEntityTypeReference entityTypeReference)
             : this(entityTypeReference.EntityDefinition(), entityTypeReference.IsNullable)
         {

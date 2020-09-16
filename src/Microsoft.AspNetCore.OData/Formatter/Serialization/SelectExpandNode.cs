@@ -34,6 +34,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="selectExpandNodeToCopy">The instance from which the state for the new instance will be copied.</param>
         public SelectExpandNode(SelectExpandNode selectExpandNodeToCopy)
         {
+            if (selectExpandNodeToCopy == null)
+            {
+                throw Error.ArgumentNull(nameof(selectExpandNodeToCopy));
+            }
+
             SelectedStructuralProperties = selectExpandNodeToCopy.SelectedStructuralProperties == null ?
                 null : new HashSet<IEdmStructuralProperty>(selectExpandNodeToCopy.SelectedStructuralProperties);
 
@@ -71,6 +76,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public SelectExpandNode(IEdmStructuredType structuredType, ODataSerializerContext writeContext)
             : this()
         {
+            if (writeContext == null)
+            {
+                throw Error.ArgumentNull(nameof(writeContext));
+            }
+
             Initialize(writeContext.SelectExpandClause, structuredType, writeContext.Model, writeContext.ExpandReference);
         }
 

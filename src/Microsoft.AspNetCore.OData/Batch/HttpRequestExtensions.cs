@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="request">The request.</param>
         /// <param name="requestContainer">The dependency injection container for the request.</param>
         /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public static ODataMessageReader GetODataMessageReader(this HttpRequest request, IServiceProvider requestContainer)
         {
             if (request == null)

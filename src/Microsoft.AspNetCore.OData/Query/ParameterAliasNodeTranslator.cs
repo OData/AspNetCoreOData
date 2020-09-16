@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (parameterAliasNodes == null)
             {
-                throw Error.ArgumentNull("parameterAliasNodes");
+                throw Error.ArgumentNull(nameof(parameterAliasNodes));
             }
 
             _parameterAliasNode = parameterAliasNodes;
@@ -37,6 +37,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(AllNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             AllNode allNode = new AllNode(nodeIn.RangeVariables, nodeIn.CurrentRangeVariable);
 
             if (nodeIn.Source != null)
@@ -59,6 +64,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(AnyNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             AnyNode anyNode = new AnyNode(nodeIn.RangeVariables, nodeIn.CurrentRangeVariable);
 
             if (nodeIn.Source != null)
@@ -81,6 +91,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(BinaryOperatorNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new BinaryOperatorNode(
                 nodeIn.OperatorKind,
                 (SingleValueNode)nodeIn.Left.Accept(this),
@@ -94,6 +109,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(InNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new InNode(
                 (SingleValueNode)nodeIn.Left.Accept(this),
                 (CollectionNode)nodeIn.Right.Accept(this));
@@ -106,6 +126,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionFunctionCallNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionFunctionCallNode(
                 nodeIn.Name,
                 nodeIn.Functions,
@@ -121,6 +146,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionNavigationNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return nodeIn.Source == null ?
                 nodeIn :
                 new CollectionNavigationNode(
@@ -136,6 +166,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionOpenPropertyAccessNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionOpenPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
                 nodeIn.Name);
@@ -148,6 +183,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionComplexNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionComplexNode(
                 (SingleResourceNode)nodeIn.Source.Accept(this),
                 nodeIn.Property);
@@ -160,6 +200,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionPropertyAccessNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
                 nodeIn.Property);
@@ -192,6 +237,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(ConvertNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new ConvertNode((SingleValueNode)nodeIn.Source.Accept(this), nodeIn.TypeReference);
         }
 
@@ -202,6 +252,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionResourceCastNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionResourceCastNode(
                 (CollectionResourceNode)nodeIn.Source.Accept(this),
                 (IEdmStructuredType)nodeIn.ItemType.Definition);
@@ -214,6 +269,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionResourceFunctionCallNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CollectionResourceFunctionCallNode(
                 nodeIn.Name,
                 nodeIn.Functions,
@@ -240,6 +300,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(NamedFunctionParameterNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new NamedFunctionParameterNode(
                 nodeIn.Name,
                 nodeIn.Value == null ? null : nodeIn.Value.Accept(this));
@@ -291,6 +356,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleResourceCastNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return nodeIn.Source == null ?
                 nodeIn :
                 new SingleResourceCastNode(
@@ -305,6 +375,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleResourceFunctionCallNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new SingleResourceFunctionCallNode(
                 nodeIn.Name,
                 nodeIn.Functions,
@@ -321,6 +396,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleNavigationNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return nodeIn.Source == null ?
                 nodeIn :
                 new SingleNavigationNode(
@@ -336,6 +416,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValueFunctionCallNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new SingleValueFunctionCallNode(
                 nodeIn.Name,
                 nodeIn.Functions,
@@ -351,6 +436,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValueOpenPropertyAccessNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new SingleValueOpenPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
                 nodeIn.Name);
@@ -363,6 +453,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValuePropertyAccessNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new SingleValuePropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
                 nodeIn.Property);
@@ -375,6 +470,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleComplexNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new SingleComplexNode(
                 (SingleResourceNode)nodeIn.Source.Accept(this),
                 nodeIn.Property);
@@ -387,6 +487,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(UnaryOperatorNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new UnaryOperatorNode(nodeIn.OperatorKind, (SingleValueNode)nodeIn.Operand.Accept(this));
         }
 
@@ -397,6 +502,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns> 
         public override QueryNode Visit(CountNode nodeIn)
         {
+            if (nodeIn == null)
+            {
+                throw Error.ArgumentNull(nameof(nodeIn));
+            }
+
             return new CountNode((CollectionNode)nodeIn.Source.Accept(this));
         }
     }

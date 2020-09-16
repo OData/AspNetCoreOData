@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Common;
 using Xunit;
+using Microsoft.AspNetCore.OData.TestCommon;
 
 namespace Microsoft.AspNetCore.OData.Test.Batch
 {

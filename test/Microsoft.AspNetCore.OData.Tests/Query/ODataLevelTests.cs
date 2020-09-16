@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -19,9 +21,23 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
-    public class ODataLevelsTest
+    public class ODataLevelsTest : WebODataTestBase<ODataLevelsTest.Startup>
     {
-        private HttpClient _client;
+        public class Startup : TestStartupBase
+        {
+            public override void ConfigureServices(IServiceCollection services)
+            {
+                services.ConfigureControllers(typeof(LevelsEntitiesController));
+
+                IEdmModel model = GetEdmModel();
+                services.AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+            }
+        }
+
+        public ODataLevelsTest(WebODataTestFixture<Startup> factory)
+            : base(factory)
+        {
+        }
 
         //public ODataLevelsTest()
         //{
@@ -33,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //        config.MapODataServiceRoute("odata", "odata", model);
         //    });
 
-        //    _client = TestServerFactory.CreateClient(_nullPrefixServer);
+        //    Client = TestServerFactory.CreateClient(_nullPrefixServer);
         //}
 
         [Fact]
@@ -43,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities?$expand=Parent($levels=0)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -63,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities?$expand=Parent($levels=20)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -82,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=5)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -108,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities?$expand=Parent($levels=5)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -129,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(5)?$expand=Parent($levels=2)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -149,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(5)?$expand=Parent($levels=max)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -173,7 +189,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(9)?$expand=Parent($expand=Parent($levels=2))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -195,7 +211,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(9)?$expand=Parent($levels=max)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -221,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(2)?$expand=BaseEntities($levels=3)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -248,7 +264,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(5)?$expand=DerivedAncestors($levels=3)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -275,7 +291,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Microsoft.AspNet.OData.Test.Routing.LevelsDerivedEntity/AncestorsInDerivedEntity($levels=2)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -321,7 +337,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(5)?$select=ID&$expand=Parent($levels=2;$select=Name)";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -346,7 +362,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=2;$expand=DerivedAncestors($levels=2))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -383,7 +399,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=3;$expand=DerivedAncestors($levels=max))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -411,7 +427,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=max;$expand=DerivedAncestors($levels=max))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -442,7 +458,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($select=ID;$levels=3;$expand=DerivedAncestors($levels=max;$select=DerivedName))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -474,7 +490,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=max;$expand=DerivedAncestors($levels=2))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -493,7 +509,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=max;$expand=DerivedAncestors($levels=2),BaseEntities($levels=3))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -516,7 +532,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=max;$expand=DerivedAncestors($levels=2),BaseEntities($levels=max))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -543,7 +559,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string uri = "LevelsEntities(6)?$expand=Parent($levels=max;$expand=DerivedAncestors($levels=2;$expand=BaseEntities($levels=max)))";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -662,13 +678,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     //var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
                     //responseMessage.Content = new StringContent(
                     //    Error.Format("The query specified in the URI is not valid. {0}", e.Message));
-                    //return ResponseMessage(responseMessage);
+
+                    return BadRequest(Error.Format("The query specified in the URI is not valid. {0}", e.Message));
                 }
 
                 var querySettings = new ODataQuerySettings();
                 var result = queryOptions.ApplyTo(Entities.AsQueryable(), querySettings).AsQueryable();
 
-                return Ok();
+                return Ok(result);
                 //return Ok(result, result.GetType());
             }
 

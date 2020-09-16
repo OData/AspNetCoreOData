@@ -130,21 +130,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Retrieves the Content-ID to Location mapping associated with the request.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>The Content-ID to Location mapping associated with this request, or <c>null</c> if there isn't one.</returns>
-        public static IDictionary<string, string> GetODataContentIdMapping(this HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw Error.ArgumentNull("request");
-            }
-
-            return request.ODataBatchFeature().ContentIdMapping;
-        }
-
-        /// <summary>
         /// Creates a link for the next page of results; To be used as the value of @odata.nextLink.
         /// </summary>
         /// <param name="request">The request on which to base the next page link.</param>

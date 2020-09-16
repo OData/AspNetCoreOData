@@ -438,7 +438,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         selectExpandClause);
 
                     autoExpandItems.Add(item);
-                    if (!isAllSelected || autoSelectProperties.Count() != 0)
+                    if (!isAllSelected || autoSelectProperties.Any())
                     {
                         PathSelectItem pathSelectItem = new PathSelectItem(
                             new ODataSelectPath(pathSegments));

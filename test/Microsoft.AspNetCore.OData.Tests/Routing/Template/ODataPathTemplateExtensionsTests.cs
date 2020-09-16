@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData.Edm;
 using Xunit;
 

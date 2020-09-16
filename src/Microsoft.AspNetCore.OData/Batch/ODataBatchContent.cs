@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -74,6 +75,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="stream">The stream to serialize to.</param>
         /// <returns>A <see cref="Task"/> that can be awaited.</returns>
         /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public Task SerializeToStreamAsync(Stream stream)
         {
             // how to dispose it?
@@ -81,11 +83,13 @@ namespace Microsoft.AspNetCore.OData.Batch
             return WriteToResponseMessageAsync(responseMessage);
         }
 
+
         /// <summary>
         ///  Serialize the batch responses to an <see cref="IODataResponseMessage"/>.
         /// </summary>
         /// <param name="responseMessage">The response message.</param>
         /// <returns></returns>
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         private async Task WriteToResponseMessageAsync(IODataResponseMessage responseMessage)
         {
             // how to dispose it?

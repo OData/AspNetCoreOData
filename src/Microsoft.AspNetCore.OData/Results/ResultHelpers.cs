@@ -2,7 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
@@ -132,35 +134,33 @@ namespace Microsoft.AspNetCore.OData.Results
                 throw Error.InvalidOperation(SRResources.ODataPathMissing);
             }
 
-            //path = new ContainmentPathBuilder().TryComputeCanonicalContainingPath(path);
+            path = new ContainmentPathBuilder().TryComputeCanonicalContainingPath(path);
 
-            //List<ODataPathSegment> odataPath = path.Segments.ToList();
+            List<ODataPathSegment> odataPath = path.ToList();
 
-            //// create a template entity set if it's contained entity set
-            //IEdmEntitySet entitySet = resourceContext.NavigationSource as IEdmEntitySet;
-            //if (entitySet == null)
-            //{
-            //    EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
-            //    entitySet = new EdmEntitySet(container, resourceContext.NavigationSource.Name, resourceContext.NavigationSource.EntityType());
-            //}
+            // create a template entity set if it's contained entity set
+            IEdmEntitySet entitySet = resourceContext.NavigationSource as IEdmEntitySet;
+            if (entitySet == null)
+            {
+                EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+                entitySet = new EdmEntitySet(container, resourceContext.NavigationSource.Name, resourceContext.NavigationSource.EntityType());
+            }
 
-            //odataPath.Add(new EntitySetSegment(entitySet));
-            //odataPath.Add(new KeySegment(ConventionsHelpers.GetEntityKey(resourceContext),
-            //    resourceContext.StructuredType as IEdmEntityType, resourceContext.NavigationSource));
+            odataPath.Add(new EntitySetSegment(entitySet));
+            odataPath.Add(new KeySegment(ConventionsHelpers.GetEntityKey(resourceContext),
+            resourceContext.StructuredType as IEdmEntityType, resourceContext.NavigationSource));
 
-            //if (!isEntityId)
-            //{
-            //    bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType();
-            //    if (!isSameType)
-            //    {
-            //        odataPath.Add(new TypeSegment(resourceContext.StructuredType, resourceContext.NavigationSource));
-            //    }
-            //}
+            if (!isEntityId)
+            {
+                bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType();
+                if (!isSameType)
+                {
+                    odataPath.Add(new TypeSegment(resourceContext.StructuredType, resourceContext.NavigationSource));
+                }
+            }
 
-            //string odataLink = resourceContext.CreateODataLink(odataPath);
-            //return odataLink == null ? null : new Uri(odataLink);
-
-            return null;
+            string odataLink = resourceContext.Request.CreateODataLink(odataPath);
+            return odataLink == null ? null : new Uri(odataLink);
         }
 
         internal static ODataVersion GetODataResponseVersion(HttpRequest request)

@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -55,15 +56,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             if (filterClause == null)
             {
-                throw Error.ArgumentNull("filterClause");
+                throw Error.ArgumentNull(nameof(filterClause));
             }
+
             if (filterType == null)
             {
-                throw Error.ArgumentNull("filterType");
+                throw Error.ArgumentNull(nameof(filterType));
             }
+
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             FilterBinder binder = GetOrCreateFilterBinder(context, querySettings);
@@ -96,14 +99,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private static FilterBinder GetOrCreateFilterBinder(ODataQueryContext context, ODataQuerySettings querySettings)
         {
             FilterBinder binder = null;
-            //if (context.RequestContainer != null)
-            //{
-            //    binder = context.RequestContainer.GetRequiredService<FilterBinder>();
-            //    if (binder != null && binder.Model != context.Model && binder.Model == EdmCoreModel.Instance)
-            //    {
-            //        binder.Model = context.Model;
-            //    }
-            //}
+            if (context.RequestContainer != null)
+            {
+                binder = context.RequestContainer.GetRequiredService<FilterBinder>();
+                if (binder != null && binder.Model != context.Model && binder.Model == EdmCoreModel.Instance)
+                {
+                    binder.Model = context.Model;
+                }
+            }
 
             return binder ?? new FilterBinder(querySettings, DefaultAssemblyResolver.Default, context.Model);
         }
@@ -181,6 +184,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public override Expression Bind(QueryNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
@@ -246,7 +254,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindDynamicPropertyAccessQueryNode(SingleValueOpenPropertyAccessNode openNode)
         {
-            if (EdmLibQueryHelpers.IsDynamicTypeWrapper(_filterType))
+            if (openNode == null)
+            {
+                throw Error.ArgumentNull(nameof(openNode));
+            }
+
+            if (_filterType.IsDynamicTypeWrapper())
             {
                 return GetFlattenedPropertyExpression(openNode.Name) ?? Expression.Property(Bind(openNode.Source), openNode.Name);
             }
@@ -301,6 +314,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindSingleResourceFunctionCallNode(SingleResourceFunctionCallNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             switch (node.Name)
             {
                 case ClrCanonicalFunctions.CastFunctionName:
@@ -354,6 +372,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindSingleResourceCastNode(SingleResourceCastNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             IEdmStructuredTypeReference structured = node.StructuredTypeReference;
             Contract.Assert(structured != null, "NS casts can contain only structured types");
 
@@ -371,6 +394,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindCollectionResourceCastNode(CollectionResourceCastNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             IEdmStructuredTypeReference structured = node.ItemStructuredType;
             Contract.Assert(structured != null, "NS casts can contain only structured types");
 
@@ -457,6 +485,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode)
         {
+            if (binaryOperatorNode == null)
+            {
+                throw Error.ArgumentNull(nameof(binaryOperatorNode));
+            }
+
             Expression left = Bind(binaryOperatorNode.Left);
             Expression right = Bind(binaryOperatorNode.Right);
 
@@ -507,6 +540,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindInNode(InNode inNode)
         {
+            if (inNode == null)
+            {
+                throw Error.ArgumentNull(nameof(inNode));
+            }
+
             Expression singleValue = Bind(inNode.Left);
             Expression collection = Bind(inNode.Right);
 
@@ -575,6 +613,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindRangeVariable(RangeVariable rangeVariable)
         {
+            if (rangeVariable == null)
+            {
+                throw Error.ArgumentNull(nameof(rangeVariable));
+            }
+
             ParameterExpression parameter = _lambdaParameters[rangeVariable.Name];
             return ConvertNonStandardPrimitives(parameter);
         }
@@ -587,6 +630,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode)
         {
+            if (propertyAccessNode == null)
+            {
+                throw Error.ArgumentNull(nameof(propertyAccessNode));
+            }
+
             Expression source = Bind(propertyAccessNode.Source);
             return CreatePropertyAccessExpression(source, propertyAccessNode.Property);
         }
@@ -599,6 +647,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindCollectionComplexNode(CollectionComplexNode collectionComplexNode)
         {
+            if (collectionComplexNode == null)
+            {
+                throw Error.ArgumentNull(nameof(collectionComplexNode));
+            }
+
             Expression source = Bind(collectionComplexNode.Source);
             return CreatePropertyAccessExpression(source, collectionComplexNode.Property);
         }
@@ -611,6 +664,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindPropertyAccessQueryNode(SingleValuePropertyAccessNode propertyAccessNode)
         {
+            if (propertyAccessNode == null)
+            {
+                throw Error.ArgumentNull(nameof(propertyAccessNode));
+            }
+
             Expression source = Bind(propertyAccessNode.Source);
             return CreatePropertyAccessExpression(source, propertyAccessNode.Property, GetFullPropertyPath(propertyAccessNode));
         }
@@ -623,6 +681,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindSingleComplexNode(SingleComplexNode singleComplexNode)
         {
+            if (singleComplexNode == null)
+            {
+                throw Error.ArgumentNull(nameof(singleComplexNode));
+            }
+
             Expression source = Bind(singleComplexNode.Source);
             return CreatePropertyAccessExpression(source, singleComplexNode.Property, GetFullPropertyPath(singleComplexNode));
         }
@@ -635,6 +698,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode)
         {
+            if (unaryOperatorNode == null)
+            {
+                throw Error.ArgumentNull(nameof(unaryOperatorNode));
+            }
+
             // No need to handle null-propagation here as CLR already handles it.
             // !(null) = null
             // -(null) = null
@@ -668,6 +736,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindAllNode(AllNode allNode)
         {
+            if (allNode == null)
+            {
+                throw Error.ArgumentNull(nameof(allNode));
+            }
+
             ParameterExpression allIt = HandleLambdaParameters(allNode.RangeVariables);
 
             Expression source;
@@ -708,6 +781,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindAnyNode(AnyNode anyNode)
         {
+            if (anyNode == null)
+            {
+                throw Error.ArgumentNull(nameof(anyNode));
+            }
+
             ParameterExpression anyIt = HandleLambdaParameters(anyNode.RangeVariables);
 
             Expression source;

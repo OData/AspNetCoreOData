@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
@@ -10,12 +11,12 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// <summary>
     /// The result of a $select and $expand projection is represented as an <see cref="ISelectExpandWrapper"/>
     /// instance. That instance can be projected into an <see cref="IDictionary{TKey,TValue}"/> instance by calling
-    /// <see cref="ISelectExpandWrapper.ToDictionary(Func{IEdmModel,IEdmStructuredType,IPropertyMapper})"/>. 
-    /// That method will use the function to construct an <see cref="IPropertyMapper"/> that will map the property 
+    /// <see cref="ISelectExpandWrapper.ToDictionary(Func{IEdmModel,IEdmStructuredType,IPropertyMapper})"/>.
+    /// That method will use the function to construct an <see cref="IPropertyMapper"/> that will map the property
     /// names in that projection to the keys in the returned <see cref="IDictionary{TKey,TValue}"/>.
     /// The main purpose of converting an <see cref="ISelectExpandWrapper"/> instance into an 
-    /// <see cref="IDictionary{TKey,TValue}"/> (using the method mentioned above) is to allow changing the names of the 
-    /// properties in the <see cref="IEdmStructuredType"/> that will be used during the serialization of the $select 
+    /// <see cref="IDictionary{TKey,TValue}"/> (using the method mentioned above) is to allow changing the names of the
+    /// properties in the <see cref="IEdmStructuredType"/> that will be used during the serialization of the $select
     /// and $expand projection by a given formatter. For example, to support custom serialization attributes of a
     /// particular formatter.
     /// </summary>

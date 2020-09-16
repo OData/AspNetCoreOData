@@ -608,4 +608,7 @@
   <data name="CannotProcessPrefixTemplate" xml:space="preserve">
     <value>Cannot process the prefix '{0}' template.</value>
   </data>
+  <data name="OnlySingleValueNodeSupported" xml:space="preserve">
+    <value>Only SingleValueNode supported.</value>
+  </data>
 </root>

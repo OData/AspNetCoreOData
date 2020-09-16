@@ -1096,6 +1096,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only SingleValueNode supported..
+        /// </summary>
+        internal static string OnlySingleValueNodeSupported {
+            get {
+                return ResourceManager.GetString("OnlySingleValueNodeSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
         /// </summary>
         internal static string OrderByClauseNotSupported {
