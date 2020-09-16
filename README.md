@@ -2,8 +2,8 @@ ASP.NET Core (.NET 5) OData
 ============= 
 Component | Build  | Status 
 --------|--------- |---------
-Routing|Rolling | X 
-Routing|Nightly | X
+ASP.NET Core OData|Rolling | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-master-rolling)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1132) 
+ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-master-nightly)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1169)
 
 ## 1. Introduction
 This is the official ASP.NET Core OData repository.
