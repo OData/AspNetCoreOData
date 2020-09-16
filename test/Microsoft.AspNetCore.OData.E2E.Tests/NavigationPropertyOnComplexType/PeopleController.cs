@@ -87,6 +87,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             return Ok(_repo.People.FirstOrDefault(p => p.Id == id).OrderInfo);
         }
 
+        [HttpGet]
         [ODataRoute("People({id})/HomeLocation/ZipCode")]
         public IActionResult GetZipCode([FromODataUri]int id)
         {

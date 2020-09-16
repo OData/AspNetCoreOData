@@ -15,6 +15,8 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// </summary>
     public class NavigationSourceLinkBuilderAnnotation
     {
+        //TODO: Need refactor the process about how to set the link builder?
+
         private readonly SelfLinkBuilder<Uri> _idLinkBuilder;
         private readonly SelfLinkBuilder<Uri> _editLinkBuilder;
         private readonly SelfLinkBuilder<Uri> _readLinkBuilder;

@@ -85,8 +85,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 case Microsoft.OData.ServiceLifetime.Scoped:
                     return Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped;
+
                 case Microsoft.OData.ServiceLifetime.Singleton:
                     return Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
+
                 default:
                     return Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient;
             }

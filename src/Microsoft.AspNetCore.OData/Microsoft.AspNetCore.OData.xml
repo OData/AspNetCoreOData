@@ -156,9 +156,9 @@
             Gets/sets the endpoint selected
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.UrlHelper">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BaseAddress">
             <summary>
-            Gets or sets the Url helper.
+            Gets or sets the OData base address.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RequestScope">
@@ -339,9 +339,9 @@
             Gets or sets the route prefix name.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.UrlHelper">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BaseAddress">
             <summary>
-            Gets or sets the Url helper.
+            Gets or sets the OData base address.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope">
@@ -2336,7 +2336,7 @@
             <summary>
             Generates an OData link using the request's OData route name and path handler and given segments.
             </summary>
-            <param name="request">The URL helper.</param>
+            <param name="request">The Http request.</param>
             <param name="segments">The OData path segments.</param>
             <returns>The generated OData link.</returns>
         </member>
@@ -2344,7 +2344,7 @@
             <summary>
             Generates an OData link using the given OData route name, path handler, and segments.
             </summary>
-            <param name="request">The name of the OData route.</param>
+            <param name="request">The Http request.</param>
             <param name="segments">The OData path segments.</param>
             <returns>The generated OData link.</returns>
         </member>
@@ -5689,6 +5689,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotPatchNavigationProperties">
             <summary>
               Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotProcessPrefixTemplate">
+            <summary>
+              Looks up a localized string similar to Cannot process the prefix &apos;{0}&apos; template..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotSerializerNull">
@@ -10915,6 +10920,13 @@
             </summary>
             <param name="path">Path to compute the set for.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> of the resource, or null if the path does not identify a resource that is part of a set.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPathString(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Get the string representation of <see cref="T:Microsoft.OData.UriParser.ODataPath"/> mainly translate Context Url path.
+            </summary>
+            <param name="path">Path to compute the set for.</param>
+            <returns>The string representation of the Context Url path.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPathString(System.Collections.Generic.IList{Microsoft.OData.UriParser.ODataPathSegment})">
             <summary>

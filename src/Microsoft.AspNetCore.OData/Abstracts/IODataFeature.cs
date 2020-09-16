@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -39,9 +38,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         EndPoint Endpoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the Url helper.
+        /// Gets or sets the OData base address.
         /// </summary>
-        IUrlHelper UrlHelper { get; set; }
+        string BaseAddress { get; set; }
 
         /// <summary>
         /// Gets or sets the request scope.

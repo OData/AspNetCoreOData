@@ -3,11 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Extensions
@@ -20,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Generates an OData link using the request's OData route name and path handler and given segments.
         /// </summary>
-        /// <param name="request">The URL helper.</param>
+        /// <param name="request">The Http request.</param>
         /// <param name="segments">The OData path segments.</param>
         /// <returns>The generated OData link.</returns>
         public static string CreateODataLink(this HttpRequest request, params ODataPathSegment[] segments)
@@ -31,54 +38,110 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Generates an OData link using the given OData route name, path handler, and segments.
         /// </summary>
-        /// <param name="request">The name of the OData route.</param>
+        /// <param name="request">The Http request.</param>
         /// <param name="segments">The OData path segments.</param>
         /// <returns>The generated OData link.</returns>
         public static string CreateODataLink(this HttpRequest request, IList<ODataPathSegment> segments)
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
-            string aUriString = null;
-            LinkGenerator linkGenerator = request.HttpContext.RequestServices?.GetService<LinkGenerator>();
-            if (linkGenerator == null)
+            IODataFeature oDataFeature = request.ODataFeature();
+            string odataPath = segments.GetPathString();
+
+            // retrieve the cached base address
+            string baseAddress = oDataFeature.BaseAddress;
+            if (baseAddress != null)
             {
-                aUriString = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase);
+                return CombinePath(baseAddress, odataPath);
+            }
+
+            // if no, calculate the base address
+            string uriString = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase);
+            string prefix = oDataFeature.PrefixName;
+            if (string.IsNullOrEmpty(prefix))
+            {
+                baseAddress = uriString;
             }
             else
             {
-                Endpoint endPoint = request.HttpContext.GetEndpoint();
-                EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
-                if (endpointName != null)
+                // Construct the prefix template if it's a template
+                RoutePattern routePattern = RoutePatternFactory.Parse(prefix);
+                if (!routePattern.Parameters.Any())
                 {
-                    aUriString = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
-                        request.RouteValues, request.Scheme, request.Host, request.PathBase);
+                    baseAddress = CombinePath(uriString, prefix);
                 }
-
-                if (aUriString == null)
+                else
                 {
-                    RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
-                    if (routeName != null)
+                    if (TryProcessPrefixTemplate(request, routePattern, out var path))
                     {
-                        aUriString = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
-                            request.RouteValues, request.Scheme, request.Host, request.PathBase);
+                        baseAddress = CombinePath(uriString, path);
+                    }
+                    else
+                    {
+                        throw new ODataException(Error.Format(SRResources.CannotProcessPrefixTemplate, prefix));
                     }
                 }
             }
 
-            aUriString = aUriString[aUriString.Length - 1] == '/' ? aUriString.Substring(0, aUriString.Length - 1) : aUriString;
+            // catche the base address.
+            oDataFeature.BaseAddress = baseAddress;
+            return CombinePath(baseAddress, odataPath);
+        }
 
-            string odataPath = segments.GetPathString();
+        private static bool TryProcessPrefixTemplate(HttpRequest request, RoutePattern routePattern, out string path)
+        {
+            Contract.Assert(request != null);
+            Contract.Assert(routePattern != null);
 
-            if (string.IsNullOrEmpty(odataPath))
+            HttpContext httpContext = request.HttpContext;
+            TemplateBinderFactory factory = request.HttpContext.RequestServices.GetService<TemplateBinderFactory>();
+            TemplateBinder templateBinder = factory.Create(routePattern);
+
+            RouteValueDictionary ambientValues = GetAmbientValues(httpContext);
+
+            var templateValuesResult = templateBinder.GetValues(ambientValues, request.RouteValues);
+            if (templateValuesResult == null)
             {
-                return aUriString;
+                // We're missing one of the required values for this route.
+                path = default;
+                return false;
             }
 
-            return $"{aUriString}/{odataPath}";
+            if (!templateBinder.TryProcessConstraints(httpContext, templateValuesResult.CombinedValues, out var _, out var _))
+            {
+                path = default;
+                return false;
+            }
+
+            string temp = templateBinder.BindValues(templateValuesResult.AcceptedValues);
+            int index = temp.IndexOf("?", StringComparison.Ordinal); // remove the query string
+            path = temp.Substring(0, index);
+            return true;
+        }
+
+        private static RouteValueDictionary GetAmbientValues(HttpContext httpContext)
+        {
+            return httpContext?.Features.Get<IRouteValuesFeature>()?.RouteValues;
+        }
+
+        private static string CombinePath(string baseAddress, string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return baseAddress;
+            }
+
+            if (baseAddress.EndsWith("/", StringComparison.Ordinal))
+            {
+                return baseAddress + path;
+            }
+            else
+            {
+                return $"{baseAddress}/{path}";
+            }
         }
     }
 }

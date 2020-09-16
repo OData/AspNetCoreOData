@@ -5,12 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
-using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
@@ -18,45 +16,31 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
-    public class NavigationPropertyOnComplexType : WebHostTestBase<NavigationPropertyOnComplexType>
+    public class NavigationPropertyOnComplexTypeTests : WebODataTestBase<NavigationPropertyOnComplexTypeTests.Startup>
     {
-        private const string PeopleBaseUrl = "{0}/odata/People";
-
-        public NavigationPropertyOnComplexType(WebHostTestFixture<NavigationPropertyOnComplexType> fixture)
-            : base(fixture)
+        public class Startup : TestStartupBase
         {
-        }
-
-        protected static void UpdateServices(IServiceCollection services)
-        {
-            IEdmModel model = ModelGenerator.GetConventionalEdmModel();
-            services.AddOData(options => options.AddModel("odata", model));
-        }
-
-        protected static void UpdateConfigure(IApplicationBuilder app)
-        {
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            public override void ConfigureServices(IServiceCollection services)
             {
-                endpoints.MapControllers();
-            });
+                services.ConfigureControllers(typeof(PeopleController));
+
+                IEdmModel model = ModelGenerator.GetConventionalEdmModel();
+                services.AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+            }
         }
 
-            //protected override void UpdateConfiguration(WebRouteConfiguration configuration)
-            //{
-            //    configuration.AddControllers(typeof(PeopleController));
-            //    configuration.JsonReferenceLoopHandling =
-            //        Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            //    configuration.MaxTop(2).Expand().Select().OrderBy().Filter();
-            //    configuration.MapODataServiceRoute("odata", "odata", ModelGenerator.GetConventionalEdmModel());
-            //}
+        private const string PeopleBaseUrl = "odata/People";
+
+        public NavigationPropertyOnComplexTypeTests(WebODataTestFixture<Startup> factory)
+            : base(factory)
+        {
+        }
 
         [Fact]
         public void QueryNavigationPropertyOnComplexProperty()
         {
             // Arrange : GET ~/People(1)/HomeLocation/ZipCode
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)/HomeLocation/ZipCode";
+            string requestUri = PeopleBaseUrl + "(1)/HomeLocation/ZipCode";
 
             string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#ZipCodes/$entity\"," +
                 "\"Zip\":98052,\"City\":\"Redmond\",\"State\":\"Washington\"}";
@@ -69,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryComplexTypePropertyWithSelectAndExpand()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)/HomeLocation?$select=Street&$expand=ZipCode";
+            string requestUri = PeopleBaseUrl + "(1)/HomeLocation?$select=Street&$expand=ZipCode";
 
             string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(1)/HomeLocation(Street,ZipCode())\"," +
                 "\"Street\":\"110th\"," +
@@ -83,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryCollectionComplexTypePropertyWithSelectAndExpand()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)/RepoLocations?$select=Street&$expand=ZipCode";
+            string requestUri = PeopleBaseUrl + "(1)/RepoLocations?$select=Street&$expand=ZipCode";
 
             // Act
             string result = ExecuteAndVerifyQueryRequest(requestUri);
@@ -109,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnNavigationPropertyOfComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$expand=HomeLocation/ZipCode";
+            string requestUri = PeopleBaseUrl + "(1)?$expand=HomeLocation/ZipCode";
 
             // Includes all properties of People(1) and expand the ZipCode on HomeLocation
             string contains = ",\"Id\":1," +
@@ -128,7 +112,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnNavigationPropertyOfComplexTypePropertyAndSelectOnOtherProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$expand=HomeLocation/ZipCode&$select=Name";
+            string requestUri = PeopleBaseUrl + "(1)?$expand=HomeLocation/ZipCode&$select=Name";
 
             // Only includes Name, HomeLocation and expand ZipCode on HomeLocation
             // Be noted: The output should not include "Primitive properties" in "HomeLocation".
@@ -148,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnNavigationPropertyOfComplexTypePropertyAndSelectOnComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$expand=HomeLocation/ZipCode&$select=HomeLocation/Street";
+            string requestUri = PeopleBaseUrl + "(1)?$expand=HomeLocation/ZipCode&$select=HomeLocation/Street";
 
             string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Street,HomeLocation/ZipCode())/$entity\"," +
                 "\"HomeLocation\":{\"Street\":\"110th\",\"ZipCode\":{\"Zip\":98052,\"City\":\"Redmond\",\"State\":\"Washington\"}}}";
@@ -163,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnMultipleNavigationPropertiesOfComplexTypeProperty(int key)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(" + key + ")?$expand=HomeLocation/ZipCode,PreciseLocation/ZipCode&$select=Name";
+            string requestUri = PeopleBaseUrl + "(" + key + ")?$expand=HomeLocation/ZipCode,PreciseLocation/ZipCode&$select=Name";
 
             // only includes Name, HomeLocation, PreciseLocation and expand ZipCode on HomeLocation
             string equals;
@@ -196,7 +180,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnNavigationPropertiesOnDeepComplexTypeProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(2)?$expand=OrderInfo/BillLocation/ZipCode&$select=OrderInfo";
+            string requestUri = PeopleBaseUrl + "(2)?$expand=OrderInfo/BillLocation/ZipCode&$select=OrderInfo";
 
             string contains = "odata/$metadata#People(OrderInfo,OrderInfo/BillLocation/ZipCode())/$entity\"," +
               "\"OrderInfo\":{" +
@@ -222,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithReferenceOnNavigationPropertiesOfComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$expand=HomeLocation/ZipCode/$ref&$select=HomeLocation/Street";
+            string requestUri = PeopleBaseUrl + "(1)?$expand=HomeLocation/ZipCode/$ref&$select=HomeLocation/Street";
 
             string contains = "odata/$metadata#People(HomeLocation/Street,HomeLocation/ZipCode,HomeLocation/ZipCode/$ref())/$entity\"," +
               "\"HomeLocation\":{" +
@@ -241,7 +225,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithReferenceOnCollectionNavigationPropertiesOfComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$expand=HomeLocation/DetailCodes/$ref&$select=HomeLocation/Street";
+            string requestUri = PeopleBaseUrl + "(1)?$expand=HomeLocation/DetailCodes/$ref&$select=HomeLocation/Street";
 
             string contains = "odata/$metadata#People(HomeLocation/Street,HomeLocation/DetailCodes,HomeLocation/DetailCodes/$ref())/$entity\"," +
               "\"HomeLocation\":{" +
@@ -268,7 +252,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithReferenceOnNavigationPropertiesOfDeepComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(2)?$expand=OrderInfo/BillLocation/ZipCode/$ref&$select=OrderInfo/BillLocation/Street";
+            string requestUri = PeopleBaseUrl + "(2)?$expand=OrderInfo/BillLocation/ZipCode/$ref&$select=OrderInfo/BillLocation/Street";
 
             string contains = "odata/$metadata#People(OrderInfo/BillLocation/Street,OrderInfo/BillLocation/ZipCode,OrderInfo/BillLocation/ZipCode/$ref())/$entity\"," +
               "\"OrderInfo\":{" +
@@ -292,17 +276,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             string url =  PeopleBaseUrl + "(1)/HomeLocation/ZipCode/$ref";
             string payload = "{\"Zip\":98038,\"City\":\"Redmond\",\"State\":\"Washington\"}";
             HttpContent content = new StringContent(payload, Encoding.UTF8, mediaType: "application/json");
-            string queryUrl =
-                string.Format(
-                    url,
-                    BaseAddress);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, queryUrl);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Content = content;
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
-            HttpClient client = new HttpClient();
 
             // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+            HttpResponseMessage response = await this.Client.SendAsync(request);
             string result = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -314,9 +293,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryComplexWithExpandOnDerivedNavigationProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)/HomeLocation?$expand=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Area";
+            string requestUri = PeopleBaseUrl + "(4)/HomeLocation?$expand=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Area";
 
-            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(4)/HomeLocation(Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Area())\"," +
+            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(4)/HomeLocation(Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Area())\"," +
                 "\"Street\":\"120th\",\"TaxNo\":17,\"Emails\":[\"E7\",\"E4\",\"E5\"],\"Latitude\":\"12.8\",\"Longitude\":\"22.9\",\"Rela";
 
             // Act & Assert
@@ -327,9 +306,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryComplexWithTypeCastAndExpandOnDerivedNavigationProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)/HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation?$expand=Area";
+            string requestUri = PeopleBaseUrl + "(4)/HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation?$expand=Area";
 
-            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(4)/HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation(Area())\"," +
+            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(4)/HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation(Area())\"," +
                 "\"Street\":\"120th\",\"TaxNo\":17,\"Emails\":[\"E7\",\"E4\",\"E5\"],\"Latitude\":\"12.8\",\"Longitude\":\"22.9\",\"Rela";
 
             // Act & Assert
@@ -340,22 +319,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithExpandOnComplexWithTypeCastAndDerivedNavigationProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)?$expand=HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Area";
+            string requestUri = PeopleBaseUrl + "(4)?$expand=HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Area";
 
-            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Area())/$entity\"," +
+            string contains = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Area())/$entity\"," +
                 "\"Id\":4,\"Name\":\"Jones\",\"Age\":9,";
 
             // Act & Assert
             var result = ExecuteAndVerifyQueryRequest(requestUri, contains: contains, equals: null);
 
-            Assert.Contains("\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"12", result);
+            Assert.Contains("\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"12", result);
         }
 
         [Fact]
         public void QueryEntityWithExpandNavigationPropertyOnRecursiveComplexProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)?$expand=OrderInfo/SubInfo/BillLocation/ZipCode&$select=OrderInfo/SubInfo/BillLocation/Street";
+            string requestUri = PeopleBaseUrl + "(4)?$expand=OrderInfo/SubInfo/BillLocation/ZipCode&$select=OrderInfo/SubInfo/BillLocation/Street";
 
             string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(OrderInfo/SubInfo/BillLocation/Street,OrderInfo/SubInfo/BillLocation/ZipCode())/$entity\"," +
                 "\"OrderInfo\":{" +
@@ -368,15 +347,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, contains: null, equals: equals);
         }
 
-        private static string ExecuteAndVerifyQueryRequest(string requestUri, string contains = null, string equals = null)
+        private string ExecuteAndVerifyQueryRequest(string requestUri, string contains = null, string equals = null)
         {
             // Arrange
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            HttpClient client = new HttpClient();
 
             // Act
-            HttpResponseMessage response = client.SendAsync(request).Result;
+            HttpResponseMessage response = Client.SendAsync(request).Result;
 
             // Assert
             string result = response.Content.ReadAsStringAsync().Result;

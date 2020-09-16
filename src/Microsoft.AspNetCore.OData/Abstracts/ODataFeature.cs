@@ -57,9 +57,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         public string PrefixName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Url helper.
+        /// Gets or sets the OData base address.
         /// </summary>
-        public IUrlHelper UrlHelper { get; set; }
+        public string BaseAddress { get; set; }
 
         /// <summary>
         /// Gets or sets the request scope.

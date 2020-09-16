@@ -286,6 +286,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot process the prefix &apos;{0}&apos; template..
+        /// </summary>
+        internal static string CannotProcessPrefixTemplate {
+            get {
+                return ResourceManager.GetString("CannotProcessPrefixTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot serialize a null &apos;{0}&apos;..
         /// </summary>
         internal static string CannotSerializerNull {

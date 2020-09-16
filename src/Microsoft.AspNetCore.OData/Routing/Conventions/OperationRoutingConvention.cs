@@ -69,6 +69,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
+            // TODO: refactor here
+            // If we have mulitple same function defined, we should match the best one?
             IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name == operationName);
             foreach (IEdmOperation edmOperation in candidates)
             {
@@ -253,21 +255,24 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 targetset = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
             }
 
+            string httpMethod;
             if (edmOperation.IsAction())
             {
                 segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetset));
+                httpMethod = "post";
             }
             else
             {
                 ISet<String> required = GetRequiredFunctionParamters(edmOperation, context.Action);
                 segments.Add(new FunctionSegmentTemplate((IEdmFunction)edmOperation, targetset, required));
+                httpMethod = "get";
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            context.Action.AddSelector(context.Prefix, context.Model, template);
+            context.Action.AddSelector(httpMethod, context.Prefix, context.Model, template);
         }
 
-        private static ISet<String> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
+        private static ISet<string> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
             Contract.Assert(operation.IsFunction());

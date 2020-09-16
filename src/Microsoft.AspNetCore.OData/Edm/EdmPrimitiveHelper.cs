@@ -14,8 +14,13 @@ namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class EdmPrimitiveHelper
     {
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
         public static object ConvertPrimitiveValue(object value, Type type)
+        {
+            return ConvertPrimitiveValue(value, type, timeZoneInfo: null);
+        }
+
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
+        public static object ConvertPrimitiveValue(object value, Type type, TimeZoneInfo timeZoneInfo)
         {
             Contract.Assert(value != null);
             Contract.Assert(type != null);
@@ -86,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     if (value is DateTimeOffset)
                     {
                         DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
-                        TimeZoneInfo timeZone = TimeZoneInfoHelper.TimeZone;
+                        TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
                         dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
                         return dateTimeOffsetValue.DateTime;
                     }

@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
                 if (_client == null)
                 {
                     _client = Factory.CreateClient();
-                    // _client.Timeout = Debugger.IsAttached ? TimeSpan.FromSeconds(3600) : _client.Timeout;
+                    _client.Timeout = TimeSpan.FromSeconds(3600);
                 }
 
                 return _client;

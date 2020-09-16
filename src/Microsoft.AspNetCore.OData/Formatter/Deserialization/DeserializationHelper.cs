@@ -98,15 +98,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
-        internal static void SetCollectionProperty(object resource, IEdmProperty edmProperty, object value, string propertyName)
+        internal static void SetCollectionProperty(object resource, IEdmProperty edmProperty, object value, string propertyName, TimeZoneInfo timeZoneInfo = null)
         {
             Contract.Assert(edmProperty != null);
 
-            SetCollectionProperty(resource, propertyName, edmProperty.Type.AsCollection(), value, clearCollection: false);
+            SetCollectionProperty(resource, propertyName, edmProperty.Type.AsCollection(), value, clearCollection: false, timeZoneInfo: timeZoneInfo);
         }
 
         internal static void SetCollectionProperty(object resource, string propertyName,
-            IEdmCollectionTypeReference edmPropertyType, object value, bool clearCollection)
+            IEdmCollectionTypeReference edmPropertyType, object value, bool clearCollection, TimeZoneInfo timeZoneInfo = null)
         {
             if (value != null)
             {
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     CollectionDeserializationHelpers.TryCreateInstance(propertyType, edmPropertyType, elementType, out newCollection))
                 {
                     // settable collections
-                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType);
+                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, timeZoneInfo);
                     if (propertyType.IsArray)
                     {
                         newCollection = CollectionDeserializationHelpers.ToArray(newCollection, elementType);
@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         newCollection.Clear(propertyName, resourceType);
                     }
 
-                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType);
+                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, timeZoneInfo);
                 }
             }
         }

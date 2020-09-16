@@ -8,9 +8,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -20,62 +20,41 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 {
-    public class BoundOperationTest : WebHostTestBase<BoundOperationTest>
+    public class BoundOperationTest : WebODataTestBase<BoundOperationTest.Startup>
     {
+        public class Startup : TestStartupBase
+        {
+            public override void ConfigureServices(IServiceCollection services)
+            {
+                services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
+
+                IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();
+
+                services.AddOData(opt => opt.AddModel("AttributeRouting", edmModel));
+
+                services.AddOData(opt => opt.AddModel("ConventionRouting", edmModel).SetAttributeRouting(false));
+            }
+        }
+
         private const string CollectionOfEmployee = "Collection(NS.Employee)";
         private const string CollectionOfManager = "Collection(NS.Manager)";
         private const string Employee = "NS.Employee";
         private const string Manager = "NS.Manager";
 
-        public BoundOperationTest(WebHostTestFixture<BoundOperationTest> fixture)
-            :base(fixture)
+        public BoundOperationTest(WebODataTestFixture<Startup> factory)
+            :base(factory)
         {
         }
 
+        private string BaseAddress => this.Client.BaseAddress.AbsoluteUri;
+
         private async Task<HttpResponseMessage> ResetDatasource()
         {
-            var requestUriForPost = this.BaseAddress + "/AttributeRouting/ResetDataSource";
+            var requestUriForPost = "AttributeRouting/ResetDataSource";
             var responseForPost = await this.Client.PostAsync(requestUriForPost, new StringContent(""));
             Assert.True(responseForPost.IsSuccessStatusCode);
             return responseForPost;
         }
-
-        protected static void UpdateServices(IServiceCollection services)
-        {
-            //IEdmModel model = ModelGenerator.GetConventionalEdmModel();
-            //services.AddOData()
-            //    .AddODataRouting(options => options.AddModel("odata", model));
-
-            //services.AddODataFormatter();
-        }
-
-        protected static void UpdateConfigure(IApplicationBuilder app)
-        {
-        }
-
-        //protected override void UpdateConfiguration(WebRouteConfiguration configuration)
-        //{
-        //    var controllers = new[] { typeof(EmployeesController), typeof(MetadataController) };
-        //    configuration.AddControllers(controllers);
-
-        //    configuration.Routes.Clear();
-
-        //    IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel(configuration);
-        //    DefaultODataPathHandler pathHandler = new DefaultODataPathHandler();
-
-        //    // only with attribute routing & metadata routing convention
-        //    IList<IODataRoutingConvention> routingConventions = new List<IODataRoutingConvention>
-        //    {
-        //        configuration.CreateAttributeRoutingConvention(),
-        //        new MetadataRoutingConvention()
-        //    };
-        //    configuration.Count().Filter().OrderBy().Expand().MaxTop(null);
-        //    configuration.MapODataServiceRoute("AttributeRouting", "AttributeRouting", edmModel, pathHandler, routingConventions);
-
-        //    // only with convention routing
-        //    configuration.MapODataServiceRoute("ConventionRouting", "ConventionRouting", edmModel, pathHandler, ODataRoutingConventions.CreateDefault());
-        //    configuration.EnsureInitialized();
-        //}
 
         [Theory]
         [InlineData("AttributeRouting")]
@@ -84,11 +63,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ModelBuilderTest(string routing)
         {
             // Arrange
-            string requestUri = string.Format("{0}/{1}/$metadata", this.BaseAddress, routing);
             var typeOfEmployee = typeof(Employee);
 
             // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            HttpResponseMessage response = await Client.GetAsync($"{routing}/$metadata");
             var stream = await response.Content.ReadAsStreamAsync();
             IODataResponseMessage message = new ODataMessageWrapper(stream, response.Content.Headers);
             var reader = new ODataMessageReader(message);
@@ -308,11 +286,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees/Default.GetCount()")]//Attribute routing
         public async Task FunctionBoundToEntitySet(string url)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -334,11 +309,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees/Default.GetCount(Name='Name20%23')", 2)]// Pound
         public async Task FunctionBoundToEntitySetOverload(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -352,12 +324,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees/NS.Manager/Default.GetCount()", 10)]//Attribute routing
         public async Task FunctionBoundToEntitySetForDerivedBindingType(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -371,12 +339,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees(1)/Default.GetEmailsCount()", 2)]//Attribute routing
         public async Task FunctionBoundToEntityType(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -394,12 +358,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees/Default.GetWholeSalary(minSalary=8.1,maxSalary=1.1,aveSalary=3.3)", "(8.1, 1.1, 3.3)")]
         public async Task FunctionWithOptionalParamsBoundToEntityType(string url, string expected)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -413,12 +373,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees(1)/NS.Manager/Default.GetEmailsCount()", 2)]//Attribute routing
         public async Task FunctionBoundToDerivedEntityType(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -434,12 +390,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("ConventionRouting/Employees/NS.Manager?$filter=$it/Default.GetEmailsCount() lt 10")]
         public async Task BoundFunctionInDollarFilter(string url)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -453,12 +405,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees(1)/Emails/$count", 2)]
         public async Task DollarCount(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -477,18 +425,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         [InlineData("AttributeRouting/Employees(1)/OptionalAddresses/$count?$filter=City eq 'Beijing'", 1)]
         public async Task DollarCountFollowingComplexCollection(string url, int expectedCount)
         {
-            // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            // Arrange & Act
+            HttpResponseMessage response = await Client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.True(expectedCount == int.Parse(responseString),
-                string.Format("Expected: {0}; Actual: {1}; Request URL: {2}", expectedCount, responseString, requestUri));
+                string.Format("Expected: {0}; Actual: {1}; Request URL: {2}", expectedCount, responseString, url));
         }
 
         [Theory]
@@ -501,7 +445,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_Works_WithPrimitive_And_CollectionOfPrimitiveParameters(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.PrimitiveFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.PrimitiveFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -519,7 +463,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_DoesnotWork_WithNullValue_ForNonNullablePrimitiveParameter(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.PrimitiveFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.PrimitiveFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -540,7 +484,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_Works_WithEnum_And_CollectionOfEnumParameters(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EnumFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.EnumFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -558,7 +502,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_DoesnotWork_WithNullValue_ForNonNullableEnumParameter(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EnumFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.EnumFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -575,7 +519,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_DoesnotWork_WithNullValue_ForNonNullableCollectionEnumParameter(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EnumFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.EnumFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -651,7 +595,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_Works_WithComplex_And_CollectionOfComplexParameters(string route, string parameter, string expect)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.ComplexFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.ComplexFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -671,7 +615,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_DoesnotWork_WithNullValue_ForNonNullableComplexParameter(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.ComplexFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.ComplexFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -688,7 +632,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunction_DoesnotWork_WithNullValue_ForCollectionComplexParameter(string route, string parameter)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.ComplexFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.ComplexFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -738,7 +682,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         {
             // Arrange
             parameter = parameter.Replace("BASEADDRESS", string.Format("{0}/{1}", BaseAddress, route));
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EntityFunction{2}", BaseAddress, route, parameter);
+            var requestUri = string.Format("{0}/Employees/Default.EntityFunction{1}", route, parameter);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(requestUri);
@@ -756,8 +700,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ActionBountToEntitySet(string url, int expectedCount)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            var requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            var requestForPost = new HttpRequestMessage(HttpMethod.Post, url);
             requestForPost.Content = new StringContent(@"{""Name"":""Name1""}");
             requestForPost.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
@@ -777,8 +720,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ActionBountToEntitySetForDerivedBindingType(string url, int expectedCount)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            var requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            var requestForPost = new HttpRequestMessage(HttpMethod.Post, url);
             requestForPost.Content = new StringContent(@"{""Name"":""Name""}");
             requestForPost.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
@@ -798,10 +740,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ActionFollowedByQueryOption(string url, int expectedCount)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}?$filter=ID mod 4 eq 0", this.BaseAddress, url);
+            var requestUri = $"{url}?$filter=ID mod 4 eq 0";
+            string payload = @"{""Name"":""Name""}";
             var requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri);
-            requestForPost.Content = new StringContent(@"{""Name"":""Name""}");
+            requestForPost.Content = new StringContent(payload);
             requestForPost.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            requestForPost.Content.Headers.ContentLength = payload.Length;
 
             //Act
             HttpResponseMessage responseForPost = await this.Client.SendAsync(requestForPost);
@@ -819,8 +763,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ActionBountToBaseEntityType(string url, int expectedCount)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            var requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            var requestForPost = new HttpRequestMessage(HttpMethod.Post, url);
 
             //Act
             HttpResponseMessage responseForPost = await this.Client.SendAsync(requestForPost);
@@ -841,8 +784,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task ActionBountToDerivedEntityType(string url, int expectedCount)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}", this.BaseAddress, url);
-            var requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            var requestForPost = new HttpRequestMessage(HttpMethod.Post, url);
 
             //Act
             HttpResponseMessage responseForPost = await this.Client.SendAsync(requestForPost);
@@ -861,7 +803,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundAction_Works_WithPrimitive_And_CollectionOfPrimitiveParameters(string route)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.PrimitiveAction", BaseAddress, route);
+            var requestUri = $"{route}/Employees/Default.PrimitiveAction";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             string payload = @"{
@@ -872,6 +814,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             }";
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await Client.SendAsync(request);
@@ -880,8 +823,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Assert
             response.EnsureSuccessStatusCode();
 
-            Assert.Contains(String.Format("\"@odata.context\":\"{0}/{1}/$metadata#Edm.Boolean\",\"value\":true", BaseAddress.ToLower(), route),
-                responseString);
+            Assert.Contains($"/{route}/$metadata#Edm.Boolean\",\"value\":true", responseString);
         }
 
         [Theory]
@@ -890,7 +832,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundAction_Works_WithEnum_And_CollectionOfEnumParameters(string route)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EnumAction", BaseAddress, route);
+            var requestUri = $"{route}/Employees/Default.EnumAction";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             string payload = @"{
@@ -900,6 +842,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             }";
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await Client.SendAsync(request);
@@ -908,8 +851,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Assert
             response.EnsureSuccessStatusCode();
 
-            Assert.Contains(String.Format("\"@odata.context\":\"{0}/{1}/$metadata#Edm.Boolean\",\"value\":true", BaseAddress.ToLower(), route),
-                responseString);
+            Assert.Contains($"/{route}/$metadata#Edm.Boolean\",\"value\":true", responseString);
         }
 
         [Theory]
@@ -918,7 +860,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundAction_Works_WithComplex_And_CollectionOfComplexParameters(string route)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.ComplexAction", BaseAddress, route);
+            var requestUri = $"{route}/Employees/Default.ComplexAction";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             string payload = @"{
@@ -929,6 +871,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await Client.SendAsync(request);
@@ -937,8 +880,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Assert
             response.EnsureSuccessStatusCode();
 
-            Assert.Contains(String.Format("\"@odata.context\":\"{0}/{1}/$metadata#Edm.Boolean\",\"value\":true", BaseAddress.ToLower(), route),
-                responseString);
+            Assert.Contains($"/{route}/$metadata#Edm.Boolean\",\"value\":true", responseString);
         }
 
         [Theory]
@@ -947,7 +889,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundAction_Works_WithEntity_And_CollectionOfEntityParameters(string route)
         {
             // Arrange
-            var requestUri = string.Format("{0}/{1}/Employees/Default.EntityAction", BaseAddress, route);
+            var requestUri = $"{route}/Employees/Default.EntityAction";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             string payload = @"{
@@ -958,6 +900,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await Client.SendAsync(request);
@@ -966,8 +909,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Assert
             response.EnsureSuccessStatusCode();
 
-            Assert.Contains(String.Format("\"@odata.context\":\"{0}/{1}/$metadata#Edm.Boolean\",\"value\":true", BaseAddress.ToLower(), route),
-                responseString);
+            Assert.Contains($"/{route}/$metadata#Edm.Boolean\",\"value\":true", responseString);
         }
         #endregion
     }

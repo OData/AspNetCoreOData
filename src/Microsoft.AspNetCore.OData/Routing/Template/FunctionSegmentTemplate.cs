@@ -196,6 +196,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
 
+            if (string.IsNullOrEmpty(combintes) && !RequiredParameters.Any())
+            {
+                return true;
+            }
+
             if (!combintes.TryExtractKeyValuePairs(out actualParameters))
             {
                 return false;

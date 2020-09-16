@@ -18,25 +18,39 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <inheritdoc />
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
-            foreach (var controller in context.Result.Controllers)
+#if DEBUG
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\routingTemplate.txt"))
             {
-                foreach (var action in controller.Actions)
+#endif
+                foreach (var controller in context.Result.Controllers)
                 {
-                    string parameters = string.Join(",", action.Parameters.Select(p => p.Name));
-
-                    foreach (var selector in action.Selectors)
+                    foreach (var action in controller.Actions)
                     {
-                        ODataRoutingMetadata metadata = selector.EndpointMetadata.OfType<ODataRoutingMetadata>().FirstOrDefault();
-                        if (metadata == null)
-                        {
-                            continue;
-                        }
+                        string parameters = string.Join(",", action.Parameters.Select(p => p.Name));
 
-                        /*{metadata.Template.Template}*/
-                        Console.WriteLine($"{action.ActionMethod.Name}({parameters}) in {controller.ControllerName}Controller: '{selector.AttributeRouteModel.Template}' ");
+                        foreach (var selector in action.Selectors)
+                        {
+                            ODataRoutingMetadata metadata = selector.EndpointMetadata.OfType<ODataRoutingMetadata>().FirstOrDefault();
+                            if (metadata == null)
+                            {
+                                continue;
+                            }
+
+                            /*{metadata.Template.Template}*/
+                            string template = $"{action.ActionMethod.Name}({parameters}) in {controller.ControllerName}Controller: '{selector.AttributeRouteModel.Template}'";
+                            Console.WriteLine(template);
+
+#if DEBUG
+                            file.WriteLine(template);
+#endif
+                        }
                     }
                 }
+
+#if DEBUG
+                file.Flush();
             }
+#endif
         }
 
         /// <inheritdoc />

@@ -1,32 +1,35 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
+using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Edm;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
-    public class SelectImprovementOnComplexTypeTests : WebHostTestBase<SelectImprovementOnComplexTypeTests>
+    public class SelectImprovementOnComplexTypeTests : WebODataTestBase<SelectImprovementOnComplexTypeTests.Startup>
     {
-        private const string PeopleBaseUrl = "{0}/odata/People";
-
-        public SelectImprovementOnComplexTypeTests(WebHostTestFixture<SelectImprovementOnComplexTypeTests> fixture)
-            : base(fixture)
+        public class Startup : TestStartupBase
         {
+            public override void ConfigureServices(IServiceCollection services)
+            {
+                services.ConfigureControllers(typeof(PeopleController));
+
+                IEdmModel model = ModelGenerator.GetConventionalEdmModel();
+                services.AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+            }
         }
 
-        //protected override void UpdateConfiguration(WebRouteConfiguration configuration)
-        //{
-        //    configuration.AddControllers(typeof(PeopleController));
-        //    configuration.JsonReferenceLoopHandling =
-        //        Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        //    configuration.MaxTop(2).Expand().Select().OrderBy().Filter();
-        //    configuration.MapODataServiceRoute("odata", "odata", ModelGenerator.GetConventionalEdmModel());
-        //}
+        private const string PeopleBaseUrl = "odata/People";
+
+        public SelectImprovementOnComplexTypeTests(WebODataTestFixture<Startup> factory)
+            : base(factory)
+        {
+        }
 
         #region SubProperty on Single ComplexProperty
         [Theory]
@@ -35,18 +38,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubPrimitivePropertyOfComplexProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"HomeLocation\":{\"Street\":\"110th\",\"TaxNo\":19}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Street,HomeLocation/TaxNo)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Street,HomeLocation/TaxNo)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -58,18 +53,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"HomeLocation\":{\"Emails\":[\"E1\",\"E3\",\"E2\"]}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -81,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubComplexPropertyOfComplexProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"HomeLocation\":{\"RelatedInfo\":{\"AreaSize\":101,\"CountyName\":\"King\"}," +
                 "\"AdditionInfos\":[" +
@@ -89,15 +76,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
                   "{\"AreaSize\":103,\"CountyName\":\"King2\"}," +
                   "{\"AreaSize\":104,\"CountyName\":\"King3\"}" +
                 "]}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/RelatedInfo,HomeLocation/AdditionInfos)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/RelatedInfo,HomeLocation/AdditionInfos)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -105,53 +84,37 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 
         [Theory]
         [InlineData("HomeLocation/ZipCode,HomeLocation/Street")]
-        // [InlineData("HomeLocation($select=ZipCode,Street)")] See https://github.com/OData/odata.net/issues/1574#issuecomment-547570980
+        [InlineData("HomeLocation($select=ZipCode,Street)")]
         public void QueryEntityWithSelectOnSubNavigationPropertyOfComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select + "&$format=application/json;odata.metadata=full";
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select + "&$format=application/json;odata.metadata=full";
 
-            string value = "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+            string value = "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                 "\"@odata.id\":\"BASE_ADDRESS/odata/People(1)\"," +
-                "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(1)\"," +
+                "\"@odata.editLink\":\"People(1)\"," +
                 "\"HomeLocation\":{" +
-                    "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Address\"," +
+                    "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Address\"," +
                     "\"Street\":\"110th\"," +
                     "\"ZipCode@odata.associationLink\":\"BASE_ADDRESS/odata/People(1)/HomeLocation/ZipCode/$ref\"," +
                     "\"ZipCode@odata.navigationLink\":\"BASE_ADDRESS/odata/People(1)/HomeLocation/ZipCode\"" +
                 "}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/ZipCode,HomeLocation/Street)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/ZipCode,HomeLocation/Street)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
         [Theory]
-        [InlineData("HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Longitude")]
-        [InlineData("HomeLocation($select=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Longitude)")]
+        [InlineData("HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Longitude")]
+        [InlineData("HomeLocation($select=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Longitude)")]
         public void QueryEntityWithSelectOnDerivedSubPropertyOfComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(2)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(2)?$select=" + select;
 
-            string value = "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.211\",\"Longitude\":\"231.131\"}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Longitude)/$entity\"," + value + "}";
-            }
+            string value = "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.211\",\"Longitude\":\"231.131\"}";
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Longitude)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -163,27 +126,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubDynamicPropertyOfComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(5)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(5)?$select=" + select;
 
             string value = "\"OrderInfo\":{" +
                 "\"DynamicInt\":9," +
                 "\"DynamicAddress\":{" +
-                  "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Address\"," +
+                  "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Address\"," +
                   "\"Street\":\"\"," +
                   "\"TaxNo\":0," +
                   "\"Emails\":[\"abc@1.com\",\"xyz@2.com\"]," +
                   "\"RelatedInfo\":null," +
                   "\"AdditionInfos\":[]" +
                 "}}";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(OrderInfo)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(OrderInfo/DynamicAddress,OrderInfo/DynamicInt)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(OrderInfo/DynamicAddress,OrderInfo/DynamicInt)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -197,22 +152,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubPropertyOfCollectionComplexProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"RepoLocations\":[" +
                 "{\"Street\":\"110th\",\"TaxNo\":19,\"RelatedInfo\":{\"AreaSize\":101,\"CountyName\":\"King\"}}," +
-                "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"120th\",\"TaxNo\":17,\"RelatedInfo\":null}," +
+                "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"120th\",\"TaxNo\":17,\"RelatedInfo\":null}," +
                 "{\"Street\":\"130th\",\"TaxNo\":18,\"RelatedInfo\":{\"AreaSize\":201,\"CountyName\":\"Queue\"}}" +
               "]";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Street,RepoLocations/TaxNo,RepoLocations/RelatedInfo)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Street,RepoLocations/TaxNo,RepoLocations/RelatedInfo)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -224,25 +171,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfCollectionComplexProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(4)?$select=" + select;
 
             string value = "\"RepoLocations\":[" +
                 "{\"Emails\":[\"E1\",\"E3\",\"E2\"]}," +
                 "{" +
-                  "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\"," +
+                  "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\"," +
                   "\"Emails\":[\"E7\",\"E4\",\"E5\"]" +
                 "}" +
               "]";
 
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -254,7 +193,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubComplexPropertyOfCollectionComplexProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(5)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(5)?$select=" + select;
 
             string value = "\"RepoLocations\":[{\"RelatedInfo\":{\"AreaSize\":101,\"CountyName\":\"King\"}," +
                 "\"AdditionInfos\":[" +
@@ -263,41 +202,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
                   "{\"AreaSize\":104,\"CountyName\":\"King3\"}" +
                 "]}]";
 
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/RelatedInfo,RepoLocations/AdditionInfos)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/RelatedInfo,RepoLocations/AdditionInfos)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
         [Theory]
-        [InlineData("RepoLocations/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude")]
-        [InlineData("RepoLocations($select=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude)")]
+        [InlineData("RepoLocations/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude")]
+        [InlineData("RepoLocations($select=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude)")]
         public void QueryEntityWithSelectOnDerivedSubPropertyOfCollectionComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(4)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(4)?$select=" + select;
 
             string value = "\"RepoLocations\":[" +
                   "{}," + // Be noted, this is correct.
-                  "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.8\"}" +
+                  "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.8\"}" +
                 "]";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -312,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyWithNestedFilter(string select, string value)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
             string equals = string.Format("{{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Taxes)/$entity\",{0}}}", value);
 
             // Act & Assert
@@ -325,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyWithNestedOrderby(string select, string value)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
             string equals = string.Format("{{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Taxes)/$entity\",{0}}}", value);
 
             // Act & Assert
@@ -339,7 +262,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyWithNestedTopAndSkip(string select, string value)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
             string equals = string.Format("{{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Taxes)/$entity\",{0}}}", value);
 
             // Act & Assert
@@ -352,19 +275,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfComplexTypePropertyWithNestedFilter(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," +
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\"," +
                     "\"HomeLocation\":{\"Emails\":[\"E3\"]}}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\"," +
-                    "\"HomeLocation\":{\"Emails\":[\"E3\"]}}";
-            }
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -376,12 +290,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyOfComplexPropertyWithNestedOrderby(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(5)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(5)?$select=" + select;
 
             string equals;
             if (select.Contains("$select="))
             {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)/$entity\"," +
+                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\"," +
                     "\"HomeLocation\":{\"Emails\":[\"E9\",\"E8\",\"E6\"]}}";
             }
             else
@@ -401,7 +315,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyOfComplexPropertyWithNestedTopAndSkip(string select, string value)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(5)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(5)?$select=" + select;
             string equals = string.Format("{{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Emails)/$entity\",\"HomeLocation\":{{{0}}}}}", value);
 
             // Act & Assert
@@ -414,22 +328,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfCollectionComplexTypePropertyWithFilter(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"RepoLocations\":[" +
                 "{\"Emails\":[\"E3\"]}," +
-                "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Emails\":[]}," +
+                "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Emails\":[]}," +
                 "{\"Emails\":[]}" +
               "]";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -441,22 +347,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfCollectionComplexTypePropertyWithOrderByTopSkip(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
             string value = "\"RepoLocations\":[" +
                 "{\"Emails\":[\"E3\"]}," +
-                "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Emails\":[\"E7\"]}," +
+                "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Emails\":[\"E7\"]}," +
                 "{\"Emails\":[\"E9\"]}" +
               "]";
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/Emails)/$entity\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -467,12 +365,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntityWithSelectOnSubCollectionComplexPropertyOfCollectionComplexTypePropertyWithNestedFilter(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "(1)?$select=" + select;
+            string requestUri = PeopleBaseUrl + "(1)?$select=" + select;
 
-            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations)/$entity\"," +
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(RepoLocations/AdditionInfos)/$entity\"," +
                 "\"RepoLocations\":[" +
                   "{" +
-                    "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\"," +
+                    "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\"," +
                     "\"AdditionInfos\":[" +
                       "{\"AreaSize\":102,\"CountyName\":\"King1\"}" +
                     "]" +
@@ -490,25 +388,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntitySetWithSelectOnSubPropertyOfComplexTypeProperty(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "?$select=" + select;
+            string requestUri = PeopleBaseUrl + "?$select=" + select;
 
             string value = "\"value\":[" +
                 "{\"HomeLocation\":{\"Street\":\"110th\"}}," +
-                "{\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"110th\"}}," +
+                "{\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"110th\"}}," +
                 "{\"HomeLocation\":{\"Street\":null}}," +
-                "{\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"120th\"}}," +
+                "{\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Street\":\"120th\"}}," +
                 "{\"HomeLocation\":{\"Street\":\"130th\"}}," +
-                "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson\",\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeometryLocation\",\"Street\":\"130th\"}}]";
+                "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson\",\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeometryLocation\",\"Street\":\"130th\"}}]";
 
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Street)\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Street)\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
@@ -518,17 +408,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntitySetWithSelectOnDerivedProperty()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) +
-                "?$select=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson/Bonus";
+            string requestUri = PeopleBaseUrl +
+                $"?$select=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson/Bonus";
 
-            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson/Bonus)\"," +
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson/Bonus)\"," +
                 "\"value\":[" +
                 "{}," +
                 "{}," +
                 "{}," +
                 "{}," +
                 "{}," +
-                "{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson\",\"Bonus\":99}" +
+                "{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson\",\"Bonus\":99}" +
               "]}";
 
             // Act & Assert
@@ -539,40 +429,40 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         public void QueryEntitySetWithSelectOnDerivedPropertyWithFullMetadata()
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) +
-                "?$select=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson/Bonus&$format=application/json;odata.metadata=full";
+            string requestUri = PeopleBaseUrl +
+                "?$select=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson/Bonus&$format=application/json;odata.metadata=full";
 
-            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson/Bonus)\"," +
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson/Bonus)\"," +
                 "\"value\":[" +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(1)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(1)\"" +
+                   "\"@odata.editLink\":\"People(1)\"" +
                 "}," +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(2)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(2)\"" +
+                   "\"@odata.editLink\":\"People(2)\"" +
                 "}," +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(3)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(3)\"" +
+                   "\"@odata.editLink\":\"People(3)\"" +
                 "}," +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(4)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(4)\"" +
+                   "\"@odata.editLink\":\"People(4)\"" +
                 "}," +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.Person\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.Person\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(5)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(5)\"" +
+                   "\"@odata.editLink\":\"People(5)\"" +
                 "}," +
                 "{" +
-                   "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson\"," +
+                   "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson\"," +
                    "\"@odata.id\":\"BASE_ADDRESS/odata/People(6)\"," +
-                   "\"@odata.editLink\":\"BASE_ADDRESS/odata/People(6)\"," +
+                   "\"@odata.editLink\":\"People(6)/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson\"," +
                    "\"Bonus\":99" +
                 "}" +
               "]}";
@@ -582,58 +472,49 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         }
 
         [Theory]
-        [InlineData("HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeometryLocation/Latitude")]
-        [InlineData("HomeLocation($select=Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeometryLocation/Latitude)")]
+        [InlineData("HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeometryLocation/Latitude")]
+        [InlineData("HomeLocation($select=Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeometryLocation/Latitude)")]
         public void QueryEntitySetWithSelectOnSameNameDerivedPropertyOfComplexPropertyWithTypeCast(string select)
         {
             // Arrange
-            string requestUri = string.Format(PeopleBaseUrl, BaseAddress) + "?$select=" + select;
+            string requestUri = PeopleBaseUrl + "?$select=" + select;
 
             string value = "\"value\":[" +
                 "{" +
                     "\"HomeLocation\":{}" +
                 "}," +
                 "{" +
-                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.211\"}" +
+                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.211\"}" +
                 "}," +
                 "{" +
                     "\"HomeLocation\":{}" +
                 "}," +
                 "{" +
-                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.8\"}" +
+                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation\",\"Latitude\":\"12.8\"}" +
                 "}," +
                 "{" +
                     "\"HomeLocation\":{}" +
                 "}," +
                 "{" +
-                    "\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.VipPerson\"," +
-                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeometryLocation\",\"Latitude\":\"101.1\"}" +
+                    "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.VipPerson\"," +
+                    "\"HomeLocation\":{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeometryLocation\",\"Latitude\":\"101.1\"}" +
                 "}" +
              "]";
 
-            string equals;
-            if (select.Contains("$select="))
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation)\"," + value + "}";
-            }
-            else
-            {
-                equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.Test.E2E.AspNet.OData.NavigationPropertyOnComplexType.GeometryLocation/Latitude)\"," + value + "}";
-            }
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#People(HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeoLocation/Latitude,HomeLocation/Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType.GeometryLocation/Latitude)\"," + value + "}";
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        private static string ExecuteAndVerifyQueryRequest(string requestUri, string equals)
+        private string ExecuteAndVerifyQueryRequest(string requestUri, string equals)
         {
             // Arrange
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            HttpClient client = new HttpClient();
 
             // Act
-            HttpResponseMessage response = client.SendAsync(request).Result;
+            HttpResponseMessage response = this.Client.SendAsync(request).Result;
 
             // Assert
             string result = response.Content.ReadAsStringAsync().Result;

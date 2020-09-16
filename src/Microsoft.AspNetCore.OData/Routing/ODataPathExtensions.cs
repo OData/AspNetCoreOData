@@ -50,6 +50,27 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <summary>
         /// Get the string representation of <see cref="ODataPath"/> mainly translate Context Url path.
         /// </summary>
+        /// <param name="path">Path to compute the set for.</param>
+        /// <returns>The string representation of the Context Url path.</returns>
+        public static string GetPathString(this ODataPath path)
+        {
+            if (path == null)
+            {
+                throw Error.ArgumentNull(nameof(path));
+            }
+
+            ODataPathSegmentHandler handler = new ODataPathSegmentHandler();
+            foreach (var segment in path)
+            {
+                segment.HandleWith(handler);
+            }
+
+            return handler.PathLiteral;
+        }
+
+        /// <summary>
+        /// Get the string representation of <see cref="ODataPath"/> mainly translate Context Url path.
+        /// </summary>
         /// <param name="segments">The path segments.</param>
         /// <returns>The string representation of the Context Url path.</returns>
         public static string GetPathString(this IList<ODataPathSegment> segments)

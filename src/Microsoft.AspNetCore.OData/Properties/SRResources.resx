@@ -605,4 +605,7 @@
   <data name="EmptyKeyTemplate" xml:space="preserve">
     <value>Key template value '{0}' for key segment '{1}' is empty.</value>
   </data>
+  <data name="CannotProcessPrefixTemplate" xml:space="preserve">
+    <value>Cannot process the prefix '{0}' template.</value>
+  </data>
 </root>
