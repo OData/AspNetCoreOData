@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethod">The prefix.</param>
+        /// <param name="httpMethod">The http method.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>
