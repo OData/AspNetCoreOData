@@ -9,6 +9,7 @@
     <Message Importance="high" Text="##vso[task.setvariable variable=VersionNuGetSemantic]$(VersionNuGetSemantic)" />
     <Message Importance="high" Text="##vso[task.setvariable variable=VersionNugetNightlyBuild]$(VersionNugetNightlyBuild)" />
     <Message Importance="high" Text="##vso[task.setvariable variable=ODataLibPackageDependency]$(ODataLibPackageDependency)" />
+    <Message Importance="high" Text="##vso[task.setvariable variable=ODataModelBuilderPackageDependency]$(ODataModelBuilderPackageDependency)" />
     <Message Importance="high" Text="##vso[task.setvariable variable=SystemTextJsonPackageDependency]$(SystemTextJsonPackageDependency)" />
   </Target>
 </Project>
