@@ -2695,7 +2695,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 filterClause,
                 typeof(DataTypes),
                 model,
-                DefaultAssemblyResolver.Default,
+                AssemblyResolverHelper.Default,
                 new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False });
 
             // Assert
@@ -2727,7 +2727,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 filterClause,
                 typeof(DataTypes),
                 model,
-                DefaultAssemblyResolver.Default,
+                AssemblyResolverHelper.Default,
                 new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False });
 
             // Assert
@@ -2757,7 +2757,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 filterClause,
                 typeof(DataTypes),
                 model,
-                DefaultAssemblyResolver.Default,
+                AssemblyResolverHelper.Default,
                 new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False });
 
             // Assert
@@ -2981,7 +2981,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 querySettings = CreateSettings();
             }
 
-            return Bind<T>(filterNode, model, DefaultAssemblyResolver.Default, querySettings);
+            return Bind<T>(filterNode, model, AssemblyResolverHelper.Default, querySettings);
         }
 
         private static Expression<Func<TEntityType, bool>> Bind<TEntityType>(FilterClause filterNode, IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
@@ -3048,7 +3048,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             IEdmModel model = GetModel<T>();
             FilterClause filterNode = CreateFilterNode(filter, model, typeof(T));
-            IAssemblyResolver assembliesResolver = DefaultAssemblyResolver.Default;
+            IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
 
             Func<ODataQuerySettings, ODataQuerySettings> customizeSettings = (settings) =>
             {

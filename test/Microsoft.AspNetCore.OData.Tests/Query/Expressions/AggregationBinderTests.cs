@@ -198,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             IEdmModel model = GetModel<T>();
             ApplyClause clause = CreateApplyNode(clauseString, model, typeof(T));
-            IAssemblyResolver assembliesResolver = DefaultAssemblyResolver.Default;
+            IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
 
             Func<ODataQuerySettings, ODataQuerySettings> customizeSettings = (settings) =>
             {

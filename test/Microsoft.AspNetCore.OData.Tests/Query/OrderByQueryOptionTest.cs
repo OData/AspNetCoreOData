@@ -281,7 +281,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ApplyTo_PropertyAliased_IfEnabled(bool modelAliasing, string propertyName)
         {
             // Arrange
-            var builder = new ODataConventionModelBuilder(DefaultAssemblyResolver.Default, modelAliasing);
+            var builder = new ODataConventionModelBuilder(AssemblyResolverHelper.Default, modelAliasing);
             builder.EntitySet<PropertyAlias>("PropertyAliases");
             var model = builder.GetEdmModel();
 

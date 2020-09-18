@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.Query
             // The IWebApiAssembliesResolver service is internal and can only be injected by WebApi.
             // This code path may be used in cases when the service container is not available
             // and the service container is available but may not contain an instance of IWebApiAssembliesResolver.
-            IAssemblyResolver assembliesResolver = DefaultAssemblyResolver.Default;
+            IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
             if (Context.RequestContainer != null)
             {
                 IAssemblyResolver injectedResolver = Context.RequestContainer.GetService<IAssemblyResolver>();

@@ -33,12 +33,12 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.dll" target="lib\netcoreapp3.1" />
-    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.xml" target="lib\netcoreapp3.1" />
-    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.OData.ModelBuilder.pdb" target="lib\netcoreapp3.1" />
-    <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.dll" target="lib\net5.0" />
-    <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.xml" target="lib\net5.0" />
-    <file src="$ProductRoot$\net5.0\Microsoft.OData.ModelBuilder.pdb" target="lib\net5.0" />
+    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.AspNetCore.OData.dll" target="lib\netcoreapp3.1" />
+    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.AspNetCore.OData.xml" target="lib\netcoreapp3.1" />
+    <file src="$ProductRoot$\netcoreapp3.1\Microsoft.AspNetCore.OData.pdb" target="lib\netcoreapp3.1" />
+    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.dll" target="lib\net5.0" />
+    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.xml" target="lib\net5.0" />
+    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.pdb" target="lib\net5.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
   </files>
 </package>

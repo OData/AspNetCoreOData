@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// <summary>
     /// The extensions for the <see cref="IEdmModel"/> for the annotations.
     /// </summary>
-    public static class EmdModelAnnotationExtensions
+    public static class EdmModelAnnotationExtensions
     {
         /// <summary>
         /// Get concurrency properties.

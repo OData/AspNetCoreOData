@@ -11,22 +11,6 @@
             <param name="builder">The container builder.</param>
             <returns>The calling itself.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver">
-            <summary>
-            Default implementation of <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Default">
-            <summary>
-            This static instance is used in the shared code in places where the request container context
-            is not known or does not contain an instance of IWebApiAssembliesResolver.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.DefaultAssemblyResolver.Assemblies">
-            <summary>
-            Gets the assemblies.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder">
             <summary>
             The default container builder implementation based on the Microsoft dependency injection framework.
@@ -1646,12 +1630,12 @@
             <param name="second">the second type</param>
             <returns>Whether the two types are related.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions">
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions">
             <summary>
             The extensions for the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> for the annotations.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Get concurrency properties.
             </summary>
@@ -1659,7 +1643,7 @@
             <param name="navigationSource">The navigation source.</param>
             <returns>The concurrency properties.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrEnumMemberAnnotation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEnumType)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrEnumMemberAnnotation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEnumType)">
             <summary>
             Gets the Enum member annotations.
             </summary>
@@ -1667,7 +1651,7 @@
             <param name="enumType">The Enum Type.</param>
             <returns>The Enum member annotation.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetClrPropertyName(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmProperty)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrPropertyName(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmProperty)">
             <summary>
             Get the CLR property name.
             </summary>
@@ -1675,7 +1659,7 @@
             <param name="edmProperty">The Edm property.</param>
             <returns>The property name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetDynamicPropertyDictionary(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetDynamicPropertyDictionary(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
             <summary>
             Gets the dynamic property container name.
             </summary>
@@ -1683,14 +1667,14 @@
             <param name="edmType">The Edm type.</param>
             <returns>The dynamic property container property info.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Gets the model name.
             </summary>
             <param name="model">The Edm model.</param>
             <returns>The Edm model name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EmdModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Sets the Edm model name.
             </summary>

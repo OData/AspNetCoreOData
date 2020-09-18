@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // This code path may be used in the cases when the service container available
             // but may not contain an instance of IWebApiAssembliesResolver.
             IAssemblyResolver injectedResolver = requestContainer.GetService<IAssemblyResolver>();
-            InternalAssembliesResolver = (injectedResolver != null) ? injectedResolver : DefaultAssemblyResolver.Default;
+            InternalAssembliesResolver = (injectedResolver != null) ? injectedResolver : AssemblyResolverHelper.Default;
         }
 
         internal ExpressionBinderBase(IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)

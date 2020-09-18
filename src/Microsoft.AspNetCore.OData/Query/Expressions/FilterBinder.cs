@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
             }
 
-            return binder ?? new FilterBinder(querySettings, DefaultAssemblyResolver.Default, context.Model);
+            return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
         }
 
         #region For testing purposes only.

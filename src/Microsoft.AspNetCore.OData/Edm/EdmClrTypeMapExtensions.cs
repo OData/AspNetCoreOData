@@ -268,7 +268,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>Null or the CLR type.</returns>
         public static Type GetClrType(this IEdmModel edmModel, IEdmTypeReference edmTypeReference)
         {
-            return edmModel.GetClrType(edmTypeReference, DefaultAssemblyResolver.Default);
+            return edmModel.GetClrType(edmTypeReference, AssemblyResolverHelper.Default);
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>Null or the CLR type.</returns>
         internal static Type GetClrType(this IEdmModel edmModel, IEdmType edmType)
         {
-            return edmModel.GetClrType(edmType, DefaultAssemblyResolver.Default);
+            return edmModel.GetClrType(edmType, AssemblyResolverHelper.Default);
         }
 
         /// <summary>
