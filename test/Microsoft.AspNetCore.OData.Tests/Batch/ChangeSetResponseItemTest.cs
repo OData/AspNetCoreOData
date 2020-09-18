@@ -28,10 +28,10 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         }
 
         [Fact]
-        public void Constructor_NullResponses_Throws()
+        public void Constructor_NullContexts_Throws()
         {
             // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ChangeSetResponseItem(null), "responses");
+            ExceptionAssert.ThrowsArgumentNull(() => new ChangeSetResponseItem(null), "contexts");
         }
 
         [Fact]

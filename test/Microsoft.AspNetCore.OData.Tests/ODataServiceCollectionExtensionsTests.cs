@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             var model = Assert.Single(odataOptions.Models);
             Assert.Equal("odata", model.Key);
             Assert.Same(coreModel, model.Value.Item1);
-            Assert.Null(model.Value.Item2);
+            Assert.NotNull(model.Value.Item2);
         }
 
         [Fact]

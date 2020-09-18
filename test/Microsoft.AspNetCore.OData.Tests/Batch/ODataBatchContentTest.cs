@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
 using Xunit;
 using Microsoft.AspNetCore.OData.TestCommon;
 
@@ -22,12 +24,12 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         {
             // Arrange & Act
             const string boundaryHeader = "boundary";
-            ODataBatchContent batchContent = CreateBatchContent(new ODataBatchResponseItem[0]);
+            ODataBatchContent batchContent = CreateBatchContent(Array.Empty<ODataBatchResponseItem>());
             string contentTypeHeader = batchContent.Headers["Content-Type"].FirstOrDefault();
             string mediaType = contentTypeHeader.Substring(0, contentTypeHeader.IndexOf(';'));
             int boundaryParamStart = contentTypeHeader.IndexOf(boundaryHeader);
             string boundary = contentTypeHeader.Substring(boundaryParamStart + boundaryHeader.Length);
-            var odataVersion = batchContent.Headers.FirstOrDefault(h => String.Equals(h.Key, ODataVersionConstraint.ODataServiceVersionHeader, StringComparison.OrdinalIgnoreCase));
+            var odataVersion = batchContent.Headers.FirstOrDefault(h => string.Equals(h.Key, ODataVersionConstraint.ODataServiceVersionHeader, StringComparison.OrdinalIgnoreCase));
 
             // Assert
             Assert.NotEmpty(boundary);
@@ -43,15 +45,32 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         }
 
         [Fact]
-        public void ODataVersionInWriterSetting_IsPropagatedToTheHeader()
+        public void NoODataVersionSettingInWriterSetting_SetDefaultVersionInTheHeader()
         {
             // Arrange & Act
-            ODataBatchContent batchContent = CreateBatchContent(new ODataBatchResponseItem[0]);
+            ODataBatchContent batchContent = CreateBatchContent(Array.Empty<ODataBatchResponseItem>());
+
             var odataVersion = batchContent.Headers
                 .FirstOrDefault(h => string.Equals(h.Key, ODataVersionConstraint.ODataServiceVersionHeader, StringComparison.OrdinalIgnoreCase));
 
             // Assert
             Assert.Equal("4.0", odataVersion.Value.FirstOrDefault());
+        }
+
+        [Theory]
+        [InlineData(ODataVersion.V4, "4.0")]
+        [InlineData(ODataVersion.V401, "4.01")]
+        public void ODataVersionInWriterSetting_IsPropagatedToTheHeader(ODataVersion version, string expect)
+        {
+            // Arrange & Act
+            ODataBatchContent batchContent = CreateBatchContent(Array.Empty<ODataBatchResponseItem>(),
+                s => s.AddSingleton(new ODataMessageWriterSettings { Version = version }));
+
+            var odataVersion = batchContent.Headers
+                .FirstOrDefault(h => string.Equals(h.Key, ODataVersionConstraint.ODataServiceVersionHeader, StringComparison.OrdinalIgnoreCase));
+
+            // Assert
+            Assert.Equal(expect, odataVersion.Value.FirstOrDefault());
         }
 
         [Fact]
@@ -68,15 +87,16 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             badRequestContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 
             // Act
-            ODataBatchContent batchContent = CreateBatchContent(new ODataBatchResponseItem[]
-            {
-                new OperationResponseItem(okContext),
-                new ChangeSetResponseItem(new HttpContext[]
+            ODataBatchContent batchContent = new ODataBatchContent(new ODataBatchResponseItem[]
                 {
-                    acceptedContext,
-                    badRequestContext
-                })
-            });
+                    new OperationResponseItem(okContext),
+                    new ChangeSetResponseItem(new HttpContext[]
+                    {
+                        acceptedContext,
+                        badRequestContext
+                    })
+                },
+                new MockServiceProvider());
 
             MemoryStream stream = new MemoryStream();
             await batchContent.SerializeToStreamAsync(stream);
@@ -92,7 +112,15 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
 
         private static ODataBatchContent CreateBatchContent(IEnumerable<ODataBatchResponseItem> responses)
         {
-            return new ODataBatchContent(responses, new MockServiceProvider());
+            return CreateBatchContent(responses, s => s.AddSingleton<ODataMessageWriterSettings>());
+        }
+
+        private static ODataBatchContent CreateBatchContent(IEnumerable<ODataBatchResponseItem> responses, Action<IServiceCollection> setupConfig)
+        {
+            IServiceCollection services = new ServiceCollection();
+            setupConfig?.Invoke(services);
+            IServiceProvider sp = services.BuildServiceProvider();
+            return new ODataBatchContent(responses, sp);
         }
     }
 }

@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
@@ -124,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(int), typeof(int), false)]
         [InlineData(typeof(int?), typeof(int?), false)]
         [InlineData(typeof(object), typeof(object), false)]
-        [InlineData(typeof(Address), typeof(Address), false)]
+        [InlineData(typeof(MyAddress), typeof(MyAddress), false)]
         // non-standard primitive types
         [InlineData(typeof(XElement), typeof(string), true)]
         [InlineData(typeof(ushort), typeof(int), true)]
@@ -224,9 +226,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Theory]
-        [InlineData("NS.Address", typeof(Address))] // use ClrTypeAnnotation
-        [InlineData("NS.CnAddress", typeof(CnAddress))]
-        [InlineData("Microsoft.AspNetCore.OData.Tests.Edm.Customer", typeof(Customer))] // use the full name match
+        [InlineData("NS.Address", typeof(MyAddress))] // use ClrTypeAnnotation
+        [InlineData("NS.CnAddress", typeof(CnMyAddress))]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Edm.MyCustomer", typeof(MyCustomer))] // use the full name match
         public void GetClrTypeWorksAsExpectedForSchemaStrucutralType(string typeName, Type expected)
         {
             // Arrange
@@ -235,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             // #1. Act & Assert
             IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(true);
-            Type clrType = EdmModel.GetClrType(edmTypeReference);
+            Type clrType = EdmModel.GetClrType(edmTypeReference, new AssemblyResolver());
             Assert.Same(expected, clrType);
 
             // #2. Act & Assert
@@ -254,12 +256,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // #1. Act & Assert
             IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(true);
             Type clrType = EdmModel.GetClrType(edmTypeReference);
-            Assert.Same(typeof(Color?), clrType);
+            Assert.Same(typeof(MyColor?), clrType);
 
             // #2. Act & Assert
             edmTypeReference = edmType.ToEdmTypeReference(false);
             clrType = EdmModel.GetClrType(edmTypeReference);
-            Assert.Same(typeof(Color), clrType);
+            Assert.Same(typeof(MyColor), clrType);
         }
 
         #endregion
@@ -291,9 +293,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [Theory]
         [InlineData(typeof(string), "Edm.String")]
         [InlineData(typeof(int?), "Edm.Int32")]
-        [InlineData(typeof(Address), "NS.Address")]
-        [InlineData(typeof(CnAddress), "NS.CnAddress")]
-        [InlineData(typeof(Customer), "Microsoft.AspNetCore.OData.Tests.Edm.Customer")]
+        [InlineData(typeof(MyAddress), "NS.Address")]
+        [InlineData(typeof(CnMyAddress), "NS.CnAddress")]
+        [InlineData(typeof(MyCustomer), "Microsoft.AspNetCore.OData.Tests.Edm.MyCustomer")]
         [InlineData(typeof(BaseType), "NS.BaseType")]
         [InlineData(typeof(Derived1Type), "NS.Derived1Type")]
         [InlineData(typeof(Derived2Type), "NS.Derived2Type")]
@@ -323,19 +325,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             Assert.NotNull(expectedType); // Guard
 
             // #1. Act & Assert
-            IEdmTypeReference colorType = EdmModel.GetEdmTypeReference(typeof(Color));
+            IEdmTypeReference colorType = EdmModel.GetEdmTypeReference(typeof(MyColor));
             Assert.Same(expectedType, colorType.Definition);
             Assert.False(colorType.IsNullable);
 
             // #2. Act & Assert
-            colorType = EdmModel.GetEdmTypeReference(typeof(Color?));
+            colorType = EdmModel.GetEdmTypeReference(typeof(MyColor?));
             Assert.Same(expectedType, colorType.Definition);
             Assert.True(colorType.IsNullable);
         }
         #endregion
 
         [Theory]
-        [InlineData(typeof(Customer), "Customer")]
+        [InlineData(typeof(MyCustomer), "MyCustomer")]
         [InlineData(typeof(int), "Int32")]
         [InlineData(typeof(IEnumerable<int>), "IEnumerable_1OfInt32")]
         [InlineData(typeof(IEnumerable<Func<int, string>>), "IEnumerable_1OfFunc_2OfInt32_String")]
@@ -352,17 +354,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             EdmComplexType address = new EdmComplexType("NS", "Address");
             address.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
             model.AddElement(address);
-            model.SetAnnotationValue(address, new ClrTypeAnnotation(typeof(Address)));
+            model.SetAnnotationValue(address, new ClrTypeAnnotation(typeof(MyAddress)));
             var cnAddress = new EdmComplexType("NS", "CnAddress", address);
             cnAddress.AddStructuralProperty("Zipcode", EdmPrimitiveTypeKind.String);
             model.AddElement(cnAddress);
-            model.SetAnnotationValue(cnAddress, new ClrTypeAnnotation(typeof(CnAddress)));
+            model.SetAnnotationValue(cnAddress, new ClrTypeAnnotation(typeof(CnMyAddress)));
 
             var color = new EdmEnumType("NS", "Color");
             model.AddElement(color);
-            model.SetAnnotationValue(color, new ClrTypeAnnotation(typeof(Color)));
+            model.SetAnnotationValue(color, new ClrTypeAnnotation(typeof(MyColor)));
 
-            var customer = new EdmEntityType("Microsoft.AspNetCore.OData.Tests.Edm", "Customer");
+            var customer = new EdmEntityType("Microsoft.AspNetCore.OData.Tests.Edm", "MyCustomer");
             model.AddElement(customer);
 
             // Inheritance
@@ -379,20 +381,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             return model;
         }
 
-        public class Customer
-        { }
-
-        public class Address
+        public class MyAddress
         {
             public string City { get; set; }
         }
 
-        public class CnAddress : Address
+        public class CnMyAddress : MyAddress
         {
             public string Zipcode { get; set; }
         }
 
-        public enum Color
+        public enum MyColor
         {
             Red
         }
@@ -411,5 +410,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
         public class TypeNotInModel
         { }
+
+        public class AssemblyResolver : IAssemblyResolver
+        {
+            public IEnumerable<Assembly> Assemblies
+            {
+                get
+                {
+                    yield return typeof(AssemblyResolver).Assembly;
+                }
+            }
+        }
     }
+
+    public class MyCustomer
+    { }
 }

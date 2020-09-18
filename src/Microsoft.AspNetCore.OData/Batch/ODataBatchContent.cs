@@ -41,15 +41,15 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="contentType">The response content type.</param>
         public ODataBatchContent(IEnumerable<ODataBatchResponseItem> responses, IServiceProvider requestContainer, string contentType)
         {
-            Responses = responses ?? throw new ArgumentNullException(nameof(responses));
+            Responses = responses ?? throw Error.ArgumentNull(nameof(responses));
 
             _requestContainer = requestContainer;
-            _writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
+            _writerSettings = requestContainer.GetService<ODataMessageWriterSettings>() ?? new ODataMessageWriterSettings();
 
             // Set the Content-Type header for existing batch formats
             if (contentType == null)
             {
-                contentType = String.Format(
+                contentType = string.Format(
                     CultureInfo.InvariantCulture, "multipart/mixed;boundary=batchresponse_{0}", Guid.NewGuid());
             }
 
@@ -82,7 +82,6 @@ namespace Microsoft.AspNetCore.OData.Batch
             IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(stream, Headers, _requestContainer);
             return WriteToResponseMessageAsync(responseMessage);
         }
-
 
         /// <summary>
         ///  Serialize the batch responses to an <see cref="IODataResponseMessage"/>.

@@ -26,18 +26,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         public void OnProvidersExecuting_DoesNothing()
         {
             // Arrange
-            var options = new ODataOptions();
+            ODataOptions options = new ODataOptions();
             options.AddModel("odata", _model);
 
-            var conventions = new IODataControllerActionConvention[]
+            IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
                 new EntitySetRoutingConvention()
             };
 
-            var provider = CreateProvider(options, conventions);
+            ODataRoutingApplicationModelProvider provider = CreateProvider(options, conventions);
 
-            var controllerType = typeof(CustomersController);
-            var providerContext = CreateProviderContext(controllerType);
+            Type controllerType = typeof(CustomersController);
+            ApplicationModelProviderContext providerContext = CreateProviderContext(controllerType);
 
             // Act
             provider.OnProvidersExecuting(providerContext);
@@ -65,18 +65,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         public void OnProvidersExecuted_AddODataRoutingSelector_WhenEntitySetRoutingConvention()
         {
             // Arrange
-            var options = new ODataOptions();
+            ODataOptions options = new ODataOptions();
             options.AddModel("odata", _model);
 
-            var conventions = new IODataControllerActionConvention[]
+            IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
                 new EntitySetRoutingConvention()
             };
 
-            var provider = CreateProvider(options, conventions);
+            ODataRoutingApplicationModelProvider provider = CreateProvider(options, conventions);
 
-            var controllerType = typeof(CustomersController);
-            var providerContext = CreateProviderContext(controllerType);
+            Type controllerType = typeof(CustomersController);
+            ApplicationModelProviderContext providerContext = CreateProviderContext(controllerType);
 
             // Act
             provider.OnProvidersExecuted(providerContext);
@@ -107,24 +107,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         public void OnProvidersExecuted_AddODataRoutingSelector_WhenEntityRoutingConvention()
         {
             // Arrange
-            var options = new ODataOptions();
+            ODataOptions options = new ODataOptions();
             options.AddModel("odata", _model);
 
-            var conventions = new IODataControllerActionConvention[]
+            IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
                 new EntityRoutingConvention()
             };
 
-            var provider = CreateProvider(options, conventions);
+            ODataRoutingApplicationModelProvider provider = CreateProvider(options, conventions);
 
-            var controllerType = typeof(CustomersController);
-            var providerContext = CreateProviderContext(controllerType);
+            Type controllerType = typeof(CustomersController);
+            ApplicationModelProviderContext providerContext = CreateProviderContext(controllerType);
 
             // Act
             provider.OnProvidersExecuted(providerContext);
 
             // Assert
-            var controller = Assert.Single(providerContext.Result.Controllers);
+            ControllerModel controller = Assert.Single(providerContext.Result.Controllers);
 
             Assert.Equal(2, controller.Actions.Count);
             Assert.Collection(controller.Actions,
@@ -149,29 +149,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         public void OnProvidersExecuted_AddODataRoutingSelector_WhenAttributeRoutingConvention()
         {
             // Arrange
-            var options = new ODataOptions();
+            ODataOptions options = new ODataOptions();
             options.AddModel("odata", _model);
 
             LoggerFactory loggerFactory = new LoggerFactory();
             var logger = new Logger<AttributeRoutingConvention>(loggerFactory);
             IODataPathTemplateParser parser = new DefaultODataPathTemplateParser();
-            var conventions = new IODataControllerActionConvention[]
+            IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
                 new AttributeRoutingConvention(logger, parser)
             };
 
-            var provider = CreateProvider(options, conventions);
-            var providerContext = CreateProviderContext(typeof(AttributeRoutingController));
+            ODataRoutingApplicationModelProvider provider = CreateProvider(options, conventions);
+            ApplicationModelProviderContext providerContext = CreateProviderContext(typeof(AttributeRoutingController));
 
             // Act
             provider.OnProvidersExecuted(providerContext);
 
             // Assert
-            var controller = Assert.Single(providerContext.Result.Controllers);
+            ControllerModel controller = Assert.Single(providerContext.Result.Controllers);
 
             ActionModel action = Assert.Single(controller.Actions);
             Assert.Equal("AnyMethodNameHere", action.ActionMethod.Name);
-            Assert.Empty(action.Parameters);
+            Assert.Single(action.Parameters);
             Assert.Equal(2, action.Selectors.Count);
             Assert.Equal(new[] { "odata/Customers({key})/Name", "odata/Customers/{key}/Name" }, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
@@ -193,12 +193,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
         private static IEdmModel GetEdmModel()
         {
-            var model = new EdmModel();
-            var customer = new EdmEntityType("NS", "Customer");
+            EdmModel model = new EdmModel();
+            EdmEntityType customer = new EdmEntityType("NS", "Customer");
             customer.AddKeys(customer.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
             customer.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
             model.AddElement(customer);
-            var container = new EdmEntityContainer("NS", "Default");
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
             model.AddElement(container);
             return model;

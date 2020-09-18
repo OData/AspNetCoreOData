@@ -16,7 +16,8 @@ namespace Microsoft.AspNetCore.OData.Tests
             ODataOptions options = new ODataOptions();
 
             // Act & Assert
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.SetMaxTop(-2), "Value must be greater than or equal to 0.");
+            ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.SetMaxTop(-2));
+            Assert.Contains("Value must be greater than or equal to 0", exception.Message);
         }
     }
 }
