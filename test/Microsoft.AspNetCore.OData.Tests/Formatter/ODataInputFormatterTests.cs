@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +26,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     public class ODataInputFormatterTests
     {
-        private static IServiceProvider _serviceProvider = BuildServiceProvider();
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
@@ -78,7 +76,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Arrange & Act
             IEdmEntitySet entitySet = _edmModel.EntityContainer.FindEntitySet("Customers");
             EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
-            HttpRequest request = RequestFactory.Create(f => { f.Model = _edmModel; f.Path = new ODataPath(entitySetSeg); });
+            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", _edmModel));
+            request.ODataFeature().PrefixName = "odata";
+            request.ODataFeature().Model = _edmModel;
+            request.ODataFeature().Path = new ODataPath(entitySetSeg);
 
             InputFormatterContext context = CreateInputContext(type, request);
 
@@ -95,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ODataInputFormatter formatter = GetInputFormatter();
             Mock<Stream> mockStream = new Mock<Stream>();
 
-            byte[] contentBytes = Encoding.UTF8.GetBytes(String.Empty);
+            byte[] contentBytes = Encoding.UTF8.GetBytes(string.Empty);
             HttpContext httpContext = GetHttpContext(contentBytes);
             InputFormatterContext formatterContext = CreateInputFormatterContext(typeof(Customer), httpContext);
 
@@ -148,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                 "{" +
                     "\"@odata.context\":\"http://localhost/$metadata#Customers/$entity\"," +
                     "\"Number\":42" +
-                    "}");
+                 "}");
 
             ODataInputFormatter formatter = GetInputFormatter();
 
@@ -167,8 +168,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                     Assert.Equal(TaskStatus.RanToCompletion, readTask.Status);
                     Assert.True(memStream.CanRead);
 
-                    var value = Assert.IsType<Customer>(readTask.Result);
-                    Assert.Equal(42, value.Number);
+                    InputFormatterResult result = Assert.IsType<InputFormatterResult>(readTask.Result);
+                    Assert.Null(result.Model);
                 });
         }
 
@@ -188,11 +189,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ODataInputFormatter formatter = GetInputFormatter();
             formatter.BaseAddressFactory = (request) => new Uri("http://localhost");
 
-            HttpContext httpContext = GetHttpContext(expectedSampleTypeByte);
-            httpContext.RequestServices = _serviceProvider;
+            HttpContext httpContext = GetHttpContext(expectedSampleTypeByte, opt => opt.AddModel("odata", _edmModel));
             httpContext.Request.ContentType = "application/json;odata.metadata=minimal";
             httpContext.Request.ContentLength = expectedSampleTypeByte.Length;
             httpContext.ODataFeature().Model = _edmModel;
+            httpContext.ODataFeature().PrefixName = "odata";
             httpContext.ODataFeature().Path = new ODataPath(singletonSeg);
             Stream memStream = httpContext.Request.Body;
 
@@ -216,16 +217,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             return ODataInputFormatterFactory.Create().FirstOrDefault();
         }
 
-        protected static HttpContext GetHttpContext(byte[] contentBytes, string contentType = "application/json")
+        protected static HttpContext GetHttpContext(byte[] contentBytes, Action<ODataOptions> setupAction = null)
         {
-            return GetHttpContext(new MemoryStream(contentBytes), contentType);
-        }
-
-        protected static HttpContext GetHttpContext(Stream requestStream, string contentType = "application/json")
-        {
+            MemoryStream stream = new MemoryStream(contentBytes);
             DefaultHttpContext httpContext = new DefaultHttpContext();
-            httpContext.Request.Body = requestStream;
-            httpContext.Request.ContentType = contentType;
+            httpContext.Request.Body = stream;
+            httpContext.Request.ContentType = "application/json";
+
+            IServiceCollection services = new ServiceCollection();
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
+
+            httpContext.RequestServices = services.BuildServiceProvider();
             return httpContext;
         }
 
@@ -247,46 +252,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
         private static InputFormatterContext CreateInputContext(Type type, HttpRequest request)
         {
-            request.HttpContext.RequestServices = _serviceProvider;
             return new InputFormatterContext(
                 request.HttpContext,
                 "modelName",
                 new ModelStateDictionary(),
                 new EmptyModelMetadataProvider().GetMetadataForType(type),
                 (stream, encoding) => new StreamReader(stream, encoding));
-        }
-
-        private static IServiceProvider BuildServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-            services.AddRouting();
-            services.AddOptions();
-            services.AddLogging();
-
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
-
-            // Deserializers.
-            services.AddSingleton<ODataResourceDeserializer>();
-            services.AddSingleton<ODataEnumDeserializer>();
-            services.AddSingleton<ODataPrimitiveDeserializer>();
-            services.AddSingleton<ODataResourceSetDeserializer>();
-            services.AddSingleton<ODataCollectionDeserializer>();
-            services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
-            services.AddSingleton<ODataActionPayloadDeserializer>();
-
-            services.AddSingleton(new ODataMessageReaderSettings
-            {
-                EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
-            });
-
-            services.AddSingleton(new ODataMessageWriterSettings
-            {
-                EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
-            });
-
-            return services.BuildServiceProvider();
         }
 
         private static IEdmModel GetEdmModel()

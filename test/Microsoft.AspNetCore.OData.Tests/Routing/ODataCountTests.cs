@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.AspNetCore.TestHost;
@@ -29,11 +28,28 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing
 {
-    public class ODataCountTest
+    public class ODataCountTest : WebODataTestBase<ODataCountTest.Startup>
     {
+        public class Startup : TestStartupBase
+        {
+            public override void ConfigureServices(IServiceCollection services)
+            {
+                services.ConfigureControllers(typeof(DollarCountEntitiesController));
+
+                IEdmModel model = GetEdmModel();
+                services.AddOData(options => options.AddModel(model)
+                    .Count().SetMaxTop(null).Expand().Select().OrderBy().Filter());
+            }
+        }
+
+        public ODataCountTest(WebODataTestFixture<Startup> factory)
+            : base(factory)
+        {
+        }
+
         private static HttpClient _client;
 
-        public ODataCountTest()
+        public void ODataCountTest2()
         {
             var controllers = new[] { typeof(DollarCountEntitiesController) };
             IEdmModel model = GetEdmModel();
@@ -110,7 +126,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         public async Task DollarCount_Works(string uri, int expectedCount)
         {
             // Arrange & Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync(uri);
+            //HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

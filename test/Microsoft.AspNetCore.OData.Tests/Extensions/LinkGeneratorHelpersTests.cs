@@ -9,52 +9,105 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
     public class LinkGeneratorHelpersTests
     {
-        private static IServiceProvider _serviceProvider = BuildServiceProvider();
-
-        [Fact]
-        public void CreateODataLinkReturnsODataLinksAsExpectedForNonODataPath()
+        [Theory]
+        [InlineData("")]
+        [InlineData("odata")]
+        public void CreateODataLinkReturnsODataLinksAsExpected(string prefix)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost:8080/odata", model: null);
-            request.HttpContext.RequestServices = _serviceProvider;
-            request.RouteValues = new RouteValueDictionary(new { controller = "Customers" });
+            string baseAddress = "http://localhost:8080/";
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().PrefixName = prefix;
 
-            var endpoint = EndpointFactory.CreateRouteEndpoint("Customers", metadata: new object[] { new EndpointNameMetadata("MyName"), });
-            request.HttpContext.SetEndpoint(endpoint);
-
+            // Act
             string odataLink = request.CreateODataLink();
 
-            Assert.Equal("http://localhost:8080/odata", odataLink);
+            // Assert
+            Assert.Equal(baseAddress + prefix, odataLink);
         }
 
-        private static IServiceProvider BuildServiceProvider(/*EndpointDataSource[] dataSources*/)
+        [Theory]
+        [InlineData("")]
+        [InlineData("odata")]
+        public void CreateODataLinkWithODataSegmentsReturnsODataLinksAsExpected(string prefix)
         {
+            // Arrange
+            string baseAddress = "http://localhost:8080/";
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().PrefixName = prefix;
+
+            // Act
+            string odataLink = request.CreateODataLink(MetadataSegment.Instance);
+
+            // Assert
+            if (prefix == "")
+            {
+                Assert.Equal($"{baseAddress}$metadata", odataLink);
+            }
+            else
+            {
+                Assert.Equal($"{baseAddress}{prefix}/$metadata", odataLink);
+            }
+        }
+
+        [Theory]
+        [InlineData("v1")]
+        [InlineData("v2")]
+        [InlineData("anything")]
+        public void CreateODataLinkReturnsODataLinksWithTemplateAsExpected(string value)
+        {
+            // Arrange
             IServiceCollection services = new ServiceCollection();
-
-          //  services.TryAddSingleton<LinkGenerator, DefaultLinkGenerator>();
-
-            services.AddRouting();
             services.AddOptions();
-            services.AddLogging();
+            services.AddRouting(); // because want to use "TemplateBinderFactory"
+            IServiceProvider sp = services.BuildServiceProvider();
 
-            //services.Configure<RouteOptions>(o =>
-            //{
-            //    if (dataSources != null)
-            //    {
-            //        foreach (var dataSource in dataSources)
-            //        {
-            //           // o.EndpointDataSources.Add(dataSource);
-            //        }
-            //    }
-            //});
+            string baseAddress = "http://localhost:8080/";
+            string prefix = "odata{version}";
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().PrefixName = prefix;
+            request.RouteValues = new RouteValueDictionary(new { version = value });
+            request.HttpContext.RequestServices = sp; // global level SP
 
-            return services.BuildServiceProvider();
+            // Act
+            string odataLink = request.CreateODataLink();
+
+            // Assert
+            Assert.Equal(baseAddress + $"odata{value}", odataLink);
+        }
+
+        [Theory]
+        [InlineData("v1")]
+        [InlineData("v2")]
+        [InlineData("anything")]
+        public void CreateODataLinkWithODataSegmentsReturnsODataLinksWithTemplateAsExpected(string value)
+        {
+            // Arrange
+            IServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.AddRouting(); // because want to use "TemplateBinderFactory"
+            IServiceProvider sp = services.BuildServiceProvider();
+
+            string baseAddress = "http://localhost:8080/";
+            string prefix = "odata{version}";
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().PrefixName = prefix;
+            request.RouteValues = new RouteValueDictionary(new { version = value });
+            request.HttpContext.RequestServices = sp; // global level SP
+
+            // Act
+            string odataLink = request.CreateODataLink(MetadataSegment.Instance);
+
+            // Assert
+            Assert.Equal($"{baseAddress}odata{value}/$metadata", odataLink);
         }
     }
 

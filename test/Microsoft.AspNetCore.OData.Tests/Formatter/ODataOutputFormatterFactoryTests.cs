@@ -241,11 +241,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
         private MediaTypeHeaderValue GetContentTypeFromQueryString(IEdmModel model, Type type, string dollarFormat)
         {
+            Action<ODataOptions> setupAction = opt => opt.AddModel("odata", model);
             ODataPath path = new ODataPath();
             HttpRequest request = string.IsNullOrEmpty(dollarFormat)
-                ? RequestFactory.Create("Get", "http://any", model, path)
-                : RequestFactory.Create("Get", "http://any/?$format=" + dollarFormat, model, path);
-            request.HttpContext.RequestServices = _serviceProvider;
+                ? RequestFactory.Create("Get", "http://any", setupAction)
+                : RequestFactory.Create("Get", "http://any/?$format=" + dollarFormat, setupAction);
+            request.Configure("odata", model, path);
 
             var context = new OutputFormatterWriteContext(
                 request.HttpContext,

@@ -9,9 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -23,7 +21,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     public class ODataInputFormatterFactoryTests
     {
-        private static IServiceProvider _serviceProvider = BuildServiceProvider();
         private static IEdmModel _edmModel = GetEdmModel();
         private static IList<ODataInputFormatter> _formatters = ODataInputFormatterFactory.Create();
 
@@ -113,8 +110,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         public void ODataInputFormattersForReadTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create(f => { f.Model = _edmModel; f.Path = new ODataPath(); });
-            request.HttpContext.RequestServices = _serviceProvider;
+            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", _edmModel));
+            request.Configure("odata", _edmModel, new ODataPath());
+
             IEnumerable<ODataInputFormatter> odataFormatters = _formatters.Where(f => CanReadType(f, type, request));
 
             // Act
@@ -122,23 +120,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Assert
             Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
-        }
-
-        private static IServiceProvider BuildServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
-
-            // Deserializers.
-            services.AddSingleton<ODataResourceDeserializer>();
-            services.AddSingleton<ODataEnumDeserializer>();
-            services.AddSingleton<ODataPrimitiveDeserializer>();
-            services.AddSingleton<ODataResourceSetDeserializer>();
-            services.AddSingleton<ODataCollectionDeserializer>();
-            services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
-            services.AddSingleton<ODataActionPayloadDeserializer>();
-            return services.BuildServiceProvider();
         }
 
         private static IEdmModel GetEdmModel()

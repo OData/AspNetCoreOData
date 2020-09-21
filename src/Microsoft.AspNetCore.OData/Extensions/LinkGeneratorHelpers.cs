@@ -86,18 +86,19 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 }
             }
 
-            // catche the base address.
+            // cache the base address
             oDataFeature.BaseAddress = baseAddress;
             return CombinePath(baseAddress, odataPath);
         }
 
         private static bool TryProcessPrefixTemplate(HttpRequest request, RoutePattern routePattern, out string path)
         {
+            // TODO: Do you have a better way to process the prefix template?
             Contract.Assert(request != null);
             Contract.Assert(routePattern != null);
 
             HttpContext httpContext = request.HttpContext;
-            TemplateBinderFactory factory = request.HttpContext.RequestServices.GetService<TemplateBinderFactory>();
+            TemplateBinderFactory factory = request.HttpContext.RequestServices.GetRequiredService<TemplateBinderFactory>();
             TemplateBinder templateBinder = factory.Create(routePattern);
 
             RouteValueDictionary ambientValues = GetAmbientValues(httpContext);
@@ -116,9 +117,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return false;
             }
 
-            string temp = templateBinder.BindValues(templateValuesResult.AcceptedValues);
-            int index = temp.IndexOf("?", StringComparison.Ordinal); // remove the query string
-            path = temp.Substring(0, index);
+            path = templateBinder.BindValues(templateValuesResult.AcceptedValues);
+            int index = path.IndexOf("?", StringComparison.Ordinal); // remove the query string
+
+            if (index >= 0)
+            {
+                path = path.Substring(0, index);
+            }
+
             return true;
         }
 
@@ -132,6 +138,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
             if (string.IsNullOrEmpty(path))
             {
                 return baseAddress;
+            }
+
+            if (path.StartsWith("/", StringComparison.Ordinal))
+            {
+                path = path.Substring(1); // remove the first "/"
             }
 
             if (baseAddress.EndsWith("/", StringComparison.Ordinal))

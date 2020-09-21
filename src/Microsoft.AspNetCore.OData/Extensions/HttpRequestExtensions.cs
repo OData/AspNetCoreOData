@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
@@ -221,7 +221,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             IServiceProvider requestContainer = request.ODataFeature().SubServiceProvider;
@@ -230,8 +230,18 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return requestContainer;
             }
 
+            IOptions<ODataOptions> odataOptionsOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
+            if (odataOptionsOptions == null)
+            {
+                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(ODataOptions));
+            }
+
+            ODataOptions options = odataOptionsOptions.Value;
+
+            return options.GetODataServiceProvider(request.ODataFeature().PrefixName);
+
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
-            return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
+            // return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
         }
 
         /// <summary>

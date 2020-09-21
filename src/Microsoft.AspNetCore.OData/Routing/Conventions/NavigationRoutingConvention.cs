@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
@@ -100,17 +101,64 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Starts the routing template
-            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-            if (context.EntitySet != null)
+            //IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            //if (context.EntitySet != null)
+            //{
+            //    segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+            //}
+            //else
+            //{
+            //    segments.Add(new SingletonSegmentTemplate(context.Singleton));
+            //}
+
+            //if (hasKeyParameter)
+            //{
+            //    segments.Add(new KeySegmentTemplate(entityType));
+            //}
+
+            //if (declared != null)
+            //{
+            //    // It should be always single type
+            //    segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
+            //}
+
+            IEdmNavigationProperty navigationProperty = (IEdmNavigationProperty)edmProperty;
+            //IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
+
+            //segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
+
+            //ODataPathTemplate template = new ODataPathTemplate(segments);
+            //action.AddSelector(method, context.Prefix, context.Model, template);
+
+            AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
+
+            if (CanApplyDollarCount(navigationProperty, method))
             {
-                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+                AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
+            }
+
+            return true;
+        }
+
+        private void AddSelector(string httpMethod, string prefix, IEdmModel model, ActionModel action,
+            IEdmNavigationSource navigationSource, string declared, IEdmEntityType declaringEntityType,
+            IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
+        {
+            IEdmEntitySet entitySet = navigationSource as IEdmEntitySet;
+            IEdmEntityType entityType = navigationSource.EntityType();
+
+            // Starts the routing template
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (entitySet != null)
+            {
+                segments.Add(new EntitySetSegmentTemplate(entitySet));
             }
             else
             {
-                segments.Add(new SingletonSegmentTemplate(context.Singleton));
+                segments.Add(new SingletonSegmentTemplate(navigationSource as IEdmSingleton));
             }
 
-            if (hasKeyParameter)
+            if (hasKey)
             {
                 segments.Add(new KeySegmentTemplate(entityType));
             }
@@ -121,17 +169,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
             }
 
-            IEdmNavigationProperty navigationProperty = (IEdmNavigationProperty)edmProperty;
             IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
 
             segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
 
+            if (dollarCount)
+            {
+                segments.Add(CountSegmentTemplate.Instance);
+            }
+
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(context.Prefix, context.Model, template);
+            action.AddSelector(httpMethod, prefix, model, template);
 
             Log.AddedODataSelector(_logger, action, template);
-
-            return true;
         }
 
         /// <summary>
@@ -180,6 +230,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             return method;
+        }
+
+        // OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+        // the client issues a GET request with /$count appended to the resource path of the collection.
+        private static bool CanApplyDollarCount(IEdmNavigationProperty edmProperty, string method)
+        {
+            Contract.Assert(edmProperty != null);
+
+            return method == "Get" && edmProperty.Type.IsCollection();
         }
 
         private static class Log

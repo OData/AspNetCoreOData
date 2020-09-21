@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -16,13 +15,19 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
     /// <summary>
-    /// A class to create HttpRequest.
+    /// A class to create HttpRequest for tests.
     /// </summary>
     public static class RequestFactory
     {
+        /// <summary>
+        /// Reads the request body as string.
+        /// </summary>
+        /// <param name="request">The Http request.</param>
+        /// <param name="multipleRead">true/false for multiple read.</param>
+        /// <returns>The request body or empty string.</returns>
         public static string ReadBody(this HttpRequest request, bool multipleRead = false)
         {
-            if (request.Body == null)
+            if (request == null || request.Body == null)
             {
                 return "";
             }
@@ -46,6 +51,54 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             }
 
             return requestBody;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="HttpRequest"/> with OData configuration.
+        /// </summary>
+        /// <param name="setupAction">The OData options configuration.</param>
+        /// <returns>The Http Request.</returns>
+        public static HttpRequest Create(Action<ODataOptions> setupAction)
+        {
+            return Create("GET", "http://localhost", setupAction);
+        }
+
+        /// <summary>
+        /// Creates the <see cref="HttpRequest"/> with OData configuration.
+        /// </summary>
+        /// <param name="method">The http method.</param>
+        /// <param name="uri">The http request uri.</param>
+        /// <param name="setupAction">The OData configuration.</param>
+        /// <returns>The HttpRequest.</returns>
+        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction)
+        {
+            HttpContext context = new DefaultHttpContext();
+            HttpRequest request = context.Request;
+
+            IServiceCollection services = new ServiceCollection();
+            services.Configure(setupAction);
+            context.RequestServices = services.BuildServiceProvider();
+
+            request.Method = method;
+            Uri requestUri = new Uri(uri);
+            request.Scheme = requestUri.Scheme;
+            request.Host = requestUri.IsDefaultPort ? new HostString(requestUri.Host) : new HostString(requestUri.Host, requestUri.Port);
+            request.QueryString = new QueryString(requestUri.Query);
+            request.Path = new PathString(requestUri.AbsolutePath);
+
+            //request.Host = HostString.FromUriComponent(BaseAddress);
+            //if (BaseAddress.IsDefaultPort)
+            //{
+            //    request.Host = new HostString(request.Host.Host);
+            //}
+            //var pathBase = PathString.FromUriComponent(BaseAddress);
+            //if (pathBase.HasValue && pathBase.Value.EndsWith("/"))
+            //{
+            //    pathBase = new PathString(pathBase.Value[..^1]); // All but the last character.
+            //}
+            //request.PathBase = pathBase;
+
+            return request;
         }
 
         /// <summary>
@@ -97,45 +150,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             return context.Request;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="uri"></param>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static HttpRequest Create(string method, string uri, Action<IODataFeature> setupAction)
+        public static HttpRequest Create(string method, string uri, IEdmModel model)
         {
-            HttpRequest request = Create(setupAction);
-
-            request.Method = method;
-            Uri requestUri = new Uri(uri);
-            request.Scheme = requestUri.Scheme;
-            request.Host = requestUri.IsDefaultPort ?
-                new HostString(requestUri.Host) :
-                new HostString(requestUri.Host, requestUri.Port);
-            request.QueryString = new QueryString(requestUri.Query);
-            request.Path = new PathString(requestUri.AbsolutePath);
-
+            HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
+            IODataFeature feature = request.ODataFeature();
+            feature.PrefixName = "odata";
+            feature.Model = model;
             return request;
         }
 
-        public static HttpRequest Create(string method, string uri, IEdmModel model)
+        /// <summary>
+        /// Confgiures the http request with OData values.
+        /// </summary>
+        /// <param name="request">The http request.</param>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="path">The OData path.</param>
+        /// <returns></returns>
+        public static HttpRequest Configure(this HttpRequest request, string prefix, IEdmModel model, ODataPath path)
         {
-            return Create(method, uri, f => { f.Model = model; });
-        }
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-        public static HttpRequest Create(string method, string uri, IEdmModel model, ODataPath path)
-        {
-            return Create(method, uri, f => { f.Model = model; f.Path = path; });
-        }
-
-        public static HttpRequest Create(Action<ODataOptions> setupAction)
-        {
-            HttpRequest request = Create();
-            IServiceCollection services = new ServiceCollection();
-            services.Configure(setupAction);
-            request.HttpContext.RequestServices = services.BuildServiceProvider();
+            IODataFeature feature = request.ODataFeature();
+            feature.PrefixName = prefix;
+            feature.Model = model;
+            feature.Path = path;
             return request;
         }
 

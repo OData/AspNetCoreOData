@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
@@ -156,6 +158,16 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw new ArgumentNullException(nameof(request));
             }
 
+            string baseAddress = request.CreateODataLink();
+
+            if (baseAddress == null)
+            {
+                throw new SerializationException(SRResources.UnableToDetermineBaseUrl);
+            }
+
+            return baseAddress[baseAddress.Length - 1] != '/' ? new Uri(baseAddress + '/') : new Uri(baseAddress);
+
+            /*
             LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
             if (linkGenerator != null)
             {
@@ -178,7 +190,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 }
             }
 
-            return null;
+            return null;*/
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is sent to the logger, which may throw it.")]
