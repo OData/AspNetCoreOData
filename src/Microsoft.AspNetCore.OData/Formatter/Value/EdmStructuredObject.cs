@@ -243,7 +243,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             switch (edmType.TypeKind())
             {
                 case EdmTypeKind.Primitive:
-                    //return EdmLibHelpers.GetClrType(edmType.AsPrimitive(), EdmCoreModel.Instance);
+                    return EdmCoreModel.Instance.GetClrType(edmType.AsPrimitive());
 
                 case EdmTypeKind.Complex:
                     return typeof(EdmComplexObject);
@@ -273,6 +273,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
                     {
                         return typeof(EdmEnumObjectCollection);
                     }
+
                     break;
             }
 

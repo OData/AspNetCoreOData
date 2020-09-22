@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
@@ -135,8 +137,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Stream stream = new MemoryStream();
             mockRequest.Setup(r => r.GetStream()).Returns(stream);
             var messageWriter = new ODataMessageWriter(mockRequest.Object);
-            HttpContext httpContext = new DefaultHttpContext();
-            HttpRequest request = httpContext.Request;
+            HttpRequest request = RequestFactory.Create(opt => opt.AddModel(EdmCoreModel.Instance));
             request.ODataFeature().Path = new ODataPath(CountSegment.Instance);
             var context = new ODataSerializerContext { Request = request };
 

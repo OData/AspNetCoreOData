@@ -616,15 +616,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResourceSet_SetsODataOperations()
         {
             // Arrange
-            var request = RequestFactory.Create(method: "get", uri: "http://IgnoreMetadataPath", setupAction: null);
-
             IEdmModel model = GetEdmModelWithOperations(out IEdmEntityType customerType, out IEdmEntitySet customers);
             IEdmCollectionTypeReference customersType = new EdmCollectionTypeReference(new EdmCollectionType(customerType.AsReference()));
 
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+            var request = RequestFactory.Create(method: "get", uri: "http://IgnoreMetadataPath", opt => opt.AddModel(model));
 
-           // Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
             ODataSerializerContext context = new ODataSerializerContext
             {
                 NavigationSource = customers,
@@ -766,7 +764,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             var operationLinkBuilder = new OperationLinkBuilder(functionLinkFactory, followConventions);
             model.SetOperationLinkBuilder(edmFunction, operationLinkBuilder);
 
-            var request = RequestFactory.Create(method: "get", uri: "http://any", setupAction: null);
+            var request = RequestFactory.Create(method: "get", uri: "http://any", opt => opt.AddModel(model));
             ResourceSetContext resourceSetContext = new ResourceSetContext
             {
                 EntitySetBase = customers,
