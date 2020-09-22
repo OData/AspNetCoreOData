@@ -32,15 +32,14 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// Writes the response as an Operation.
         /// </summary>
         /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        /// <param name="asyncWriter">Whether or not the writer is in async mode. </param>
-        public override Task WriteResponseAsync(ODataBatchWriter writer, bool asyncWriter)
+        public override Task WriteResponseAsync(ODataBatchWriter writer)
         {
             if (writer == null)
             {
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            return WriteMessageAsync(writer, Context, asyncWriter);
+            return WriteMessageAsync(writer, Context);
         }
 
         /// <summary>

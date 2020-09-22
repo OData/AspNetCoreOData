@@ -17,22 +17,11 @@ namespace Microsoft.AspNetCore.OData.Batch
     public abstract class ODataBatchResponseItem
     {
         /// <summary>
-        /// Writes a single OData batch response using a synchronous writer.
-        /// </summary>
-        /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        /// <param name="context">The message context.</param>
-        public static async Task WriteMessageAsync(ODataBatchWriter writer, HttpContext context)
-        {
-            await WriteMessageAsync(writer, context, false).ConfigureAwait(false);
-        }
-
-        /// <summary>
         /// Writes a single OData batch response.
         /// </summary>
         /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
         /// <param name="context">The message context.</param>
-        /// <param name="asyncWriter">Whether or not the writer is in async mode. </param>
-        public static async Task WriteMessageAsync(ODataBatchWriter writer, HttpContext context, bool asyncWriter)
+        public static async Task WriteMessageAsync(ODataBatchWriter writer, HttpContext context)
         {
             if (writer == null)
             {
@@ -46,9 +35,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             string contentId = (context.Request != null) ? context.Request.GetODataContentId() : String.Empty;
 
-            ODataBatchOperationResponseMessage batchResponse = asyncWriter ?
-                await writer.CreateOperationResponseMessageAsync(contentId).ConfigureAwait(false) :
-                writer.CreateOperationResponseMessage(contentId);
+            ODataBatchOperationResponseMessage batchResponse = await writer.CreateOperationResponseMessageAsync(contentId).ConfigureAwait(false);
 
             batchResponse.StatusCode = context.Response.StatusCode;
 
@@ -59,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             if (context.Response.Body != null && context.Response.Body.Length != 0)
             {
-                using (Stream stream = asyncWriter ? await batchResponse.GetStreamAsync().ConfigureAwait(false) : batchResponse.GetStream())
+                using (Stream stream = await batchResponse.GetStreamAsync().ConfigureAwait(false))
                 {
                     context.RequestAborted.ThrowIfCancellationRequested();
                     context.Response.Body.Seek(0L, SeekOrigin.Begin);
@@ -69,34 +56,17 @@ namespace Microsoft.AspNetCore.OData.Batch
                     ODataBatchStream batchStream = context.Response.Body as ODataBatchStream;
                     if (batchStream != null)
                     {
-                        if (asyncWriter)
-                        {
-                            await batchStream.InternalDisposeAsync().ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            batchStream.InternalDispose();
-                        }
+                        await batchStream.InternalDisposeAsync().ConfigureAwait(false);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Writes the response to a synchronous writer.
-        /// </summary>
-        /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        public Task WriteResponseAsync(ODataBatchWriter writer)
-        {
-            return WriteResponseAsync(writer, false);
-        }
-
-        /// <summary>
         /// Writes the response.
         /// </summary>
         /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        /// <param name="asyncWriter">Whether or not the writer is writing asynchronously.</param>
-        public abstract Task WriteResponseAsync(ODataBatchWriter writer, bool asyncWriter);
+        public abstract Task WriteResponseAsync(ODataBatchWriter writer);
 
         /// <summary>
         /// Gets a value that indicates if the responses in this item are successful.

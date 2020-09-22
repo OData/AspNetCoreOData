@@ -41,11 +41,11 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             HttpContext[] contexts = Array.Empty<HttpContext>();
             ChangeSetResponseItem responseItem = new ChangeSetResponseItem(contexts);
 
-            await ExceptionAssert.ThrowsArgumentNullAsync(() => responseItem.WriteResponseAsync(null, true), "writer");
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => responseItem.WriteResponseAsync(null), "writer");
         }
 
         [Fact]
-        public async Task WriteResponse_SynchronouslyWritesChangeSet()
+        public void WriteResponse_SynchronouslyWritesChangeSet_Throws()
         {
             // Arrange
             HttpContext context1 = HttpContextHelper.Create(StatusCodes.Status202Accepted);
@@ -59,16 +59,12 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act
             ODataBatchWriter batchWriter = writer.CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
-            await responseItem.WriteResponseAsync(batchWriter, false);
-            batchWriter.WriteEndBatch();
-
-            memoryStream.Position = 0;
-            string responseString = new StreamReader(memoryStream).ReadToEnd();
 
             // Assert
-            Assert.Contains("changesetresponse", responseString);
-            Assert.Contains("Accepted", responseString);
-            Assert.Contains("No Content", responseString);
+            Action test = () => responseItem.WriteResponseAsync(batchWriter).Wait();
+            ODataException exception = ExceptionAssert.Throws<ODataException>(test);
+            Assert.Equal("An asynchronous operation was called on a synchronous batch writer. Calls on a batch writer instance must be either all synchronous or all asynchronous.",
+                exception.Message);
         }
 
         [Fact]
@@ -86,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act
             ODataBatchWriter batchWriter = await writer.CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
-            await responseItem.WriteResponseAsync(batchWriter, /*asyncWriter*/ true);
+            await responseItem.WriteResponseAsync(batchWriter);
             await batchWriter.WriteEndBatchAsync();
 
             memoryStream.Position = 0;

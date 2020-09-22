@@ -513,12 +513,11 @@
             Gets the response contexts for the ChangeSet.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter)">
             <summary>
             Writes the responses as a ChangeSet.
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
-            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ChangeSetResponseItem.IsResponseSuccessful">
             <summary>
@@ -892,31 +891,16 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter,Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
-            Writes a single OData batch response using a synchronous writer.
-            </summary>
-            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
-            <param name="context">The message context.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter,Microsoft.AspNetCore.Http.HttpContext,System.Boolean)">
-            <summary>
             Writes a single OData batch response.
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
             <param name="context">The message context.</param>
-            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter)">
-            <summary>
-            Writes the response to a synchronous writer.
-            </summary>
-            <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
             <summary>
             Writes the response.
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
-            <param name="asyncWriter">Whether or not the writer is writing asynchronously.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.IsResponseSuccessful">
             <summary>
@@ -978,12 +962,11 @@
             Gets the response messages for the Operation.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter)">
             <summary>
             Writes the response as an Operation.
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataBatchWriter"/>.</param>
-            <param name="asyncWriter">Whether or not the writer is in async mode. </param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.OperationResponseItem.IsResponseSuccessful">
             <summary>
@@ -3957,18 +3940,6 @@
             <param name="structuredType">The structural type of the resource that would be written.</param>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> that contains the given structural type.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.ReferencedNavigationProperties">
-            <summary>
-            Gets the list of EDM navigation properties to be expand referenced in the response.
-            keeping this is only for non-breaking changes, This should be replaced by "ReferencedProperties" later.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedComplexProperties">
-            <summary>
-            Gets the list of EDM nested properties (complex or collection of complex) to be included in the response.
-            keeping this is only for non-breaking changes, This should be replaced by "SelectedComplexes".
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedStructuralProperties">
             <summary>
             Gets the list of EDM structural properties (primitive, enum or collection of them) to be included in the response.
@@ -3980,7 +3951,7 @@
             Gets the list of EDM navigation properties to be included as links in the response. It could be null.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedComplexTypeProperties">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedComplexProperties">
             <summary>
             Gets the list of Edm structural properties (complex or complex collection) to be included in the response.
             The key is the Edm structural property.

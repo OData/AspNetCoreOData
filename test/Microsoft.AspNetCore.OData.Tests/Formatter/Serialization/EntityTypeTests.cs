@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("employees");
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
 
-            var request = RequestFactory.CreateWitContainer("Get", "http://localhost/property", opt => opt.AddModel(routeName, _model));
+            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddModel(routeName, _model));
             request.ODataFeature().Model = _model;
             request.ODataFeature().Path = path;
             request.ODataFeature().PrefixName = routeName;
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act & Assert
             string actual = await ODataFormatterHelpers.GetContentResult(content, request);
 
-            Assert.Equal("{\"@odata.context\":\"http://localhost/$metadata#employees/$entity\"," +
+            Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#employees/$entity\"," +
                 "\"EmployeeID\":8," +
                 "\"EmployeeName\":\"Ssa\"," +
                 "\"BaseSalary\":0," +

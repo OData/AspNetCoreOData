@@ -111,11 +111,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             if (complexesToSelect == null)
             {
-                Assert.Null(selectExpandNode.SelectedComplexTypeProperties);
+                Assert.Null(selectExpandNode.SelectedComplexProperties);
             }
             else
             {
-                Assert.Equal(complexesToSelect, String.Join(",", selectExpandNode.SelectedComplexTypeProperties.Keys.Select(p => p.Name).OrderBy(n => n)));
+                Assert.Equal(complexesToSelect, String.Join(",", selectExpandNode.SelectedComplexProperties.Keys.Select(p => p.Name).OrderBy(n => n)));
             }
         }
 
@@ -154,8 +154,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             SelectExpandNode selectExpandNode = new SelectExpandNode(selectExpandClause, _model.Customer, _model.Model);
 
             // Assert
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal(firstSelected, firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act: Sub Level
             IEdmStructuredType subLevelElementType = firstLevelSelected.Key.Type.ToStructuredType();
             SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, subLevelElementType, _model.Model);
-            Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(subSelectExpandNode.SelectedComplexProperties);
 
             // Assert
             Assert.NotNull(subSelectExpandNode.SelectedStructuralProperties);
@@ -186,8 +186,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Null(selectExpandNode.SelectedStructuralProperties);
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal("Account", firstLevelSelected.Key.Name);
             Assert.NotNull(firstLevelSelected.Value);
             Assert.NotNull(firstLevelSelected.Value.SelectAndExpand);
@@ -197,8 +197,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Null(secondSelectExpandNode.SelectedStructuralProperties);
-            Assert.NotNull(secondSelectExpandNode.SelectedComplexTypeProperties);
-            var secondLevelSelected = Assert.Single(secondSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(secondSelectExpandNode.SelectedComplexProperties);
+            var secondLevelSelected = Assert.Single(secondSelectExpandNode.SelectedComplexProperties);
             Assert.Equal("BankAddress", secondLevelSelected.Key.Name);
             Assert.NotNull(secondLevelSelected.Value);
             Assert.NotNull(secondLevelSelected.Value.SelectAndExpand);
@@ -207,7 +207,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             SelectExpandNode thirdSelectExpandNode = new SelectExpandNode(secondLevelSelected.Value.SelectAndExpand, _model.Address, _model.Model);
 
             // Assert
-            Assert.Null(thirdSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(thirdSelectExpandNode.SelectedComplexProperties);
             Assert.NotNull(thirdSelectExpandNode.SelectedStructuralProperties);
             Assert.Equal(3, thirdSelectExpandNode.SelectedStructuralProperties.Count);
             Assert.Equal(new[] { "Street", "City", "ZipCode" }, thirdSelectExpandNode.SelectedStructuralProperties.Select(s => s.Name));
@@ -231,8 +231,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(selectExpandNode.SelectedDynamicProperties);
             Assert.Null(selectExpandNode.SelectedStructuralProperties);
             Assert.Null(selectExpandNode.SelectedNavigationProperties);
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal(firstSelected, firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert: Second Level
             SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, _model.Account, _model.Model);
-            Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(subSelectExpandNode.SelectedComplexProperties);
             Assert.Null(subSelectExpandNode.SelectedStructuralProperties);
             Assert.Null(subSelectExpandNode.SelectedNavigationProperties);
             Assert.False(subSelectExpandNode.SelectAllDynamicProperties);
@@ -271,8 +271,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Assert: Top Level
             Assert.Null(selectExpandNode.SelectedStructuralProperties);
             Assert.Null(selectExpandNode.SelectedNavigationProperties);
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal(firstSelected, firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -280,7 +280,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert: Second Level
             SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, _model.Account, _model.Model);
-            Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(subSelectExpandNode.SelectedComplexProperties);
             Assert.Null(subSelectExpandNode.SelectedStructuralProperties);
             Assert.NotNull(subSelectExpandNode.SelectedNavigationProperties);
             Assert.Equal("AccountOrderNav", Assert.Single(subSelectExpandNode.SelectedNavigationProperties).Name);
@@ -300,8 +300,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Assert: Top Level
             Assert.Null(selectExpandNode.SelectedStructuralProperties);
             Assert.Null(selectExpandNode.SelectedNavigationProperties);
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal("Account", firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -316,8 +316,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             Assert.Null(secondSelectExpandNode.SelectedNavigationProperties);
 
-            Assert.NotNull(secondSelectExpandNode.SelectedComplexTypeProperties);
-            var secondLevelSelected = Assert.Single(secondSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(secondSelectExpandNode.SelectedComplexProperties);
+            var secondLevelSelected = Assert.Single(secondSelectExpandNode.SelectedComplexProperties);
             Assert.Equal("BankAddress", secondLevelSelected.Key.Name);
             Assert.NotNull(secondLevelSelected.Value);
             Assert.NotNull(secondLevelSelected.Value.SelectAndExpand);
@@ -328,7 +328,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.NotNull(thirdSelectExpandNode.SelectedStructuralProperties);
             Assert.Equal("Street", Assert.Single(thirdSelectExpandNode.SelectedStructuralProperties).Name);
             Assert.Null(thirdSelectExpandNode.SelectedNavigationProperties);
-            Assert.Null(thirdSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(thirdSelectExpandNode.SelectedComplexProperties);
         }
 
         [Theory]
@@ -362,8 +362,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(selectExpandNode.SelectedNavigationProperties);
             Assert.Null(selectExpandNode.ExpandedProperties); // Not expanded at first level
 
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal(firstSelected, firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -371,7 +371,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert: Second Level
             SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, _model.Account, _model.Model);
-            Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(subSelectExpandNode.SelectedComplexProperties);
             Assert.NotNull(subSelectExpandNode.SelectedStructuralProperties);
             Assert.Equal("Bank", Assert.Single(subSelectExpandNode.SelectedStructuralProperties).Name);
 
@@ -412,8 +412,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(selectExpandNode.SelectedNavigationProperties);
             Assert.Null(selectExpandNode.ExpandedProperties); // Not expanded at first level
 
-            Assert.NotNull(selectExpandNode.SelectedComplexTypeProperties);
-            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.NotNull(selectExpandNode.SelectedComplexProperties);
+            var firstLevelSelected = Assert.Single(selectExpandNode.SelectedComplexProperties);
             Assert.Equal("Address", firstLevelSelected.Key.Name);
 
             Assert.NotNull(firstLevelSelected.Value);
@@ -424,14 +424,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 // use the base type to test
                 SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, _model.Address, _model.Model);
                 Assert.Null(subSelectExpandNode.SelectedStructuralProperties);
-                Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+                Assert.Null(subSelectExpandNode.SelectedComplexProperties);
                 Assert.Null(subSelectExpandNode.ExpandedProperties);
                 Assert.Null(subSelectExpandNode.SelectedNavigationProperties);
             }
             {
                 // use the sub type to test
                 SelectExpandNode subSelectExpandNode = new SelectExpandNode(firstLevelSelected.Value.SelectAndExpand, subComplexType, _model.Model);
-                Assert.Null(subSelectExpandNode.SelectedComplexTypeProperties);
+                Assert.Null(subSelectExpandNode.SelectedComplexProperties);
                 Assert.NotNull(subSelectExpandNode.SelectedStructuralProperties);
                 Assert.Equal("SubAddressProperty", Assert.Single(subSelectExpandNode.SelectedStructuralProperties).Name);
 
@@ -603,7 +603,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Null(selectExpandNode.SelectedStructuralProperties);
-            Assert.Null(selectExpandNode.SelectedComplexTypeProperties);
+            Assert.Null(selectExpandNode.SelectedComplexProperties);
 
             Assert.NotNull(selectExpandNode.SelectedNavigationProperties);
             Assert.Single(selectExpandNode.SelectedNavigationProperties);

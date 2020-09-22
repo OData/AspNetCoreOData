@@ -42,9 +42,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             SelectedStructuralProperties = selectExpandNodeToCopy.SelectedStructuralProperties == null ?
                 null : new HashSet<IEdmStructuralProperty>(selectExpandNodeToCopy.SelectedStructuralProperties);
 
-            SelectedComplexTypeProperties = selectExpandNodeToCopy.SelectedComplexTypeProperties == null ?
-                null : new Dictionary<IEdmStructuralProperty, PathSelectItem>(selectExpandNodeToCopy.SelectedComplexTypeProperties);
-
             SelectedNavigationProperties = selectExpandNodeToCopy.SelectedNavigationProperties == null ?
                 null : new HashSet<IEdmNavigationProperty>(selectExpandNodeToCopy.SelectedNavigationProperties);
 
@@ -98,42 +95,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
-        /// Gets the list of EDM navigation properties to be expand referenced in the response.
-        /// keeping this is only for non-breaking changes, This should be replaced by "ReferencedProperties" later.
-        /// </summary>
-        [Obsolete("This property will be removed later, please use ReferencedProperties.")]
-        public ISet<IEdmNavigationProperty> ReferencedNavigationProperties
-        {
-            get
-            {
-                if (ReferencedProperties == null)
-                {
-                    return null;
-                }
-
-                return new HashSet<IEdmNavigationProperty>(ReferencedProperties.Keys);
-            }
-        }
-
-        /// <summary>
-        /// Gets the list of EDM nested properties (complex or collection of complex) to be included in the response.
-        /// keeping this is only for non-breaking changes, This should be replaced by "SelectedComplexes".
-        /// </summary>
-        [Obsolete("This property will be removed later, please use SelectedComplexTypeProperties.")]
-        public ISet<IEdmStructuralProperty> SelectedComplexProperties
-        {
-            get
-            {
-                if (SelectedComplexTypeProperties == null)
-                {
-                    return null;
-                }
-
-                return new HashSet<IEdmStructuralProperty>(SelectedComplexTypeProperties.Keys);
-            }
-        }
-
-        /// <summary>
         /// Gets the list of EDM structural properties (primitive, enum or collection of them) to be included in the response.
         /// It could be null if there's no property selected.
         /// </summary>
@@ -149,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// The key is the Edm structural property.
         /// The value is the potential sub select item.
         /// </summary>
-        public IDictionary<IEdmStructuralProperty, PathSelectItem> SelectedComplexTypeProperties { get; internal set; }
+        public IDictionary<IEdmStructuralProperty, PathSelectItem> SelectedComplexProperties { get; internal set; }
 
         /// <summary>
         /// Gets the list of EDM navigation properties to be expanded in the response along with the nested query options embedded in the expand.
@@ -563,12 +524,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (isComplexOrCollectComplex)
             {
-                if (SelectedComplexTypeProperties == null)
+                if (SelectedComplexProperties == null)
                 {
-                    SelectedComplexTypeProperties = new Dictionary<IEdmStructuralProperty, PathSelectItem>();
+                    SelectedComplexProperties = new Dictionary<IEdmStructuralProperty, PathSelectItem>();
                 }
 
-                SelectedComplexTypeProperties[structuralProperty] = pathSelectItem;
+                SelectedComplexProperties[structuralProperty] = pathSelectItem;
             }
             else
             {

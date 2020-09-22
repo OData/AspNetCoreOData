@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             foreach (ODataBatchResponseItem response in Responses)
             {
-                await response.WriteResponseAsync(writer, /*asyncWriter*/ true).ConfigureAwait(false);
+                await response.WriteResponseAsync(writer).ConfigureAwait(false);
             }
 
             await writer.WriteEndBatchAsync().ConfigureAwait(false);

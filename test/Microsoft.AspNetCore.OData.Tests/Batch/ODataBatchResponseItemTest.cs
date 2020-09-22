@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act
             ODataBatchWriter batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext, /*asyncWriter*/ true);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext);
             await batchWriter.WriteEndBatchAsync();
 
             ms.Position = 0;
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             ODataBatchWriter batchWriter = await new ODataMessageWriter(odataResponse).CreateODataBatchWriterAsync();
             await batchWriter.WriteStartBatchAsync();
             await batchWriter.WriteStartChangesetAsync();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext, /*asyncWriter*/ true);
+            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext);
             await batchWriter.WriteEndChangesetAsync();
             await batchWriter.WriteEndBatchAsync();
 

@@ -156,11 +156,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
 
-            if (selectExpandNode.SelectedComplexTypeProperties == null)
+            if (selectExpandNode.SelectedComplexProperties == null)
             {
                 return;
             }
-            IEnumerable<IEdmStructuralProperty> complexProperties = selectExpandNode.SelectedComplexTypeProperties.Keys;
+            IEnumerable<IEdmStructuralProperty> complexProperties = selectExpandNode.SelectedComplexProperties.Keys;
 
             if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
             {
@@ -772,7 +772,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
 
-            IDictionary<IEdmStructuralProperty, PathSelectItem> complexProperties = selectExpandNode.SelectedComplexTypeProperties;
+            IDictionary<IEdmStructuralProperty, PathSelectItem> complexProperties = selectExpandNode.SelectedComplexProperties;
             if (complexProperties == null)
             {
                 return;

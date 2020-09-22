@@ -1394,7 +1394,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // In ASP.NET Core, it's using the global UriHelper to pick up the first Router to generate the Uri.
             // Owing that there's no router created in this case, a default OData router will be used to generate the Uri.
             // The default OData router will add '$metadata' after the route prefix.
-            string expectedMetadata = expectedMetadataPrefix + "/$metadata#" + expectedNamespace + "." + expectedActionName;
+            string expectedMetadata = expectedMetadataPrefix + "/OData/$metadata#" + expectedNamespace + "." + expectedActionName;
             ODataAction expectedAction = new ODataAction
             {
                 Metadata = new Uri(expectedMetadata),
@@ -1457,7 +1457,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // In ASP.NET Core, it's using the global UriHelper to pick up the first Router to generate the Uri.
             // Owing that there's no router created in this case, a default OData router will be used to generate the Uri.
             // The default OData router will add '$metadata' after the route prefix.
-            string expectedMetadata = expectedMetadataPrefix + "/$metadata#" + expectedNamespace + "." + expectedActionName;
+            string expectedMetadata = expectedMetadataPrefix + "/OData/$metadata#" + expectedNamespace + "." + expectedActionName;
             AssertEqual(new Uri(expectedMetadata), actualAction.Metadata);
         }
 
@@ -1936,7 +1936,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         private static ResourceContext CreateContext(IEdmModel model, string expectedMetadataPrefix)
         {
-            var request = RequestFactory.CreateWitContainer("get", expectedMetadataPrefix, opt => opt.AddModel("OData", model));
+            var request = RequestFactory.Create("get", expectedMetadataPrefix, opt => opt.AddModel("OData", model));
             request.ODataFeature().PrefixName = "OData";
             request.ODataFeature().Model = model;
             return new ResourceContext

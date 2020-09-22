@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
                 () => serializer.CreateODataCollectionValue(enumerable, this._edmIntType, new ODataSerializerContext { Model = EdmCoreModel.Instance }),
-                "'Edm.Int32' cannot be serialized using the ODataMediaTypeFormatter.");
+                "'Edm.Int32' cannot be serialized using the OData output formatter.");
         }
 
         [Fact]
