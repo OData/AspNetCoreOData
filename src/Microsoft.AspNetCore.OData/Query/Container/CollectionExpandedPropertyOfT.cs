@@ -15,6 +15,11 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 
         public override object GetValue()
         {
+            if (Collection == null)
+            {
+                return null;
+            }
+
             if (TotalCount == null)
             {
                 return new TruncatedCollection<T>(Collection, PageSize);

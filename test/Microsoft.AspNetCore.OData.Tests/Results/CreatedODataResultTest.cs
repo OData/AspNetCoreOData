@@ -123,12 +123,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             // Arrange
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();
             ODataPath path = new ODataPath(new EntitySetSegment(model.Customers));
-            var request = RequestFactory.Create(model.Model, path: path);
+            var request = RequestFactory.Create(opt => opt.AddModel(model.Model));
+            request.Configure("", model.Model, path);
             var createdODataResult = GetCreatedODataResult<TestEntity>(_entity, request);
 
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() => createdODataResult.GenerateLocationHeader(request),
-                "Cannot find the resource type 'Microsoft.AspNet.OData.Test.Results.CreatedODataResultTest+TestEntity' in the model.");
+                "Cannot find the resource type 'Microsoft.AspNetCore.OData.Tests.Results.CreatedODataResultTest+TestEntity' in the model.");
         }
 
         [Fact]
@@ -176,10 +177,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             // Arrange
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();
             model.Model.SetAnnotationValue(model.OrderLine, new ClrTypeAnnotation(typeof(OrderLine)));
-            ODataPath path = new ODataUriParser(model.Model, new Uri("MyOrders(1)/OrderLines"))
-                .ParsePath();
+            ODataPath path = new ODataUriParser(model.Model,
+                new Uri("http://localhost/"),
+                new Uri("MyOrders(1)/OrderLines", UriKind.Relative)).ParsePath();
 
-            var request = RequestFactory.Create(model.Model, path: path);
+            var request = RequestFactory.Create(opt => opt.AddModel(model.Model));
+            request.Configure("", model.Model, path);
             var orderLine = new OrderLine { ID = 2 };
             var createdODataResult = GetCreatedODataResult<OrderLine>(orderLine, request);
 

@@ -51,8 +51,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.IsBaseUpgraded()",
-                            "Customers/{key}/NS.IsBaseUpgraded()",
                             "Customers({key})/IsBaseUpgraded()",
+                            "Customers/{key}/NS.IsBaseUpgraded()",
                             "Customers/{key}/IsBaseUpgraded()"
                         }
                     },
@@ -71,8 +71,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.IsUpgraded()",
-                            "Customers/{key}/NS.IsUpgraded()",
                             "Customers({key})/IsUpgraded()",
+                            "Customers/{key}/NS.IsUpgraded()",
                             "Customers/{key}/IsUpgraded()"
                         }
                     },
@@ -91,8 +91,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
-                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
                             "Customers({key})/NS.VipCustomer/IsVipUpgraded(param={param})",
+                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
                             "Customers/{key}/NS.VipCustomer/IsVipUpgraded(param={param})"
                         }
                     },

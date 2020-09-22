@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 {
     public class SelectExpandNodeTest
     {
-        private static CustomersModelWithInheritance _model = new CustomersModelWithInheritance();
+        private CustomersModelWithInheritance _model = new CustomersModelWithInheritance();
 
         [Fact]
         public void Ctor_ThrowsArgumentNull_StructuredType()
@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             }
             else
             {
-                Assert.Equal(structuralsToSelect, String.Join(",", selectExpandNode.SelectedStructuralProperties.Select(p => p.Name).OrderBy(n => n)));
+                Assert.Equal(structuralsToSelect, string.Join(",", selectExpandNode.SelectedStructuralProperties.Select(p => p.Name).OrderBy(n => n)));
             }
 
             if (complexesToSelect == null)
@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             }
             else
             {
-                Assert.Equal(complexesToSelect, String.Join(",", selectExpandNode.SelectedComplexProperties.Keys.Select(p => p.Name).OrderBy(n => n)));
+                Assert.Equal(complexesToSelect, string.Join(",", selectExpandNode.SelectedComplexProperties.Keys.Select(p => p.Name).OrderBy(n => n)));
             }
         }
 
@@ -762,7 +762,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(structuralTypeInfo.AllActions);
             Assert.Null(structuralTypeInfo.AllFunctions);
         }
-
 
         #endregion
 

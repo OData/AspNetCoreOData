@@ -50,8 +50,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.IsBaseUpgraded",
-                            "Customers/{key}/NS.IsBaseUpgraded",
                             "Customers({key})/IsBaseUpgraded",
+                            "Customers/{key}/NS.IsBaseUpgraded",
                             "Customers/{key}/IsBaseUpgraded",
                         }
                     },
@@ -70,8 +70,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.IsUpgraded",
-                            "Customers/{key}/NS.IsUpgraded",
                             "Customers({key})/IsUpgraded",
+                            "Customers/{key}/NS.IsUpgraded",
                             "Customers/{key}/IsUpgraded"
                         }
                     },
@@ -90,8 +90,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.VipCustomer/NS.IsVipUpgraded",
-                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded",
                             "Customers({key})/NS.VipCustomer/IsVipUpgraded",
+                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded",
                             "Customers/{key}/NS.VipCustomer/IsVipUpgraded"
                         }
                     },
@@ -139,8 +139,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.UpgradedAll",
-                            "Customers/{key}/NS.UpgradedAll",
                             "Customers({key})/UpgradedAll",
+                            "Customers/{key}/NS.UpgradedAll",
                             "Customers/{key}/UpgradedAll"
                         }
                     },

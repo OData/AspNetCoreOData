@@ -87,9 +87,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.False(ok);
 
             // Assert
-            SelectorModel selector = Assert.Single(action.Selectors);
-            Assert.NotNull(selector.AttributeRouteModel);
-            Assert.Equal("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title", selector.AttributeRouteModel.Template);
+            Assert.Equal(4, action.Selectors.Count);
+            Assert.Equal(new[]
+                {
+                    "Customers({key})/Orders({relatedKey})/NS.MyOrder/Title",
+                    "Customers({key})/Orders/{relatedKey}/NS.MyOrder/Title",
+                    "Customers/{key}/Orders({relatedKey})/NS.MyOrder/Title",
+                    "Customers/{key}/Orders/{relatedKey}/NS.MyOrder/Title"
+                },
+                action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
         [Theory]
@@ -142,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             model.AddElement(order);
 
             // MyOrder
-            EdmEntityType myOrder = new EdmEntityType("NS", "MyOrder");
+            EdmEntityType myOrder = new EdmEntityType("NS", "MyOrder", order);
             myOrder.AddKeys(myOrder.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
             myOrder.AddStructuralProperty("Title", EdmPrimitiveTypeKind.String);
             model.AddElement(myOrder);

@@ -101,16 +101,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public ISet<IEdmStructuralProperty> SelectedStructuralProperties { get; internal set; }
 
         /// <summary>
-        /// Gets the list of EDM navigation properties to be included as links in the response. It could be null.
-        /// </summary>
-        public ISet<IEdmNavigationProperty> SelectedNavigationProperties { get; internal set; }
-
-        /// <summary>
         /// Gets the list of Edm structural properties (complex or complex collection) to be included in the response.
         /// The key is the Edm structural property.
         /// The value is the potential sub select item.
         /// </summary>
         public IDictionary<IEdmStructuralProperty, PathSelectItem> SelectedComplexProperties { get; internal set; }
+
+        /// <summary>
+        /// Gets the list of EDM navigation properties to be included as links in the response. It could be null.
+        /// </summary>
+        public ISet<IEdmNavigationProperty> SelectedNavigationProperties { get; internal set; }
 
         /// <summary>
         /// Gets the list of EDM navigation properties to be expanded in the response along with the nested query options embedded in the expand.

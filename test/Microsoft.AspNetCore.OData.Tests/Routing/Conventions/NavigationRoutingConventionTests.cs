@@ -48,7 +48,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/Orders",
-                            "Customers/{key}/Orders"
+                            "Customers/{key}/Orders",
+                            "Customers({key})/Orders/$count",
+                            "Customers/{key}/Orders/$count"
                         }
                     },
                     {
@@ -57,7 +59,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         new[]
                         {
                             "Customers({key})/NS.VipCustomer/SubOrders",
-                            "Customers/{key}/NS.VipCustomer/SubOrders"
+                            "Customers/{key}/NS.VipCustomer/SubOrders",
+                            "Customers({key})/NS.VipCustomer/SubOrders/$count",
+                            "Customers/{key}/NS.VipCustomer/SubOrders/$count"
                         }
                     },
                     {
