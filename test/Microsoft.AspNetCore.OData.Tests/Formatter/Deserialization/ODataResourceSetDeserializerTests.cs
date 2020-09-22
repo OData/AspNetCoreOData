@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             ExceptionAssert.Throws<SerializationException>(
                 () => deserializer.ReadResourceSet(feedWrapper, _customerType, readContext).GetEnumerator().MoveNext(),
-                "'Microsoft.AspNet.OData.Test.Common.Models.Customer' cannot be deserialized using the ODataMediaTypeFormatter.");
+                "'Microsoft.AspNetCore.OData.Tests.Models.Customer' cannot be deserialized using the OData input formatter.");
         }
 
         [Fact]
@@ -136,8 +136,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IEdmCollectionTypeReference addressCollectionType =
                 new EdmCollectionTypeReference(new EdmCollectionType(addressType));
 
-            HttpContent content = new StringContent("{ 'value': [ {'@odata.type':'Microsoft.AspNet.OData.Test.Common.Models.Address', 'City' : 'Redmond' } ] }");
-            //var headers = FormatterTestHelper.GetContentHeaders("application/json");
+            HttpContent content = new StringContent("{ 'value': [ {'@odata.type':'Microsoft.AspNetCore.OData.Tests.Models.Address', 'City' : 'Redmond' } ] }");
             HeaderDictionary headerDict = new HeaderDictionary
             {
                 { "Content-Type", "application/json" }

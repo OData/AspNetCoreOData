@@ -344,6 +344,12 @@ namespace Microsoft.AspNetCore.OData.Edm
                     typeName, string.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
             }
 
+            Type type = matchingTypes.SingleOrDefault();
+            if (type == null)
+            {
+                return null;
+            }
+
             edmModel.SetAnnotationValue(edmSchemaType, new ClrTypeAnnotation(matchingTypes.SingleOrDefault()));
             return matchingTypes.SingleOrDefault();
         }

@@ -47,6 +47,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             byte[] contentBytes = Encoding.UTF8.GetBytes(content);
             request.Body = new MemoryStream(contentBytes);
             request.ContentType = "application/json";
+            request.ContentLength = contentBytes.Length;
             request.Headers.Add("OData-Version", "4.0");
             request.Headers.Add("Accept", "application/json;odata.metadata=full");
 

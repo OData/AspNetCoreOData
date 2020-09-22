@@ -29,15 +29,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw Error.ArgumentNull("messageReader");
+                throw Error.ArgumentNull(nameof(messageReader));
             }
+
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
+
             if (readContext == null)
             {
-                throw Error.ArgumentNull("readContext");
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             IEdmTypeReference edmType = readContext.GetEdmType(type);
@@ -57,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (readContext == null)
             {
-                throw new ArgumentNullException(nameof(readContext));
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             ODataProperty property = item as ODataProperty;

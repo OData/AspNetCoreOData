@@ -6,16 +6,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Xml;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -304,13 +305,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceWrapper resourceWrapper =
                 new ODataResourceWrapper(new ODataResource
                 {
-                    TypeName = "Microsoft.AspNet.OData.Test.Formatter.Deserialization.BaseType"
+                    TypeName = "Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.BaseType"
                 });
 
             // Act & Assert
             ExceptionAssert.Throws<ODataException>(
                 () => deserializer.ReadResource(resourceWrapper, _productEdmType, new ODataDeserializerContext { Model = model }),
-                "An instance of the abstract resource type 'Microsoft.AspNet.OData.Test.Formatter.Deserialization.BaseType' was found. " +
+                "An instance of the abstract resource type 'Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.BaseType' was found. " +
                 "Abstract resource types cannot be instantiated.");
         }
 
@@ -326,7 +327,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
                 () => deserializer.ReadResource(resourceWrapper, _productEdmType, _readContext),
-                "'ODataDemo.Supplier' cannot be deserialized using the ODataMediaTypeFormatter.");
+                "'ODataDemo.Supplier' cannot be deserialized using the OData input formatter.");
         }
 
         [Fact]
@@ -1013,7 +1014,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
             // Act
-            Product product = deserializer.Read(GetODataMessageReader(GetODataMessage(content), _edmModel),
+            Product product = deserializer.Read(GetODataMessageReader(content, _edmModel),
                 typeof(Product), _readContext) as Product;
 
             // Assert
@@ -1040,7 +1041,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            Supplier supplier = deserializer.Read(GetODataMessageReader(GetODataMessage(content), _edmModel),
+            Supplier supplier = deserializer.Read(GetODataMessageReader(content, _edmModel),
                 typeof(Supplier), readContext) as Supplier;
 
             // Assert
@@ -1083,7 +1084,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 new ODataResourceDeserializer(_deserializerProvider);
 
             // Act
-            Delta<Supplier> supplier = deserializer.Read(GetODataMessageReader(GetODataMessage(content), _edmModel),
+            Delta<Supplier> supplier = deserializer.Read(GetODataMessageReader(content, _edmModel),
                 typeof(Delta<Supplier>), readContext) as Delta<Supplier>;
 
             // Assert
@@ -1103,7 +1104,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => deserializer.Read(GetODataMessageReader(GetODataMessage(content), _edmModel),
+            ExceptionAssert.Throws<ODataException>(() => deserializer.Read(GetODataMessageReader(content, _edmModel),
                 typeof(Product), _readContext), "The property 'Concurrency' does not exist on type 'ODataDemo.Product'. Make sure to only use property names that are defined by the type or mark the type as open type.");
         }
 
@@ -1112,17 +1113,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             return new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings(), edmModel);
         }
 
-        private static IODataRequestMessage GetODataMessage(string content)
+        private static ODataMessageReader GetODataMessageReader(string content, IEdmModel edmModel)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/OData/OData.svc/Products");
+            IODataRequestMessage oDataRequestMessage = GetODataMessage(content, edmModel);
+            return new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings(), edmModel);
+        }
 
-            request.Content = new StringContent(content);
+        private static IODataRequestMessage GetODataMessage(string content, IEdmModel model)
+        {
+        //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/OData/OData.svc/Products");
+
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/Products", opt => opt.AddModel("odata", model));
+
+            //request.Content = new StringContent(content);
+            //request.Headers.Add("OData-Version", "4.0");
+
+            //MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
+            //mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
+            //request.Headers.Accept.Add(mediaType);
+            //request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            request.Body = new MemoryStream(contentBytes);
+            request.ContentType = "application/json";
+            request.ContentLength = contentBytes.Length;
             request.Headers.Add("OData-Version", "4.0");
-
-            MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
-            mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
-            request.Headers.Accept.Add(mediaType);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Headers.Add("Accept", "application/json;odata.metadata=full");
 
             return new HttpRequestODataMessage(request);
         }

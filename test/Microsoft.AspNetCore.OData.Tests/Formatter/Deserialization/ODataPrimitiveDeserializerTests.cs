@@ -228,8 +228,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Arrange
             IEdmModel model = CreateModel();
 
-            // new HttpRequestMessage(new HttpMethod("Patch"), "http://localhost/OData/Suppliers(1)/Address")
-            HttpRequest request = RequestFactory.Create("Patch", "http://localhost/OData/Suppliers(1)/Address", model);
+            HttpRequest request = RequestFactory.Create("Patch", "http://localhost/OData/Suppliers(1)/Address", opt => opt.AddModel("odata", model));
 
             ODataPrimitiveDeserializer deserializer = new ODataPrimitiveDeserializer();
             ODataDeserializerContext readContext = new ODataDeserializerContext
@@ -254,8 +253,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             object expected = new Guid("f4b787c7-920d-4993-a584-ceb68968058c");
 
             IEdmModel model = CreateModel();
-            // new HttpRequestMessage(new HttpMethod("Patch"), "http://localhost/OData/Suppliers(1)/Address")
-            HttpRequest request = RequestFactory.Create("Patch", "http://localhost/OData/Suppliers(1)/Address", model);
+            HttpRequest request = RequestFactory.Create("Patch", "http://localhost/OData/Suppliers(1)/Address", opt => opt.AddModel("odata", model));
 
             ODataPrimitiveDeserializer deserializer = new ODataPrimitiveDeserializer();
             ODataDeserializerContext readContext = new ODataDeserializerContext

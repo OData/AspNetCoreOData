@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
             HttpContext context = new DefaultHttpContext();
-            context.RequestServices = _serviceProvider;
+            context.ODataFeature().SubServiceProvider = _serviceProvider;
             HttpRequest request = context.Request;
 
             // Act & Assert
@@ -78,27 +78,22 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         {
             // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
-            HttpContext httpContext = BuildHttpContext(StatusCodes.Status200OK);
-            httpContext.RequestServices = _serviceProvider;
+            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            request.ODataFeature().PrefixName = "odata";
+            HttpContext httpContext = request.HttpContext;
+            httpContext.Response.StatusCode = StatusCodes.Status200OK;
+            httpContext.Response.Body = new MemoryStream();
             ODataBatchResponseItem[] responses = new ODataBatchResponseItem[]
             {
                 new OperationResponseItem(httpContext)
             };
-            HttpRequest request = httpContext.Request;
 
             // Act
             await batchHandler.CreateResponseMessageAsync(responses, request);
 
             // Assert
-            var batchContent = Assert.IsType<ODataBatchContent>(httpContext.Response.Body);
-            Assert.Single(batchContent.Responses);
-        }
-
-        private static HttpContext BuildHttpContext(int statusCode)
-        {
-            HttpContext httpContext = new DefaultHttpContext();
-            httpContext.Response.StatusCode = statusCode;
-            return httpContext;
+            string responseString = httpContext.Response.ReadBody();
+            Assert.Contains("200 OK", responseString);
         }
 
         [Fact]
@@ -580,27 +575,18 @@ Host: example.com
         public async Task SendAsync_Works_ForBatchRequestWithInsertedEntityReferencedInAnotherRequest()
         {
             // Arrange
-            Type[] controllers = new[] { typeof(BatchTestCustomersController), typeof(BatchTestOrdersController), };
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
+                    services.ConfigureControllers(typeof(BatchTestCustomersController), typeof(BatchTestOrdersController));
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestCustomer>("BatchTestCustomers");
                     builder.EntitySet<BatchTestOrder>("BatchTestOrders");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddOData(opt => opt.AddModel("odata", model, b => b.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton)).Expand());
+                    services.AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
-                    ApplicationPartManager applicationPartManager = app.ApplicationServices.GetRequiredService<ApplicationPartManager>();
-                    applicationPartManager.ApplicationParts.Clear();
-
-                    if (controllers != null)
-                    {
-                        AssemblyPart part = new AssemblyPart(new MockAssembly(controllers));
-                        applicationPartManager.ApplicationParts.Add(part);
-                    }
-
                     app.UseODataBatching();
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
@@ -664,8 +650,10 @@ Accept-Charset: UTF-8
             httpContent.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/mixed; boundary={batchRef}");
             batchRequest.Content = httpContent;
 
+            // Act
             var response = await client.SendAsync(batchRequest);
 
+            // Assert
             ExceptionAssert.DoesNotThrow(() => response.EnsureSuccessStatusCode());
 
             HttpRequestMessage customerRequest = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}/BatchTestCustomers(2)?$expand=Orders");

@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                     }
                 }
 
-            return requests;
+              return requests;
             }
         }
     }

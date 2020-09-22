@@ -37,12 +37,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (messageReader == null)
             {
-                throw new ArgumentNullException(nameof(messageReader));
+                throw Error.ArgumentNull(nameof(messageReader));
             }
 
             if (readContext == null)
             {
-                throw new ArgumentNullException(nameof(readContext));
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             IEdmTypeReference edmType = readContext.GetEdmType(type);
@@ -69,23 +69,23 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             if (readContext == null)
             {
-                throw new ArgumentNullException(nameof(readContext));
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             if (!edmType.IsCollection() || !edmType.AsCollection().ElementType().IsStructured())
             {
-                throw Error.Argument("edmType", SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
             }
 
             ODataResourceSetWrapper resourceSet = item as ODataResourceSetWrapper;
             if (resourceSet == null)
             {
-                throw Error.Argument("item", SRResources.ArgumentMustBeOfType, typeof(ODataResourceSetWrapper).Name);
+                throw Error.Argument(nameof(item), SRResources.ArgumentMustBeOfType, typeof(ODataResourceSetWrapper).Name);
             }
 
             // Recursion guard to avoid stack overflows

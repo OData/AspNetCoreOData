@@ -24,10 +24,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static readonly IEdmModel Model = GetEdmModel();
 
         // private static readonly ODataSerializerProvider SerializerProvider = ODataSerializerProviderFactory.Create();
-        private static readonly ODataSerializerProvider SerializerProvider = null; // TODO:
+        private static readonly ODataSerializerProvider SerializerProvider = ODataFormatterHelpers.GetSerializerProvider(); // TODO:
 
         // private static readonly ODataDeserializerProvider DeserializerProvider = ODataDeserializerProviderFactory.Create();
-        private static readonly ODataDeserializerProvider DeserializerProvider = null; // TODO:
+        private static readonly ODataDeserializerProvider DeserializerProvider = ODataFormatterHelpers.GetDeserializerProvider(); // TODO:
 
         private static readonly IEdmEnumTypeReference ColorType =
             new EdmEnumTypeReference(Model.SchemaElements.OfType<IEdmEnumType>().First(c => c.Name == "Color"),
@@ -77,16 +77,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             var deserializer = new ODataCollectionDeserializer(DeserializerProvider);
 
             // Act & Assert
-#if NETCOREAPP3_1
             ExceptionAssert.Throws<ArgumentException>(
                 () => deserializer.ReadInline(42, IntCollectionType, new ODataDeserializerContext()),
                 "The argument must be of type 'ODataCollectionValue'. (Parameter 'item')");
-#else
-
-            ExceptionAssert.Throws<ArgumentException>(
-                () => deserializer.ReadInline(42, IntCollectionType, new ODataDeserializerContext()),
-                "The argument must be of type 'ODataCollectionValue'.\r\nParameter name: item");
-#endif
         }
 
         [Fact]
@@ -168,7 +161,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                     ColorCollectionType.ElementType(), new ODataDeserializerContext())
                     .GetEnumerator()
                     .MoveNext(),
-                "'NS.Color' cannot be deserialized using the ODataMediaTypeFormatter.");
+                "'NS.Color' cannot be deserialized using the OData input formatter.");
         }
 
         [Fact]

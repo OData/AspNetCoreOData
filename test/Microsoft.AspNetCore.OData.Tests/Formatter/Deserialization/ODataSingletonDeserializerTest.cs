@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -79,15 +83,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         private ODataMessageReader GetODataMessageReader(string content)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/odata/CEO");
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddModel("odata", _edmModel));
 
-            request.Content = new StringContent(content);
+            //request.Content = new StringContent(content);
+            //request.Headers.Add("OData-Version", "4.0");
+
+            //MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
+            //mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
+            //request.Headers.Accept.Add(mediaType);
+            //request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            request.Body = new MemoryStream(contentBytes);
+            request.ContentType = "application/json";
+            request.ContentLength = contentBytes.Length;
             request.Headers.Add("OData-Version", "4.0");
-
-            MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
-            mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
-            request.Headers.Accept.Add(mediaType);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Headers.Add("Accept", "application/json;odata.metadata=full");
 
             return new ODataMessageReader(new HttpRequestODataMessage(request), new ODataMessageReaderSettings(), _edmModel);
         }

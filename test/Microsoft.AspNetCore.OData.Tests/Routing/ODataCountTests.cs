@@ -34,11 +34,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             public override void ConfigureServices(IServiceCollection services)
             {
+              //  services.AddSession();
+
                 services.ConfigureControllers(typeof(DollarCountEntitiesController));
 
                 IEdmModel model = GetEdmModel();
                 services.AddOData(options => options.AddModel(model)
                     .Count().SetMaxTop(null).Expand().Select().OrderBy().Filter());
+            }
+
+            protected override void ConfigureInRouting(IApplicationBuilder app, IWebHostEnvironment env)
+            {
+               // app.UseSession();
             }
         }
 
@@ -49,27 +56,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
         private static HttpClient _client;
 
-        public void ODataCountTest2()
+        public static HttpClient GetClient()
         {
             var controllers = new[] { typeof(DollarCountEntitiesController) };
             IEdmModel model = GetEdmModel();
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
+                    services.ConfigureControllers(typeof(DollarCountEntitiesController));
+
                     services.AddOData(opt => opt.AddModel("odata", model)
                         .Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
                 })
                 .Configure(app =>
                 {
-                    ApplicationPartManager applicationPartManager = app.ApplicationServices.GetRequiredService<ApplicationPartManager>();
-                    applicationPartManager.ApplicationParts.Clear();
-
-                    if (controllers != null)
-                    {
-                        AssemblyPart part = new AssemblyPart(new MockAssembly(controllers));
-                        applicationPartManager.ApplicationParts.Add(part);
-                    }
-
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {
@@ -79,6 +79,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             var server = new TestServer(builder);
             _client = server.CreateClient();
+
+            return _client;
         }
 
         public static TheoryDataSet<string, int> DollarCountData
@@ -141,7 +143,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             // Arrange
             var uri = "DollarCountEntities(5)/StringCollectionProp";
 
+            HttpClient client = GetClient();
             // Act
+            //HttpResponseMessage response = await Client.GetAsync(uri);
             HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
@@ -159,7 +163,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             var uri = "DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()?$count=true";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -174,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             var uri = "DollarCountEntities(5)/DollarCountNotAllowedCollectionProp/$count";
 
             // Act
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync("http://localhost/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

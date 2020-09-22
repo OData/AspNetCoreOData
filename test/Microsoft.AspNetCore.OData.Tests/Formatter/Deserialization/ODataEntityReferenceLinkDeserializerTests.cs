@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -10,6 +11,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
@@ -19,16 +21,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void Ctor_DoesnotThrow()
         {
+            // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
 
+            // Act & Assert
             Assert.Equal(ODataPayloadKind.EntityReferenceLink, deserializer.ODataPayloadKind);
         }
 
         [Fact]
         public void Read_ThrowsArgumentNull_MessageReader()
         {
+            // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
 
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => deserializer.Read(messageReader: null, type: null, readContext: new ODataDeserializerContext()),
                 "messageReader");
@@ -37,9 +43,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void Read_ThrowsArgumentNull_ReadContext()
         {
+            // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
             ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
 
+            // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => deserializer.Read(messageReader, type: null, readContext: null),
                 "readContext");
@@ -61,9 +69,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
             messageWriter.WriteEntityReferenceLink(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
 
-            // var config = RoutingConfigurationFactory.CreateWithRootContainer("OData");
-            //  var request = RequestFactory.Create(config, "OData");
-            var request = RequestFactory.Create();
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
             ODataMessageReaderSettings readSettings = new ODataMessageReaderSettings();
             ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage), readSettings, model);
             ODataDeserializerContext context = new ODataDeserializerContext
@@ -96,9 +103,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             IEdmNavigationProperty navigationProperty = GetNavigationProperty(model);
 
-            // var config = RoutingConfigurationFactory.CreateWithRootContainer("OData");
-            //  var request = RequestFactory.Create(config, "OData");
-            var request = RequestFactory.Create();
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Request = request,
@@ -115,7 +121,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         private static IEdmModel CreateModel()
         {
-            ODataModelBuilder builder = new ODataConventionModelBuilder();
+            Mock<ODataModelBuilder> mock = new Mock<ODataModelBuilder>();
+            mock.Setup(b => b.ValidateModel(It.IsAny<IEdmModel>())).Callback(() => { });
+            mock.CallBase = true;
+            ODataModelBuilder builder = mock.Object;
             EntitySetConfiguration<Entity> entities = builder.EntitySet<Entity>("entities");
             builder.EntitySet<RelatedEntity>("related");
             NavigationPropertyConfiguration entityToRelated =

@@ -7,25 +7,25 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
     class HttpRequestODataMessage : IODataRequestMessage
     {
-        public HttpRequestMessage _request;
         public HttpRequest _httpRequest;
 
         public Dictionary<string, string> _headers;
 
-        public HttpRequestODataMessage(HttpRequestMessage request)
-        {
-            _request = request;
-            _headers = Enumerable
-                .Concat<KeyValuePair<string, IEnumerable<string>>>(request.Headers, request.Content.Headers)
-                .Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        }
+        //public HttpRequestODataMessage(HttpRequestMessage request)
+        //{
+        //    _request = request;
+        //    _headers = Enumerable
+        //        .Concat<KeyValuePair<string, IEnumerable<string>>>(request.Headers, request.Content.Headers)
+        //        .Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
+        //        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        //}
 
         public HttpRequestODataMessage(HttpRequest request)
         {
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public Stream GetStream()
         {
             // Can't make this async as the interface requires a return stream, not Task<Stream>
-            return _request.Content.ReadAsStreamAsync().Result;
+            return _httpRequest.Body;
         }
 
         public IEnumerable<KeyValuePair<string, string>> Headers
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             get
             {
-                return _request.Method.ToString();
+                return _httpRequest.Method;
             }
             set
             {
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             get
             {
-                return _request.RequestUri;
+                return new Uri(UriHelper.GetEncodedUrl(_httpRequest));
             }
             set
             {

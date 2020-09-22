@@ -16,13 +16,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
     {
         private static IEdmModel _edmModel = GetEdmModel();
 
-        private static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EnumType<Color>().Namespace = "NS";
-            return builder.GetEdmModel();
-        }
-
         [Fact]
         public void ReadFromStreamAsync()
         {
@@ -36,8 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(Color)
             };
 
-            // new HttpRequestMessage(new HttpMethod("Post"), "http://localhost/OData/TestUri")
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddModel("odata", _edmModel));
 
             // Act
             object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
@@ -124,6 +116,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.Equal(Level.High, level);
         }
 
+        private static IEdmModel GetEdmModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EnumType<Color>().Namespace = "NS";
+            return builder.GetEdmModel();
+        }
+
         public enum Color
         {
             Red,
@@ -136,6 +135,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             [EnumMember(Value = "low")]
             Low,
+
             [EnumMember(Value = "veryhigh")]
             High
         }

@@ -214,6 +214,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             try
             {
+                // TODO: We should remove this and make other serializers call using Async?
                 var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
                 if (body != null)
                 {

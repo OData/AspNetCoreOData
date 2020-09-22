@@ -665,16 +665,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static ODataPath CreateBoundPath(string actionName)
         {
             string path = String.Format("Customers(1)/A.B.{0}", actionName);
-           // ODataPath odataPath = new DefaultODataPathHandler().Parse(_model, _serviceRoot, path);
-            ODataPath odataPath = new ODataUriParser(_model, new Uri(_serviceRoot), new Uri(path)).ParsePath();
+            ODataPath odataPath = new ODataUriParser(_model, new Uri(_serviceRoot), new Uri(path, UriKind.Relative)).ParsePath();
             Assert.NotNull(odataPath); // Guard
             return odataPath;
         }
 
         private static ODataPath CreateUnboundPath(string actionName)
         {
-            string path = String.Format("{0}", actionName);
-            ODataPath odataPath = new ODataUriParser(_model, new Uri(_serviceRoot), new Uri(path)).ParsePath();
+            string path = string.Format("{0}", actionName);
+            ODataPath odataPath = new ODataUriParser(_model, new Uri(_serviceRoot), new Uri(path, UriKind.Relative)).ParsePath();
             Assert.NotNull(odataPath); // Guard
             return odataPath;
         }
