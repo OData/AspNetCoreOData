@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="actionImport">The wrapper action import.</param>
         /// <param name="navigationSource">The target navigation source. it could be null.</param>
         public ActionImportSegmentTemplate(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
-            : this(new OperationImportSegment(actionImport, navigationSource as IEdmEntitySetBase))
+            : this(BuildSegment(actionImport, navigationSource as IEdmEntitySetBase))
         {
         }
 
@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="segment">The operation import segment.</param>
         internal ActionImportSegmentTemplate(OperationImportSegment segment)
         {
-            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+            Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
             ActionImport = segment.OperationImports.First() as IEdmActionImport;
 
@@ -72,6 +72,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             return Segment;
+        }
+
+        private static OperationImportSegment BuildSegment(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
+        {
+            if (actionImport == null)
+            {
+                throw Error.ArgumentNull(nameof(actionImport));
+            }
+
+            return new OperationImportSegment(actionImport, navigationSource as IEdmEntitySetBase);
         }
     }
 }

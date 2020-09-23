@@ -41,6 +41,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             ActionModel action = context.Action;
             string actionMethodName = action.ActionMethod.Name;
 
+            // Need to refactor the following
+            // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
             // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
             string method = SplitRefActionName(actionMethodName, out string property, out string declaring);
             if (method == null)
@@ -124,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmEntityType navigationPropertyType = navigationProperty.Type.AsEntity().EntityDefinition();
+            IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
             bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
@@ -135,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(context.Prefix, context.Model, template);
+            action.AddSelector(method, context.Prefix, context.Model, template);
 
             // processed
             return true;

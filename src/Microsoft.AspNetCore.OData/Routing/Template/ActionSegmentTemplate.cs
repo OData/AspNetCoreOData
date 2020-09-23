@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -16,19 +15,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
         /// <param name="action">The Edm action.</param>
-        public ActionSegmentTemplate(IEdmAction action)
-            : this(action, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="action">The Edm action.</param>
         /// <param name="navigationSource">Unqualified function/action call boolean value.</param>
         public ActionSegmentTemplate(IEdmAction action, IEdmNavigationSource navigationSource)
         {
-            Action = action ?? throw new ArgumentNullException(nameof(action));
+            Action = action ?? throw Error.ArgumentNull(nameof(action));
             NavigationSource = navigationSource;
 
             if (action.ReturnType != null)

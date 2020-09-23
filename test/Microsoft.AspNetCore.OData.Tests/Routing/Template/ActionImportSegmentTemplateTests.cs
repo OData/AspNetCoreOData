@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -19,17 +20,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void KindProperty_ReturnsActionImport()
+        public void CommonProperties_ReturnsAsExpected()
         {
             // Assert
             EdmEntityContainer container = new EdmEntityContainer("NS", "default");
             EdmAction action = new EdmAction("NS", "action", null);
-            EdmActionImport actionImport = new EdmActionImport(container, "name", action);
+            EdmActionImport actionImport = new EdmActionImport(container, "actionImport", action);
 
             ActionImportSegmentTemplate template = new ActionImportSegmentTemplate(actionImport, null);
 
             // Act & Assert
             Assert.Equal(ODataSegmentKind.ActionImport, template.Kind);
+            Assert.Equal("actionImport", template.Literal);
+            Assert.False(template.IsSingle);
+            Assert.Null(template.EdmType);
+            Assert.Null(template.NavigationSource);
         }
 
         [Fact]
@@ -48,8 +53,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Assert
             Assert.NotNull(actual);
-            ActionImportSegmentTemplate actionImportSegment = Assert.IsType<ActionImportSegmentTemplate>(actual);
-            Assert.Same(actionImport, actionImportSegment.ActionImport);
+            OperationImportSegment actionImportSegment = Assert.IsType<OperationImportSegment>(actual);
+            Assert.Same(actionImport, actionImportSegment.OperationImports.First());
         }
     }
 }

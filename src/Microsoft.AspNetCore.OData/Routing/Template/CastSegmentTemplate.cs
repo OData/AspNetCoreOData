@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -19,17 +18,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="expectedType">The expected Edm type.</param>
         /// <param name="navigationSource">The target navigation source. it could be null.</param>
         public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
-            : this(new TypeSegment(castType, expectedType, navigationSource))
+            : this(BuildSegment(castType, expectedType, navigationSource))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="typeSegment"></param>
+        /// <param name="typeSegment">The type segment.</param>
         public CastSegmentTemplate(TypeSegment typeSegment)
         {
-            TypeSegment = typeSegment ?? throw new ArgumentNullException(nameof(typeSegment));
+            TypeSegment = typeSegment ?? throw Error.ArgumentNull(nameof(typeSegment));
 
             Literal = typeSegment.EdmType.AsElementType().FullTypeName();
 
@@ -70,6 +69,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             return TypeSegment;
+        }
+
+        private static TypeSegment BuildSegment(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
+        {
+            if (castType == null)
+            {
+                throw Error.ArgumentNull(nameof(castType));
+            }
+
+            if (expectedType == null)
+            {
+                throw Error.ArgumentNull(nameof(expectedType));
+            }
+
+            return new TypeSegment(castType, expectedType, navigationSource);
         }
     }
 }

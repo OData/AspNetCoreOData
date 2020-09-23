@@ -3,7 +3,9 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
@@ -22,6 +24,11 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             _rootContainer = sp;
         }
 
+        public MockServiceProvider(IEdmModel model)
+        {
+            _rootContainer = BuilderDefaultServiceProvider(b => b.AddService(ServiceLifetime.Singleton, sp => model));
+        }
+
         public MockServiceProvider(Action<IContainerBuilder> setupAction)
         {
             _rootContainer = BuilderDefaultServiceProvider(setupAction);
@@ -37,6 +44,8 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             IContainerBuilder odataContainerBuilder = new DefaultContainerBuilder();
 
             odataContainerBuilder.AddDefaultODataServices();
+
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => new DefaultQuerySettings());
 
             // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();

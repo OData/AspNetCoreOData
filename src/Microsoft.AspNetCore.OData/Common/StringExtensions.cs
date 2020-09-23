@@ -9,16 +9,22 @@ namespace Microsoft.AspNetCore.OData.Common
 {
     internal static class StringExtensions
     {
+        /// <summary>
+        /// Extract key/value pairs, the value could have "=" or ', or "", etc.
+        /// </summary>
+        /// <param name="input">The input string</param>
+        /// <param name="pairs"></param>
+        /// <returns>true or false</returns>
         public static bool TryExtractKeyValuePairs(this string input, out IDictionary<string, string> pairs)
         {
             if (input == null)
             {
-                throw new ArgumentNullException(nameof(input));
+                throw Error.ArgumentNull(nameof(input));
             }
 
+            // "  minSalary='af''d,2,=897abc' , maxSalary=3"
             pairs = new Dictionary<string, string>();
             input = input.Trim();
-            // "  minSalary='af''d,2,=897abc' , maxSalary=3"
 
             int length = input.Length;
             int start = 0;
@@ -66,7 +72,6 @@ namespace Microsoft.AspNetCore.OData.Common
             }
 
             return (input.Substring(start, end - start), end);
-
         }
 
         private static (string, int) ReadValue(string input, int start)

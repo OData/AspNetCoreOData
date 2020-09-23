@@ -23,8 +23,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="function">The Edm function, it should be bound function..</param>
-        /// <param name="navigationSource">The Edm navigation source of this function return.</param>
+        /// <param name="function">The Edm function, it should be bound function.</param>
+        /// <param name="navigationSource">The Edm navigation source of this function return. It could be null.</param>
         public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource)
             : this(function, navigationSource, function?.GetFunctionParamters())
         {
@@ -33,36 +33,40 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="function">The Edm function.</param>
-        /// <param name="navigationSource">Unqualified function call boolean value.</param>
-        /// <param name="requiredParameters">The required parameters.</param>
+        /// <param name="function">The Edm function, it should be bound function.</param>
+        /// <param name="navigationSource">The Edm navigation source of this function return. It could be null.</param>
+        /// <param name="requiredParameters">The required parameters of this function.</param>
         public FunctionSegmentTemplate(IEdmFunction function, IEdmNavigationSource navigationSource, ISet<string> requiredParameters)
         {
-            Function = function ?? throw new ArgumentNullException(nameof(function));
+            Function = function ?? throw Error.ArgumentNull(nameof(function));
 
             NavigationSource = navigationSource;
 
-            RequiredParameters = requiredParameters ?? throw new ArgumentNullException(nameof(requiredParameters));
+            RequiredParameters = requiredParameters ?? throw Error.ArgumentNull(nameof(requiredParameters));
 
+            // Only accept the bound function
             if (!function.IsBound)
             {
                 throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.FunctionIsNotBound, function.Name));
             }
 
+            // make sure the input parameter is subset of the function paremeters.
             ISet<string> functionParameters = function.GetFunctionParamters();
             if (!requiredParameters.IsSubsetOf(functionParameters))
             {
                 string required = string.Join(",", requiredParameters);
                 string actual = string.Join(",", functionParameters);
-                throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.RequiredParametersNotSubsetOfFunctionParameters, required, actual));
+                throw new ODataException(Error.Format(SRResources.RequiredParametersNotSubsetOfFunctionParameters, required, actual));
             }
 
+            // Join the parameters as p1={p1}
             string parameters = "(" + string.Join(",", requiredParameters.Select(a => $"{a}={{{a}}}")) + ")";
 
             UnqualifiedIdentifier = function.Name + parameters;
 
             Literal = function.FullName() + parameters;
 
+            // Function will always have the return type
             IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
@@ -98,50 +102,41 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         public ISet<string> RequiredParameters { get; }
 
-        internal bool IsAllParameters(RouteValueDictionary routeValue)
-        {
-            foreach (var parameter in RequiredParameters)
-            {
-                if (!routeValue.ContainsKey(parameter))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            var routeValue = context.RouteValues;
+            RouteValueDictionary routeValue = context.RouteValues;
+
             // TODO: process the parameter alias
             int skip = Function.IsBound ? 1 : 0;
 
-            if (!TestParameters(context, out IDictionary<string, string> actualParameters))
-            {
-                return null;
-            }
+            //if (!TestParameters(context, out IDictionary<string, string> actualParameters))
+            //{
+            //    return null;
+            //}
 
             if (!IsAllParameters(routeValue))
             {
-                return null;
-            }
-
-            if (HasOptional)
-            {
-                if (routeValue.TryGetValue("parameters", out object value))
+                if (!TestParameters(context, out IDictionary<string, string> actualParameters))
                 {
-                    string parametersStr = value as string;
-                    if (!parametersStr.TryExtractKeyValuePairs(out IDictionary<string, string> pairs))
-                    {
-                        return null;
-                    }
+                    return null;
+                }
+
+                routeValue = new RouteValueDictionary();
+                foreach (var item in context.RouteValues)
+                {
+                    routeValue.Add(item.Key, item.Value);
+                }
+
+                // Replace
+                foreach (var item in actualParameters)
+                {
+                    routeValue[item.Key] = item.Value;
                 }
             }
 
@@ -179,9 +174,31 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
         }
 
+        internal bool IsAllParameters(RouteValueDictionary routeValue)
+        {
+            foreach (var parameter in RequiredParameters)
+            {
+                if (!routeValue.ContainsKey(parameter))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         private bool TestParameters(ODataTemplateTranslateContext context, out IDictionary<string, string> actualParameters)
         {
+            // If we have a function(p1, p2, p3), where p3 is optinal parameter.
+            // In controller, we may have two functions:
+            // IActionResult function(p1, p2)   --> #1
+            // IActionResult function(p1, p2, p3)  --> #2
+            // #1  can match ~/function(p1=a, p2=b) , where p1=a, p2=b
+            // It also match ~/function(p1=a,p2=b,p3=c), where p2="b,p3=c".
+            // In this case, we should skip this.
+            // Here is a workaround:
+            // 1) We get all the parameters from the function and all parameter values from routeValue.
+            // Combine them as a string. so, actualParameters = "p1=a,p2=b,p3=c"
             var routeValue = context.RouteValues;
 
             int skip = Function.IsBound ? 1 : 0;
@@ -194,18 +211,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
-
-            if (string.IsNullOrEmpty(combintes) && !RequiredParameters.Any())
+            if (!actualParameters.Any())
             {
-                return true;
+                if (RequiredParameters.Any())
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
 
+            string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
+
+            // 2) Extract the key/value pairs
+            //   p1=a    p2=b    p3=c
             if (!combintes.TryExtractKeyValuePairs(out actualParameters))
             {
                 return false;
             }
 
+            // 3) now the RequiredParameters (p1, p3) is not equal to actualParameters (p1, p2, p3)
             return RequiredParameters.SetEquals(actualParameters.Keys);
         }
     }

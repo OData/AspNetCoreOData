@@ -121,70 +121,70 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 return new TheoryDataSet<string, int[]>
                 {
                     // Simple Enums
-                    { "Simple eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", new int[] { 1, 3 } },
-                    { "Simple eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'0'", new int[] { 1, 3 } },
-                    { "Simple eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'Fourth'", new int[] { } },
-                    { "Simple eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'3'", new int[] { } },
-                    { "Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First' eq Simple", new int[] { 1, 3 } },
-                    { "Simple eq cast('0',Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum)", new int[] { 1, 3} },
-                    { "Simple eq cast('First','Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum')", new int[] { 1, 3} },
+                    { "Simple eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", new int[] { 1, 3 } },
+                    { "Simple eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'0'", new int[] { 1, 3 } },
+                    { "Simple eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'Fourth'", new int[] { } },
+                    { "Simple eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'3'", new int[] { } },
+                    { "Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First' eq Simple", new int[] { 1, 3 } },
+                    { "Simple eq cast('0',Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum)", new int[] { 1, 3} },
+                    { "Simple eq cast('First','Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum')", new int[] { 1, 3} },
                     { "Simple eq null", new int[] { } },
                     { "null eq Simple", new int[] { } },
                     { "Simple eq SimpleNullable", new int[] { 1 } },
-                    { "Simple has Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", new int[] { 1, 2, 3, 5, 6 } },
-                    { "Simple has Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'0'", new int[] { 1, 2, 3, 5, 6 } },
-                    { "Simple has Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'Second'", new int[] { 5 } },
-                    { "SimpleNullable eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", new int[] { 1 } },
-                    { "Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First' eq SimpleNullable", new int[] { 1 } },
+                    { "Simple has Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", new int[] { 1, 2, 3, 5, 6 } },
+                    { "Simple has Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'0'", new int[] { 1, 2, 3, 5, 6 } },
+                    { "Simple has Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'Second'", new int[] { 5 } },
+                    { "SimpleNullable eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", new int[] { 1 } },
+                    { "Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First' eq SimpleNullable", new int[] { 1 } },
                     { "SimpleNullable eq null", new int[] { 3, 5 } },
                     { "null eq SimpleNullable", new int[] { 3, 5 } },
 
                     // Long enums
-                    { "Long eq Microsoft.AspNet.OData.Test.Common.Types.LongEnum'SecondLong'", new int[] { 2 } },
-                    { "Long eq Microsoft.AspNet.OData.Test.Common.Types.LongEnum'FourthLong'", new int[] { } },
-                    { "Long eq Microsoft.AspNet.OData.Test.Common.Types.LongEnum'3'", new int[] { } },
+                    { "Long eq Microsoft.AspNetCore.OData.Tests.Models.LongEnum'SecondLong'", new int[] { 2 } },
+                    { "Long eq Microsoft.AspNetCore.OData.Tests.Models.LongEnum'FourthLong'", new int[] { } },
+                    { "Long eq Microsoft.AspNetCore.OData.Tests.Models.LongEnum'3'", new int[] { } },
 
                     // Byte enums
-                    { "Byte eq Microsoft.AspNet.OData.Test.Common.Types.ByteEnum'SecondByte'", new int[] { 2 } },
+                    { "Byte eq Microsoft.AspNetCore.OData.Tests.Models.ByteEnum'SecondByte'", new int[] { 2 } },
 
                     // SByte enums
-                    { "SByte eq Microsoft.AspNet.OData.Test.Common.Types.SByteEnum'SecondSByte'", new int[] { 2 } },
+                    { "SByte eq Microsoft.AspNetCore.OData.Tests.Models.SByteEnum'SecondSByte'", new int[] { 2 } },
 
                     // Short enums
-                    { "Short eq Microsoft.AspNet.OData.Test.Common.Types.ShortEnum'SecondShort'", new int[] { 2 } },
+                    { "Short eq Microsoft.AspNetCore.OData.Tests.Models.ShortEnum'SecondShort'", new int[] { 2 } },
 
                     // UShort enums
-                    { "UShort eq Microsoft.AspNet.OData.Test.Common.Types.UShortEnum'SecondUShort'", new int[] { 2 } },
+                    { "UShort eq Microsoft.AspNetCore.OData.Tests.Models.UShortEnum'SecondUShort'", new int[] { 2 } },
 
                     // UInt enums
-                    { "UInt eq Microsoft.AspNet.OData.Test.Common.Types.UIntEnum'SecondUInt'", new int[] { 2 } },
+                    { "UInt eq Microsoft.AspNetCore.OData.Tests.Models.UIntEnum'SecondUInt'", new int[] { 2 } },
 
                     // Flag enums
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four'", new int[] { 1 } },
-                    { "Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four' eq Flag", new int[] { 1 } },
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'0'", new int[] { } },
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'1'", new int[] { 5 } },
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'5'", new int[] { 1 } },
-                    { "Flag has Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four'", new int[] { 1 } },
-                    { "Flag has Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One'", new int[] { 1, 2, 5 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four'", new int[] { 1 } },
+                    { "Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four' eq Flag", new int[] { 1 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'0'", new int[] { } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'1'", new int[] { 5 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'5'", new int[] { 1 } },
+                    { "Flag has Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four'", new int[] { 1 } },
+                    { "Flag has Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One'", new int[] { 1, 2, 5 } },
                     { "Flag eq null", new int[] { } },
                     { "null eq Flag", new int[] { } },
                     { "Flag eq FlagNullable", new int[] { 1 } },
-                    { "FlagNullable eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four'", new int[] { 1 } },
-                    { "Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four' eq FlagNullable", new int[] { 1 } },
+                    { "FlagNullable eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four'", new int[] { 1 } },
+                    { "Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four' eq FlagNullable", new int[] { 1 } },
                     { "FlagNullable eq null", new int[] { 3, 5 } },
                     { "null eq FlagNullable", new int[] { 3, 5 } },
 
                     // Flag enums with different formats
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One,Four'", new int[] { 1 } },
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One,    Four'", new int[] { 1 } },
-                    { "Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'Four, One'", new int[] { 1 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One,Four'", new int[] { 1 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One,    Four'", new int[] { 1 } },
+                    { "Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'Four, One'", new int[] { 1 } },
 
                     // Other expressions
-                    { "Flag ne Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'One, Four'", new int[] { 2, 3, 5, 6 } },
+                    { "Flag ne Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Four'", new int[] { 2, 3, 5, 6 } },
                     { "Flag eq FlagNullable and Simple eq SimpleNullable", new int[] { 1 } },
-                    { "Simple gt Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", new int[] { 2, 5, 6 } },
-                    { "Flag ge Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'Four,One'", new int[] { 1, 3, 6 } }
+                    { "Simple gt Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", new int[] { 2, 5, 6 } },
+                    { "Flag ge Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'Four,One'", new int[] { 1, 3, 6 } }
                 };
             }
         }
@@ -672,7 +672,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = GetEnumModel();
-            var context = new ODataQueryContext(model, typeof(EnumModel)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(EnumModel)) { RequestContainer = new MockServiceProvider(model) };
             var filterOption = new FilterQueryOption(filter, context);
             IEnumerable<EnumModel> enumModels = EnumModelTestData;
 
@@ -693,7 +693,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = GetEnumModel();
-            var context = new ODataQueryContext(model, typeof(EnumModel)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(EnumModel)) { RequestContainer = new MockServiceProvider(model) };
             var filterOption = new FilterQueryOption(filter, context);
             IEnumerable<EnumModel> enumModels = EnumModelTestData;
 
@@ -762,7 +762,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = GetCastModel();
-            var context = new ODataQueryContext(model, typeof(DataTypes)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(DataTypes)) { RequestContainer = new MockServiceProvider(model) };
             var filterOption = new FilterQueryOption(filter, context);
             IEnumerable<DataTypes> castModels = CastModelTestData;
 
@@ -863,7 +863,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = GetParameterAliasModel();
-            var context = new ODataQueryContext(model, typeof(DataTypes)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(DataTypes)) { RequestContainer = new MockServiceProvider(model) };
             IEdmType targetEdmType = model.FindType("Microsoft.AspNet.OData.Test.Query.Expressions.DataTypes");
             IEdmNavigationSource targetNavigationSource = model.FindDeclaredEntitySet("Microsoft.AspNet.OData.Test.Query.Expressions.Products");
 
@@ -893,7 +893,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = GetPropertyAliasModel();
-            var context = new ODataQueryContext(model, typeof(PropertyAlias)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(PropertyAlias)) { RequestContainer = new MockServiceProvider(model) };
             var filterOption = new FilterQueryOption(filter, context);
             IEnumerable<PropertyAlias> propertyAliases = PropertyAliasTestData;
 

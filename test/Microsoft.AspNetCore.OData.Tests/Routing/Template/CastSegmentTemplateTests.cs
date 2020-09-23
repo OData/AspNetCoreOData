@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -12,14 +13,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class CastSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_ActualType()
+        public void Ctor_ThrowsArgumentNull_CastType()
         {
             // Assert & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new CastSegmentTemplate(null, null, null), "actualType");
+            ExceptionAssert.ThrowsArgumentNull(() => new CastSegmentTemplate(null, null, null), "castType");
         }
 
         [Fact]
-        public void KindProperty_ReturnsCast()
+        public void Ctor_ThrowsArgumentNull_ExpectedType()
+        {
+            // Assert
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new CastSegmentTemplate(edmType.Object, null, null), "expectedType");
+        }
+
+        [Fact]
+        public void CommonCastProperties_ReturnsAsExpected()
         {
             // Assert
             EdmEntityType baseType = new EdmEntityType("NS", "base");
@@ -28,6 +39,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Act & Assert
             Assert.Equal(ODataSegmentKind.Cast, template.Kind);
+            Assert.Equal("NS.sub", template.Literal);
+            Assert.True(template.IsSingle);
+            Assert.Same(subType, template.EdmType);
+            Assert.Null(template.NavigationSource);
         }
 
         [Fact]

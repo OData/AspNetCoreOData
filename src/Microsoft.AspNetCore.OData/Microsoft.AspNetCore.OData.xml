@@ -1132,6 +1132,14 @@
             <returns>a fast getter.</returns>
             <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.TryExtractKeyValuePairs(System.String,System.Collections.Generic.IDictionary{System.String,System.String}@)">
+            <summary>
+            Extract key/value pairs, the value could have "=" or ', or "", etc.
+            </summary>
+            <param name="input">The input string</param>
+            <param name="pairs"></param>
+            <returns>true or false</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.ExtractKeyValuePairs(System.String)">
             <summary>
             Each key/value pair is separated using ",".
@@ -11188,18 +11196,6 @@
             Gets the supported Http methods.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataBuilderRoutingServicesExtensions">
-            <summary>
-            Extension methods to add odata routing services to the OData builder.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataBuilderRoutingServicesExtensions.AddODataRouting(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            Adds the core odata routing services.
-            </summary>
-            <param name="builder">The OData builder.</param>
-            <returns>The IODataBuilder itself.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds">
             <summary>
             Provides the values of segment kinds for implementations of odata path template.
@@ -11496,12 +11492,6 @@
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmAction"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmAction)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate" /> class.
-            </summary>
-            <param name="action">The Edm action.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmAction,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate" /> class.
@@ -11554,7 +11544,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate" /> class.
             </summary>
-            <param name="typeSegment"></param>
+            <param name="typeSegment">The type segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.Literal">
             <inheritdoc />
@@ -11614,6 +11604,9 @@
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.IsSingle">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.NavigationSource">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
@@ -11764,16 +11757,16 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate" /> class.
             </summary>
-            <param name="function">The Edm function, it should be bound function..</param>
-            <param name="navigationSource">The Edm navigation source of this function return.</param>
+            <param name="function">The Edm function, it should be bound function.</param>
+            <param name="navigationSource">The Edm navigation source of this function return. It could be null.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmFunction,Microsoft.OData.Edm.IEdmNavigationSource,System.Collections.Generic.ISet{System.String})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate" /> class.
             </summary>
-            <param name="function">The Edm function.</param>
-            <param name="navigationSource">Unqualified function call boolean value.</param>
-            <param name="requiredParameters">The required parameters.</param>
+            <param name="function">The Edm function, it should be bound function.</param>
+            <param name="navigationSource">The Edm navigation source of this function return. It could be null.</param>
+            <param name="requiredParameters">The required parameters of this function.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Literal">
             <inheritdoc />

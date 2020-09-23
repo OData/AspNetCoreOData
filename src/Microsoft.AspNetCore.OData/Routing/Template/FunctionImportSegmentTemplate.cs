@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
@@ -25,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="navigationSource">The target navigation source, it could be null.</param>
         public FunctionImportSegmentTemplate(IEdmFunctionImport functionImport, IEdmNavigationSource navigationSource)
         {
-            FunctionImport = functionImport ?? throw new ArgumentNullException(nameof(functionImport));
+            FunctionImport = functionImport ?? throw Error.ArgumentNull(nameof(functionImport));
             NavigationSource = navigationSource;
 
             IDictionary<string, string> keyMappings = new Dictionary<string, string>();
@@ -71,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             IEdmModel model = context.Model;
@@ -108,9 +107,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            IEdmNavigationSource targetset = null; // todo
-
-            return new OperationImportSegment(FunctionImport, targetset as IEdmEntitySetBase, parameters);
+            return new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase, parameters);
         }
     }
 }

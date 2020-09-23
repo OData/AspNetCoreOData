@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void KindProperty_ReturnsAction()
+        public void CommonActionProperties_ReturnsAsExpected()
         {
             // Assert
             EdmAction action = new EdmAction("NS", "action", null);
@@ -28,6 +28,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Act & Assert
             Assert.Equal(ODataSegmentKind.Action, template.Kind);
+            Assert.Equal("NS.action", template.Literal);
+            Assert.False(template.IsSingle);
+            Assert.Null(template.EdmType);
+            Assert.Null(template.NavigationSource);
         }
 
         [Fact]

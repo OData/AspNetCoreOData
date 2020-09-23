@@ -2,10 +2,13 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -51,7 +54,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             EdmFunctionImport functionImport = new EdmFunctionImport(container, "MyFunctionImport", function);
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(functionImport, null);
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            Mock<IEdmModel> edmModel = new Mock<IEdmModel>();
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext.Object,
+                new RouteValueDictionary(), edmModel.Object);
 
             // Act
             ODataPathSegment actual = template.Translate(context);

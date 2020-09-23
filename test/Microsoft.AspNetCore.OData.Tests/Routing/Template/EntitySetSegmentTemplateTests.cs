@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void KindProperty_ReturnsEntitySet()
+        public void CommonEntitySetProperties_ReturnsAsExpected()
         {
             // Assert
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
@@ -36,6 +36,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Act & Assert
             Assert.Equal(ODataSegmentKind.EntitySet, template.Kind);
+
+            Assert.Equal("entities", template.Literal);
+            Assert.False(template.IsSingle);
+            Assert.Equal(EdmTypeKind.Collection, template.EdmType.TypeKind);
+            Assert.Same(entityset, template.NavigationSource);
         }
 
         [Fact]

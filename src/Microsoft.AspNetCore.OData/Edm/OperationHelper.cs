@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (function == null)
             {
-                throw new ArgumentNullException(nameof(function));
+                throw Error.ArgumentNull(nameof(function));
             }
 
             int skip = function.IsBound ? 1 : 0;
