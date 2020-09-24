@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             var partialCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(enumerator.Current);
             Assert.False(enumerator.MoveNext());
             Assert.Null(partialCustomer.Instance);
-            Assert.Equal("Microsoft.AspNet.OData.Test.Query.Expressions.QueryCustomer", partialCustomer.InstanceType);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCustomer", partialCustomer.InstanceType);
             IEnumerable<SelectExpandWrapper<QueryOrder>> innerOrders = partialCustomer.Container
                 .ToDictionary(PropertyMapper)["Orders"] as IEnumerable<SelectExpandWrapper<QueryOrder>>;
             Assert.NotNull(innerOrders);
@@ -485,7 +485,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotEmpty((projection as MemberInitExpression).Bindings.Where(p => p.Member.Name == "InstanceType"));
             SelectExpandWrapper<QueryCustomer> customerWrapper = Expression.Lambda(projection).Compile().DynamicInvoke() as SelectExpandWrapper<QueryCustomer>;
             Assert.Null(customerWrapper.Instance);
-            Assert.Equal("Microsoft.AspNet.OData.Test.Query.Expressions.QueryCustomer", customerWrapper.InstanceType);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCustomer", customerWrapper.InstanceType);
         }
 
         [Theory]
@@ -744,7 +744,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             };
             Expression source = Expression.Constant(aCustomer);
 
-            string select = "HomeAddress/Street,HomeAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryCnAddress/PostCode";
+            string select = "HomeAddress/Street,HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/PostCode";
             SelectExpandClause selectExpandClause = ParseSelectExpand(select, null, _model, _customer, _customers);
             Assert.NotNull(selectExpandClause);
 
@@ -910,11 +910,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Addresses")]
         [InlineData("Emails")]
         [InlineData("Name")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/Level")] // $select=typeCast/Property
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/Birthday")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/Taxes")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/VipAddress")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/VipAddresses")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Level")] // $select=typeCast/Property
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Birthday")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Taxes")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddress")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddresses")]
         public void GetSelectExpandProperties_ForDirectProperty_OutputCorrectProperties(string select)
         {
             // Arrange
@@ -1076,8 +1076,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Theory]
         [InlineData("Orders")]
         [InlineData("PrivateOrder")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrder")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrders")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrder")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrders")]
         public void GetSelectExpandProperties_SkipForNavigationSelection(string select)
         {
             // Arrange
@@ -1107,11 +1107,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Orders")]
         [InlineData("Orders/$ref")]
         [InlineData("Orders($top=2;$count=true)")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrder")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrder/$ref")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrders")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrders/$ref")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/SpecialOrders($search=abc)")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrder")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrder/$ref")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrders")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrders/$ref")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/SpecialOrders($search=abc)")]
         public void GetSelectExpandProperties_ForDirectNavigationProperty_ReturnsProperties(string expand)
         {
             // Arrange
@@ -1157,14 +1157,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Addresses/Cities/$ref")]
         [InlineData("HomeAddress/Info/InfoCity")]
         [InlineData("Addresses/Info/InfoCity")]
-        [InlineData("HomeAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryUsAddress/UsCity")]
-        [InlineData("HomeAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryUsAddress/UsCities")]
-        [InlineData("HomeAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryUsAddress/UsCities($select=CityName)")]
-        [InlineData("HomeAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryUsAddress/UsCities/$ref")]
-        [InlineData("Addresses/Microsoft.AspNet.OData.Test.Query.Expressions.QueryCnAddress/CnCity")]
-        [InlineData("Addresses/Microsoft.AspNet.OData.Test.Query.Expressions.QueryCnAddress/CnCities")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/VipAddress/Microsoft.AspNet.OData.Test.Query.Expressions.QueryCnAddress/CnCities")]
-        [InlineData("Microsoft.AspNet.OData.Test.Query.Expressions.QueryVipCustomer/VipAddresses/Microsoft.AspNet.OData.Test.Query.Expressions.QueryUsAddress/UsCities")]
+        [InlineData("HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCity")]
+        [InlineData("HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities")]
+        [InlineData("HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities($select=CityName)")]
+        [InlineData("HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities/$ref")]
+        [InlineData("Addresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCity")]
+        [InlineData("Addresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCities")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCities")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities")]
         public void GetSelectExpandProperties_ForNonDirectNavigationProperty_ReturnsCorrectExpandedProperties(string expand)
         {
             // Arrange
@@ -1540,7 +1540,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                         "IIF((value({0}) == null), null, IIF((value({0}).Orders == null), null, " +
                         "value({0}).Orders.Where($it => ($it.Id == value({1}).TypedProperty))))",
                         source.Type,
-                        "Microsoft.AspNet.OData.Query.Expressions.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]"),
+                        "Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]"),
                     filterInExpand.ToString());
             }
             else
@@ -1548,7 +1548,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 Assert.Equal(
                     string.Format(
                         "value({0}).Orders.Where($it => ($it.Id == value(" +
-                        "Microsoft.AspNet.OData.Query.Expressions.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty))",
+                        "Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty))",
                         source.Type),
                     filterInExpand.ToString());
             }
@@ -1644,7 +1644,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 Assert.Equal(
                     string.Format(
                         "IIF((value({0}) == null), null, IIF((value({0}).Customer == null), null, " +
-                        "IIF((value({0}).Customer.Id != value(Microsoft.AspNet.OData.Query.Expressions.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty), " +
+                        "IIF((value({0}).Customer.Id != value(Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty), " +
                         "value({0}).Customer, null)))",
                         source.Type),
                     filterInExpand.ToString());
@@ -1653,7 +1653,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             {
                 Assert.Equal(
                     string.Format(
-                        "IIF((value({0}).Customer.Id != value(Microsoft.AspNet.OData.Query.Expressions.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty), " +
+                        "IIF((value({0}).Customer.Id != value(Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.Int32]).TypedProperty), " +
                         "value({0}).Customer, null)",
                         source.Type),
                     filterInExpand.ToString());

@@ -942,28 +942,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         [MemberData(nameof(OtherFunctions_SomeSingleParameterCasts))]
         public void OtherFunctions_SomeSingleParameterCasts_ThrowODataException(AllowedFunctions unused, string query, string unusedName)
         {
-            // Thrown at
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.ValidateIsOfOrCast(BindingState state, ..., ref List<QueryNode> args) Line 600
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.ValidateAndBuildCastArgs(BindingState state, ref List<QueryNode> args) Line 557
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.CreateUnboundFunctionNode(FunctionCallToken functionCallToken, ..., BindingState state) Line 525
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.BindAsBuiltInFunction(FunctionCallToken functionCallToken, ..., List<QueryNode> argumentNodes) Line 265
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.BindFunctionCall(FunctionCallToken functionCallToken, BindingState state) Line 202
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindFunctionCall(FunctionCallToken functionCallToken) Line 323
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 172
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.EndPathBinder.DetermineParentNode(EndPathToken segmentToken, BindingState state) Line 188
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.EndPathBinder.BindEndPath(EndPathToken endPathToken, BindingState state) Line 138
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindEndPath(EndPathToken endPathToken) Line 312
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 169
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.BinaryOperatorBinder.GetOperandFromToken(BinaryOperatorKind operatorKind, QueryToken queryToken) Line 83
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.BinaryOperatorBinder.BindBinaryOperator(BinaryOperatorToken binaryOperatorToken) Line 46
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindBinaryOperator(BinaryOperatorToken binaryOperatorToken) Line 266
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 163
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FilterBinder.BindFilter(QueryToken filter) Line 51
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.ODataQueryOptionParser.ParseFilterImplementation(string filter, ..., IEdmNavigationSource navigationSource) Line 250
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.ODataQueryOptionParser.ParseFilter() Line 112
-            // Microsoft.AspNet.OData.Test.dll!Microsoft.AspNet.OData.Test.Query.FilterQueryOption.FilterClause.get() Line 99
-            // Microsoft.AspNet.OData.Test.dll!Microsoft.AspNet.OData.Test.Query.Validators.FilterQueryValidator.Validate(FilterQueryOption filterQueryOption, ODataValidationSettings settings) Line 54
-
             // Arrange
             var settings = new ODataValidationSettings
             {
@@ -983,33 +961,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         [MemberData(nameof(OtherFunctions_SomeTwoParameterCasts))]
         public void OtherFunctions_SomeTwoParameterCasts_ThrowODataException(AllowedFunctions unused, string query, string unusedName)
         {
-            // Thrown at
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Metadata.UriEdmHelpers.CheckRelatedTo(IEdmType parentType, IEdmType childType) Line 108
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.DottedIdentifierBinder.BindDottedIdentifier(DottedIdentifierToken dottedIdentifierToken, BindingState state) Line 107
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindCast(DottedIdentifierToken dottedIdentifierToken) Line 288
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 175
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindFunctionParameter(FunctionParameterToken token) Line 223
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 184
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.BindFunctionCall.AnonymousMethod__8(FunctionParameterToken ar) Line 201
-            // System.Core.dll!System.Linq.Enumerable.WhereSelectEnumerableIterator<FunctionParameterToken,QueryNode>.MoveNext() Line 285
-            // mscorlib.dll!System.Collections.Generic.List<QueryNode>.List(System.Collections.Generic.IEnumerable<QueryNode> collection) Line 105
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FunctionCallBinder.BindFunctionCall(FunctionCallToken functionCallToken, BindingState state) Line 201
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindFunctionCall(FunctionCallToken functionCallToken) Line 323
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 172
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.EndPathBinder.DetermineParentNode(EndPathToken segmentToken, BindingState state) Line 188
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.EndPathBinder.BindEndPath(EndPathToken endPathToken, BindingState state) Line 138
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindEndPath(EndPathToken endPathToken) Line 312
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 169
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.BinaryOperatorBinder.GetOperandFromToken(BinaryOperatorKind operatorKind, QueryToken queryToken) Line 83
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.BinaryOperatorBinder.BindBinaryOperator(BinaryOperatorToken binaryOperatorToken) Line 46
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.BindBinaryOperator(BinaryOperatorToken binaryOperatorToken) Line 266
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.MetadataBinder.Bind(QueryToken token) Line 163
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.Parsers.FilterBinder.BindFilter(QueryToken filter) Line 51
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.ODataQueryOptionParser.ParseFilterImplementation(string filter, ..., IEdmNavigationSource navigationSource) Line 250
-            // Microsoft.OData.Core.dll!Microsoft.OData.Core.UriParser.ODataQueryOptionParser.ParseFilter() Line 112
-            // Microsoft.AspNet.OData.Test.dll!Microsoft.AspNet.OData.Test.Query.FilterQueryOption.FilterClause.get() Line 99
-            // Microsoft.AspNet.OData.Test.dll!Microsoft.AspNet.OData.Test.Query.Validators.FilterQueryValidator.Validate(FilterQueryOption filterQueryOption, ODataValidationSettings settings) Line 54
-
             // Arrange
             var settings = new ODataValidationSettings
             {

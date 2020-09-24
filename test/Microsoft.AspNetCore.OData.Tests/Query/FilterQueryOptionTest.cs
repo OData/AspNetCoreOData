@@ -283,7 +283,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     { "cast(IntProp,Edm.String) eq '3'", new int[] { 3 } },
                     { "cast(NullableIntProp,Edm.Int64) eq 1", new int[] { 1 }},
                     { "cast(NullableIntProp,Edm.String) eq null", new int[] { 3 }},
-                    { "cast('Two, Four',Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum) has FlagsEnumProp", new int[] { 2, 3 } },
+                    { "cast('Two, Four',Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum) has FlagsEnumProp", new int[] { 2, 3 } },
                     { "contains(cast(StringProp,Edm.String),'String')", new int[] { 1, 3 } },
                     { "cast(NullableSimpleEnumProp,Edm.String) ne '0'", new int[] { 2, 3 } },
                     { "cast(DateTimeOffsetProp,Edm.DateTimeOffset) eq 2001-01-01T01:01:01.000+00:00", new int[] { 1 } },
@@ -295,13 +295,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     { "cast(IntProp,Edm.DateTimeOffset) eq null", new int[] { 1, 2, 3 } },
                     { "cast(NullableIntProp,Edm.Guid) eq null", new int[] { 1, 2, 3 } },
                     { "cast(StringProp,Edm.Double) eq null", new int[] { 1, 2, 3 } },
-                    { "cast(StringProp,Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum) eq null", new int[] { 1, 2, 3 } },
+                    { "cast(StringProp,Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum) eq null", new int[] { 1, 2, 3 } },
                     { "cast(DateTimeOffsetProp,Edm.Int32) eq null", new int[] { 1, 2, 3 } },
                     { "cast(Edm.Int32) eq null", new int[] { 1, 2, 3 } },
                     { "cast($it,Edm.String) ne null", new int[] { } },
                     { "cast(ComplexProp,Edm.Double) ne null", new int[] { } },
                     { "cast(ComplexProp,Edm.String) ne null", new int[] { } },
-                    { "cast('123',Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum) ne 'First'", new int[] { 1, 2, 3 } }
+                    { "cast('123',Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum) ne 'First'", new int[] { 1, 2, 3 } }
                 };
             }
         }
@@ -360,8 +360,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     { "IntProp gt @p", "1.5", new int[] { 2, 3 }},
                     { "NullableIntProp lt @p", "1.5", new int[] { 1}},
                     { "contains(StringProp,@p)", "'3'", new int[] { 3 } },
-                    { "FlagsEnumProp has @p", "Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'Two'", new int[] { 2, 3 } },
-                    { "NullableSimpleEnumProp ne @p", "Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'1'", new int[] { 1, 3 } },
+                    { "FlagsEnumProp has @p", "Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'Two'", new int[] { 2, 3 } },
+                    { "NullableSimpleEnumProp ne @p", "Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'1'", new int[] { 1, 3 } },
                     { "DateTimeOffsetProp ne @p", "2001-01-01T01:01:01.000+00:00", new int[] { 2, 3 } },
                     { "GuidProp eq @p", "00000000-0000-0000-0000-000000000000", new int[] { 1, 3 } },
                     { "EntityProp/AlternateAddresses/all(a: a/City ne @p)", "'bc'", new int[] { 1 } },
@@ -714,8 +714,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
         [Theory]
         [InlineData("Simple has null", typeof(ODataException))]
-        [InlineData("null has Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", typeof(ODataException))]
-        [InlineData("Id has Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'First'", typeof(ODataException))]
+        [InlineData("null has Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", typeof(ODataException))]
+        [InlineData("Id has Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'First'", typeof(ODataException))]
         [InlineData("null has null", typeof(NotSupportedException))]
         [InlineData("Simple has 23", typeof(ODataException))]
         [InlineData("'Some string' has 0", typeof(ODataException))]
@@ -736,8 +736,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Theory]
-        [InlineData("Simple eq Microsoft.AspNet.OData.Test.Common.Types.SimpleEnum'4'")]
-        [InlineData("Flag eq Microsoft.AspNet.OData.Test.Common.Types.FlagsEnum'8'")]
+        [InlineData("Simple eq Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'4'")]
+        [InlineData("Flag eq Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'8'")]
         public void ApplyToEnums_DoesnotThrow_ForUndefinedValue(string filter)
         {
             // Arrange
@@ -864,8 +864,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Arrange
             var model = GetParameterAliasModel();
             var context = new ODataQueryContext(model, typeof(DataTypes)) { RequestContainer = new MockServiceProvider(model) };
-            IEdmType targetEdmType = model.FindType("Microsoft.AspNet.OData.Test.Query.Expressions.DataTypes");
-            IEdmNavigationSource targetNavigationSource = model.FindDeclaredEntitySet("Microsoft.AspNet.OData.Test.Query.Expressions.Products");
+            IEdmType targetEdmType = model.FindType("Microsoft.AspNetCore.OData.Tests.Models.DataTypes");
+            IEdmNavigationSource targetNavigationSource = model.FindDeclaredEntitySet("Microsoft.AspNetCore.OData.Tests.Models.Products");
 
             ODataQueryOptionParser parser = new ODataQueryOptionParser(
                 model,

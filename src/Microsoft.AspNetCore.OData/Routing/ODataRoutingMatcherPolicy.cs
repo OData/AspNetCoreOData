@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -47,12 +48,14 @@ namespace Microsoft.AspNetCore.OData.Routing
             return endpoints.Any(e => e.Metadata.OfType<ODataRoutingMetadata>().FirstOrDefault() != null);
         }
 
+
         /// <summary>
         /// Applies the policy to the CandidateSet.
         /// </summary>
         /// <param name="httpContext">The context associated with the current request.</param>
         /// <param name="candidates">The CandidateSet.</param>
         /// <returns>The task.</returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
         {
             if (httpContext == null)
@@ -108,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                         candidates.SetValidity(i, false);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     candidates.SetValidity(i, false);
                 }
