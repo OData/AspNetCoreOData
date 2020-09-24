@@ -9,6 +9,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
 {
     public class TestAssemblyResolver : IAssemblyResolver
     {
+        public static TestAssemblyResolver Instance = new TestAssemblyResolver();
+
         public IEnumerable<Assembly> Assemblies => new[] { typeof(TestAssemblyResolver).Assembly };
     }
 }

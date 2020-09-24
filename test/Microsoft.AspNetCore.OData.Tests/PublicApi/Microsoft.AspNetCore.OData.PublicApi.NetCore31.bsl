@@ -1139,6 +1139,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 }
 
 [
+NonValidatingParameterBindingAttribute(),
 ODataQueryParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions {

@@ -110,9 +110,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //}
 
         [Theory]
-        [InlineData("customerid")]
-        [InlineData("cUsToMeRiD")]
-        [InlineData("CUSTOMERID")]
+        [InlineData("id")]
+        [InlineData("iD")]
+        [InlineData("ID")]
         public void CanApplyOrderByQueryCaseInsensitive(string orderbyValue)
         {
             var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
@@ -280,7 +280,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ApplyTo_PropertyAliased_IfEnabled(bool modelAliasing, string propertyName)
         {
             // Arrange
-            var builder = new ODataConventionModelBuilder(AssemblyResolverHelper.Default, modelAliasing);
+            var builder = new ODataConventionModelBuilder(TestAssemblyResolver.Instance);
+            builder.ModelAliasingEnabled = modelAliasing;
             builder.EntitySet<PropertyAlias>("PropertyAliases");
             var model = builder.GetEdmModel();
 
@@ -547,7 +548,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             var parser = new ODataQueryOptionParser(
                 model,
-                model.FindType("Microsoft.AspNetCore.OData.Tests.TestModels.Customer"),
+                model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
                 model.FindDeclaredNavigationSource("Default.Container.Customers"),
                 new Dictionary<string, string> { { "$orderby", "@q desc,@p asc" }, { "@q", "Address/HouseNumber" }, { "@p", "Id" } });
 
