@@ -72,7 +72,6 @@ namespace Microsoft.AspNetCore.OData.Query
                     throw Error.Argument("actionContext", SRResources.ActionContextMustHaveDescriptor);
                 }
 
-
                 // Get the parameter description of the parameter to bind.
                 ParameterDescriptor paramDescriptor = bindingContext.ActionContext.ActionDescriptor.Parameters
                     .Where(p => p.Name == bindingContext.FieldName)
@@ -82,7 +81,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 Type parameterType = paramDescriptor?.ParameterType;
                 if (IsODataQueryOptions(parameterType))
                 {
-
                     // Get the entity type from the parameter type if it is ODataQueryOptions<T>.
                     // Fall back to the return type if not. Also, note that the entity type from the return type and ODataQueryOptions<T>
                     // can be different (example implementing $select or $expand).

@@ -7,10 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
@@ -18,7 +15,6 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -34,53 +30,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             public override void ConfigureServices(IServiceCollection services)
             {
-              //  services.AddSession();
-
                 services.ConfigureControllers(typeof(DollarCountEntitiesController));
 
                 IEdmModel model = GetEdmModel();
                 services.AddOData(options => options.AddModel(model)
                     .Count().SetMaxTop(null).Expand().Select().OrderBy().Filter());
             }
-
-            protected override void ConfigureInRouting(IApplicationBuilder app, IWebHostEnvironment env)
-            {
-               // app.UseSession();
-            }
         }
 
         public ODataCountTest(WebODataTestFixture<Startup> factory)
             : base(factory)
         {
-        }
-
-        private static HttpClient _client;
-
-        public static HttpClient GetClient()
-        {
-            var controllers = new[] { typeof(DollarCountEntitiesController) };
-            IEdmModel model = GetEdmModel();
-            var builder = new WebHostBuilder()
-                .ConfigureServices(services =>
-                {
-                    services.ConfigureControllers(typeof(DollarCountEntitiesController));
-
-                    services.AddOData(opt => opt.AddModel("odata", model)
-                        .Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
-                })
-                .Configure(app =>
-                {
-                    app.UseRouting();
-                    app.UseEndpoints(endpoints =>
-                    {
-                        endpoints.MapControllers();
-                    });
-                });
-
-            var server = new TestServer(builder);
-            _client = server.CreateClient();
-
-            return _client;
         }
 
         public static TheoryDataSet<string, int> DollarCountData
@@ -92,11 +52,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                 // $count follows entity set, structural collection property or navigation collection property.
                 data.Add("DollarCountEntities/$count", 10);
                 data.Add("DollarCountEntities/$count?$filter=Id gt 5", 5);
-                data.Add("DollarCountEntities/Microsoft.AspNet.OData.Test.Routing.DerivedDollarCountEntity/$count", 5);
+                data.Add("DollarCountEntities/Microsoft.AspNetCore.OData.Tests.Routing.DerivedDollarCountEntity/$count", 5);
                 data.Add("DollarCountEntities(5)/StringCollectionProp/$count", 2);
                 data.Add("DollarCountEntities(5)/StringCollectionProp/$count?$filter=$it eq '2'", 1);
                 data.Add("DollarCountEntities(5)/EnumCollectionProp/$count", 3);
-                data.Add("DollarCountEntities(5)/EnumCollectionProp/$count?$filter=$it has Microsoft.AspNet.OData.Test.Builder.TestModels.Color'Green'", 2);
+                data.Add("DollarCountEntities(5)/EnumCollectionProp/$count?$filter=$it has Microsoft.AspNetCore.OData.Tests.Models.Color'Green'", 2);
                 data.Add("DollarCountEntities(5)/TimeSpanCollectionProp/$count", 4);
                 data.Add("DollarCountEntities(5)/ComplexCollectionProp/$count", 5);
                 data.Add("DollarCountEntities(5)/EntityCollectionProp/$count", 4);
@@ -108,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                 data.Add("UnboundFunctionReturnsDateCollection()/$count", 18);
                 data.Add("UnboundFunctionReturnsComplexCollection()/$count", 9);
                 data.Add("UnboundFunctionReturnsEntityCollection()/$count", 10);
-                data.Add("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNet.OData.Test.Routing.DerivedDollarCountEntity/$count", 11);
+                data.Add("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.Tests.Routing.DerivedDollarCountEntity/$count", 11);
 
                 // $count follows bound function that returns collection.
                 data.Add("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count", 12);
@@ -117,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                 data.Add("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count", 15);
                 data.Add("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count?$filter=contains(StringProp,'1')", 7);
                 data.Add("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count", 10);
-                data.Add("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNet.OData.Test.Routing.DerivedDollarCountEntity/$count", 5);
+                data.Add("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.Tests.Routing.DerivedDollarCountEntity/$count", 5);
 
                 return data;
             }
@@ -129,7 +89,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             // Arrange & Act
             HttpResponseMessage response = await Client.GetAsync(uri);
-            //HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -143,10 +102,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             // Arrange
             var uri = "DollarCountEntities(5)/StringCollectionProp";
 
-            HttpClient client = GetClient();
             // Act
-            //HttpResponseMessage response = await Client.GetAsync(uri);
-            HttpResponseMessage response = await _client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync(uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -163,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             var uri = "DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()?$count=true";
 
             // Act
-            HttpResponseMessage response = await Client.GetAsync("http://localhost/odata/" + uri);
+            HttpResponseMessage response = await Client.GetAsync(uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -402,7 +359,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             }
 
             [HttpGet]
-            [ODataRoute("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNet.OData.Test.Routing.DerivedDollarCountEntity/$count")]
+            [ODataRoute("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.Tests.Routing.DerivedDollarCountEntity/$count")]
             public IActionResult UnboundFunctionReturnsDerivedEntityCollectionWithDollarCount()
             {
                 return Ok(11);
@@ -410,6 +367,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count")]
             public IActionResult BoundFunctionReturnsPrimitveCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Enumerable.Range(1, 12).Select(_ => DateTimeOffset.Now));
@@ -417,6 +375,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEnumCollection()/$count")]
             public IActionResult BoundFunctionReturnsEnumCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Enumerable.Range(1, 13).Select(_ => Color.Green));
@@ -424,6 +383,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsDateTimeOffsetCollection()/$count")]
             public IActionResult BoundFunctionReturnsDateTimeOffsetCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Enumerable.Range(1, 14).Select(_ => DateTimeOffset.Now));
@@ -431,6 +391,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count")]
             public IActionResult BoundFunctionReturnsComplexCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Enumerable.Range(1, 15).Select(i => new DollarCountComplex { StringProp = i.ToString() }));
@@ -438,6 +399,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count")]
             public IActionResult BoundFunctionReturnsEntityCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Entities);
@@ -445,7 +407,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             [HttpGet]
             [EnableQuery]
-            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNet.OData.Test.Routing.DerivedDollarCountEntity/$count")]
+            [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.Tests.Routing.DerivedDollarCountEntity/$count")]
             public IActionResult BoundFunctionReturnsDerivedEntityCollectionOnCollectionOfDollarCountEntity()
             {
                 return Ok(Entities.OfType<DerivedDollarCountEntity>());

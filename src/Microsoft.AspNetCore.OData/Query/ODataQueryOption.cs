@@ -29,6 +29,7 @@ namespace Microsoft.AspNetCore.OData.Query
     /// This defines a composite OData query options that can be used to perform query composition.
     /// Currently this only supports $filter, $orderby, $top, $skip, and $count.
     /// </summary>
+    [NonValidatingParameterBinding]
     [ODataQueryParameterBinding]
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     public class ODataQueryOptions

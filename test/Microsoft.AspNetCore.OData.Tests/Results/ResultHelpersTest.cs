@@ -5,12 +5,12 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             // Arrange
             var linkBuilder = new Mock<NavigationSourceLinkBuilderAnnotation>();
             var model = new CustomersModelWithInheritance();
-            model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(TestEntity)));
+            model.Model.SetAnnotationValue(model.Customer, new Microsoft.OData.ModelBuilder.ClrTypeAnnotation(typeof(TestEntity)));
             model.Model.SetNavigationSourceLinkBuilder(model.Customers, linkBuilder.Object);
             var path = new ODataPath(new EntitySetSegment(model.Customers));
             var request = RequestFactory.Create(model.Model, path: path);

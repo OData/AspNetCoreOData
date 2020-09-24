@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing
@@ -92,15 +93,22 @@ namespace Microsoft.AspNetCore.OData.Routing
                 ODataTemplateTranslateContext translatorContext =
                     new ODataTemplateTranslateContext(httpContext, candidate.Values, metadata.Model);
 
-                ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
-                if (odataPath != null)
+                try
                 {
-                    IODataFeature odataFeature = httpContext.ODataFeature();
-                    odataFeature.PrefixName = metadata.Prefix;
-                    odataFeature.Model = metadata.Model;
-                    odataFeature.Path = odataPath;
+                    ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
+                    if (odataPath != null)
+                    {
+                        IODataFeature odataFeature = httpContext.ODataFeature();
+                        odataFeature.PrefixName = metadata.Prefix;
+                        odataFeature.Model = metadata.Model;
+                        odataFeature.Path = odataPath;
+                    }
+                    else
+                    {
+                        candidates.SetValidity(i, false);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     candidates.SetValidity(i, false);
                 }
