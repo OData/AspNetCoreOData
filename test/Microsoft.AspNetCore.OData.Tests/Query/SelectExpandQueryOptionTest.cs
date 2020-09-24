@@ -145,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             IEdmModel model = _model.Model;
-            _model.Model.SetAnnotationValue(_model.Customer, new ClrTypeAnnotation(typeof(Customer)));
+            _model.Model.SetAnnotationValue(_model.Customer, new ClrTypeAnnotation(typeof(Formatter.Models.Customer)));
             ODataPath odataPath = new ODataPath(new EntitySetSegment(_model.Customers));
             ODataQueryContext context = new ODataQueryContext(model, _model.Customer, odataPath);
             context.RequestContainer = new MockServiceProvider();
@@ -259,7 +259,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = ODataLevelsTest.GetEdmModel();
-            var entityType = model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity");
+            var entityType = model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity");
             var context = new ODataQueryContext(
                 model,
                 entityType);
@@ -287,7 +287,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.NotNull(item.ApplyOption);
         }
 
-
         [Fact]
         public void ProcessLevelsCorrectly_AllSelected()
         {
@@ -295,7 +294,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = ODataLevelsTest.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
             context.RequestContainer = new MockServiceProvider();
             var selectExpand = new SelectExpandQueryOption(
                 select: null,
@@ -351,7 +350,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = ODataLevelsTest.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
             context.RequestContainer = new MockServiceProvider();
             var selectExpand = new SelectExpandQueryOption(
                 select: "Name",
@@ -424,7 +423,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = ODataLevelsTest.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
             context.RequestContainer = new MockServiceProvider();
             var selectExpand = new SelectExpandQueryOption(
                 select: null,
@@ -533,7 +532,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = ODataLevelsTest.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
             context.RequestContainer = new MockServiceProvider();
             var selectExpand = new SelectExpandQueryOption(
                 select: null,
@@ -619,7 +618,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = ODataLevelsTest.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Routing.LevelsEntity"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
             context.RequestContainer = new MockServiceProvider();
             var selectExpand = new SelectExpandQueryOption(
                 select: null,
@@ -678,7 +677,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var model = GetAutoExpandEdmModel();
             var context = new ODataQueryContext(
                 model,
-                model.FindDeclaredType("Microsoft.AspNet.OData.Test.Common.Models.AutoExpandCustomer"));
+                model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.AutoExpandCustomer"));
             var request = RequestFactory.Create("Get", url, model: null);
             var queryOption = new ODataQueryOptions(context, request);
             queryOption.AddAutoSelectExpandProperties();
@@ -758,14 +757,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             return builder.GetEdmModel();
         }
 
-        public class Customer
+        public class SelectExpandCustomer
         {
             public int Id { get; set; }
             public string Name { get; set; }
         }
 
         [AutoExpand]
-        public class AutoExpandCustomer : Customer
+        public class AutoExpandCustomer : SelectExpandCustomer
         {
             public AutoExpandOrder Order { get; set; }
             public AutoExpandCustomer Friend { get; set; }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
@@ -548,7 +547,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             var parser = new ODataQueryOptionParser(
                 model,
-                model.FindType("Microsoft.AspNet.OData.Test.Builder.TestModels.Customer"),
+                model.FindType("Microsoft.AspNetCore.OData.Tests.TestModels.Customer"),
                 model.FindDeclaredNavigationSource("Default.Container.Customers"),
                 new Dictionary<string, string> { { "$orderby", "@q desc,@p asc" }, { "@q", "Address/HouseNumber" }, { "@p", "Id" } });
 
@@ -582,7 +581,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             var parser = new ODataQueryOptionParser(
                 model,
-                model.FindType("Microsoft.AspNet.OData.Test.Builder.TestModels.Customer"),
+                model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
                 model.FindDeclaredNavigationSource("Default.Container.Customers"),
                 new Dictionary<string, string> { { "$orderby", "@p1" }, { "@p2", "Name" }, { "@p1", "@p2" } });
 
@@ -622,7 +621,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             var parser = new ODataQueryOptionParser(
                 model,
-                model.FindType("Microsoft.AspNet.OData.Test.Builder.TestModels.Customer"),
+                model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
                 model.FindDeclaredNavigationSource("Default.Container.Customers"),
                 new Dictionary<string, string> { { "$orderby", orderby } });
 

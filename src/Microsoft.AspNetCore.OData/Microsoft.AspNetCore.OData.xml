@@ -5529,6 +5529,11 @@
               Looks up a localized string similar to The argument must be of type &apos;{0}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ArgumentNullOrEmpty">
+            <summary>
+              Looks up a localized string similar to The argument &apos;{0}&apos; is null or empty..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestInvalidMediaType">
             <summary>
               Looks up a localized string similar to The batch request must have &apos;{0}&apos; or &apos;{1}&apos; as the media type..

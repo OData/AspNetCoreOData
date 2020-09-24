@@ -87,8 +87,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The logged <see cref="Exception"/>.</returns>
         internal static ArgumentException ArgumentNullOrEmpty(string parameterName)
         {
-            string message = $"The argument '{parameterName}' is null or empty.";
-            return new ArgumentException(message);
+            return Error.Argument(parameterName, SRResources.ArgumentNullOrEmpty, parameterName);
         }
 
         /// <summary>

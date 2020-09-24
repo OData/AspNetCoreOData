@@ -15,7 +15,6 @@ namespace Microsoft.AspNetCore.OData.TestCommon
 
         public MockServiceProvider()
         {
-            // TODO: to build the default sp.
             _rootContainer = BuilderDefaultServiceProvider(null);
         }
 

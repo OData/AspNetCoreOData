@@ -611,4 +611,7 @@
   <data name="OnlySingleValueNodeSupported" xml:space="preserve">
     <value>Only SingleValueNode supported.</value>
   </data>
+  <data name="ArgumentNullOrEmpty" xml:space="preserve">
+    <value>The argument '{0}' is null or empty.</value>
+  </data>
 </root>

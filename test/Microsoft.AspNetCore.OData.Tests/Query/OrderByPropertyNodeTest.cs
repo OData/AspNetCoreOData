@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Models;
@@ -87,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void CreateCollection_From_OrderByNode_Succeeds()
         {
             // Arrange
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            ODataConventionModelBuilder builder = ODataModelBuilderMocks.GetModelBuilderMock<ODataConventionModelBuilder>();
             builder.EntitySet<SampleClass>("entityset");
 
             IEdmModel model = builder.GetEdmModel();
