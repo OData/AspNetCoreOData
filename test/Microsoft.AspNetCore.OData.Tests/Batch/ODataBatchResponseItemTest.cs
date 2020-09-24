@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         }
 
         [Fact]
-        public async Task WriteMessage_SynchronouslyWritesResponseMessage()
+        public void WriteMessage_SynchronouslyWritesResponseMessage_Throws()
         {
             HeaderDictionary headers = new HeaderDictionary
             {
@@ -64,17 +64,12 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Act
             ODataBatchWriter batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext);
-            batchWriter.WriteEndBatch();
-
-            ms.Position = 0;
-            string result = new StreamReader(ms).ReadToEnd();
 
             // Assert
-            Assert.Contains("example content", result);
-            Assert.Contains("text/example", result);
-            Assert.Contains("customHeader", result);
-            Assert.Contains("bar", result);
+            Action test = () => ODataBatchResponseItem.WriteMessageAsync(batchWriter, response.HttpContext).Wait();
+            ODataException exception = ExceptionAssert.Throws<ODataException>(test);
+            Assert.Equal("An asynchronous operation was called on a synchronous batch writer. Calls on a batch writer instance must be either all synchronous or all asynchronous.",
+                exception.Message);
         }
 
         [Fact]
@@ -111,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         }
 
         [Fact]
-        public async Task WriteMessageAsync_SynchronousResponseContainsContentId_IfHasContentIdInRequestChangeSet()
+        public void WriteMessageAsync_SynchronousResponseContainsContentId_IfHasContentIdInRequestChangeSet()
         {
             // Arrange
             HeaderDictionary headers = new HeaderDictionary
@@ -130,18 +125,12 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             ODataBatchWriter batchWriter = new ODataMessageWriter(odataResponse).CreateODataBatchWriter();
             batchWriter.WriteStartBatch();
             batchWriter.WriteStartChangeset();
-            await ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext);
-            batchWriter.WriteEndChangeset();
-            batchWriter.WriteEndBatch();
-
-            ms.Position = 0;
-            string result = new StreamReader(ms).ReadToEnd();
 
             // Assert
-            Assert.Contains("any", result);
-            Assert.Contains("text/example", result);
-            Assert.Contains("Content-ID", result);
-            Assert.Contains(contentId, result);
+            Action test = () => ODataBatchResponseItem.WriteMessageAsync(batchWriter, httpResponse.HttpContext).Wait();
+            ODataException exception = ExceptionAssert.Throws<ODataException>(test);
+            Assert.Equal("An asynchronous operation was called on a synchronous batch writer. Calls on a batch writer instance must be either all synchronous or all asynchronous.",
+                exception.Message);
         }
 
         [Fact]

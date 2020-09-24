@@ -5584,6 +5584,11 @@
               Looks up a localized string similar to The property &apos;{0}&apos; does not exist on type &apos;{1}&apos;. Make sure to only use property names that are defined by the type..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotGetEnumClrMember">
+            <summary>
+              Looks up a localized string similar to Cannot Get the Enum Clr member using &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotInstantiateAbstractResourceType">
             <summary>
               Looks up a localized string similar to An instance of the abstract resource type &apos;{0}&apos; was found. Abstract resource types cannot be instantiated..

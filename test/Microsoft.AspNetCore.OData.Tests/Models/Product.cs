@@ -37,6 +37,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
         public Date DateProperty { get; set; }
         public Date? NullableDateProperty { get; set; }
 
+        public Guid GuidProperty { get; set; }
+        public Guid? NullableGuidProperty { get; set; }
+
         public TimeOfDay TimeOfDayProperty { get; set; }
         public TimeOfDay? NullableTimeOfDayProperty { get; set; }
 

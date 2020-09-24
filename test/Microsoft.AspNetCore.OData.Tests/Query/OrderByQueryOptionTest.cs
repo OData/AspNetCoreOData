@@ -284,7 +284,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             builder.EntitySet<PropertyAlias>("PropertyAliases");
             var model = builder.GetEdmModel();
 
-            var context = new ODataQueryContext(model, typeof(PropertyAlias)) { RequestContainer = new MockServiceProvider(/*model*/) };
+            var context = new ODataQueryContext(model, typeof(PropertyAlias)) { RequestContainer = new MockServiceProvider(model) };
             var orderByOption = new OrderByQueryOption(propertyName, context);
             IEnumerable<PropertyAlias> propertyAliases = FilterQueryOptionTest.PropertyAliasTestData;
 

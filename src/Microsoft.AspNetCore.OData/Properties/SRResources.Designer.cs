@@ -277,6 +277,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Get the Enum Clr member using &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotGetEnumClrMember {
+            get {
+                return ResourceManager.GetString("CannotGetEnumClrMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An instance of the abstract resource type &apos;{0}&apos; was found. Abstract resource types cannot be instantiated..
         /// </summary>
         internal static string CannotInstantiateAbstractResourceType {

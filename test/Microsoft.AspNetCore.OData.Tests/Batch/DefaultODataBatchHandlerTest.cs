@@ -764,7 +764,6 @@ Accept-Charset: UTF-8
             var acceptJsonFullMetadata = "application/json;odata.metadata=minimal";
             var postPayload = "Bar";
 
-
             Type[] controllers = new[] { typeof(BatchTestHeadersCustomersController) };
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
@@ -772,7 +771,7 @@ Accept-Charset: UTF-8
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestHeadersCustomer>("BatchTestHeadersCustomers");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddOData(opt => opt.AddModel("odata", model, b => b.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton)).Expand());
+                    services.AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {

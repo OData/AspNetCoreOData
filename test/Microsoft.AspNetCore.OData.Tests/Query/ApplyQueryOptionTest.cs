@@ -4,18 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.OData;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
@@ -1369,7 +1364,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
         */
 
-#if !NETCORE // TODO 939: This crashes on AspNetCore
         [Theory]
         [MemberData(nameof(CustomerTestFilters))]
         public void ApplyTo_Returns_Correct_Queryable_ForFilter(string filter, int[] customerIds)
@@ -1405,7 +1399,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 customerIds,
                 actualCustomers.Select(customer => customer.Id));
         }
-#endif
 
         //[Fact]
         //public async Task ApplyToSerializationWorks()

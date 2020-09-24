@@ -614,4 +614,7 @@
   <data name="ArgumentNullOrEmpty" xml:space="preserve">
     <value>The argument '{0}' is null or empty.</value>
   </data>
+  <data name="CannotGetEnumClrMember" xml:space="preserve">
+    <value>Cannot Get the Enum Clr member using '{0}'.</value>
+  </data>
 </root>

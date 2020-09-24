@@ -142,7 +142,10 @@ namespace Microsoft.AspNetCore.OData.Batch
                 await stream.CopyToAsync(bufferedStream, bufferSize: 81920, cancellationToken: cancellationToken).ConfigureAwait(false);
                 bufferedStream.Position = 0;
                 request.Body = bufferedStream;
-                request.Headers.ContentLength = bufferedStream.Length;
+                if (bufferedStream.Length > 0)
+                {
+                    request.Headers.ContentLength = bufferedStream.Length;
+                }
             }
 
             foreach (var header in batchRequest.Headers)
