@@ -3220,6 +3220,11 @@
             </summary>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.SkipExpensiveAvailabilityChecks">
             <summary>
             Gets or sets a value indicating whether ActionAvailabilityChecks should be performed or not.
@@ -3835,6 +3840,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SkipExpensiveAvailabilityChecks">
             <summary>
             Get or sets whether expensive links should be calculated.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.QueryOptions">

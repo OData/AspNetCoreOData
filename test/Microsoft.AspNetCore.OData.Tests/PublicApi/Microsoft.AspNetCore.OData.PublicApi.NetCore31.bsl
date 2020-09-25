@@ -1836,6 +1836,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerC
 	string RootElementName  { public get; public set; }
 	Microsoft.OData.UriParser.SelectExpandClause SelectExpandClause  { public get; public set; }
 	bool SkipExpensiveAvailabilityChecks  { public get; public set; }
+	System.TimeZoneInfo TimeZone  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer {

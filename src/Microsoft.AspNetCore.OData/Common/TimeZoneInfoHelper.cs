@@ -7,25 +7,9 @@ namespace Microsoft.AspNetCore.OData.Common
 {
     internal class TimeZoneInfoHelper
     {
-        private static TimeZoneInfo _defaultTimeZoneInfo;
-
-        public static TimeZoneInfo TimeZone
-        {
-            get
-            {
-                if (_defaultTimeZoneInfo == null)
-                {
-                    return TimeZoneInfo.Local;
-                }
-
-                return _defaultTimeZoneInfo;
-            }
-            set { _defaultTimeZoneInfo = value; }
-        }
-
         public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime)
         {
-            return ConvertToDateTimeOffset(dateTime, TimeZoneInfoHelper.TimeZone);
+            return ConvertToDateTimeOffset(dateTime, TimeZoneInfo.Local);
         }
 
         public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime, TimeZoneInfo timeZone)

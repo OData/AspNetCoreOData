@@ -65,7 +65,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         public void ConvertDateTimeValue_NonStandardPrimitives_DefaultTimeZoneInfo(DateTimeOffset valueToConvert)
         { 
             // Arrange & Act
-            TimeZoneInfoHelper.TimeZone = null;
             object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
 
             // Assert
@@ -79,8 +78,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         {
             // Arrange & Act
             var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            TimeZoneInfoHelper.TimeZone = timeZone;
-            object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
+            object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime), timeZone);
 
             // Assert
             DateTime dt = Assert.IsType<DateTime>(actual);

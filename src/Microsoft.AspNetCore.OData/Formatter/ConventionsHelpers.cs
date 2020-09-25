@@ -7,10 +7,9 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -46,10 +45,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.KeyValueCannotBeNull, key.Name, edmType.Definition);
             }
 
-            return ConvertValue(value);
+            return ConvertValue(value, resourceContext.TimeZone);
         }
 
-        public static object ConvertValue(object value)
+        public static object ConvertValue(object value, TimeZoneInfo timeZone)
         {
             Contract.Assert(value != null);
 
@@ -61,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             else
             {
                 Contract.Assert(type.GetEdmPrimitiveType() != null);
-                value = ConvertUnsupportedPrimitives(value);
+                value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(value, timeZone);
             }
 
             return value;
@@ -136,6 +135,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         // gets the primitive odata uri representation.
         public static string GetUriRepresentationForValue(object value)
         {
+            return GetUriRepresentationForValue(value, TimeZoneInfo.Local);
+        }
+
+        public static string GetUriRepresentationForValue(object value, TimeZoneInfo timeZone)
+        {
             Contract.Assert(value != null);
 
             Type type = value.GetType();
@@ -146,7 +150,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             else
             {
                 Contract.Assert(type.GetEdmPrimitiveType() != null);
-                value = ConvertUnsupportedPrimitives(value);
+                value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(value, timeZone);
             }
 
             return ODataUriUtils.ConvertToUriLiteral(value, ODataVersion.V4);
@@ -164,51 +168,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.KeyValueCannotBeNull, key.Name, edmType.Definition);
             }
 
-            return GetUriRepresentationForValue(value);
+            return GetUriRepresentationForValue(value, resourceContext.TimeZone);
         }
-
-        internal static object ConvertUnsupportedPrimitives(object value)
-        {
-            if (value != null)
-            {
-                Type type = value.GetType();
-
-                // Note that type cannot be a nullable type as value is not null and it is boxed.
-                switch (Type.GetTypeCode(type))
-                {
-                    case TypeCode.Char:
-                        return new String((char)value, 1);
-
-                    case TypeCode.UInt16:
-                        return (int)(ushort)value;
-
-                    case TypeCode.UInt32:
-                        return (long)(uint)value;
-
-                    case TypeCode.UInt64:
-                        return checked((long)(ulong)value);
-
-                    case TypeCode.DateTime:
-                        DateTime dateTime = (DateTime)value;
-                        return TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime);
-
-                    default:
-                        if (type == typeof(char[]))
-                        {
-                            return new String(value as char[]);
-                        }
-                        else if (type == typeof(XElement))
-                        {
-                            return ((XElement)value).ToString();
-                        }
-
-                        break;
-                }
-            }
-
-            return value;
-        }
-
 
         private class PropertyEqualityComparer : IEqualityComparer<PropertyInfo>
         {

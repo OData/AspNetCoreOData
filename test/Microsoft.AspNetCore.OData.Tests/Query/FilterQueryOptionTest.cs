@@ -653,7 +653,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                             .Add_Customers_EntitySet()
                             .GetEdmModel();
             var context = new ODataQueryContext(model, typeof(Customer), null);
-            var filterOption = new FilterQueryOption("CustomerId eq 1", context);
+            var filterOption = new FilterQueryOption("Id eq 1", context);
             IEnumerable<Customer> customers = CustomerFilterTestData;
 
             // Act

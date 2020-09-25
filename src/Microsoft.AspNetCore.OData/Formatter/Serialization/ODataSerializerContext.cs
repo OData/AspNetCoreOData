@@ -73,6 +73,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             MetadataLevel = context.MetadataLevel;
             Items = context.Items;
             ExpandReference = context.ExpandReference;
+            TimeZone = context.TimeZone;
 
             QueryContext = queryContext;
 
@@ -163,6 +164,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Get or sets whether expensive links should be calculated.
         /// </summary>
         public bool SkipExpensiveAvailabilityChecks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ODataQueryOptions"/>.

@@ -127,6 +127,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         //}
 
         /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        internal TimeZoneInfo TimeZone => SerializerContext.TimeZone;
+
+        /// <summary>
         /// Gets or sets a value indicating whether ActionAvailabilityChecks should be performed or not.
         /// </summary>
         /// <remarks>

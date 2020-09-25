@@ -108,8 +108,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            TimeZoneInfo timeZoneInfo = GetTimeZone(writeContext);
-            object supportedValue = ConvertPrimitiveValue(value, primitiveType, timeZoneInfo);
+            object supportedValue = ConvertPrimitiveValue(value, primitiveType, writeContext?.TimeZone);
             ODataPrimitiveValue primitive = new ODataPrimitiveValue(supportedValue);
 
             if (writeContext != null)
@@ -118,23 +117,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return primitive;
-        }
-
-        internal static TimeZoneInfo GetTimeZone(ODataSerializerContext writeContext)
-        {
-            TimeZoneInfo timeZone = TimeZoneInfo.Local;
-            if (writeContext == null || writeContext.Request == null)
-            {
-                return timeZone;
-            }
-
-            IOptions<ODataOptions> odataOptions = writeContext.Request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions == null || odataOptions.Value == null)
-            {
-                return timeZone;
-            }
-
-            return odataOptions.Value.TimeZone;
         }
 
         internal static object ConvertPrimitiveValue(object value, IEdmPrimitiveTypeReference primitiveType, TimeZoneInfo timeZoneInfo)

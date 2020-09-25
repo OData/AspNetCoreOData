@@ -42,8 +42,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
-                TimeZoneInfo timeZone = ODataPrimitiveSerializer.GetTimeZone(writeContext);
-                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, timeZone));
+                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, writeContext?.TimeZone));
             }
         }
     }

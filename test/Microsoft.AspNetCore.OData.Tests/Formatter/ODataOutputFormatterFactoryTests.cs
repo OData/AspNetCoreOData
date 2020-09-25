@@ -27,7 +27,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     public class ODataOutputFormatterFactoryTests
     {
-        private static IServiceProvider _serviceProvider = BuildServiceProvider();
         private static IEdmModel _edmModel = GetEdmModel();
         private static IList<ODataOutputFormatter> _formatters = ODataOutputFormatterFactory.Create();
 
@@ -123,8 +122,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         public void ODataOutputFormattersForWriteTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create(f => { f.Model = _edmModel; f.Path = new ODataPath(); });
-            request.HttpContext.RequestServices = _serviceProvider;
+            HttpRequest request = RequestFactory.Create(opt => opt.AddModel(_edmModel));
+            request.Configure("", _edmModel, new ODataPath());
             var metadataDocumentFormatters = _formatters.Where(f => CanWriteType(f, type, request));
 
             // Act
@@ -274,26 +273,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             }
 
             return null;
-        }
-
-        private static IServiceProvider BuildServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
-            services.AddSingleton<ODataEnumSerializer>();
-            services.AddSingleton<ODataPrimitiveSerializer>();
-            services.AddSingleton<ODataDeltaFeedSerializer>();
-            services.AddSingleton<ODataResourceSetSerializer>();
-            services.AddSingleton<ODataCollectionSerializer>();
-            services.AddSingleton<ODataResourceSerializer>();
-            services.AddSingleton<ODataServiceDocumentSerializer>();
-            services.AddSingleton<ODataEntityReferenceLinkSerializer>();
-            services.AddSingleton<ODataEntityReferenceLinksSerializer>();
-            services.AddSingleton<ODataErrorSerializer>();
-            services.AddSingleton<ODataMetadataSerializer>();
-            services.AddSingleton<ODataRawValueSerializer>();
-            return services.BuildServiceProvider();
         }
 
         private static IEdmModel GetEdmModel()

@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -22,12 +24,26 @@ namespace Microsoft.AspNetCore.OData.Formatter
 {
     internal static class ODataOutputFormatterHelper
     {
-        public static ODataSerializerContext BuildSerializerContext(HttpRequest request) =>
-            new ODataSerializerContext()
+        public static ODataSerializerContext BuildSerializerContext(HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            TimeZoneInfo timeZone = null;
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value == null)
+            {
+                timeZone = odataOptions.Value.TimeZone;
+            }
+
+            return new ODataSerializerContext()
             {
                 Request = request,
-                // LinkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>()
+                TimeZone = timeZone,
             };
+        }
         
 
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable")]
