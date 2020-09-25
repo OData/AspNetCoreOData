@@ -33,17 +33,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "aggregate(CustomerId with sum as CustomerId)",
+                        "aggregate(Id with sum as Id)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "CustomerId", 15} }
+                            new Dictionary<string, object> { { "Id", 15} }
                         }
                     },
                     {
-                        "aggregate(cast(CustomerId, Edm.Int64) with sum as CustomerId)",
+                        "aggregate(cast(Id, Edm.Int64) with sum as Id)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "CustomerId", 15L} }
+                            new Dictionary<string, object> { { "Id", 15L} }
                         }
                     },
                     {
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "aggregate(CustomerId with sum as Total, SharePrice with countdistinct as SharePriceDistinctCount)",
+                        "aggregate(Id with sum as Total, SharePrice with countdistinct as SharePriceDistinctCount)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "SharePriceDistinctCount", 3L}, { "Total", 15} }
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "groupby((Name), aggregate(CustomerId with sum as Total))",
+                        "groupby((Name), aggregate(Id with sum as Total))",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Name", "Lowest"}, { "Total", 10} },
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "groupby((Name), aggregate(CustomerId with sum as Total))/filter(Total eq 3)",
+                        "groupby((Name), aggregate(Id with sum as Total))/filter(Total eq 3)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Name", "Middle"}, { "Total", 3 } }
@@ -256,19 +256,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "groupby((Address/State), aggregate(Address/City with max as MaxCity, CustomerId mul CustomerId with sum as CustomerId))",
+                        "groupby((Address/State), aggregate(Address/City with max as MaxCity, Id mul Id with sum as Id))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "MaxCity", "seattle"}, { "CustomerId", 30}, { "Address/State", "WA"} },
-                            new Dictionary<string, object> { { "MaxCity", "hobart"}, { "CustomerId", 25 }, { "Address/State", null} },
+                            new Dictionary<string, object> { { "MaxCity", "seattle"}, { "Id", 30}, { "Address/State", "WA"} },
+                            new Dictionary<string, object> { { "MaxCity", "hobart"}, { "Id", 25 }, { "Address/State", null} },
                         }
                     },
                     {
-                        "groupby((Address/State), aggregate(CustomerId mul CustomerId with sum as CustomerId))",
+                        "groupby((Address/State), aggregate(Id mul Id with sum as Id))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "CustomerId", 30}, { "Address/State", "WA"} },
-                            new Dictionary<string, object> { { "CustomerId", 25}, { "Address/State", null} },
+                            new Dictionary<string, object> { { "Id", 30}, { "Address/State", "WA"} },
+                            new Dictionary<string, object> { { "Id", 25}, { "Address/State", null} },
                         }
                     },
                     {
@@ -375,15 +375,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "aggregate(CustomerId mul CustomerId with sum as CustomerId)",
+                        "aggregate(Id mul Id with sum as Id)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "CustomerId", 55} }
+                            new Dictionary<string, object> { { "Id", 55} }
                         }
                     },
                     {
-                        // Note SharePrice and CustomerId have different type
-                        "aggregate(SharePrice mul CustomerId with sum as Result)",
+                        // Note SharePrice and Id have different type
+                        "aggregate(SharePrice mul Id with sum as Result)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Result", 65.0M} }
@@ -466,7 +466,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "groupby((Name), aggregate(CustomerId with sum as Total))/compute(Total add Total as DoubleTotal, length(Name) as NameLen)",
+                        "groupby((Name), aggregate(Id with sum as Total))/compute(Total add Total as DoubleTotal, length(Name) as NameLen)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Name", "Lowest"},  { "Total", 10}, { "DoubleTotal", 20}, { "NameLen", 6},},
@@ -478,22 +478,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         "compute(length(Name) as NameLen)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "CustomerId", 1},},
-                            new Dictionary<string, object> { { "Name", "Highest"},  { "NameLen", 7}, { "CustomerId", 2},},
-                            new Dictionary<string, object> { { "Name", "Middle" },  { "NameLen", 6}, { "CustomerId", 3},},
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "CustomerId", 4},},
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "CustomerId", 5},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "Id", 1},},
+                            new Dictionary<string, object> { { "Name", "Highest"},  { "NameLen", 7}, { "Id", 2},},
+                            new Dictionary<string, object> { { "Name", "Middle" },  { "NameLen", 6}, { "Id", 3},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "Id", 4},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", 6}, { "Id", 5},},
                         }
                     },
                     {
                         "compute(length(ShareSymbol) as NameLen)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "CustomerId", 1},},
-                            new Dictionary<string, object> { { "Name", "Highest"},  { "NameLen", null}, { "CustomerId", 2},},
-                            new Dictionary<string, object> { { "Name", "Middle" },  { "NameLen", null}, { "CustomerId", 3},},
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "CustomerId", 4},},
-                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "CustomerId", 5},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "Id", 1},},
+                            new Dictionary<string, object> { { "Name", "Highest"},  { "NameLen", null}, { "Id", 2},},
+                            new Dictionary<string, object> { { "Name", "Middle" },  { "NameLen", null}, { "Id", 3},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "Id", 4},},
+                            new Dictionary<string, object> { { "Name", "Lowest" },  { "NameLen", null}, { "Id", 5},},
                         }
                     },
                     {
@@ -504,14 +504,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "compute(length(Name) as NameLen)/aggregate(NameLen add CustomerId with sum as TotalLen)",
+                        "compute(length(Name) as NameLen)/aggregate(NameLen add Id with sum as TotalLen)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "TotalLen", 46} }
                         }
                     },
                     {
-                        "compute(length(Name) as NameLen)/groupby((Name),aggregate( CustomerId with sum as Total, NameLen with max as MaxNameLen))",
+                        "compute(length(Name) as NameLen)/groupby((Name),aggregate(Id with sum as Total, NameLen with max as MaxNameLen))",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Name", "Lowest"},  { "Total", 10},  { "MaxNameLen", 6},},
@@ -520,7 +520,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "compute(length(Name) as NameLen)/groupby((NameLen),aggregate( CustomerId with sum as Total))",
+                        "compute(length(Name) as NameLen)/groupby((NameLen),aggregate(Id with sum as Total))",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Total", 13},  { "NameLen", 6},},
@@ -554,14 +554,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 return new TheoryDataSet<string, List<Dictionary<string, object>>>
                 {
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))&$filter=Total eq 3",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))&$filter=Total eq 3",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Middle"}, {"Total", 3}}
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))&$orderby=Name",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))&$orderby=Name",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -579,7 +579,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total, CustomerId with sum as Total2))&$orderby=Total",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total, Id with sum as Total2))&$orderby=Total",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -588,7 +588,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total, CustomerId with sum as Total2))&$orderby=Total, Total2",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total, Id with sum as Total2))&$orderby=Total, Total2",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -597,7 +597,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))&$orderby=Name, Total",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))&$orderby=Name, Total",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -732,7 +732,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))/compute(Total mul 2 as NewTotal)&$orderby=Name, NewTotal",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))/compute(Total mul 2 as NewTotal)&$orderby=Name, NewTotal",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2},  {"NewTotal", 4}, },
@@ -741,7 +741,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))/compute(Total mul 2 as NewTotal)/filter(NewTotal gt 6)&$orderby=Name, NewTotal",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))/compute(Total mul 2 as NewTotal)/filter(NewTotal gt 6)&$orderby=Name, NewTotal",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Lowest"},  {"Total", 10}, {"NewTotal", 20},},
@@ -773,21 +773,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 return new TheoryDataSet<string, List<Dictionary<string, object>>>
                 {
                     {
-                        "$apply=aggregate(CustomerId with sum as CustomerId)",
+                        "$apply=aggregate(Id with sum as Id)",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> { { "CustomerId", 15} }
+                            new Dictionary<string, object> { { "Id", 15} }
                         }
                     },
                     {
-                        "$apply=aggregate(CustomerId with sum as Total)",
+                        "$apply=aggregate(Id with sum as Total)",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> { { "Total", 15} }
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total, CustomerId with sum as Total2))",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total, Id with sum as Total2))",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -795,7 +795,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total, CustomerId with sum as Total2))&$skip=2",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total, Id with sum as Total2))&$skip=2",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Middle"}, {"Total", 3}},
@@ -817,31 +817,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((CustomerId, Name))",
+                        "$apply=groupby((Id, Name))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Lowest"}, { "CustomerId", 1}},
-                            new Dictionary<string, object> {{"Name", "Highest"}, { "CustomerId", 2}},
+                            new Dictionary<string, object> {{"Name", "Lowest"}, { "Id", 1}},
+                            new Dictionary<string, object> {{"Name", "Highest"}, { "Id", 2}},
                         }
                     },
                     {
-                        "$apply=groupby((Name, CustomerId))",
+                        "$apply=groupby((Name, Id))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Highest" }, { "CustomerId", 2}},
-                            new Dictionary<string, object> {{"Name", "Lowest" }, { "CustomerId", 1}},
+                            new Dictionary<string, object> {{"Name", "Highest" }, { "Id", 2}},
+                            new Dictionary<string, object> {{"Name", "Lowest" }, { "Id", 1}},
                         }
                     },
                     {
-                        "$apply=groupby((Name, CustomerId))&$skip=2",
+                        "$apply=groupby((Name, Id))&$skip=2",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Lowest" }, { "CustomerId", 4}},
-                            new Dictionary<string, object> {{"Name", "Lowest" }, { "CustomerId", 5}},
+                            new Dictionary<string, object> {{"Name", "Lowest" }, { "Id", 4}},
+                            new Dictionary<string, object> {{"Name", "Lowest" }, { "Id", 5}},
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Highest"}, {"Total", 2}},
@@ -849,7 +849,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((Name), aggregate(CustomerId with sum as Total))&$skip=2",
+                        "$apply=groupby((Name), aggregate(Id with sum as Total))&$skip=2",
                         new List<Dictionary<string, object>>
                         {
                             new Dictionary<string, object> {{"Name", "Middle"}, {"Total", 3}},
@@ -974,27 +974,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         }
                     },
                     {
-                        "$apply=groupby((CustomerId, Name))&$orderby=CustomerId",
+                        "$apply=groupby((Id, Name))&$orderby=Id",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Lowest"}, { "CustomerId", 1}},
-                            new Dictionary<string, object> {{"Name", "Highest"}, { "CustomerId", 2}},
+                            new Dictionary<string, object> {{"Name", "Lowest"}, { "Id", 1}},
+                            new Dictionary<string, object> {{"Name", "Highest"}, { "Id", 2}},
                         }
                     },
                     {
-                        "$apply=groupby((CustomerId, Name))&$orderby=Name",
+                        "$apply=groupby((Id, Name))&$orderby=Name",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Highest"}, { "CustomerId", 2}},
-                            new Dictionary<string, object> {{"Name", "Lowest"}, { "CustomerId", 1}},
+                            new Dictionary<string, object> {{"Name", "Highest"}, { "Id", 2}},
+                            new Dictionary<string, object> {{"Name", "Lowest"}, { "Id", 1}},
                         }
                     },
                     {
-                        "$apply=groupby((CustomerId, Name))&$orderby=Name&$skip=2",
+                        "$apply=groupby((Id, Name))&$orderby=Name&$skip=2",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"Name", "Lowest"}, { "CustomerId", 4}},
-                            new Dictionary<string, object> {{"Name", "Lowest"}, { "CustomerId", 5}},
+                            new Dictionary<string, object> {{"Name", "Lowest"}, { "Id", 4}},
+                            new Dictionary<string, object> {{"Name", "Lowest"}, { "Id", 5}},
                         }
                     },
                     {
@@ -1176,14 +1176,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             {
                 return new TheoryDataSet<string>
                 {
-                    "$apply=groupby((Name))&$filter=CustomerId eq 1",
-                    "$apply=groupby((Name))/filter(CustomerId eq 1)",
+                    "$apply=groupby((Name))&$filter=Id eq 1",
+                    "$apply=groupby((Name))/filter(Id eq 1)",
                     "$apply=groupby((Name))/filter(Address/City eq 1)",
-                    "$apply=groupby((Name))/groupby((CustomerId))",
-                    "$apply=groupby((Company/CEO/EmployeeName))&$filter=CustomerId eq 1",
-                    "$apply=groupby((Company/CEO/EmployeeName))/filter(CustomerId eq 1)",
+                    "$apply=groupby((Name))/groupby((Id))",
+                    "$apply=groupby((Company/CEO/EmployeeName))&$filter=Id eq 1",
+                    "$apply=groupby((Company/CEO/EmployeeName))/filter(Id eq 1)",
                     "$apply=groupby((Company/CEO/EmployeeName))/filter(Address/City eq 1)",
-                    "$apply=groupby((Company/CEO/EmployeeName))/groupby((CustomerId))",
+                    "$apply=groupby((Company/CEO/EmployeeName))/groupby((Id))",
                     "$apply=groupby((Company/CEO/EmployeeName))/groupby((Company/CEO/BaseSalary))",
                     "$apply=groupby((Company/CEO/EmployeeName))/filter(Company/CEO/BaseSalary eq 20)",
                     "$apply=groupby((Company/CEO/EmployeeName))&$filter=Company/CEO/BaseSalary eq 20",
@@ -1421,7 +1421,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //    HttpClient client = TestServerFactory.CreateClient(server);
 
         //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get,
-        //        "http://localhost/odata/Customers?$apply=groupby((Name), aggregate(CustomerId with sum as TotalId))");
+        //        "http://localhost/odata/Customers?$apply=groupby((Name), aggregate(Id with sum as TotalId))");
 
         //    // Act
         //    HttpResponseMessage response = await client.SendAsync(request);
@@ -1461,7 +1461,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //    HttpClient client = TestServerFactory.CreateClient(server);
 
         //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get,
-        //        "http://localhost/odata/Customers?$apply=groupby((Address/City), aggregate(CustomerId with sum as TotalId))");
+        //        "http://localhost/odata/Customers?$apply=groupby((Address/City), aggregate(Id with sum as TotalId))");
 
         //    // Act
         //    HttpResponseMessage response = await client.SendAsync(request);
