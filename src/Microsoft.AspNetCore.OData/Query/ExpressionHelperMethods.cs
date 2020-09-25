@@ -32,6 +32,9 @@ namespace Microsoft.AspNetCore.OData.Query
         private static MethodInfo _enumerableSkipMethod = GenericMethodOf(_ => Enumerable.Skip<int>(default(IEnumerable<int>), default(int)));
         private static MethodInfo _whereMethod = GenericMethodOf(_ => Queryable.Where<int>(default(IQueryable<int>), default(Expression<Func<int, bool>>)));
 
+        private static MethodInfo _queryableCastMethod = GenericMethodOf(_ => Queryable.Cast<int>(default(IQueryable<int>)));
+        private static MethodInfo _enumerableCastMethod = GenericMethodOf(_ => Enumerable.Cast<int>(default(IEnumerable<int>)));
+
         private static MethodInfo _queryableContainsMethod = GenericMethodOf(_ => Queryable.Contains<int>(default(IQueryable<int>), default(int)));
         private static MethodInfo _enumerableContainsMethod = GenericMethodOf(_ => Enumerable.Contains<int>(default(IEnumerable<int>), default(int)));
 
@@ -251,6 +254,16 @@ namespace Microsoft.AspNetCore.OData.Query
         public static MethodInfo QueryableWhereGeneric
         {
             get { return _whereMethod; }
+        }
+
+        public static MethodInfo QueryableCastGeneric
+        {
+            get { return _queryableCastMethod; }
+        }
+
+        public static MethodInfo EnumerableCastGeneric
+        {
+            get { return _enumerableCastMethod; }
         }
 
         public static MethodInfo QueryableContainsGeneric

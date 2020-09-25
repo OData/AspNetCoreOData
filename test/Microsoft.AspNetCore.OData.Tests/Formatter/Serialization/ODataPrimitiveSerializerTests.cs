@@ -187,8 +187,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = DateTime.MinValue;
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(timeZone));
-            ODataSerializerContext context = new ODataSerializerContext { Request = request };
+            var request = RequestFactory.Create();
+            ODataSerializerContext context = new ODataSerializerContext { Request = request, TimeZone = timeZone };
 
             // Act
             ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, context);
@@ -217,8 +217,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
             DateTime dt = DateTime.MaxValue;
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(timeZone));
-            ODataSerializerContext context = new ODataSerializerContext { Request = request };
+            var request = RequestFactory.Create();
+            ODataSerializerContext context = new ODataSerializerContext { Request = request, TimeZone = timeZone };
 
             // Act
             ODataValue odataValue = serializer.CreateODataValue(dt, edmPrimitiveType, context);
