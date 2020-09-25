@@ -39,17 +39,17 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            if (String.IsNullOrEmpty(select) && String.IsNullOrEmpty(expand))
+            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
             {
                 throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
             }
 
             if (queryOptionParser == null)
             {
-                throw Error.ArgumentNull("queryOptionParser");
+                throw Error.ArgumentNull(nameof(queryOptionParser));
             }
 
             if (!(context.ElementType is IEdmStructuredType))
@@ -79,10 +79,10 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            if (String.IsNullOrEmpty(select) && String.IsNullOrEmpty(expand))
+            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
             {
                 throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
             }
@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Context = context;
-            RawSelect = select; 
+            RawSelect = select;
             RawExpand = expand;
             Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
 
@@ -101,8 +101,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$select", select }, { "$expand", expand } }
-                /*, context.RequestContainer*/);
+                new Dictionary<string, string> { { "$select", select }, { "$expand", expand } },
+                context.RequestContainer);
         }
 
         /// <summary>
@@ -192,11 +192,11 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (queryable == null)
             {
-                throw Error.ArgumentNull("queryable");
+                throw Error.ArgumentNull(nameof(queryable));
             }
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
             if (Context.ElementClrType == null)
             {
@@ -218,11 +218,11 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (entity == null)
             {
-                throw Error.ArgumentNull("entity");
+                throw Error.ArgumentNull(nameof(entity));
             }
             if (settings == null)
             {
-                throw Error.ArgumentNull("settings");
+                throw Error.ArgumentNull(nameof(settings));
             }
             if (Context.ElementClrType == null)
             {

@@ -874,10 +874,10 @@ namespace Microsoft.AspNetCore.OData.Tests.PublicApi
                 // only going into this method if there is a "Version=" present in the name.
                 AppendGenericTypeName(builder, parameterType);
             }
-            else if (name.StartsWith("Microsoft.AspNet.OData."))
-            {
-                builder.Append(parameterType.Name);
-            }
+            //else if (name.StartsWith("Microsoft.AspNetCore.OData."))
+            //{
+            //    builder.Append(parameterType.Name);
+            //}
             else
             {
                 builder.Append(name);

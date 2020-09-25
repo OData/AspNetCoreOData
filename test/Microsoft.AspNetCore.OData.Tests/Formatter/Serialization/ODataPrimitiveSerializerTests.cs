@@ -245,9 +245,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
 
             TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            var request = RequestFactory.Create(opt => opt.SetTimeZoneInfo(tzi));
+            var request = RequestFactory.Create();
 
-            ODataSerializerContext context = new ODataSerializerContext { Request = request };
+            ODataSerializerContext context = new ODataSerializerContext { Request = request, TimeZone = tzi };
 
             DateTimeOffset expected = value.Kind == DateTimeKind.Unspecified
                 ? new DateTimeOffset(value, tzi.GetUtcOffset(value))

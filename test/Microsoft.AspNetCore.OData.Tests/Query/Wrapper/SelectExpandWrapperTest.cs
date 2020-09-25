@@ -249,7 +249,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() => 
                 wrapper.ToDictionary(mapperProvider: mapperProvider),
-                "The mapper provider must return a valid 'Microsoft.AspNet.OData.Query.IPropertyMapper' instance for the given 'NS.Name' IEdmType.");
+                "The mapper provider must return a valid 'Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper' instance for the given 'NS.Name' IEdmType.");
         }
 
         [Theory]

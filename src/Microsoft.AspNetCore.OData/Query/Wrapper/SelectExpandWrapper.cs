@@ -83,15 +83,17 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             // fall back to the instance.
             if (UseInstanceForProperties && UntypedInstance != null)
             {
-                if (GetEdmType() is IEdmComplexTypeReference)
+                IEdmTypeReference edmTypeReference = GetEdmType();
+                IEdmModel model = GetModel();
+                if (edmTypeReference is IEdmComplexTypeReference)
                 {
                     _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                    new TypedEdmComplexObject(UntypedInstance, GetEdmType() as IEdmComplexTypeReference, GetModel());
+                        new TypedEdmComplexObject(UntypedInstance, edmTypeReference as IEdmComplexTypeReference, model);
                 }
                 else
                 {
                     _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                    new TypedEdmEntityObject(UntypedInstance, GetEdmType() as IEdmEntityTypeReference, GetModel());
+                        new TypedEdmEntityObject(UntypedInstance, edmTypeReference as IEdmEntityTypeReference, model);
                 }
 
                 return _typedEdmStructuredObject.TryGetPropertyValue(propertyName, out value);

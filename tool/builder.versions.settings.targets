@@ -9,7 +9,7 @@
   
     <!-- For NuGet Package Dependencies -->
   <PropertyGroup>
-    <ODataLibPackageDependency>[7.6.1, 8.0.0)</ODataLibPackageDependency>
+    <ODataLibPackageDependency>[7.7.0, 8.0.0)</ODataLibPackageDependency>
     <ODataModelBuilderPackageDependency>[1.0.4, 2.0.0)</ODataModelBuilderPackageDependency>
     <SystemTextJsonPackageDependency>[4.7.2, 5.0.0)</SystemTextJsonPackageDependency>
   </PropertyGroup>
@@ -64,7 +64,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(VersionFileGenerationEnabled)' == 'true'">
-    <Compile Include="$(AssemblyVersionFile)" />
+    <Compile Include="$(AssemblyVersionFile)" Link="Properties\$(MSBuildProjectName).version.cs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

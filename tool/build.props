@@ -1,9 +1,18 @@
 <Project>
 
   <PropertyGroup>
+    <!-- Enlist root path with the last '\' -->
+    <EnlistmentRoot Condition=" '$(EnlistmentRoot)'=='' ">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</EnlistmentRoot>
+
+    <!-- tool path with end '\' -->
+    <BuildToolPath Condition=" '$(BuildToolPath)'=='' ">$(EnlistmentRoot)\tool\</BuildToolPath>
+
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <OutputPath Condition="'$(OutputPath)' == ''">$(WebStackRootPath)bin\$(Configuration)\</OutputPath>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+
+    <!-- Output and intermediate output root dir -->
+    <IntermediateOutputPath Condition=" '$(IntermediateOutputPath)'=='' ">$(EnlistmentRoot)\obj\$(Platform)\$(Configuration)\$(MSBuildProjectFile)\</IntermediateOutputPath>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(EnlistmentRoot)\bin\$(Platform)\$(Configuration)\</OutputPath>
 
     <!-- Variables for output redirection (localization, signing, etc)-->
     <Language Condition=" '$(Language)' == '' ">ENU</Language>
@@ -12,24 +21,23 @@
     <!-- Everything is delay signed by default -->
     <DelaySign>true</DelaySign>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileFullPath)\..\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>	
-
-    <ModelBuildPath>$(MSBuildThisFileDirectory)</ModelBuildPath>
+    <AssemblyOriginatorKeyFile>$(BuildToolPath)35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
 
    <!-- Use CustomAfterMicrosoftCommonTargets property (defined in Microsoft.Common.targets) to
       inject post-Common targets files without requiring the inclusion -->
-    <CustomAfterMicrosoftCommonTargets>$(ModelBuildPath)build.targets</CustomAfterMicrosoftCommonTargets>
+    <CustomAfterMicrosoftCommonTargets>$(BuildToolPath)build.targets</CustomAfterMicrosoftCommonTargets>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <NoWarn>$(NoWarn);1701;1702;1307</NoWarn>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
 </Project>

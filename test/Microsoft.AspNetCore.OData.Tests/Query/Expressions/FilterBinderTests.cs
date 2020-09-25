@@ -3,14 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-#if NETFX // Binary only supported on Net Framework
-using System.Data.Linq;
-#endif
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
@@ -1139,19 +1135,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             VerifyQueryDeserialization(filter, expression);
         }
 
-        //[Theory]
-        //[InlineData("year(Birthday) eq 100", "$it => {0}.Year == 100)")]
-        //[InlineData("month(Birthday) eq 100", "$it => {0}.Month == 100)")]
-        //[InlineData("day(Birthday) eq 100", "$it => {0}.Day == 100)")]
-        //[InlineData("hour(Birthday) eq 100", "$it => {0}.Hour == 100)")]
-        //[InlineData("minute(Birthday) eq 100", "$it => {0}.Minute == 100)")]
-        //[InlineData("second(Birthday) eq 100", "$it => {0}.Second == 100)")]
-        //public void DateTimeFunctions(string filter, string expression)
-        //{
-        //    TimeZoneInfoHelper.TimeZone = TimeZoneInfo.Utc;
-        //    string expect = String.Format(expression, "($it.Birthday");
-        //    VerifyQueryDeserialization(filter, expect);
-        //}
+        [Theory]
+        [InlineData("year(Birthday) eq 100", "$it => {0}.Year == 100)")]
+        [InlineData("month(Birthday) eq 100", "$it => {0}.Month == 100)")]
+        [InlineData("day(Birthday) eq 100", "$it => {0}.Day == 100)")]
+        [InlineData("hour(Birthday) eq 100", "$it => {0}.Hour == 100)")]
+        [InlineData("minute(Birthday) eq 100", "$it => {0}.Minute == 100)")]
+        [InlineData("second(Birthday) eq 100", "$it => {0}.Second == 100)")]
+        public void DateTimeFunctions(string filter, string expression)
+        {
+            string expect = string.Format(expression, "($it.Birthday");
+            VerifyQueryDeserialization(filter, expect);
+        }
 
         [Theory]
         [InlineData("year(NullableDateProperty) eq 2015", "$it => ($it.NullableDateProperty.Value.Year == 2015)")]

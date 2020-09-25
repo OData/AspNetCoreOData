@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -678,7 +679,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.AutoExpandCustomer"));
-            var request = RequestFactory.Create("Get", url, model: null);
+            var request = RequestFactory.Create("Get", url, opt => opt.AddModel(model));
+            request.ODataFeature().PrefixName = "";
+            request.ODataFeature().Model = model;
             var queryOption = new ODataQueryOptions(context, request);
             queryOption.AddAutoSelectExpandProperties();
             var selectExpand = queryOption.SelectExpand;
