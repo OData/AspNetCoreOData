@@ -134,11 +134,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Assert
             var unaryExpression = (UnaryExpression)((MethodCallExpression)queryable.Expression).Arguments.Single(a => a is UnaryExpression);
             var expressionString = unaryExpression.Operand.ToString();
-#if NETCORE
             Assert.Contains("IsNull = (Convert($it.Customer.Id, Nullable`1) == null)}", expressionString);
-#else
-            Assert.Contains("IsNull = (Convert($it.Customer.Id) == null)}", expressionString);
-#endif
         }
 
         [Fact]
@@ -728,7 +724,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             codes = properties["Codes"] as IEnumerable<string>;
             Assert.Equal(expect2, string.Join(",", codes));
         }
-
 
         [Fact(Skip = "ODL parses the following select as \"HomeAddress\\dynamic\\dynamic\", that's not correct.")]
         public void ProjectAsWrapper_Element_ProjectedValueContains_SelectedTypeCastSubStructuralProperties()
@@ -1391,11 +1386,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression propertyValue = _binder.CreatePropertyValueExpression(_customer, edmProperty, source, null);
 
             // Assert
-#if NETCORE
             Assert.Equal(String.Format("Convert(({0} As QueryVipCustomer).{1}, Nullable`1)", source.ToString(), property), propertyValue.ToString());
-#else
-            Assert.Equal(String.Format("Convert(({0} As QueryVipCustomer).{1})", source.ToString(), property), propertyValue.ToString());
-#endif
         }
 
         [Theory]
@@ -1469,11 +1460,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression property = _binder.CreatePropertyValueExpression(_customer, idProperty, source, filterClause: null);
 
             // Assert
-#if NETCORE
             Assert.Equal(String.Format("Convert({0}.Id, Nullable`1)", source.ToString()), property.ToString());
-#else
-            Assert.Equal(String.Format("Convert({0}.Id)", source.ToString()), property.ToString());
-#endif
             Assert.Equal(typeof(int?), property.Type);
         }
 
@@ -1558,6 +1545,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.Equal(1, order.Id);
         }
 
+        // OData.ModelBuilder 1.0.4 make the ClrTypeAnnotation ctor throws argument null exception
+        // 1.0.5 will allow null. So, please enable this when update to 1.0.5 model builder.
+        /*
         [Fact]
         public void CreatePropertyValueExpression_Single_ThrowsODataException_IfMappingTypeIsNotFoundInModel()
         {
@@ -1577,7 +1567,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExceptionAssert.Throws<ODataException>(
                 () => _binder.CreatePropertyValueExpression(_order, customerProperty, source, expandItem.FilterOption),
                 String.Format("The provided mapping does not contain a resource for the resource type '{0}'.", customerProperty.Type.FullName()));
-        }
+        }*/
 
         [Fact]
         public void CreatePropertyValueExpression_Single_Works_IfSettingIsOff()

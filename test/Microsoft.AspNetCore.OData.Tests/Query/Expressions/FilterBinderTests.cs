@@ -2352,13 +2352,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void Isof_WithNullTypeName_ThrowsArgumentNullException(string filter)
         {
             // Arrange & Act & Assert
-#if NETCOREAPP3_1
             ExceptionAssert.Throws<ArgumentNullException>(() => Bind<Product>(filter),
                 "Value cannot be null. (Parameter 'qualifiedName')");
-#else
-            ExceptionAssert.Throws<ArgumentNullException>(() => Bind<Product>(filter),
-                "Value cannot be null.\r\nParameter name: qualifiedName");
-#endif
         }
 
         [Theory]
