@@ -1464,7 +1464,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.Equal(typeof(int?), property.Type);
         }
 
-        [Fact]
+        // OData.ModelBuilder 1.0.4 make the ClrTypeAnnotation ctor throws argument null exception
+        // 1.0.5 will allow null. So, please enable this when update to 1.0.5 model builder.
+        [Fact(Skip = "OData.ModelBuilder 1.0.4 throws null reference for ClrTypeAnnotation with null")]
         public void CreatePropertyValueExpression_Collection_ThrowsODataException_IfMappingTypeIsNotFoundInModel()
         {
             // Arrange
