@@ -28,9 +28,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         public NavigationRoutingConvention(ILogger<NavigationRoutingConvention> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            string message = $"About page visited at {DateTime.UtcNow.ToLongTimeString()}";
-            _logger.LogTrace(message);
         }
 
         /// <inheritdoc />

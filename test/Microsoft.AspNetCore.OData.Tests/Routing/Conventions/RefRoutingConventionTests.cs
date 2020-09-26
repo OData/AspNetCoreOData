@@ -26,21 +26,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         {
             // Arranges & Act & Assert
             string actionMethodName = "CreateRef";
-            string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string prop, out string declaring);
+            string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string httpMethod, out string prop, out string declaring);
+            Assert.Equal("post,patch", httpMethod);
             Assert.Equal("CreateRef", method);
             Assert.Null(prop);
             Assert.Null(declaring);
 
             // Arranges & Act & Assert
             actionMethodName = "GetRefToPropertyFromAbc";
-            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out prop, out declaring);
+            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out httpMethod, out prop, out declaring);
+            Assert.Equal("get", httpMethod);
             Assert.Equal("GetRef", method);
             Assert.Equal("Property", prop);
             Assert.Equal("Abc", declaring);
 
             // Arranges & Act & Assert
             actionMethodName = "CreateRefFromAbcToProperty";
-            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out prop, out declaring);
+            method = RefRoutingConvention.SplitRefActionName(actionMethodName, out httpMethod, out prop, out declaring);
             Assert.Null(method);
         }
 

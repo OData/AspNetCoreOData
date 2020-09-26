@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -31,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
                 IEdmModel model = GetEdmModel();
                 services.AddOData(options => options.AddModel("odata", model)
-                .SetMaxTop(2).Expand().Select().OrderBy().Filter());
+                .SetMaxTop(null).Expand().Select().OrderBy().Filter());
             }
         }
 
@@ -276,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public async Task Levels_Works_WithTypeCast()
         {
             // Arrange
-            string uri = "odata/LevelsEntities(6)?$expand=Microsoft.AspNetCore.OData.Tests.Routing.LevelsDerivedEntity/AncestorsInDerivedEntity($levels=2)";
+            string uri = "odata/LevelsEntities(6)?$expand=Microsoft.AspNetCore.OData.Tests.Query.LevelsDerivedEntity/AncestorsInDerivedEntity($levels=2)";
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(uri);
@@ -666,7 +667,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     //var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
                     //responseMessage.Content = new StringContent(
                     //    Error.Format("The query specified in the URI is not valid. {0}", e.Message));
-
+                    Request.ODataFeature().Path = null;
                     return BadRequest(Error.Format("The query specified in the URI is not valid. {0}", e.Message));
                 }
 

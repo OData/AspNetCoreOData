@@ -15,9 +15,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="RefSegmentTemplate" /> class.
         /// </summary>
         /// <param name="navigation">The Edm navigation property.</param>
-        public RefSegmentTemplate(IEdmNavigationProperty navigation)
+        /// <param name="navigationSource">The Edm navigation source.</param>
+        public RefSegmentTemplate(IEdmNavigationProperty navigation, IEdmNavigationSource navigationSource)
         {
             Navigation = navigation ?? throw Error.ArgumentNull(nameof(navigation));
+
+            NavigationSource = navigationSource;
 
             IsSingle = !navigation.Type.IsCollection();
         }
@@ -40,8 +43,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource { get; }
+
+        /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.RouteValues["navigationProperty"] = Navigation.Name;
+
             // ODL implementation is complex, here i just use the NavigationPropertyLinkSegment
             return new NavigationPropertyLinkSegment(Navigation, NavigationSource);
         }

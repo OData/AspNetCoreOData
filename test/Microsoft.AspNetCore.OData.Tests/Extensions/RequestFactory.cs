@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -186,6 +187,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             var context = new DefaultHttpContext();
             context.Features.Get<IHttpRequestFeature>().Headers = headers;
             return context.Request;
+        }
+
+        public static TKey GetKeyFromLinkUri<TKey>(this HttpRequest request, Uri link)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (link == null)
+            {
+                throw new ArgumentNullException(nameof(link));
+            }
+
+            var serviceRoot = request.CreateODataLink();
+            IEdmModel model = request.GetModel();
+
+            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), new Uri(link.LocalPath, UriKind.Relative),
+                request.GetSubServiceProvider());
+
+            var odataPath = uriParser.ParsePath();
+
+            var keySegment = odataPath.Where(p => p is KeySegment).FirstOrDefault() as KeySegment;
+
+            if (keySegment == null || !keySegment.Keys.Any())
+                throw new InvalidOperationException("This link does not contain a key.");
+
+            // Return the key value of the first segment
+            return (TKey)keySegment.Keys.First().Value;
         }
     }
 }

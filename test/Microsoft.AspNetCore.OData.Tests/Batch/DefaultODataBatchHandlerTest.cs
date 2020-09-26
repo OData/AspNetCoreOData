@@ -290,8 +290,8 @@ bar
 
             // Assert
             Assert.NotNull(responseBody);
-            Assert.Contains("GET,0,", responseBody);
-            Assert.Contains("DELETE,0,", responseBody);
+            Assert.Contains("GET,,", responseBody);
+            Assert.Contains("DELETE,,", responseBody);
             Assert.Contains("POST,3,text/plain; charset=utf-8", responseBody);
         }
 
@@ -931,29 +931,29 @@ Accept-Charset: UTF-8
             return SingleResult.Create(BatchTestCustomer.Customers.Where(d => d.Id.Equals(key)).AsQueryable());
         }
 
-        public IActionResult CreateRef([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
+        public IActionResult CreateRefToOrders([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
         {
             var customer = BatchTestCustomer.Customers.FirstOrDefault(d => d.Id.Equals(key));
             if (customer == null)
                 return NotFound();
 
-            //switch (navigationProperty)
-            //{
-            //    case "Orders":
-            //        var orderId = GetKeyFromLinkUri<int>(Request, link);
-            //        var order = BatchTestOrder.Orders.FirstOrDefault(d => d.Id.Equals(orderId));
+            switch (navigationProperty)
+            {
+                case "Orders":
+                    var orderId = Request.GetKeyFromLinkUri<int>(link);
+                    var order = BatchTestOrder.Orders.FirstOrDefault(d => d.Id.Equals(orderId));
 
-            //        if (order == null)
-            //            return NotFound();
+                    if (order == null)
+                        return NotFound();
 
-            //        if (customer.Orders == null)
-            //            customer.Orders = new List<BatchTestOrder>();
-            //        if (customer.Orders.FirstOrDefault(d => d.Id.Equals(orderId)) == null)
-            //            customer.Orders.Add(order);
-            //        break;
-            //    default:
-            //        return BadRequest();
-            //}
+                    if (customer.Orders == null)
+                        customer.Orders = new List<BatchTestOrder>();
+                    if (customer.Orders.FirstOrDefault(d => d.Id.Equals(orderId)) == null)
+                        customer.Orders.Add(order);
+                    break;
+                default:
+                    return BadRequest();
+            }
 
             return NoContent();
         }

@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethod">The http method.</param>
+        /// <param name="httpMethod">The http method, if mulitple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>
@@ -205,12 +205,27 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
                 selectorModel.EndpointMetadata.Add(odataMetadata);
 
-                odataMetadata.HttpMethods.Add(httpMethod);
+                AddHttpMethod(odataMetadata, httpMethod);
 
                 // Check with .NET Team whether the "Endpoint name metadata"
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
         }
+
+        private static void AddHttpMethod(ODataRoutingMetadata metadata, string httpMethod)
+        {
+            if (string.IsNullOrEmpty(httpMethod))
+            {
+                return;
+            }
+
+            string[] methods = httpMethod.Split(',');
+            foreach (var method in methods)
+            {
+                metadata.HttpMethods.Add(method);
+            }
+        }
+
     }
 }
 

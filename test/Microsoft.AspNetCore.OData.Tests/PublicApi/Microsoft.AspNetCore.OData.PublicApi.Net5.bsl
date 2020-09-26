@@ -2882,13 +2882,14 @@ public class Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public RefSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation)
+	public RefSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	bool IsSingle  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }

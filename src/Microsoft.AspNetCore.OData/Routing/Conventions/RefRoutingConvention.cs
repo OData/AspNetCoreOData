@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // Need to refactor the following
             // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
             // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
-            string method = SplitRefActionName(actionMethodName, out string property, out string declaring);
+            string method = SplitRefActionName(actionMethodName, out string httpMethod, out string property, out string declaring);
             if (method == null)
             {
                 return false;
@@ -122,7 +122,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else
             {
-                //TODO: Add the navigation template segment template
+                //TODO: Add the navigation template segment template,
+                // Or add the template for all navigation properties? 
                 return false;
             }
 
@@ -133,19 +134,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(new KeySegmentTemplate(navigationPropertyType, "relatedKey"));
             }
 
-            segments.Add(new RefSegmentTemplate(navigationProperty));
+            IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
+
+            segments.Add(new RefSegmentTemplate(navigationProperty, targetNavigationSource));
 
             // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(method, context.Prefix, context.Model, template);
+            action.AddSelector(httpMethod, context.Prefix, context.Model, template);
 
             // processed
             return true;
         }
 
-        internal static string SplitRefActionName(string actionName, out string property, out string declaring)
+        internal static string SplitRefActionName(string actionName, out string httpMethod, out string property, out string declaring)
         {
             string method;
+            httpMethod = null;
             property = null;
             declaring = null;
             string remaining;
@@ -154,16 +158,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
             {
                 method = "CreateRef";
+                httpMethod = "post,patch";
                 remaining = actionName.Substring(9);
             }
             else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))
             {
                 method = "GetRef";
+                httpMethod = "get";
                 remaining = actionName.Substring(6);
             }
             else if (actionName.StartsWith("DeleteRef", StringComparison.Ordinal))
             {
                 method = "DeleteRef";
+                httpMethod = "delete";
                 remaining = actionName.Substring(9);
             }
             else
