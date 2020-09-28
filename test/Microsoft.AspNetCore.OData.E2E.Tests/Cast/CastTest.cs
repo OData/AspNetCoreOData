@@ -26,11 +26,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
                 // services.AddDbContext<ProductsContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=CastProductsContext;Trusted_Connection=True;"));
                 //services.AddDbContext<ProductsContext>(opt => opt.UseInMemoryDatabase("CastProductsContext"));
 
-                services.AddControllers()
-                    .ConfigureApplicationPartManager(pm =>
-                    {
-                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(ProductsController), typeof(MetadataController)));
-                    });
+                services.ConfigureControllers(typeof(ProductsController), typeof(MetadataController));
 
                 IEdmModel edmModel = CastEdmModel.GetEdmModel();
 
@@ -63,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
                     // To Edm.String
                     combinations.Add(dataSourceType, "?$filter=cast('Name1',Edm.String) eq Name", 1);
                     combinations.Add(dataSourceType, "?$filter=contains(cast(Name,Edm.String),'Name')", 6);
-                    combinations.Add(dataSourceType, "?$filter=cast(Microsoft.Test.E2E.AspNet.OData.Cast.Domain'Civil',Edm.String) eq '2'", 6);
+                    combinations.Add(dataSourceType, "?$filter=cast(Microsoft.AspNetCore.OData.E2E.Tests.Cast.Domain'Civil',Edm.String) eq '2'", 6);
                     combinations.Add(dataSourceType, "?$filter=cast(Domain,Edm.String) eq '3'", 2);
                     combinations.Add(dataSourceType, "?$filter=cast(ID,Edm.String) gt '1'", 5);
                     // TODO bug 1889: Cast function reports error if it is used against a collection of primitive value.
@@ -83,14 +79,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
                     combinations.Add(dataSourceType, "?$filter=cast(null,Edm.DateTimeOffset) eq null", 6);
 
                     // To Enum
-                    combinations.Add(dataSourceType, "?$filter=cast('Both',Microsoft.Test.E2E.AspNet.OData.Cast.Domain) eq Domain", 2);
-                    combinations.Add(dataSourceType, "?$filter=cast('1',Microsoft.Test.E2E.AspNet.OData.Cast.Domain) eq Domain", 2);
-                    combinations.Add(dataSourceType, "?$filter=cast(null,Microsoft.Test.E2E.AspNet.OData.Cast.Domain) eq Domain", 0);
+                    combinations.Add(dataSourceType, "?$filter=cast('Both',Microsoft.AspNetCore.OData.E2E.Tests.Cast.Domain) eq Domain", 2);
+                    combinations.Add(dataSourceType, "?$filter=cast('1',Microsoft.AspNetCore.OData.E2E.Tests.Cast.Domain) eq Domain", 2);
+                    combinations.Add(dataSourceType, "?$filter=cast(null,Microsoft.AspNetCore.OData.E2E.Tests.Cast.Domain) eq Domain", 0);
 
                     //To Derived Structured Types
-                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.Test.E2E.AspNet.OData.Cast.AirPlane')/Speed eq 100", 2);
-                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.Test.E2E.AspNet.OData.Cast.AirPlane')/Speed eq 500", 1);
-                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.Test.E2E.AspNet.OData.Cast.JetPlane')/Company eq 'Boeing'", 1);
+                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 100", 2);
+                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 500", 1);
+                    combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.JetPlane')/Company eq 'Boeing'", 1);
                 }
 
                 return combinations;

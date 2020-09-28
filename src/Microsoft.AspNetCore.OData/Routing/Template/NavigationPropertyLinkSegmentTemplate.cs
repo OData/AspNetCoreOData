@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override IEdmType EdmType => null;
 
         /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Ref;
+        public override ODataSegmentKind Kind => ODataSegmentKind.NavigationLink;
 
         /// <inheritdoc />
         public override bool IsSingle => false;

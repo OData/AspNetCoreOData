@@ -150,6 +150,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), requestUri);
             request.Content = new StringContent(content);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = content.Length;
             return client.SendAsync(request, CancellationToken.None);
         }
 

@@ -32,9 +32,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 new StringBuilder()
             };
 
-            int index = 0;
-            foreach (ODataSegmentTemplate segment in path.Segments)
+            int count = path.Segments.Count;
+            for (int index = 0; index < count; index++)
             {
+                ODataSegmentTemplate segment = path.Segments[index];
+
                 if (segment.Kind == ODataSegmentKind.Key)
                 {
                     KeySegmentTemplate keySg = segment as KeySegmentTemplate;
@@ -47,7 +49,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         templates = CombinateTemplate(templates, "(" + segment.Literal + ")");
                     }
 
-                    index++;
                     continue;
                 }
 
@@ -55,7 +56,47 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     templates = CombinateTemplate(templates, "/");
                 }
-                index++;
+
+                // create =>  ~.../navigation/{key}/$ref
+                if (segment.Kind == ODataSegmentKind.NavigationLink)
+                {
+                    NavigationPropertyLinkSegmentTemplate navigationLinkSegment = (NavigationPropertyLinkSegmentTemplate)segment;
+                    if (index == count - 1)
+                    {
+                        // we don't have the other segment
+                        templates = CombinateTemplates(templates, $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref");
+                    }
+                    else
+                    {
+                        ODataSegmentTemplate nextSegment = path.Segments[index];
+                        if (nextSegment.Kind == ODataSegmentKind.Key)
+                        {
+                            // append "navigation property"
+                            templates = CombinateTemplates(templates, navigationLinkSegment.Segment.NavigationProperty.Name);
+
+                            // append "key"
+                            KeySegmentTemplate keySg = nextSegment as KeySegmentTemplate;
+                            if (keySg.Count == 1)
+                            {
+                                templates = CombinateTemplates(templates, "(" + nextSegment.Literal + ")", "/" + nextSegment.Literal);
+                            }
+                            else
+                            {
+                                templates = CombinateTemplate(templates, "(" + nextSegment.Literal + ")");
+                            }
+
+                            // append $ref
+                            templates = CombinateTemplates(templates, "$ref");
+                            index++; // skip the key segment after $ref.
+                        }
+                        else
+                        {
+                            templates = CombinateTemplates(templates, $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref");
+                        }
+                    }
+
+                    continue;
+                }
 
                 if (segment.Kind == ODataSegmentKind.Action)
                 {

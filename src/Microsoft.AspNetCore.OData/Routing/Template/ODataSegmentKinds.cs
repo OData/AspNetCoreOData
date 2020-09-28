@@ -74,6 +74,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         Ref,
 
         /// <summary>
+        /// Navigation link segment.
+        /// </summary>
+        NavigationLink,
+
+        /// <summary>
         /// $count segment.
         /// </summary>
         Count,

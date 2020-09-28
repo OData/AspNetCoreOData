@@ -517,6 +517,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetSupportedHttpMethods (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static bool HasODataKeyParameter (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, params string keyPrefix)
 
 	[
@@ -2580,15 +2585,16 @@ public enum Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind : int {
 	Action = 8
 	ActionImport = 10
 	Cast = 4
-	Count = 13
-	Dynamic = 15
+	Count = 14
+	Dynamic = 16
 	EntitySet = 1
 	Function = 7
 	FunctionImport = 9
 	Key = 3
 	Metadata = 0
 	Navigation = 6
-	PathTemplate = 14
+	NavigationLink = 13
+	PathTemplate = 15
 	Property = 5
 	Ref = 12
 	Singleton = 2
@@ -2788,21 +2794,6 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkS
 	bool IsSingle  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
-	Microsoft.OData.UriParser.NavigationPropertyLinkSegment Segment  { public get; }
-
-	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
-}
-
-public class Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public NavigationPropertyRefSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
-	public NavigationPropertyRefSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.NavigationPropertyLinkSegment Segment  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)

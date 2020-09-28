@@ -1972,6 +1972,11 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel"/>.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.SupportedHttpMethodConventions">
+            <summary>
+            Gets the collection of supported HTTP methods for conventions.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsNonODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
             Test whether the action is not suitable for OData action.
@@ -2005,6 +2010,13 @@
             <param name="keyPrefix">The key prefix for the action parameter.</param>
             <returns>True/false.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetSupportedHttpMethods(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+            <summary>
+            Gets the supported Http method on the action or by convention using the action name.
+            </summary>
+            <param name="action">The action model.</param>
+            <returns>The supported http methods.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
             Adds the OData selector model to the action.
@@ -2019,7 +2031,7 @@
             Adds the OData selector model to the action.
             </summary>
             <param name="action">The given action model.</param>
-            <param name="httpMethod">The http method, if mulitple, using ',' to separate.</param>
+            <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="path">The OData path template.</param>
@@ -11972,52 +11984,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate">
-            <summary>
-            Represents a template that could match a $ref segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.Edm.IEdmNavigationSource)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate" /> class.
-            </summary>
-            <param name="navigation">The Edm navigation property.</param>
-            <param name="navigationSource">The Edm navigation property.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.#ctor(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate" /> class.
-            </summary>
-            <param name="segment">The navigation property link segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.Literal">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.EdmType">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.Kind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.NavigationSource">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.Navigation">
-            <summary>
-            Gets the wrapped navigation property.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.Segment">
-            <summary>
-            Gets the navigation property link segment.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.IsSingle">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyRefSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate">
             <summary>
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
@@ -12274,6 +12240,11 @@
         <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Ref">
             <summary>
             $ref segment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.NavigationLink">
+            <summary>
+            Navigation link segment.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Count">

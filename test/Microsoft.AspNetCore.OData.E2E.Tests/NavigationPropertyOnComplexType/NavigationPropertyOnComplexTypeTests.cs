@@ -276,6 +276,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             string url =  PeopleBaseUrl + "(1)/HomeLocation/ZipCode/$ref";
             string payload = "{\"Zip\":98038,\"City\":\"Redmond\",\"State\":\"Washington\"}";
             HttpContent content = new StringContent(payload, Encoding.UTF8, mediaType: "application/json");
+            content.Headers.ContentLength = payload.Length;
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Content = content;
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -20,6 +21,20 @@ namespace Microsoft.AspNetCore.OData.Extensions
     /// </summary>
     public static class ActionModelExtensions
     {
+        /// <summary>
+        /// Gets the collection of supported HTTP methods for conventions.
+        /// </summary>
+        private static readonly string[] SupportedHttpMethodConventions = new string[]
+        {
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE",
+            "PATCH",
+            "HEAD",
+            "OPTIONS",
+        };
+
         /// <summary>
         /// Test whether the action is not suitable for OData action.
         /// </summary>
@@ -118,6 +133,38 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the supported Http method on the action or by convention using the action name.
+        /// </summary>
+        /// <param name="action">The action model.</param>
+        /// <returns>The supported http methods.</returns>
+        public static IEnumerable<string> GetSupportedHttpMethods(this ActionModel action)
+        {
+            if (action == null)
+            {
+                throw Error.ArgumentNull(nameof(action));
+            }
+
+            // Determine the supported methods.
+            IEnumerable<string> httpMethods = action.Attributes.OfType<IActionHttpMethodProvider>()
+                .FirstOrDefault()?.HttpMethods;
+
+            if (httpMethods == null)
+            {
+                // If no IActionHttpMethodProvider is specified, fall back to convention the way AspNet does.
+                httpMethods = SupportedHttpMethodConventions
+                    .Where(method => action.ActionMethod.Name.StartsWith(method, StringComparison.OrdinalIgnoreCase));
+
+                // Use POST as the default method.
+                if (!httpMethods.Any())
+                {
+                    httpMethods = new string[] { "POST" };
+                }
+            }
+
+            return httpMethods;
+        }
+
+        /// <summary>
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
@@ -141,6 +188,8 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
+            var httpMethods = action.GetSupportedHttpMethods();
+
             foreach (var template in path.GetTemplates())
             {
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
@@ -152,15 +201,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
                 string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
 
-                string modelName = model.GetModelName();
-
-                templateStr = templateStr.Replace("MODELNAME", modelName, StringComparison.Ordinal);
-
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-                selectorModel.EndpointMetadata.Add(new ODataRoutingMetadata(prefix, model, path));
+
+                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
+                selectorModel.EndpointMetadata.Add(odataMetadata);
 
                 // Check with .NET Team whether the "Endpoint name metadata"
                 // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
+                foreach (var httpMethod in httpMethods)
+                {
+                    odataMetadata.HttpMethods.Add(httpMethod);
+                }
             }
         }
 
@@ -168,7 +219,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethod">The http method, if mulitple, using ',' to separate.</param>
+        /// <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>

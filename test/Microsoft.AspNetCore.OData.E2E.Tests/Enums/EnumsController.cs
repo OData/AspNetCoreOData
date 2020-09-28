@@ -1,6 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -8,10 +12,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
@@ -38,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 {
                     ID=1,
                     Name="Name1",
-                    SkillSet=new List<Skill>{Skill.CSharp,Skill.Sql},
+                    SkillSet=new List<Skill> { Skill.CSharp, Skill.Sql },
                     Gender=Gender.Female,
                     AccessLevel=AccessLevel.Execute,
                     FavoriteSports=new FavoriteSports()
@@ -56,18 +57,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                     FavoriteSports=new FavoriteSports()
                     {
                         LikeMost=Sport.Pingpong,
-                        Like=new List<Sport>{Sport.Pingpong,Sport.Basketball}
+                        Like=new List<Sport> { Sport.Pingpong, Sport.Basketball }
                     }
                 },
-                new Employee(){
+                new Employee()
+                {
                     ID=3,Name="Name3",
-                    SkillSet=new List<Skill>{Skill.Web,Skill.Sql},
+                    SkillSet=new List<Skill> { Skill.Web, Skill.Sql },
                     Gender=Gender.Female,
                     AccessLevel=AccessLevel.Read|AccessLevel.Write,
                     FavoriteSports=new FavoriteSports()
                     {
                         LikeMost=Sport.Pingpong|Sport.Basketball,
-                        Like=new List<Sport>{Sport.Pingpong,Sport.Basketball}
+                        Like=new List<Sport> { Sport.Pingpong, Sport.Basketball }
                     }
                 },
             };
@@ -84,8 +86,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(Employees.SingleOrDefault(e => e.ID == key));
         }
 
-        public IActionResult GetAccessLevelFromEmployee(int key)
+        [HttpGet]
+        // public IActionResult FindAccessLevelFromEmployee(int key)
+        public IActionResult FindAccessLevel(int key)
         {
+            if (key == 9)
+            {
+                // Special key to verify the function call
+                return Ok(AccessLevel.Execute);
+            }
+
             return Ok(Employees.SingleOrDefault(e => e.ID == key).AccessLevel);
         }
 
@@ -192,6 +202,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
             Skill skill = (Skill)parameters["skill"];
 
+            if (key == 6)
+            {
+                Assert.Equal(Skill.Sql, skill);
+                return Ok();
+            }
+
             Employee employee = Employees.FirstOrDefault(e => e.ID == key);
             if (!employee.SkillSet.Contains(skill))
             {
@@ -217,8 +233,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             {
                 return BadRequest(ModelState);
             }
+
             int ID = (int)parameters["ID"];
             AccessLevel accessLevel = (AccessLevel)parameters["accessLevel"];
+            if (accessLevel.HasFlag(AccessLevel.Read) &&
+                accessLevel.HasFlag(AccessLevel.Execute) &&
+                ID == 7) // special
+            {
+                return Ok(AccessLevel.Read | AccessLevel.Write);
+            }
+
             Employee employee = Employees.FirstOrDefault(e => e.ID == ID);
             employee.AccessLevel = accessLevel;
             return Ok(employee.AccessLevel);
@@ -245,9 +269,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             {
                 return BadRequest(ModelState);
             }
-            Employee employee = Employees.FirstOrDefault(e => e.ID == id);
-            var result = employee.AccessLevel.HasFlag(accessLevel);
-            return Ok(result);
+
+            if (id == 1 && accessLevel == AccessLevel.Read)
+            {
+                return Ok(false);
+            }
+
+            if (id == 2 && accessLevel == AccessLevel.Read)
+            {
+                return Ok(true);
+            }
+
+            return BadRequest("Bad request!");
         }
     }
 

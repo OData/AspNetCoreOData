@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         }*/
 
         [EnableQuery]
-        public IActionResult GetHomeLocationOfGeolocation([FromODataUri]int key)
+        public IActionResult GetHomeLocationOfGeoLocation([FromODataUri]int key)
         {
             Person person = _repo.People.FirstOrDefault(p => p.Id == key);
             if (person == null)
@@ -100,6 +100,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             return Ok(person.HomeLocation.ZipCode);
         }
 
+        [HttpPost]
         [ODataRoute("People({id})/HomeLocation/ZipCode/$ref")]
         public IActionResult CreateRefToZipCode([FromODataUri] int id, [FromBody] ZipCode zip)
         {

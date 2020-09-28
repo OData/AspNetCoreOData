@@ -25,11 +25,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
                 //services.AddDbContext<ProductsContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=CastProductsContext;Trusted_Connection=True;"));
                 services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
 
-                services.AddControllers()
-                    .ConfigureApplicationPartManager(pm =>
-                    {
-                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(CustomersController)));
-                    });
+                services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
                 services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)

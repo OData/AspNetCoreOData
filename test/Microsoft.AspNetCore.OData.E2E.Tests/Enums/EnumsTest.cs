@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,6 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
@@ -26,19 +26,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             public override void ConfigureServices(IServiceCollection services)
             {
-                services.AddControllers()
-                    .ConfigureApplicationPartManager(pm =>
-                    {
-                        pm.FeatureProviders.Add(new WebODataControllerFeatureProvider(typeof(EmployeesController), typeof(MetadataController)));
-                    });
+                services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
                 services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddModel("convention", model1)
-                .AddModel("explicit", model2)
-                );
+                .AddModel("explicit", model2));
             }
         }
 
@@ -121,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(EdmTypeKind.Enum, iEdmTpeReferenceOfAccessLevel.Definition.TypeKind);
 
             // Function GetAccessLevel
-            var iEdmOperationOfGetAccessLevel = edmModel.FindDeclaredOperations(typeof(Employee).Namespace + ".GetAccessLevel").FirstOrDefault();
+            var iEdmOperationOfGetAccessLevel = edmModel.FindDeclaredOperations(typeof(Employee).Namespace + ".FindAccessLevel").FirstOrDefault();
             var iEdmTypeReferenceOfGetAccessLevel = iEdmOperationOfGetAccessLevel.ReturnType;
             Assert.Equal(EdmTypeKind.Enum, iEdmTypeReferenceOfGetAccessLevel.Definition.TypeKind);
 
@@ -138,11 +133,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         [InlineData("application/json;odata.metadata=none")]
         public async Task QueryEntitySet(string format)
         {
+            // Arrange
             await ResetDatasource();
             string requestUri = "/convention/Employees?$format=" + format;
 
+            // Act
             HttpResponseMessage response = await this.Client.GetAsync(requestUri);
-            string test = await response.Content.ReadAsStringAsync();
+
+            // Assert
             Assert.True(response.IsSuccessStatusCode);
 
             var json = await response.Content.ReadAsObject<JObject>();
@@ -177,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
         [Theory]
         [InlineData("/convention/Employees(1)/SkillSet/$count", 2)]
-        [InlineData("/convention/Employees(1)/SkillSet/$count?$filter=$it eq Microsoft.Test.E2E.AspNet.OData.Enums.Skill'Sql'", 1)]
+        [InlineData("/convention/Employees(1)/SkillSet/$count?$filter=$it eq Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill'Sql'", 1)]
         public async Task QuerySkillSetCount(string requestUri, int expectedCount)
         {
             // Arrange
@@ -423,7 +421,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             //Arrange
             await ResetDatasource();
-            string requestUri = "/convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
+            string requestUri = Client.BaseAddress + "convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
             //Get the count before the post
             int count = 0;
             using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
@@ -440,6 +438,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             requestForPost.Content = new StringContent(content: @"{
                     'value':'Sql'
                     }", encoding: Encoding.UTF8, mediaType: "application/json");
+            requestForPost.Content.Headers.ContentLength = 10;
 
             //Act
             using (HttpResponseMessage response = await this.Client.SendAsync(requestForPost))
@@ -594,30 +593,37 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         [Fact]
         public async Task EnumInActionParameter()
         {
-            await ResetDatasource();
-            var postUri = "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.AddSkill";
-            var postContent = new StringContent(@"{""skill"":""Sql""}");
+            // Arrange
+            string postUri = "/convention/Employees(6)/Microsoft.AspNetCore.OData.E2E.Tests.Enums.AddSkill";
+            string payload = @"{""skill"":""Sql""}";
+            var postContent = new StringContent(payload);
             postContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            postContent.Headers.ContentLength = payload.Length;
+
+            // Act
             var response = await Client.PostAsync(postUri, postContent);
 
+            // Assert
             response.EnsureSuccessStatusCode();
         }
 
         [Fact]
         public async Task EnumInActionOutput()
         {
-            await ResetDatasource();
-            var postUri = "/convention/SetAccessLevel";
-            var postContent = JObject.Parse(@"{""accessLevel"":""Read,Execute"",""ID"":1}");
+            // Arrange
+            var postUri = Client.BaseAddress + "convention/SetAccessLevel";
+            var postContent = JObject.Parse(@"{""accessLevel"":""Read,Execute"",""ID"":7}");
 
+            // Act
             var response = await Client.PostAsJsonAsync(postUri, postContent);
 
+            // Assert
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsObject<JObject>();
             var value = json["value"].ToString();
 
-            Assert.Equal("Read, Execute", value);
+            Assert.Equal("Read, Write", value);
         }
 
         #endregion
@@ -627,9 +633,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         [Fact]
         public async Task EnumInFunctionOutput()
         {
-            await ResetDatasource();
-            var getUri = "/convention/Employees(1)/Microsoft.Test.E2E.AspNet.OData.Enums.GetAccessLevel";
+            // Arrange
+            var getUri = "/convention/Employees(9)/Microsoft.AspNetCore.OData.E2E.Tests.Enums.FindAccessLevel()";
             var response = await this.Client.GetAsync(getUri);
+
+            // Act & Assert
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsObject<JObject>();
@@ -638,13 +646,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [Theory]
-        [InlineData("/convention/HasAccessLevel(ID=1,AccessLevel=Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'Read')", false)]
-        [InlineData("/convention/HasAccessLevel(ID=2,AccessLevel=Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'1')", true)]
+        [InlineData("/convention/HasAccessLevel(ID=1,AccessLevel=Microsoft.AspNetCore.OData.E2E.Tests.Enums.AccessLevel'Read')", false)]
+        [InlineData("/convention/HasAccessLevel(ID=2,AccessLevel=Microsoft.AspNetCore.OData.E2E.Tests.Enums.AccessLevel'1')", true)]
         public async Task EnumInFunctionParameter(string requestUri, bool expectedValue)
         {
-            await ResetDatasource();
+            // Arrange
             var response = await this.Client.GetAsync(requestUri);
 
+            // Act & Assert
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsObject<JObject>();

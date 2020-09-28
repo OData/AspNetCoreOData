@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             actionConfiguration.Parameter<Skill>("skill");
             actionConfiguration.ReturnsCollection<Skill>();
 
-            var functionConfiguration = employee.Function("GetAccessLevel");
+            var functionConfiguration = employee.Function("FindAccessLevel");
             functionConfiguration.Returns<AccessLevel>();
         }
 
