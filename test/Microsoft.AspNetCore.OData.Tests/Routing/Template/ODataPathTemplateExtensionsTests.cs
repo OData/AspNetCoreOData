@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -15,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         private static IEdmTypeReference IntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
 
         [Fact]
-        public void GetAllTemplatesWorksForBasicPath()
+        public void GetTemplatesWorksForBasicPath()
         {
             // Arrange
             EdmEntityType customer = new EdmEntityType("NS", "Customer");
@@ -28,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new KeySegmentTemplate(customer, entitySet));
 
             // Act
-            IEnumerable<string> actual = template.GetAllTemplates();
+            IEnumerable<string> actual = template.GetTemplates();
 
             // Assert
             Assert.Equal(2, actual.Count());
@@ -36,7 +37,79 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void GetAllTemplatesWorksForPathWithTypeCastAndFunction()
+        public void GetTemplatesWorksForODataPathWithDollarRefOnSingleNavigation()
+        {
+            // Arrange
+            EdmEntityType customer = new EdmEntityType("NS", "Customer");
+            customer.AddKeys(customer.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+            var entitySet = container.AddEntitySet("Customers", customer);
+            var navigation = customer.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
+            {
+                TargetMultiplicity = EdmMultiplicity.One,
+                Name = "SubCustomer",
+                Target = customer
+            });
+
+            ODataPathTemplate template = new ODataPathTemplate(
+                new EntitySetSegmentTemplate(entitySet),
+                new KeySegmentTemplate(customer, entitySet),
+                new NavigationPropertyLinkSegmentTemplate(new NavigationPropertyLinkSegment(navigation, entitySet)));
+
+            // Act
+            IEnumerable<string> actual = template.GetTemplates();
+
+            // Assert
+            Assert.Equal(2, actual.Count());
+            Assert.Equal(new[]
+                {
+                    "Customers({key})/SubCustomer/$ref",
+                    "Customers/{key}/SubCustomer/$ref"
+                }, actual);
+        }
+
+        [Fact]
+        public void GetTemplatesWorksForODataPathWithDollarRefOnCollectionNavigation()
+        {
+            // Arrange
+            EdmEntityType customer = new EdmEntityType("NS", "Customer");
+            customer.AddKeys(customer.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+            var entitySet = container.AddEntitySet("Customers", customer);
+            var navigation = customer.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
+            {
+                TargetMultiplicity = EdmMultiplicity.Many,
+                Name = "SubCustomers",
+                Target = customer
+            });
+
+            KeyValuePair<string, object>[] keys = new KeyValuePair<string, object>[]
+            {
+                new KeyValuePair<string, object>("Id", "{nextKey}")
+            };
+            KeySegment keySegment = new KeySegment(keys, customer, entitySet);
+            ODataPathTemplate template = new ODataPathTemplate(
+                new EntitySetSegmentTemplate(entitySet),
+                new KeySegmentTemplate(customer, entitySet),
+                new NavigationPropertyLinkSegmentTemplate(new NavigationPropertyLinkSegment(navigation, entitySet)),
+                new KeySegmentTemplate(keySegment));
+
+            // Act
+            IEnumerable<string> actual = template.GetTemplates();
+
+            // Assert
+            Assert.Equal(4, actual.Count());
+            Assert.Equal(new[]
+                {
+                    "Customers({key})/SubCustomers({nextKey})/$ref",
+                    "Customers({key})/SubCustomers/{nextKey}/$ref",
+                    "Customers/{key}/SubCustomers({nextKey})/$ref",
+                    "Customers/{key}/SubCustomers/{nextKey}/$ref"
+                }, actual);
+        }
+
+        [Fact]
+        public void GetTemplatesWorksForPathWithTypeCastAndFunction()
         {
             // Arrange
             EdmEntityType customer = new EdmEntityType("NS", "Customer");
@@ -62,29 +135,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new FunctionSegmentTemplate(getSalaray, null));
 
             // Act
-            IEnumerable<string> actual = template.GetAllTemplates();
+            IEnumerable<string> actual = template.GetTemplates();
 
-            Assert.Equal(16, actual.Count());
+            Assert.Equal(4, actual.Count());
             Assert.Equal(new[]
             {
-                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary})",
-                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary})",
                 "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-
-                "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary})",
-                "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary})",
                 "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-
-                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary})",
-                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary})",
                 "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-
-                "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary})",
-                "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary})",
                 "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
             }, actual);
         }

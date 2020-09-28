@@ -12078,10 +12078,10 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
-            
+            Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
-            <param name="path"></param>
-            <returns></returns>
+            <param name="path">The given path template.</param>
+            <returns>All path templates.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GenerateFunctionSegments(Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate)">
             <summary>
@@ -12089,13 +12089,6 @@
             </summary>
             <param name="segment">The input function.</param>
             <returns>All templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetAllPaths(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
-            <summary>
-            
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate}},Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate)">
             <summary>

@@ -16,15 +16,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public static class ODataPathTemplateExtensions
     {
         /// <summary>
-        /// 
+        /// Generates all templates for the given <see cref="ODataPathTemplate"/>
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">The given path template.</param>
+        /// <returns>All path templates.</returns>
         public static IEnumerable<string> GetTemplates(this ODataPathTemplate path)
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw Error.ArgumentNull(nameof(path));
             }
 
             IList<StringBuilder> templates = new List<StringBuilder>
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     }
                     else
                     {
-                        ODataSegmentTemplate nextSegment = path.Segments[index];
+                        ODataSegmentTemplate nextSegment = path.Segments[index + 1];
                         if (nextSegment.Kind == ODataSegmentKind.Key)
                         {
                             // append "navigation property"
@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                             }
 
                             // append $ref
-                            templates = CombinateTemplates(templates, "$ref");
+                            templates = CombinateTemplates(templates, "/$ref");
                             index++; // skip the key segment after $ref.
                         }
                         else
@@ -156,90 +156,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return newList;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static IEnumerable<ODataPathTemplate> GetAllPaths(this ODataPathTemplate path)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            IList<IList<ODataSegmentTemplate>> templates = new List<IList<ODataSegmentTemplate>>
-            {
-                new List<ODataSegmentTemplate>()
-            };
-
-            foreach (ODataSegmentTemplate segment in path.Segments)
-            {
-                if (segment.Kind == ODataSegmentKind.Function)
-                {
-                    FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
-                    IList<FunctionSegmentTemplate> functionTemplates = function.GenerateFunctionSegments();
-                    templates = CombinateTemplates(templates, functionTemplates);
-                }
-                else if (segment.Kind == ODataSegmentKind.FunctionImport)
-                {
-                    //FunctionImportSegmentTemplate functionImport = (FunctionImportSegmentTemplate)segment;
-                    //IList<string> functionTemplates = functionImport.FunctionImport.Function.GenerateFunctionTemplates();
-                    //templates = CombinateTemplates(templates, functionTemplates);
-                }
-                else
-                {
-                    templates = CombinateTemplate(templates, segment);
-                }
-            }
-
-            return templates.Select(e => new ODataPathTemplate(e));
-        }
-
-        /// <summary>
-        /// Combinates the next template to the existing templates.
-        /// </summary>
-        /// <param name="templates">The existing templates.</param>
-        /// <param name="nextTemplate">The nexte template.</param>
-        /// <returns>The templates.</returns>
-        private static IList<IList<ODataSegmentTemplate>> CombinateTemplate(IList<IList<ODataSegmentTemplate>> templates, ODataSegmentTemplate nextTemplate)
-        {
-            Contract.Assert(templates != null);
-            Contract.Assert(nextTemplate != null);
-
-            foreach (IList<ODataSegmentTemplate> sb in templates)
-            {
-                sb.Add(nextTemplate);
-            }
-
-            return templates;
-        }
-
-        /// <summary>
-        /// Combinates the next templates with existing templates.
-        /// </summary>
-        /// <param name="templates">The existing templates.</param>
-        /// <param name="nextTemplates">The nexte templates.</param>
-        /// <returns>The new templates.</returns>
-        private static IList<IList<ODataSegmentTemplate>> CombinateTemplates<T>(IList<IList<ODataSegmentTemplate>> templates, IList<T> nextTemplates)
-            where T : ODataSegmentTemplate
-        {
-            Contract.Assert(templates != null);
-
-            IList<IList<ODataSegmentTemplate>> newList = new List<IList<ODataSegmentTemplate>>(templates.Count * nextTemplates.Count);
-
-            foreach (IList<ODataSegmentTemplate> sb in templates)
-            {
-                foreach (ODataSegmentTemplate newTemplate in nextTemplates)
-                {
-                    IList<ODataSegmentTemplate> newSb = new List<ODataSegmentTemplate>(sb);
-                    newSb.Add(newTemplate);
-                    newList.Add(newSb);
-                }
-            }
-
-            return newList;
-        }
         /// <summary>
         /// Gets the whole supported template belongs to a <see cref="ODataPathTemplate"/>.
         /// We supports:
