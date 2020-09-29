@@ -206,7 +206,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, prefix, model, template);
+            action.AddSelector(NormalizeHttpMethod(httpMethod), prefix, model, template);
+        }
+
+        private static string NormalizeHttpMethod(string method)
+        {
+            switch(method.ToUpperInvariant())
+            {
+                case "POSTTO":
+                    return "POST";
+
+                case "PUTTO":
+                    return "PUT";
+
+                case "PATCHTO":
+                    return "PATCH";
+
+                case "DELETETO":
+                    return "DELETE";
+
+                default:
+                    return method;
+            }
         }
 
         // Split the property such as "GetCityOfSubAddressFromVipCustomer"
@@ -296,7 +317,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             Contract.Assert(edmProperty != null);
 
-            return method == "Get" && !edmProperty.Type.IsCollection() && edmProperty.Type.IsPrimitive();
+            return method == "Get" && !edmProperty.Type.IsCollection() && (edmProperty.Type.IsPrimitive() || edmProperty.Type.IsEnum());
         }
 
         // OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,

@@ -31,9 +31,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public string Name { get; set; }
 
-        public IList<Order> Orders { get; set; }
-
         public Address Address { get; set; }
+
+        public IList<Order> Orders { get; set; }
     }
 
     public class Order

@@ -15,6 +15,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 {
+    // The test can't work in EFCore, because it's not supported with Groupby and selectmany on collection.
+    // Later, we'd swith it to EF6.
     public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
     {
         public class TestsStartup : TestStartupBase
@@ -22,13 +24,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             public override void ConfigureServices(IServiceCollection services)
             {
                 // Use the sql server got the access error.
-                //services.AddDbContext<ProductsContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=CastProductsContext;Trusted_Connection=True;"));
-                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
+                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EntitySetAggregationContext;Trusted_Connection=True;"));
+                //services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
 
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
-                services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
                     .AddModel("aggregation", edmModel));
             }
         }
@@ -40,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         {
         }
 
-        [Theory]
+        [Theory(Skip = "See the comments above")]
         [InlineData("sum",600)]
         [InlineData("min", 25)]
         [InlineData("max", 225)]
@@ -54,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             var result = await response.Content.ReadAsObject<JObject>();
@@ -67,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(expected, TotalPrice);
         }
 
-        [Theory]
+        [Theory(Skip = "See the comments above")]
         [InlineData("?$apply=aggregate(Orders(Price with sum as TotalPrice, Id with sum as TotalId))")]
         [InlineData("?$apply=aggregate(Orders(Price with sum as TotalPrice), Orders(Id with sum as TotalId))")]
         public async Task MultipleAggregationOnEntitySetWorks(string queryString)
@@ -96,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 + 2 + 3 + 4 + 5 + 6, totalId); 
         }
 
-        [Fact]
+        [Fact(Skip = "See the comments above")]
         public async Task AggregationOnEntitySetWorksWithPropertyAggregation()
         {
             // Arrange
@@ -123,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 + 2 + 3, totalId); 
         }
 
-        [Fact]
+        [Fact(Skip = "See the comments above")]
         public async Task TestAggregationOnEntitySetsWithArithmeticOperators()
         {
             // Arrange
@@ -145,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal((1 + 4 + 9) * (25 * 25 + 75 * 75), TotalPrice);
         }
 
-        [Fact]
+        [Fact(Skip = "See the comments above")]
         public async Task TestAggregationOnEntitySetsWithArithmeticOperatorsAndPropertyNavigation()
         {
             // Arrange
@@ -167,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 * (25 + 75) + 2 * (25 + 75) + 3 * (25 + 75), TotalPrice);
         }
 
-        [Fact]
+        [Fact(Skip = "See the comments above")]
         public async Task AggregationOnEntitySetWorksWithGroupby()
         {
             // Arrange

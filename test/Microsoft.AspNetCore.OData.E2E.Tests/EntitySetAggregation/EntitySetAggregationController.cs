@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public CustomersController(EntitySetAggregationContext context)
         {
+            context.Database.EnsureCreated();
             _context = context;
-            _context.Database.EnsureCreated();
 
             if (!_context.Customers.Any())
             {
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             {
                 var customer = new Customer
                 {
-                    Id = i,
+                   // Id = i,
                     Name = "Customer" + (i+1) % 2,
                     Orders = 
                         new List<Order> {

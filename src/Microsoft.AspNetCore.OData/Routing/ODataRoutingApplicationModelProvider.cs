@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -33,7 +34,8 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (!_options.EnableAttributeRouting)
             {
-                _controllerActionConventions = conventions.Where(c => !(c is AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
+                Type attributeType = typeof(AttributeRoutingConvention);
+                _controllerActionConventions = conventions.Where(c => c.GetType() != attributeType).OrderBy(p => p.Order).ToArray();
             }
             else
             {

@@ -12090,22 +12090,6 @@
             <param name="segment">The input function.</param>
             <returns>All templates.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate}},Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate)">
-            <summary>
-            Combinates the next template to the existing templates.
-            </summary>
-            <param name="templates">The existing templates.</param>
-            <param name="nextTemplate">The nexte template.</param>
-            <returns>The templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates``1(System.Collections.Generic.IList{System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate}},System.Collections.Generic.IList{``0})">
-            <summary>
-            Combinates the next templates with existing templates.
-            </summary>
-            <param name="templates">The existing templates.</param>
-            <param name="nextTemplates">The nexte templates.</param>
-            <returns>The new templates.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetAllTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
             <summary>
             Gets the whole supported template belongs to a <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.

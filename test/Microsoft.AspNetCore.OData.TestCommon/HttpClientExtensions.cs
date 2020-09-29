@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         /// <returns>A task object representing the asynchronous operation.</returns>
         public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, string content)
         {
-            return client.PatchAsync(new Uri(requestUri), content, CancellationToken.None);
+            return client.PatchAsync(new Uri(requestUri, UriKind.RelativeOrAbsolute), content, CancellationToken.None);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "We want to support URIs as strings")]
         public static Task<HttpResponseMessage> PatchAsJsonAsync<T>(this HttpClient client, string requestUri, T value)
         {
-            return client.PatchAsJsonAsync(new Uri(requestUri), value, CancellationToken.None);
+            return client.PatchAsJsonAsync(new Uri(requestUri, UriKind.RelativeOrAbsolute), value, CancellationToken.None);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "We want to support URIs as strings")]
         public static Task<HttpResponseMessage> PostAsJsonAsync<T>(this HttpClient client, string requestUri, T value)
         {
-            return client.PostAsJsonAsync(new Uri(requestUri), value);
+            return client.PostAsJsonAsync(new Uri(requestUri, UriKind.RelativeOrAbsolute), value);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "We want to support URIs as strings")]
         public static Task<HttpResponseMessage> PutAsJsonAsync<T>(this HttpClient client, string requestUri, T value)
         {
-            return client.PutAsJsonAsync(new Uri(requestUri), value);
+            return client.PutAsJsonAsync(new Uri(requestUri, UriKind.RelativeOrAbsolute), value);
         }
 
         /// <summary>
@@ -184,6 +184,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PUT"), requestUri);
             request.Content = new StringContent(content);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = content.Length;
             return client.SendAsync(request, CancellationToken.None);
         }
     }

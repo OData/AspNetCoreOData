@@ -73,7 +73,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             InitEmployeesAndManagers();
         }
 
-
         public IList<Employee> Customers { get { return _employees; } }
 
         [EnableQuery(PageSize = 10, MaxExpansionDepth = 5)]

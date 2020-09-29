@@ -353,7 +353,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Create the lambda that acceses the property in the selectMany clause.
             var selectManyParam = Expression.Parameter(baseElementType, "$it");
             var propertyExpression = Expression.Property(selectManyParam, expression.Expression.NavigationProperty.Name);
-            var selectManyLambda = Expression.Lambda(propertyExpression, selectManyParam);
+
+            // Collection selector body is IQueryable, we need to adjust the type to IEnumerable, to match the SelectMany signature
+            // therefore the delegate type is specified explicitly
+            var collectionSelectorLambdaType = typeof(Func<,>).MakeGenericType(
+                source.Type,
+                typeof(IEnumerable<>).MakeGenericType(selectedElementType));
+            var selectManyLambda = Expression.Lambda(collectionSelectorLambdaType, propertyExpression, selectManyParam);
 
             // Get expression to get collection of entities
             var entitySet = Expression.Call(null, selectManyMethod, asQueryableExpression, selectManyLambda);

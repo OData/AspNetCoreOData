@@ -222,7 +222,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             if (format != "application/json;odata.metadata=none")
             {
                 var context = json["@odata.context"].ToString();
-                Assert.True(context.IndexOf("/$metadata#Collection(Microsoft.Test.E2E.AspNet.OData.Enums.Skill)") >= 0);
+                Assert.True(context.IndexOf("/$metadata#Collection(Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill)") >= 0);
             }
         }
 
@@ -235,6 +235,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             await ResetDatasource();
             var requestUri = "/convention/Employees(1)/AccessLevel/$value?$format=" + format;
             var response = await this.Client.GetAsync(requestUri);
+
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
@@ -289,10 +290,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             if (format == "application/json;odata.metadata=full")
             {
                 var typeOfAccessLevel = result["AccessLevel@odata.type"].ToString();
-                Assert.Equal("#Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel", typeOfAccessLevel);
+                Assert.Equal("#Microsoft.AspNetCore.OData.E2E.Tests.Enums.AccessLevel", typeOfAccessLevel);
 
                 var typeOfSkillSet = result["SkillSet@odata.type"].ToString();
-                Assert.Equal("#Collection(Microsoft.Test.E2E.AspNet.OData.Enums.Skill)", typeOfSkillSet);
+                Assert.Equal("#Collection(Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill)", typeOfSkillSet);
             }
         }
 
@@ -421,7 +422,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             //Arrange
             await ResetDatasource();
-            string requestUri = Client.BaseAddress + "convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
+            string requestUri = "/convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
             //Get the count before the post
             int count = 0;
             using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
@@ -528,7 +529,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             await ResetDatasource();
 
             var requestUri = "/convention/Employees(20)";
-            var requestContent = JObject.Parse(@"{""ID"":20,
+            var requestContent = @"{""ID"":20,
                     ""Name"":""Name2"",
                     ""SkillSet"":[""Sql""],
                     ""Gender"":""Female"",
@@ -536,10 +537,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                     ""FavoriteSports"":{
                             ""LikeMost"":""Basketball"",
                             ""Like"":[""Pingpong"",""Basketball""]
-                    }}");
+                    }}";
             HttpRequestMessage request = new HttpRequestMessage(new HttpMethod(method), requestUri);
-            request.Content = new StringContent(requestContent.ToString());
+            request.Content = new StringContent(requestContent);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = requestContent.Length;
             request.Headers.Add("Prefer", "return=minimal");
             using (HttpResponseMessage response = await Client.SendAsync(request))
             {
