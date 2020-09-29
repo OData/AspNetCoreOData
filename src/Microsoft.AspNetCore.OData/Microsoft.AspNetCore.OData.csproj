@@ -30,6 +30,7 @@
     <PackageReference Include="Microsoft.OData.Edm" Version="7.7.0" />
     <PackageReference Include="Microsoft.Spatial" Version="7.7.0" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
