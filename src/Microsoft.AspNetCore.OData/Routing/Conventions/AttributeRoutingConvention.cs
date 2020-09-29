@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
@@ -46,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             // It allows to use attribute routing without ODataRoutePrefixAttribute.
@@ -60,8 +59,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                     foreach (ODataRouteAttribute routeAttribute in routeAttributes)
                     {
-                        // If we have the model name setting, make sure we only let the attribute with the same model name to pass.
-                        if (!string.IsNullOrEmpty(routeAttribute.ModelName) && routeAttribute.ModelName != context.Prefix)
+                        // If we have the route prefix name setting, make sure we only let the attribute with the same route prefx to pass.
+                        if (!string.IsNullOrEmpty(routeAttribute.RoutePrefix) &&
+                            !string.Equals(routeAttribute.RoutePrefix, routePrefix, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
@@ -103,10 +103,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// Gets the route prefix on the controller.
         /// </summary>
-        /// <param name="modelName">The model name.</param>
+        /// <param name="routePrefix">The route prefix.</param>
         /// <param name="controller">The controller.</param>
         /// <returns>The prefix string list.</returns>
-        private IEnumerable<string> GetODataRoutePrefixes(string modelName, ControllerModel controller)
+        private IEnumerable<string> GetODataRoutePrefixes(string routePrefix, ControllerModel controller)
         {
             Contract.Assert(controller != null);
 
@@ -118,27 +118,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             foreach (ODataRoutePrefixAttribute prefixAttribute in prefixAttributes)
             {
-                // If we have the model name setting, make sure we only let the attribute with the same model name to pass.
-                if (!string.IsNullOrEmpty(prefixAttribute.ModelName) && prefixAttribute.ModelName != modelName)
+                // If we have the route prefix setting, make sure we only let the attribute with the same route prefix (ignore case) to pass.
+                if (!string.IsNullOrEmpty(prefixAttribute.RoutePrefix) &&
+                    !string.Equals(prefixAttribute.RoutePrefix, routePrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                string prefix = prefixAttribute.RoutePrefix;
-                if (prefix != null && prefix.StartsWith("/", StringComparison.Ordinal))
+                string template = prefixAttribute.PathPrefixTemplate;
+                if (template != null && template.StartsWith("/", StringComparison.Ordinal))
                 {
                     // So skip it? or let's remove the "/" and let it go?
-                    _logger.LogWarning($"The OData route prefix '{prefix}' on the controller '{controller.ControllerName}' starts with a '/'. Route prefixes cannot start with a '/'.");
+                    _logger.LogWarning($"The OData route prefix '{template}' on the controller '{controller.ControllerName}' starts with a '/'. Route prefixes cannot start with a '/'.");
 
-                    prefix = prefix.TrimStart('/');
+                    template = template.TrimStart('/');
                 }
 
-                if (prefix != null && prefix.EndsWith("/", StringComparison.Ordinal))
+                if (template != null && template.EndsWith("/", StringComparison.Ordinal))
                 {
-                    prefix = prefix.TrimEnd('/');
+                    template = template.TrimEnd('/');
                 }
 
-                yield return prefix;
+                yield return template;
             }
         }
 

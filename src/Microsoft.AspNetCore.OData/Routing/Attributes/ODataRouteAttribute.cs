@@ -16,17 +16,30 @@ namespace Microsoft.AspNetCore.OData.Routing.Attributes
         /// Initializes a new instance of the <see cref="ODataRouteAttribute"/> class.
         /// </summary>
         public ODataRouteAttribute()
-            : this(pathTemplate: null)
+            : this(template: null)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataRouteAttribute"/> class.
         /// </summary>
-        /// <param name="pathTemplate">The OData URL path template that this action handles.</param>
-        public ODataRouteAttribute(string pathTemplate)
+        /// <param name="template">The OData URL path template that this action handles, it could be null.</param>
+        public ODataRouteAttribute(string template)
+            : this(template, null)
         {
-            PathTemplate = pathTemplate ?? String.Empty;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRoutePrefixAttribute"/> class.
+        /// </summary>
+        /// <param name="template">The OData URL path template that this action handles. It could be null, For example: "customers({key})".</param>
+        /// <param name="prefix">The OData routing prefix setting. For example: "v{version}". It could be null which means this attribute be suitable for routes.</param>
+        public ODataRouteAttribute(string template, string prefix)
+        {
+            PathTemplate = template ?? string.Empty;
+
+            // It could be null which means this attribute can apply for all routes.
+            RoutePrefix = prefix;
         }
 
         /// <summary>
@@ -37,6 +50,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Attributes
         /// <summary>
         /// Gets or sets the OData route with which to associate the attribute.
         /// </summary>
-        public string ModelName { get; set; }
+        public string RoutePrefix { get; }
     }
 }

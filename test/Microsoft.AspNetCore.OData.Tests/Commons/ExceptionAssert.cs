@@ -259,7 +259,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
         /// <exception cref="ThrowsException">Thrown when an exception was not thrown, or when an exception of the incorrect type is thrown</exception>
         public static ArgumentException ThrowsArgumentNullOrEmpty(Action testCode, string paramName)
         {
-            return Throws<ArgumentException>(testCode, "Value cannot be null or empty.\r\nParameter name: " + paramName, allowDerivedExceptions: false);
+            return Throws<ArgumentException>(testCode, $"The argument '{paramName}' is null or empty. (Parameter '{paramName}')", allowDerivedExceptions: false);
         }
 
         /// <summary>

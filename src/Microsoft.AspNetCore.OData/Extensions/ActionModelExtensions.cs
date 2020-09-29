@@ -7,7 +7,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -36,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         };
 
         /// <summary>
-        /// Test whether the action is not suitable for OData action.
+        /// Tests whether the action is not suitable for OData action.
         /// </summary>
         /// <param name="action">The given action model.</param>
         /// <returns>True/False.</returns>
@@ -44,14 +43,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             return action.Attributes.Any(a => a is NonODataActionAttribute);
         }
 
         /// <summary>
-        /// Test whether the action has the given parameter with the given type.
+        /// Tests whether the action has the given parameter with the given type.
         /// </summary>
         /// <typeparam name="T">The parameter type.</typeparam>
         /// <param name="action">The given action model.</param>
@@ -61,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             // parameter name is unique?
@@ -84,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             return action.Attributes.OfType<T>().FirstOrDefault();
@@ -101,12 +100,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             if (entityType == null)
             {
-                throw new ArgumentNullException(nameof(entityType));
+                throw Error.ArgumentNull(nameof(entityType));
             }
 
             // TODO: shall we make sure the type is matching?
@@ -175,12 +174,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (path == null)
@@ -227,17 +226,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw Error.ArgumentNull(nameof(path));
             }
 
             foreach (var template in path.GetTemplates())
@@ -276,7 +275,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 metadata.HttpMethods.Add(method);
             }
         }
-
     }
 }
 

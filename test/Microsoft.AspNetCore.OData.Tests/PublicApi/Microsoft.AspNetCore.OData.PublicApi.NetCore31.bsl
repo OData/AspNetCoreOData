@@ -2387,19 +2387,21 @@ AttributeUsageAttribute(),
 ]
 public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute : System.Attribute {
 	public ODataRouteAttribute ()
-	public ODataRouteAttribute (string pathTemplate)
+	public ODataRouteAttribute (string template)
+	public ODataRouteAttribute (string template, string prefix)
 
-	string ModelName  { public get; public set; }
 	string PathTemplate  { public get; }
+	string RoutePrefix  { public get; }
 }
 
 [
 AttributeUsageAttribute(),
 ]
 public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute : System.Attribute {
-	public ODataRoutePrefixAttribute (string routePrefix)
+	public ODataRoutePrefixAttribute (string template)
+	public ODataRoutePrefixAttribute (string template, string prefix)
 
-	string ModelName  { public get; public set; }
+	string PathPrefixTemplate  { public get; }
 	string RoutePrefix  { public get; }
 }
 
