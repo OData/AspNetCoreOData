@@ -26,6 +26,11 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
 }
 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {

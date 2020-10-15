@@ -53,6 +53,35 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
+        public void AddOData_RegistersODataOptionsWithServiceProvider()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            IEdmModel coreModel = EdmCoreModel.Instance;
+
+            services.AddSingleton(_ => coreModel);
+
+            // Act
+            services.AddOData((options, serviceProvider) =>
+            {
+                var edmModel = serviceProvider.GetRequiredService<IEdmModel>();
+                options.AddModel("odata", edmModel);
+            });
+
+            IServiceProvider provider = services.BuildServiceProvider();
+
+            // Assert
+            IOptions<ODataOptions> options = provider.GetService<IOptions<ODataOptions>>();
+            Assert.NotNull(options);
+
+            ODataOptions odataOptions = options.Value;
+            var model = Assert.Single(odataOptions.Models);
+            Assert.Equal("odata", model.Key);
+            Assert.Same(coreModel, model.Value.Item1);
+            Assert.NotNull(model.Value.Item2);
+        }
+
+        [Fact]
         public void AddConvention_RegistersODataRoutingConvention()
         {
             // Arrange

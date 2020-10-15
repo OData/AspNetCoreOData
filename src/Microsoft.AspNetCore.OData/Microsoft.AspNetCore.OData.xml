@@ -5446,6 +5446,15 @@
             <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
+            <summary>
+            Adds services required for OData requests.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
             <summary>
             Adds services required for OData requests.
@@ -5460,6 +5469,13 @@
             </summary>
             <typeparam name="T">The routing convention type.</typeparam>
             <param name="builder">The OData service builder.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataCore(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds the core OData services required for OData requests, excluding the <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> configuration.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
