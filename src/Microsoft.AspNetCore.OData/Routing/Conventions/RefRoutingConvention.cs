@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (context.EntitySet != null)
             {
                 segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                segments.Add(new KeySegmentTemplate(entityType));
+                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
             }
             else
             {
@@ -116,9 +116,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(new CastSegmentTemplate(declaringType, entityType, navigationSource));
             }
 
+            IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
+
             if (navigationProperty != null)
             {
-                segments.Add(new NavigationSegmentTemplate(navigationProperty));
+                segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
             }
             else
             {
@@ -131,10 +133,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
-                segments.Add(new KeySegmentTemplate(navigationPropertyType, "relatedKey"));
+                segments.Add(KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey"));
             }
-
-            IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
 
             segments.Add(new RefSegmentTemplate(navigationProperty, targetNavigationSource));
 

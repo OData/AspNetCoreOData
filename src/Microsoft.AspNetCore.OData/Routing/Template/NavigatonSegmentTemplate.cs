@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -15,19 +14,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="NavigationSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="navigation">The Edm navigation property.</param>
-        public NavigationSegmentTemplate(IEdmNavigationProperty navigation)
-            : this(new NavigationPropertySegment(navigation, null))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="navigation">The Edm navigation property.</param>
-        /// <param name="targetNavigationSource">The target navigation source.</param>
-        public NavigationSegmentTemplate(IEdmNavigationProperty navigation, IEdmNavigationSource targetNavigationSource)
-            : this (new NavigationPropertySegment(navigation, targetNavigationSource))
+        /// <param name="navigationProperty">The Edm navigation property.</param>
+        /// <param name="navigationSource">The target navigation source.</param>
+        public NavigationSegmentTemplate(IEdmNavigationProperty navigationProperty, IEdmNavigationSource navigationSource)
+            : this(new NavigationPropertySegment(navigationProperty, navigationSource))
         {
         }
 
@@ -37,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="segment">The navigation property segment.</param>
         public NavigationSegmentTemplate(NavigationPropertySegment segment)
         {
-            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+            Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
             IsSingle = !segment.NavigationProperty.Type.IsCollection();
         }
@@ -59,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the wrapped navigation property.
         /// </summary>
-        public IEdmNavigationSource TargetNavigationSource => Segment.NavigationSource;
+        public override IEdmNavigationSource NavigationSource => Segment.NavigationSource;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }

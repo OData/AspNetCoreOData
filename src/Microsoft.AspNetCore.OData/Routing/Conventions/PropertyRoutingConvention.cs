@@ -170,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (entitySet != null)
             {
                 segments.Add(new EntitySetSegmentTemplate(entitySet));
-                segments.Add(new KeySegmentTemplate(entityType, navigationSource));
+                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, navigationSource));
             }
             else
             {

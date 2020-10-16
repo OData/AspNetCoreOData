@@ -2626,11 +2626,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplat
 	[
 	ExtensionAttribute(),
 	]
-	public static System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate]] GenerateFunctionSegments (Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate segment)
-
-	[
-	ExtensionAttribute(),
-	]
 	public static System.Collections.Generic.IList`1[[System.String]] GenerateFunctionTemplates (Microsoft.OData.Edm.IEdmFunction edmFunction)
 
 	[
@@ -2659,6 +2654,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemp
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public ActionSegmentTemplate (Microsoft.OData.UriParser.OperationSegment operationSegment)
 	public ActionSegmentTemplate (Microsoft.OData.Edm.IEdmAction action, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmAction Action  { public get; }
@@ -2727,7 +2723,9 @@ public class Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplat
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public FunctionImportSegmentTemplate (Microsoft.OData.UriParser.OperationImportSegment segment)
 	public FunctionImportSegmentTemplate (Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
+	public FunctionImportSegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] parameters, Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmFunctionImport FunctionImport  { public get; }
@@ -2735,14 +2733,16 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTe
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
 	Microsoft.OData.UriParser.OperationImportSegment Segment  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public FunctionSegmentTemplate (Microsoft.OData.UriParser.OperationSegment operationSegment)
 	public FunctionSegmentTemplate (Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-	public FunctionSegmentTemplate (Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, System.Collections.Generic.ISet`1[[System.String]] requiredParameters)
+	public FunctionSegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] parameters, Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmFunction Function  { public get; }
@@ -2750,22 +2750,21 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
 	System.Collections.Generic.ISet`1[[System.String]] RequiredParameters  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public KeySegmentTemplate (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public KeySegmentTemplate (Microsoft.OData.UriParser.KeySegment segment)
-	public KeySegmentTemplate (Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-	public KeySegmentTemplate (Microsoft.OData.Edm.IEdmEntityType entityType, string keyPrefix)
 	public KeySegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] keys, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	int Count  { public get; }
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	bool IsSingle  { public virtual get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] KeyMappings  { public get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
@@ -2784,30 +2783,31 @@ public class Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
-public class Microsoft.AspNetCore.OData.Routing.Template.NavigationPropertyLinkSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public NavigationPropertyLinkSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
+public class Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public NavigationLinkSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
+	public NavigationLinkSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	bool IsSingle  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.NavigationPropertyLinkSegment Segment  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public NavigationSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation)
 	public NavigationSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertySegment segment)
-	public NavigationSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource targetNavigationSource)
+	public NavigationSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	bool IsSingle  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.NavigationPropertySegment Segment  { public get; }
-	Microsoft.OData.Edm.IEdmNavigationSource TargetNavigationSource  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
@@ -2826,7 +2826,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateC
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary RouteValues  { public get; }
 
-	public Microsoft.Extensions.Primitives.StringValues GetQueryString (string key)
+	public string GetParameterAliasOrSelf (string alias)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {

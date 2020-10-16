@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -17,21 +18,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class FunctionSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Function()
+        public void Ctor_ThrowsArgumentNull_Parameters()
         {
             // Assert & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(function: null, null), "function");
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(null, null, navigationSource: null), "parameters");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_RequiredParameters()
+        public void Ctor_ThrowsArgumentNull_Function()
         {
-            // Assert
-            IEdmFunction function = new Mock<IEdmFunction>().Object;
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(function, null, null), "requiredParameters");
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(new Dictionary<string, string>(), null, navigationSource: null), "function");
         }
+
+        [Fact]
+        public void Ctor_ThrowsArgumentNull_OperationSegment()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(operationSegment: null), "operationSegment");
+        }
+
+        //[Fact]
+        //public void Ctor_ThrowsArgumentNull_RequiredParameters()
+        //{
+        //    // Assert
+        //    IEdmFunction function = new Mock<IEdmFunction>().Object;
+
+        //    // Act & Assert
+        //    ExceptionAssert.ThrowsArgumentNull(() => new FunctionSegmentTemplate(function, null, null), "requiredParameters");
+        //}
 
         [Fact]
         public void Ctor_ThrowsArgument_NonboundFunction()
@@ -47,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void FunctionCommonProperties_ReturnsAsExpected()
+        public void CommonFunctionTemplateProperties_ReturnsAsExpected()
         {
             // Assert
             var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
@@ -60,6 +75,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Act & Assert
             Assert.Equal("NS.MyFunction(name={name},title={title})", functionSegment.Literal);
+            Assert.Equal(ODataSegmentKind.Function, functionSegment.Kind);
+            Assert.True(functionSegment.IsSingle);
+            Assert.Same(primitive.Definition, functionSegment.EdmType);
+            Assert.Null(functionSegment.NavigationSource);
+        }
+
+        [Fact]
+        public void CommonFunctionTemplateProperties_ReturnsAsExpected_WithParameters()
+        {
+            // Assert
+            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+            EdmFunction function = new EdmFunction("NS", "MyFunction", primitive, true, null, false);
+            function.AddParameter("bindingParameter", primitive);
+            function.AddParameter("name", primitive);
+            function.AddParameter("title", primitive);
+            function.AddOptionalParameter("option1", primitive);
+            function.AddOptionalParameter("option2", primitive);
+            IDictionary<string, string> parameters = new Dictionary<string, string>
+            {
+                { "name", "{nameTemp}" },
+                { "title", "{titleTemp}" },
+                { "option2", "{option2Temp}" },
+            };
+
+            FunctionSegmentTemplate functionSegment = new FunctionSegmentTemplate(parameters, function, null);
+
+            // Act & Assert
+            Assert.Equal("NS.MyFunction(name={nameTemp},title={titleTemp},option2={option2Temp})", functionSegment.Literal);
             Assert.Equal(ODataSegmentKind.Function, functionSegment.Kind);
             Assert.True(functionSegment.IsSingle);
             Assert.Same(primitive.Definition, functionSegment.EdmType);

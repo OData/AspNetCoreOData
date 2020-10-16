@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
-using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing

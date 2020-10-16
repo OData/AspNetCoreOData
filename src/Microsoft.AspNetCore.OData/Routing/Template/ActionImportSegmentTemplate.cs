@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -31,7 +32,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
-            ActionImport = segment.OperationImports.First() as IEdmActionImport;
+            IEdmOperationImport operationImport = segment.OperationImports.FirstOrDefault();
+            if (!operationImport.IsActionImport())
+            {
+                throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "ActionImport", "ActionImportSegmentTemplate"));
+            }
+
+            ActionImport = (IEdmActionImport)operationImport;
 
             if (ActionImport.Action.ReturnType != null)
             {

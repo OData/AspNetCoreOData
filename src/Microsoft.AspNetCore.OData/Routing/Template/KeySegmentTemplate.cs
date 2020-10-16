@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
@@ -20,147 +19,54 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public class KeySegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// Key/Value pairs:
-        /// Key: entity type key name, for example ID
-        /// Value: a tuple of (string, IEdmTypeReference): Item1 is the mapped name, Item2 is the key's type
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
-        private IDictionary<string, (string, IEdmTypeReference)> _keyMappings { get; } = new Dictionary<string, (string, IEdmTypeReference)>();
+        /// <param name="keys">The input key mappings, the key string is case-sensitive, the value string should wrapper with { and }.</param>
+        /// <param name="entityType">The declaring type containes the key.</param>
+        /// <param name="navigationSource">The navigation source. It could be null.</param>
+        public KeySegmentTemplate(IDictionary<string, string> keys, IEdmEntityType entityType, IEdmNavigationSource navigationSource)
+        {
+            if (keys == null)
+            {
+                throw Error.ArgumentNull(nameof(keys));
+            }
+
+            EntityType = entityType ?? throw Error.ArgumentNull(nameof(entityType));
+            NavigationSource = navigationSource;
+
+            KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType);
+
+            Literal = KeyMappings.Count == 1 ?
+                $"{{{KeyMappings.First().Value}}}" :
+                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
-        /// <param name="segment">The key segment.</param>
+        /// <param name="segment">The key segment, it should be a template key segment.</param>
         public KeySegmentTemplate(KeySegment segment)
         {
             if (segment == null)
             {
-                throw new ArgumentNullException(nameof(segment));
+                throw Error.ArgumentNull(nameof(segment));
             }
 
             NavigationSource = segment.NavigationSource;
             EntityType = segment.EdmType as IEdmEntityType;
 
-            var keys = BuildKeyMappings(segment.Keys);
-            if (keys.Count == 1)
-            {
-                var first = keys.First();
-                // {key}
-                Literal = first.Value;
-                var firstKey = EntityType.Key().First();
+            KeyMappings = BuildKeyMappings(segment.Keys, EntityType);
 
-                _keyMappings[firstKey.Name] = (Literal, firstKey.Type);
-            }
-            else
-            {
-                // Id1={keyId1},Id2={keyId2}
-                foreach (var key in keys)
-                {
-                    var entityKey = EntityType.Key().First(e => e.Name == key.Key);
-                    _keyMappings[entityKey.Name] = (key.Value, entityKey.Type);
-                }
-
-                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={{{a.Value.Item1}}}"));
-            }
+            Literal = KeyMappings.Count == 1 ?
+                $"{{{KeyMappings.First().Value}}}" :
+                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
+        /// Gets the dictionary representing the mappings from the key names in the current key segment to the 
+        /// key names in route data.
         /// </summary>
-        /// <param name="entityType">The declaring type containes the key.</param>
-        /// <param name="navigationSource"></param>
-        public KeySegmentTemplate(IEdmEntityType entityType, IEdmNavigationSource navigationSource)
-            : this(entityType, keyPrefix: "key")
-        {
-            NavigationSource = navigationSource;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="entityType">The declaring type containes the key.</param>
-        public KeySegmentTemplate(IEdmEntityType entityType)
-            : this(entityType, keyPrefix: "key")
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="entityType">The declaring type containes the key.</param>
-        /// <param name="keyPrefix">The prefix for the key mapping, for example, for the navigation it count be "relatedKey".</param>
-        public KeySegmentTemplate(IEdmEntityType entityType, string keyPrefix)
-        {
-            EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
-
-            var keys = entityType.Key().ToArray();
-            if (keys.Length == 1)
-            {
-                // {key}
-                Literal = $"{{{keyPrefix}}}";
-                _keyMappings[keys[0].Name] = ($"{keyPrefix}", keys[0].Type);
-            }
-            else
-            {
-                // Id1={keyId1},Id2={keyId2}
-                foreach (var key in keys)
-                {
-                    _keyMappings[key.Name] = ($"{keyPrefix}{key.Name}", key.Type);
-                }
-
-                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={{{a.Value.Item1}}}"));
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="keys">The input key mappings.</param>
-        /// <param name="entityType">The declaring type containes the key.</param>
-        /// <param name="navigationSource">The navigation source.</param>
-        public KeySegmentTemplate(IDictionary<string, string> keys,
-            IEdmEntityType entityType, IEdmNavigationSource navigationSource)
-        {
-            if (keys == null)
-            {
-                throw new ArgumentNullException(nameof(keys));
-            }
-
-            EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
-            NavigationSource = navigationSource ?? throw new ArgumentNullException(nameof(navigationSource));
-
-            var entityTypeKeys = EntityType.Key();
-            if (keys.Count != entityTypeKeys.Count())
-            {
-                throw new ODataException(string.Format(CultureInfo.CurrentCulture, SRResources.InputKeyNotMatchEntityTypeKey, keys.Count, entityTypeKeys.Count()));
-            }
-
-            if (keys.Count == 1)
-            {
-                KeyValuePair<string, string> key = keys.First();
-                IEdmStructuralProperty keyProperty = entityTypeKeys.First();
-                _keyMappings[keyProperty.Name] = (key.Value, keyProperty.Type);
-                Literal = key.Value;
-            }
-            else
-            {
-                foreach (var key in keys)
-                {
-                    string keyName = key.Key;
-
-                    IEdmStructuralProperty keyProperty;
-
-                    keyProperty = entityType.Key().FirstOrDefault(k => k.Name == keyName);
-                    if (keyProperty == null)
-                    {
-                        throw new InvalidOperationException($"Cannot find '{keyName}' key in the '{entityType.FullName()}' type.");
-                    }
-
-                    _keyMappings[keyName] = (key.Value, keyProperty.Type);
-                }
-
-                Literal = string.Join(",", _keyMappings.Select(a => $"{a.Key}={a.Value.Item1}"));
-            }
-        }
+        public IDictionary<string, string> KeyMappings { get; }
 
         /// <inheritdoc />
         public override string Literal { get; }
@@ -179,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the key count
         /// </summary>
-        public int Count => _keyMappings.Count;
+        public int Count => KeyMappings.Count;
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Key;
@@ -192,19 +98,27 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
+            // Context.RouteValues contains the key value string.
             RouteValueDictionary routeValues = context.RouteValues;
             IDictionary<string, object> keysValues = new Dictionary<string, object>();
-            foreach (var key in _keyMappings)
+            foreach (var key in KeyMappings)
             {
                 string keyName = key.Key;
-                string templateName = key.Value.Item1;
-                IEdmTypeReference edmType = key.Value.Item2;
+                string templateName = key.Value;
+
+                IEdmProperty keyProperty = EntityType.Key().FirstOrDefault(k => k.Name == keyName);
+                Contract.Assert(keyProperty != null);
+
+                IEdmTypeReference edmType = keyProperty.Type;
                 if (routeValues.TryGetValue(templateName, out object rawValue))
                 {
                     string strValue = rawValue as string;
+
+                    strValue = context.GetParameterAliasOrSelf(strValue);
+
                     object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
 
                     // for without FromODataUri, so update it, for example, remove the single quote for string value.
@@ -221,14 +135,63 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return new KeySegment(keysValues, EntityType, NavigationSource);
         }
 
-        internal static IDictionary<string, string> BuildKeyMappings(IEnumerable<KeyValuePair<string, object>> keys)
+        /// <summary>
+        /// Create <see cref="KeySegmentTemplate"/> based on the given entity type and navigation source.
+        /// </summary>
+        /// <param name="entityType">The given entity type.</param>
+        /// <param name="navigationSource">The given navigation source.</param>
+        /// <param name="keyPrefix">The prefix used before key template.</param>
+        /// <returns>The built <see cref="KeySegmentTemplate"/>.</returns>
+        internal static KeySegmentTemplate CreateKeySegment(IEdmEntityType entityType, IEdmNavigationSource navigationSource, string keyPrefix = "key")
+        {
+            if (entityType == null)
+            {
+                throw Error.ArgumentNull(nameof(entityType));
+            }
+
+            IDictionary<string, string> keyTemplates = new Dictionary<string, string>();
+            var keys = entityType.Key().ToArray();
+            if (keys.Length == 1)
+            {
+                // Id={key}
+                keyTemplates[keys[0].Name] = $"{{{keyPrefix}}}";
+            }
+            else
+            {
+                // Id1={keyId1},Id2={keyId2}
+                foreach (var key in keys)
+                {
+                    keyTemplates[key.Name] = $"{{{keyPrefix}{key.Name}}}";
+                }
+            }
+
+            return new KeySegmentTemplate(keyTemplates, entityType, navigationSource);
+        }
+
+        internal static IDictionary<string, string> BuildKeyMappings(IEnumerable<KeyValuePair<string, object>> keys, IEdmEntityType entityType)
         {
             Contract.Assert(keys != null);
+            Contract.Assert(entityType != null);
 
             Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
 
+            int count = keys.Count();
+            ISet<string> entityTypeKeys = entityType.Key().Select(c => c.Name).ToHashSet();
+            if (count != entityTypeKeys.Count)
+            {
+                throw new ODataException(Error.Format(SRResources.InputKeyNotMatchEntityTypeKey, count, entityTypeKeys.Count));
+            }
+
             foreach (KeyValuePair<string, object> key in keys)
             {
+                string keyName = key.Key;
+
+                // key name is case-sensitive
+                if (!entityTypeKeys.Contains(key.Key))
+                {
+                    throw new ODataException(Error.Format(SRResources.CannotFindKeyInEntityType, keyName, entityType.FullName()));
+                }
+
                 string nameInRouteData;
 
                 UriTemplateExpression uriTemplateExpression = key.Value as UriTemplateExpression;
@@ -243,29 +206,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     nameInRouteData = key.Value as string;
                 }
 
-                if (nameInRouteData == null || !IsRouteParameter(nameInRouteData))
+                if (nameInRouteData == null || !nameInRouteData.IsValidTemplateLiteral())
                 {
-                    throw new ODataException(
-                        Error.Format(SRResources.KeyTemplateMustBeInCurlyBraces, key.Value, key.Key));
+                    throw new ODataException(Error.Format(SRResources.KeyTemplateMustBeInCurlyBraces, key.Value, key.Key));
                 }
 
-                //nameInRouteData = nameInRouteData.Substring(1, nameInRouteData.Length - 2);
-                //if (String.IsNullOrEmpty(nameInRouteData))
-                //{
-                //    throw new ODataException(
-                //            Error.Format(SRResources.EmptyKeyTemplate, key.Value, key.Key));
-                //}
+                nameInRouteData = nameInRouteData.Substring(1, nameInRouteData.Length - 2);
+                if (string.IsNullOrEmpty(nameInRouteData))
+                {
+                    throw new ODataException(Error.Format(SRResources.EmptyKeyTemplate, key.Value, key.Key));
+                }
 
                 parameterMappings[key.Key] = nameInRouteData;
             }
 
             return parameterMappings;
-        }
-
-        private static bool IsRouteParameter(string parameterName)
-        {
-            return parameterName.StartsWith("{", StringComparison.Ordinal) &&
-                    parameterName.EndsWith("}", StringComparison.Ordinal);
         }
     }
 }

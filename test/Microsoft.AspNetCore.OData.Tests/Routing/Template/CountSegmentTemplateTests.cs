@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
@@ -12,7 +11,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class CountSegmentTemplateTests
     {
         [Fact]
-        public void CommonCountProperties_ReturnsAsExpected()
+        public void CommonCountSegmentTemplateProperties_ReturnsAsExpected()
         {
             // Assert & Act & Assert
             Assert.Equal("$count", CountSegmentTemplate.Instance.Literal);
@@ -23,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataActionImportSegment()
+        public void TranslateCountSegmentTemplate_ReturnsODataCountSegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();

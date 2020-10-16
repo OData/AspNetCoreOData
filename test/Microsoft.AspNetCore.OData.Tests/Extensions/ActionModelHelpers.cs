@@ -4,11 +4,37 @@
 using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
     internal static class ActionModelHelpers
     {
+        /// <summary>
+        /// Build the actio nmodel using the method info.
+        /// </summary>
+        /// <param name="methodInfo">The input method info.</param>
+        /// <returns>The action model.</returns>
+        public static ActionModel BuildActionModel(this MethodInfo methodInfo)
+        {
+            object[] attributes = methodInfo.GetCustomAttributes(inherit: true);
+            ActionModel actionModel = new ActionModel(methodInfo, attributes);
+
+            foreach (var parameterInfo in methodInfo.GetParameters())
+            {
+                object[] paramAttributes = parameterInfo.GetCustomAttributes(inherit: true);
+                ParameterModel parameterModel = new ParameterModel(parameterInfo, paramAttributes)
+                {
+                    ParameterName = parameterInfo.Name,
+                };
+
+                actionModel.Parameters.Add(parameterModel);
+            }
+
+            return actionModel;
+        }
+
         /// <summary>
         /// Copied from ASP.NET Core and make some changes.
         /// Returns <c>true</c> if the <paramref name="methodInfo"/> is an action. Otherwise <c>false</c>.
@@ -21,6 +47,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// </remarks>
         public static bool IsAction(this MethodInfo methodInfo)
         {
+            Assert.NotNull(methodInfo);
+
             // The SpecialName bit is set to flag members that are treated in a special way by some compilers
             // (such as property accessors and operator overloading methods).
             if (methodInfo.IsSpecialName)

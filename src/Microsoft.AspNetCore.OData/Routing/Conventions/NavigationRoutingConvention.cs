@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             if (hasKey)
             {
-                segments.Add(new KeySegmentTemplate(entityType));
+                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, navigationSource));
             }
 
             if (declared != null)

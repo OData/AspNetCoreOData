@@ -2,9 +2,11 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -63,14 +65,45 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmModel Model { get; }
 
         /// <summary>
-        /// Gets the query string using the key.
+        /// Gets the parameter alias or the alias name itself.
         /// </summary>
-        /// <param name="key">The query string key.</param>
-        /// <returns>Null or the string value of the query.</returns>
-        public StringValues GetQueryString(string key)
+        /// <param name="alias">The potential alias name.</param>
+        /// <returns>The parameter alias name.</returns>
+        public string GetParameterAliasOrSelf(string alias)
         {
-            HttpContext.Request.Query.TryGetValue(key, out StringValues values);
-            return values;
+            return GetParameterAliasOrSelf(alias, new HashSet<string>());
+        }
+
+        private string GetParameterAliasOrSelf(string alias, ISet<string> visited)
+        {
+            if (visited.Contains(alias))
+            {
+                // process "?@p1=@p2&@p2=@p1" infinite loop?
+                throw new ODataException(Error.Format(SRResources.InfiniteParameterAlias, alias));
+            }
+
+            visited.Add(alias);
+
+            if (alias == null)
+            {
+                return null;
+            }
+
+            // parameter alias starts with "@"
+            if (!alias.StartsWith("@", StringComparison.Ordinal))
+            {
+                return alias;
+            }
+
+            if (!HttpContext.Request.Query.TryGetValue(alias, out StringValues values))
+            {
+                throw new ODataException(Error.Format(SRResources.MissingParameterAlias, alias));
+            }
+
+            alias = values;
+
+            // Go to next level of parameter alias "?@p1=@p2&@p2=abc"
+            return GetParameterAliasOrSelf(alias, visited);
         }
     }
 }

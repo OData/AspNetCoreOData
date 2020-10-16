@@ -10,6 +10,18 @@ namespace Microsoft.AspNetCore.OData.Common
     internal static class StringExtensions
     {
         /// <summary>
+        /// Check whether given literal matches the uri template pattern {literals}.
+        /// </summary>
+        /// <param name="literalText">The text to be evaluated</param>
+        /// <returns>True if <paramref name="literalText"/> is valid for Uri template</returns>
+        internal static bool IsValidTemplateLiteral(this string literalText)
+        {
+            return (!string.IsNullOrEmpty(literalText)
+                && literalText.StartsWith("{", StringComparison.Ordinal)
+                && literalText.EndsWith("}", StringComparison.Ordinal));
+        }
+
+        /// <summary>
         /// Extract key/value pairs, the value could have "=" or ', or "", etc.
         /// </summary>
         /// <param name="input">The input string</param>

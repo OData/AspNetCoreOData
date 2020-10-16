@@ -32,8 +32,18 @@ namespace ODataRoutingSample.Models
             functionWithOptional.Parameter<string>("order");
             functionWithOptional.Parameter<string>("name");
 
+            // function with only one parameter (optional)
+            functionWithOptional = builder.EntityType<Product>().Collection.Function("GetOptional").ReturnsCollectionFromEntitySet<Order>("Orders");
+            functionWithOptional.Parameter<string>("param").Optional();
+
+            // unbound
             builder.Action("ResetData");
 
+            // using attribute routing
+            var unboundFunction = builder.Function("CalculateSalary").Returns<string>();
+            unboundFunction.Parameter<int>("minSalary");
+            unboundFunction.Parameter<int>("maxSalary").Optional();
+            unboundFunction.Parameter<string>("wholeName").HasDefaultValue("abc");
             return builder.GetEdmModel();
         }
 

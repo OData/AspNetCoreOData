@@ -12,14 +12,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class SingletonSegmentTemplateTests
     {
         [Fact]
-        public void CtorThrowsArgumentNullSegment()
+        public void Ctor_ThrowsArgumentNull_Singleton()
+        {
+            // Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new SingletonSegmentTemplate(singleton: null), "singleton");
+        }
+
+        [Fact]
+        public void Ctor_ThrowsArgumentNull_Segment()
         {
             // Assert
             ExceptionAssert.ThrowsArgumentNull(() => new SingletonSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void SingletonCommonPropertiesReturnsAsExpected()
+        public void CommonSingletonSegmentTemplateProperties_ReturnsAsExpected()
         {
             // Assert
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
@@ -36,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateValueTemplateReturnsAsExpected()
+        public void TranslateSingletonSegmentTemplate_ReturnsSingletonSegment()
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "entity");

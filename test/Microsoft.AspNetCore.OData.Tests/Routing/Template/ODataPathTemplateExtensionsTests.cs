@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
-                new KeySegmentTemplate(customer, entitySet));
+                KeySegmentTemplate.CreateKeySegment(customer, entitySet));
 
             // Act
             IEnumerable<string> actual = template.GetTemplates();
@@ -53,8 +53,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
-                new KeySegmentTemplate(customer, entitySet),
-                new NavigationPropertyLinkSegmentTemplate(new NavigationPropertyLinkSegment(navigation, entitySet)));
+                KeySegmentTemplate.CreateKeySegment(customer, entitySet),
+                new NavigationLinkSegmentTemplate(navigation, entitySet));
 
             // Act
             IEnumerable<string> actual = template.GetTemplates();
@@ -90,8 +90,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             KeySegment keySegment = new KeySegment(keys, customer, entitySet);
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
-                new KeySegmentTemplate(customer, entitySet),
-                new NavigationPropertyLinkSegmentTemplate(new NavigationPropertyLinkSegment(navigation, entitySet)),
+                KeySegmentTemplate.CreateKeySegment(customer, entitySet),
+                new NavigationLinkSegmentTemplate(navigation, entitySet),
                 new KeySegmentTemplate(keySegment));
 
             // Act
@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
-                new KeySegmentTemplate(customer, entitySet),
+                KeySegmentTemplate.CreateKeySegment(customer, entitySet),
                 new CastSegmentTemplate(vipCustomer, customer, entitySet),
                 new FunctionSegmentTemplate(getSalaray, null));
 

@@ -125,6 +125,9 @@
   <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
     <value>The input key count '{0}' doesn't match the number of the entity type key '{1}'.</value>
   </data>
+  <data name="CannotFindKeyInEntityType" xml:space="preserve">
+    <value>Cannot find key '{0}' in the '{1}' type.</value>
+  </data>
   <data name="InputCastTypeKindNotMatch" xml:space="preserve">
     <value>The input cast type '{0}' does not match the expected type kind '{1}'.</value>
   </data>
@@ -616,5 +619,26 @@
   </data>
   <data name="CannotGetEnumClrMember" xml:space="preserve">
     <value>Cannot Get the Enum Clr member using '{0}'.</value>
+  </data>
+  <data name="InvalidTemplateLiteral" xml:space="preserve">
+    <value>The template string '{0}' of '{1}' is not a valid template literal. And a template literal should wrapper with '{' and '}'.</value>
+  </data>
+  <data name="MissingParameterAlias" xml:space="preserve">
+    <value>Missing the parameter alias '{0}' in the request query string.</value>
+  </data>
+  <data name="InfiniteParameterAlias" xml:space="preserve">
+    <value>The parameter alias '{0}' is in an infinite loop.</value>
+  </data>
+  <data name="MissingRequiredParameterInOperation" xml:space="preserve">
+    <value>Missing the required parameter '{0}' is in the operation '{1}' parameter mapping.</value>
+  </data>
+  <data name="CannotFindParameterInOperation" xml:space="preserve">
+    <value>Cannot find parameter '{0}' is in the operation '{1}'.</value>
+  </data>
+  <data name="ParameterTemplateMustBeInCurlyBraces" xml:space="preserve">
+    <value>Parameter template '{0}' in segment '{1}' does not start with '{{' or ends with '}}'.</value>
+  </data>
+  <data name="SegmentShouldBeKind" xml:space="preserve">
+    <value>The input segment should be '{0}' in '{1}'.</value>
   </data>
 </root>

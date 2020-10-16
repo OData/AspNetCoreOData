@@ -12,14 +12,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class PropertySegmentTemplateTests
     {
         [Fact]
-        public void CtorThrowsArgumentNullSegment()
+        public void Ctor_ThrowsArgumentNull_Property()
+        {
+            // Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(property: null), "property");
+        }
+
+        [Fact]
+        public void Ctor_ThrowsArgumentNull_Segment()
         {
             // Assert
             ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void PropertyCommonPropertiesReturnsAsExpected()
+        public void CommonPropertySegmentTemplateProperties_ReturnsAsExpected()
         {
             // Assert
             EdmEntityType entityType = new EdmEntityType("NS", "Customer");
@@ -34,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateValueTemplateReturnsAsExpected()
+        public void TranslatePropertySegmentTemplate_ReturnsPropertySegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();

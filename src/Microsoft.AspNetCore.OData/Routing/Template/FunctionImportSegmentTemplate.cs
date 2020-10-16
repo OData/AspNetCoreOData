@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -23,20 +21,71 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="functionImport">The Edm function import.</param>
         /// <param name="navigationSource">The target navigation source, it could be null.</param>
         public FunctionImportSegmentTemplate(IEdmFunctionImport functionImport, IEdmNavigationSource navigationSource)
+            : this(functionImport.GetFunctionParamterMappings(), functionImport, navigationSource)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionImportSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="parameters">The function parameter template mappings.The key string is case-sensitive, the value string should wrapper with { and }.</param>
+        /// <param name="functionImport">The Edm function import.</param>
+        /// <param name="navigationSource">The target navigation source, it could be null.</param>
+        public FunctionImportSegmentTemplate(IDictionary<string, string> parameters, IEdmFunctionImport functionImport, IEdmNavigationSource navigationSource)
+        {
+            if (parameters == null)
+            {
+                throw Error.ArgumentNull(nameof(parameters));
+            }
+
             FunctionImport = functionImport ?? throw Error.ArgumentNull(nameof(functionImport));
             NavigationSource = navigationSource;
 
-            IDictionary<string, string> keyMappings = new Dictionary<string, string>();
-            foreach (var parameter in functionImport.Function.Parameters)
-            {
-                keyMappings[parameter.Name] = $"{{{parameter.Name}}}";
-            }
+            // parameters should include all required parameter, but maybe include the optional parameter.
+            ParameterMappings = functionImport.Function.VerifyAndBuildParameterMappings(parameters);
 
-            Literal = functionImport.Name + "(" + string.Join(",", keyMappings.Select(a => $"{a.Key}={a.Value}")) + ")";
+            Literal = functionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             IsSingle = functionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
+
+            HasOptionalMissing = ParameterMappings.Count != FunctionImport.Function.Parameters.Count();
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionImportSegmentTemplate" /> class.
+        /// </summary>
+        /// <param name="segment">The input function import segment.</param>
+        public FunctionImportSegmentTemplate(OperationImportSegment segment)
+        {
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
+            IEdmOperationImport operationImport = segment.OperationImports.First();
+            if (!operationImport.IsFunctionImport())
+            {
+                throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "FunctionImport", "FunctionImportSegmentTemplate"));
+            }
+
+            FunctionImport = (IEdmFunctionImport)operationImport;
+
+            NavigationSource = segment.EntitySet;
+
+            ParameterMappings = OperationHelper.BuildParameterMappings(segment.Parameters, operationImport.Name);
+
+            Literal = FunctionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+
+            IsSingle = FunctionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
+
+            HasOptionalMissing = ParameterMappings.Count != FunctionImport.Function.Parameters.Count();
+        }
+
+        /// <summary>
+        /// Gets the dictionary representing the mappings from the parameter names in the current function segment to the 
+        /// parameter names in route data.
+        /// </summary>
+        public IDictionary<string, string> ParameterMappings { get; private set; }
 
         /// <inheritdoc />
         public override string Literal { get; }
@@ -65,6 +114,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         public OperationImportSegment Segment { get; }
 
+        /// <summary>
+        /// Gets the boolean value indcating whether there's an optional parameter missed.
+        /// </summary>
+        internal bool HasOptionalMissing { get; }
+
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
         {
@@ -73,38 +127,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            IEdmModel model = context.Model;
-            RouteValueDictionary routeValues = context.RouteValues;
-            // TODO: process the parameter alias
-            IList<OperationSegmentParameter> parameters = new List<OperationSegmentParameter>();
-            foreach (var parameter in FunctionImport.Function.Parameters)
+            if (HasOptionalMissing)
             {
-                if (routeValues.TryGetValue(parameter.Name, out object rawValue))
+                // If this function template has the optional parameter missing,
+                // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
+                // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
+                // In this request, the comming route data has:
+                // min = 1
+                // max = 2,ave=3
+                // so, let's combine the route data together and separate them using "," again.
+                if (!FunctionSegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
                 {
-                    // for resource or collection resource, this method will return "ODataResourceValue, ..." we should support it.
-                    if (parameter.Type.IsResourceOrCollectionResource())
-                    {
-                        // For FromODataUri
-                        string prefixName = ODataParameterValue.ParameterValuePrefix + parameter.Name;
-                        routeValues[prefixName] = new ODataParameterValue(rawValue, parameter.Type);
-
-                        parameters.Add(new OperationSegmentParameter(parameter.Name, rawValue));
-                    }
-                    else
-                    {
-                        string strValue = rawValue as string;
-                        object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, model, parameter.Type);
-
-                        // for without FromODataUri, so update it, for example, remove the single quote for string value.
-                        routeValues[parameter.Name] = newValue;
-
-                        // For FromODataUri
-                        string prefixName = ODataParameterValue.ParameterValuePrefix + parameter.Name;
-                        routeValues[prefixName] = new ODataParameterValue(newValue, parameter.Type);
-
-                        parameters.Add(new OperationSegmentParameter(parameter.Name, newValue));
-                    }
+                    return null;
                 }
+            }
+
+            IList<OperationSegmentParameter> parameters = FunctionSegmentTemplateHelpers.Match(context, FunctionImport.Function, ParameterMappings);
+            if (parameters == null)
+            {
+                return null;
             }
 
             return new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase, parameters);

@@ -4,12 +4,151 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Common;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class OperationHelper
     {
+        public static IDictionary<string, string> VerifyAndBuildParameterMappings(this IEdmFunction function, IDictionary<string, string> parameters)
+        {
+            if (function == null)
+            {
+                throw Error.ArgumentNull(nameof(function));
+            }
+
+            if (parameters == null)
+            {
+                throw Error.ArgumentNull(nameof(parameters));
+            }
+
+            Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
+
+            int skip = function.IsBound ? 1 : 0;
+            ISet<string> funcParameters = new HashSet<string>();
+            foreach (var parameter in function.Parameters.Skip(skip))
+            {
+                funcParameters.Add(parameter.Name);
+
+                IEdmOptionalParameter optionalParameter = parameter as IEdmOptionalParameter;
+                if (optionalParameter != null)
+                {
+                    // skip verification for optional parameter
+                    continue;
+                }
+
+                // for required parameter, it should be in the parameter template mapping.
+                if (!parameters.ContainsKey(parameter.Name))
+                {
+                    throw new ODataException(Error.Format(SRResources.MissingRequiredParameterInOperation, parameter.Name, function.FullName()));
+                }
+            }
+
+            foreach (var parameter in parameters)
+            {
+                if (!funcParameters.Contains(parameter.Key))
+                {
+                    throw new ODataException(Error.Format(SRResources.CannotFindParameterInOperation, parameter.Key, function.FullName()));
+                }
+
+                string templateName = parameter.Value;
+                if (templateName == null || !templateName.IsValidTemplateLiteral())
+                {
+                    throw new ODataException(Error.Format(SRResources.ParameterTemplateMustBeInCurlyBraces, parameter.Value, function.FullName()));
+                }
+
+                templateName = templateName.Substring(1, templateName.Length - 2).Trim();
+                if (String.IsNullOrEmpty(templateName))
+                {
+                    throw new ODataException(Error.Format(SRResources.EmptyParameterAlias, parameter.Value, function.FullName()));
+                }
+
+                parameterMappings[parameter.Key] = templateName;
+            }
+
+            return parameterMappings;
+        }
+
+        public static IDictionary<string, string> BuildParameterMappings(IEnumerable<OperationSegmentParameter> parameters, string segment)
+        {
+            if (parameters == null)
+            {
+                throw Error.ArgumentNull(nameof(parameters));
+            }
+
+            Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
+
+            foreach (OperationSegmentParameter parameter in parameters)
+            {
+                string parameterName = parameter.Name;
+                string nameInRouteData = null;
+
+                ConstantNode node = parameter.Value as ConstantNode;
+                if (node != null)
+                {
+                    UriTemplateExpression uriTemplateExpression = node.Value as UriTemplateExpression;
+                    if (uriTemplateExpression != null)
+                    {
+                        nameInRouteData = uriTemplateExpression.LiteralText.Trim();
+                    }
+                }
+                else
+                {
+                    // Just for easy constructor the function parameters
+                    nameInRouteData = parameter.Value as string;
+                }
+
+                if (nameInRouteData == null || !nameInRouteData.IsValidTemplateLiteral())
+                {
+                    throw new ODataException(Error.Format(SRResources.ParameterTemplateMustBeInCurlyBraces, parameter.Value, segment));
+                }
+
+                nameInRouteData = nameInRouteData.Substring(1, nameInRouteData.Length - 2).Trim();
+                if (String.IsNullOrEmpty(nameInRouteData))
+                {
+                    throw new ODataException(Error.Format(SRResources.EmptyParameterAlias, parameter.Value, segment));
+                }
+
+                parameterMappings[parameterName] = nameInRouteData;
+            }
+
+            return parameterMappings;
+        }
+
+        /// <summary>
+        /// Gets the function parameter sets.
+        /// </summary>
+        /// <param name="function">The input function.</param>
+        /// <returns>The set of parameter name.</returns>
+        public static IDictionary<string, string> GetFunctionParamterMappings(this IEdmFunction function)
+        {
+            if (function == null)
+            {
+                throw Error.ArgumentNull(nameof(function));
+            }
+
+            int skip = function.IsBound ? 1 : 0;
+            return function.Parameters.Skip(skip).ToDictionary(p => p.Name, p => $"{{{p.Name}}}");
+        }
+
+        /// <summary>
+        /// Gets the function parameter sets.
+        /// </summary>
+        /// <param name="functionImport">The input function import.</param>
+        /// <returns>The set of parameter name.</returns>
+        public static IDictionary<string, string> GetFunctionParamterMappings(this IEdmFunctionImport functionImport)
+        {
+            if (functionImport == null)
+            {
+                throw Error.ArgumentNull(nameof(functionImport));
+            }
+
+            return functionImport.Function.Parameters.ToDictionary(p => p.Name, p => $"{{{p.Name}}}");
+        }
+
         /// <summary>
         /// Gets the function parameter sets.
         /// </summary>

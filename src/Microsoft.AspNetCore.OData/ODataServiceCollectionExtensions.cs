@@ -42,12 +42,12 @@ namespace Microsoft.AspNetCore.OData
         {
             if (services == null)
             {
-                throw new ArgumentNullException(nameof(services));
+                throw Error.ArgumentNull(nameof(services));
             }
 
             if (setupAction == null)
             {
-                throw new ArgumentNullException(nameof(setupAction));
+                throw Error.ArgumentNull(nameof(setupAction));
             }
 
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (builder == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw Error.ArgumentNull(nameof(builder));
             }
 
             builder.Services.TryAddEnumerable(
@@ -113,15 +113,15 @@ namespace Microsoft.AspNetCore.OData
         {
             if (services == null)
             {
-                throw new ArgumentNullException(nameof(services));
+                throw Error.ArgumentNull(nameof(services));
             }
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
 
             // for debug only
-            //services.TryAddEnumerable(
-            //    ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelDebugProvider>());
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelDebugProvider>());
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
 

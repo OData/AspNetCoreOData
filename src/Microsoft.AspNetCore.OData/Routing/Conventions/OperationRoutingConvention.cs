@@ -228,7 +228,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
                 if (hasKeyParameter)
                 {
-                    segments.Add(new KeySegmentTemplate(entityType, navigationSource));
+                    segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, navigationSource));
                 }
             }
             else
@@ -263,8 +263,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else
             {
-                ISet<String> required = GetRequiredFunctionParamters(edmOperation, context.Action);
-                segments.Add(new FunctionSegmentTemplate((IEdmFunction)edmOperation, targetset, required));
+                IDictionary<string, string> required = GetRequiredFunctionParamters(edmOperation, context.Action);
+                segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetset));
                 httpMethod = "get";
             }
 
@@ -272,19 +272,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             context.Action.AddSelector(httpMethod, context.Prefix, context.Model, template);
         }
 
-        private static ISet<string> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
+        private static IDictionary<string, string> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
             Contract.Assert(operation.IsFunction());
             Contract.Assert(action != null);
 
-            ISet<string> requiredParameters = new HashSet<string>();
+            IDictionary<string, string> requiredParameters = new Dictionary<string, string>();
             // we can allow the action has other parameters except the functio parameters.
             foreach (var parameter in operation.Parameters.Skip(1))
             {
                 if (action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))
                 {
-                    requiredParameters.Add(parameter.Name);
+                    requiredParameters[parameter.Name] = $"{{{parameter.Name}}}";
                 }
             }
 

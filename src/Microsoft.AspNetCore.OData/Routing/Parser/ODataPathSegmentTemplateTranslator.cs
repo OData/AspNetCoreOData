@@ -100,10 +100,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 return new ActionImportSegmentTemplate(segment);
             }
 
-            IEdmFunctionImport functionImport = segment.OperationImports.First() as IEdmFunctionImport;
-
-            // TODO: need process the optional parameter in the "Segment".
-            return new FunctionImportSegmentTemplate(functionImport, segment.EntitySet);
+            return new FunctionImportSegmentTemplate(segment);
         }
 
         /// <summary>
@@ -121,11 +118,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             IEdmOperation operation = segment.Operations.First();
             if (operation.IsAction())
             {
-                return new ActionSegmentTemplate(operation as IEdmAction, segment.EntitySet);
+                return new ActionSegmentTemplate(segment);
             }
 
-            // TODO: need process the optional parameter in the "Segment".
-            return new FunctionSegmentTemplate(operation as IEdmFunction, segment.EntitySet);
+            return new FunctionSegmentTemplate(segment);
         }
 
         /// <summary>
@@ -145,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <returns>Translated the path segment template.</returns>
         public override ODataSegmentTemplate Translate(NavigationPropertyLinkSegment segment)
         {
-            return new NavigationPropertyLinkSegmentTemplate(segment);
+            return new NavigationLinkSegmentTemplate(segment);
         }
 
         /// <summary>

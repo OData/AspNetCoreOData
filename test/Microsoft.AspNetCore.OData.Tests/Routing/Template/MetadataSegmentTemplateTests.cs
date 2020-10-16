@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class MetadataSegmentTemplateTests
     {
         [Fact]
-        public void MetadataCommonPropertiesReturnsAsExpected()
+        public void CommonMetadataTemplateProperties_ReturnsAsExpected()
         {
             // Assert & Act & Assert
             Assert.Equal("$metadata", MetadataSegmentTemplate.Instance.Literal);
@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateMetadataTemplateReturnsAsExpected()
+        public void TranslateMetadataTemplate_ReturnsODataMetadataSegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();

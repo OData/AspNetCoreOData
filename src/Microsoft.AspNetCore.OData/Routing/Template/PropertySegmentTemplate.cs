@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="property">The wrapped Edm property.</param>
         public PropertySegmentTemplate(IEdmStructuralProperty property)
-            : this (new PropertySegment(property))
+            : this(new PropertySegment(property))
         {
         }
 

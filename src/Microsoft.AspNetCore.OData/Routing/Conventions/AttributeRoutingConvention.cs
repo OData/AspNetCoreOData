@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // It allows to use attribute routing without ODataRoutePrefixAttribute.
             // In this case, we only use the ODataRouteAttrbute to construct the route template.
             // Otherwise, we combine each route prefix with each route attribute to construct the route template.
-            foreach (var routePrefix in GetODataRoutePrefixes(context.Prefix, context.Controller))
+            foreach (var pathTemplatePrefix in GetODataPathTemplatePrefixes(context.Prefix, context.Controller))
             {
                 foreach (var action in context.Controller.Actions)
                 {
@@ -60,15 +60,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     foreach (ODataRouteAttribute routeAttribute in routeAttributes)
                     {
                         // If we have the route prefix name setting, make sure we only let the attribute with the same route prefx to pass.
-                        if (!string.IsNullOrEmpty(routeAttribute.RoutePrefix) &&
-                            !string.Equals(routeAttribute.RoutePrefix, routePrefix, StringComparison.OrdinalIgnoreCase))
+                        if (routeAttribute.RoutePrefix != null &&
+                            !string.Equals(routeAttribute.RoutePrefix, context.Prefix, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
 
                         try
                         {
-                            string routeTemplate = GetODataPathTemplateString(routePrefix, routeAttribute.PathTemplate);
+                            string routeTemplate = GetODataPathTemplateString(pathTemplatePrefix, routeAttribute.PathTemplate);
 
                             ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate, context.ServiceProvider);
 
@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="routePrefix">The route prefix.</param>
         /// <param name="controller">The controller.</param>
         /// <returns>The prefix string list.</returns>
-        private IEnumerable<string> GetODataRoutePrefixes(string routePrefix, ControllerModel controller)
+        private IEnumerable<string> GetODataPathTemplatePrefixes(string routePrefix, ControllerModel controller)
         {
             Contract.Assert(controller != null);
 
@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             foreach (ODataRoutePrefixAttribute prefixAttribute in prefixAttributes)
             {
                 // If we have the route prefix setting, make sure we only let the attribute with the same route prefix (ignore case) to pass.
-                if (!string.IsNullOrEmpty(prefixAttribute.RoutePrefix) &&
+                if (prefixAttribute.RoutePrefix != null &&
                     !string.Equals(prefixAttribute.RoutePrefix, routePrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -15,6 +16,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class FunctionImportSegmentTemplateTests
     {
+        private static IEdmPrimitiveTypeReference IntPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+        private static IEdmPrimitiveTypeReference StringPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, false);
+
+        private EdmFunctionImport _functionImport;
+        private EdmFunction _function;
+        private EdmEntityContainer _container;
+
+        public FunctionImportSegmentTemplateTests()
+        {
+            _function = new EdmFunction("NS", "MyFunctionImport", IntPrimitive, false, null, false);
+            _function.AddParameter("name", StringPrimitive);
+            _function.AddParameter("title", StringPrimitive);
+            _container = new EdmEntityContainer("NS", "Default");
+            _functionImport = new EdmFunctionImport(_container, "MyFunctionImport", _function);
+        }
+
         [Fact]
         public void Ctor_ThrowsArgumentNull_FunctionImport()
         {
@@ -23,23 +40,37 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void FunctionCommonProperties_ReturnsAsExpected()
+        public void Ctor_ThrowsArgumentNull_Parameters()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(parameters: null, null, null), "parameters");
+        }
+
+        [Fact]
+        public void Ctor_ThrowsArgumentNull_FunctionImport_InParametersCtor()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(new Dictionary<string, string>(), null, null), "functionImport");
+        }
+
+        [Fact]
+        public void Ctor_ThrowsArgumentNull_Segment()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(segment: null), "segment");
+        }
+
+        [Fact]
+        public void CommonFunctionImportTemplateProperties_ReturnsAsExpected()
         {
             // Assert
-            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
-            EdmFunction function = new EdmFunction("NS", "MyFunction", primitive, false, null, false);
-            function.AddParameter("name", primitive);
-            function.AddParameter("title", primitive);
-            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
-            EdmFunctionImport functionImport = new EdmFunctionImport(container, "MyFunctionImport", function);
-
-            FunctionImportSegmentTemplate functionImportSegment = new FunctionImportSegmentTemplate(functionImport, null);
+            FunctionImportSegmentTemplate functionImportSegment = new FunctionImportSegmentTemplate(_functionImport, null);
 
             // Act & Assert
             Assert.Equal("MyFunctionImport(name={name},title={title})", functionImportSegment.Literal);
             Assert.Equal(ODataSegmentKind.FunctionImport, functionImportSegment.Kind);
             Assert.True(functionImportSegment.IsSingle);
-            Assert.Same(primitive.Definition, functionImportSegment.EdmType);
+            Assert.Same(IntPrimitive.Definition, functionImportSegment.EdmType);
             Assert.Null(functionImportSegment.NavigationSource);
         }
 
@@ -47,12 +78,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         public void Translate_ReturnsODataFunctionImportSegment()
         {
             // Arrange
-            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
-            EdmFunction function = new EdmFunction("NS", "MyFunction", primitive, false, null, false);
-            function.AddParameter("name", primitive);
-            function.AddParameter("title", primitive);
+            EdmFunction function = new EdmFunction("NS", "MyFunctionImport", IntPrimitive, false, null, false);
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             EdmFunctionImport functionImport = new EdmFunctionImport(container, "MyFunctionImport", function);
+
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(functionImport, null);
 
             Mock<HttpContext> httpContext = new Mock<HttpContext>();
@@ -67,6 +96,70 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Assert.NotNull(actual);
             OperationImportSegment functionImportSegment = Assert.IsType<OperationImportSegment>(actual);
             Assert.Same(function, functionImportSegment.OperationImports.First().Operation);
+        }
+
+        [Fact]
+        public void TranslateFunctionImportSegmentTemplate_ReturnsODataFunctionImportSegment_WithOptionalParameter()
+        {
+            // Arrange
+            _function.AddOptionalParameter("min", IntPrimitive);
+            _function.AddOptionalParameter("max", IntPrimitive);
+            EdmModel model = new EdmModel();
+            model.AddElement(_function);
+            model.AddElement(_container);
+
+            IDictionary<string, string> parameters = new Dictionary<string, string>
+            {
+                { "name", "{nameTemp}" },
+                { "title", "{titleTemp}" },
+                { "min", "{minTemp}" },
+            };
+            FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
+
+            RouteValueDictionary routeValues = new RouteValueDictionary(new { nameTemp = "'pt'", titleTemp = "'abc'", minTemp = "42" });
+            HttpContext httpContext = new DefaultHttpContext();
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+
+            // Act
+             ODataPathSegment actual = template.Translate(context);
+
+            // Assert
+            Assert.NotNull(actual);
+            OperationImportSegment functionImportSegment = Assert.IsType<OperationImportSegment>(actual);
+            Assert.Same(_function, functionImportSegment.OperationImports.First().Operation);
+
+            Assert.Equal("pt", routeValues["nameTemp"]);
+            Assert.Equal("abc", routeValues["titleTemp"]);
+            Assert.Equal(42, routeValues["minTemp"]);
+        }
+
+        [Fact]
+        public void TranslateFunctionImportSegmentTemplate_ReturnsNull_WithOptionalParameterMisMatch()
+        {
+            // Arrange
+            _function.AddOptionalParameter("min", IntPrimitive);
+            _function.AddOptionalParameter("max", IntPrimitive);
+            EdmModel model = new EdmModel();
+            model.AddElement(_function);
+            model.AddElement(_container);
+
+            IDictionary<string, string> parameters = new Dictionary<string, string>
+            {
+                { "name", "{nameTemp}" },
+                { "title", "{titleTemp}" },
+                { "min", "{minTemp}" },
+            };
+            FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
+
+            RouteValueDictionary routeValues = new RouteValueDictionary(new { name = "'pt'", title = "'abc'", min = "42,max=5" });
+            HttpContext httpContext = new DefaultHttpContext();
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+
+            // Act
+            ODataPathSegment actual = template.Translate(context);
+
+            // Assert
+            Assert.Null(actual);
         }
     }
 }

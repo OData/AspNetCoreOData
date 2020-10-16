@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -13,14 +12,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class ValueSegmentTemplateTests
     {
         [Fact]
-        public void CtorThrowsArgumentNullSegment()
+        public void Ctor_ThrowsArgumentNull_Segment()
         {
             // Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ValueSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void ValueCommonPropertiesReturnsAsExpected()
+        public void CommonValueSegmentTemplateProperties_ReturnsAsExpected()
         {
             // Assert
             IEdmPrimitiveType primitive = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Int32);
@@ -40,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         [InlineData(EdmPrimitiveTypeKind.Double)]
         [InlineData(EdmPrimitiveTypeKind.Guid)]
         [InlineData(EdmPrimitiveTypeKind.Date)]
-        public void TranslateValueTemplateReturnsAsExpected(EdmPrimitiveTypeKind kind)
+        public void TranslateValueSegmentTemplate_ReturnsValueSegment(EdmPrimitiveTypeKind kind)
         {
             // Arrange
             IEdmPrimitiveType primitive = EdmCoreModel.Instance.GetPrimitiveType(kind);

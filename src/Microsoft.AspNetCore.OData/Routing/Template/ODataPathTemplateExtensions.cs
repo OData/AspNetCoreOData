@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // create =>  ~.../navigation/{key}/$ref
                 if (segment.Kind == ODataSegmentKind.NavigationLink)
                 {
-                    NavigationPropertyLinkSegmentTemplate navigationLinkSegment = (NavigationPropertyLinkSegmentTemplate)segment;
+                    NavigationLinkSegmentTemplate navigationLinkSegment = (NavigationLinkSegmentTemplate)segment;
                     if (index == count - 1)
                     {
                         // we don't have the other segment
@@ -117,44 +117,44 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return templates.Select(t => t.ToString());
         }
 
-        /// <summary>
-        /// Generates all templates for an input function.
-        /// </summary>
-        /// <param name="segment">The input function.</param>
-        /// <returns>All templates.</returns>
-        public static IList<FunctionSegmentTemplate> GenerateFunctionSegments(this FunctionSegmentTemplate segment)
-        {
-            if (segment == null)
-            {
-                throw new ArgumentNullException(nameof(segment));
-            }
+        ///// <summary>
+        ///// Generates all templates for an input function.
+        ///// </summary>
+        ///// <param name="segment">The input function.</param>
+        ///// <returns>All templates.</returns>
+        //public static IList<FunctionSegmentTemplate> GenerateFunctionSegments(this FunctionSegmentTemplate segment)
+        //{
+        //    if (segment == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(segment));
+        //    }
 
-            // split parameters
-            (var fixes, var optionals) = SplitParameters(segment.Function);
+        //    // split parameters
+        //    (var fixes, var optionals) = SplitParameters(segment.Function);
 
-            // gets all combinations of the optional parameters.
-            Stack<IEdmOptionalParameter> current = new Stack<IEdmOptionalParameter>();
-            IList<IEdmOptionalParameter[]> full = new List<IEdmOptionalParameter[]>();
-            int length = optionals.Count;
-            if (optionals.Count > 0)
-            {
-                Traveral(optionals.ToArray(), 0, length, current, full);
-            }
+        //    // gets all combinations of the optional parameters.
+        //    Stack<IEdmOptionalParameter> current = new Stack<IEdmOptionalParameter>();
+        //    IList<IEdmOptionalParameter[]> full = new List<IEdmOptionalParameter[]>();
+        //    int length = optionals.Count;
+        //    if (optionals.Count > 0)
+        //    {
+        //        Traveral(optionals.ToArray(), 0, length, current, full);
+        //    }
 
-            IList<FunctionSegmentTemplate> newList = new List<FunctionSegmentTemplate>();
-            foreach (var optional in full)
-            {
-                ISet<string> requiredParameters = new HashSet<string>(fixes.Select(e => e.Name));
-                foreach (var optionalParameter in optional)
-                {
-                    requiredParameters.Add(optionalParameter.Name);
-                }
+        //    IList<FunctionSegmentTemplate> newList = new List<FunctionSegmentTemplate>();
+        //    foreach (var optional in full)
+        //    {
+        //        ISet<string> requiredParameters = new HashSet<string>(fixes.Select(e => e.Name));
+        //        foreach (var optionalParameter in optional)
+        //        {
+        //            requiredParameters.Add(optionalParameter.Name);
+        //        }
 
-                newList.Add(new FunctionSegmentTemplate(segment.Function, segment.NavigationSource, requiredParameters));
-            }
+        //        newList.Add(new FunctionSegmentTemplate(segment.Function, segment.NavigationSource, requiredParameters));
+        //    }
 
-            return newList;
-        }
+        //    return newList;
+        //}
 
         /// <summary>
         /// Gets the whole supported template belongs to a <see cref="ODataPathTemplate"/>.

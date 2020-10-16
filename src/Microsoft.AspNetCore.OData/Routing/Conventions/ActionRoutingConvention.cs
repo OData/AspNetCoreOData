@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             IEdmEntityType entityType = navigationSource.EntityType();
 
-            // function should have the [HttpPost]
+            // action should have the [HttpPost]
             if (!context.Action.Attributes.Any(a => a is HttpPostAttribute))
             {
                 return false;

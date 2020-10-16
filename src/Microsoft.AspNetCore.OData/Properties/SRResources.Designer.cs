@@ -277,6 +277,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot find key &apos;{0}&apos; in the &apos;{1}&apos; type..
+        /// </summary>
+        internal static string CannotFindKeyInEntityType {
+            get {
+                return ResourceManager.GetString("CannotFindKeyInEntityType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find parameter &apos;{0}&apos; is in the operation &apos;{1}&apos;..
+        /// </summary>
+        internal static string CannotFindParameterInOperation {
+            get {
+                return ResourceManager.GetString("CannotFindParameterInOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot Get the Enum Clr member using &apos;{0}&apos;..
         /// </summary>
         internal static string CannotGetEnumClrMember {
@@ -682,6 +700,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parameter alias &apos;{0}&apos; is in an infinite loop..
+        /// </summary>
+        internal static string InfiniteParameterAlias {
+            get {
+                return ResourceManager.GetString("InfiniteParameterAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input cast type &apos;{0}&apos; does not match the expected type kind &apos;{1}&apos;..
         /// </summary>
         internal static string InputCastTypeKindNotMatch {
@@ -781,6 +808,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{&apos; and &apos;}&apos;..
+        /// </summary>
+        internal static string InvalidTemplateLiteral {
+            get {
+                return ResourceManager.GetString("InvalidTemplateLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
         /// </summary>
         internal static string KeyTemplateMustBeInCurlyBraces {
@@ -858,6 +894,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string MissingODataServices {
             get {
                 return ResourceManager.GetString("MissingODataServices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing the parameter alias &apos;{0}&apos; in the request query string..
+        /// </summary>
+        internal static string MissingParameterAlias {
+            get {
+                return ResourceManager.GetString("MissingParameterAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing the required parameter &apos;{0}&apos; is in the operation &apos;{1}&apos; parameter mapping..
+        /// </summary>
+        internal static string MissingRequiredParameterInOperation {
+            get {
+                return ResourceManager.GetString("MissingRequiredParameterInOperation", resourceCulture);
             }
         }
         
@@ -1159,6 +1213,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter template &apos;{0}&apos; in segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
+        /// </summary>
+        internal static string ParameterTemplateMustBeInCurlyBraces {
+            get {
+                return ResourceManager.GetString("ParameterTemplateMustBeInCurlyBraces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; must be a collection..
         /// </summary>
         internal static string ParameterTypeIsNotCollection {
@@ -1371,6 +1434,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string RootElementNameMissing {
             get {
                 return ResourceManager.GetString("RootElementNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The input segment should be &apos;{0}&apos; in &apos;{1}&apos;..
+        /// </summary>
+        internal static string SegmentShouldBeKind {
+            get {
+                return ResourceManager.GetString("SegmentShouldBeKind", resourceCulture);
             }
         }
         

@@ -184,7 +184,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw Error.ArgumentNull(nameof(path));
             }
 
             var httpMethods = action.GetSupportedHttpMethods();
@@ -260,6 +260,22 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // Check with .NET Team whether the "Endpoint name metadata"
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
+        }
+
+        /// <summary>
+        /// Gets the supported Http method on the action or by convention using the action name.
+        /// </summary>
+        /// <param name="action">The action model.</param>
+        /// <returns>The supported http methods.</returns>
+        internal static bool HasHttpMethod(this ActionModel action)
+        {
+            if (action == null)
+            {
+                throw Error.ArgumentNull(nameof(action));
+            }
+
+            // Determine the supported methods.
+            return action.Attributes.Any(a => a is IActionHttpMethodProvider);
         }
 
         private static void AddHttpMethod(ODataRoutingMetadata metadata, string httpMethod)

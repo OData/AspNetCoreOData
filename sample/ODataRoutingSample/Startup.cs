@@ -58,13 +58,6 @@ namespace ODataRoutingSample
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
             */
 
-            //services.AddOData(opt => opt.AddModel(model0)
-            //    .AddModel("v1", model1)
-            //    .AddModel("v2{data}", model2))
-            //    .AddODataRouting()
-            //    .AddFormatter()
-            //    .AddODataQuery();
-
             services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddModel(model0)
                 .AddModel("v1", model1)

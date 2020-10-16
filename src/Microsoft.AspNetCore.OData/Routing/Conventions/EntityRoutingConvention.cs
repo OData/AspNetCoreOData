@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
             {
                 new EntitySetSegmentTemplate(entitySet),
-                new KeySegmentTemplate(entityType, entitySet)
+                KeySegmentTemplate.CreateKeySegment(entityType, entitySet)
             };
 
             // If we have the type cast

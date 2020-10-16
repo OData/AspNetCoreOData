@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataActionImportSegment()
+        public void TranslateCastSegmentTemplate_ReturnsODataTypeSegment()
         {
             // Arrange
             EdmEntityType baseType = new EdmEntityType("NS", "base");

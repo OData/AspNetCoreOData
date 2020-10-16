@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -10,22 +9,32 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// <summary>
     /// Represents a template that can match a <see cref="NavigationPropertyLinkSegment"/>.
     /// </summary>
-    public class NavigationPropertyLinkSegmentTemplate : ODataSegmentTemplate
+    public class NavigationLinkSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationPropertyLinkSegmentTemplate"/> class.
+        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate"/> class.
+        /// </summary>
+        /// <param name="navigationProperty">The navigation property this link or ref acts on</param>
+        /// <param name="navigationSource">The navigation source of entities linked to. This can be null.</param>
+        public NavigationLinkSegmentTemplate(IEdmNavigationProperty navigationProperty, IEdmNavigationSource navigationSource)
+            : this(new NavigationPropertyLinkSegment(navigationProperty, navigationSource))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate"/> class.
         /// </summary>
         /// <param name="segment">The navigation property link segment</param>
-        public NavigationPropertyLinkSegmentTemplate(NavigationPropertyLinkSegment segment)
+        public NavigationLinkSegmentTemplate(NavigationPropertyLinkSegment segment)
         {
-            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+            Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
         /// <inheritdoc />
         public override string Literal => Segment.Identifier;
 
         /// <inheritdoc />
-        public override IEdmType EdmType => null;
+        public override IEdmType EdmType => Segment.EdmType;
 
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.NavigationLink;
@@ -33,10 +42,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle => false;
 
+        /// <inheritdoc />
+        public override IEdmNavigationSource NavigationSource => Segment.NavigationSource;
+
         /// <summary>
         /// Gets or sets the navigation property link segment.
         /// </summary>
-        public NavigationPropertyLinkSegment Segment { get; private set; }
+        public NavigationPropertyLinkSegment Segment { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
