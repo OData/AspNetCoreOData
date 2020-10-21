@@ -169,21 +169,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
         [Theory]
         [MemberData(nameof(FunctionWithoutParametersData))]
-        public void GenerateFunctionTemplatesWorksForEdmFunctionWithoutParameters(bool bound, string[] expects)
+        public void GetTemplatesWorks_ForEdmFunctionWithoutParameters(bool bound, string[] expects)
         {
             // Arrange
+            ODataPathTemplate template;
             EdmFunction getSalaray = new EdmFunction("NS", "GetWholeSalary", IntType, isBound: bound, entitySetPathExpression: null, isComposable: false);
             if (bound)
             {
                 EdmEntityType customer = new EdmEntityType("NS", "Customer");
                 getSalaray.AddParameter("entityset", new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+                template = new ODataPathTemplate(new FunctionSegmentTemplate(getSalaray, null));
+            }
+            else
+            {
+                EdmEntityContainer container = new EdmEntityContainer("NS", "Container");
+                template = new ODataPathTemplate(new FunctionImportSegmentTemplate(new EdmFunctionImport(container, "GetWholeSalary", getSalaray), null));
             }
 
             // Act
-            IList<string> items = getSalaray.GenerateFunctionTemplates();
+            IEnumerable<string> items = template.GetTemplates();
 
             // Assert
-            Assert.Equal(expects.Length, items.Count);
+            Assert.Equal(expects.Length, items.Count());
             Assert.Equal(expects, items);
         }
 
@@ -206,9 +213,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
         [Theory]
         [MemberData(nameof(FunctionWithoutOptionalParametersData))]
-        public void GenerateFunctionTemplatesWorksForEdmFunctionWithoutOptionalParameters(bool bound, string[] expects)
+        public void GetTemplatesWorks_ForEdmFunctionWithoutOptionalParameters(bool bound, string[] expects)
         {
             // Arrange
+            ODataPathTemplate template;
             EdmFunction getSalaray = new EdmFunction("NS", "GetWholeSalary", IntType, isBound: bound, entitySetPathExpression: null, isComposable: false);
             if (bound)
             {
@@ -220,11 +228,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             getSalaray.AddParameter("minSalary", IntType);
             getSalaray.AddParameter("maxSalary", IntType);
 
+            if (bound)
+            {
+                template = new ODataPathTemplate(new FunctionSegmentTemplate(getSalaray, null));
+            }
+            else
+            {
+                EdmEntityContainer container = new EdmEntityContainer("NS", "Container");
+                template = new ODataPathTemplate(new FunctionImportSegmentTemplate(new EdmFunctionImport(container, "GetWholeSalary", getSalaray), null));
+            }
+
             // Act
-            IList<string> items = getSalaray.GenerateFunctionTemplates();
+            IEnumerable<string> items = template.GetTemplates();
 
             // Assert
-            Assert.Equal(expects.Length, items.Count);
+            Assert.Equal(expects.Length, items.Count());
             Assert.Equal(expects, items);
         }
 
@@ -236,35 +254,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 {
                     { true, new[]
                         {
-                            "NS.GetWholeSalary(salary={salary})",
-                            "NS.GetWholeSalary(salary={salary},aveSalary={aveSalary})",
-                            "NS.GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                            "NS.GetWholeSalary(salary={salary},maxSalary={maxSalary},aveSalary={aveSalary})",
-                            "NS.GetWholeSalary(salary={salary},minSalary={minSalary})",
-                            "NS.GetWholeSalary(salary={salary},minSalary={minSalary},aveSalary={aveSalary})",
-                            "NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                            "NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})",
-
-                            "GetWholeSalary(salary={salary})",
-                            "GetWholeSalary(salary={salary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                            "GetWholeSalary(salary={salary},maxSalary={maxSalary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})",
+                            "NS.GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})",
+                            "GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})"
                         }
                     },
                     { false, new[]
                         {
-                            "GetWholeSalary(salary={salary})",
-                            "GetWholeSalary(salary={salary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},maxSalary={maxSalary})",
-                            "GetWholeSalary(salary={salary},maxSalary={maxSalary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},aveSalary={aveSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                            "GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})",
+                            "GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})"
                         }
                     }
                 };
@@ -288,11 +284,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             getSalaray.AddOptionalParameter("maxSalary", IntType);
             getSalaray.AddOptionalParameter("aveSalary", IntType, "129");
 
+            IDictionary<string, string> parameters = new Dictionary<string, string>
+            {
+                { "salary", "{salary}" },
+                { "minSalary", "{min}" },
+                { "maxSalary", "{max}" }, // without "aveSalary"
+            };
+
+            ODataPathTemplate template;
+            if (bound)
+            {
+                template = new ODataPathTemplate(new FunctionSegmentTemplate(parameters, getSalaray, null));
+            }
+            else
+            {
+                EdmEntityContainer container = new EdmEntityContainer("NS", "Container");
+                template = new ODataPathTemplate(new FunctionImportSegmentTemplate(parameters, new EdmFunctionImport(container, "GetWholeSalary", getSalaray), null));
+            }
+
             // Act
-            var items = getSalaray.GenerateFunctionTemplates();
+            IEnumerable<string> items = template.GetTemplates();
 
             // Assert
-            Assert.Equal(expects.Length, items.Count);
+            Assert.Equal(expects.Length, items.Count());
             Assert.Equal(expects, items);
         }
         #endregion

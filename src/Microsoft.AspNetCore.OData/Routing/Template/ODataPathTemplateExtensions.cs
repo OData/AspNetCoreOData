@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -16,7 +15,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public static class ODataPathTemplateExtensions
     {
         /// <summary>
-        /// Generates all templates for the given <see cref="ODataPathTemplate"/>
+        /// Generates all templates for the given <see cref="ODataPathTemplate"/>.
+        /// All templates mean:
+        /// 1) for key segment, we have key in parenthesis & key as segment.
+        /// 2) for bound function segment, we have qualified function call & unqualified function call.
         /// </summary>
         /// <param name="path">The given path template.</param>
         /// <returns>All path templates.</returns>
@@ -39,6 +41,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
                 if (segment.Kind == ODataSegmentKind.Key)
                 {
+                    // for key segment, if it's single key, let's add key as segment template also
+                    // otherwise, we only add the key in parenthesis template.
                     KeySegmentTemplate keySg = segment as KeySegmentTemplate;
                     if (keySg.Count == 1)
                     {
@@ -117,123 +121,57 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return templates.Select(t => t.ToString());
         }
 
-        ///// <summary>
-        ///// Generates all templates for an input function.
-        ///// </summary>
-        ///// <param name="segment">The input function.</param>
-        ///// <returns>All templates.</returns>
-        //public static IList<FunctionSegmentTemplate> GenerateFunctionSegments(this FunctionSegmentTemplate segment)
-        //{
-        //    if (segment == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(segment));
-        //    }
-
-        //    // split parameters
-        //    (var fixes, var optionals) = SplitParameters(segment.Function);
-
-        //    // gets all combinations of the optional parameters.
-        //    Stack<IEdmOptionalParameter> current = new Stack<IEdmOptionalParameter>();
-        //    IList<IEdmOptionalParameter[]> full = new List<IEdmOptionalParameter[]>();
-        //    int length = optionals.Count;
-        //    if (optionals.Count > 0)
-        //    {
-        //        Traveral(optionals.ToArray(), 0, length, current, full);
-        //    }
-
-        //    IList<FunctionSegmentTemplate> newList = new List<FunctionSegmentTemplate>();
-        //    foreach (var optional in full)
-        //    {
-        //        ISet<string> requiredParameters = new HashSet<string>(fixes.Select(e => e.Name));
-        //        foreach (var optionalParameter in optional)
-        //        {
-        //            requiredParameters.Add(optionalParameter.Name);
-        //        }
-
-        //        newList.Add(new FunctionSegmentTemplate(segment.Function, segment.NavigationSource, requiredParameters));
-        //    }
-
-        //    return newList;
-        //}
-
         /// <summary>
-        /// Gets the whole supported template belongs to a <see cref="ODataPathTemplate"/>.
-        /// We supports:
-        /// 1. Key as segment if it's single key (We doesn't consider the alternate key so far)
-        /// 2. Unqualified function/action call
-        /// 3. Optional parameters combination.
+        /// Combinates the next template to the existing templates.
         /// </summary>
-        /// <param name="path">The input path template.</param>
-        /// <returns>The whole path template string.</returns>
-        public static IEnumerable<string> GetAllTemplates(this ODataPathTemplate path)
+        /// <param name="templates">The existing templates.</param>
+        /// <param name="nextTemplate">The nexte template.</param>
+        /// <returns>The templates.</returns>
+        private static IList<StringBuilder> CombinateTemplate(IList<StringBuilder> templates, string nextTemplate)
         {
-            if (path == null)
+            Contract.Assert(templates != null);
+            Contract.Assert(nextTemplate != null);
+
+            foreach (StringBuilder sb in templates)
             {
-                throw new ArgumentNullException(nameof(path));
+                sb.Append(nextTemplate);
             }
 
-            IList<StringBuilder> templates = new List<StringBuilder>
-            {
-                new StringBuilder()
-            };
-
-            int index = 0;
-            foreach (ODataSegmentTemplate segment in path.Segments)
-            {
-                if (segment.Kind == ODataSegmentKind.Key)
-                {
-                    KeySegmentTemplate keySg = segment as KeySegmentTemplate;
-                    if (keySg.Count == 1)
-                    {
-                        templates = CombinateTemplates(templates, "(" + segment.Literal + ")", "/" + segment.Literal);
-                    }
-                    else
-                    {
-                        templates = CombinateTemplate(templates, "(" + segment.Literal + ")");
-                    }
-
-                    index++;
-                    continue;
-                }
-
-                if (index != 0)
-                {
-                    templates = CombinateTemplate(templates, "/");
-                }
-                index++;
-
-                if (segment.Kind == ODataSegmentKind.Action)
-                {
-                    ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
-                    templates = CombinateTemplates(templates, action.Action.FullName(), action.Action.Name);
-                }
-                else if (segment.Kind == ODataSegmentKind.Function)
-                {
-                    FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
-                    IList<string> functionTemplates = function.Function.GenerateFunctionTemplates();
-                    templates = CombinateTemplates(templates, functionTemplates);
-                }
-                else if (segment.Kind == ODataSegmentKind.FunctionImport)
-                {
-                    FunctionImportSegmentTemplate functionImport = (FunctionImportSegmentTemplate)segment;
-                    IList<string> functionTemplates = functionImport.FunctionImport.Function.GenerateFunctionTemplates();
-                    templates = CombinateTemplates(templates, functionTemplates);
-                }
-                else
-                {
-                    templates = CombinateTemplate(templates, segment.Literal);
-                }
-            }
-
-            return templates.Select(t => t.ToString());
+            return templates;
         }
 
+        /// <summary>
+        /// Combinates the next templates with existing templates.
+        /// </summary>
+        /// <param name="templates">The existing templates.</param>
+        /// <param name="nextTemplates">The next templates.</param>
+        /// <returns>The new templates.</returns>
+        private static IList<StringBuilder> CombinateTemplates(IList<StringBuilder> templates, params string[] nextTemplates)
+        {
+            Contract.Assert(templates != null);
+
+            IList<StringBuilder> newList = new List<StringBuilder>(templates.Count * nextTemplates.Length);
+
+            foreach (StringBuilder sb in templates)
+            {
+                string oldTemplate = sb.ToString();
+                foreach (string newTemplate in nextTemplates)
+                {
+                    newList.Add(new StringBuilder(oldTemplate).Append(newTemplate));
+                }
+            }
+
+            return newList;
+        }
+
+        #region BackupTheUnusedCodes
+#if false
         /// <summary>
         /// Generates all templates for an input function.
         /// </summary>
         /// <param name="edmFunction">The input function.</param>
         /// <returns>All templates.</returns>
-        public static IList<string> GenerateFunctionTemplates(this IEdmFunction edmFunction)
+        internal static IList<string> GenerateFunctionTemplates(this IEdmFunction edmFunction)
         {
             if (edmFunction == null)
             {
@@ -369,59 +307,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             return (fixes, optionals);
         }
-
-        /// <summary>
-        /// Combinates the next template to the existing templates.
-        /// </summary>
-        /// <param name="templates">The existing templates.</param>
-        /// <param name="nextTemplate">The nexte template.</param>
-        /// <returns>The templates.</returns>
-        private static IList<StringBuilder> CombinateTemplate(IList<StringBuilder> templates, string nextTemplate)
-        {
-            Contract.Assert(templates != null);
-            Contract.Assert(nextTemplate != null);
-
-            foreach (StringBuilder sb in templates)
-            {
-                sb.Append(nextTemplate);
-            }
-
-            return templates;
-        }
-
-        /// <summary>
-        /// Combinates the next templates with existing templates.
-        /// </summary>
-        /// <param name="templates">The existing templates.</param>
-        /// <param name="nextTemplates">The nexte templates.</param>
-        /// <returns>The new templates.</returns>
-        private static IList<StringBuilder> CombinateTemplates(IList<StringBuilder> templates, params string[] nextTemplates)
-        {
-            return CombinateTemplates(templates, new List<string>(nextTemplates));
-        }
-
-        /// <summary>
-        /// Combinates the next templates with existing templates.
-        /// </summary>
-        /// <param name="templates">The existing templates.</param>
-        /// <param name="nextTemplates">The nexte templates.</param>
-        /// <returns>The new templates.</returns>
-        private static IList<StringBuilder> CombinateTemplates(IList<StringBuilder> templates, IList<string> nextTemplates)
-        {
-            Contract.Assert(templates != null);
-
-            IList<StringBuilder> newList = new List<StringBuilder>(templates.Count * nextTemplates.Count);
-
-            foreach (StringBuilder sb in templates)
-            {
-                string oldTemplate = sb.ToString();
-                foreach (string newTemplate in nextTemplates)
-                {
-                    newList.Add(new StringBuilder(oldTemplate).Append(newTemplate));
-                }
-            }
-
-            return newList;
-        }
+#endif
+        #endregion
     }
 }

@@ -2626,16 +2626,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplat
 	[
 	ExtensionAttribute(),
 	]
-	public static System.Collections.Generic.IList`1[[System.String]] GenerateFunctionTemplates (Microsoft.OData.Edm.IEdmFunction edmFunction)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetAllTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path)
-
-	[
-	ExtensionAttribute(),
-	]
 	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path)
 }
 

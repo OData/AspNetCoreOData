@@ -12198,48 +12198,7 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
-            <summary>
-            Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
-            </summary>
-            <param name="path">The given path template.</param>
-            <returns>All path templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetAllTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
-            <summary>
-            Gets the whole supported template belongs to a <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
-            We supports:
-            1. Key as segment if it's single key (We doesn't consider the alternate key so far)
-            2. Unqualified function/action call
-            3. Optional parameters combination.
-            </summary>
-            <param name="path">The input path template.</param>
-            <returns>The whole path template string.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GenerateFunctionTemplates(Microsoft.OData.Edm.IEdmFunction)">
-            <summary>
-            Generates all templates for an input function.
-            </summary>
-            <param name="edmFunction">The input function.</param>
-            <returns>All templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.Traveral(Microsoft.OData.Edm.IEdmOptionalParameter[],System.Int32,System.Int32,System.Collections.Generic.Stack{Microsoft.OData.Edm.IEdmOptionalParameter},System.Collections.Generic.IList{Microsoft.OData.Edm.IEdmOptionalParameter[]})">
-            <summary>
-            Traveral the array to output the whole combination.
-            </summary>
-            <param name="optionals">The input array</param>
-            <param name="start">The current start index.</param>
-            <param name="end">The end index.</param>
-            <param name="current">The current iteration stack</param>
-            <param name="full">The whole combination.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.SplitParameters(Microsoft.OData.Edm.IEdmFunction)">
-            <summary>
-            Splits the parameters into parts, one is the required parameters, the other is optional parameters.
-            </summary>
-            <param name="edmFunction">The input function.</param>
-            <returns></returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)" -->
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
             <summary>
             Combinates the next template to the existing templates.
@@ -12253,15 +12212,7 @@
             Combinates the next templates with existing templates.
             </summary>
             <param name="templates">The existing templates.</param>
-            <param name="nextTemplates">The nexte templates.</param>
-            <returns>The new templates.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates(System.Collections.Generic.IList{System.Text.StringBuilder},System.Collections.Generic.IList{System.String})">
-            <summary>
-            Combinates the next templates with existing templates.
-            </summary>
-            <param name="templates">The existing templates.</param>
-            <param name="nextTemplates">The nexte templates.</param>
+            <param name="nextTemplates">The next templates.</param>
             <returns>The new templates.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind">
