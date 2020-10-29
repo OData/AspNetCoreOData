@@ -1597,8 +1597,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmTypeReference returnType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Boolean, isNullable: false);
             IEdmFunction function = new EdmFunction("NS", "Function", returnType, isBound: true, entitySetPathExpression: null, isComposable: false);
 
-            OperationLinkBuilder linkBuilder = new OperationLinkBuilder((ResourceContext a) => new Uri(expectedTarget),
-                followsConventions: false);
+            OperationLinkBuilder linkBuilder = new OperationLinkBuilder((ResourceContext a) => new Uri(expectedTarget), followsConventions: false);
             IEdmDirectValueAnnotationsManager annotationsManager = CreateFakeAnnotationsManager();
             annotationsManager.SetOperationLinkBuilder(function, linkBuilder);
             annotationsManager.SetIsAlwaysBindable(function);

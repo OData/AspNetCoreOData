@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     public class ActionRoutingConvention : OperationRoutingConvention
     {
         /// <inheritdoc />
-        public override int Order => 800;
+        public override int Order => 700;
 
         /// <inheritdoc />
         public override bool AppliesToAction(ODataControllerActionContext context)

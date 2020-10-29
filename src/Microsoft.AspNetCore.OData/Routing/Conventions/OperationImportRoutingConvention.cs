@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     public class OperationImportRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public int Order => 700;
+        public int Order => 900;
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)

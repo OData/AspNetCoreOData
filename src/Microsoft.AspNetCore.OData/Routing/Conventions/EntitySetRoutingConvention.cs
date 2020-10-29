@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     public class EntitySetRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public virtual int Order => 200;
+        public virtual int Order => 100;
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
