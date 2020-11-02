@@ -17,8 +17,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Generates all templates for the given <see cref="ODataPathTemplate"/>.
         /// All templates mean:
-        /// 1) for key segment, we have key in parenthesis & key as segment.
-        /// 2) for bound function segment, we have qualified function call & unqualified function call.
+        /// 1) for key segment, we have key in parenthesis and key as segment.
+        /// 2) for bound function segment, we have qualified function call and unqualified function call.
         /// </summary>
         /// <param name="path">The given path template.</param>
         /// <returns>All path templates.</returns>

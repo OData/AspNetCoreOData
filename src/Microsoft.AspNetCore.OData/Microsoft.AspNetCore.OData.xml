@@ -7592,12 +7592,12 @@
             <param name="propertyPath"></param>
             <returns>Returns null if no aggregations were used so far</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GuidCompare(System.Guid,System.Guid)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GuidCompare(System.Nullable{System.Guid},System.Nullable{System.Guid})">
             <summary>
             Compares two guids
             </summary>
-            <param name="firstValue"></param>
-            <param name="secondValue"></param>
+            <param name="left">The left guid.</param>
+            <param name="right">The right guid.</param>
             <returns>An integer value based on the Guid's CompareTo method</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.IsFlatteningSource(System.Linq.Expressions.Expression)">
@@ -12198,7 +12198,16 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+            <summary>
+            Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            All templates mean:
+            1) for key segment, we have key in parenthesis and key as segment.
+            2) for bound function segment, we have qualified function call and unqualified function call.
+            </summary>
+            <param name="path">The given path template.</param>
+            <returns>All path templates.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
             <summary>
             Combinates the next template to the existing templates.

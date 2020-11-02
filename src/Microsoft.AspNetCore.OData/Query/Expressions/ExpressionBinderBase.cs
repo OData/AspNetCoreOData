@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public abstract class ExpressionBinderBase
     {
         internal static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
-        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(ExpressionBinderBase).GetMethod("GuidCompare", new[] { typeof(Guid), typeof(Guid) });
+        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(ExpressionBinderBase).GetMethod("GuidCompare", new[] { typeof(Guid?), typeof(Guid?) });
         internal static readonly string DictionaryStringObjectIndexerName = typeof(Dictionary<string, object>).GetDefaultMembers()[0].Name;
 
         internal static readonly Expression NullConstant = Expression.Constant(null);
@@ -164,8 +164,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (left.Type == typeof(Guid) || right.Type == typeof(Guid))
             {
-                left = ConvertNull(left, typeof(Guid));
-                right = ConvertNull(right, typeof(Guid));
+                left = ConvertNull(left, typeof(Guid?));
+                right = ConvertNull(right, typeof(Guid?));
 
                 switch (binaryOperator)
                 {
@@ -173,6 +173,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     case BinaryOperatorKind.GreaterThanOrEqual:
                     case BinaryOperatorKind.LessThan:
                     case BinaryOperatorKind.LessThanOrEqual:
+                        // why don't call the instance CompareTo method?
                         left = Expression.Call(GuidCompareMethodInfo, left, right);
                         right = ZeroConstant;
                         break;
@@ -1110,22 +1111,27 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Compares two guids
         /// </summary>
-        /// <param name="firstValue"></param>
-        /// <param name="secondValue"></param>
+        /// <param name="left">The left guid.</param>
+        /// <param name="right">The right guid.</param>
         /// <returns>An integer value based on the Guid's CompareTo method</returns>
-        public static int GuidCompare(Guid firstValue, Guid secondValue)
+        public static int GuidCompare(Guid? left, Guid? right)
         {
-            if (firstValue != null)
+            if (left == null && right == null)
             {
-                return firstValue.CompareTo(secondValue);
+                return 0;
             }
-
-            if (secondValue != null)
+            else if (left != null && right != null)
             {
-                return (-1) * secondValue.CompareTo(firstValue);
+                return left.Value.CompareTo(right.Value);
             }
-
-            return 0;
+            else if (left == null)
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         /// <summary>
