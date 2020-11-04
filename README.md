@@ -10,6 +10,10 @@ ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstu
 This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0-preview) is a server side library built upon ODataLib and ASP.NET Core.
 
+Blogs:
+1) [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
+2) [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
+
 ## 2. Basic Usage
 
 In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
