@@ -290,42 +290,8 @@ namespace Microsoft.AspNetCore.OData.Batch
                 return new Uri(request.GetDisplayUrl());
             }
 
-            string requestUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, request.Path);
-            return new Uri(requestUri);
-            /*
-            HttpContext context = new DefaultHttpContext
-            {
-                RequestServices = request.HttpContext.RequestServices,
-            };
-
-            IEndpointFeature endpointFeature = new ODataEndpointFeature();
-            endpointFeature.Endpoint = new Endpoint((d) => null, null, "anything");
-            context.Features.Set(endpointFeature);
-            context.SetEndpoint(endpointFeature.Endpoint);
-
-            context.Request.Scheme = request.Scheme;
-            context.Request.Host = request.Host;
-
-            context.Request.ODataFeature().PrefixName = oDataPrefixName;
-
-            RouteValueDictionary routeData = new RouteValueDictionary();
-            RouteValueDictionary batchRouteData = request.ODataFeature().BatchRouteData;
-            if (batchRouteData != null && batchRouteData.Any())
-            {
-                foreach (var data in batchRouteData)
-                {
-                    context.Request.RouteValues.Add(data.Key, data.Value);
-                }
-            }
-
-            //string baseAddress = helper.Link(oDataRouteName, routeData);
-            string baseAddress = request.CreateODataLink();
-            if (baseAddress == null)
-            {
-                throw new InvalidOperationException(SRResources.UnableToDetermineBaseUrl);
-            }
-
-            return new Uri(baseAddress);*/
+            request.ODataFeature().PrefixName = oDataPrefixName;
+            return new Uri(request.CreateODataLink());
         }
 
         internal static ODataVersion GetODataResponseVersion(HttpRequest request)

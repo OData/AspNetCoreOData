@@ -7592,14 +7592,6 @@
             <param name="propertyPath"></param>
             <returns>Returns null if no aggregations were used so far</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GuidCompare(System.Nullable{System.Guid},System.Nullable{System.Guid})">
-            <summary>
-            Compares two guids
-            </summary>
-            <param name="left">The left guid.</param>
-            <param name="right">The right guid.</param>
-            <returns>An integer value based on the Guid's CompareTo method</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.IsFlatteningSource(System.Linq.Expressions.Expression)">
             <summary>
             Recognize $it.Source where $it is FlatteningWrapper

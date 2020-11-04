@@ -2232,7 +2232,6 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBin
 	protected void EnsureFlattenedPropertyContainer (System.Linq.Expressions.ParameterExpression source)
 	protected System.Reflection.PropertyInfo GetDynamicPropertyContainer (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode)
 	protected System.Linq.Expressions.Expression GetFlattenedPropertyExpression (string propertyPath)
-	public static int GuidCompare (System.Nullable`1[[System.Guid]] left, System.Nullable`1[[System.Guid]] right)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {

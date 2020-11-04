@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public abstract class ExpressionBinderBase
     {
         internal static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
-        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(ExpressionBinderBase).GetMethod("GuidCompare", new[] { typeof(Guid?), typeof(Guid?) });
+        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
         internal static readonly string DictionaryStringObjectIndexerName = typeof(Dictionary<string, object>).GetDefaultMembers()[0].Name;
 
         internal static readonly Expression NullConstant = Expression.Constant(null);
@@ -164,17 +164,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (left.Type == typeof(Guid) || right.Type == typeof(Guid))
             {
-                left = ConvertNull(left, typeof(Guid?));
-                right = ConvertNull(right, typeof(Guid?));
-
                 switch (binaryOperator)
                 {
                     case BinaryOperatorKind.GreaterThan:
                     case BinaryOperatorKind.GreaterThanOrEqual:
                     case BinaryOperatorKind.LessThan:
                     case BinaryOperatorKind.LessThanOrEqual:
-                        // why don't call the instance CompareTo method?
-                        left = Expression.Call(GuidCompareMethodInfo, left, right);
+                        left = Expression.Call(left, GuidCompareMethodInfo, right);
                         right = ZeroConstant;
                         break;
                     default:
@@ -1105,32 +1101,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else
             {
                 return expression;
-            }
-        }
-
-        /// <summary>
-        /// Compares two guids
-        /// </summary>
-        /// <param name="left">The left guid.</param>
-        /// <param name="right">The right guid.</param>
-        /// <returns>An integer value based on the Guid's CompareTo method</returns>
-        public static int GuidCompare(Guid? left, Guid? right)
-        {
-            if (left == null && right == null)
-            {
-                return 0;
-            }
-            else if (left != null && right != null)
-            {
-                return left.Value.CompareTo(right.Value);
-            }
-            else if (left == null)
-            {
-                return 1;
-            }
-            else
-            {
-                return -1;
             }
         }
 
