@@ -192,7 +192,5 @@ namespace ODataRoutingSample.Controllers
         {
             return $"Unbound function call on CalculateSalary: min={min}, max={max}, name={name}";
         }
-
-
     }
 }

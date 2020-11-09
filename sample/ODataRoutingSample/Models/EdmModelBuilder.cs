@@ -15,6 +15,7 @@ namespace ODataRoutingSample.Models
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
+            builder.EntitySet<Person>("People").EntityType.HasKey(c => new { c.FirstName, c.LastName });
 
             // function with optional parameters
             var functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
