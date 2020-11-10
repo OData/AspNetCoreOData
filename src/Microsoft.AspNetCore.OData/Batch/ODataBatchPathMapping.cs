@@ -19,11 +19,6 @@ namespace Microsoft.AspNetCore.OData.Batch
         private Dictionary<TemplateMatcher, (string, ODataBatchHandler)> templateMappings = new Dictionary<TemplateMatcher, (string, ODataBatchHandler)>();
 
         /// <summary>
-        /// Gets/sets a boolean value indicating whether it's endpoint routing.
-        /// </summary>
-        internal bool IsEndpointRouting { get; set; } = false;
-
-        /// <summary>
         /// Add a route name and template for batching.
         /// </summary>
         /// <param name="prefixName">The route prefix name.</param>

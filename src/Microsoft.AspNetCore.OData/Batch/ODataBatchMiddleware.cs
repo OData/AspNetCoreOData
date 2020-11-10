@@ -29,13 +29,18 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             _next = next;
 
-            // We inject the service provider to let the middel ware pass without inject the ODataOptions.
+            // We inject the service provider to let the middle ware pass without ODataOptions injected.
             IOptions<ODataOptions> odataOptionsOptions = serviceProvider?.GetService<IOptions<ODataOptions>>();
             if (odataOptionsOptions != null && odataOptionsOptions.Value != null)
             {
                 Initialize(odataOptionsOptions.Value);
             }
         }
+
+        /// <summary>
+        /// Gets the batch path mapping, for unit test only
+        /// </summary>
+        internal ODataBatchPathMapping BatchMapping => _batchMapping;
 
         /// <summary>
         /// Invoke the OData $Batch middleware.
@@ -46,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             string prefixName;

@@ -763,6 +763,11 @@
             <param name="serviceProvider">The service provider, we don't inject the ODataOptions.</param>
             <param name="next">The next middleware.</param>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.BatchMapping">
+            <summary>
+            Gets the batch path mapping, for unit test only
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             Invoke the OData $Batch middleware.
@@ -774,11 +779,6 @@
             <summary>
             A class for storing batch route names and prefixes used to determine if a route is a
             batch route.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.IsEndpointRouting">
-            <summary>
-            Gets/sets a boolean value indicating whether it's endpoint routing.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchPathMapping.AddRoute(System.String,System.String,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">

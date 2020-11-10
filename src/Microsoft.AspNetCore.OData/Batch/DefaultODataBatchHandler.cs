@@ -25,12 +25,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (nextHandler == null)
             {
-                throw new ArgumentNullException(nameof(nextHandler));
+                throw Error.ArgumentNull(nameof(nextHandler));
             }
 
             if (!await ValidateRequest(context.Request).ConfigureAwait(false))
@@ -40,11 +40,8 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             IList<ODataBatchRequestItem> subRequests = await ParseBatchRequestsAsync(context).ConfigureAwait(false);
 
-            // ODataOptions options = context.RequestServices.GetRequiredService<ODataOptions>();
             ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
-            bool enableContinueOnErrorHeader = (options != null)
-                ? options.EnableContinueOnErrorHeader
-                : false;
+            bool enableContinueOnErrorHeader = (options != null) ? options.EnableContinueOnErrorHeader : false;
 
             SetContinueOnError(context.Request.Headers, enableContinueOnErrorHeader);
 
@@ -59,17 +56,16 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="requests">The collection of OData batch requests.</param>
         /// <param name="handler">The handler for processing a message.</param>
         /// <returns>A collection of <see cref="ODataBatchResponseItem"/> for the batch requests.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need to return a collection of response messages asynchronously.")]
         public virtual async Task<IList<ODataBatchResponseItem>> ExecuteRequestMessagesAsync(IEnumerable<ODataBatchRequestItem> requests, RequestDelegate handler)
         {
             if (requests == null)
             {
-                throw new ArgumentNullException(nameof(requests));
+                throw Error.ArgumentNull(nameof(requests));
             }
 
             if (handler == null)
             {
-                throw new ArgumentNullException(nameof(handler));
+                throw Error.ArgumentNull(nameof(handler));
             }
 
             IList<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
@@ -97,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             HttpRequest request = context.Request;
