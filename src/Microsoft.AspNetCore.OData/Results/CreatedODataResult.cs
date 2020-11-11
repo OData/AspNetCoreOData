@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Results
     /// <remarks>This action result handles content negotiation and the HTTP prefer header. It generates a location
     /// header containing the edit link of the created entity and, if response has status code: NoContent, also
     /// generates an OData-EntityId header.</remarks>
-    public class CreatedODataResult<T> : IActionResult
+    public class CreatedODataResult<T> : ActionResult
     {
         private readonly T _innerResult;
 
@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Results
         }
 
         /// <inheritdoc/>
-        public async virtual Task ExecuteResultAsync(ActionContext context)
+        public async override Task ExecuteResultAsync(ActionContext context)
         {
             if (context == null)
             {

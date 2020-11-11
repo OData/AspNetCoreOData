@@ -1383,7 +1383,7 @@ public abstract class Microsoft.AspNetCore.OData.Results.SingleResult {
 	public static SingleResult`1 Create (IQueryable`1 queryable)
 }
 
-public class Microsoft.AspNetCore.OData.Results.CreatedODataResult`1 : IActionResult {
+public class Microsoft.AspNetCore.OData.Results.CreatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
 	public CreatedODataResult`1 (T entity)
 
 	T Entity  { public virtual get; }
@@ -1409,7 +1409,7 @@ public class Microsoft.AspNetCore.OData.Results.PageResult`1 : Microsoft.AspNetC
 	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 }
 
-public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : IActionResult {
+public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
 	public UpdatedODataResult`1 (T entity)
 
 	T Entity  { public virtual get; }
