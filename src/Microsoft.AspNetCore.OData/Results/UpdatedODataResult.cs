@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Results
     /// </summary>
     /// <typeparam name="T">The entity type.</typeparam>
     /// <remarks>This action result handles content negotiation and the HTTP prefer header.</remarks>
-    public class UpdatedODataResult<T> : IActionResult
+    public class UpdatedODataResult<T> : ActionResult
     {
         private readonly T _innerResult;
 
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Results
         }
 
         /// <inheritdoc/>
-        public async virtual Task ExecuteResultAsync(ActionContext context)
+        public async override Task ExecuteResultAsync(ActionContext context)
         {
             if (context == null)
             {
