@@ -76,9 +76,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataPayloadKind.MetadataDocument);
 
             formatter.SupportedMediaTypes.Add(ODataMediaTypes.ApplicationXml);
+            formatter.SupportedMediaTypes.Add(ODataMediaTypes.ApplicationJson);
 
             formatter.AddDollarFormatQueryStringMappings();
             formatter.AddQueryStringMapping(DollarFormat, XmlFormat, ODataMediaTypes.ApplicationXml);
+            formatter.AddQueryStringMapping(DollarFormat, JsonFormat, ODataMediaTypes.ApplicationJson);
 
             return formatter;
         }
