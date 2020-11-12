@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                     { typeof(Uri), applicationJsonMediaTypes },
                     { typeof(IEnumerable<int>), applicationJsonMediaTypes },
                     { typeof(ODataServiceDocument), applicationJsonMediaTypes },
-                    { typeof(IEdmModel), new [] { "application/xml" } },
+                    { typeof(IEdmModel), new [] { "application/xml", "application/json" } },
                     { typeof(ODataError), applicationJsonMediaTypes }
                 };
             }
