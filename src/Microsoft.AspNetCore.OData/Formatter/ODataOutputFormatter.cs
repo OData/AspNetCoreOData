@@ -80,6 +80,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return false;
             }
 
+            // Be noted: Before coming here (.NET 5), the ContentType is reset as empty as:
+            // formatterContext.ContentType = new StringSegment();
+
             // Allow the base class to make its determination, which includes
             // checks for SupportedMediaTypes.
             bool suportedMediaTypeFound = false;
