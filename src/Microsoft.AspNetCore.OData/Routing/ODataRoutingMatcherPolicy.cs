@@ -47,7 +47,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             return endpoints.Any(e => e.Metadata.OfType<ODataRoutingMetadata>().FirstOrDefault() != null);
         }
 
-
         /// <summary>
         /// Applies the policy to the CandidateSet.
         /// </summary>
@@ -63,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             // The goal of this method is to perform the final matching:
-            // Map between route values matched by the template and the ones we want to expose to the action for binding. 
+            // Map between route values matched by the template and the ones we want to expose to the action for binding.
             // (tweaking the route values is fine here)
             // Invalidating the candidate if the key/function values are not valid/missing.
             // Perform overload resolution for functions by looking at the candidates and their metadata.

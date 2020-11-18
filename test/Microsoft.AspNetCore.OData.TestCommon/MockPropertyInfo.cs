@@ -7,21 +7,27 @@ using Moq;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
+    /// <summary>
+    /// A mock to represent a property info.
+    /// </summary>
     public sealed class MockPropertyInfo : Mock<PropertyInfo>
     {
         private readonly Mock<MethodInfo> _mockGetMethod = new Mock<MethodInfo>();
         private readonly Mock<MethodInfo> _mockSetMethod = new Mock<MethodInfo>();
 
-        public static implicit operator PropertyInfo(MockPropertyInfo mockPropertyInfo)
-        {
-            return mockPropertyInfo.Object;
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockPropertyInfo"/> class.
+        /// </summary>
         public MockPropertyInfo()
             : this(typeof(object), "P")
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockPropertyInfo"/> class.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <param name="propertyName">The property name.</param>
         public MockPropertyInfo(Type propertyType, string propertyName)
         {
             SetupGet(p => p.DeclaringType).Returns(typeof(object));
@@ -37,6 +43,19 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             _mockGetMethod.SetupGet(m => m.Attributes).Returns(MethodAttributes.Public);
         }
 
+        /// <summary>
+        /// Implicit operator to convert Mock property info to property info.
+        /// </summary>
+        /// <param name="mockPropertyInfo">The left mock property info.</param>
+        public static implicit operator PropertyInfo(MockPropertyInfo mockPropertyInfo)
+        {
+            return mockPropertyInfo.Object;
+        }
+
+        /// <summary>
+        /// Set up the property as abstract.
+        /// </summary>
+        /// <returns></returns>
         public MockPropertyInfo Abstract()
         {
             _mockGetMethod.SetupGet(m => m.Attributes)

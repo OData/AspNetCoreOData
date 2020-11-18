@@ -6,8 +6,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
+    /// <summary>
+    /// Extension for <see cref="IServiceCollection"/>.
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Config the controller provider.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="controllers">The configured controllers.</param>
+        /// <returns>The caller.</returns>
         public static IServiceCollection ConfigureControllers(this IServiceCollection services, params Type[] controllers)
         {
             if (services == null)

@@ -8,21 +8,33 @@ using System.Reflection;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
+    /// <summary>
+    /// A mock to represent an assembly
+    /// </summary>
     public sealed class MockAssembly : Assembly
     {
-        Type[] _types;
+        private Type[] _types;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockAssembly"/> class.
+        /// </summary>
+        /// <param name="types">The types in this assembly.</param>
         public MockAssembly(params Type[] types)
         {
             _types = types;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockAssembly"/> class.
+        /// </summary>
+        /// <param name="types">The mock types in this assembly.</param>
         public MockAssembly(params MockType[] types)
         {
             foreach (var type in types)
             {
                 type.SetupGet(t => t.Assembly).Returns(this);
             }
+
             _types = types.Select(t => t.Object).ToArray();
         }
 

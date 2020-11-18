@@ -10,21 +10,27 @@ using Moq.Protected;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
+    /// <summary>
+    /// A mock to represent a CLR type.
+    /// </summary>
     public sealed class MockType : Mock<Type>
     {
-        public static implicit operator Type(MockType mockType)
-        {
-            return mockType.Object;
-        }
-
         private readonly List<MockPropertyInfo> _propertyInfos = new List<MockPropertyInfo>();
         private MockType _baseType;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockType"/> class.
+        /// </summary>
         public MockType()
             : this("T")
-        {
-        }
+        { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockType"/> class.
+        /// </summary>
+        /// <param name="typeName">The type name.</param>
+        /// <param name="hasDefaultCtor">Has default constructor.</param>
+        /// <param name="namespace">The namespace.</param>
         public MockType(string typeName, bool hasDefaultCtor = true, string @namespace = "DefaultNamespace")
         {
             SetupGet(t => t.Name).Returns(typeName);
@@ -53,6 +59,15 @@ namespace Microsoft.AspNetCore.OData.TestCommon
                         ItExpr.IsNull<ParameterModifier[]>())
                     .Returns(new Mock<ConstructorInfo>().Object);
             }
+        }
+
+        /// <summary>
+        /// Implicit operator to convert Mock type info to type.
+        /// </summary>
+        /// <param name="mockType">The mock type.</param>
+        public static implicit operator Type(MockType mockType)
+        {
+            return mockType.Object;
         }
 
         public MockType TypeAttributes(TypeAttributes typeAttributes)
