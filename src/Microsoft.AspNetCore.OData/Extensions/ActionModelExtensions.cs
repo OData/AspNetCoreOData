@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Routing;
@@ -239,12 +240,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            foreach (var template in path.GetTemplates())
+            foreach (string template in path.GetTemplates())
             {
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
                 {
-                    selectorModel = new SelectorModel();
+                    selectorModel = CreateSelectorModel(action.Attributes);
                     action.Selectors.Add(selectorModel);
                 }
 
@@ -260,6 +261,30 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // Check with .NET Team whether the "Endpoint name metadata"
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
+        }
+
+        // this method refers to the similar method in ASP.NET Core
+        internal static SelectorModel CreateSelectorModel(IReadOnlyList<object> attributes)
+        {
+            var selectorModel = new SelectorModel();
+
+            AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
+            AddRange(selectorModel.EndpointMetadata, attributes);
+
+            // Simple case, all HTTP method attributes apply
+            var httpMethods = attributes
+                .OfType<IActionHttpMethodProvider>()
+                .SelectMany(a => a.HttpMethods)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (httpMethods.Length > 0)
+            {
+                selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+                selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+            }
+
+            return selectorModel;
         }
 
         /// <summary>
@@ -289,6 +314,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
             foreach (var method in methods)
             {
                 metadata.HttpMethods.Add(method);
+            }
+        }
+
+        private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                list.Add(item);
             }
         }
     }
