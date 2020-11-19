@@ -168,57 +168,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="prefix">The prefix.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="path">The OData path template.</param>
-        public static void AddSelector(this ActionModel action, string prefix, IEdmModel model, ODataPathTemplate path)
-        {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (path == null)
-            {
-                throw Error.ArgumentNull(nameof(path));
-            }
-
-            var httpMethods = action.GetSupportedHttpMethods();
-
-            foreach (var template in path.GetTemplates())
-            {
-                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-                if (selectorModel == null)
-                {
-                    selectorModel = new SelectorModel();
-                    action.Selectors.Add(selectorModel);
-                }
-
-                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-
-                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
-                selectorModel.EndpointMetadata.Add(odataMetadata);
-
-                // Check with .NET Team whether the "Endpoint name metadata"
-                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
-                foreach (var httpMethod in httpMethods)
-                {
-                    odataMetadata.HttpMethods.Add(httpMethod);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the OData selector model to the action.
-        /// </summary>
-        /// <param name="action">The given action model.</param>
         /// <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>

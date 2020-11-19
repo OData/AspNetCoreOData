@@ -48,11 +48,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             string singletonName = context.Singleton.Name;
 
             string actionMethodName = action.ActionMethod.Name;
-            if (IsSupportedActionName(actionMethodName, singletonName))
+            if (IsSupportedActionName(actionMethodName, singletonName, out string httpMethod))
             {
                 // ~/Me
                 ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton));
-                action.AddSelector(context.Prefix, context.Model, template);
+                action.AddSelector(httpMethod, context.Prefix, context.Model, template);
 
                 // processed
                 return true;
@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string actionPrefix = actionMethodName.Substring(0, index);
-            if (IsSupportedActionName(actionPrefix, singletonName))
+            if (IsSupportedActionName(actionPrefix, singletonName, out httpMethod))
             {
                 string castTypeName = actionMethodName.Substring(index + 4);
                 IEdmEntityType entityType = context.Singleton.EntityType();
@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                         new SingletonSegmentTemplate(context.Singleton),
                         new CastSegmentTemplate(castType, entityType, context.Singleton));
 
-                    action.AddSelector(context.Prefix, context.Model, template);
+                    action.AddSelector(httpMethod, context.Prefix, context.Model, template);
                     return true;
                 }
             }
@@ -89,14 +89,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return false;
         }
 
-        private static bool IsSupportedActionName(string actionName, string singletonName)
+        private static bool IsSupportedActionName(string actionName, string singletonName, out string httpMethod)
         {
-            return actionName == "Get" ||
-                actionName == $"Get{singletonName}" ||
-                actionName == "Put" ||
-                actionName == $"Put{singletonName}" ||
-                actionName == "Patch" ||
-                actionName == $"Patch{singletonName}";
+            if (actionName == "Get" || actionName == $"Get{singletonName}")
+            {
+                httpMethod = "Get";
+                return true;
+            }
+            else if (actionName == "Put" || actionName == $"Put{singletonName}")
+            {
+                httpMethod = "put";
+                return true;
+            }
+            else if (actionName == "Patch" || actionName == $"Patch{singletonName}")
+            {
+                httpMethod = "patch";
+                return true;
+            }
+
+            httpMethod = "";
+            return false;
         }
     }
 }
