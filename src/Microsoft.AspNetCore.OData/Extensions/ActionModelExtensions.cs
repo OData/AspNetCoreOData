@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Routing;
@@ -167,57 +168,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="prefix">The prefix.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="path">The OData path template.</param>
-        public static void AddSelector(this ActionModel action, string prefix, IEdmModel model, ODataPathTemplate path)
-        {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (path == null)
-            {
-                throw Error.ArgumentNull(nameof(path));
-            }
-
-            var httpMethods = action.GetSupportedHttpMethods();
-
-            foreach (var template in path.GetTemplates())
-            {
-                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-                if (selectorModel == null)
-                {
-                    selectorModel = new SelectorModel();
-                    action.Selectors.Add(selectorModel);
-                }
-
-                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
-
-                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
-                selectorModel.EndpointMetadata.Add(odataMetadata);
-
-                // Check with .NET Team whether the "Endpoint name metadata"
-                // selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(templateStr));
-                foreach (var httpMethod in httpMethods)
-                {
-                    odataMetadata.HttpMethods.Add(httpMethod);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the OData selector model to the action.
-        /// </summary>
-        /// <param name="action">The given action model.</param>
         /// <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
@@ -239,12 +189,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            foreach (var template in path.GetTemplates())
+            foreach (string template in path.GetTemplates())
             {
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
                 {
-                    selectorModel = new SelectorModel();
+                    selectorModel = CreateSelectorModel(action.Attributes);
                     action.Selectors.Add(selectorModel);
                 }
 
@@ -260,6 +210,30 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // Check with .NET Team whether the "Endpoint name metadata"
                 selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
             }
+        }
+
+        // this method refers to the similar method in ASP.NET Core
+        internal static SelectorModel CreateSelectorModel(IReadOnlyList<object> attributes)
+        {
+            var selectorModel = new SelectorModel();
+
+            AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
+            AddRange(selectorModel.EndpointMetadata, attributes);
+
+            // Simple case, all HTTP method attributes apply
+            var httpMethods = attributes
+                .OfType<IActionHttpMethodProvider>()
+                .SelectMany(a => a.HttpMethods)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (httpMethods.Length > 0)
+            {
+                selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+                selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+            }
+
+            return selectorModel;
         }
 
         /// <summary>
@@ -289,6 +263,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
             foreach (var method in methods)
             {
                 metadata.HttpMethods.Add(method);
+            }
+        }
+
+        private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                list.Add(item);
             }
         }
     }
