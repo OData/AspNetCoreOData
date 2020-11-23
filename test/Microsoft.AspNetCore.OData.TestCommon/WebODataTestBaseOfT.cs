@@ -12,8 +12,6 @@ namespace Microsoft.AspNetCore.OData.TestCommon
     /// </summary>
     public abstract class WebODataTestBase<TStartup> : IClassFixture<WebODataTestFixture<TStartup>> where TStartup : class
     {
-        private HttpClient _client;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WebODataTestBase{TStartup}"/> class.
         /// </summary>
@@ -26,19 +24,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         /// <summary>
         /// An HttpClient to use with the server.
         /// </summary>
-        public virtual HttpClient Client
-        {
-            get
-            {
-                if (_client == null)
-                {
-                    _client = Factory.CreateClient();
-                    _client.Timeout = TimeSpan.FromSeconds(3600);
-                }
-
-                return _client;
-            }
-        }
+        public virtual HttpClient Client => Factory.CreateClient();
 
         /// <summary>
         /// Gets the factory.
