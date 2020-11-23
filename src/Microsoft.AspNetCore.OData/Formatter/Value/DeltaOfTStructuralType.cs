@@ -630,10 +630,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 
             PropertyAccessor<TStructuralType> cacheHit = _allProperties[name];
 
-            //if (value == null && !EdmLibHelpers.IsNullable(cacheHit.Property.PropertyType))
-            //{
-            //    return false;
-            //}
+            if (value == null && !cacheHit.Property.PropertyType.IsNullable())
+            {
+                return false;
+            }
 
             Type propertyType = cacheHit.Property.PropertyType;
             if (value != null && !TypeHelper.IsCollection(propertyType) && !propertyType.IsAssignableFrom(value.GetType()))
@@ -663,6 +663,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
                 // Ignore duplicated nested resource.
                 return false;
             }
+
+            PropertyAccessor<TStructuralType> cacheHit = _allProperties[name];
+            // Get the Delta<{NestedResourceType}>._instance using Reflection.
+            FieldInfo field = deltaNestedResource.GetType().GetField("_instance", BindingFlags.NonPublic | BindingFlags.Instance);
+            Contract.Assert(field != null, "field != null");
+            cacheHit.SetValue(_instance, field.GetValue(deltaNestedResource));
 
             // Add the nested resource in the hierarchy.
             // Note: We shouldn't add the structural properties to the <code>_changedProperties</code>, which
