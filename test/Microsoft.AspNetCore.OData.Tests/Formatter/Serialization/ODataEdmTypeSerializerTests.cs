@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
@@ -35,14 +36,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObjectInline_Throws_NotSupported()
+        public async Task WriteObjectInlineAsync_Throws_NotSupported()
         {
             // Arrange
             var serializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Unsupported) { CallBase = true };
 
             // Act & Assert
-            ExceptionAssert.Throws<NotSupportedException>(
-                () => serializer.Object.WriteObjectInline(graph: null, expectedType: null, writer: null, writeContext: null),
+            await ExceptionAssert.ThrowsAsync<NotSupportedException>(
+                () => serializer.Object.WriteObjectInlineAsync(graph: null, expectedType: null, writer: null, writeContext: null),
                 "ODataEdmTypeSerializerProxy does not support WriteObjectInline.");
         }
 

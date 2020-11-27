@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -16,19 +17,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
     public class ODataMetadataSerializerTest
     {
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(42, typeof(IEdmModel), messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(42, typeof(IEdmModel), messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
-        public void ODataMetadataSerializer_Works()
+        public async Task ODataMetadataSerializer_Works()
         {
             // Arrange
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
@@ -38,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmModel model = new EdmModel();
 
             // Act
-            serializer.WriteObject("42", typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            await serializer.WriteObjectAsync("42", typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
 
             // Assert
             stream.Seek(0, SeekOrigin.Begin);
@@ -47,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void ODataMetadataSerializer_Works_ForSingleton()
+        public async Task ODataMetadataSerializer_Works_ForSingleton()
         {
             // Arrange
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
@@ -60,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
 
             // Act
-            serializer.WriteObject(model, typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            await serializer.WriteObjectAsync(model, typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
 
             // Assert
             stream.Seek(0, SeekOrigin.Begin);

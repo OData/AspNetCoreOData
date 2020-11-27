@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -74,40 +75,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_MessageReader()
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
             // Arrange
             ODataActionPayloadDeserializer deserializer = new ODataActionPayloadDeserializer(_deserializerProvider);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: null, type: typeof(ODataActionParameters), readContext: new ODataDeserializerContext()),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: typeof(ODataActionParameters), readContext: new ODataDeserializerContext()),
                 "messageReader");
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_ReadContext()
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
         {
             // Arrange
             ODataActionPayloadDeserializer deserializer = new ODataActionPayloadDeserializer(_deserializerProvider);
             ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader, typeof(ODataActionParameters), readContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader, typeof(ODataActionParameters), readContext: null),
                 "readContext");
         }
 
         [Fact]
-        public void Read_Throws_SerializationException_ODataPathMissing()
+        public async Task ReadAsync_Throws_SerializationException_ODataPathMissing()
         {
             // Arrange
             ODataActionPayloadDeserializer deserializer = new ODataActionPayloadDeserializer(_deserializerProvider);
             ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => deserializer.Read(messageReader, typeof(ODataActionParameters), readContext: new ODataDeserializerContext()),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => deserializer.ReadAsync(messageReader, typeof(ODataActionParameters), readContext: new ODataDeserializerContext()),
                 "The operation cannot be completed because no ODataPath is available for the request.");
         }
 
@@ -207,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithPrimitiveParametersTest))]
-        public void Can_DeserializePayload_WithPrimitiveParameters(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithPrimitiveParameters(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const int Quantity = 1;
@@ -216,13 +217,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 string.Format(@" ""Quantity"": {0} , ""ProductCode"": ""{1}"" , ""Birthday"": ""2015-02-27"", ""BkgColor"": ""Red"", ""InnerColor"": null", Quantity, ProductCode) +
                 "}";
 
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(body));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext() { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             // Assert
@@ -247,17 +248,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithComplexParametersTest))]
-        public void Can_DeserializePayload_WithComplexParameters(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithComplexParameters(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Quantity"": 1 , ""Address"": { ""StreetAddress"":""1 Microsoft Way"", ""City"": ""Redmond"", ""State"": ""WA"", ""ZipCode"": 98052 } }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext() { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             // Assert
@@ -277,13 +278,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithPrimitiveCollectionsTest))]
-        public void Can_DeserializePayload_WithPrimitiveCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithPrimitiveCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body =
                 @"{ ""Name"": ""Avatar"", ""Ratings"": [ 5, 5, 3, 4, 5, 5, 4, 5, 5, 4 ], ""Time"": [""01:02:03.0040000"", ""12:13:14.1150000""]}";
             int[] expectedRatings = new int[] { 5, 5, 3, 4, 5, 5, 4, 5, 5, 4 };
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
 
             ODataMessageReaderSettings settings = new ODataMessageReaderSettings();
@@ -291,7 +292,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             //Assert
@@ -313,18 +314,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithComplexCollectionsTest))]
-        public void Can_DeserializePayload_WithComplexCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithComplexCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Name"": ""Avatar"" , ""Addresses"": [{ ""StreetAddress"":""1 Microsoft Way"", ""City"": ""Redmond"", ""State"": ""WA"", ""ZipCode"": 98052 }] }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
 
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.NotNull(actionName);
@@ -344,18 +345,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithEnumCollectionsTest))]
-        public void Can_DeserializePayload_WithEnumCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEnumCollections_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Colors"": [ ""Red"", ""Green""] }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
 
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.NotNull(actionName);
@@ -370,11 +371,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithComplexParametersTest))]
-        public void Can_DeserializePayload_WithComplexParameters_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithComplexParameters_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Quantity"": 1 , ""Address"": { ""StreetAddress"":""1 Microsoft Way"", ""City"": ""Redmond"", ""State"": ""WA"", ""ZipCode"": 98052 } }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
 
             ODataMessageReaderSettings settings = new ODataMessageReaderSettings();
@@ -383,7 +384,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.NotNull(actionName);
@@ -402,11 +403,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithEnumParametersTest))]
-        public void Can_DeserializePayload_WithEnumParameters_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEnumParameters_InUntypedMode(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Color"": ""Red""}";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
 
             ODataMessageReaderSettings settings = new ODataMessageReaderSettings();
@@ -415,7 +416,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.NotNull(actionName);
@@ -429,21 +430,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithPrimitiveCollectionsTest))]
-        public void Can_DeserializePayload_WithPrimitiveCollectionParameters(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithPrimitiveCollectionParameters(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body =
                 @"{ ""Name"": ""Avatar"", ""Ratings"": [ 5, 5, 3, 4, 5, 5, 4, 5, 5, 4 ], ""Time"": [""01:02:03.0040000"", ""12:13:14.1150000""], ""Colors"": [ ""Red"", null, ""Green""] }";
             int[] expectedRatings = new int[] { 5, 5, 3, 4, 5, 5, 4, 5, 5, 4 };
 
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
 
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             // Assert
@@ -460,7 +461,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.True(payload.ContainsKey("Time"));
             IEnumerable<TimeOfDay> times = payload["Time"] as IEnumerable<TimeOfDay>;
             Assert.Equal(2, times.Count());
-            Assert.Equal(new[] {new TimeOfDay(1, 2, 3, 4), new TimeOfDay(12, 13, 14, 115) }, times.ToList());
+            Assert.Equal(new[] { new TimeOfDay(1, 2, 3, 4), new TimeOfDay(12, 13, 14, 115) }, times.ToList());
 
             Assert.True(payload.ContainsKey("Colors"));
             IEnumerable<AColor?> colors = payload["Colors"] as IEnumerable<AColor?>;
@@ -469,17 +470,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithComplexCollectionsTest))]
-        public void Can_DeserializePayload_WithComplexCollectionParameters(string actionName, IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithComplexCollectionParameters(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Name"": ""Microsoft"", ""Addresses"": [ { ""StreetAddress"":""1 Microsoft Way"", ""City"": ""Redmond"", ""State"": ""WA"", ""ZipCode"": 98052 } ] }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(Body));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
 
             // Assert
             Assert.NotNull(actionName);
@@ -500,25 +501,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         private const string EntityPayload =
-            "{" +
-                "\"Id\": 1, " +
-                "\"Customer\": {\"@odata.type\":\"#A.B.Customer\", \"Id\":109,\"Name\":\"Avatar\" } " +
-                // null can't work here, see: https://github.com/OData/odata.net/issues/99
-                // ",\"NullableCustomer\" : null " +  //
-            "}";
+"{" +
+    "\"Id\": 1, " +
+    "\"Customer\": {\"@odata.type\":\"#A.B.Customer\", \"Id\":109,\"Name\":\"Avatar\" } " +
+// null can't work here, see: https://github.com/OData/odata.net/issues/99
+// ",\"NullableCustomer\" : null " +  //
+"}";
 
         [Theory]
         [MemberData(nameof(DeserializeWithEntityParametersTest))]
-        public void Can_DeserializePayload_WithEntityParameters(IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEntityParameters(IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(EntityPayload));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(EntityPayload));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext() { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             // Assert
@@ -538,16 +539,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithEntityParametersTest))]
-        public void Can_DeserializePayload_WithEntityParameters_InUntypedMode(IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEntityParameters_InUntypedMode(IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(EntityPayload));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(EntityPayload));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.NotNull(payload);
@@ -567,28 +568,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         private const string EntityCollectionPayload =
-            "{" +
-                "\"Id\": 1, " +
-                "\"Customers\": [" +
-                    "{\"@odata.type\":\"#A.B.Customer\", \"Id\":109,\"Name\":\"Avatar\" }, " +
-                    // null can't work. see: https://github.com/OData/odata.net/issues/100
-                    // "null," +
-                    "{\"@odata.type\":\"#A.B.Customer\", \"Id\":901,\"Name\":\"Robot\" } " +
-                 "]" +
-            "}";
+"{" +
+    "\"Id\": 1, " +
+    "\"Customers\": [" +
+        "{\"@odata.type\":\"#A.B.Customer\", \"Id\":109,\"Name\":\"Avatar\" }, " +
+        // null can't work. see: https://github.com/OData/odata.net/issues/100
+        // "null," +
+        "{\"@odata.type\":\"#A.B.Customer\", \"Id\":901,\"Name\":\"Robot\" } " +
+        "]" +
+"}";
 
         [Theory]
         [MemberData(nameof(DeserializeWithEntityCollectionsTest))]
-        public void Can_DeserializePayload_WithEntityCollectionParameters(IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEntityCollectionParameters(IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(EntityCollectionPayload));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(EntityCollectionPayload));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext() { Path = path, Model = _model };
 
             // Act
-            ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+            ODataActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
             IEdmAction action = ODataActionPayloadDeserializer.GetAction(context);
 
             // Assert
@@ -613,16 +614,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithEntityCollectionsTest))]
-        public void Can_DeserializePayload_WithEntityCollectionParameters_InUntypedMode(IEdmAction expectedAction, ODataPath path)
+        public async Task Can_DeserializePayload_WithEntityCollectionParameters_InUntypedMode(IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(EntityCollectionPayload));
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(EntityCollectionPayload));
             message.SetHeader("Content-Type", "application/json");
             ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model, ResourceType = typeof(ODataUntypedActionParameters) };
 
             // Act
-            ODataUntypedActionParameters payload = _deserializer.Read(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
+            ODataUntypedActionParameters payload = await _deserializer.ReadAsync(reader, typeof(ODataUntypedActionParameters), context) as ODataUntypedActionParameters;
 
             // Assert
             Assert.Same(expectedAction, payload.Action);
@@ -645,20 +646,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(DeserializeWithPrimitiveParametersTest))]
-        public void Throws_ODataException_When_Parameter_Notfound(string actionName, IEdmAction expectedAction, ODataPath path)
+        public void ThrowsAsync_ODataException_When_Parameter_Notfound(string actionName, IEdmAction expectedAction, ODataPath path)
         {
             // Arrange
             const string Body = @"{ ""Quantity"": 1 , ""ProductCode"": ""PCode"", ""MissingParameter"": 1 }";
-            ODataMessageWrapper message = new ODataMessageWrapper(GetStringAsStream(Body));
+            IODataRequestMessageAsync message = new ODataMessageWrapper(GetStringAsStreamAsync(Body).Result);
             message.SetHeader("Content-Type", "application/json");
-            ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
+            ODataMessageReader reader = new ODataMessageReader(message, new ODataMessageReaderSettings(), _model);
             ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model };
 
             // Act & Assert
             Assert.NotNull(expectedAction);
             ExceptionAssert.Throws<ODataException>(() =>
             {
-                ODataActionParameters payload = _deserializer.Read(reader, typeof(ODataActionParameters), context) as ODataActionParameters;
+                ODataActionParameters payload = _deserializer.ReadAsync(reader, typeof(ODataActionParameters), context).Result as ODataActionParameters;
             }, "The parameter 'MissingParameter' in the request payload is not a valid parameter for the operation '" + actionName + "'.");
         }
 
@@ -777,12 +778,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             return builder.GetEdmModel();
         }
 
-        private static Stream GetStringAsStream(string body)
+        private static async Task<Stream> GetStringAsStreamAsync(string body)
         {
             Stream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
-            writer.Write(body);
-            writer.Flush();
+            await writer.WriteAsync(body);
+            await writer.FlushAsync();
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
         }

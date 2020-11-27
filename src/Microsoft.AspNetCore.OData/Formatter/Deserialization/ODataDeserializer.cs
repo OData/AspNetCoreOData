@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
@@ -40,6 +41,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         public virtual object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             throw Error.NotSupported(SRResources.DeserializerDoesNotSupportRead, GetType().Name);
+        }
+
+        /// <summary>
+        /// Reads an <see cref="IODataRequestMessage"/> using messageReader.
+        /// </summary>
+        /// <param name="messageReader">The messageReader to use.</param>
+        /// <param name="type">The type of the object to read into.</param>
+        /// <param name="readContext">The read context.</param>
+        /// <returns>The deserialized object.</returns>
+        public virtual Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        {
+            return Task.Run(() => Read(messageReader, type, readContext));
         }
     }
 }

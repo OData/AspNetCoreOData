@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     internal class ODataBodyModelBinder : IModelBinder
     {
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We don't want to fail in model binding.")]
-        public Task BindModelAsync(ModelBindingContext bindingContext)
+        public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext == null)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IDictionary<string, object> values = odataFeature?.BodyValues;
             if (values == null)
             {
-                values = ReadODataBody(bindingContext);
+                values = await ReadODataBody(bindingContext).ConfigureAwait(false);
                 if (values == null)
                 {
                     values = new Dictionary<string, object>();
@@ -63,10 +63,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 //bindingContext.ModelState.SetModelValue(bindingContext.ModelName, valueProviderResult);
 
                 bindingContext.Result = ModelBindingResult.Success(result);
-                return Task.CompletedTask;
             }
-
-            return Task.CompletedTask;
         }
 
         internal static ODataDeserializerContext BuildDeserializerContext(ModelBindingContext bindingContext/*, IEdmTypeReference edmTypeReference*/)
@@ -86,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
-        public static IDictionary<string, object> ReadODataBody(ModelBindingContext bindingContext)
+        public static async Task<IDictionary<string, object>> ReadODataBody(ModelBindingContext bindingContext)
         {
             ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();
             if (deserializer == null)
@@ -108,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = request.GetModel();
             using (var messageReader = new ODataMessageReader(oDataRequestMessage, null, model))
             {
-                var result = deserializer.Read(messageReader, typeof(ODataActionParameters), context);
+                var result = await deserializer.ReadAsync(messageReader, typeof(ODataActionParameters), context).ConfigureAwait(false);
                 return result as ODataActionParameters;
             }
         }

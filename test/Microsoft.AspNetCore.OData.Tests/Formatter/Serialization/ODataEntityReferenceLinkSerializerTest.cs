@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.TestCommon;
@@ -16,40 +17,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
     public class ODataEntityReferenceLinkSerializerTest
     {
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObject_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
             ODataEntityReferenceLinkSerializer serializer = new ODataEntityReferenceLinkSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(ODataEntityReferenceLink), messageWriter: null,
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(ODataEntityReferenceLink), messageWriter: null,
                     writeContext: new ODataSerializerContext()),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_WriteContext()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange
             ODataEntityReferenceLinkSerializer serializer = new ODataEntityReferenceLinkSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(ODataEntityReferenceLink),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(ODataEntityReferenceLink),
                     messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public void WriteObject_Throws_ObjectCannotBeWritten_IfGraphIsNotUri()
+        public async Task WriteObjectAsync_Throws_ObjectCannotBeWritten_IfGraphIsNotUri()
         {
             // Arrange
             ODataEntityReferenceLinkSerializer serializer = new ODataEntityReferenceLinkSerializer();
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.WriteObject(graph: "not uri", type: typeof(ODataEntityReferenceLink),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => serializer.WriteObjectAsync(graph: "not uri", type: typeof(ODataEntityReferenceLink),
                     messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: new ODataSerializerContext()),
                 "ODataEntityReferenceLinkSerializer cannot write an object of type 'System.String'.");
         }
@@ -69,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         [Theory]
         [MemberData(nameof(SerializationTestData))]
-        public void ODataEntityReferenceLinkSerializer_Serializes_Uri(object link)
+        public async Task ODataEntityReferenceLinkSerializer_Serializes_Uri(object link)
         {
             // Arrange
             ODataEntityReferenceLinkSerializer serializer = new ODataEntityReferenceLinkSerializer();
@@ -86,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter writer = new ODataMessageWriter(message, settings);
 
             // Act
-            serializer.WriteObject(link, typeof(ODataEntityReferenceLink), writer, writeContext);
+            await serializer.WriteObjectAsync(link, typeof(ODataEntityReferenceLink), writer, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
             string result = new StreamReader(stream).ReadToEnd();
 

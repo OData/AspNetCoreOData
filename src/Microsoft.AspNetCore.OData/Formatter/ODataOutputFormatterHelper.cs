@@ -4,8 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.MediaType;
@@ -48,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable")]
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
-        internal static void WriteToStream(
+        internal static async Task WriteToStreamAsync(
             Type type,
             object value,
             IEdmModel model,
@@ -80,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, request.GetSubServiceProvider());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, request.GetSubServiceProvider());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -150,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     writeContext.SelectExpandClause = selectExpandDifferentFromQueryOptions;
                 }
 
-                serializer.WriteObject(value, type, messageWriter, writeContext);
+                await serializer.WriteObjectAsync(value, type, messageWriter, writeContext).ConfigureAwait(false);
             }
         }
 

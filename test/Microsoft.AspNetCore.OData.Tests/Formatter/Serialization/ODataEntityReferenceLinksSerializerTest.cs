@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -18,40 +19,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
     public class ODataEntityReferenceLinksSerializerTest
     {
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
             ODataEntityReferenceLinksSerializer serializer = new ODataEntityReferenceLinksSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(ODataEntityReferenceLinks), messageWriter: null,
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(ODataEntityReferenceLinks), messageWriter: null,
                     writeContext: new ODataSerializerContext()),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_WriteContext()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange
             ODataEntityReferenceLinksSerializer serializer = new ODataEntityReferenceLinksSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(ODataEntityReferenceLinks),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(ODataEntityReferenceLinks),
                     messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public void WriteObject_Throws_ObjectCannotBeWritten_IfGraphIsNotUri()
+        public async Task WriteObjectAsync_Throws_ObjectCannotBeWritten_IfGraphIsNotUri()
         {
             // Arrange
             ODataEntityReferenceLinksSerializer serializer = new ODataEntityReferenceLinksSerializer();
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.WriteObject(graph: "not uri", type: typeof(ODataEntityReferenceLinks),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => serializer.WriteObjectAsync(graph: "not uri", type: typeof(ODataEntityReferenceLinks),
                     messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: new ODataSerializerContext()),
                 "ODataEntityReferenceLinksSerializer cannot write an object of type 'System.String'.");
         }
@@ -66,11 +67,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 {
                     new Uri[] { uri1, uri2 },
 
-                    new ODataEntityReferenceLinks 
-                    { 
-                        Links = new ODataEntityReferenceLink[] 
-                        { 
-                            new ODataEntityReferenceLink{ Url = uri1 }, 
+                    new ODataEntityReferenceLinks
+                    {
+                        Links = new ODataEntityReferenceLink[]
+                        {
+                            new ODataEntityReferenceLink{ Url = uri1 },
                             new ODataEntityReferenceLink{ Url = uri2 }
                         }
                     }
@@ -80,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         [Theory]
         [MemberData(nameof(SerializationTestData))]
-        public void ODataEntityReferenceLinkSerializer_Serializes_UrisAndEntityReferenceLinks(object uris)
+        public async Task ODataEntityReferenceLinkSerializer_Serializes_UrisAndEntityReferenceLinks(object uris)
         {
             // Arrange
             ODataEntityReferenceLinksSerializer serializer = new ODataEntityReferenceLinksSerializer();
@@ -97,9 +98,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter writer = new ODataMessageWriter(message, settings);
 
             // Act
-            serializer.WriteObject(uris, typeof(ODataEntityReferenceLinks), writer, writeContext);
+            await serializer.WriteObjectAsync(uris, typeof(ODataEntityReferenceLinks), writer, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
-            string result = new StreamReader(stream).ReadToEnd();
+            string result = await new StreamReader(stream).ReadToEndAsync();
 
             // Assert
             Assert.Equal("{\"@odata.context\":\"http://any/$metadata#Collection($ref)\"," +
@@ -121,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         [Theory]
         [MemberData(nameof(SerializationTestData2))]
-        public void ODataEntityReferenceLinkSerializer_Serializes_UrisAndEntityReferenceLinks_WithCount(object uris)
+        public async Task ODataEntityReferenceLinkSerializer_Serializes_UrisAndEntityReferenceLinks_WithCount(object uris)
         {
             // Arrange
             //var config = RoutingConfigurationFactory.CreateWithRootContainer("OData");
@@ -143,9 +144,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter writer = new ODataMessageWriter(message, settings);
 
             // Act
-            serializer.WriteObject(uris, typeof(ODataEntityReferenceLinks), writer, writeContext);
+            await serializer.WriteObjectAsync(uris, typeof(ODataEntityReferenceLinks), writer, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
-            string result = new StreamReader(stream).ReadToEnd();
+            string result = await new StreamReader(stream).ReadToEndAsync();
             Assert.Equal(
                 string.Format("{0},{1},{2}",
                     "{\"@odata.context\":\"http://any/$metadata#Collection($ref)\"",

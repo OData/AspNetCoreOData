@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -22,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc/>
-        public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        public override Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
             if (graph == null)
             {
@@ -38,11 +39,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // TODO: Make the enum alias working
             if (TypeHelper.IsEnum(graph.GetType()))
             {
-                messageWriter.WriteValue(graph.ToString());
+                return messageWriter.WriteValueAsync(graph.ToString());
             }
             else
             {
-                messageWriter.WriteValue(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, writeContext?.TimeZone));
+                return messageWriter.WriteValueAsync(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, writeContext?.TimeZone));
             }
         }
     }

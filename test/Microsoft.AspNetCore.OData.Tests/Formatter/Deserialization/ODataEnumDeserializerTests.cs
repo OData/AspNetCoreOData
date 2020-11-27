@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -17,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
-        public void ReadFromStreamAsync()
+        public async Task ReadFromStreamAsync()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
@@ -32,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddModel("odata", _edmModel));
 
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
                 typeof(Color), readContext);
 
             // Assert
@@ -41,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFromStreamAsync_RawValue()
+        public async Task ReadFromStreamAsync_RawValue()
         {
             // Arrange
             string content = "{\"value\":\"Blue\"}";
@@ -55,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
 
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
                 typeof(Color), readContext);
 
             // Assert
@@ -64,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFromStreamAsync_ForUnType()
+        public async Task ReadFromStreamAsync_ForUnType()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
@@ -78,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
 
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
                 typeof(Color), readContext);
 
             // Assert
@@ -89,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFromStreamAsync_ModelAlias()
+        public async Task ReadFromStreamAsync_ModelAlias()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}";
@@ -108,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
 
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),
                 typeof(Level), readContext);
 
             // Assert

@@ -218,11 +218,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
             try
             {
                 // TODO: We should remove this and make other serializers call using Async?
-                var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
-                if (body != null)
-                {
-                    body.AllowSynchronousIO = true;
-                }
+                //var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
+                //if (body != null)
+                //{
+                //    body.AllowSynchronousIO = true;
+                //}
 
                 HttpResponse response = context.HttpContext.Response;
                 Uri baseAddress = GetBaseAddressInternal(request);
@@ -230,7 +230,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
 
-                ODataOutputFormatterHelper.WriteToStream(
+                return ODataOutputFormatterHelper.WriteToStreamAsync(
                     type,
                     context.Object,
                     request.GetModel(),
@@ -241,7 +241,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     request.Headers,
                     serializerProvider);
 
-                return Task.CompletedTask;
+                //return Task.CompletedTask;
             }
             catch (Exception ex)
             {

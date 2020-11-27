@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -30,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc/>
-        public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter,
+        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter,
             ODataSerializerContext writeContext)
         {
             if (messageWriter == null)
@@ -47,8 +48,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(collectionType != null);
 
             IEdmTypeReference elementType = GetElementType(collectionType);
-            ODataCollectionWriter writer = messageWriter.CreateODataCollectionWriter(elementType);
-            WriteCollection(writer, graph, collectionType.AsCollection(), writeContext);
+            ODataCollectionWriter writer = await messageWriter.CreateODataCollectionWriterAsync(elementType)
+                .ConfigureAwait(false);
+            await WriteCollectionAsync(writer, graph, collectionType.AsCollection(), writeContext).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -70,6 +72,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return CreateODataCollectionValue(enumerable, elementType, writeContext);
         }
 
+
         /// <summary>
         /// Writes the given <paramref name="graph"/> using the given <paramref name="writer"/>.
         /// </summary>
@@ -77,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="graph">The collection to write.</param>
         /// <param name="collectionType">The EDM type of the collection.</param>
         /// <param name="writeContext">The serializer context.</param>
-        public virtual void WriteCollection(ODataCollectionWriter writer, object graph, IEdmTypeReference collectionType,
+        public virtual async Task WriteCollectionAsync(ODataCollectionWriter writer, object graph, IEdmTypeReference collectionType,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -112,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            writer.WriteStart(collectionStart);
+            await writer.WriteStartAsync(collectionStart).ConfigureAwait(false);
 
             if (graph != null)
             {
@@ -121,12 +124,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     foreach (object item in collectionValue.Items)
                     {
-                        writer.WriteItem(item);
+                        await writer.WriteItemAsync(item).ConfigureAwait(false);
                     }
                 }
             }
 
-            writer.WriteEnd();
+            await writer.WriteEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>

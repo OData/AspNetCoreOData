@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -17,43 +18,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         private Type _workspaceType = typeof(ODataServiceDocument);
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
             ODataServiceDocumentSerializer serializer = new ODataServiceDocumentSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(42, _workspaceType, messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(42, _workspaceType, messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_Graph()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_Graph()
         {
             // Arrange
             ODataServiceDocumentSerializer serializer = new ODataServiceDocumentSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(null, type: _workspaceType, messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(null, type: _workspaceType, messageWriter: null, writeContext: null),
                 "graph");
         }
 
         [Fact]
-        public void WriteObject_Throws_CannotWriteType()
+        public async Task WriteObjectAsync_Throws_CannotWriteType()
         {
             // Arrange
             ODataServiceDocumentSerializer serializer = new ODataServiceDocumentSerializer();
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.WriteObject(42, _workspaceType, messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => serializer.WriteObjectAsync(42, _workspaceType, messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: null),
                 "ODataServiceDocumentSerializer cannot write an object of type 'ODataServiceDocument'.");
         }
 
         [Fact]
-        public void ODataServiceDocumentSerializer_Works()
+        public async Task ODataServiceDocumentSerializer_Works()
         {
             // Arrange
             ODataServiceDocumentSerializer serializer = new ODataServiceDocumentSerializer();
@@ -69,8 +70,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter writer = new ODataMessageWriter(message, settings);
 
             // Act
-            serializer.WriteObject(new ODataServiceDocument(), _workspaceType, writer, new ODataSerializerContext());
-            stream.FlushAsync();
+            await serializer.WriteObjectAsync(new ODataServiceDocument(), _workspaceType, writer, new ODataSerializerContext());
+            await stream.FlushAsync();
             stream.Seek(0, SeekOrigin.Begin);
             string result = new StreamReader(stream).ReadToEnd();
 

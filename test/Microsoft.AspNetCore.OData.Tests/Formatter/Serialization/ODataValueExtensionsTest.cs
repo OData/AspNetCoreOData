@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     { new ODataNullValue(), null },
                     { collectionValue, collectionValue },
                     { streamReferenceValue, streamReferenceValue },
-                    { null, null } 
+                    { null, null }
                 };
             }
         }

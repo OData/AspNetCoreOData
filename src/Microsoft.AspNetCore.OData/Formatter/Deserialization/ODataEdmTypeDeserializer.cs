@@ -3,6 +3,7 @@
 
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
