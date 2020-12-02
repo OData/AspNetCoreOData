@@ -501,7 +501,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     return responseValue.GetType();
                 }
 
-                enumerable = singleResultCollection as IEnumerable;
+                enumerable = singleResultCollection;
             }
 
             Type elementClrType = TypeHelper.GetImplementedIEnumerableType(enumerable.GetType());
@@ -529,8 +529,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="queryOptions">
         /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
         /// </param>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "Response disposed after being sent.")]
         public virtual void ValidateQuery(HttpRequest request, ODataQueryOptions queryOptions)
         {
             if (request == null)
@@ -559,7 +557,7 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Determine if the 
+        /// Determine if the query containes auto select expand property.
         /// </summary>
         /// <param name="responseValue">The response value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
@@ -647,9 +645,9 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
         /// querying.
         /// </summary>
-        /// <param name = "elementClrType" > The CLR type to retrieve a model for.</param>
-        /// <param name = "request" > The request message to retrieve a model for.</param>
-        /// <param name = "actionDescriptor" > The action descriptor for the action being queried on.</param>
+        /// <param name="elementClrType">The CLR type to retrieve a model for.</param>
+        /// <param name="request">The request message to retrieve a model for.</param>
+        /// <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
         /// <returns>The EDM model for the given type and request.</returns>
         public static IEdmModel GetModel(
             Type elementClrType,
@@ -659,7 +657,8 @@ namespace Microsoft.AspNetCore.OData.Query
             // Get model for the request
             IEdmModel model = request.GetModel();
 
-            if (model == EdmCoreModel.Instance || model.GetEdmType(elementClrType) == null)
+            if (model == null ||
+                model == EdmCoreModel.Instance || model.GetEdmType(elementClrType) == null)
             {
                 // user has not configured anything or has registered a model without the element type
                 // let's create one just for this type and cache it in the action descriptor

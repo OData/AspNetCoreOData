@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.HttpContext.ODataFeature();
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.HttpContext.ODataBatchFeature();
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.ODataFeature().Model;
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             ODataPath path = request.ODataFeature().Path;
@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataMessageReaderSettings>();
@@ -109,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataMessageWriterSettings>();
@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             UriBuilder uriBuilder = new UriBuilder(request.Scheme, request.Host.Host)
@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (request.HttpContext == null)
@@ -340,7 +340,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             ODataFeature feature = request.ODataFeature() as ODataFeature;
@@ -352,7 +352,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataServiceVersionHeader);
@@ -362,7 +362,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMaxServiceVersionHeader);
@@ -372,7 +372,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMinServiceVersionHeader);
