@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// If two conventions have the same numeric value of <see cref="Order"/>, then their relative execution order
         /// is undefined.
         /// </para>
-        public int Order { get; }
+        int Order { get; }
 
         /// <summary>
         /// Applies the convention on controller

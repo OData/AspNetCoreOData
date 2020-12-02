@@ -22,14 +22,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     public class OperationImportRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public int Order => 900;
+        public virtual int Order => 900;
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             // By convention, we look for the controller name as "ODataOperationImportController"
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             ActionModel action = context.Action;
