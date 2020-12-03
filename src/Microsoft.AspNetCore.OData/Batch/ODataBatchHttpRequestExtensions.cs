@@ -290,7 +290,21 @@ namespace Microsoft.AspNetCore.OData.Batch
                 return new Uri(request.GetDisplayUrl());
             }
 
+            // Maybe we can just do:
+            // string requestUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, request.Path);
+            // use requestUri to remove the "$batch"?
+
             request.ODataFeature().PrefixName = oDataPrefixName;
+
+            RouteValueDictionary batchRouteData = request.ODataFeature().BatchRouteData;
+            if (batchRouteData != null && batchRouteData.Any())
+            {
+                foreach (var data in batchRouteData)
+                {
+                    request.RouteValues.Add(data.Key, data.Value);
+                }
+            }
+
             return new Uri(request.CreateODataLink());
         }
 

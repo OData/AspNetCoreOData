@@ -1,9 +1,8 @@
-﻿using Microsoft.OData.Edm;
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+
+using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ODataRoutingSample.Models
 {
@@ -51,6 +50,7 @@ namespace ODataRoutingSample.Models
         public static IEdmModel GetEdmModelV1()
         {
             var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Company>("Companies");
             builder.EntitySet<Customer>("Customers");
             builder.Singleton<Customer>("Me");
 

@@ -7428,7 +7428,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ContainsAutoSelectExpandProperty(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Determine if the 
+            Determine if the query containes auto select expand property.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
@@ -7441,9 +7441,9 @@
             Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
             querying.
             </summary>
-            <param name = "elementClrType" > The CLR type to retrieve a model for.</param>
-            <param name = "request" > The request message to retrieve a model for.</param>
-            <param name = "actionDescriptor" > The action descriptor for the action being queried on.</param>
+            <param name="elementClrType">The CLR type to retrieve a model for.</param>
+            <param name="request">The request message to retrieve a model for.</param>
+            <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
             <returns>The EDM model for the given type and request.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ETag">
