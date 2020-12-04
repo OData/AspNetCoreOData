@@ -48,7 +48,6 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableSkipToken  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] Models  { public get; }
-	bool OmitNullDynamicProperty  { public get; public set; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
 
@@ -68,7 +67,6 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions SetCompatibilityOptions (bool enabled)
 	public Microsoft.AspNetCore.OData.ODataOptions SetContinueOnErrorHeader (bool enableContinueOnError)
 	public Microsoft.AspNetCore.OData.ODataOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.ODataOptions SetNullDynamicProperty (bool enabled)
 	public Microsoft.AspNetCore.OData.ODataOptions SetTimeZoneInfo (System.TimeZoneInfo timeZoneInfo)
 	public Microsoft.AspNetCore.OData.ODataOptions SetUrlKeyDelimiter (Microsoft.OData.ODataUrlKeyDelimiter keyDelimiter)
 	public Microsoft.AspNetCore.OData.ODataOptions SkipToken ()

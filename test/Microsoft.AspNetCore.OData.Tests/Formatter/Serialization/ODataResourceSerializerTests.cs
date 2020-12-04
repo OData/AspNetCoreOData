@@ -922,10 +922,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(new DateTimeOffset(dateTime), dateTimeProperty.Value);
         }
 
-        [Theory]
-        [InlineData(true, 4)]
-        [InlineData(false, 3)]
-        public void CreateResource_Works_ToAppendNullDynamicProperties_ForOpenEntityType(bool enableNullDynamicProperty, int count)
+        [Fact]
+        public void CreateResource_Works_ToAppendNullDynamicProperties_ForOpenEntityType()
         {
             // Arrange
             IEdmModel model = SerializationTestsHelpers.SimpleOpenTypeModel();
@@ -952,7 +950,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model).SetNullDynamicProperty(enableNullDynamicProperty));
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
             request.ODataFeature().PrefixName = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
@@ -986,7 +984,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Equal("Default.Customer", resource.TypeName);
-            Assert.Equal(count, resource.Properties.Count());
+            Assert.Equal(3, resource.Properties.Count());
 
             // Verify the declared properties
             ODataProperty street = Assert.Single(resource.Properties.Where(p => p.Name == "CustomerId"));
@@ -1003,15 +1001,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"), guidProperty.Value);
 
             ODataProperty nullProperty = resource.Properties.SingleOrDefault(p => p.Name == "NullProperty");
-            if (enableNullDynamicProperty)
-            {
-                Assert.NotNull(nullProperty);
-                Assert.Null(nullProperty.Value);
-            }
-            else
-            {
-                Assert.Null(nullProperty);
-            }
+            Assert.Null(nullProperty);
         }
 
         [Fact]

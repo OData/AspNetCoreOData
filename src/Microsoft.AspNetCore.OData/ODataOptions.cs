@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
@@ -37,23 +36,6 @@ namespace Microsoft.AspNetCore.OData
         public ODataOptions SetUrlKeyDelimiter(ODataUrlKeyDelimiter keyDelimiter)
         {
             UrlKeyDelimiter = keyDelimiter;
-            return this;
-        }
-
-        /// <summary>
-        /// Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
-        /// By default, it's true;
-        /// </summary>
-        public bool OmitNullDynamicProperty { get; set; } = true;
-
-        /// <summary>
-        ///Sets a value indicating if value should be emitted for dynamic properties which are null.
-        /// </summary>
-        /// <param name="enabled">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetNullDynamicProperty(bool enabled)
-        {
-            OmitNullDynamicProperty = enabled;
             return this;
         }
 

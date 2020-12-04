@@ -540,14 +540,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 nullDynamicPropertyEnabled = true;
             }
-            else if (resourceContext.Request != null)
-            {
-                ODataOptions options = resourceContext.Request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
-                if (options != null)
-                {
-                    nullDynamicPropertyEnabled = options.OmitNullDynamicProperty;
-                }
-            }
 
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;

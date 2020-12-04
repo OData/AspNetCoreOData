@@ -5201,19 +5201,6 @@
             <param name="keyDelimiter">The key demimiter.</param>
             <returns>The calling itself.</returns>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.OmitNullDynamicProperty">
-            <summary>
-            Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
-            By default, it's true;
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetNullDynamicProperty(System.Boolean)">
-             <summary>
-            Sets a value indicating if value should be emitted for dynamic properties which are null.
-             </summary>
-             <param name="enabled">The boolean value.</param>
-             <returns>The calling itself.</returns>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader">
             <summary>
             Gets or Sets a value indicating if batch requests should continue on error.

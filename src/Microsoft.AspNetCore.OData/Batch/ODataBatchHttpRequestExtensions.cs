@@ -14,9 +14,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Headers;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -184,7 +181,6 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
         }
 
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing the object.")]
         internal static Task CreateODataBatchResponseAsync(this HttpRequest request, IEnumerable<ODataBatchResponseItem> responses, ODataMessageQuotas messageQuotas)
         {
             Contract.Assert(request != null);
@@ -231,7 +227,6 @@ namespace Microsoft.AspNetCore.OData.Batch
             return batchContent.SerializeToStreamAsync(response.Body);
         }
 
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing the object.")]
         internal static async Task<bool> ValidateODataBatchRequest(this HttpRequest request)
         {
             Contract.Assert(request != null);
@@ -320,11 +315,6 @@ namespace Microsoft.AspNetCore.OData.Batch
             return request.ODataMaxServiceVersion() ??
                 request.ODataServiceVersion() ??
                 ODataVersionConstraint.DefaultODataVersion;
-        }
-
-        internal class ODataEndpointFeature : IEndpointFeature
-        {
-            public Endpoint Endpoint { get; set; }
         }
     }
 }
