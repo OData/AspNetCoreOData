@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
     {
         public static IEdmModel GetEdmModel()
         {
-            var builder = new ODataConventionModelBuilder(); ;
+            var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Customer>("Customers");
             return builder.GetEdmModel();
         }
