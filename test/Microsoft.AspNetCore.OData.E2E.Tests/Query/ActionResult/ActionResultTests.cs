@@ -20,9 +20,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
     /// </summary>
     public class ActionResultTests : WebODataTestBase<ActionResultTests.Startup>
     {
-        /// <summary>
-        /// Test startup class.
-        /// </summary>
         public class Startup : TestStartupBase
         {
             public override void ConfigureServices(IServiceCollection services)
