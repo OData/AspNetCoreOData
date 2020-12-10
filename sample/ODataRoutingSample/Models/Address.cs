@@ -9,4 +9,14 @@ namespace ODataRoutingSample.Models
 
         public string Street { get; set; }
     }
+
+    public class CnAddress : Address
+    {
+        public string Postcode { get; set; }
+    }
+
+    public class UsAddress : Address
+    {
+        public string Zipcode { get; set; }
+    }
 }

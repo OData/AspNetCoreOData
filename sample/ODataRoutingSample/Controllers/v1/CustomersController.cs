@@ -23,42 +23,7 @@ namespace ODataRoutingSample.Controllers.v1
             _context = context;
             if (_context.Customers.Count() == 0)
             {
-                IList<Customer> customers = new List<Customer>
-                {
-                    new Customer
-                    {
-                        Name = "Jonier",
-                        FavoriteColor = Color.Red,
-                        HomeAddress = new Address { City = "Redmond", Street = "156 AVE NE"},
-                        FavoriteAddresses = new List<Address>
-                        {
-                            new Address { City = "Redmond", Street = "256 AVE NE"},
-                            new Address { City = "Redd", Street = "56 AVE NE"},
-                        },
-                    },
-                    new Customer
-                    {
-                        Name = "Sam",
-                        FavoriteColor = Color.Blue,
-                        HomeAddress = new Address { City = "Bellevue", Street = "Main St NE"},
-                        FavoriteAddresses = new List<Address>
-                        {
-                            new Address { City = "Red4ond", Street = "456 AVE NE"},
-                            new Address { City = "Re4d", Street = "51 NE"},
-                        },
-                    },
-                    new Customer
-                    {
-                        Name = "Peter",
-                        FavoriteColor = Color.Green,
-                        HomeAddress = new Address {  City = "Hollewye", Street = "Main St NE"},
-                        FavoriteAddresses = new List<Address>
-                        {
-                            new Address { City = "R4mond", Street = "546 NE"},
-                            new Address { City = "R4d", Street = "546 AVE"},
-                        },
-                    },
-                };
+                IList<Customer> customers = GetCustomers();
 
                 foreach (var customer in customers)
                 {
@@ -71,15 +36,9 @@ namespace ODataRoutingSample.Controllers.v1
 
         [HttpGet]
         [EnableQuery]
-        public IEnumerable<Customer> Get()
+        public IActionResult Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Customer
-            {
-                Id = index,
-                Name = "Name + " + index
-            })
-            .ToArray();
+            return Ok(GetCustomers());
         }
 
         [HttpGet]
@@ -114,6 +73,46 @@ namespace ODataRoutingSample.Controllers.v1
         public IActionResult BoundAction(int key, ODataActionParameters parameters)
         {
             return Ok($"BoundAction of Customers with key {key} : {System.Text.Json.JsonSerializer.Serialize(parameters)}");
+        }
+
+        private static IList<Customer> GetCustomers()
+        {
+            return new List<Customer>
+            {
+                new Customer
+                {
+                    Name = "Jonier",
+                    FavoriteColor = Color.Red,
+                    HomeAddress = new Address { City = "Redmond", Street = "156 AVE NE" },
+                    FavoriteAddresses = new List<Address>
+                    {
+                        new Address { City = "Redmond", Street = "256 AVE NE" },
+                        new Address { City = "Redd", Street = "56 AVE NE" },
+                    },
+                },
+                new Customer
+                {
+                    Name = "Sam",
+                    FavoriteColor = Color.Blue,
+                    HomeAddress = new CnAddress { City = "Bellevue", Street = "Main St NE", Postcode = "201100" },
+                    FavoriteAddresses = new List<Address>
+                    {
+                        new Address { City = "Red4ond", Street = "456 AVE NE" },
+                        new Address { City = "Re4d", Street = "51 NE" },
+                    },
+                },
+                new Customer
+                {
+                    Name = "Peter",
+                    FavoriteColor = Color.Green,
+                    HomeAddress = new UsAddress { City = "Hollewye", Street = "Main St NE", Zipcode = "98029" },
+                    FavoriteAddresses = new List<Address>
+                    {
+                        new Address { City = "R4mond", Street = "546 NE" },
+                        new Address { City = "R4d", Street = "546 AVE" },
+                    },
+                }
+            };
         }
     }
 }
