@@ -15,6 +15,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 {
+#if false
     // The test can't work in EFCore, because it's not supported with Groupby and selectmany on collection.
     // Later, we'd swith it to EF6.
     public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
@@ -198,4 +199,5 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(2 * (25 + 75), customerOnePrice);
         }
     }
+#endif
 }

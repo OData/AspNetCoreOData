@@ -24,6 +24,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 {
+#if false
     public class BoundOperationTest : WebODataTestBase<BoundOperationTest.Startup>
     {
         public class Startup : TestStartupBase
@@ -78,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             var edmModel = reader.ReadMetadataDocument();
 
             // Assert
-            #region functions
+#region functions
             // Function GetCount
             var iEdmOperationsOfGetCount = edmModel.FindDeclaredOperations("Default.GetCount");
             Assert.Equal(3, iEdmOperationsOfGetCount.Count());
@@ -133,9 +134,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Function with optional parameters
             AssertOperationWithOptionalParameter(edmModel, "Default.GetWholeSalary");
 
-            #endregion
+#endregion
 
-            #region actions
+#region actions
 
             // Action IncreaseSalary
             var iEdmOperationOfIncreaseSalary = edmModel.FindDeclaredOperations("Default.IncreaseSalary");
@@ -176,7 +177,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Action with optional parameters
             AssertOperationWithOptionalParameter(edmModel, "Default.IncreaseWholeSalary");
 
-            #endregion
+#endregion
 
             // ActionImport: ResetDataSource
             Assert.Single(edmModel.EntityContainer.OperationImports());
@@ -284,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             Assert.Equal("Collection(NS.Employee)", parameter.Type.FullName());
             Assert.True(parameter.Type.IsNullable);
         }
-        #region functions
+#region functions
 
         /*
         [Theory]
@@ -698,9 +699,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             // Assert
             response.EnsureSuccessStatusCode();
         }
-        #endregion
+#endregion
 
-        #region actions
+#region actions
 
         [Theory]
         [InlineData("ConventionRouting/Employees/Default.IncreaseSalary", 2)]//Convention routing
@@ -920,7 +921,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             Assert.Contains($"/{route}/$metadata#Edm.Boolean\",\"value\":true", responseString);
         }
         */
-        #endregion
+#endregion
     }
 
     public class MyAttributeRoutingConvention : AttributeRoutingConvention
@@ -940,4 +941,5 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return false;
         }
     }
+#endif
 }

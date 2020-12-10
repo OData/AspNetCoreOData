@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
+#if false
     public class SelectImprovementOnComplexTypeTests : WebODataTestBase<SelectImprovementOnComplexTypeTests.Startup>
     {
         public class Startup : TestStartupBase
@@ -31,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         {
         }
 
-        #region SubProperty on Single ComplexProperty
+#region SubProperty on Single ComplexProperty
         [Theory]
         [InlineData("HomeLocation/Street,HomeLocation/TaxNo")]
         [InlineData("HomeLocation($select=Street,TaxNo)")]
@@ -143,9 +144,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
-        #endregion
+#endregion
 
-        #region SubProperty On Collection ComplexProperty
+#region SubProperty On Collection ComplexProperty
         [Theory]
         [InlineData("RepoLocations/Street,RepoLocations/TaxNo,RepoLocations/RelatedInfo")]
         [InlineData("RepoLocations($select=Street,TaxNo,RelatedInfo)")]
@@ -225,9 +226,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
-        #endregion
+#endregion
 
-        #region Nested query option on select
+#region Nested query option on select
         [Theory]
         [InlineData("Taxes", "\"Taxes\":[7,5,9]")]
         [InlineData("Taxes($filter=$it eq 5)", "\"Taxes\":[5]")]
@@ -380,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
-        #endregion
+#endregion
 
         [Theory]
         [InlineData("HomeLocation/Street")]
@@ -532,5 +533,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             return result;
         }
     }
+#endif
 }
 

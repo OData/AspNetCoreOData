@@ -20,6 +20,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
+#if false
     public class EnumsTest : WebODataTestBase<EnumsTest.EnumsTestStartup>
     {
         public class EnumsTestStartup : TestStartupBase
@@ -42,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
         }
 
-        #region ModelBuilder
+#region ModelBuilder
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
@@ -126,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(EdmTypeKind.Enum, iEdmOperationParameterOfHasAccessLevel.Type.Definition.TypeKind);
         }
 
-        #endregion
+#endregion
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -374,7 +375,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(3, secondEmployee["ID"]);
         }
 
-        #region Update
+#region Update
 
         //[Fact]
         //public async Task AddEntity()
@@ -553,9 +554,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-        #endregion
+#endregion
 
-        #region Delete
+#region Delete
 
         [Fact]
         public async Task DeleteEntity()
@@ -588,9 +589,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-        #endregion
+#endregion
 
-        #region Enum with action
+#region Enum with action
 
         [Fact]
         public async Task EnumInActionParameter()
@@ -628,9 +629,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal("Read, Write", value);
         }
 
-        #endregion
+#endregion
 
-        #region Enum with function
+#region Enum with function
 
         [Fact]
         public async Task EnumInFunctionOutput()
@@ -663,7 +664,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(expectedValue, actualValue);
         }
 
-        #endregion
+#endregion
 
         private async Task<HttpResponseMessage> ResetDatasource()
         {
@@ -672,4 +673,5 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return response;
         }
     }
+#endif
 }
