@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
@@ -30,15 +31,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         }
 
         private const string PeopleBaseUrl = "odata/People";
-
-        public NavigationPropertyOnComplexTypeTests(WebODataTestFixture<Startup> factory)
+        private readonly ITestOutputHelper _testOutputHelper;
+        public NavigationPropertyOnComplexTypeTests(WebODataTestFixture<Startup> factory, ITestOutputHelper outputHelper)
             : base(factory)
         {
+            _testOutputHelper = outputHelper;
         }
 
         [Fact]
         public void QueryNavigationPropertyOnComplexProperty()
         {
+            _testOutputHelper.WriteLine("[Test] Start .........");
+
             // Arrange : GET ~/People(1)/HomeLocation/ZipCode
             string requestUri = PeopleBaseUrl + "(1)/HomeLocation/ZipCode";
 
@@ -47,6 +51,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, contains: null, equals: equals);
+
+            _testOutputHelper.WriteLine("[Test] Done .........");
         }
 #if false
         [Fact]
@@ -354,12 +360,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
+            _testOutputHelper.WriteLine("[Test] Before Send .........");
             // Act
             HttpResponseMessage response = Client.SendAsync(request).Result;
 
             // Assert
+            _testOutputHelper.WriteLine("[Test] After Send .........");
             string result = response.Content.ReadAsStringAsync().Result;
 
+            _testOutputHelper.WriteLine($"[Test] Result: {result}.........");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             // replace the real address using "BASE_ADDRESS"
@@ -378,6 +387,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             {
                 Assert.Equal(equals, result);
             }
+
+            _testOutputHelper.WriteLine($"[Test] Finished Compare!.........");
 
             return result;
         }
