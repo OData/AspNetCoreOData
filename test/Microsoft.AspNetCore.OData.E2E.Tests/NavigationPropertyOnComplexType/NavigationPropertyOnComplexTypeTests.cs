@@ -63,6 +63,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, contains: null, equals: equals);
         }
 
+#if false
         [Fact]
         public void QueryCollectionComplexTypePropertyWithSelectAndExpand()
         {
@@ -347,7 +348,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             // Act & Assert
             ExecuteAndVerifyQueryRequest(requestUri, contains: null, equals: equals);
         }
-
+#endif
         private string ExecuteAndVerifyQueryRequest(string requestUri, string contains = null, string equals = null)
         {
             // Arrange
