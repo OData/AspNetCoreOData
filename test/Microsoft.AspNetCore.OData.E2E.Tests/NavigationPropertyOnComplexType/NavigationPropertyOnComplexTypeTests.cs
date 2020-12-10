@@ -16,7 +16,6 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
-#if false
     public class NavigationPropertyOnComplexTypeTests : WebODataTestBase<NavigationPropertyOnComplexTypeTests.Startup>
     {
         public class Startup : TestStartupBase
@@ -383,6 +382,5 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             return result;
         }
     }
-#endif
 }
 
