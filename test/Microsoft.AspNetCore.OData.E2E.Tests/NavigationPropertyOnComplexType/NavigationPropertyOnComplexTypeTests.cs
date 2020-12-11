@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             _testOutputHelper = outputHelper;
         }
 
-        [Fact]
+        [Fact(Skip = "skip")]
         public void QueryNavigationPropertyOnComplexProperty2()
         {
             _testOutputHelper.WriteLine("[Test] Start .........");
