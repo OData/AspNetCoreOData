@@ -39,6 +39,23 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         }
 
         [Fact]
+        public void QueryNavigationPropertyOnComplexProperty2()
+        {
+            _testOutputHelper.WriteLine("[Test] Start .........");
+
+            // Arrange : GET ~/People(1)/HomeLocation/ZipCode
+            string requestUri = PeopleBaseUrl;
+
+            string equals = "{\"@odata.context\":\"BASE_ADDRESS/odata/$metadata#ZipCodes/$entity\"," +
+                "\"Zip\":98052,\"City\":\"Redmond\",\"State\":\"Washington\"}";
+
+            // Act & Assert
+            ExecuteAndVerifyQueryRequest(requestUri, contains: null, equals: equals);
+
+            _testOutputHelper.WriteLine("[Test] Done .........");
+        }
+
+        [Fact(Skip = "skip")]
         public void QueryNavigationPropertyOnComplexProperty()
         {
             _testOutputHelper.WriteLine("[Test] Start .........");
