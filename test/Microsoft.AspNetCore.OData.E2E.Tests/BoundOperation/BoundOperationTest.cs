@@ -24,7 +24,6 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 {
-#if false
     public class BoundOperationTest : WebODataTestBase<BoundOperationTest.Startup>
     {
         public class Startup : TestStartupBase
@@ -941,5 +940,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return false;
         }
     }
-#endif
 }

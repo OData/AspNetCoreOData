@@ -20,7 +20,6 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
-#if false
     public class EnumsTest : WebODataTestBase<EnumsTest.EnumsTestStartup>
     {
         public class EnumsTestStartup : TestStartupBase
@@ -673,5 +672,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return response;
         }
     }
-#endif
 }

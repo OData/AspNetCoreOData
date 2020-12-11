@@ -16,7 +16,6 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
 {
-#if false
     public class CastTest : WebODataTestBase<CastTest.CastTestStartup>
     {
         public class CastTestStartup : TestStartupBase
@@ -116,5 +115,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
                 expectedEntityCount, value.Count, requestUri));
         }
     }
-#endif
 }
