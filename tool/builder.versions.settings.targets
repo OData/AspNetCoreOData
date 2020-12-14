@@ -4,13 +4,13 @@
     <VersionMajor Condition="'$(VersionMajor)' == ''">8</VersionMajor>
     <VersionMinor Condition="'$(VersionMinor)' == ''">0</VersionMinor>
     <VersionBuild Condition="'$(VersionBuild)' == ''">0</VersionBuild>
-    <VersionRelease Condition="'$(VersionRelease)' == ''">preview2</VersionRelease>
+    <VersionRelease Condition="'$(VersionRelease)' == ''">preview3</VersionRelease>
   </PropertyGroup>
   
     <!-- For NuGet Package Dependencies -->
   <PropertyGroup>
     <ODataLibPackageDependency>[7.7.3, 8.0.0)</ODataLibPackageDependency>
-    <ODataModelBuilderPackageDependency>[1.0.4, 2.0.0)</ODataModelBuilderPackageDependency>
+    <ODataModelBuilderPackageDependency>[1.0.5, 2.0.0)</ODataModelBuilderPackageDependency>
   </PropertyGroup>
 
   <!--
