@@ -19,7 +19,7 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Results
 {
-    internal static partial class ResultHelpers
+    internal static class ResultHelpers
     {
         public const string EntityIdHeaderName = "OData-EntityId";
 

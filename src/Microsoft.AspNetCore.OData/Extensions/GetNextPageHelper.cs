@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
     /// <summary>
     /// Helper to generate next page links.
     /// </summary>
-    internal static partial class GetNextPageHelper
+    internal static class GetNextPageHelper
     {
         [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
         internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null, CompatibilityOptions options = CompatibilityOptions.None)
