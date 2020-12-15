@@ -65,21 +65,6 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         }
 
         /// <summary>
-        /// Creates the Test server using the service config and application builder action.
-        /// </summary>
-        /// <param name="configureServices">The service config.</param>
-        /// <param name="configureApp">The application builder.</param>
-        /// <returns>The created test server.</returns>
-        public static TestServer Create(Action<IServiceCollection> configureServices, Action<IApplicationBuilder> configureApp)
-        {
-            var builder = new WebHostBuilder()
-                .ConfigureServices(configureServices)
-                .Configure(configureApp);
-
-            return new TestServer(builder);
-        }
-
-        /// <summary>
         /// Creates the Test server using the startup class.
         /// </summary>
         /// <typeparam name="TStartup">The start up class type.</typeparam>
