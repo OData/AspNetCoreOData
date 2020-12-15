@@ -47,10 +47,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Get the content as the value of JsonElement.
         /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
+        /// <param name="content">The content.</param>
+        /// <returns>The content as Json element.</returns>
         public static async Task<JsonElement> ReadAsElement(this HttpContent content)
         {
             string json = await content.ReadAsStringAsync();
