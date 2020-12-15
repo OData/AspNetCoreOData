@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests
 {
+    // Sam's test changes
     public class ODataOptionsTests
     {
         [Fact]
