@@ -7267,6 +7267,18 @@
             Gets or sets the maximum number of expressions that can be present in the $orderby.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute._queryValidationRunBeforeActionExecution">
+            <summary>
+            Marks if the query validation was run before the action execution. This is not always possible.
+            For cases where the run failed before action execution. We will run validation on result.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute._processedQueryOptions">
+            <summary>
+            Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
+            This is because ValidateQuery internally modifies query options (expands are prime example of this).
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>
             Performs the query composition before action is executing.
