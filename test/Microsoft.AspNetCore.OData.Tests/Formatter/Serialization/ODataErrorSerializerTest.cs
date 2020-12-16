@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -16,70 +17,70 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
     public class ODataErrorSerializerTest
     {
         [Fact]
-        public void WriteObject_SupportsHttpError()
+        public void WriteObjectAsync_SupportsHttpError()
         {
             // Arrange
             ODataErrorSerializer serializer = new ODataErrorSerializer();
             SerializableError error = new SerializableError();
 
-            Mock<IODataResponseMessage> mockResponseMessage = new Mock<IODataResponseMessage>();
-            mockResponseMessage.Setup(response => response.GetStream()).Returns(new MemoryStream());
+            Mock<IODataResponseMessageAsync> mockResponseMessage = new Mock<IODataResponseMessageAsync>();
+            mockResponseMessage.Setup(response => response.GetStreamAsync()).ReturnsAsync(new MemoryStream());
 
             // Act & Assert
-            ExceptionAssert.DoesNotThrow(() =>
-                serializer.WriteObject(error, typeof(ODataError), new ODataMessageWriter(mockResponseMessage.Object), new ODataSerializerContext()));
+            ExceptionAssert.DoesNotThrow(() => serializer.WriteObjectAsync(error, typeof(ODataError), new ODataMessageWriter(mockResponseMessage.Object), new ODataSerializerContext())
+                .Wait());
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_Graph()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_Graph()
         {
             // Arrange
             ODataErrorSerializer serializer = new ODataErrorSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(ODataError),messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(ODataError), messageWriter: null, writeContext: null),
                 "graph");
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
             ODataErrorSerializer serializer = new ODataErrorSerializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: 42, type: typeof(ODataError), messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: 42, type: typeof(ODataError), messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_Throws_ErrorTypeMustBeODataErrorOrHttpError()
+        public async Task WriteObject_ThrowsAsync_ErrorTypeMustBeODataErrorOrHttpError()
         {
             // Arrange
             ODataErrorSerializer serializer = new ODataErrorSerializer();
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.WriteObject(42, typeof(ODataError), ODataTestUtil.GetMockODataMessageWriter(), new ODataSerializerContext()),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => serializer.WriteObjectAsync(42, typeof(ODataError), ODataTestUtil.GetMockODataMessageWriter(), new ODataSerializerContext()),
                 "The type 'System.Int32' is not supported by the ODataErrorSerializer. The type must be ODataError or HttpError.");
         }
 
         [Fact]
-        public void ODataErrorSerializer_Works()
+        public async Task ODataErrorSerializer_Works()
         {
             // Arrange
             ODataErrorSerializer serializer = new ODataErrorSerializer();
             MemoryStream stream = new MemoryStream();
-            IODataResponseMessage message = new ODataMessageWrapper(stream);
+            IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
             ODataError error = new ODataError { Message = "Error!!!" };
             ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
             settings.SetContentType(ODataFormat.Json);
             ODataMessageWriter writer = new ODataMessageWriter(message, settings);
 
             // Act
-            serializer.WriteObject(error, typeof(ODataError), writer, new ODataSerializerContext());
+            await serializer.WriteObjectAsync(error, typeof(ODataError), writer, new ODataSerializerContext());
             stream.Seek(0, SeekOrigin.Begin);
             string result = new StreamReader(stream).ReadToEnd();
 

@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public async Task Read_ReturnsEdmComplexObjectCollection_TypelessMode()
+        public async Task ReadAsync_ReturnsEdmComplexObjectCollection_TypelessMode()
         {
             // Arrange
             IEdmTypeReference addressType = _model.GetEdmTypeReference(typeof(Address)).AsComplex();
@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            IEnumerable result = deserializer.Read(reader, typeof(IEdmObject), readContext) as IEnumerable;
+            IEnumerable result = await deserializer.ReadAsync(reader, typeof(IEdmObject), readContext) as IEnumerable;
 
             // Assert
             var addresses = result.Cast<EdmComplexObject>();
@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_Roundtrip_ComplexCollection()
+        public async Task ReadAsync_Roundtrip_ComplexCollection()
         {
             // Arrange
             Address[] addresses = new[]
@@ -192,9 +192,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext readContext = new ODataDeserializerContext() { Model = _model };
 
             // Act
-            serializer.WriteObject(addresses, addresses.GetType(), messageWriter, writeContext);
+            await serializer.WriteObjectAsync(addresses, addresses.GetType(), messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
-            IEnumerable readAddresses = deserializer.Read(messageReader, typeof(Address[]), readContext) as IEnumerable;
+            IEnumerable readAddresses = await deserializer.ReadAsync(messageReader, typeof(Address[]), readContext) as IEnumerable;
 
             // Assert
             Assert.Equal(addresses, readAddresses.Cast<Address>(), new AddressComparer());

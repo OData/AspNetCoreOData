@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Commons
 {
-    public class InMemoryMessage : IODataRequestMessage, IODataResponseMessage, IContainerProvider, IDisposable
+    public class InMemoryMessage : IODataRequestMessageAsync, IODataResponseMessageAsync, IContainerProvider, IDisposable
     {
         private readonly Dictionary<string, string> headers;
 
@@ -56,6 +57,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             {
                 this.DisposeAction();
             }
+        }
+
+        public Task<Stream> GetStreamAsync()
+        {
+            return Task.FromResult(this.Stream);
         }
     }
 }

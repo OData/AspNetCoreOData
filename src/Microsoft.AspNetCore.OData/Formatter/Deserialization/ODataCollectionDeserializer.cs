@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
@@ -32,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -54,8 +55,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             IEdmCollectionTypeReference collectionType = edmType.AsCollection();
             IEdmTypeReference elementType = collectionType.ElementType();
-            ODataCollectionReader reader = messageReader.CreateODataCollectionReader(elementType);
-            return ReadInline(ReadCollection(reader), edmType, readContext);
+            ODataCollectionReader reader = await messageReader.CreateODataCollectionReaderAsync(elementType).ConfigureAwait(false);
+            return ReadInline(await ReadCollectionAsync(reader).ConfigureAwait(false), edmType, readContext);
         }
 
         /// <inheritdoc />
@@ -150,12 +151,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
-        internal static ODataCollectionValue ReadCollection(ODataCollectionReader reader)
+        internal static async Task<ODataCollectionValue> ReadCollectionAsync(ODataCollectionReader reader)
         {
             ArrayList items = new ArrayList();
             string typeName = null;
 
-            while (reader.Read())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 if (ODataCollectionReaderState.Value == reader.State)
                 {

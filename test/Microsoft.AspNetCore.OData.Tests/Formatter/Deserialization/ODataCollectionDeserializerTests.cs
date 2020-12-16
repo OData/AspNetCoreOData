@@ -6,6 +6,7 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -47,26 +48,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_MessageReader()
+        public async Task Read_ThrowsArgumentNull_MessageReader()
         {
             // Arrange
             var deserializer = new ODataCollectionDeserializer(DeserializerProvider);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: null, type: typeof(int[]), readContext: new ODataDeserializerContext()),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: typeof(int[]), readContext: new ODataDeserializerContext()),
                 "messageReader");
         }
 
         [Fact]
-        public void Read_ThrowsArgumentMustBeOfType_Type()
+        public void ReadAsync_ThrowsArgumentMustBeOfType_Type()
         {
             // Arrange
             var deserializer = new ODataCollectionDeserializer(DeserializerProvider);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgument(() => deserializer.Read(messageReader: ODataTestUtil.GetMockODataMessageReader(),
-                type: typeof(int), readContext: new ODataDeserializerContext { Model = Model }),
+            ExceptionAssert.ThrowsArgument(() => deserializer.ReadAsync(messageReader: ODataTestUtil.GetMockODataMessageReader(),
+                type: typeof(int), readContext: new ODataDeserializerContext { Model = Model }).Wait(),
                 "type", "The argument must be of type 'Collection'.");
         }
 
@@ -165,7 +166,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_Roundtrip_PrimitiveCollection()
+        public async Task Read_Roundtrip_PrimitiveCollection()
         {
             // Arrange
             int[] numbers = Enumerable.Range(0, 100).ToArray();
@@ -185,19 +186,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext readContext = new ODataDeserializerContext() { Model = Model };
 
             // Act
-            serializer.WriteObject(numbers, numbers.GetType(), messageWriter, writeContext);
+            await serializer.WriteObjectAsync(numbers, numbers.GetType(), messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
-            IEnumerable readnumbers = deserializer.Read(messageReader, typeof(int[]), readContext) as IEnumerable;
+            IEnumerable readnumbers = await deserializer.ReadAsync(messageReader, typeof(int[]), readContext) as IEnumerable;
 
             // Assert
             Assert.Equal(numbers, readnumbers.Cast<int>());
         }
 
         [Fact]
-        public void Read_Roundtrip_EnumCollection()
+        public async Task Read_Roundtrip_EnumCollection()
         {
             // Arrange
-            Color[] colors = {Color.Blue, Color.Green};
+            Color[] colors = { Color.Blue, Color.Green };
 
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(SerializerProvider);
             ODataCollectionDeserializer deserializer = new ODataCollectionDeserializer(DeserializerProvider);
@@ -214,9 +215,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext readContext = new ODataDeserializerContext() { Model = Model };
 
             // Act
-            serializer.WriteObject(colors, colors.GetType(), messageWriter, writeContext);
+            await serializer.WriteObjectAsync(colors, colors.GetType(), messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
-            IEnumerable readAddresses = deserializer.Read(messageReader, typeof(Color[]), readContext) as IEnumerable;
+            IEnumerable readAddresses = await deserializer.ReadAsync(messageReader, typeof(Color[]), readContext) as IEnumerable;
 
             // Assert
             Assert.Equal(colors, readAddresses.Cast<Color>());

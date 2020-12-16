@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -27,43 +28,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [InlineData("test")]
         [InlineData(false)]
         [InlineData('t')]
-        public void SerializesPrimitiveTypes(object value)
+        public async Task SerializesPrimitiveTypes(object value)
         {
             // Arrange
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-            Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
+            Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
             Stream stream = new MemoryStream();
-            mockRequest.Setup(r => r.GetStream()).Returns(stream);
+            mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
             // Act
-            serializer.WriteObject(value, value.GetType(), messageWriter, null);
+            await serializer.WriteObjectAsync(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
-            string result = reader.ReadToEnd();
+            string result = await reader.ReadToEndAsync();
 
             // Assert
             Assert.Equal(value.ToString(), result, ignoreCase: true);
         }
 
         [Fact]
-        public void SerializesNullablePrimitiveTypes()
+        public async Task SerializesNullablePrimitiveTypes()
         {
             // Arrange
             int? value = 5;
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-            Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
+            Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
             Stream stream = new MemoryStream();
-            mockRequest.Setup(r => r.GetStream()).Returns(stream);
+            mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
             // Act
-            serializer.WriteObject(value, value.GetType(), messageWriter, null);
+            await serializer.WriteObjectAsync(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
 
             // Assert
-            Assert.Equal(value.ToString(), reader.ReadToEnd());
+            Assert.Equal(value.ToString(), await reader.ReadToEndAsync());
         }
 
         public static TheoryDataSet<object, DateTimeOffset> DateTimeTestData
@@ -89,63 +90,63 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         [Theory]
         [MemberData(nameof(DateTimeTestData))]
-        public void SerializesDateTimeTypes(object value, DateTimeOffset expect)
+        public async Task SerializesDateTimeTypes(object value, DateTimeOffset expect)
         {
             // Arrange
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-            Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
+            Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
             Stream stream = new MemoryStream();
-            mockRequest.Setup(r => r.GetStream()).Returns(stream);
+            mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
             // Act
-            serializer.WriteObject(value, value.GetType(), messageWriter, null);
+            await serializer.WriteObjectAsync(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
 
             // Assert
-            Assert.Equal(expect, DateTimeOffset.Parse(reader.ReadToEnd()));
+            Assert.Equal(expect, DateTimeOffset.Parse(await reader.ReadToEndAsync()));
         }
 
         [Fact]
-        public void SerializesEnumType()
+        public async Task SerializesEnumType()
         {
             // Arrange
             ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-            Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
+            Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
             Stream stream = new MemoryStream();
-            mockRequest.Setup(r => r.GetStream()).Returns(stream);
+            mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
             object value = Color.Red | Color.Blue;
 
             // Act
-            serializer.WriteObject(value, value.GetType(), messageWriter, null);
+            await serializer.WriteObjectAsync(value, value.GetType(), messageWriter, null);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
-            string result = reader.ReadToEnd();
+            string result = await reader.ReadToEndAsync();
 
             // Assert
             Assert.Equal(value.ToString(), result, ignoreCase: true);
         }
 
         [Fact]
-        public void SerializesReturnedCountValue()
+        public async Task SerializesReturnedCountValue()
         {
             // Arrange
             var serializer = new ODataRawValueSerializer();
-            var mockRequest = new Mock<IODataRequestMessage>();
+            var mockRequest = new Mock<IODataRequestMessageAsync>();
             Stream stream = new MemoryStream();
-            mockRequest.Setup(r => r.GetStream()).Returns(stream);
+            mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             var messageWriter = new ODataMessageWriter(mockRequest.Object);
             HttpRequest request = RequestFactory.Create(opt => opt.AddModel(EdmCoreModel.Instance));
             request.ODataFeature().Path = new ODataPath(CountSegment.Instance);
             var context = new ODataSerializerContext { Request = request };
 
             // Act
-            serializer.WriteObject(5, null, messageWriter, context);
+            await serializer.WriteObjectAsync(5, null, messageWriter, context);
             stream.Seek(0, SeekOrigin.Begin);
             TextReader reader = new StreamReader(stream);
-            string result = reader.ReadToEnd();
+            string result = await reader.ReadToEndAsync();
 
             // Assert
             Assert.Equal("5", result);

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
@@ -33,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -54,8 +55,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);
             }
 
-            ODataReader resourceSetReader = messageReader.CreateODataResourceSetReader();
-            object resourceSet = resourceSetReader.ReadResourceOrResourceSet();
+            ODataReader resourceSetReader = await messageReader.CreateODataResourceSetReaderAsync().ConfigureAwait(false);
+            object resourceSet = await resourceSetReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false);
             return ReadInline(resourceSet, edmType, readContext);
         }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -100,20 +101,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObject_Throws_RootElementNameMissing()
+        public async Task WriteObjectAsync_ThrowsAsync_RootElementNameMissing()
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
 
             // Act & Assert
-            ExceptionAssert.Throws<ArgumentException>(
-                () => serializer.WriteObject(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext),
+            await ExceptionAssert.ThrowsAsync<ArgumentException>(
+                () => serializer.WriteObjectAsync(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext),
                 "The 'RootElementName' property is required on 'ODataSerializerContext'. (Parameter 'writeContext')");
         }
 
         [Fact]
-        public void WriteObject_Calls_CreateODataPrimitiveValue()
+        public async Task WriteObjectAsync_Calls_CreateODataPrimitiveValue()
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "Property", Model = EdmCoreModel.Instance };
@@ -124,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Returns(new ODataPrimitiveValue(42)).Verifiable();
 
             // Act
-            serializer.Object.WriteObject(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext);
+            await serializer.Object.WriteObjectAsync(42, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), writeContext);
 
             // Assert
             serializer.Verify();
@@ -298,7 +299,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [Theory]
         [MemberData(nameof(EdmPrimitiveData))]
         [MemberData(nameof(NonEdmPrimitiveData))]
-        public void WriteObject_EdmPrimitives(object graph, string type, string value)
+        public async Task WriteObjectAsync_EdmPrimitives(object graph, string type, string value)
         {
             // Arrange
             ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
@@ -328,7 +329,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             }
 
             // Act
-            serializer.WriteObject(graph, typeof(int), writer, writecontext);
+            await serializer.WriteObjectAsync(graph, typeof(int), writer, writecontext);
 
             // Assert
             stream.Seek(0, SeekOrigin.Begin);

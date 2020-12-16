@@ -16,6 +16,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -44,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
             Justification = "The majority of types referenced by this method are EdmLib types this method needs to know about to operate correctly")]
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -65,9 +66,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 payload = new ODataUntypedActionParameters(action);
             }
 
-            ODataParameterReader reader = messageReader.CreateODataParameterReader(action);
+            ODataParameterReader reader = await messageReader.CreateODataParameterReaderAsync(action).ConfigureAwait(false);
 
-            while (reader.Read())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 string parameterName = null;
                 IEdmOperationParameter parameter = null;
@@ -97,7 +98,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         Contract.Assert(parameter != null, String.Format(CultureInfo.InvariantCulture, "Parameter '{0}' not found.", parameterName));
                         IEdmCollectionTypeReference collectionType = parameter.Type as IEdmCollectionTypeReference;
                         Contract.Assert(collectionType != null);
-                        ODataCollectionValue value = ODataCollectionDeserializer.ReadCollection(reader.CreateCollectionReader());
+                        ODataCollectionValue value = await ODataCollectionDeserializer
+                            .ReadCollectionAsync(reader.CreateCollectionReader()).ConfigureAwait(false);
                         ODataCollectionDeserializer collectionDeserializer = (ODataCollectionDeserializer)DeserializerProvider.GetEdmTypeDeserializer(collectionType);
                         payload[parameterName] = collectionDeserializer.ReadInline(value, collectionType, readContext);
                         break;
@@ -109,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         Contract.Assert(parameter.Type.IsStructured());
 
                         ODataReader resourceReader = reader.CreateResourceReader();
-                        object item = resourceReader.ReadResourceOrResourceSet();
+                        object item = await resourceReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false);
                         ODataResourceDeserializer resourceDeserializer = (ODataResourceDeserializer)DeserializerProvider.GetEdmTypeDeserializer(parameter.Type);
                         payload[parameterName] = resourceDeserializer.ReadInline(item, parameter.Type, readContext);
                         break;
@@ -123,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         Contract.Assert(resourceSetType != null);
 
                         ODataReader resourceSetReader = reader.CreateResourceSetReader();
-                        object feed = resourceSetReader.ReadResourceOrResourceSet();
+                        object feed = await resourceSetReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false);
                         ODataResourceSetDeserializer resourceSetDeserializer = (ODataResourceSetDeserializer)DeserializerProvider.GetEdmTypeDeserializer(resourceSetType);
 
                         object result = resourceSetDeserializer.ReadInline(feed, resourceSetType, readContext);

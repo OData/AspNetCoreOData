@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -25,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         public ODataCollectionSerializerTests()
         {
-             _edmIntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
+            _edmIntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
             _collectionType = new EdmCollectionTypeReference(new EdmCollectionType(_edmIntType));
         }
 
@@ -37,20 +38,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObject_Throws_ArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_Throws_ArgumentNull_MessageWriter()
         {
             // Arrange
             ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(int[]), messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_Throws_ArgumentNull_WriteContext()
+        public async Task WriteObjectAsync_Throws_ArgumentNull_WriteContext()
         {
             // Arrange
             ODataMessageWriter messageWriter = ODataTestUtil.GetMockODataMessageWriter();
@@ -58,13 +59,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: null, type: typeof(int[]), messageWriter, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter, writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public void WriteObject_WritesValueReturnedFrom_CreateODataCollectionValue()
+        public async Task WriteObjectAsync_WritesValueReturnedFrom_CreateODataCollectionValue()
         {
             // Arrange
             MemoryStream stream = new MemoryStream();
@@ -89,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Returns(collectionValue).Verifiable();
 
             // Act
-            serializer.Object.WriteObject(enumerable, typeof(int[]), messageWriter, writeContext);
+            await serializer.Object.WriteObjectAsync(enumerable, typeof(int[]), messageWriter, writeContext);
 
             // Assert
             serializer.Verify();

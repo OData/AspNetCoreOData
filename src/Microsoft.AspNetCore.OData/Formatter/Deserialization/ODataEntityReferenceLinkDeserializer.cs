@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
@@ -23,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -35,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(readContext));
             }
 
-            ODataEntityReferenceLink entityReferenceLink = messageReader.ReadEntityReferenceLink();
+            ODataEntityReferenceLink entityReferenceLink = await messageReader.ReadEntityReferenceLinkAsync().ConfigureAwait(false);
 
             if (entityReferenceLink != null)
             {

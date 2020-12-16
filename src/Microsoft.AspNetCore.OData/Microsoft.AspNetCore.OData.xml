@@ -2388,7 +2388,7 @@
             Gets the deserializer provider to use to read inner objects.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer">
@@ -2402,7 +2402,7 @@
             </summary>
             <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
@@ -2438,7 +2438,7 @@
             The kind of ODataPayload this deserializer handles.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Reads an <see cref="T:Microsoft.OData.IODataRequestMessage"/> using messageReader.
             </summary>
@@ -2539,7 +2539,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer"/> class.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer">
@@ -2552,7 +2552,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer"/> class.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
@@ -2568,7 +2568,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer"/> class.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
@@ -2593,7 +2593,7 @@
             </summary>
             <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
@@ -2663,7 +2663,7 @@
             </summary>
             <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.Read(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
@@ -3345,13 +3345,13 @@
             </summary>
             <param name="serializerProvider">The serializer provider to use to serialize nested objects.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteCollection(Microsoft.OData.ODataCollectionWriter,System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteCollectionAsync(Microsoft.OData.ODataCollectionWriter,System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given <paramref name="graph"/> using the given <paramref name="writer"/>.
             </summary>
@@ -3388,10 +3388,10 @@
             </summary>
             <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaFeedInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaFeedInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3420,7 +3420,7 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedEntry(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedEntryAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3429,7 +3429,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedLink(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3438,7 +3438,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaLink(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3477,7 +3477,7 @@
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> that can be used to write inner objects.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.WriteObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3506,7 +3506,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer">
@@ -3519,7 +3519,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer"/> class.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheridoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer">
@@ -3532,7 +3532,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -3557,7 +3557,7 @@
             Initializes a new instance of the class <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.IsHttpError(System.Object)">
@@ -3584,7 +3584,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
             <remarks>The metadata written is from the model set on the <paramref name="messageWriter"/>. The <paramref name="graph" />
             is not used.</remarks>
@@ -3599,7 +3599,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -3624,7 +3624,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer">
@@ -3635,13 +3635,13 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteDeltaObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteDeltaObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             deltaWriter and the writeContext.
@@ -3685,7 +3685,7 @@
             <param name="resourceContext">The context for the resource instance being written.</param>
             <returns>The created ETag.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteNavigationLinks(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.ODataWriter)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteNavigationLinksAsync(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.ODataWriter)">
             <summary>
             Write the navigation link for the select navigation properties.
             </summary>
@@ -3733,10 +3733,10 @@
             </summary>
             <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateResourceSet(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -3787,7 +3787,7 @@
             Gets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind"/> that this serializer generates.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a whole using the given messageWriter and writeContext.
             </summary>
@@ -3949,7 +3949,7 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.WriteObject(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode">
@@ -5121,6 +5121,13 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSet(Microsoft.OData.ODataReader)">
+            <summary>
+            Reads a <see cref="T:Microsoft.OData.ODataResource"/> or <see cref="T:Microsoft.OData.ODataResourceSet"/> object.
+            </summary>
+            <param name="reader">The OData reader to read from.</param>
+            <returns>The read resource or resource set.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSetAsync(Microsoft.OData.ODataReader)">
             <summary>
             Reads a <see cref="T:Microsoft.OData.ODataResource"/> or <see cref="T:Microsoft.OData.ODataResourceSet"/> object.
             </summary>

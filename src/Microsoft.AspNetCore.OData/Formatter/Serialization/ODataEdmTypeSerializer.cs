@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -45,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
         /// <param name="writer">The <see cref="ODataWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual void WriteObjectInline(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        public virtual Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             throw Error.NotSupported(SRResources.WriteObjectInlineNotSupported, GetType().Name);

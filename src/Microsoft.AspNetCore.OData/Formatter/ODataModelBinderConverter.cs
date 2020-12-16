@@ -320,7 +320,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataReader resourceReader = oDataMessageReader.CreateODataUriParameterResourceReader(tempEntitySet,
                 edmTypeReference.ToStructuredType());
 
-            object item = resourceReader.ReadResourceOrResourceSet();
+            object item = resourceReader.ReadResourceOrResourceSetAsync();
 
             ODataResourceWrapper topLevelResource = item as ODataResourceWrapper;
             Contract.Assert(topLevelResource != null);

@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -126,12 +127,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_MessageReader()
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
             var deserializer = new ODataPrimitiveDeserializer();
 
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: null, type: typeof(int), readContext: new ODataDeserializerContext()),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: typeof(int), readContext: new ODataDeserializerContext()),
                 "messageReader");
         }
 
@@ -147,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         [Theory]
         [MemberData(nameof(EdmPrimitiveData))]
-        public void Read_PrimitiveWithTypeinContext(object obj, string edmType, string value)
+        public async Task ReadAsync_PrimitiveWithTypeinContext(object obj, string edmType, string value)
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -169,19 +170,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageReader messageReader = new ODataMessageReader(message as IODataResponseMessage, new ODataMessageReaderSettings(), model);
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "Property", Model = model };
             ODataDeserializerContext readContext = new ODataDeserializerContext { Model = model, ResourceType = type };
-            
-            serializer.WriteObject(obj, type, messageWriter, writeContext);
+
+            await serializer.WriteObjectAsync(obj, type, messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act & Assert
             Assert.NotNull(edmType);
             Assert.NotNull(value);
-            Assert.Equal(obj, deserializer.Read(messageReader, type, readContext));
+            Assert.Equal(obj, await deserializer.ReadAsync(messageReader, type, readContext));
         }
 
         [Theory]
         [MemberData(nameof(EdmPrimitiveData))]
-        public void Read_Primitive(object obj, string edmType, string value)
+        public async Task ReadAsync_Primitive(object obj, string edmType, string value)
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -200,17 +201,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(message as IODataResponseMessage, settings, model);
             ODataMessageReader messageReader = new ODataMessageReader(message as IODataResponseMessage, new ODataMessageReaderSettings(), model);
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "Property", Model = model };
-            ODataDeserializerContext readContext = new ODataDeserializerContext { Model = model};
+            ODataDeserializerContext readContext = new ODataDeserializerContext { Model = model };
 
             Type type = obj == null ? typeof(int) : obj.GetType();
 
-            serializer.WriteObject(obj, type, messageWriter, writeContext);
+            await serializer.WriteObjectAsync(obj, type, messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act & Assert
             Assert.NotNull(edmType);
             Assert.NotNull(value);
-            Assert.Equal(obj, deserializer.Read(messageReader, type, readContext));
+            Assert.Equal(obj, await deserializer.ReadAsync(messageReader, type, readContext));
         }
 
         [Theory]
@@ -223,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [InlineData("{\"value\":201}", typeof(Byte), (Byte)201)]
         [InlineData("{\"value\":1.1}", typeof(Double), 1.1)]
         [InlineData("{\"value\":1.1}", typeof(Single), (Single)1.1)]
-        public void ReadFromStreamAsync_RawPrimitive(string content, Type type, object expected)
+        public async Task ReadFromStreamAsync_RawPrimitive(string content, Type type, object expected)
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -236,16 +237,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 Model = model,
                 ResourceType = type
             };
-            
+
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model), type, readContext);
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model), type, readContext);
 
             // Assert
-            Assert.Equal(expected,value);
+            Assert.Equal(expected, value);
         }
 
         [Fact]
-        public void ReadFromStreamAsync_RawGuid()
+        public async Task ReadFromStreamAsync_RawGuid()
         {
             // Arrange
             string content = "{\"value\":\"f4b787c7-920d-4993-a584-ceb68968058c\"}";
@@ -263,15 +264,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            object value = deserializer.Read(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model), type, readContext);
+            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model), type, readContext);
 
             // Assert
-            Assert.Equal(expected,value);
+            Assert.Equal(expected, value);
         }
 
         [Theory]
         [MemberData(nameof(NonEdmPrimitiveData))]
-        public void Read_MappedPrimitiveWithTypeinContext(object obj, object expected)
+        public async Task ReadAsync_MappedPrimitiveWithTypeinContext(object obj, object expected)
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -294,16 +295,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "Property", Model = model };
             ODataDeserializerContext readContext = new ODataDeserializerContext { Model = model, ResourceType = type };
 
-            serializer.WriteObject(obj, type, messageWriter, writeContext);
+            await serializer.WriteObjectAsync(obj, type, messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act && Assert
-            Assert.Equal(expected, deserializer.Read(messageReader, type, readContext));
+            Assert.Equal(expected, await deserializer.ReadAsync(messageReader, type, readContext));
         }
 
         [Theory]
         [MemberData(nameof(NonEdmPrimitiveData))]
-        public void Read_MappedPrimitive(object obj, object expected)
+        public async Task ReadAsync_MappedPrimitive(object obj, object expected)
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -326,11 +327,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             Type type = obj == null ? typeof(int) : expected.GetType();
 
-            serializer.WriteObject(obj, type, messageWriter, writeContext);
+            await serializer.WriteObjectAsync(obj, type, messageWriter, writeContext);
             stream.Seek(0, SeekOrigin.Begin);
 
             // Act && Assert
-            Assert.Equal(expected, deserializer.Read(messageReader, type, readContext));
+            Assert.Equal(expected, await deserializer.ReadAsync(messageReader, type, readContext));
         }
 
         /*

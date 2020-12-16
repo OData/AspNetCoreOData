@@ -215,38 +215,22 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.WriteToStreamAsyncMustHaveRequest);
             }
 
-            try
-            {
-                // TODO: We should remove this and make other serializers call using Async?
-                var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
-                if (body != null)
-                {
-                    body.AllowSynchronousIO = true;
-                }
+            HttpResponse response = context.HttpContext.Response;
+            Uri baseAddress = GetBaseAddressInternal(request);
+            MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
-                HttpResponse response = context.HttpContext.Response;
-                Uri baseAddress = GetBaseAddressInternal(request);
-                MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
+            ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
 
-                ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
-
-                ODataOutputFormatterHelper.WriteToStream(
-                    type,
-                    context.Object,
-                    request.GetModel(),
-                    request.GetODataResponseVersion(),
-                    baseAddress,
-                    contentType,
-                    request,
-                    request.Headers,
-                    serializerProvider);
-
-                return Task.CompletedTask;
-            }
-            catch (Exception ex)
-            {
-                return Task.FromException(ex);
-            }
+            return ODataOutputFormatterHelper.WriteToStreamAsync(
+                type,
+                context.Object,
+                request.GetModel(),
+                request.GetODataResponseVersion(),
+                baseAddress,
+                contentType,
+                request,
+                request.Headers,
+                serializerProvider);
         }
 
         /// <summary>

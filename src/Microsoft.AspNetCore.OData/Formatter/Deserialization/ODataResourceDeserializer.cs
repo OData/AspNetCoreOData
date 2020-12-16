@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Edm;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -33,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -70,8 +71,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
             }
 
-            ODataReader odataReader = messageReader.CreateODataResourceReader(navigationSource, structuredType.StructuredDefinition());
-            ODataResourceWrapper topLevelResource = odataReader.ReadResourceOrResourceSet() as ODataResourceWrapper;
+            ODataReader odataReader = await messageReader
+                .CreateODataResourceReaderAsync(navigationSource, structuredType.StructuredDefinition()).ConfigureAwait(false);
+            ODataResourceWrapper topLevelResource = await odataReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false)
+                as ODataResourceWrapper;
             Contract.Assert(topLevelResource != null);
 
             return ReadInline(topLevelResource, structuredType, readContext);

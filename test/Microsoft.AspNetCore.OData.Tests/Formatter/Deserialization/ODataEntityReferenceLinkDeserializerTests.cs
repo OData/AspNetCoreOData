@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -29,32 +30,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_MessageReader()
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
             // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: null, type: null, readContext: new ODataDeserializerContext()),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: null, readContext: new ODataDeserializerContext()),
                 "messageReader");
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_ReadContext()
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
         {
             // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
             ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader, type: null, readContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader, type: null, readContext: null),
                 "readContext");
         }
 
         [Fact]
-        public void Read_RoundTrips()
+        public async Task ReadAsync_RoundTrips()
         {
             // Arrange
             IEdmModel model = CreateModel();
@@ -67,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             settings.SetContentType(ODataFormat.Json);
 
             ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
-            messageWriter.WriteEntityReferenceLink(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
+            await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
 
             var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
             request.ODataFeature().PrefixName = "odata";
@@ -80,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            Uri uri = deserializer.Read(messageReader, typeof(Uri), context) as Uri;
+            Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
 
             // Assert
             Assert.NotNull(uri);
@@ -88,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadJsonLight()
+        public async Task ReadJsonLightAsync()
         {
             // Arrange
             var deserializer = new ODataEntityReferenceLinkDeserializer();
@@ -97,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             writerSettings.SetContentType(ODataFormat.Json);
             IEdmModel model = CreateModel();
             ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, writerSettings, model);
-            messageWriter.WriteEntityReferenceLink(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
+            await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
             ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage),
                 new ODataMessageReaderSettings(), model);
 
@@ -112,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            Uri uri = deserializer.Read(messageReader, typeof(Uri), context) as Uri;
+            Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
 
             // Assert
             Assert.NotNull(uri);
@@ -129,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             builder.EntitySet<RelatedEntity>("related");
             NavigationPropertyConfiguration entityToRelated =
                 entities.EntityType.HasOptional<RelatedEntity>((e) => e.Related);
-           // entities.HasNavigationPropertyLink(entityToRelated, (a, b) => new Uri("aa:b"), false);
+            // entities.HasNavigationPropertyLink(entityToRelated, (a, b) => new Uri("aa:b"), false);
             entities.HasOptionalBinding((e) => e.Related, "related");
 
             return builder.GetEdmModel();
