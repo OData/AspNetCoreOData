@@ -20,8 +20,6 @@ namespace Microsoft.AspNetCore.OData.Results
     /// generates an OData-EntityId header.</remarks>
     public class CreatedODataResult<T> : ActionResult
     {
-        private readonly T _innerResult;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CreatedODataResult{T}"/> class.
         /// </summary>
@@ -33,19 +31,13 @@ namespace Microsoft.AspNetCore.OData.Results
                 throw Error.ArgumentNull(nameof(entity));
             }
 
-            this._innerResult = entity;
+            Entity = entity ?? throw Error.ArgumentNull(nameof(entity));
         }
 
         /// <summary>
         /// Gets the entity that was created.
         /// </summary>
-        public virtual T Entity
-        {
-            get
-            {
-                return _innerResult;
-            }
-        }
+        public virtual T Entity { get; }
 
         /// <inheritdoc/>
         public async override Task ExecuteResultAsync(ActionContext context)
@@ -76,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Results
             }
             else
             {
-                ObjectResult objectResult = new ObjectResult(_innerResult)
+                ObjectResult objectResult = new ObjectResult(Entity)
                 {
                     StatusCode = StatusCodes.Status201Created
                 };
@@ -88,13 +80,13 @@ namespace Microsoft.AspNetCore.OData.Results
         // internal just for unit test.
         internal Uri GenerateEntityId(HttpRequest request)
         {
-            return ResultHelpers.GenerateODataLink(request, _innerResult, isEntityId: true);
+            return ResultHelpers.GenerateODataLink(request, Entity, isEntityId: true);
         }
 
         // internal just for unit test.
         internal Uri GenerateLocationHeader(HttpRequest request)
         {
-            return ResultHelpers.GenerateODataLink(request, _innerResult, isEntityId: false);
+            return ResultHelpers.GenerateODataLink(request, Entity, isEntityId: false);
         }
     }
 }
