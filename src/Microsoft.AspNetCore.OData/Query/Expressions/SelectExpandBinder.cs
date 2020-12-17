@@ -689,7 +689,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             IEdmEntityType edmEntityType = navigationProperty.ToEntityType();
 
-          //  ModelBoundQuerySettings querySettings = EdmLibHelpers.GetModelBoundQuerySettings(navigationProperty, edmEntityType, _model);
+            ModelBoundQuerySettings querySettings = EdmHelpers.GetModelBoundQuerySettings(navigationProperty, edmEntityType, _model);
 
             // TODO: Process $apply and $compute in the $expand here, will support later.
             // $apply=...; $compute=...
@@ -709,8 +709,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression countExpression = CreateTotalCountExpression(propertyValue, expandedItem.CountOption);
 
-            //  int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
-            int? modelBoundPageSize = null;
+            int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
             propertyValue = ProjectAsWrapper(propertyValue, subSelectExpandClause, edmEntityType, expandedItem.NavigationSource,
                 expandedItem.OrderByOption, // $orderby=...
                 expandedItem.TopOption, // $top=...
@@ -730,10 +729,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    //if (querySettings != null && querySettings.PageSize.HasValue)
-                    //{
-                    //    propertyExpression.PageSize = querySettings.PageSize.Value;
-                    //}
+                    if (querySettings != null && querySettings.PageSize.HasValue)
+                    {
+                        propertyExpression.PageSize = querySettings.PageSize.Value;
+                    }
                 }
 
                 propertyExpression.TotalCount = countExpression;
@@ -795,14 +794,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // be noted: the property structured type could be null, because the property maybe not a complex property.
             IEdmStructuredType propertyStructuredType = structuralProperty.Type.ToStructuredType();
-            //ModelBoundQuerySettings querySettings = null;
-            //if (propertyStructuredType != null)
-            //{
-            //    querySettings = EdmLibHelpers.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType, _context.Model);
-            //}
+            ModelBoundQuerySettings querySettings = null;
+            if (propertyStructuredType != null)
+            {
+                querySettings = EdmHelpers.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType, _context.Model);
+            }
 
-            //int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
-            int? modelBoundPageSize = null;
+            int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
             propertyValue = ProjectAsWrapper(propertyValue, subSelectExpandClause, structuralProperty.Type.ToStructuredType(), pathSelectItem.NavigationSource,
                 pathSelectItem.OrderByOption, // $orderby=...
                 pathSelectItem.TopOption, // $top=...
@@ -822,10 +820,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    //if (querySettings != null && querySettings.PageSize.HasValue)
-                    //{
-                    //    propertyExpression.PageSize = querySettings.PageSize.Value;
-                    //}
+                    if (querySettings != null && querySettings.PageSize.HasValue)
+                    {
+                        propertyExpression.PageSize = querySettings.PageSize.Value;
+                    }
                 }
 
                 propertyExpression.TotalCount = countExpression;
