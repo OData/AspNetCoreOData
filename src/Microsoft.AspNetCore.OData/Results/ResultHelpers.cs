@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (response.StatusCode == (int)HttpStatusCode.NoContent)
             {
-                response.Headers.Add(EntityIdHeaderName, entityId().ToString());
+                response.Headers.Add(EntityIdHeaderName, entityId().AbsoluteUri);
             }
         }
 
