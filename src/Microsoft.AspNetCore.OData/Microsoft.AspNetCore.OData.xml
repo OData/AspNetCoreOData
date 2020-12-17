@@ -10024,6 +10024,11 @@
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.AggregationTypeWrapperConverter">
+            <summary>
+            Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> instances to JSON.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.ModelID">
             <summary>
             An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.ModelContainer"/>.
