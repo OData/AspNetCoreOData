@@ -37,7 +37,6 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public ODataOptions ()
 
 	System.Func`1[[Microsoft.OData.IContainerBuilder]] BuilderFactory  { public get; public set; }
-	Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions CompatibilityOptions  { public get; public set; }
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableCount  { public get; public set; }
@@ -64,7 +63,6 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions Select ()
 	public Microsoft.AspNetCore.OData.ODataOptions SetAttributeRouting (bool enabled)
 	public Microsoft.AspNetCore.OData.ODataOptions SetBuilderFactory (System.Func`1[[Microsoft.OData.IContainerBuilder]] factory)
-	public Microsoft.AspNetCore.OData.ODataOptions SetCompatibilityOptions (bool enabled)
 	public Microsoft.AspNetCore.OData.ODataOptions SetContinueOnErrorHeader (bool enableContinueOnError)
 	public Microsoft.AspNetCore.OData.ODataOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataOptions SetTimeZoneInfo (System.TimeZoneInfo timeZoneInfo)

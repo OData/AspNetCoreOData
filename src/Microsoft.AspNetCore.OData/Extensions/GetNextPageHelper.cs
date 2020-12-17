@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
     internal static class GetNextPageHelper
     {
         [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
-        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null, CompatibilityOptions options = CompatibilityOptions.None)
+        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null)
         {
             Contract.Assert(requestUri != null);
             Contract.Assert(queryParameters != null);
@@ -43,8 +43,9 @@ namespace Microsoft.AspNetCore.OData.Extensions
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
-                            // We decrease top by the pageSize because that's the number of results we're returning in the current page. If the $top query option's value is less than or equal to the page size, there is no next page.
-                            if ((options & CompatibilityOptions.AllowNextLinkWithNonPositiveTopValue) != 0 || top > pageSize)
+                            // We decrease top by the pageSize because that's the number of results we're returning in the current page.
+                            // If the $top query option's value is less than or equal to the page size, there is no next page.
+                            if (top > pageSize)
                             {
                                 value = (top - pageSize).ToString(CultureInfo.InvariantCulture);
                             }

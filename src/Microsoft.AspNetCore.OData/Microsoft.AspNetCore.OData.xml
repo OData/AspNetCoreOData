@@ -2194,13 +2194,6 @@
             <param name="objectToSkipTokenValue">Function that takes in the last object and returns the skiptoken value string.</param>
             <returns>A next page link.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetCompatibilityOptions(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets the set of flags for <see cref="T:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions"/> from ODataOptions. 
-            </summary>
-            <param name="request">The request.</param>
-            <returns>Set of flags for <see cref="T:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions"/> from ODataOptions.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(Microsoft.AspNetCore.Http.HttpRequest,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Creates an ETag from concurrency property names and values.
@@ -5219,18 +5212,6 @@
             Sets a value indicating if batch requests should continue on error.
             </summary>
             <param name="enableContinueOnError">The boolean value.</param>
-            <returns>The calling itself.</returns>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.CompatibilityOptions">
-            <summary>
-            Gets or Sets the set of flags that have options for backward compatibility.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetCompatibilityOptions(System.Boolean)">
-            <summary>
-            Sets the set of flags that have options for backward compatibility.
-            </summary>
-            <param name="enabled">The boolean value.</param>
             <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting">
