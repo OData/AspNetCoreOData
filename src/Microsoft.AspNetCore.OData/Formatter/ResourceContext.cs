@@ -217,6 +217,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 object value;
                 if (EdmObject.TryGetPropertyValue(property.Name, out value) && value != null)
                 {
+                    if (value is SelectExpandWrapper)
+                    {
+                        // Skip the select expand property
+                        continue;
+                    }
+
                     string propertyName = EdmModel.GetClrPropertyName(property);
 
                     if (TypeHelper.IsCollection(value.GetType()))
