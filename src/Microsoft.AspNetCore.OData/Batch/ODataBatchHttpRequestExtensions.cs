@@ -12,14 +12,12 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 
@@ -181,6 +179,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
         }
 
+        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         internal static Task CreateODataBatchResponseAsync(this HttpRequest request, IEnumerable<ODataBatchResponseItem> responses, ODataMessageQuotas messageQuotas)
         {
             Contract.Assert(request != null);
@@ -194,26 +193,31 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             HttpResponse response = request.HttpContext.Response;
 
-            StringValues acceptHeader = request.Headers["Accept"];
+            IEnumerable<MediaTypeHeaderValue> acceptHeaders = MediaTypeHeaderValue.ParseList(request.Headers.GetCommaSeparatedValues("Accept"));
             string responseContentType = null;
-            if (StringValues.IsNullOrEmpty(acceptHeader))
+            foreach (MediaTypeHeaderValue acceptHeader in acceptHeaders.OrderByDescending(h => h.Quality == null ? 1 : h.Quality))
+            {
+                if (acceptHeader.MediaType.Equals(BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase))
+                {
+                    responseContentType = string.Format(CultureInfo.InvariantCulture, "multipart/mixed;boundary=batchresponse_{0}", Guid.NewGuid());
+                    break;
+                }
+                else if (acceptHeader.MediaType.Equals(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase))
+                {
+                    responseContentType = BatchMediaTypeJson;
+                    break;
+                }
+            }
+            if (responseContentType == null)
             {
                 // In absence of accept, if request was JSON then default response to be JSON.
                 // Note that, if responseContentType is not set, then it will default to multipart/mixed
                 // when constructing the BatchContent, so we don't need to handle that case here
-                if (!String.IsNullOrEmpty(request.ContentType)
+                if (!string.IsNullOrEmpty(request.ContentType)
                 && request.ContentType.IndexOf(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1)
                 {
                     responseContentType = BatchMediaTypeJson;
                 }
-            }
-            else if (acceptHeader.Any(h => h.Equals(BatchMediaTypeMime, StringComparison.OrdinalIgnoreCase)))
-            {
-                responseContentType = String.Format(CultureInfo.InvariantCulture, "multipart/mixed;boundary=batchresponse_{0}", Guid.NewGuid());
-            }
-            else if (acceptHeader.Any(h => h.IndexOf(BatchMediaTypeJson, StringComparison.OrdinalIgnoreCase) > -1))
-            {
-                responseContentType = BatchMediaTypeJson;
             }
 
             response.StatusCode = StatusCodes.Status200OK;
@@ -264,7 +268,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             if (isMimeBatch)
             {
                 NameValueHeaderValue boundary = contentType.Parameters.FirstOrDefault(p => String.Equals(p.Name.ToString(), Boundary, StringComparison.OrdinalIgnoreCase));
-                if (boundary == null || String.IsNullOrEmpty(boundary.Value.ToString()))
+                if (boundary == null || string.IsNullOrEmpty(boundary.Value.ToString()))
                 {
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     await response.WriteAsync(SRResources.BatchRequestMissingBoundary).ConfigureAwait(false);
