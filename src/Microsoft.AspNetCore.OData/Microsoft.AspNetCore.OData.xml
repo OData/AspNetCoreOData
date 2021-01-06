@@ -1132,6 +1132,13 @@
             <returns>a fast getter.</returns>
             <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.NormalizeHttpMethod(System.String)">
+            <summary>
+            Normalize the http method.
+            </summary>
+            <param name="method">The http method.</param>
+            <returns>Normalized http method.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.IsValidTemplateLiteral(System.String)">
             <summary>
             Check whether given literal matches the uri template pattern {literals}.

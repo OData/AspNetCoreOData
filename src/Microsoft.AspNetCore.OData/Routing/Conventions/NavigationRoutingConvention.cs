@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
-using System.Diagnostics.Contracts;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
@@ -181,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, prefix, model, template);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
 
             Log.AddedODataSelector(_logger, action, template);
         }

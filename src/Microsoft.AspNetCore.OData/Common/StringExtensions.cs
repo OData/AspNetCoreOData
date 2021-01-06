@@ -10,6 +10,32 @@ namespace Microsoft.AspNetCore.OData.Common
     internal static class StringExtensions
     {
         /// <summary>
+        /// Normalize the http method.
+        /// </summary>
+        /// <param name="method">The http method.</param>
+        /// <returns>Normalized http method.</returns>
+        internal static string NormalizeHttpMethod(this string method)
+        {
+            switch (method.ToUpperInvariant())
+            {
+                case "POSTTO":
+                    return "POST";
+
+                case "PUTTO":
+                    return "PUT";
+
+                case "PATCHTO":
+                    return "PATCH";
+
+                case "DELETETO":
+                    return "DELETE";
+
+                default:
+                    return method;
+            }
+        }
+
+        /// <summary>
         /// Check whether given literal matches the uri template pattern {literals}.
         /// </summary>
         /// <param name="literalText">The text to be evaluated</param>
