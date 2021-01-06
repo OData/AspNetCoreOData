@@ -246,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmEntityType entityType, object graph,
-            Dictionary<IEdmProperty, object> dynamicTypeProperties)
+            Dictionary<IEdmProperty, object> dynamicTypeProperties, ODataSerializerContext writeContext)
         {
             Contract.Assert(dynamicTypeProperties != null);
 
@@ -264,11 +264,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 foreach (var prop in dynamicObject.Values)
                 {
+                    IEdmProperty edmProperty = entityType?.Properties()
+                            .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
+
                     if (prop.Value != null
                         && (prop.Value is DynamicTypeWrapper || (prop.Value is IEnumerable<DynamicTypeWrapper>)))
                     {
-                        IEdmProperty edmProperty = entityType.Properties()
-                            .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
                         if (edmProperty != null)
                         {
                             dynamicTypeProperties.Add(edmProperty, prop.Value);
@@ -276,11 +277,34 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
                     else
                     {
-                        var property = new ODataProperty
+                        ODataProperty property;
+                        if (prop.Value == null)
                         {
-                            Name = prop.Key,
-                            Value = prop.Value
-                        };
+                            property = new ODataProperty
+                            {
+                                Name = prop.Key,
+                                Value = new ODataNullValue()
+                            };
+                        }
+                        else
+                        {
+                            if (edmProperty != null)
+                            {
+                                property = new ODataProperty
+                                {
+                                    Name = prop.Key,
+                                    Value = ODataPrimitiveSerializer.ConvertPrimitiveValue(prop.Value, edmProperty.Type.AsPrimitive(), writeContext?.TimeZone)
+                                };
+                            }
+                            else
+                            {
+                                property = new ODataProperty
+                                {
+                                    Name = prop.Key,
+                                    Value = prop.Value
+                                };
+                            }
+                        }
 
                         properties.Add(property);
                     }
@@ -298,7 +322,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             var resource = new ODataResource()
             {
                 TypeName = expectedType.FullName(),
-                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties)
+                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties, writeContext)
             };
 
             resource.IsTransient = true;
