@@ -50,6 +50,7 @@ namespace ODataRoutingSample.Models
         public static IEdmModel GetEdmModelV1()
         {
             var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Organization>("Organizations");
             builder.EntitySet<Company>("Companies");
             builder.EntitySet<Customer>("Customers");
             builder.Singleton<Customer>("Me");
@@ -71,6 +72,12 @@ namespace ODataRoutingSample.Models
             boundAction.CollectionParameter<string>("p3");
             boundAction.CollectionParameter<Address>("p4");
             boundAction.CollectionParameter<Color?>("colors");
+
+            // bound function for organization
+            var productPrice = builder.EntityType<Organization>().Collection.
+                Function("GetPrice").Returns<string>();
+            productPrice.Parameter<string>("organizationId").Required();
+            productPrice.Parameter<string>("partId").Required();
 
             return builder.GetEdmModel();
         }

@@ -52,6 +52,7 @@ namespace ODataRoutingSample.Extensions
                 action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
                 action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
                 action.Append(")");
+                string actionName = controllerActionDescriptor.MethodInfo.Name;
 
                 sb.Append("<tr>");
                 sb.Append($"<td>{controllerActionDescriptor.ControllerTypeInfo.FullName}</td>");
@@ -59,16 +60,34 @@ namespace ODataRoutingSample.Extensions
 
                 // http methods
                 string httpMethods = string.Join(",", metadata.HttpMethods);
-                sb.Append($"<td>{httpMethods}</td>");
+                sb.Append($"<td>{httpMethods.ToUpper()}</td>");
 
                 // OData routing templates
-                int index = 1;
-                sb.Append("<td>");
-                foreach (var template in metadata.Template.GetTemplates())
+                RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
+                if (routeEndpoint != null)
                 {
-                    sb.Append($"{index++})").Append(" ~/").Append(template).Append("<br/>");
+                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td></tr>");
                 }
-                sb.Append("</td></tr>");
+                else
+                {
+                    int index = 1;
+                    sb.Append("<td>");
+                    foreach (var template in metadata.Template.GetTemplates())
+                    {
+                        sb.Append($"{index++})");
+                        if (string.IsNullOrEmpty(metadata.Prefix))
+                        {
+                            sb.Append(" ~/");
+                        }
+                        else
+                        {
+                            sb.Append($" ~/{metadata.Prefix}/");
+                        }
+
+                        sb.Append(template).Append("<br/>");
+                    }
+                    sb.Append("</td></tr>");
+                }
             }
 
             string output = ODataRouteMappingHtmlTemplate.Replace("{CONTNET}", sb.ToString());
