@@ -14,6 +14,9 @@ Blogs:
 1) [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
 2) [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
 
+Example:
+* [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/master/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
+
 ## 2. Basic Usage
 
 In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
