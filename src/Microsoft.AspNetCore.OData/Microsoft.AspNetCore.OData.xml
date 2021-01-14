@@ -6847,13 +6847,6 @@
             Gets a value representing if the collection is truncated or not.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.Container.ModelContainer">
-            <summary>
-            EntityFramework does not let you inject non primitive constant values (like IEdmModel) in Select queries. Primitives like strings and guids can be
-            injected as they can be translated into a SQL query. This container associates a unique string with each EDM model, so that, given the string the model
-            can be retrieved later.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression">
             <summary>
             Represents a container that captures a named property that is a part of the select expand query.
@@ -10047,9 +10040,9 @@
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.ModelID">
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Model">
             <summary>
-            An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.ModelContainer"/>.
+            The Edm Model associated with the wrapper.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper">
@@ -10124,9 +10117,11 @@
             Gets or sets the property container that contains the properties being expanded. 
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.ModelID">
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.Model">
             <summary>
-            An ID to uniquely identify the model in the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.ModelContainer"/>.
+            The Edm Model associated with the wrapper.
+            EntityFramework does not let us inject non primitive constant values (like IEdmModel).
+            However, we can always 'parameterize" this non-constant value.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.UntypedInstance">

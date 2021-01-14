@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -26,9 +25,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         public PropertyContainer Container { get; set; }
 
         /// <summary>
-        /// An ID to uniquely identify the model in the <see cref="ModelContainer"/>.
+        /// The Edm Model associated with the wrapper.
+        /// EntityFramework does not let us inject non primitive constant values (like IEdmModel).
+        /// However, we can always 'parameterize" this non-constant value.
         /// </summary>
-        public string ModelID { get; set; }
+        public IEdmModel Model { get; set; }
 
         /// <inheritdoc />
         public object UntypedInstance { get; set; }
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         /// <inheritdoc />
         public IEdmTypeReference GetEdmType()
         {
-            IEdmModel model = GetModel();
+            IEdmModel model = Model;
 
             if (InstanceType != null)
             {
@@ -84,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             if (UseInstanceForProperties && UntypedInstance != null)
             {
                 IEdmTypeReference edmTypeReference = GetEdmType();
-                IEdmModel model = GetModel();
+                IEdmModel model = Model;
                 if (edmTypeReference is IEdmComplexTypeReference)
                 {
                     _typedEdmStructuredObject = _typedEdmStructuredObject ??
@@ -118,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             IEdmStructuredType type = GetEdmType().AsStructured().StructuredDefinition();
 
-            IPropertyMapper mapper = mapperProvider(GetModel(), type);
+            IPropertyMapper mapper = mapperProvider(Model, type);
             if (mapper == null)
             {
                 throw Error.InvalidOperation(SRResources.InvalidPropertyMapper, typeof(IPropertyMapper).FullName,
@@ -153,12 +154,5 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         }
 
         protected abstract Type GetElementType();
-
-        private IEdmModel GetModel()
-        {
-            Contract.Assert(ModelID != null);
-
-            return ModelContainer.GetModel(ModelID);
-        }
     }
 }

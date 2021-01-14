@@ -324,7 +324,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         }
 
         [Fact]
-        public void ProjectAsWrapper_Element_ProjectedValueContainsModelID()
+        public void ProjectAsWrapper_Element_ProjectedValueContainsModel()
         {
             // Arrange
             SelectExpandClause selectExpand = new SelectExpandClause(new SelectItem[0], allSelected: true);
@@ -336,8 +336,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Assert
             SelectExpandWrapper<QueryCustomer> customerWrapper = Expression.Lambda(projection).Compile().DynamicInvoke() as SelectExpandWrapper<QueryCustomer>;
-            Assert.NotNull(customerWrapper.ModelID);
-            Assert.Same(_model, ModelContainer.GetModel(customerWrapper.ModelID));
+            Assert.NotNull(customerWrapper.Model);
+            Assert.Same(_model, customerWrapper.Model);
         }
 
         [Fact]
