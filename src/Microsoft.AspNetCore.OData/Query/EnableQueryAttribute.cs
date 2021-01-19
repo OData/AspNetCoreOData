@@ -38,18 +38,6 @@ namespace Microsoft.AspNetCore.OData.Query
     public partial class EnableQueryAttribute : ActionFilterAttribute
     {
         /// <summary>
-        /// Marks if the query validation was run before the action execution. This is not always possible.
-        /// For cases where the run failed before action execution. We will run validation on result.
-        /// </summary>
-        private bool _queryValidationRunBeforeActionExecution;
-
-        /// <summary>
-        /// Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
-        /// This is because ValidateQuery internally modifies query options (expands are prime example of this).
-        /// </summary>
-        private ODataQueryOptions _processedQueryOptions;
-
-        /// <summary>
         /// Performs the query composition before action is executing.
         /// </summary>
         /// <param name="actionExecutingContext">The action executing context.</param>
@@ -61,6 +49,13 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             base.OnActionExecuting(actionExecutingContext);
+
+            RequestQueryData requestQueryData = new RequestQueryData()
+            {
+                QueryValidationRunBeforeActionExecution = false,
+            };
+
+            actionExecutingContext.HttpContext.Items.Add(nameof(RequestQueryData), requestQueryData);
 
             HttpRequest request = actionExecutingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;
@@ -86,7 +81,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 // For Swagger metadata request. elementType is null.
                 if (elementType == null || edmModel == null)
                 {
-                    _queryValidationRunBeforeActionExecution = false;
                     return;
                 }
 
@@ -104,11 +98,8 @@ namespace Microsoft.AspNetCore.OData.Query
                     // In case where CLRType is missing, $count, $expand verifications cannot be done.
                     // More importantly $expand required ODataQueryContext with clrType which cannot be done
                     // If the model is untyped. Hence for such cases, letting the validation run post action.
-                    _queryValidationRunBeforeActionExecution = false;
                     return;
                 }
-
-                _queryValidationRunBeforeActionExecution = true;
             }
             else
             {
@@ -121,7 +112,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 if (controllerActionDescriptor == null)
                 {
-                    _queryValidationRunBeforeActionExecution = false;
                     return;
                 }
 
@@ -150,7 +140,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
                 else
                 {
-                    _queryValidationRunBeforeActionExecution = false;
                     return;
                 }
 
@@ -162,15 +151,15 @@ namespace Microsoft.AspNetCore.OData.Query
                 queryContext = new ODataQueryContext(
                     edmModel,
                     elementType);
-                _queryValidationRunBeforeActionExecution = true;
             }
 
             // Create and validate the query options.
-            _processedQueryOptions = new ODataQueryOptions(queryContext, request);
+            requestQueryData.QueryValidationRunBeforeActionExecution = true;
+            requestQueryData.ProcessedQueryOptions = new ODataQueryOptions(queryContext, request);
 
             try
             {
-                ValidateQuery(request, _processedQueryOptions);
+                ValidateQuery(request, requestQueryData.ProcessedQueryOptions);
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -547,9 +536,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns></returns>
         private ODataQueryOptions CreateAndValidateQueryOptions(HttpRequest request, ODataQueryContext queryContext)
         {
-            if (_queryValidationRunBeforeActionExecution)
+            RequestQueryData requestQueryData = request.HttpContext.Items[nameof(RequestQueryData)] as RequestQueryData;
+
+            if (requestQueryData.QueryValidationRunBeforeActionExecution)
             {
-                return _processedQueryOptions;
+                return requestQueryData.ProcessedQueryOptions;
             }
 
             ODataQueryOptions queryOptions = new ODataQueryOptions(queryContext, request);
@@ -823,6 +814,30 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Contract.Assert(model != null);
             return model;
+        }
+
+        /// <summary>
+        /// Holds request level query information.
+        /// </summary>
+        private class RequestQueryData
+        {
+            /// <summary>
+            /// Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
+            /// </summary>
+            /// <remarks>
+            /// Marks if the query validation was run before the action execution. This is not always possible.
+            /// For cases where the run failed before action execution. We will run validation on result.
+            /// </remarks>
+            public bool QueryValidationRunBeforeActionExecution { get; set; }
+
+            /// <summary>
+            /// Gets or sets the processed query options.
+            /// </summary>
+            /// <remarks>
+            /// Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
+            /// This is because ValidateQuery internally modifies query options (expands are prime example of this).
+            /// </remarks>
+            public ODataQueryOptions ProcessedQueryOptions { get; set; }
         }
     }
 }
