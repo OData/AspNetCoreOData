@@ -8,14 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.Http;
-using ODataRoutingSample.Models;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
-using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
+using Microsoft.AspNetCore.Routing;
+using ODataRoutingSample.Extensions;
+using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample
 {
@@ -94,36 +94,39 @@ namespace ODataRoutingSample
 
             app.UseEndpoints(endpoints =>
             {
+                // A odata debuger route is only for debugger view of the all OData endpoint routing.
+                endpoints.MapGet("/$odata", ODataRouteHandler.HandleOData);
+
                 endpoints.MapControllers();
             });
         }
     }
 
     /// <summary>
-    /// 
+    /// My simple convention
     /// </summary>
     public class MyConvention : IODataControllerActionConvention
     {
         /// <summary>
-        /// 
+        /// Order value.
         /// </summary>
         public int Order => -100;
 
         /// <summary>
-        /// 
+        /// Apply to action,.
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="context">Http context.</param>
+        /// <returns>true/false</returns>
         public bool AppliesToAction(ODataControllerActionContext context)
         {
             return true; // apply to all controller
         }
 
         /// <summary>
-        /// 
+        /// Apply to controller
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="context">Http context.</param>
+        /// <returns>true/false</returns>
         public bool AppliesToController(ODataControllerActionContext context)
         {
             return false; // continue for all others

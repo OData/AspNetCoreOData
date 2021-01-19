@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
@@ -63,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         [Fact]
-        public void ReadResourceWorksAsExpected()
+        public async Task ReadResourceWorksAsExpected()
         {
             // Arrange
             const string payload =
@@ -79,8 +80,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, ODataReader> func = mr => mr.CreateODataResourceReader(customers, customers.EntityType());
-            ODataItemBase item = ReadPayload(payload, Model, func);
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            ODataItemBase item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
             Assert.NotNull(item);
@@ -90,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         [Fact]
-        public void ReadResourceSetWorksAsExpected()
+        public async Task ReadResourceSetWorksAsExpected()
         {
             // Arrange
             const string payload =
@@ -110,8 +111,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, ODataReader> func = mr => mr.CreateODataResourceSetReader(customers, customers.EntityType());
-            ODataItemBase item = ReadPayload(payload, Model, func);
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType());
+            ODataItemBase item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
             Assert.NotNull(item);
@@ -120,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal(new[] { "Location", "Order", "Orders" }, resource.NestedResourceInfos.Select(n => n.NestedResourceInfo.Name));
         }
 
-        private ODataItemBase ReadPayload(string payload, IEdmModel edmModel, Func<ODataMessageReader, ODataReader> createReader)
+        private async Task<ODataItemBase> ReadPayloadAsync(string payload, IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader)
         {
             var message = new InMemoryMessage()
             {
@@ -135,10 +136,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 Version = ODataVersion.V4,
             };
 
-            using (var msgReader = new ODataMessageReader((IODataResponseMessage)message, readerSettings, edmModel))
+            using (var msgReader = new ODataMessageReader((IODataResponseMessageAsync)message, readerSettings, edmModel))
             {
-                ODataReader reader = createReader(msgReader);
-                return reader.ReadResourceOrResourceSet();
+                ODataReader reader = await createReader(msgReader);
+                return await reader.ReadResourceOrResourceSetAsync();
             }
         }
     }

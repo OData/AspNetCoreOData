@@ -32,9 +32,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="controller">The controller model.</param>
         public ODataControllerActionContext(string prefix, IEdmModel model, ControllerModel controller)
         {
-            Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
-            Model = model ?? throw new ArgumentNullException(nameof(model));
-            Controller = controller ?? throw new ArgumentNullException(nameof(controller));
+            Prefix = prefix ?? throw Error.ArgumentNull(nameof(prefix));
+            Model = model ?? throw Error.ArgumentNull(nameof(model));
+            Controller = controller ?? throw Error.ArgumentNull(nameof(controller));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         public ODataControllerActionContext(string prefix, IEdmModel model, ControllerModel controller, IEdmEntitySet entitySet)
             : this(prefix, model, controller)
         {
-            EntitySet = entitySet ?? throw new ArgumentNullException(nameof(entitySet));
+            EntitySet = entitySet ?? throw Error.ArgumentNull(nameof(entitySet));
             EntityType = entitySet.EntityType();
         }
 
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         public ODataControllerActionContext(string prefix, IEdmModel model, ControllerModel controller, IEdmSingleton singleton)
             : this(prefix, model, controller)
         {
-            Singleton = singleton ?? throw new ArgumentNullException(nameof(singleton));
+            Singleton = singleton ?? throw Error.ArgumentNull(nameof(singleton));
             EntityType = singleton.EntityType();
         }
 

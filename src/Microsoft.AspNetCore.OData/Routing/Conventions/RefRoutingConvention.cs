@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             Debug.Assert(context.Action != null);

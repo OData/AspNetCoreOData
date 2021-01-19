@@ -2,9 +2,8 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -55,11 +54,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(EmployeeModel)
             };
 
-             _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
         }
 
         [Fact]
-        public void CanDeserializerSingletonPayloadFromStream()
+        public async Task CanDeserializerSingletonPayloadFromStream()
         {
             // Arrange
             const string payload = "{" +
@@ -70,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
             // Act
-            EmployeeModel employee = deserializer.Read(
+            EmployeeModel employee = await deserializer.ReadAsync(
                 GetODataMessageReader(payload),
                 typeof(EmployeeModel),
                 _readContext) as EmployeeModel;

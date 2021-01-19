@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Batch;
@@ -55,6 +57,25 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
 
             // Assert
             Assert.Equal(StatusCodes.Status201Created, context.Response.StatusCode);
+        }
+
+        [Fact]
+        public async Task SendMessageAsync_Resolves_Uri_From_ContentId()
+        {
+            // Arrange
+            DefaultHttpContext context = new DefaultHttpContext();
+            HttpResponseMessage response = new HttpResponseMessage();
+            RequestDelegate handler = (c) => { return Task.FromResult(response); };
+            Dictionary<string, string> contentIdLocationMappings = new Dictionary<string, string>();
+            contentIdLocationMappings.Add("1", "http://localhost:12345/odata/Customers(42)");
+            Uri unresolvedUri = new Uri("http://localhost:12345/odata/$1/Orders");
+            context.Request.CopyAbsoluteUrl(unresolvedUri);
+
+            // Act
+            await ODataBatchRequestItem.SendRequestAsync(handler, context, contentIdLocationMappings);
+
+            // Assert
+            Assert.Equal("/odata/Customers(42)/Orders", context.Request.Path.ToString());
         }
     }
 }

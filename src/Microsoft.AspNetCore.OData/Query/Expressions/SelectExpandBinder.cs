@@ -27,7 +27,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private ODataQueryContext _context;
         private IEdmModel _model;
         private ODataQuerySettings _settings;
-        private string _modelID;
 
         public SelectExpandBinder(ODataQuerySettings settings, ODataQueryContext context)
         {
@@ -38,7 +37,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             _context = context;
             _model = _context.Model;
-            _modelID = ModelContainer.GetModelID(_model);
             _settings = settings;
         }
 
@@ -278,12 +276,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             bool isTypeNamePropertySet = false;
             bool isContainerPropertySet = false;
 
-            // Initialize property 'ModelID' on the wrapper class.
-            // source = new Wrapper { ModelID = 'some-guid-id' }
-            wrapperProperty = wrapperType.GetProperty("ModelID");
-            wrapperPropertyValueExpression = _settings.EnableConstantParameterization ?
-                LinqParameterContainer.Parameterize(typeof(string), _modelID) :
-                Expression.Constant(_modelID);
+            // Initialize property 'Model' on the wrapper class.
+            // source = new Wrapper { Model = parameterized(a-edm-model) }
+            // Always parameterize as EntityFramework does not let you inject non primitive constant values (like IEdmModel).
+            wrapperProperty = wrapperType.GetProperty("Model");
+            wrapperPropertyValueExpression = LinqParameterContainer.Parameterize(typeof(IEdmModel), _model);
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
 
             if (IsSelectAll(selectExpandClause))
@@ -689,7 +686,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             IEdmEntityType edmEntityType = navigationProperty.ToEntityType();
 
-          //  ModelBoundQuerySettings querySettings = EdmLibHelpers.GetModelBoundQuerySettings(navigationProperty, edmEntityType, _model);
+            ModelBoundQuerySettings querySettings = EdmHelpers.GetModelBoundQuerySettings(navigationProperty, edmEntityType, _model);
 
             // TODO: Process $apply and $compute in the $expand here, will support later.
             // $apply=...; $compute=...
@@ -709,8 +706,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression countExpression = CreateTotalCountExpression(propertyValue, expandedItem.CountOption);
 
-            //  int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
-            int? modelBoundPageSize = null;
+            int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
             propertyValue = ProjectAsWrapper(propertyValue, subSelectExpandClause, edmEntityType, expandedItem.NavigationSource,
                 expandedItem.OrderByOption, // $orderby=...
                 expandedItem.TopOption, // $top=...
@@ -730,10 +726,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    //if (querySettings != null && querySettings.PageSize.HasValue)
-                    //{
-                    //    propertyExpression.PageSize = querySettings.PageSize.Value;
-                    //}
+                    if (querySettings != null && querySettings.PageSize.HasValue)
+                    {
+                        propertyExpression.PageSize = querySettings.PageSize.Value;
+                    }
                 }
 
                 propertyExpression.TotalCount = countExpression;
@@ -795,14 +791,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // be noted: the property structured type could be null, because the property maybe not a complex property.
             IEdmStructuredType propertyStructuredType = structuralProperty.Type.ToStructuredType();
-            //ModelBoundQuerySettings querySettings = null;
-            //if (propertyStructuredType != null)
-            //{
-            //    querySettings = EdmLibHelpers.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType, _context.Model);
-            //}
+            ModelBoundQuerySettings querySettings = null;
+            if (propertyStructuredType != null)
+            {
+                querySettings = EdmHelpers.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType, _context.Model);
+            }
 
-            //int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
-            int? modelBoundPageSize = null;
+            int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;
             propertyValue = ProjectAsWrapper(propertyValue, subSelectExpandClause, structuralProperty.Type.ToStructuredType(), pathSelectItem.NavigationSource,
                 pathSelectItem.OrderByOption, // $orderby=...
                 pathSelectItem.TopOption, // $top=...
@@ -822,10 +817,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    //if (querySettings != null && querySettings.PageSize.HasValue)
-                    //{
-                    //    propertyExpression.PageSize = querySettings.PageSize.Value;
-                    //}
+                    if (querySettings != null && querySettings.PageSize.HasValue)
+                    {
+                        propertyExpression.PageSize = querySettings.PageSize.Value;
+                    }
                 }
 
                 propertyExpression.TotalCount = countExpression;

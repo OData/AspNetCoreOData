@@ -2311,7 +2311,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         [Theory]
         [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)","$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
-        [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it As DerivedCategory).DerivedCategoryName == null)", "$it => (IIF((($it As DerivedCategory) == null), null, ($it As DerivedCategory).DerivedCategoryName) == null)")]
+        [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it.Category As DerivedCategory).DerivedCategoryName == null)", "$it => (IIF((($it.Category As DerivedCategory) == null), null, ($it.Category As DerivedCategory).DerivedCategoryName) == null)")]
         public void CastToQuotedEntityOrComplexType_DerivedProductName(string filter, string expectedExpression, string expectedExpressionWithNullCheck)
         {
             // Arrange, Act & Assert
@@ -2944,6 +2944,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             VerifyQueryDeserialization<DynamicProduct>("Token eq '1'",
                 "$it => (Convert(IIF($it.ProductProperties.ContainsKey(Token), $it.ProductPropertiesToken, null)) == \"1\")",
                 "$it => (Convert(IIF((($it.ProductProperties != null) AndAlso $it.ProductProperties.ContainsKey(Token)), $it.ProductPropertiesToken, null)) == \"1\")");
+        }
+
+        [Theory]
+        [InlineData(new[] { 1, 2, 42 }, true)]
+        [InlineData(new[] { 1, 2 }, false)]
+        public void InOnPrimitiveCollectionPropertyOnRHS(int[] alternateIds, bool withNullPropagation)
+        {
+            var filters = VerifyQueryDeserialization(
+               "42 in AlternateIDs",
+               "$it => $it.AlternateIDs.Contains(42)",
+               NotTesting);
+
+            RunFilters(
+                filters,
+                new Product { AlternateIDs = alternateIds },
+                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withNullPropagation });
         }
 
         #region Negative Tests

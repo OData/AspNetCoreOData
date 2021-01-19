@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
-    internal class MockODataRequestMessage : IODataRequestMessage
+    internal class MockODataRequestMessage : IODataRequestMessageAsync
     {
         Dictionary<string, string> _headers;
         MemoryStream _body;
@@ -57,6 +58,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void SetHeader(string headerName, string headerValue)
         {
             _headers[headerName] = headerValue;
+        }
+
+        public Task<Stream> GetStreamAsync()
+        {
+            return Task.FromResult<Stream>(_body);
         }
 
         public Uri Url

@@ -2,12 +2,10 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
-using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
@@ -17,9 +15,9 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         public T Instance { get; set; }
 
         /// <summary>
-        /// An ID to uniquely identify the model in the <see cref="ModelContainer"/>.
+        /// The Edm Model associated with the wrapper.
         /// </summary>
-        public string ModelID { get; set; }
+        public IEdmModel Model { get; set; }
 
         public override Dictionary<string, object> Values
         {
@@ -52,12 +50,12 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                     if (edmType is IEdmComplexTypeReference t)
                     {
                         _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                        new TypedEdmComplexObject(Instance, t, GetModel());
+                        new TypedEdmComplexObject(Instance, t, Model);
                     }
                     else
                     {
                         _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                        new TypedEdmEntityObject(Instance, edmType as IEdmEntityTypeReference, GetModel());
+                        new TypedEdmEntityObject(Instance, edmType as IEdmEntityTypeReference, Model);
                     }
 
                     var props = edmType.DeclaredStructuralProperties().Where(p => p.Type.IsPrimitive()).Select(p => p.Name);
@@ -77,17 +75,9 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
 
         private TypedEdmStructuredObject _typedEdmStructuredObject;
 
-        private IEdmModel GetModel()
-        {
-            Contract.Assert(ModelID != null);
-
-            return ModelContainer.GetModel(ModelID);
-        }
-
         public IEdmTypeReference GetEdmType()
         {
-            IEdmModel model = GetModel();
-            return model.GetEdmTypeReference(typeof(T));
+            return Model.GetEdmTypeReference(typeof(T));
         }
     }
 }

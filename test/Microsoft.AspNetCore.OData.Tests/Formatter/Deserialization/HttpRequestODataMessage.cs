@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
-    class HttpRequestODataMessage : IODataRequestMessage
+    class HttpRequestODataMessage : IODataRequestMessageAsync
     {
         public HttpRequest _httpRequest;
 
@@ -66,6 +67,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void SetHeader(string headerName, string headerValue)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<Stream> GetStreamAsync()
+        {
+            return Task.FromResult(_httpRequest.Body);
         }
 
         public Uri Url

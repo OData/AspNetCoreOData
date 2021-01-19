@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -15,7 +16,6 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
@@ -88,20 +88,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_MessageWriter()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange & Act
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: null, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: _customer, type: typeof(Customer), messageWriter: null, writeContext: null),
                 "messageWriter");
         }
 
         [Fact]
-        public void WriteObject_ThrowsArgumentNull_WriteContext()
+        public async Task WriteObjectAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange & Act
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
@@ -109,55 +109,55 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(new Mock<IODataRequestMessage>().Object);
 
             // Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObject(graph: _customer, type: typeof(Customer), messageWriter: messageWriter, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectAsync(graph: _customer, type: typeof(Customer), messageWriter: messageWriter, writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public void WriteObject_Calls_WriteObjectInline_WithRightEntityType()
+        public async Task WriteObjectAsync_Calls_WriteObjectInline_WithRightEntityType()
         {
             // Arrange
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             serializer
-                .Setup(s => s.WriteObjectInline(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
+                .Setup(s => s.WriteObjectInlineAsync(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
                     It.IsAny<ODataWriter>(), _writeContext))
                 .Verifiable();
             serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(new SelectExpandNode());
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObject(_customer, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
+            await serializer.Object.WriteObjectAsync(_customer, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_ThrowsArgumentNull_Writer()
+        public async Task WriteObjectInlineAsync_ThrowsArgumentNull_Writer()
         {
             // Arrange & Act
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => serializer.WriteObjectInlineAsync(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
                 "writer");
         }
 
         [Fact]
-        public void WriteObjectInline_ThrowsArgumentNull_WriteContext()
+        public async Task WriteObjectInlineAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => _serializer.WriteObjectInline(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => _serializer.WriteObjectInlineAsync(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public void WriteObjectInline_ThrowsSerializationException_WhenGraphIsNull()
+        public async Task WriteObjectInlineAsync_ThrowsSerializationException_WhenGraphIsNull()
         {
             // Arrange & Act
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
@@ -165,13 +165,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataWriter messageWriter = new Mock<ODataWriter>().Object;
 
             // Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.WriteObjectInline(graph: null, expectedType: null, writer: messageWriter, writeContext: new ODataSerializerContext()),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => serializer.WriteObjectInlineAsync(graph: null, expectedType: null, writer: messageWriter, writeContext: new ODataSerializerContext()),
                 "Cannot serialize a null 'Resource'.");
         }
 
         [Fact]
-        public void WriteObjectInline_Calls_CreateSelectExpandNode()
+        public async Task WriteObjectInlineAsync_Calls_CreateSelectExpandNode()
         {
             // Arrange
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
@@ -183,14 +183,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer, _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_Calls_CreateResource()
+        public async Task WriteObjectInlineAsync_Calls_CreateResource()
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode();
@@ -203,14 +203,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer, _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_WritesODataResourceFrom_CreateResource()
+        public async Task WriteObjectInlineAsync_WritesODataResourceFrom_CreateResource()
         {
             // Arrange
             ODataResource entry = new ODataResource();
@@ -221,17 +221,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.Setup(s => s.CreateResource(It.IsAny<SelectExpandNode>(), It.IsAny<ResourceContext>())).Returns(entry);
             serializer.CallBase = true;
 
-            writer.Setup(s => s.WriteStart(entry)).Verifiable();
+            writer.Setup(s => s.WriteStartAsync(entry)).Verifiable();
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_Calls_CreateNavigationLink_ForEachSelectedNavigationProperty()
+        public async Task WriteObjectInlineAsync_Calls_CreateNavigationLink_ForEachSelectedNavigationProperty()
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode
@@ -251,14 +251,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(1), It.IsAny<ResourceContext>())).Verifiable();
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_WritesNavigationLinksReturnedBy_CreateNavigationLink_ForEachSelectedNavigationProperty()
+        public async Task WriteObjectInlineAsync_WritesNavigationLinksReturnedBy_CreateNavigationLink_ForEachSelectedNavigationProperty()
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode
@@ -285,18 +285,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
-            writer.Setup(w => w.WriteStart(navigationLinks[0])).Verifiable();
-            writer.Setup(w => w.WriteStart(navigationLinks[1])).Verifiable();
+            writer.Setup(w => w.WriteStartAsync(navigationLinks[0])).Verifiable();
+            writer.Setup(w => w.WriteStartAsync(navigationLinks[1])).Verifiable();
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_Calls_CreateNavigationLink_ForEachExpandedNavigationProperty()
+        public async Task WriteObjectInlineAsync_Calls_CreateNavigationLink_ForEachExpandedNavigationProperty()
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode
@@ -317,14 +317,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_ExpandsUsingInnerSerializerUsingRightContext_ExpandedNavigationProperties()
+        public async Task WriteObjectInlineAsync_ExpandsUsingInnerSerializerUsingRightContext_ExpandedNavigationProperties()
         {
             // Arrange
             IEdmEntityType customerType = _customerSet.EntityType();
@@ -345,12 +345,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             innerSerializer
-                .Setup(s => s.WriteObjectInline(_customer.Orders, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>()))
+                .Setup(s => s.WriteObjectInlineAsync(_customer.Orders, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>()))
                 .Callback((object o, IEdmTypeReference t, ODataWriter w, ODataSerializerContext context) =>
                     {
                         Assert.Same(context.NavigationSource.Name, "Orders");
                         Assert.Same(context.SelectExpandClause, selectExpandNode.ExpandedProperties.Single().Value.SelectAndExpand);
                     })
+                .Returns(Task.CompletedTask)
                 .Verifiable();
 
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
@@ -362,7 +363,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _writeContext.SelectExpandClause = selectExpandClause;
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
             // Assert
             innerSerializer.Verify();
@@ -372,7 +373,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObjectInline_CanExpandNavigationProperty_ContainingEdmObject()
+        public async Task WriteObjectInlineAsync_CanExpandNavigationProperty_ContainingEdmObject()
         {
             // Arrange
             IEdmEntityType customerType = _customerSet.EntityType();
@@ -399,7 +400,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-            ordersSerializer.Setup(s => s.WriteObjectInline(ordersValue, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>())).Verifiable();
+            ordersSerializer.Setup(s => s.WriteObjectInlineAsync(ordersValue, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>())).Verifiable();
 
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type)).Returns(ordersSerializer.Object);
@@ -409,14 +410,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(customer.Object, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(customer.Object, _customerType, writer.Object, _writeContext);
 
             //Assert
             ordersSerializer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_CanWriteExpandedNavigationProperty_ExpandedCollectionValuedNavigationPropertyIsNull()
+        public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_ExpandedCollectionValuedNavigationPropertyIsNull()
         {
             // Arrange
             IEdmEntityType customerType = _customerSet.EntityType();
@@ -439,7 +440,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 selectExpandClause.SelectedItems.OfType<ExpandedNavigationSelectItem>().Single();
 
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
-            writer.Setup(w => w.WriteStart(It.IsAny<ODataResourceSet>())).Callback(
+            writer.Setup(w => w.WriteStartAsync(It.IsAny<ODataResourceSet>())).Callback(
                 (ODataResourceSet feed) =>
                 {
                     Assert.Null(feed.Count);
@@ -447,7 +448,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     Assert.Null(feed.Id);
                     Assert.Empty(feed.InstanceAnnotations);
                     Assert.Null(feed.NextPageLink);
-                }).Verifiable();
+                }).Returns(Task.CompletedTask).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type)).Returns(ordersSerializer.Object);
@@ -457,14 +458,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(customer.Object, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(customer.Object, _customerType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_CanWriteExpandedNavigationProperty_ExpandedSingleValuedNavigationPropertyIsNull()
+        public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_ExpandedSingleValuedNavigationPropertyIsNull()
         {
             // Arrange
             IEdmEntityType orderType = _orderSet.EntityType();
@@ -488,7 +489,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
-            writer.Setup(w => w.WriteStart(null as ODataResource)).Verifiable();
+            writer.Setup(w => w.WriteStartAsync(null as ODataResource)).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(customerProperty.Type))
@@ -499,14 +500,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(order.Object, _orderType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(order.Object, _orderType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_CanWriteExpandedNavigationProperty_DerivedExpandedCollectionValuedNavigationPropertyIsNull()
+        public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_DerivedExpandedCollectionValuedNavigationPropertyIsNull()
         {
             // Arrange
             IEdmEntityType specialCustomerType = (IEdmEntityType)_specialCustomerType.Definition;
@@ -538,7 +539,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 selectExpandClause.SelectedItems.OfType<ExpandedNavigationSelectItem>().Single();
 
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
-            writer.Setup(w => w.WriteStart(It.IsAny<ODataResourceSet>())).Callback(
+            writer.Setup(w => w.WriteStartAsync(It.IsAny<ODataResourceSet>())).Callback(
                 (ODataResourceSet feed) =>
                 {
                     Assert.Null(feed.Count);
@@ -546,7 +547,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     Assert.Null(feed.Id);
                     Assert.Empty(feed.InstanceAnnotations);
                     Assert.Null(feed.NextPageLink);
-                }).Verifiable();
+                }).Returns(Task.CompletedTask).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(specialOrdersProperty.Type))
@@ -557,14 +558,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(customer.Object, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(customer.Object, _customerType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public void WriteObjectInline_CanWriteExpandedNavigationProperty_DerivedExpandedSingleValuedNavigationPropertyIsNull()
+        public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_DerivedExpandedSingleValuedNavigationPropertyIsNull()
         {
             // Arrange
             IEdmEntityType specialOrderType = (IEdmEntityType)_specialOrderType.Definition;
@@ -597,7 +598,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
-            writer.Setup(w => w.WriteStart(null as ODataResource)).Verifiable();
+            writer.Setup(w => w.WriteStartAsync(null as ODataResource)).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(customerProperty.Type))
@@ -608,7 +609,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(order.Object, _orderType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(order.Object, _orderType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
@@ -922,10 +923,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(new DateTimeOffset(dateTime), dateTimeProperty.Value);
         }
 
-        [Theory]
-        [InlineData(true, 4)]
-        [InlineData(false, 3)]
-        public void CreateResource_Works_ToAppendNullDynamicProperties_ForOpenEntityType(bool enableNullDynamicProperty, int count)
+        [Fact]
+        public void CreateResource_Works_ToAppendNullDynamicProperties_ForOpenEntityType()
         {
             // Arrange
             IEdmModel model = SerializationTestsHelpers.SimpleOpenTypeModel();
@@ -952,7 +951,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model).SetNullDynamicProperty(enableNullDynamicProperty));
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
             request.ODataFeature().PrefixName = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
@@ -986,7 +985,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Equal("Default.Customer", resource.TypeName);
-            Assert.Equal(count, resource.Properties.Count());
+            Assert.Equal(3, resource.Properties.Count());
 
             // Verify the declared properties
             ODataProperty street = Assert.Single(resource.Properties.Where(p => p.Name == "CustomerId"));
@@ -1003,15 +1002,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"), guidProperty.Value);
 
             ODataProperty nullProperty = resource.Properties.SingleOrDefault(p => p.Name == "NullProperty");
-            if (enableNullDynamicProperty)
-            {
-                Assert.NotNull(nullProperty);
-                Assert.Null(nullProperty.Value);
-            }
-            else
-            {
-                Assert.Null(nullProperty);
-            }
+            Assert.Null(nullProperty);
         }
 
         [Fact]
@@ -1807,7 +1798,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void WriteObjectInline_SetsParentContext_ForExpandedNavigationProperties()
+        public async Task WriteObjectInlineAsync_SetsParentContext_ForExpandedNavigationProperties()
         {
             // Arrange
             ODataWriter mockWriter = new Mock<ODataWriter>().Object;
@@ -1830,11 +1821,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.CallBase = true;
 
             // Act
-            serializer.Object.WriteObjectInline(_customer, _customerType, mockWriter, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, mockWriter, _writeContext);
 
             // Assert
             expandedItemSerializer.Verify(
-                s => s.WriteObjectInline(It.IsAny<object>(), ordersProperty.Type, mockWriter,
+                s => s.WriteObjectInlineAsync(It.IsAny<object>(), ordersProperty.Type, mockWriter,
                     It.Is<ODataSerializerContext>(c => c.ExpandedResource.SerializerContext == _writeContext)));
         }
 

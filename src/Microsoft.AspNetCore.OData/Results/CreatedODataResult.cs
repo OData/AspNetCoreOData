@@ -18,37 +18,24 @@ namespace Microsoft.AspNetCore.OData.Results
     /// <remarks>This action result handles content negotiation and the HTTP prefer header. It generates a location
     /// header containing the edit link of the created entity and, if response has status code: NoContent, also
     /// generates an OData-EntityId header.</remarks>
-    public class CreatedODataResult<T> : IActionResult
+    public class CreatedODataResult<T> : ActionResult
     {
-        private readonly T _innerResult;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CreatedODataResult{T}"/> class.
         /// </summary>
         /// <param name="entity">The created entity.</param>
         public CreatedODataResult(T entity)
         {
-            if (entity == null)
-            {
-                throw Error.ArgumentNull(nameof(entity));
-            }
-
-            this._innerResult = entity;
+            Entity = entity ?? throw Error.ArgumentNull(nameof(entity));
         }
 
         /// <summary>
         /// Gets the entity that was created.
         /// </summary>
-        public virtual T Entity
-        {
-            get
-            {
-                return _innerResult;
-            }
-        }
+        public virtual T Entity { get; }
 
         /// <inheritdoc/>
-        public async virtual Task ExecuteResultAsync(ActionContext context)
+        public async override Task ExecuteResultAsync(ActionContext context)
         {
             if (context == null)
             {
@@ -58,8 +45,9 @@ namespace Microsoft.AspNetCore.OData.Results
             HttpRequest request = context.HttpContext.Request;
             HttpResponse response = context.HttpContext.Response;
             IActionResult result = GetInnerActionResult(request);
-            response.Headers["Location"] = GenerateLocationHeader(request).ToString();
+            Uri location = GenerateLocationHeader(request);
 
+            response.Headers["Location"] = location.AbsoluteUri;
             // Since AddEntityId relies on the response, make sure to execute the result
             // before calling AddEntityId() to ensure the response code is set correctly.
             await result.ExecuteResultAsync(context).ConfigureAwait(false);
@@ -76,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Results
             }
             else
             {
-                ObjectResult objectResult = new ObjectResult(_innerResult)
+                ObjectResult objectResult = new ObjectResult(Entity)
                 {
                     StatusCode = StatusCodes.Status201Created
                 };
@@ -88,13 +76,13 @@ namespace Microsoft.AspNetCore.OData.Results
         // internal just for unit test.
         internal Uri GenerateEntityId(HttpRequest request)
         {
-            return ResultHelpers.GenerateODataLink(request, _innerResult, isEntityId: true);
+            return ResultHelpers.GenerateODataLink(request, Entity, isEntityId: true);
         }
 
         // internal just for unit test.
         internal Uri GenerateLocationHeader(HttpRequest request)
         {
-            return ResultHelpers.GenerateODataLink(request, _innerResult, isEntityId: false);
+            return ResultHelpers.GenerateODataLink(request, Entity, isEntityId: false);
         }
     }
 }

@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
-using System.Diagnostics.Contracts;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="logger"></param>
         public NavigationRoutingConvention(ILogger<NavigationRoutingConvention> logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw Error.ArgumentNull(nameof(logger));
         }
 
         /// <inheritdoc />
@@ -36,8 +37,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // structural property supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
+            return context.EntitySet != null || context.Singleton != null;
         }
 
         /// <inheritdoc />
@@ -45,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (context.EntitySet == null && context.Singleton == null)
@@ -176,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, prefix, model, template);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
 
             Log.AddedODataSelector(_logger, action, template);
         }

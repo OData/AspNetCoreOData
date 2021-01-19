@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
@@ -55,75 +56,75 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             _deserializerProvider = ODataFormatterHelpers.GetDeserializerProvider();
 
             _supplyRequestResource = @"{
-    ""ID"":0,
-    ""Name"":""Supplier Name"",
-    ""Concurrency"":0,
-    ""Address"":
-    {
-        ""Street"":""Supplier Street"",
-        ""City"":""Supplier City"",
-        ""State"":""WA"",
-        ""ZipCode"":""123456"",
-        ""CountryOrRegion"":""USA""
-    },
-    Products:
-    [
-        {
-            ""ID"":1,
-            ""Name"":""Milk"",
-            ""Description"":""Low fat milk"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":3.5
-        },
-        {
-            ""ID"":2,
-            ""Name"":""soda"",
-            ""Description"":""sample summary"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":20.9
-        },
-        {
-            ""ID"":3,
-            ""Name"":""Product3"",
-            ""Description"":""Product3 Summary"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":19.9
-        },
-        {
-            ""ID"":4,
-            ""Name"":""Product4"",
-            ""Description"":""Product4 Summary"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":22.9
-        },
-        {
-            ""ID"":5,
-            ""Name"":""Product5"",
-            ""Description"":""Product5 Summary"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":22.8
-        },
-        {
-            ""ID"":6,
-            ""Name"":""Product6"",
-            ""Description"":""Product6 Summary"",
-            ""ReleaseDate"":""1995-10-01T00:00:00z"",
-            ""DiscontinuedDate"":null,
-            ""Rating"":3,
-            ""Price"":18.8
-        }
-    ]
-}";
+                ""ID"":0,
+                ""Name"":""Supplier Name"",
+                ""Concurrency"":0,
+                ""Address"":
+                {
+                    ""Street"":""Supplier Street"",
+                    ""City"":""Supplier City"",
+                    ""State"":""WA"",
+                    ""ZipCode"":""123456"",
+                    ""CountryOrRegion"":""USA""
+                },
+                Products:
+                [
+                    {
+                        ""ID"":1,
+                        ""Name"":""Milk"",
+                        ""Description"":""Low fat milk"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":3.5
+                    },
+                    {
+                        ""ID"":2,
+                        ""Name"":""soda"",
+                        ""Description"":""sample summary"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":20.9
+                    },
+                    {
+                        ""ID"":3,
+                        ""Name"":""Product3"",
+                        ""Description"":""Product3 Summary"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":19.9
+                    },
+                    {
+                        ""ID"":4,
+                        ""Name"":""Product4"",
+                        ""Description"":""Product4 Summary"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":22.9
+                    },
+                    {
+                        ""ID"":5,
+                        ""Name"":""Product5"",
+                        ""Description"":""Product5 Summary"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":22.8
+                    },
+                    {
+                        ""ID"":6,
+                        ""Name"":""Product6"",
+                        ""Description"":""Product6 Summary"",
+                        ""ReleaseDate"":""1995-10-01T00:00:00z"",
+                        ""DiscontinuedDate"":null,
+                        ""Rating"":3,
+                        ""Price"":18.8
+                    }
+                ]
+            }";
         }
 
         [Fact]
@@ -133,25 +134,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_MessageReader()
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: null, type: typeof(Product), readContext: _readContext),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: typeof(Product), readContext: _readContext),
                 "messageReader");
         }
 
         [Fact]
-        public void Read_ThrowsArgumentNull_ReadContext()
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
         {
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
-            ExceptionAssert.ThrowsArgumentNull(
-                () => deserializer.Read(messageReader: ODataFormatterHelpers.GetMockODataMessageReader(), type: typeof(Product), readContext: null),
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: ODataFormatterHelpers.GetMockODataMessageReader(), type: typeof(Product), readContext: null),
                 "readContext");
         }
 
         [Fact]
-        public void Read_ThrowsArgument_ODataPathMissing_ForEntity()
+        public void ReadAsync_ThrowsArgument_ODataPathMissing_ForEntity()
         {
             // Arrange
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
@@ -163,13 +164,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Act & Assert
             ExceptionAssert.ThrowsArgument(
-                () => deserializer.Read(ODataFormatterHelpers.GetMockODataMessageReader(), typeof(Product), readContext),
+                () => deserializer.ReadAsync(ODataFormatterHelpers.GetMockODataMessageReader(), typeof(Product), readContext).Wait(),
                 "readContext",
                 "The operation cannot be completed because no ODataPath is available for the request.");
         }
 
         [Fact]
-        public void Read_ThrowsArgument_EntitysetMissing()
+        public async Task ReadAsync_ThrowsArgument_EntitysetMissing()
         {
             // Arrange
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
@@ -181,8 +182,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => deserializer.Read(ODataFormatterHelpers.GetMockODataMessageReader(), typeof(Product), readContext),
+            await ExceptionAssert.ThrowsAsync<SerializationException>(
+                () => deserializer.ReadAsync(ODataFormatterHelpers.GetMockODataMessageReader(), typeof(Product), readContext),
                 "The related entity set or singleton cannot be found from the OData path. The related entity set or singleton is required to deserialize the payload.");
         }
 
@@ -998,23 +999,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFromStreamAsync()
+        public async Task ReadFromStreamAsync()
         {
             // Arrange
             string content = @"{
-    ""ID"":0,
-    ""Name"":""Bread"",
-    ""Description"":""Whole grain bread"",
-    ""ReleaseDate"":""1992-01-01T00:00:00Z"",
-    ""PublishDate"":""1997-07-01"",
-    ""DiscontinuedDate"":null,
-    ""Rating"":4,
-    ""Price"":2.5
-}";
+                ""ID"":0,
+                ""Name"":""Bread"",
+                ""Description"":""Whole grain bread"",
+                ""ReleaseDate"":""1992-01-01T00:00:00Z"",
+                ""PublishDate"":""1997-07-01"",
+                ""DiscontinuedDate"":null,
+                ""Rating"":4,
+                ""Price"":2.5
+            }";
             ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
             // Act
-            Product product = deserializer.Read(GetODataMessageReader(content, _edmModel),
+            Product product = await deserializer.ReadAsync(GetODataMessageReader(content, _edmModel),
                 typeof(Product), _readContext) as Product;
 
             // Assert
@@ -1027,7 +1028,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFromStreamAsync_ComplexTypeAndInlineData()
+        public async Task ReadFromStreamAsync_ComplexTypeAndInlineData()
         {
             // Arrange
             string content = _supplyRequestResource;
@@ -1041,7 +1042,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             };
 
             // Act
-            Supplier supplier = deserializer.Read(GetODataMessageReader(content, _edmModel),
+            Supplier supplier = await deserializer.ReadAsync(GetODataMessageReader(content, _edmModel),
                 typeof(Supplier), readContext) as Supplier;
 
             // Assert
@@ -1057,21 +1058,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_PatchMode()
+        public async Task ReadAsync_PatchMode()
         {
             // Arrange
             string content = @"{
-    ""ID"":123,
-    ""Name"":""Supplier Name"",
-    ""Address"":
-    {
-        ""Street"":""Supplier Street"",
-        ""City"":""Supplier City"",
-        ""State"":""WA"",
-        ""ZipCode"":""123456"",
-        ""CountryOrRegion"":""USA""
-    }
-}";
+                ""ID"":123,
+                ""Name"":""Supplier Name"",
+                ""Address"":
+                {
+                    ""Street"":""Supplier Street"",
+                    ""City"":""Supplier City"",
+                    ""State"":""WA"",
+                    ""ZipCode"":""123456"",
+                    ""CountryOrRegion"":""USA""
+                }
+            }";
 
             var readContext = new ODataDeserializerContext
             {
@@ -1084,7 +1085,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 new ODataResourceDeserializer(_deserializerProvider);
 
             // Act
-            Delta<Supplier> supplier = deserializer.Read(GetODataMessageReader(content, _edmModel),
+            Delta<Supplier> supplier = await deserializer.ReadAsync(GetODataMessageReader(content, _edmModel),
                 typeof(Delta<Supplier>), readContext) as Delta<Supplier>;
 
             // Assert
@@ -1097,15 +1098,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_ThrowsOnUnknownEntityType()
+        public void ReadAsync_ThrowsOnUnknownEntityType()
         {
             // Arrange
             string content = _supplyRequestResource;
             ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => deserializer.Read(GetODataMessageReader(content, _edmModel),
-                typeof(Product), _readContext), "The property 'Concurrency' does not exist on type 'ODataDemo.Product'. Make sure to only use property names that are defined by the type or mark the type as open type.");
+            ExceptionAssert.Throws<ODataException>(() => deserializer.ReadAsync(GetODataMessageReader(content, _edmModel),
+                typeof(Product), _readContext).Wait(), "The property 'Concurrency' does not exist on type 'ODataDemo.Product'. Make sure to only use property names that are defined by the type or mark the type as open type.");
         }
 
         private static ODataMessageReader GetODataMessageReader(IODataRequestMessage oDataRequestMessage, IEdmModel edmModel)
@@ -1121,7 +1122,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         private static IODataRequestMessage GetODataMessage(string content, IEdmModel model)
         {
-        //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/OData/OData.svc/Products");
+            //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/OData/OData.svc/Products");
 
             HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/Products", opt => opt.AddModel("odata", model));
 

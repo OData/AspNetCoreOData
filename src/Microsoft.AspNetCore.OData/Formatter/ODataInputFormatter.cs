@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
-        public override Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
             if (context == null)
             {
@@ -115,34 +115,29 @@ namespace Microsoft.AspNetCore.OData.Formatter
             object defaultValue = GetDefaultValueForType(type);
             if (contentHeaders == null || contentHeaders.ContentLength == null)
             {
-                return Task.FromResult(InputFormatterResult.Success(defaultValue));
+                return InputFormatterResult.Success(defaultValue);
             }
 
             try
             {
-                var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
-                if (body != null)
-                {
-                    body.AllowSynchronousIO = true;
-                }
 
                 IList<IDisposable> toDispose = new List<IDisposable>();
 
                 Uri baseAddress = GetBaseAddressInternal(request);
 
-                object result = ReadFromStream(type, defaultValue, baseAddress, request, toDispose);
+                object result = await ReadFromStreamAsync(type, defaultValue, baseAddress, request, toDispose).ConfigureAwait(false);
 
                 foreach (IDisposable obj in toDispose)
                 {
                     obj.Dispose();
                 }
 
-                return Task.FromResult(InputFormatterResult.Success(result));
+                return InputFormatterResult.Success(result);
             }
             catch (Exception ex)
             {
                 context.ModelState.AddModelError(context.ModelName, ex, context.Metadata);
-                return Task.FromResult(InputFormatterResult.Failure());
+                return InputFormatterResult.Failure();
             }
         }
 
@@ -167,35 +162,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             return baseAddress[baseAddress.Length - 1] != '/' ? new Uri(baseAddress + '/') : new Uri(baseAddress);
 
-            /*
-            LinkGenerator linkGenerator = request.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-            if (linkGenerator != null)
-            {
-                Endpoint endPoint = request.HttpContext.GetEndpoint();
-                EndpointNameMetadata endpointName = endPoint.Metadata.GetMetadata<EndpointNameMetadata>();
-
-                if (endpointName != null)
-                {
-                    string aUri = linkGenerator.GetUriByName(request.HttpContext, endpointName.EndpointName,
-                        request.RouteValues, request.Scheme, request.Host, request.PathBase);
-                    return new Uri(aUri);
-                }
-
-                RouteNameMetadata routeName = endPoint.Metadata.GetMetadata<RouteNameMetadata>();
-                if (routeName != null)
-                {
-                    string aUri = linkGenerator.GetUriByRouteValues(request.HttpContext, routeName.RouteName,
-                        request.RouteValues, request.Scheme, request.Host, request.PathBase);
-                    return new Uri(aUri);
-                }
-            }
-
-            return null;*/
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is sent to the logger, which may throw it.")]
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "oDataMessageReader mis registered for disposal.")]
-        internal static object ReadFromStream(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
+        internal static async Task<object> ReadFromStreamAsync(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
         {
             object result;
             IEdmModel model = request.GetModel();
@@ -213,7 +184,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
                 IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(request.Body, request.Headers, request.GetODataContentIdMapping(), request.GetSubServiceProvider());
+                    ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetSubServiceProvider());
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
                 disposes.Add(oDataMessageReader);
 
@@ -228,7 +199,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 readContext.ResourceType = type;
                 readContext.ResourceEdmType = expectedPayloadType;
 
-                result = deserializer.Read(oDataMessageReader, type, readContext);
+                result = await deserializer.ReadAsync(oDataMessageReader, type, readContext).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

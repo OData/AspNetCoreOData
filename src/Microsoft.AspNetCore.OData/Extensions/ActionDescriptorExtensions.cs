@@ -14,10 +14,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal static class ActionDescriptorExtensions
     {
-        // Maintain the Microsoft.AspNet.OData. prefix in any new properties to avoid conflicts with user properties
+        // Maintain the Microsoft.AspNetCore.OData. prefix in any new properties to avoid conflicts with user properties
         // and those of the v3 assembly.  Concern is reduced here due to addition of user type name but prefix
         // also clearly ties the property to code in this assembly.
-        private const string ModelKeyPrefix = "Microsoft.AspNet.OData.Model+";
+        private const string ModelKeyPrefix = "Microsoft.AspNetCore.OData.Model+";
 
         private static readonly object SyncLock = new object();
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
@@ -23,14 +24,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void Read_Throws_NotSupported()
+        public async Task ReadAsync_Throws_NotSupported()
         {
             // Arrange
             Mock<ODataDeserializer> deserializer = new Mock<ODataDeserializer>(ODataPayloadKind.Resource) { CallBase = true };
 
             // Act & Assert
-            ExceptionAssert.Throws<NotSupportedException>(
-                () => deserializer.Object.Read(messageReader: null, type: null, readContext: null),
+            await ExceptionAssert.ThrowsAsync<NotSupportedException>(
+                () => deserializer.Object.ReadAsync(messageReader: null, type: null, readContext: null),
                 "'ODataDeserializerProxy' does not support Read.");
         }
     }

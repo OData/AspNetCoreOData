@@ -4,8 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.MediaType;
@@ -48,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable")]
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
-        internal static void WriteToStream(
+        internal static async Task WriteToStreamAsync(
             Type type,
             object value,
             IEdmModel model,
@@ -80,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, request.GetSubServiceProvider());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetSubServiceProvider());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -150,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     writeContext.SelectExpandClause = selectExpandDifferentFromQueryOptions;
                 }
 
-                serializer.WriteObject(value, type, messageWriter, writeContext);
+                await serializer.WriteObjectAsync(value, type, messageWriter, writeContext).ConfigureAwait(false);
             }
         }
 
@@ -224,6 +227,120 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return null;
+        }
+    }
+
+    // Since OData metadata write is not async.
+    // Any $metadata request will throw "Synchronous operations are disallowed. Call WriteAsync or set AllowSynchronousIO to true."
+    // So, we have to use "StreamWrapper" to override "Write(byte[] buffer, int offset, int count)"
+    // Once we enable async for metadata writer, we should remove this class.
+    internal class StreamWrapper : Stream
+    {
+        private Stream stream;
+        public StreamWrapper(Stream stream)
+        {
+            this.stream = stream;
+        }
+
+        public override bool CanRead => this.stream.CanRead;
+
+        public override bool CanSeek => this.stream.CanSeek;
+
+        public override bool CanWrite => this.stream.CanWrite;
+
+        public override long Length => this.stream.Length;
+
+        public override int ReadTimeout { get => this.stream.ReadTimeout; set => this.stream.ReadTimeout = value; }
+
+        public override int WriteTimeout { get => this.stream.WriteTimeout; set => this.stream.WriteTimeout = value; }
+
+        public override bool CanTimeout => this.stream.CanTimeout;
+
+        public override void Close()
+        {
+            this.stream.Close();
+        }
+
+        public override long Position { get => this.stream.Position; set => this.stream.Position = value; }
+
+        public override void Flush()
+        {
+            this.stream.FlushAsync().Wait();
+        }
+
+        public override Task FlushAsync(CancellationToken cancellationToken)
+        {
+            return stream.FlushAsync(cancellationToken);
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return this.stream.ReadAsync(buffer, offset, count).Result;
+        }
+
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return this.stream.ReadAsync(buffer, offset, count, cancellationToken);
+        }
+
+        public override int ReadByte()
+        {
+            return this.stream.ReadByte();
+        }
+
+        public override void WriteByte(byte value)
+        {
+            this.stream.WriteByte(value);
+        }
+
+        public override Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
+        {
+            return this.stream.CopyToAsync(destination, bufferSize, cancellationToken);
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return this.stream.Seek(offset, origin);
+        }
+
+        public override void SetLength(long value)
+        {
+            this.stream.SetLength(value);
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            this.stream.WriteAsync(buffer, offset, count).GetAwaiter().GetResult();
+        }
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return this.stream.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return this.stream.BeginRead(buffer, offset, count, callback, state);
+        }
+
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return this.stream.BeginWrite(buffer, offset, count, callback, state);
+        }
+
+        public override int EndRead(IAsyncResult asyncResult)
+        {
+            return this.stream.EndRead(asyncResult);
+        }
+
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            this.stream.EndWrite(asyncResult);
+        }
+
+        public override string ToString()
+        {
+            return this.stream.ToString();
         }
     }
 }

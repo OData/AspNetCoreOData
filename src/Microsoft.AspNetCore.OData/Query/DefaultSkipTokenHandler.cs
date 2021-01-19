@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 };
             }
 
-            return context.Request.GetNextPageLink(pageSize, instance, skipTokenGenerator);
+            return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
         }
 
         /// <summary>

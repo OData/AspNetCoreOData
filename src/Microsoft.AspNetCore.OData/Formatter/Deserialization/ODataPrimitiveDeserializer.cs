@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -23,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override object Read(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             if (messageReader == null)
             {
@@ -38,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEdmTypeReference edmType = readContext.GetEdmType(type);
             Contract.Assert(edmType != null);
 
-            ODataProperty property = messageReader.ReadProperty(edmType);
+            ODataProperty property = await messageReader.ReadPropertyAsync(edmType).ConfigureAwait(false);
             return ReadInline(property, edmType, readContext);
         }
 

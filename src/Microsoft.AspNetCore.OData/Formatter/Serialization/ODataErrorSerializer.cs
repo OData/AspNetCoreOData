@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
@@ -23,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc/>
-        public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
             if (graph == null)
             {
@@ -40,8 +41,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 if (!IsHttpError(graph))
                 {
-                    string message = Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName);
-                    throw new SerializationException(message);
+                    throw new SerializationException(
+                        Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName));
                 }
                 else
                 {
@@ -49,9 +50,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            // TODO: Call Async version?
             bool includeDebugInformation = oDataError.InnerError != null;
-            messageWriter.WriteError(oDataError, includeDebugInformation);
+            await messageWriter.WriteErrorAsync(oDataError, includeDebugInformation).ConfigureAwait(false);
         }
 
         /// <summary>

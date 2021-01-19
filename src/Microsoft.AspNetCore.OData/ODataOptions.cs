@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.AspNetCore.OData.Common;
-using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -41,23 +39,6 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// Gets or Sets a value indicating if value should be emitted for dynamic properties which are null.
-        /// By default, it's true;
-        /// </summary>
-        public bool OmitNullDynamicProperty { get; set; } = true;
-
-        /// <summary>
-        ///Sets a value indicating if value should be emitted for dynamic properties which are null.
-        /// </summary>
-        /// <param name="enabled">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetNullDynamicProperty(bool enabled)
-        {
-            OmitNullDynamicProperty = enabled;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or Sets a value indicating if batch requests should continue on error.
         /// By default, it's false.
         /// </summary>
@@ -71,22 +52,6 @@ namespace Microsoft.AspNetCore.OData
         public ODataOptions SetContinueOnErrorHeader(bool enableContinueOnError)
         {
             EnableContinueOnErrorHeader = enableContinueOnError;
-            return this;
-        }
-
-        /// <summary>
-        /// Gets or Sets the set of flags that have options for backward compatibility.
-        /// </summary>
-        public CompatibilityOptions CompatibilityOptions { get; set; }
-
-        /// <summary>
-        /// Sets the set of flags that have options for backward compatibility.
-        /// </summary>
-        /// <param name="enabled">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetCompatibilityOptions(bool enabled)
-        {
-            EnableAttributeRouting = enabled;
             return this;
         }
 

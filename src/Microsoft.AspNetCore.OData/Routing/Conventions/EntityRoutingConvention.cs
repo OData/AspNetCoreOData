@@ -27,14 +27,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     public class EntityRoutingConvention : IODataControllerActionConvention
     {
         /// <inheritdoc />
-        public int Order => 300;
+        public virtual int Order => 300;
 
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             return context.EntitySet != null;
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             ActionModel action = context.Action;

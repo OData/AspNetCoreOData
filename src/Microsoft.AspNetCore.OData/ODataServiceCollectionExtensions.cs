@@ -36,18 +36,74 @@ namespace Microsoft.AspNetCore.OData
         /// Adds services required for OData requests.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with,
+        /// including access to a service provider which you can resolve services from.</param>
+        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
+        public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions, IServiceProvider> setupAction)
+        {
+            if (setupAction == null)
+            {
+                throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            IODataBuilder builder = services.AddODataCore();
+
+            services
+                .AddOptions<ODataOptions>()
+                .Configure(setupAction);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds services required for OData requests.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <param name="setupAction">The OData options to configure the services with.</param>
         /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
         public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
         {
-            if (services == null)
-            {
-                throw Error.ArgumentNull(nameof(services));
-            }
-
             if (setupAction == null)
             {
                 throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            IODataBuilder builder = services.AddODataCore();
+            services.Configure(setupAction);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds OData routing convention.
+        /// </summary>
+        /// <typeparam name="T">The routing convention type.</typeparam>
+        /// <param name="builder">The OData service builder.</param>
+        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
+        public static IODataBuilder AddConvention<T>(this IODataBuilder builder)
+            where T : class, IODataControllerActionConvention
+        {
+            if (builder == null)
+            {
+                throw Error.ArgumentNull(nameof(builder));
+            }
+
+            builder.Services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IODataControllerActionConvention, T>());
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds the core OData services required for OData requests, excluding the <see cref="ODataOptions"/> configuration.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
+        private static IODataBuilder AddODataCore(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
             }
 
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
@@ -76,30 +132,10 @@ namespace Microsoft.AspNetCore.OData
                 // options.ValueProviderFactories.Insert(0, new ODataValueProviderFactory());
             });
 
-            services.Configure(setupAction);
 
             services.AddODataRouting();
 
             IODataBuilder builder = new DefaultODataBuilder(services);
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds OData routing convention.
-        /// </summary>
-        /// <typeparam name="T">The routing convention type.</typeparam>
-        /// <param name="builder">The OData service builder.</param>
-        /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
-        public static IODataBuilder AddConvention<T>(this IODataBuilder builder)
-            where T : class, IODataControllerActionConvention
-        {
-            if (builder == null)
-            {
-                throw Error.ArgumentNull(nameof(builder));
-            }
-
-            builder.Services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IODataControllerActionConvention, T>());
 
             return builder;
         }

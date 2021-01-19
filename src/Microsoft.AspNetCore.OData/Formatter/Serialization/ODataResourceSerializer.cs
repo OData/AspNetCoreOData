@@ -12,7 +12,6 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
-using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +22,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation;
 using Microsoft.AspNetCore.OData.Common;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter,
+        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter,
             ODataSerializerContext writeContext)
         {
             if (messageWriter == null)
@@ -58,12 +58,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(edmType != null);
 
             IEdmNavigationSource navigationSource = writeContext.NavigationSource;
-            ODataWriter writer = messageWriter.CreateODataResourceWriter(navigationSource, edmType.ToStructuredType());
-            WriteObjectInline(graph, edmType, writer, writeContext);
+            ODataWriter writer = await messageWriter.CreateODataResourceWriterAsync(navigationSource, edmType.ToStructuredType())
+                .ConfigureAwait(false);
+            await WriteObjectInlineAsync(graph, edmType, writer, writeContext).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public override void WriteObjectInline(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        public override async Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -82,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
-                WriteResource(graph, writer, writeContext, expectedType);
+                await WriteResourceAsync(graph, writer, writeContext, expectedType).ConfigureAwait(false);
             }
         }
 
@@ -94,7 +95,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual void WriteDeltaObjectInline(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        public virtual async Task WriteDeltaObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
            ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -113,11 +114,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
-                WriteDeltaResource(graph, writer, writeContext);
+                await WriteDeltaResourceAsync(graph, writer, writeContext).ConfigureAwait(false);
             }
         }
 
-        private void WriteDeltaResource(object graph, ODataWriter writer, ODataSerializerContext writeContext)
+        private async Task WriteDeltaResourceAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
         {
             Contract.Assert(writeContext != null);
 
@@ -136,8 +137,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 if (resource != null)
                 {
-                    writer.WriteStart(resource);
-                    WriteDeltaComplexProperties(selectExpandNode, resourceContext, writer);
+                    await writer.WriteStartAsync(resource).ConfigureAwait(false);
+                    await WriteDeltaComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                     //TODO: Need to add support to write Navigation Links, etc. using Delta Writer
                     //https://github.com/OData/odata.net/issues/155
                     //CLEANUP: merge delta logic with regular logic; requires common base between ODataWriter and ODataDeltaWriter
@@ -145,12 +146,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     //WriteNavigationLinks(selectExpandNode.SelectedNavigationProperties, resourceContext, writer);
                     //WriteExpandedNavigationProperties(selectExpandNode.ExpandedNavigationProperties, resourceContext, writer);
 
-                    writer.WriteEnd();
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
         }
 
-        private void WriteDeltaComplexProperties(SelectExpandNode selectExpandNode,
+        private async Task WriteDeltaComplexPropertiesAsync(SelectExpandNode selectExpandNode,
             ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(resourceContext != null);
@@ -178,13 +179,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Name = complexProperty.Name
                 };
 
-                writer.WriteStart(nestedResourceInfo);
-                WriteDeltaComplexAndExpandedNavigationProperty(complexProperty, null, resourceContext, writer);
-                writer.WriteEnd();
+                await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                await WriteDeltaComplexAndExpandedNavigationPropertyAsync(complexProperty, null, resourceContext, writer)
+                    .ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
         }
 
-        private void WriteDeltaComplexAndExpandedNavigationProperty(IEdmProperty edmProperty, SelectExpandClause selectExpandClause,
+        private async Task WriteDeltaComplexAndExpandedNavigationPropertyAsync(IEdmProperty edmProperty, SelectExpandClause selectExpandClause,
             ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(edmProperty != null);
@@ -201,18 +203,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     // it may just be empty.
                     // If a collection of complex or entities can be related, it is represented as a JSON array. An empty
                     // collection of resources (one that contains no resource) is represented as an empty JSON array.
-                    writer.WriteStart(new ODataResourceSet
+                    await writer.WriteStartAsync(new ODataResourceSet
                     {
                         TypeName = edmProperty.Type.FullName()
-                    });
+                    }).ConfigureAwait(false);
                 }
                 else
                 {
                     // If at most one resource can be related, the value is null if no resource is currently related.
-                    writer.WriteStart(resource: null);
+                    await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
                 }
 
-                writer.WriteEnd();
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
             else
             {
@@ -231,18 +233,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmProperty.Type.IsCollection())
                 {
                     ODataDeltaFeedSerializer serializer = new ODataDeltaFeedSerializer(SerializerProvider);
-                    serializer.WriteDeltaFeedInline(propertyValue, edmProperty.Type, writer, nestedWriteContext);
+                    await serializer.WriteDeltaFeedInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
                     ODataResourceSerializer serializer = new ODataResourceSerializer(SerializerProvider);
-                    serializer.WriteDeltaObjectInline(propertyValue, edmProperty.Type, writer, nestedWriteContext);
+                    await serializer.WriteDeltaObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                        .ConfigureAwait(false);
                 }
             }
         }
 
         private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmEntityType entityType, object graph,
-            Dictionary<IEdmProperty, object> dynamicTypeProperties)
+            Dictionary<IEdmProperty, object> dynamicTypeProperties, ODataSerializerContext writeContext)
         {
             Contract.Assert(dynamicTypeProperties != null);
 
@@ -260,11 +264,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 foreach (var prop in dynamicObject.Values)
                 {
+                    IEdmProperty edmProperty = entityType?.Properties()
+                            .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
+
                     if (prop.Value != null
                         && (prop.Value is DynamicTypeWrapper || (prop.Value is IEnumerable<DynamicTypeWrapper>)))
                     {
-                        IEdmProperty edmProperty = entityType.Properties()
-                            .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
                         if (edmProperty != null)
                         {
                             dynamicTypeProperties.Add(edmProperty, prop.Value);
@@ -272,11 +277,34 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
                     else
                     {
-                        var property = new ODataProperty
+                        ODataProperty property;
+                        if (prop.Value == null)
                         {
-                            Name = prop.Key,
-                            Value = prop.Value
-                        };
+                            property = new ODataProperty
+                            {
+                                Name = prop.Key,
+                                Value = new ODataNullValue()
+                            };
+                        }
+                        else
+                        {
+                            if (edmProperty != null)
+                            {
+                                property = new ODataProperty
+                                {
+                                    Name = prop.Key,
+                                    Value = ODataPrimitiveSerializer.ConvertPrimitiveValue(prop.Value, edmProperty.Type.AsPrimitive(), writeContext?.TimeZone)
+                                };
+                            }
+                            else
+                            {
+                                property = new ODataProperty
+                                {
+                                    Name = prop.Key,
+                                    Value = prop.Value
+                                };
+                            }
+                        }
 
                         properties.Add(property);
                     }
@@ -286,7 +314,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return properties;
         }
 
-        private void WriteDynamicTypeResource(object graph, ODataWriter writer, IEdmTypeReference expectedType,
+        private async Task WriteDynamicTypeResourceAsync(object graph, ODataWriter writer, IEdmTypeReference expectedType,
             ODataSerializerContext writeContext)
         {
             var dynamicTypeProperties = new Dictionary<IEdmProperty, object>();
@@ -294,11 +322,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             var resource = new ODataResource()
             {
                 TypeName = expectedType.FullName(),
-                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties)
+                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties, writeContext)
             };
 
             resource.IsTransient = true;
-            writer.WriteStart(resource);
+            await writer.WriteStartAsync(resource).ConfigureAwait(false);
             foreach (var property in dynamicTypeProperties.Keys)
             {
                 var resourceContext = new ResourceContext(writeContext, expectedType.AsEntity(), graph);
@@ -308,9 +336,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     var navigationLink = CreateNavigationLink(navigationProperty, resourceContext);
                     if (navigationLink != null)
                     {
-                        writer.WriteStart(navigationLink);
-                        WriteDynamicTypeResource(dynamicTypeProperties[property], writer, property.Type, writeContext);
-                        writer.WriteEnd();
+                        await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
+                        await WriteDynamicTypeResourceAsync(dynamicTypeProperties[property], writer, property.Type, writeContext)
+                            .ConfigureAwait(false);
+                        await writer.WriteEndAsync().ConfigureAwait(false);
                     }
                 }
                 else
@@ -321,23 +350,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         Name = property.Name
                     };
 
-                    writer.WriteStart(nestedResourceInfo);
-                    WriteDynamicComplexProperty(dynamicTypeProperties[property], property.Type, resourceContext, writer);
-                    writer.WriteEnd();
+                    await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                    await WriteDynamicComplexPropertyAsync(dynamicTypeProperties[property], property.Type, resourceContext, writer)
+                        .ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
 
-            writer.WriteEnd();
+            await writer.WriteEndAsync().ConfigureAwait(false);
         }
 
-        private void WriteResource(object graph, ODataWriter writer, ODataSerializerContext writeContext,
+        private async Task WriteResourceAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext,
             IEdmTypeReference expectedType)
         {
             Contract.Assert(writeContext != null);
 
             if (graph.GetType().IsDynamicTypeWrapper())
             {
-                WriteDynamicTypeResource(graph, writer, expectedType, writeContext);
+                await WriteDynamicTypeResourceAsync(graph, writer, expectedType, writeContext).ConfigureAwait(false);
                 return;
             }
 
@@ -352,20 +382,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     if (resourceContext.SerializerContext.ExpandReference)
                     {
-                        writer.WriteEntityReferenceLink(new ODataEntityReferenceLink
+                        await writer.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink
                         {
                             Url = resource.Id
-                        });
+                        }).ConfigureAwait(false);
                     }
                     else
                     {
-                        writer.WriteStart(resource);
-                        WriteComplexProperties(selectExpandNode, resourceContext, writer);
-                        WriteDynamicComplexProperties(resourceContext, writer);
-                        WriteNavigationLinks(selectExpandNode, resourceContext, writer);
-                        WriteExpandedNavigationProperties(selectExpandNode, resourceContext, writer);
-                        WriteReferencedNavigationProperties(selectExpandNode, resourceContext, writer);
-                        writer.WriteEnd();
+                        await writer.WriteStartAsync(resource).ConfigureAwait(false);
+                        await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
+                        await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        await WriteExpandedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        await WriteReferencedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        await writer.WriteEndAsync().ConfigureAwait(false);
                     }
                 }
             }
@@ -540,14 +570,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 nullDynamicPropertyEnabled = true;
             }
-            else if (resourceContext.Request != null)
-            {
-                ODataOptions options = resourceContext.Request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
-                if (options != null)
-                {
-                    nullDynamicPropertyEnabled = options.OmitNullDynamicProperty;
-                }
-            }
 
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;
@@ -684,10 +706,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return null;
         }
 
+
         /// <summary>
         /// Write the navigation link for the select navigation properties.
         /// </summary>
-        private void WriteNavigationLinks(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteNavigationLinksAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(selectExpandNode != null);
             Contract.Assert(resourceContext != null);
@@ -700,12 +723,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEnumerable<ODataNestedResourceInfo> navigationLinks = CreateNavigationLinks(selectExpandNode.SelectedNavigationProperties, resourceContext);
             foreach (ODataNestedResourceInfo navigationLink in navigationLinks)
             {
-                writer.WriteStart(navigationLink);
-                writer.WriteEnd();
+                await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
         }
 
-        private void WriteDynamicComplexProperties(ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteDynamicComplexPropertiesAsync(ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(resourceContext != null);
             Contract.Assert(resourceContext.EdmModel != null);
@@ -737,14 +760,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         Name = dynamicComplexProperty.Key,
                     };
 
-                    writer.WriteStart(nestedResourceInfo);
-                    WriteDynamicComplexProperty(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer);
-                    writer.WriteEnd();
+                    await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                    await WriteDynamicComplexPropertyAsync(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer)
+                        .ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
         }
 
-        private void WriteDynamicComplexProperty(object propertyValue, IEdmTypeReference edmType, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteDynamicComplexPropertyAsync(object propertyValue, IEdmTypeReference edmType, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
@@ -763,10 +787,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.TypeCannotBeSerialized, edmType.ToTraceString()));
             }
 
-            serializer.WriteObjectInline(propertyValue, edmType, writer, nestedWriteContext);
+            await serializer.WriteObjectInlineAsync(propertyValue, edmType, writer, nestedWriteContext).ConfigureAwait(false);
         }
 
-        private void WriteComplexProperties(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteComplexPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(selectExpandNode != null);
             Contract.Assert(resourceContext != null);
@@ -795,13 +819,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Name = complexProperty.Name
                 };
 
-                writer.WriteStart(nestedResourceInfo);
-                WriteComplexAndExpandedNavigationProperty(complexProperty, selectedComplex.Value, resourceContext, writer);
-                writer.WriteEnd();
+                await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                await WriteComplexAndExpandedNavigationPropertyAsync(complexProperty, selectedComplex.Value, resourceContext, writer)
+                    .ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
         }
 
-        private void WriteExpandedNavigationProperties(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteExpandedNavigationPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
@@ -819,14 +844,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 ODataNestedResourceInfo navigationLink = CreateNavigationLink(navigationProperty, resourceContext);
                 if (navigationLink != null)
                 {
-                    writer.WriteStart(navigationLink);
-                    WriteComplexAndExpandedNavigationProperty(navigationProperty, navPropertyToExpand.Value, resourceContext, writer);
-                    writer.WriteEnd();
+                    await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
+                    await WriteComplexAndExpandedNavigationPropertyAsync(navigationProperty, navPropertyToExpand.Value, resourceContext, writer).ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
         }
 
-        private void WriteReferencedNavigationProperties(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteReferencedNavigationPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
@@ -844,14 +869,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 ODataNestedResourceInfo nestedResourceInfo = CreateNavigationLink(navigationProperty, resourceContext);
                 if (nestedResourceInfo != null)
                 {
-                    writer.WriteStart(nestedResourceInfo);
-                    WriteComplexAndExpandedNavigationProperty(navigationProperty, referenced.Value, resourceContext, writer);
-                    writer.WriteEnd();
+                    await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                    await WriteComplexAndExpandedNavigationPropertyAsync(navigationProperty, referenced.Value, resourceContext, writer)
+                        .ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
         }
 
-        private void WriteComplexAndExpandedNavigationProperty(IEdmProperty edmProperty, SelectItem selectItem, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteComplexAndExpandedNavigationPropertyAsync(IEdmProperty edmProperty, SelectItem selectItem, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(edmProperty != null);
             Contract.Assert(resourceContext != null);
@@ -867,18 +893,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     // it may just be empty.
                     // If a collection of complex or entities can be related, it is represented as a JSON array. An empty
                     // collection of resources (one that contains no resource) is represented as an empty JSON array.
-                    writer.WriteStart(new ODataResourceSet
+                    await writer.WriteStartAsync(new ODataResourceSet
                     {
                         TypeName = edmProperty.Type.FullName()
-                    });
+                    }).ConfigureAwait(false);
                 }
                 else
                 {
                     // If at most one resource can be related, the value is null if no resource is currently related.
-                    writer.WriteStart(resource: null);
+                    await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
                 }
 
-                writer.WriteEnd();
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
             else
             {
@@ -892,7 +918,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmProperty.Type.ToTraceString()));
                 }
 
-                serializer.WriteObjectInline(propertyValue, edmProperty.Type, writer, nestedWriteContext);
+                await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                    .ConfigureAwait(false);
             }
         }
 

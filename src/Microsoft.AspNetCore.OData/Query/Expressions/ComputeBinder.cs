@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     internal class ComputeBinder : TransformationBinderBase
     {
         private ComputeTransformationNode _transformation;
-        private string _modelID;
+        private IEdmModel _model;
 
         internal ComputeBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,
             IEdmModel model, ComputeTransformationNode transformation)
@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(transformation != null);
 
             _transformation = transformation;
-            _modelID = ModelContainer.GetModelID(model);
+            _model = model;
 
             this.ResultClrType = typeof(ComputeWrapper<>).MakeGenericType(this.ElementType);
         }
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Should return following expression
             // .Select($it => new ComputeWrapper<T> {
             //      Instance = $it,
-            //      ModelID = 'Guid',
+            //      Model = parametrized(IEdmModel),
             //      Container => new AggregationPropertyContainer() {
             //          Name = "X", 
             //          Value = $it.X + $it.Y, 
@@ -60,12 +60,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 properties.Add(new NamedPropertyExpression(Expression.Constant(computeExpression.Alias), CreateComputeExpression(computeExpression)));
             }
 
-            // Initialize property 'ModelID' on the wrapper class.
-            // source = new Wrapper { ModelID = 'some-guid-id' }
-            wrapperProperty = this.ResultClrType.GetProperty("ModelID");
-            var wrapperPropertyValueExpression = QuerySettings.EnableConstantParameterization ?
-                LinqParameterContainer.Parameterize(typeof(string), _modelID) :
-                Expression.Constant(_modelID);
+            // Initialize property 'Model' on the wrapper class.
+            // source = new Wrapper { Model = parameterized(a-edm-model) }
+            // Always parameterize as EntityFramework does not let you inject non primitive constant values (like IEdmModel).
+            wrapperProperty = this.ResultClrType.GetProperty("Model");
+            var wrapperPropertyValueExpression = LinqParameterContainer.Parameterize(typeof(IEdmModel), _model);
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
 
             // Set new compute properties

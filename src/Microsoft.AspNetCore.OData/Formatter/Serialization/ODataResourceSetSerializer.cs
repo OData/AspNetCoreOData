@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
@@ -40,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public override void WriteObject(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
             if (messageWriter == null)
             {
@@ -58,12 +59,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(resourceSetType != null);
 
             IEdmStructuredTypeReference resourceType = GetResourceType(resourceSetType);
-            ODataWriter writer = messageWriter.CreateODataResourceSetWriter(entitySet, resourceType.StructuredDefinition());
-            WriteObjectInline(graph, resourceSetType, writer, writeContext);
+            
+            ODataWriter writer = await messageWriter.CreateODataResourceSetWriterAsync(entitySet, resourceType.StructuredDefinition())
+                .ConfigureAwait(false);
+            await WriteObjectInlineAsync(graph, resourceSetType, writer, writeContext)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public override void WriteObjectInline(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        public override async Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -93,10 +97,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            WriteResourceSet(enumerable, expectedType, writer, writeContext);
+            await WriteResourceSetAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
         }
 
-        private void WriteResourceSet(IEnumerable enumerable, IEdmTypeReference resourceSetType, ODataWriter writer,
+        private async Task WriteResourceSetAsync(IEnumerable enumerable, IEdmTypeReference resourceSetType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             Contract.Assert(writer != null);
@@ -135,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             // set the nextpagelink to null to support JSON odata.streaming.
             resourceSet.NextPageLink = null;
-            writer.WriteStart(resourceSet);
+            await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
             foreach (object item in enumerable)
             {
@@ -148,12 +152,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
 
                     // for null complex element, it can be serialized as "null" in the collection.
-                    writer.WriteStart(resource: null);
-                    writer.WriteEnd();
+                    await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
                 }
                 else
                 {
-                    resourceSerializer.WriteObjectInline(item, elementType, writer, writeContext);
+                    await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
                 }
             }
 
@@ -165,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             resourceSet.NextPageLink = nextLinkGenerator(lastResource);
 
-            writer.WriteEnd();
+            await writer.WriteEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -373,11 +377,29 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         private static Uri GetNestedNextPageLink(ODataSerializerContext writeContext, int pageSize, object obj)
         {
             Contract.Assert(writeContext.ExpandedResource != null);
+            Uri navigationLink;
             IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedResource.NavigationSource;
             NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
-            Uri navigationLink =
-                linkBuilder.BuildNavigationLink(writeContext.ExpandedResource, writeContext.NavigationProperty);
+
+            // In Contained Navigation, we don't have navigation property binding,
+            // Hence we cannot get the NavigationLink from the NavigationLinkBuilder
+            if (writeContext.NavigationSource.NavigationSourceKind() == EdmNavigationSourceKind.ContainedEntitySet)
+            {
+                // Contained navigation.
+                Uri idlink = linkBuilder.BuildIdLink(writeContext.ExpandedResource);
+
+                var link = idlink.ToString() + "/" + writeContext.NavigationProperty.Name;
+                navigationLink = new Uri(link);
+            }
+            else
+            {
+                // Non-Contained navigation.
+                navigationLink =
+                    linkBuilder.BuildNavigationLink(writeContext.ExpandedResource, writeContext.NavigationProperty);
+            }
+
             Uri nestedNextLink = GenerateQueryFromExpandedItem(writeContext, navigationLink);
+
             SkipTokenHandler nextLinkGenerator = null;
             if (writeContext.QueryContext != null)
             {

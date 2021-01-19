@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.HttpContext.ODataFeature();
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.HttpContext.ODataBatchFeature();
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.ODataFeature().Model;
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             ODataPath path = request.ODataFeature().Path;
@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataMessageReaderSettings>();
@@ -109,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataMessageWriterSettings>();
@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             UriBuilder uriBuilder = new UriBuilder(request.Scheme, request.Host.Host)
@@ -153,37 +153,8 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 uriBuilder.Port = request.Host.Port.Value;
             }
 
-            CompatibilityOptions compatibilityOptions = request.GetCompatibilityOptions();
-
             IEnumerable<KeyValuePair<string, string>> queryParameters = request.Query.SelectMany(kvp => kvp.Value, (kvp, value) => new KeyValuePair<string, string>(kvp.Key, value));
-            return GetNextPageHelper.GetNextPageLink(uriBuilder.Uri, queryParameters, pageSize, instance, objectToSkipTokenValue, compatibilityOptions);
-        }
-
-        /// <summary>
-        /// Gets the set of flags for <see cref="CompatibilityOptions"/> from ODataOptions. 
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>Set of flags for <see cref="CompatibilityOptions"/> from ODataOptions.</returns>
-        internal static CompatibilityOptions GetCompatibilityOptions(this HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            if (request.HttpContext == null)
-            {
-                return CompatibilityOptions.None;
-            }
-
-            IOptions<ODataOptions> options = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
-
-            if (options == null)
-            {
-                return CompatibilityOptions.None;
-            }
-
-            return options.Value.CompatibilityOptions;
+            return GetNextPageHelper.GetNextPageLink(uriBuilder.Uri, queryParameters, pageSize, instance, objectToSkipTokenValue);
         }
 
         /// <summary>
@@ -340,7 +311,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             ODataFeature feature = request.ODataFeature() as ODataFeature;
@@ -352,7 +323,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataServiceVersionHeader);
@@ -362,7 +333,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMaxServiceVersionHeader);
@@ -372,7 +343,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return GetODataVersionFromHeader(request.Headers, ODataVersionConstraint.ODataMinServiceVersionHeader);

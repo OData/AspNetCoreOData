@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -48,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (context.EntitySet == null && context.Singleton == null)
@@ -206,28 +207,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(NormalizeHttpMethod(httpMethod), prefix, model, template);
-        }
-
-        private static string NormalizeHttpMethod(string method)
-        {
-            switch(method.ToUpperInvariant())
-            {
-                case "POSTTO":
-                    return "POST";
-
-                case "PUTTO":
-                    return "PUT";
-
-                case "PATCHTO":
-                    return "PATCH";
-
-                case "DELETETO":
-                    return "DELETE";
-
-                default:
-                    return method;
-            }
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
         }
 
         // Split the property such as "GetCityOfSubAddressFromVipCustomer"

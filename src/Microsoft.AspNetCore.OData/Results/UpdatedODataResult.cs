@@ -16,32 +16,24 @@ namespace Microsoft.AspNetCore.OData.Results
     /// </summary>
     /// <typeparam name="T">The entity type.</typeparam>
     /// <remarks>This action result handles content negotiation and the HTTP prefer header.</remarks>
-    public class UpdatedODataResult<T> : IActionResult
+    public class UpdatedODataResult<T> : ActionResult
     {
-        private readonly T _innerResult;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdatedODataResult{T}"/> class.
         /// </summary>
         /// <param name="entity">The updated entity.</param>
         public UpdatedODataResult(T entity)
         {
-            this._innerResult = entity ?? throw new ArgumentNullException(nameof(entity));
+            Entity = entity ?? throw new ArgumentNullException(nameof(entity));
         }
 
         /// <summary>
         /// Gets the entity that was updated.
         /// </summary>
-        public virtual T Entity
-        {
-            get
-            {
-                return _innerResult;
-            }
-        }
+        public virtual T Entity { get; }
 
         /// <inheritdoc/>
-        public async virtual Task ExecuteResultAsync(ActionContext context)
+        public async override Task ExecuteResultAsync(ActionContext context)
         {
             if (context == null)
             {
@@ -59,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (RequestPreferenceHelpers.RequestPrefersReturnContent(request.Headers))
             {
-                ObjectResult objectResult = new ObjectResult(_innerResult)
+                ObjectResult objectResult = new ObjectResult(Entity)
                 {
                     StatusCode = StatusCodes.Status200OK
                 };
