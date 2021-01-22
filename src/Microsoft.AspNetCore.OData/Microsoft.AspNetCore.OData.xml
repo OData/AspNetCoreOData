@@ -1075,11 +1075,139 @@
             Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input. No checking for other types.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.Text">
-            <summary>Text being parsed.</summary>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind">
+            <summary>
+            Enumeration values for token kinds.
+            </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.TextLen">
-            <summary>Length of text being parsed.</summary>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Unknown">
+            <summary>Unknown.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.TextEnd">
+            <summary>End of text.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Literal">
+            <summary>Literal, could be an identifier, a number, null, guid, etc.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Comma">
+            <summary>Comma ','</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Equal">
+            <summary>Equal '='</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionToken">
+            <summary>
+            Use this struct to represent a lexical expression token.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Kind">
+            <summary>InternalKind of token.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Text">
+            <summary>Token text.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Position">
+            <summary>Position of token.</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer">
+            <summary>
+            Components to parse an expression into token.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer._rawText">
+            <summary>The raw input text being parsed.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer._length">
+            <summary>Length of raw input text being parsed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._char">
+            <summary>Character being processed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._token">
+            <summary>Token being processed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._textPos">
+            <summary>Position on text being parsed.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer" /> class.
+            </summary>
+            <param name="expression">The expression to lexer.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.CurrentToken">
+            <summary>Token being processed. </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.NextToken">
+            <summary>
+            Reads the next token, skipping whitespace as necessary, advancing the Lexer.
+            </summary>
+            <returns>The parsed token.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ValidateToken(Microsoft.AspNetCore.OData.Common.ExpressionTokenKind)">
+            <summary>Validates the current token is of the specified kind.</summary>
+            <param name="kind">Expected token kind.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.IsValidWhiteSpace">
+            <summary>
+            Gets if the current char is whitespace.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ReadNextToken(System.Exception@)">
+            <summary>
+            Reads the next token, skipping whitespace as necessary.
+            </summary>
+            <param name="error">The potential error.</param>
+            <returns>The next token, which may be 'bad' if an error occurs.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.AdvanceToNextOccurenceOf(System.Char)">
+            <summary>
+            Advance the pointer to the next occurence of the given value, swallowing all characters in between.
+            </summary>
+            <param name="endingValue">the ending delimiter.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ParseLiteral">
+            <summary>
+            Parses a literal be checking for delimiting characters '\0', ',',')' and ' '
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.NextChar">
+            <summary>
+            Advanced to the next character.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.SetTextPos(System.Int32)">
+            <summary>
+            Sets the text position.
+            </summary>
+            <param name="pos">The new position.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ParseWhitespace">
+            <summary>
+            Parses (skip) white spaces
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer">
+            <summary>This class implements IEqualityComparer for UnicodeCategory</summary>
+            <remarks>
+            Using this class rather than EqualityComparer&lt;T&gt;.Default
+            saves from JIT'ing it in each AppDomain.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer.Equals(System.Globalization.UnicodeCategory,System.Globalization.UnicodeCategory)">
+            <summary>
+            Checks whether two unicode categories are equal
+            </summary>
+            <param name="x">first unicode category</param>
+            <param name="y">second unicode category</param>
+            <returns>true if they are equal, false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer.GetHashCode(System.Globalization.UnicodeCategory)">
+            <summary>
+            Gets a hash code for the specified unicode category
+            </summary>
+            <param name="obj">the input value</param>
+            <returns>The hash code for the given input unicode category, the underlying int</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.FastPropertyAccessor`1">
             <summary>
@@ -1087,6 +1215,26 @@
             a Getter and Setter for the PropertyInfo of TEntityType provided via the constructor.
             </summary>
             <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.KeyValuePairParser">
+            <summary>
+            Parsing function parameters and entity key in paths.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.KeyValuePairParser.Parse(System.String)">
+            <summary>
+            Parse the expression string into key/value pairs
+            </summary>
+            <param name="expression">The contents of the key/value pairs.</param>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.KeyValuePairParser.TryParse(System.String,System.Collections.Generic.IDictionary{System.String,System.String}@)">
+            <summary>
+            Tries to parse the expression string into key/value pairs
+            </summary>
+            <param name="expression">The contents of the key/value pairs.</param>
+            <param name="pairs">the output key/value pair</param>
+            <returns>true/false</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.ListWrapperCollection`1">
             <summary>
@@ -5813,6 +5961,16 @@
               Looks up a localized string similar to $filter in $expand of reference navigation property &apos;{0}&apos; is not expected type &apos;{1}&apos;.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexerSyntaxError">
+            <summary>
+              Looks up a localized string similar to Syntax error at position {0} in &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexerUnterminatedStringLiteral">
+            <summary>
+              Looks up a localized string similar to There is an unterminated string literal at position {0} in &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull">
             <summary>
               Looks up a localized string similar to Cannot create an EDM model as the action &apos;{0}&apos; on controller &apos;{1}&apos; has a void return type..
@@ -6001,6 +6159,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleMatchingClrTypesForEdmType">
             <summary>
               Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleSingleLiteralNotAllowed">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; is not a valid expression.Single literal is only for single key. Multiple keys should use key=value..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NavigationSourceMissingDuringDeserialization">

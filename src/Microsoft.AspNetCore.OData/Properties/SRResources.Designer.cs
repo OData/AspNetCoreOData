@@ -619,6 +619,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Syntax error at position {0} in &apos;{1}&apos;..
+        /// </summary>
+        internal static string ExpressionLexerSyntaxError {
+            get {
+                return ResourceManager.GetString("ExpressionLexerSyntaxError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is an unterminated string literal at position {0} in &apos;{1}&apos;..
+        /// </summary>
+        internal static string ExpressionLexerUnterminatedStringLiteral {
+            get {
+                return ResourceManager.GetString("ExpressionLexerUnterminatedStringLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot create an EDM model as the action &apos;{0}&apos; on controller &apos;{1}&apos; has a void return type..
         /// </summary>
         internal static string FailedToBuildEdmModelBecauseReturnTypeIsNull {
@@ -957,6 +975,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string MultipleMatchingClrTypesForEdmType {
             get {
                 return ResourceManager.GetString("MultipleMatchingClrTypesForEdmType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid expression.Single literal is only for single key. Multiple keys should use key=value..
+        /// </summary>
+        internal static string MultipleSingleLiteralNotAllowed {
+            get {
+                return ResourceManager.GetString("MultipleSingleLiteralNotAllowed", resourceCulture);
             }
         }
         
