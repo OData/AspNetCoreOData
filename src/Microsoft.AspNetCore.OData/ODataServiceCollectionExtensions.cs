@@ -152,6 +152,11 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(services));
             }
 
+            services.AddRouting(options =>
+            {
+                options.ConstraintMap.Add("odataParameters", typeof(ODataFunctionParameterConstraint));
+            });
+
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
 

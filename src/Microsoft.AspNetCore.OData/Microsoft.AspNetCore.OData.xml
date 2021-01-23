@@ -10912,6 +10912,29 @@
             Gets/sets the odata service provider, used for the attribute routing parser or others.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint">
+            <summary>
+            NS.MyFunction({odataParameter:odataParameters(p1;p2;p3)})
+            MyFunction({odataParameter:odataParameters(p1;p2;p3)})
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="parameters"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
+            <summary>
+            
+            </summary>
+            <param name="httpContext"></param>
+            <param name="route"></param>
+            <param name="routeKey"></param>
+            <param name="values"></param>
+            <param name="routeDirection"></param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmOperationImport"/>.

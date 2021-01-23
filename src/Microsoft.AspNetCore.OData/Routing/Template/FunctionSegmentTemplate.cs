@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -52,7 +53,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             ParameterMappings = function.VerifyAndBuildParameterMappings(parameters);
 
             // Join the parameters as p1={p1}
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+           // string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+
+            string parameterStr = ODataFunctionParameterConstraint.FormatConstraint(ParameterMappings);
 
             UnqualifiedIdentifier = function.Name + parameterStr;
 
