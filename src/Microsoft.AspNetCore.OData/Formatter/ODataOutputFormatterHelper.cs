@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             TimeZoneInfo timeZone = null;
             IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions != null && odataOptions.Value == null)
+            if (odataOptions != null && odataOptions.Value != null)
             {
                 timeZone = odataOptions.Value.TimeZone;
             }
@@ -47,7 +47,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 TimeZone = timeZone,
             };
         }
-        
 
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable")]
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
