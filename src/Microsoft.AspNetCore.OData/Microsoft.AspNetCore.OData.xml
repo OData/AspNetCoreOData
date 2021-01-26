@@ -10586,6 +10586,71 @@
             Gets or sets the route prefix with which to associate the attribute.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataKeyConstraint">
+            <summary>
+            Customers({odataKey:odataKeys(firstName;LastName)})
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataKeyConstraint.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataKeyConstraint" /> class.
+            </summary>
+            <param name="keys">the key string, separated using ';'.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataKeyConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataKeyConstraint.FormatConstraint(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Format the key constraint pattern.
+            </summary>
+            <param name="keys">The keys string.</param>
+            <returns>The built key constraint pattern.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataParameterConstraint">
+            <summary>
+            NS.MyFunction({odataParameter:odataParameters(p1;p2;p3)})
+            MyFunction({odataParameter:odataParameters(p1;p2;p3)})
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataParameterConstraint.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataParameterConstraint" /> class.
+            </summary>
+            <param name="parameters">the key and parameter string, separated using ';'.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataParameterConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataRouteConstraint">
+            <summary>
+            The OData routing constaint. It accepts the parameter in the constraint separated using ';'.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataRouteConstraint.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Constraints.ODataRouteConstraint" /> class.
+            </summary>
+            <param name="parameters">the key and parameter string, separated using ';'.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Constraints.ODataRouteConstraint.Parameters">
+            <summary>
+            Gets the parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Constraints.ODataRouteConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
+            <summary>
+            Determines whether the URL parameter contains a valid value for this constraint.
+            </summary>
+            <param name="httpContext">An object that encapsulates information about the HTTP request.</param>
+            <param name="route">The router that this constraint belongs to.</param>
+            <param name="routeKey">The name of the parameter that is being checked.</param>
+            <param name="values">A dictionary that contains the parameters for the URL.</param>
+            <param name="routeDirection">An object that indicates whether the constraint check is being performed when
+                an incoming request is being handled or when a URL is being generated.
+            </param>
+            <returns>true if the URL parameter contains a valid value; otherwise, false.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController">
             <summary>
             Represents a controller for generating OData servicedoc and metadata document ($metadata).
@@ -10911,29 +10976,6 @@
             <summary>
             Gets/sets the odata service provider, used for the attribute routing parser or others.
             </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint">
-            <summary>
-            NS.MyFunction({odataParameter:odataParameters(p1;p2;p3)})
-            MyFunction({odataParameter:odataParameters(p1;p2;p3)})
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint.#ctor(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="parameters"></param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataFunctionParameterConstraint.Match(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.IRouter,System.String,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteDirection)">
-            <summary>
-            
-            </summary>
-            <param name="httpContext"></param>
-            <param name="route"></param>
-            <param name="routeKey"></param>
-            <param name="values"></param>
-            <param name="routeDirection"></param>
-            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
             <summary>

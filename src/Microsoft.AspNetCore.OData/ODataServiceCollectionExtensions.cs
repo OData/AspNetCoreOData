@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Constraints;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -154,7 +155,8 @@ namespace Microsoft.AspNetCore.OData
 
             services.AddRouting(options =>
             {
-                options.ConstraintMap.Add("odataParameters", typeof(ODataFunctionParameterConstraint));
+                options.ConstraintMap.Add(ODataParameterConstraint.ConstraintName, typeof(ODataParameterConstraint));
+                options.ConstraintMap.Add(ODataKeyConstraint.ConstraintName, typeof(ODataKeyConstraint));
             });
 
             services.TryAddEnumerable(

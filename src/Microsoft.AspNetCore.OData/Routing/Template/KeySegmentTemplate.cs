@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Routing.Constraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -36,9 +37,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType);
 
-            Literal = KeyMappings.Count == 1 ?
-                $"{{{KeyMappings.First().Value}}}" :
-                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            Literal = ODataKeyConstraint.FormatConstraint(KeyMappings.Keys);
+
+            //Literal = KeyMappings.Count == 1 ?
+            //    $"{{{KeyMappings.First().Value}}}" :
+            //    string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
@@ -57,9 +60,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(segment.Keys, EntityType);
 
-            Literal = KeyMappings.Count == 1 ?
-                $"{{{KeyMappings.First().Value}}}" :
-                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            Literal = ODataKeyConstraint.FormatConstraint(KeyMappings.Keys);
+
+            //Literal = KeyMappings.Count == 1 ?
+            //    $"{{{KeyMappings.First().Value}}}" :
+            //    string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>

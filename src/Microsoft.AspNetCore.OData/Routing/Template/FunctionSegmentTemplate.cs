@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Routing.Constraints;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -55,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // Join the parameters as p1={p1}
            // string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
-            string parameterStr = ODataFunctionParameterConstraint.FormatConstraint(ParameterMappings);
+            string parameterStr = "(" + ODataParameterConstraint.FormatConstraint(ParameterMappings.Keys) + ")";
 
             UnqualifiedIdentifier = function.Name + parameterStr;
 
