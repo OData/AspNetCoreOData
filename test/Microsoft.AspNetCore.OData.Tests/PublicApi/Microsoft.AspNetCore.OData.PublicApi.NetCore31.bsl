@@ -1459,6 +1459,11 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataPathExtensions {
 	[
 	ExtensionAttribute(),
 	]
+	public static bool IsStreamPropertyPath (Microsoft.OData.UriParser.ODataPath path)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static string TranslatePathTemplateSegment (Microsoft.OData.UriParser.PathTemplateSegment pathTemplatesegment, out System.String& value)
 }
 
@@ -1710,6 +1715,12 @@ public class Microsoft.AspNetCore.OData.Formatter.MediaType.ODataPrimitiveValueM
 	public ODataPrimitiveValueMediaTypeMapping ()
 
 	protected virtual bool IsMatch (Microsoft.OData.UriParser.PropertySegment propertySegment)
+}
+
+public class Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping : Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping {
+	public ODataStreamMediaTypeMapping ()
+
+	public virtual double TryMatchMediaType (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping : Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping {

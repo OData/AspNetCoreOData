@@ -15,6 +15,41 @@ namespace Microsoft.AspNetCore.OData.Routing
     public static class ODataPathExtensions
     {
         /// <summary>
+        /// Gets a boolean value indicating whether the given path is a stream property path.
+        /// </summary>
+        /// <param name="path">The given odata path.</param>
+        /// <returns>true/false</returns>
+        public static bool IsStreamPropertyPath(this ODataPath path)
+        {
+            if (path == null)
+            {
+                return false;
+            }
+
+            PropertySegment propertySegment = path.LastSegment as PropertySegment;
+            if (propertySegment == null)
+            {
+                return false;
+            }
+
+            IEdmTypeReference propertyType = propertySegment.Property.Type;
+            if (propertyType == null)
+            {
+                return false;
+            }
+
+            // Edm.Stream, or a type definition whose underlying type is Edm.Stream,
+            // cannot be used in collections or for non-binding parameters to functions or actions.
+            // So, we don't need to test it but leave the codes here for awareness.
+            //if (propertyType.IsCollection())
+            //{
+            //    propertyType = propertyType.AsCollection().ElementType();
+            //}
+
+            return propertyType.IsStream();
+        }
+
+        /// <summary>
         /// Computes the <see cref="IEdmType"/> of the resource identified by this <see cref="ODataPath"/>.
         /// </summary>
         /// <param name="path">Path to compute the type for.</param>

@@ -3,26 +3,21 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.OData.UriParser;
+using Microsoft.AspNetCore.OData.Routing;
 
 namespace Microsoft.AspNetCore.OData.Formatter.MediaType
 {
     /// <summary>
-    /// Media type mapping that associates requests with $count.
+    /// Media type mapping that associates requests with stream property.
     /// </summary>
-    public class ODataCountMediaTypeMapping : MediaTypeMapping
+    public class ODataStreamMediaTypeMapping : MediaTypeMapping
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataCountMediaTypeMapping"/> class.
+        /// Initializes a new instance of the <see cref="ODataStreamMediaTypeMapping"/> class.
         /// </summary>
-        public ODataCountMediaTypeMapping()
-            : base("text/plain")
+        public ODataStreamMediaTypeMapping()
+            : base("application/octet-stream")
         {
-        }
-
-        internal static bool IsCountRequest(ODataPath path)
-        {
-            return path != null && path.LastSegment is CountSegment;
         }
 
         /// <inheritdoc/>
@@ -33,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return IsCountRequest(request.ODataFeature().Path) ? 1 : 0;
+            return request.ODataFeature().Path.IsStreamPropertyPath() ? 1 : 0;
         }
     }
 }

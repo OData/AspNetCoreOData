@@ -11,7 +11,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
     /// <summary>
     /// Media type mapping that associates requests with $count.
     /// </summary>
-    /// <remarks>This class derives from a platform-specific class.</remarks>
     public abstract class ODataRawValueMediaTypeMapping : MediaTypeMapping
     {
         /// <summary>
@@ -20,6 +19,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         protected ODataRawValueMediaTypeMapping(string mediaType)
             : base(mediaType)
         {
+        }
+
+        /// <inheritdoc/>
+        public override double TryMatchMediaType(HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            ODataPath odataPath = request.ODataFeature().Path;
+            return (IsRawValueRequest(odataPath) && IsMatch(GetProperty(odataPath))) ? 1 : 0;
         }
 
         /// <summary>
@@ -42,18 +53,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
             }
 
             return odataPath.ElementAt(odataPath.Count - 2) as PropertySegment;
-        }
-
-        /// <inheritdoc/>
-        public override double TryMatchMediaType(HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw Error.ArgumentNull("request");
-            }
-
-            ODataPath odataPath = request.ODataFeature().Path;
-            return (IsRawValueRequest(odataPath) && IsMatch(GetProperty(odataPath))) ? 1 : 0;
         }
     }
 }

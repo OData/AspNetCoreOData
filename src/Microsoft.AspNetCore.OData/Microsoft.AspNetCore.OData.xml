@@ -2991,7 +2991,6 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataCountMediaTypeMapping.#ctor">
             <summary>
@@ -3005,7 +3004,6 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataEnumValueMediaTypeMapping.#ctor">
             <summary>
@@ -3022,9 +3020,8 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataPrimitiveValueMediaTypeMapping">
             <summary>
-            Media type mapping that associates requests with $count.
+            Media type mapping that associates requests with $value on primitive property.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataPrimitiveValueMediaTypeMapping.#ctor">
             <summary>
@@ -3038,12 +3035,14 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.#ctor(System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping"/> class.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.IsMatch(Microsoft.OData.UriParser.PropertySegment)">
             <summary>
@@ -3052,14 +3051,23 @@
             <param name="propertySegment">The <see cref="T:Microsoft.OData.UriParser.PropertySegment"/> of the path.</param>
             <returns>True if the request is an OData raw value request.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping">
+            <summary>
+            Media type mapping that associates requests with stream property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping">
             <summary>
             Class that provides <see cref="T:System.Net.Http.Headers.MediaTypeHeaderValue"/>s from query strings.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping.#ctor(System.String,System.String)">
             <summary>
@@ -11072,6 +11080,13 @@
             <summary>
              Extension methods for <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.IsStreamPropertyPath(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Gets a boolean value indicating whether the given path is a stream property path.
+            </summary>
+            <param name="path">The given odata path.</param>
+            <returns>true/false</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetEdmType(Microsoft.OData.UriParser.ODataPath)">
             <summary>
