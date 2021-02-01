@@ -3854,6 +3854,14 @@
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The navigation link to be written.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStreamProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to be written for the given stream property.
+            </summary>
+            <param name="structuralProperty">The EDM structural property being written.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to write.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given entity and the structural property.

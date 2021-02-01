@@ -390,6 +390,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     else
                     {
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
+                        await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer);
                         await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
                         await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
@@ -790,6 +791,32 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             await serializer.WriteObjectInlineAsync(propertyValue, edmType, writer, nestedWriteContext).ConfigureAwait(false);
         }
 
+        private async Task WriteStreamPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        {
+            Contract.Assert(selectExpandNode != null);
+            Contract.Assert(resourceContext != null);
+            Contract.Assert(writer != null);
+
+            if (selectExpandNode.SelectedStructuralProperties != null)
+            {
+                IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
+
+                foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
+                {
+                    if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
+                    {
+                        ODataStreamPropertyInfo property = CreateStreamProperty(structuralProperty, resourceContext);
+
+                        if (property != null)
+                        {
+                            await writer.WriteStartAsync(property).ConfigureAwait(false);
+                            await writer.WriteEndAsync().ConfigureAwait(false);
+                        }
+                    }
+                }
+            }
+        }
+
         private async Task WriteComplexPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(selectExpandNode != null);
@@ -1011,6 +1038,43 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return properties;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataStreamPropertyInfo"/> to be written for the given stream property.
+        /// </summary>
+        /// <param name="structuralProperty">The EDM structural property being written.</param>
+        /// <param name="resourceContext">The context for the entity instance being written.</param>
+        /// <returns>The <see cref="ODataStreamPropertyInfo"/> to write.</returns>
+        public virtual ODataStreamPropertyInfo CreateStreamProperty(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext)
+        {
+            if (structuralProperty == null)
+            {
+                throw Error.ArgumentNull("structuralProperty");
+            }
+
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull("resourceContext");
+            }
+
+            if (structuralProperty.Type == null || !structuralProperty.Type.IsStream())
+            {
+                return null;
+            }
+
+            if (resourceContext.SerializerContext.MetadataLevel != ODataMetadataLevel.Full)
+            {
+                return null;
+            }
+
+            // TODO: we need to return ODataStreamReferenceValue if
+            // 1) If we have the EditLink link builder
+            // 2) If we have the ReadLink link builder
+            // 3) If we have the Core.AcceptableMediaTypes annotation associated with the Stream property
+
+            // So far, let's return null and let OData.lib to calculate the ODataStreamReferenceValue by conventions.
+            return null;
         }
 
         /// <summary>
