@@ -628,6 +628,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static System.TimeZoneInfo GetTimeZoneInfo (Microsoft.AspNetCore.Http.HttpRequest request)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.OData.ODataMessageWriterSettings GetWriterSettings (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
@@ -1615,6 +1620,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeseriali
 	Microsoft.AspNetCore.Http.HttpRequest Request  { public get; public set; }
 	Microsoft.OData.Edm.IEdmTypeReference ResourceEdmType  { public get; public set; }
 	System.Type ResourceType  { public get; public set; }
+	System.TimeZoneInfo TimeZone  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer : Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer {

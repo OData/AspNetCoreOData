@@ -6,10 +6,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -78,7 +80,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     {
                         bindingContext.ModelState.SetModelValue(bindingContext.ModelName, valueProviderResult);
 
-                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType);
+                        HttpRequest request = bindingContext.HttpContext.Request;
+                        TimeZoneInfo timeZone = request.GetTimeZoneInfo();
+                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType, timeZone);
                         if (model != null)
                         {
                             bindingContext.Result = ModelBindingResult.Success(model);
@@ -136,6 +140,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataPath path = request.ODataFeature().Path;
             IEdmModel edmModel = request.GetModel();
 
+            TimeZoneInfo timeZone = null;
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value != null)
+            {
+                timeZone = odataOptions.Value.TimeZone;
+            }
+
             return new ODataDeserializerContext
             {
                 Path = path,
@@ -143,6 +154,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Request = request,
                 ResourceType = bindingContext.ModelType,
                 ResourceEdmType = edmTypeReference,
+                TimeZone = timeZone
             };
         }
     }

@@ -43,6 +43,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// </summary>
         public HttpRequest Request { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; }
+
         internal bool IsDeltaOfT
         {
             get

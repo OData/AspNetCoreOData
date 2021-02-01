@@ -29,8 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// <summary>
     /// Expose functionality to convert an function parameter value into a CLR object.
     /// </summary>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
-        Justification = "Relies on many ODataLib classes.")]
     internal static class ODataModelBinderConverter
     {
         private static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
@@ -85,14 +83,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
             if (edmTypeReference.IsPrimitive())
             {
                 ConstantNode node = graph as ConstantNode;
-                return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType);
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType, readContext.TimeZone);
             }
 
             // Resource, ResourceSet, Entity Reference or collection of entity reference
             return ConvertResourceOrResourceSet(graph, edmTypeReference, readContext);
         }
 
-        internal static object ConvertTo(string valueString, Type type)
+        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone)
         {
             if (valueString == null)
             {
@@ -160,7 +158,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             if (isNonStandardEdmPrimitive)
             {
-                return EdmPrimitiveHelper.ConvertPrimitiveValue(value, type);
+                // shall we get the timezone?
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(value, type, timeZone);
             }
             else
             {

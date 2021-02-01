@@ -15,10 +15,9 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -193,10 +192,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 disposes.Add(oDataMessageReader);
 
                 ODataPath path = request.ODataFeature().Path;
-                ODataDeserializerContext readContext = new ODataDeserializerContext
-                {
-                    Request = request,
-                };
+                ODataDeserializerContext readContext = BuildDeserializerContext(request);
 
                 readContext.Path = path;
                 readContext.Model = model;
@@ -212,6 +208,20 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return result;
+        }
+
+        private static ODataDeserializerContext BuildDeserializerContext(HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            return new ODataDeserializerContext()
+            {
+                Request = request,
+                TimeZone = request.GetTimeZoneInfo(),
+            };
         }
 
         private static void LoggerError(HttpContext context, Exception ex)

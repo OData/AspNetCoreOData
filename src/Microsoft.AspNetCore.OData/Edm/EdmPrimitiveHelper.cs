@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Xml.Linq;
@@ -19,7 +18,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return ConvertPrimitiveValue(value, type, timeZoneInfo: null);
         }
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
         public static object ConvertPrimitiveValue(object value, Type type, TimeZoneInfo timeZoneInfo)
         {
             Contract.Assert(value != null);

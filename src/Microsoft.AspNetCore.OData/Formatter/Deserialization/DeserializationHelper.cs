@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     if (propertyKind == EdmTypeKind.Primitive)
                     {
                         propertyValue = EdmPrimitiveHelper.ConvertPrimitiveValue(propertyValue,
-                            GetPropertyType(resource, propertyName));
+                            GetPropertyType(resource, propertyName), readContext.TimeZone);
                     }
                 }
 

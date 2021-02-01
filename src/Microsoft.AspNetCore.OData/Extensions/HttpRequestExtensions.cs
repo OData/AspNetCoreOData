@@ -71,6 +71,28 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the <see cref="TimeZoneInfo"/> setting.
+        /// </summary>
+        /// <param name="request">The http request.</param>
+        /// <returns>null or the time zone info.</returns>
+        public static TimeZoneInfo GetTimeZoneInfo(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            TimeZoneInfo timeZone = null;
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value != null)
+            {
+                timeZone = odataOptions.Value.TimeZone;
+            }
+
+            return timeZone;
+        }
+
+        /// <summary>
         /// Gets a value indicating if this is a count request.
         /// </summary>
         /// <returns></returns>

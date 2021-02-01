@@ -34,17 +34,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            TimeZoneInfo timeZone = null;
-            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions != null && odataOptions.Value != null)
-            {
-                timeZone = odataOptions.Value.TimeZone;
-            }
-
             return new ODataSerializerContext()
             {
                 Request = request,
-                TimeZone = timeZone,
+                TimeZone = request.GetTimeZoneInfo(),
             };
         }
 

@@ -2313,6 +2313,13 @@
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:System.TimeZoneInfo"/> setting.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>null or the time zone info.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets a value indicating if this is a count request.
@@ -2623,6 +2630,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.Request">
             <summary>
             Gets or sets the HTTP Request whose response is being serialized.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider">

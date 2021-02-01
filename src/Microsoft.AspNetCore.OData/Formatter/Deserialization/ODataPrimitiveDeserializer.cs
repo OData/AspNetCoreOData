@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             //Try and change the value appropriately if type is specified
             if (readContext.ResourceType != null && primitiveProperty.Value != null)
             {
-                return EdmPrimitiveHelper.ConvertPrimitiveValue(primitiveProperty.Value, readContext.ResourceType);
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(primitiveProperty.Value, readContext.ResourceType, readContext.TimeZone);
             }
 
             return primitiveProperty.Value;
