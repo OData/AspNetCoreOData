@@ -16,6 +16,11 @@ Blogs:
 
 Example:
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/master/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
+  
+   - **`~/$odata`** gives a static routing table page of the service
+   
+   - **`~/swagger`** gives a swagger/openapi page
+ 
 
 ## 2. Basic Usage
 
