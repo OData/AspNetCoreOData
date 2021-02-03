@@ -11,3 +11,12 @@ If you run the sample and send the following request in a Web brower:
 `~/$odata`, you will get the following (similar) routing table:
 
 ![image](https://user-images.githubusercontent.com/9426627/104256721-992da180-5430-11eb-846b-19b02756c084.png)
+
+
+## OpenAPI/Swagger
+
+If you run the sample and send the following request in a Web brower:
+
+`/swagger`, you will get the following (simiar) swagger page:
+
+![image](../../images/sample_swagger.png)
