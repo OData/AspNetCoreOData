@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,12 +23,14 @@ namespace ODataRoutingSample.Extensions
         {
             EndpointDataSource dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
 
+            StringBuilder nonSb = new StringBuilder();
             StringBuilder sb = new StringBuilder();
             foreach (var endpoint in dataSource.Endpoints)
             {
                 IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
                 if (metadata == null)
                 {
+                    AppendNonODataRoute(nonSb, endpoint);
                     continue;
                 }
 
@@ -70,27 +71,12 @@ namespace ODataRoutingSample.Extensions
                 }
                 else
                 {
-                    int index = 1;
-                    sb.Append("<td>");
-                    foreach (var template in metadata.Template.GetTemplates())
-                    {
-                        sb.Append($"{index++})");
-                        if (string.IsNullOrEmpty(metadata.Prefix))
-                        {
-                            sb.Append(" ~/");
-                        }
-                        else
-                        {
-                            sb.Append($" ~/{metadata.Prefix}/");
-                        }
-
-                        sb.Append(template).Append("<br/>");
-                    }
-                    sb.Append("</td></tr>");
+                    sb.Append("<td>---NON RouteEndpoint---</td></tr>");
                 }
             }
 
-            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTNET}", sb.ToString());
+            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
+            output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
             context.Response.Headers["Content_Type"] = "text/html";
 
             await context.Response.WriteAsync(output);
@@ -100,6 +86,36 @@ namespace ODataRoutingSample.Extensions
             //context.Response.Headers.ContentLength = requestBytes.Length;
             //context.Response.Body = new MemoryStream(requestBytes);
             //await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Process the non-odata route
+        /// </summary>
+        /// <param name="sb">The string builder</param>
+        /// <param name="endPoint">The endpoint.</param>
+        public static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
+        {
+            sb.Append("<tr>");
+            sb.Append($"<td>{endpoint.DisplayName}</td>");
+
+            RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
+            if (routeEndpoint != null)
+            {
+                if (routeEndpoint.RoutePattern.RawText.StartsWith("/"))
+                {
+                    sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
+                }
+                else
+                {
+                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
+                }
+            }
+            else
+            {
+                sb.Append("<td>---NON RouteEndpoint---</td></tr>");
+            }
+
+            sb.Append("</tr>");
         }
 
         private static string ODataRouteMappingHtmlTemplate = @"<html>
@@ -130,7 +146,15 @@ namespace ODataRoutingSample.Extensions
        <th> HttpMethods </th>
        <th> Templates </th>
     </tr>
-    {CONTNET}
+    {CONTENT}
+    </table>
+    <h1>Non-OData Endpoint Mapping</h1>
+    <table>
+     <tr>
+       <th> Controller </th>
+       <th> Templates </th>
+    </tr>
+    {NONENDPOINTCONTENT}
     </table>
    </body>
 </html>";
