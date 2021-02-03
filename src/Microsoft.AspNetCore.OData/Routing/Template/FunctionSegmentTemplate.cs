@@ -48,11 +48,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw new ODataException(Error.Format(SRResources.FunctionIsNotBound, function.Name));
             }
 
-            // parameters should include all required parameter, but maybe include the optional parameter.
+            // Parameters should include all required parameter, but maybe include the optional parameter.
             ParameterMappings = function.VerifyAndBuildParameterMappings(parameters);
 
-            // Join the parameters as p1={p1}
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+            string routeKey = ParameterMappings.BuildRouteKey();
+
+            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
 
             UnqualifiedIdentifier = function.Name + parameterStr;
 
@@ -60,8 +61,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             // Function will always have the return type
             IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-            HasOptionalMissing = ParameterMappings.Count != Function.Parameters.Count() - 1;
         }
 
         /// <summary>
@@ -87,8 +86,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             ParameterMappings = OperationHelper.BuildParameterMappings(operationSegment.Parameters, operation.FullName());
 
-            // Join the parameters as p1={p1}
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+            // join the parameters as p1={p1}
+            string routeKey = ParameterMappings.BuildRouteKey();
+
+            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
 
             UnqualifiedIdentifier = Function.Name + parameterStr;
 
@@ -96,8 +97,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             // Function will always have the return type
             IsSingle = Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-            HasOptionalMissing = ParameterMappings.Count != Function.Parameters.Count() - 1;
         }
 
         /// <summary>
@@ -125,18 +124,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         internal string UnqualifiedIdentifier { get; }
 
-        internal bool HasOptionalMissing { get; }
-
         /// <inheritdoc />
         public override ODataSegmentKind Kind => ODataSegmentKind.Function;
 
         /// <inheritdoc />
         public override bool IsSingle { get; }
-
-        /// <summary>
-        /// Gets the required parameter names.
-        /// </summary>
-        public ISet<string> RequiredParameters { get; }
 
         /// <inheritdoc />
         public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
@@ -146,22 +138,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (HasOptionalMissing)
+            // If the function has no parameter, we don't need to do anything and just return an operation segment.
+            if (ParameterMappings.Count == 0)
             {
-                // If this function template has the optional parameter missing,
-                // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
-                // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // In this request, the comming route data has:
-                // min = 1
-                // max = 2,ave=3
-                // so, let's combine the route data together and separate them using "," again.
-                if (!FunctionSegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
-                {
-                    return null;
-                }
+                return new OperationSegment(Function, NavigationSource as IEdmEntitySetBase);
             }
 
-            IList<OperationSegmentParameter> parameters = FunctionSegmentTemplateHelpers.Match(context, Function, ParameterMappings);
+            if (!SegmentTemplateHelpers.TryParseRouteKey(context.RouteValues, context.UpdatedValues, ParameterMappings))
+            {
+                return null;
+            }
+
+            IList<OperationSegmentParameter> parameters = SegmentTemplateHelpers.Match(context, Function, ParameterMappings);
             if (parameters == null)
             {
                 return null;

@@ -79,6 +79,12 @@ namespace ODataRoutingSample.Models
             productPrice.Parameter<string>("organizationId").Required();
             productPrice.Parameter<string>("partId").Required();
 
+            productPrice = builder.EntityType<Organization>().Collection.
+                Function("GetPrice2").ReturnsCollectionFromEntitySet<Organization>("Organizations");
+            productPrice.Parameter<string>("organizationId").Required();
+            productPrice.Parameter<string>("partId").Required();
+            productPrice.IsComposable = true;
+
             return builder.GetEdmModel();
         }
 

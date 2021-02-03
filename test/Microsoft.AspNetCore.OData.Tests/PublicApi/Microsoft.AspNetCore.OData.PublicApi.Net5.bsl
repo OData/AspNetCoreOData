@@ -1549,6 +1549,15 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator : Mic
 	public static Microsoft.OData.UriParser.SingleValueNode TranslateParameterAlias (Microsoft.OData.UriParser.SingleValueNode node, System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.UriParser.SingleValueNode]] parameterAliasNodes)
 }
 
+public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
+	public ODataRouteOptions ()
+
+	bool EnableKeyAsSegment  { public get; public set; }
+	bool EnableKeyInParanthesis  { public get; public set; }
+	bool EnableQualifiedOperationCall  { public get; public set; }
+	bool EnableUnqualifiedOperationCall  { public get; public set; }
+}
+
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IODataRoutingMetadata {
 	public ODataRoutingMetadata (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate template)
 
@@ -2831,7 +2840,6 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTe
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
-	Microsoft.OData.UriParser.OperationImportSegment Segment  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
@@ -2848,7 +2856,6 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
-	System.Collections.Generic.ISet`1[[System.String]] RequiredParameters  { public get; }
 
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
@@ -2922,6 +2929,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateC
 	Microsoft.AspNetCore.Http.HttpContext HttpContext  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary RouteValues  { public get; }
+	Microsoft.AspNetCore.Routing.RouteValueDictionary UpdatedValues  { public get; }
 
 	public string GetParameterAliasOrSelf (string alias)
 }

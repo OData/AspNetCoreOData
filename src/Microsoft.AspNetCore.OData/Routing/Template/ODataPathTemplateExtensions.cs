@@ -44,15 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     // for key segment, if it's single key, let's add key as segment template also
                     // otherwise, we only add the key in parenthesis template.
                     KeySegmentTemplate keySg = segment as KeySegmentTemplate;
-                    if (keySg.Count == 1)
-                    {
-                        templates = CombinateTemplates(templates, "(" + segment.Literal + ")", "/" + segment.Literal);
-                    }
-                    else
-                    {
-                        templates = CombinateTemplate(templates, "(" + segment.Literal + ")");
-                    }
-
+                    templates = CombinateTemplates(templates, "(" + segment.Literal + ")", "/" + segment.Literal);
                     continue;
                 }
 

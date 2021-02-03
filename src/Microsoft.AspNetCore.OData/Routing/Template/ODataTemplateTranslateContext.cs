@@ -60,6 +60,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public RouteValueDictionary RouteValues { get; }
 
         /// <summary>
+        /// Gets the updated route values.
+        /// </summary>
+        public RouteValueDictionary UpdatedValues { get; } = new RouteValueDictionary();
+
+        /// <summary>
         /// Gets the Edm model.
         /// </summary>
         public IEdmModel Model { get; }

@@ -11394,6 +11394,31 @@
             <param name="parameterAliasNodes"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions">
+            <summary>
+            Represents the configurable options on a route.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParanthesis">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/entityset({key})
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/entityset/{key}
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableQualifiedOperationCall">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/Namespace.MyFunction(parameters...)
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/MyFunction(parameters...)
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
             <summary>
             Use for debug for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
@@ -12077,16 +12102,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Segment">
-            <summary>
-            Gets the function import segment.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.HasOptionalMissing">
-            <summary>
-            Gets the boolean value indcating whether there's an optional parameter missed.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
@@ -12147,18 +12162,8 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.RequiredParameters">
-            <summary>
-            Gets the required parameter names.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplateHelpers">
-            <summary>
-            Helper methods for function segment template
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator">
             <summary>
@@ -12196,6 +12201,8 @@
             <summary>
             Gets the dictionary representing the mappings from the key names in the current key segment to the 
             key names in route data.
+            the key in dict could be the string used in request
+            the value in dict could be the string used in action of controller
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Literal">
@@ -12518,7 +12525,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Literal">
             <summary>
-            Gets the segment URL literal.
+            Gets the segment URL template literal.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Kind">
@@ -12582,6 +12589,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.RouteValues">
             <summary>
             Gets the route values.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.UpdatedValues">
+            <summary>
+            Gets the updated route values.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model">
@@ -12749,6 +12761,37 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers">
+            <summary>
+            Helper methods for segment template
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.BuildRouteKey(System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Builds the route key. The route key pattern:  parameterTemp;parameterTemp;parameterTemp;...
+            It could be an empty string if this function has no parameter
+            RouteKey is used to retrieve the route value from request route data.
+            </summary>
+            <param name="parameterMappings">The parameter (request key) and argument (parameter name in the action) mapping.</param>
+            <returns>the route key string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.TryParseRouteKey(Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteValueDictionary,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Try to parse the route key value from route values and save the parsed values into update values.
+            </summary>
+            <param name="routeValues">The original route value from request.</param>
+            <param name="updateValues">The updated/parsed route value.</param>
+            <param name="parameterMappings">The parameter (request key) and argument (parameter name in the action) mapping.</param>
+            <returns>true/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.IsRouteKeyAndParameterMatch(System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Compare the route key and the key/value from request
+            </summary>
+            <param name="parameterMappings">The route key map.</param>
+            <param name="requestKeyValues">The key value map from request.</param>
+            <returns>True/False.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate">
             <summary>

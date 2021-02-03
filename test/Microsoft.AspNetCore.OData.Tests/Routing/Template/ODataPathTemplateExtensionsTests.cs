@@ -140,10 +140,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Assert.Equal(4, actual.Count());
             Assert.Equal(new[]
             {
-                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
-                "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
+                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary({salary;minSalary;maxSalary})",
+                "Customers({key})/NS.VipCustomer/GetWholeSalary({salary;minSalary;maxSalary})",
+                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary({salary;minSalary;maxSalary})",
+                "Customers/{key}/NS.VipCustomer/GetWholeSalary({salary;minSalary;maxSalary})",
             }, actual);
         }
 
@@ -202,11 +202,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 {
                     { true, new[]
                         {
-                            "NS.GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary})",
-                            "GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary})"
+                            "NS.GetWholeSalary({minSalary;maxSalary})",
+                            "GetWholeSalary({minSalary;maxSalary})"
                         }
                     },
-                    { false, new[] { "GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary})" } },
+                    { false, new[] { "GetWholeSalary({minSalary;maxSalary})" } },
                 };
             }
         }
@@ -254,13 +254,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 {
                     { true, new[]
                         {
-                            "NS.GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})",
-                            "GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})"
+                            "NS.GetWholeSalary({salary;min;max})",
+                            "GetWholeSalary({salary;min;max})"
                         }
                     },
                     { false, new[]
                         {
-                            "GetWholeSalary(salary={salary},minSalary={min},maxSalary={max})"
+                            "GetWholeSalary({salary;min;max})"
                         }
                     }
                 };

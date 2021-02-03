@@ -55,8 +55,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.True(returnValue);
 
             // Assert
-            SelectorModel selector = Assert.Single(action.Selectors);
-            Assert.Equal("Customers(FirstName={keyFirstName},LastName={keyLastName})", selector.AttributeRouteModel.Template);
+            Assert.Equal(2, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
+                {
+                    Assert.Equal("Customers({keyFirstName;keyLastName})", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("Customers/{keyFirstName;keyLastName}", e.AttributeRouteModel.Template);
+                });
         }
 
         [Theory]
@@ -80,13 +88,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.True(returnValue);
 
             // Assert
-            Assert.Equal(2, action.Selectors.Count);
-            Assert.Equal(new[]
+            Assert.Equal(4, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
                 {
-                    "Customers(FirstName={keyFirstName},LastName={keyLastName})",
-                    "Customers(FirstName={keyFirstName},LastName={keyLastName})/NS.Customer"
+                    Assert.Equal("Customers({keyFirstName;keyLastName})", e.AttributeRouteModel.Template);
                 },
-                action.Selectors.Select(s => s.AttributeRouteModel.Template));
+                e =>
+                {
+                    Assert.Equal("Customers/{keyFirstName;keyLastName}", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("Customers({keyFirstName;keyLastName})/NS.Customer", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("Customers/{keyFirstName;keyLastName}/NS.Customer", e.AttributeRouteModel.Template);
+                });
         }
 
         [Theory]
@@ -110,8 +129,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.True(returnValue);
 
             // Assert
-            SelectorModel selector = Assert.Single(action.Selectors);
-            Assert.Equal("Customers(FirstName={keyFirstName},LastName={keyLastName})/NS.VipCustomer", selector.AttributeRouteModel.Template);
+            Assert.Equal(2, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
+                {
+                    Assert.Equal("Customers({keyFirstName;keyLastName})/NS.VipCustomer", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("Customers/{keyFirstName;keyLastName}/NS.VipCustomer", e.AttributeRouteModel.Template);
+                });
         }
 
         [Theory]

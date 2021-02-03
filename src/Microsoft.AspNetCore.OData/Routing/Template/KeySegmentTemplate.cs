@@ -36,9 +36,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType);
 
-            Literal = KeyMappings.Count == 1 ?
-                $"{{{KeyMappings.First().Value}}}" :
-                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            string routeKey = KeyMappings.BuildRouteKey();
+            Literal = $"{{{routeKey}}}";
         }
 
         /// <summary>
@@ -57,14 +56,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(segment.Keys, EntityType);
 
-            Literal = KeyMappings.Count == 1 ?
-                $"{{{KeyMappings.First().Value}}}" :
-                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            string routeKey = KeyMappings.BuildRouteKey();
+
+            Literal = $"{{{routeKey}}}";
         }
 
         /// <summary>
         /// Gets the dictionary representing the mappings from the key names in the current key segment to the 
         /// key names in route data.
+        /// the key in dict could be the string used in request
+        /// the value in dict could be the string used in action of controller
         /// </summary>
         public IDictionary<string, string> KeyMappings { get; }
 
@@ -101,8 +102,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            // Context.RouteValues contains the key value string.
-            RouteValueDictionary routeValues = context.RouteValues;
+            if (!SegmentTemplateHelpers.TryParseRouteKey(context.RouteValues, context.UpdatedValues, KeyMappings))
+            {
+                return null;
+            }
+
+            RouteValueDictionary updateValues = context.UpdatedValues;
+
             IDictionary<string, object> keysValues = new Dictionary<string, object>();
             foreach (var key in KeyMappings)
             {
@@ -113,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 Contract.Assert(keyProperty != null);
 
                 IEdmTypeReference edmType = keyProperty.Type;
-                if (routeValues.TryGetValue(templateName, out object rawValue))
+                if (updateValues.TryGetValue(templateName, out object rawValue))
                 {
                     string strValue = rawValue as string;
 
@@ -121,12 +127,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
                     object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
 
-                    // for without FromODataUri, so update it, for example, remove the single quote for string value.
-                    routeValues[templateName] = newValue;
+                    // for non FromODataUri, so update it, for example, remove the single quote for string value.
+                    updateValues[templateName] = newValue;
 
-                    // For FromODataUri
+                    // For FromODataUri, let's refactor it later.
                     string prefixName = ODataParameterValue.ParameterValuePrefix + templateName;
-                    routeValues[prefixName] = new ODataParameterValue(newValue, edmType);
+                    updateValues[prefixName] = new ODataParameterValue(newValue, edmType);
 
                     keysValues[keyName] = newValue;
                 }

@@ -90,10 +90,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipUpgraded",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
-                            "Customers({key})/NS.VipCustomer/IsVipUpgraded(param={param})",
-                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
-                            "Customers/{key}/NS.VipCustomer/IsVipUpgraded(param={param})"
+                            "Customers({key})/NS.VipCustomer/NS.IsVipUpgraded({param})",
+                            "Customers({key})/NS.VipCustomer/IsVipUpgraded({param})",
+                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded({param})",
+                            "Customers/{key}/NS.VipCustomer/IsVipUpgraded({param})"
                         }
                     },
                     {
@@ -101,8 +101,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipUpgraded",
                         new[]
                         {
-                            "Me/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
-                            "Me/NS.VipCustomer/IsVipUpgraded(param={param})"
+                            "Me/NS.VipCustomer/NS.IsVipUpgraded({param})",
+                            "Me/NS.VipCustomer/IsVipUpgraded({param})"
                         }
                     },
                     // bound to collection
@@ -111,8 +111,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsBaseAllUpgraded",
                         new[]
                         {
-                            "Customers/NS.IsBaseAllUpgraded(param={param})",
-                            "Customers/IsBaseAllUpgraded(param={param})"
+                            "Customers/NS.IsBaseAllUpgraded({param})",
+                            "Customers/IsBaseAllUpgraded({param})"
                         }
                     },
                     {
@@ -120,8 +120,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsAllCustomersUpgraded",
                         new[]
                         {
-                            "Customers/NS.IsAllCustomersUpgraded(param={param})",
-                            "Customers/IsAllCustomersUpgraded(param={param})"
+                            "Customers/NS.IsAllCustomersUpgraded({param})",
+                            "Customers/IsAllCustomersUpgraded({param})"
                         }
                     },
                     {
@@ -129,8 +129,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipAllUpgraded",
                         new[]
                         {
-                            "Customers/NS.VipCustomer/NS.IsVipAllUpgraded(param={param})",
-                            "Customers/NS.VipCustomer/IsVipAllUpgraded(param={param})"
+                            "Customers/NS.VipCustomer/NS.IsVipAllUpgraded({param})",
+                            "Customers/NS.VipCustomer/IsVipAllUpgraded({param})"
                         }
                     },
                     // optional parameter
@@ -139,8 +139,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetWholeSalary",
                         new[]
                         {
-                            "Customers/NS.GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})",
-                            "Customers/GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})"
+                            "Customers/NS.GetWholeSalary({minSalary;maxSalary;aveSalary})",
+                            "Customers/GetWholeSalary({minSalary;maxSalary;aveSalary})"
                         }
                     }
                 };
@@ -179,10 +179,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         method1,
                         new[]
                         {
-                            "Customers/NS.UpgradedAll(age={age},name={name})",
-                            "Customers/UpgradedAll(age={age},name={name})",
-                            "Customers/NS.VipCustomer/NS.UpgradedAll(age={age},name={name})",
-                            "Customers/NS.VipCustomer/UpgradedAll(age={age},name={name})"
+                            "Customers/NS.UpgradedAll({age;name})",
+                            "Customers/UpgradedAll({age;name})",
+                            "Customers/NS.VipCustomer/NS.UpgradedAll({age;name})",
+                            "Customers/NS.VipCustomer/UpgradedAll({age;name})"
                         }
                     },
                     {
@@ -190,12 +190,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         method2,
                         new[]
                         {
-                            "Customers/NS.UpgradedAll(age={age},name={name})",
-                            "Customers/UpgradedAll(age={age},name={name})",
-                            "Customers/NS.UpgradedAll(age={age},name={name},gender={gender})",
-                            "Customers/UpgradedAll(age={age},name={name},gender={gender})",
-                            "Customers/NS.VipCustomer/NS.UpgradedAll(age={age},name={name})",
-                            "Customers/NS.VipCustomer/UpgradedAll(age={age},name={name})"
+                            "Customers/NS.UpgradedAll({age;name})",
+                            "Customers/UpgradedAll({age;name})",
+                            "Customers/NS.UpgradedAll({age;name;gender})",
+                            "Customers/UpgradedAll({age;name;gender})",
+                            "Customers/NS.VipCustomer/NS.UpgradedAll({age;name})",
+                            "Customers/NS.VipCustomer/UpgradedAll({age;name})"
                         }
                     }
                 };

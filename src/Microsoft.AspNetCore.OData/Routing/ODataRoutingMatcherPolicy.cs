@@ -103,6 +103,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                         odataFeature.PrefixName = metadata.Prefix;
                         odataFeature.Model = metadata.Model;
                         odataFeature.Path = odataPath;
+
+                        MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
                     }
                     else
                     {
@@ -116,6 +118,14 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             return Task.CompletedTask;
+        }
+
+        private static void MergeRouteValues(RouteValueDictionary updates, RouteValueDictionary source)
+        {
+            foreach (var data in updates)
+            {
+                source[data.Key] = data.Value;
+            }
         }
     }
 }
