@@ -133,17 +133,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             //ODataPathTemplate template = new ODataPathTemplate(segments);
             //action.AddSelector(method, context.Prefix, context.Model, template);
 
-            AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
+            AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
 
             if (CanApplyDollarCount(navigationProperty, method))
             {
-                AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
+                AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
             }
 
             return true;
         }
 
-        private void AddSelector(string httpMethod, string prefix, IEdmModel model, ActionModel action,
+        private void AddSelector(string httpMethod, ODataControllerActionContext context, ActionModel action,
             IEdmNavigationSource navigationSource, string declared, IEdmEntityType declaringEntityType,
             IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
         {
@@ -182,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.RouteOptions);
 
             Log.AddedODataSelector(_logger, action, template);
         }

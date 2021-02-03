@@ -5,6 +5,7 @@ namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// This class describes the settings to use during query composition.
+    /// TODO: it seems this class is never been used?? we need use it to replace "DefaultQuerySettings"??
     /// </summary>
     public class ODataQueryableOptions
     {

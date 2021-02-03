@@ -144,22 +144,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
+            AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
 
             if (CanApplyDollarCount(edmProperty, method))
             {
-                AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
+                AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
             }
 
             if (CanApplyDollarValue(edmProperty, method))
             {
-                AddSelector(method, context.Prefix, context.Model, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
+                AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
             }
 
             return true;
         }
 
-        private static void AddSelector(string httpMethod, string prefix, IEdmModel model, ActionModel action,
+        private static void AddSelector(string httpMethod, ODataControllerActionContext context, ActionModel action,
             IEdmNavigationSource navigationSource,
             IEdmStructuralProperty edmProperty,
             IEdmType cast, IEdmEntityType declaringType, bool dollarValue, bool dollarCount)
@@ -207,7 +207,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.RouteOptions);
         }
 
         // Split the property such as "GetCityOfSubAddressFromVipCustomer"

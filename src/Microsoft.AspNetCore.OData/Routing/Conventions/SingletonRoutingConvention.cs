@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             {
                 // ~/Me
                 ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton));
-                action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+                action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.RouteOptions);
 
                 // processed
                 return true;
@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                         new SingletonSegmentTemplate(context.Singleton),
                         new CastSegmentTemplate(castType, entityType, context.Singleton));
 
-                    action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+                    action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.RouteOptions);
                     return true;
                 }
             }

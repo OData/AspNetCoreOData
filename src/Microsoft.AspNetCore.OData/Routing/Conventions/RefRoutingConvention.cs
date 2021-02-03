@@ -140,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.RouteOptions);
 
             // processed
             return true;

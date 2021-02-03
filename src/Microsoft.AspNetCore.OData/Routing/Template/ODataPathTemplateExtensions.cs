@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -21,13 +22,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// 2) for bound function segment, we have qualified function call and unqualified function call.
         /// </summary>
         /// <param name="path">The given path template.</param>
+        /// <param name="options">The route options.</param>
         /// <returns>All path templates.</returns>
-        public static IEnumerable<string> GetTemplates(this ODataPathTemplate path)
+        public static IEnumerable<string> GetTemplates(this ODataPathTemplate path, ODataRouteOptions options = null)
         {
             if (path == null)
             {
                 throw Error.ArgumentNull(nameof(path));
             }
+
+            options = options ?? ODataRouteOptions.Default;
 
             IList<StringBuilder> templates = new List<StringBuilder>
             {
@@ -44,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     // for key segment, if it's single key, let's add key as segment template also
                     // otherwise, we only add the key in parenthesis template.
                     KeySegmentTemplate keySg = segment as KeySegmentTemplate;
-                    templates = CombinateTemplates(templates, "(" + segment.Literal + ")", "/" + segment.Literal);
+                    templates = AppendKeyTemplate(templates, keySg, options);
                     continue;
                 }
 
@@ -72,14 +76,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
                             // append "key"
                             KeySegmentTemplate keySg = nextSegment as KeySegmentTemplate;
-                            if (keySg.Count == 1)
-                            {
-                                templates = CombinateTemplates(templates, "(" + nextSegment.Literal + ")", "/" + nextSegment.Literal);
-                            }
-                            else
-                            {
-                                templates = CombinateTemplate(templates, "(" + nextSegment.Literal + ")");
-                            }
+                            templates = AppendKeyTemplate(templates, keySg, options);
 
                             // append $ref
                             templates = CombinateTemplates(templates, "/$ref");
@@ -97,12 +94,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 if (segment.Kind == ODataSegmentKind.Action)
                 {
                     ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
-                    templates = CombinateTemplates(templates, action.Action.FullName(), action.Action.Name);
+                    templates = AppendActionTemplate(templates, action, options);
                 }
                 else if (segment.Kind == ODataSegmentKind.Function)
                 {
                     FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
-                    templates = CombinateTemplates(templates, function.Literal, function.UnqualifiedIdentifier);
+                    templates = AppendFunctionTemplate(templates, function, options);
                 }
                 else
                 {
@@ -111,6 +108,75 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             return templates.Select(t => t.ToString());
+        }
+
+        private static IList<StringBuilder> AppendKeyTemplate(IList<StringBuilder> templates, KeySegmentTemplate segment, ODataRouteOptions options)
+        {
+            Contract.Assert(segment != null);
+            Contract.Assert(options != null);
+
+            if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
+            {
+                return CombinateTemplates(templates, $"({segment.Literal})", $"/{segment.Literal}");
+            }
+            else if (options.EnableKeyInParenthesis)
+            {
+                return CombinateTemplate(templates, $"({segment.Literal})");
+            }
+            else if (options.EnableKeyAsSegment)
+            {
+                return CombinateTemplate(templates, $"/{segment.Literal}");
+            }
+            else
+            {
+                throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
+            }
+        }
+
+        private static IList<StringBuilder> AppendActionTemplate(IList<StringBuilder> templates, ActionSegmentTemplate segment, ODataRouteOptions options)
+        {
+            Contract.Assert(segment != null);
+            Contract.Assert(options != null);
+
+            if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
+            {
+                return CombinateTemplates(templates, segment.Action.FullName(), segment.Action.Name);
+            }
+            else if (options.EnableQualifiedOperationCall)
+            {
+                return CombinateTemplate(templates, segment.Action.FullName());
+            }
+            else if (options.EnableUnqualifiedOperationCall)
+            {
+                return CombinateTemplate(templates, segment.Action.Name);
+            }
+            else
+            {
+                throw new ODataException(Error.Format(SRResources.RouteOptionDisabledOperationSegment, "action"));
+            }
+        }
+
+        private static IList<StringBuilder> AppendFunctionTemplate(IList<StringBuilder> templates, FunctionSegmentTemplate segment, ODataRouteOptions options)
+        {
+            Contract.Assert(segment != null);
+            Contract.Assert(options != null);
+
+            if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
+            {
+                return CombinateTemplates(templates, segment.Literal, segment.UnqualifiedIdentifier);
+            }
+            else if (options.EnableQualifiedOperationCall)
+            {
+                return CombinateTemplate(templates, segment.Literal);
+            }
+            else if (options.EnableUnqualifiedOperationCall)
+            {
+                return CombinateTemplate(templates, segment.UnqualifiedIdentifier);
+            }
+            else
+            {
+                throw new ODataException(Error.Format(SRResources.RouteOptionDisabledOperationSegment, "function"));
+            }
         }
 
         /// <summary>

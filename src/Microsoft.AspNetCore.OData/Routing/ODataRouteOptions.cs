@@ -8,10 +8,13 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     public class ODataRouteOptions
     {
+        // The default route options.
+        internal static readonly ODataRouteOptions Default = new ODataRouteOptions();
+
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset({key})
         /// </summary>
-        public bool EnableKeyInParanthesis { get; set; } = true;
+        public bool EnableKeyInParenthesis { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset/{key}

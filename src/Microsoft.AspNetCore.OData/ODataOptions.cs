@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -107,6 +108,27 @@ namespace Microsoft.AspNetCore.OData
             }
 
             TimeZone = timeZoneInfo;
+            return this;
+        }
+
+        /// <summary>
+        /// Configure the route options.
+        /// </summary>
+        public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
+
+        /// <summary>
+        /// Configure the route options.
+        /// </summary>
+        /// <param name="configureAction">The action to config route options.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions ConfigureRoute(Action<ODataRouteOptions> configureAction)
+        {
+            if (configureAction == null)
+            {
+                throw Error.ArgumentNull(nameof(configureAction));
+            }
+
+            configureAction(RouteOptions);
             return this;
         }
         #endregion

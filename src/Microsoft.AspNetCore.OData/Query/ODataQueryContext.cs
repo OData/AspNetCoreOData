@@ -117,6 +117,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         /// <summary>
         /// Gets the given <see cref="ODataQueryableOptions"/>.
+        /// TODO: it seems this one is never been used??
         /// </summary>
         public ODataQueryableOptions QueryableOptions
         {

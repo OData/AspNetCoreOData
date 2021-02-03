@@ -52,6 +52,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableSkipToken  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] Models  { public get; }
+	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
 
@@ -60,6 +61,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model)
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, System.Action`1[[Microsoft.OData.IContainerBuilder]] configureAction)
+	public Microsoft.AspNetCore.OData.ODataOptions ConfigureRoute (System.Action`1[[Microsoft.AspNetCore.OData.Routing.ODataRouteOptions]] configureAction)
 	public Microsoft.AspNetCore.OData.ODataOptions Count ()
 	public Microsoft.AspNetCore.OData.ODataOptions Expand ()
 	public Microsoft.AspNetCore.OData.ODataOptions Filter ()
@@ -503,7 +505,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static void AddSelector (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethod, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path)
+	public static void AddSelector (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethod, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 
 	[
 	ExtensionAttribute(),
@@ -1553,7 +1555,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	public ODataRouteOptions ()
 
 	bool EnableKeyAsSegment  { public get; public set; }
-	bool EnableKeyInParanthesis  { public get; public set; }
+	bool EnableKeyInParenthesis  { public get; public set; }
 	bool EnableQualifiedOperationCall  { public get; public set; }
 	bool EnableUnqualifiedOperationCall  { public get; public set; }
 }
@@ -2628,6 +2630,7 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActio
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	string Prefix  { public get; }
+	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; public set; }
 	System.IServiceProvider ServiceProvider  { public get; public set; }
 	Microsoft.OData.Edm.IEdmSingleton Singleton  { public get; }
 }
@@ -2742,7 +2745,7 @@ public sealed class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplat
 	[
 	ExtensionAttribute(),
 	]
-	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path)
+	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {

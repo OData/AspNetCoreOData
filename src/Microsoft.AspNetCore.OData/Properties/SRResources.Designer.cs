@@ -1465,6 +1465,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+        /// </summary>
+        internal static string RouteOptionDisabledKeySegment {
+            get {
+                return ResourceManager.GetString("RouteOptionDisabledKeySegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
+        /// </summary>
+        internal static string RouteOptionDisabledOperationSegment {
+            get {
+                return ResourceManager.GetString("RouteOptionDisabledOperationSegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input segment should be &apos;{0}&apos; in &apos;{1}&apos;..
         /// </summary>
         internal static string SegmentShouldBeKind {

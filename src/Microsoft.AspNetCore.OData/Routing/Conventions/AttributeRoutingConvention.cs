@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                             ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate, context.ServiceProvider);
 
                             // Add the httpMethod?
-                            action.AddSelector(null, context.Prefix, context.Model, pathTemplate);
+                            action.AddSelector(null, context.Prefix, context.Model, pathTemplate, context.RouteOptions);
                         }
                         catch (ODataException ex)
                         {

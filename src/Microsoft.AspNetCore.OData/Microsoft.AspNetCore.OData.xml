@@ -2193,7 +2193,7 @@
             <param name="action">The action model.</param>
             <returns>The supported http methods.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Adds the OData selector model to the action.
             </summary>
@@ -2202,6 +2202,7 @@
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="path">The OData path template.</param>
+            <param name="options">The route build options.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasHttpMethod(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
@@ -5435,6 +5436,18 @@
             <param name="timeZoneInfo">The <see cref="T:System.TimeZoneInfo"/></param>
             <returns>The calling itself.</returns>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions">
+            <summary>
+            Configure the route options.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.ConfigureRoute(System.Action{Microsoft.AspNetCore.OData.Routing.ODataRouteOptions})">
+            <summary>
+            Configure the route options.
+            </summary>
+            <param name="configureAction">The action to config route options.</param>
+            <returns>The calling itself.</returns>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
             <summary>
             Gets the configured Edm models.
@@ -6457,6 +6470,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.RootElementNameMissing">
             <summary>
               Looks up a localized string similar to The &apos;RootElementName&apos; property is required on &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledKeySegment">
+            <summary>
+              Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledOperationSegment">
+            <summary>
+              Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SegmentShouldBeKind">
@@ -8320,6 +8343,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions">
             <summary>
             This class describes the settings to use during query composition.
+            TODO: it seems this class is never been used?? we need use it to replace "DefaultQuerySettings"??
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableExpand">
@@ -8439,6 +8463,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.QueryableOptions">
             <summary>
             Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions"/>.
+            TODO: it seems this one is never been used??
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model">
@@ -10940,6 +10965,11 @@
             Gets/sets the odata service provider, used for the attribute routing parser or others.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.RouteOptions">
+            <summary>
+            Gets/sets the route build options.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmOperationImport"/>.
@@ -11399,7 +11429,7 @@
             Represents the configurable options on a route.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParanthesis">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis">
             <summary>
             Gets or sets a value indicating whether to generate odata path template as ~/entityset({key})
             </summary>
@@ -12402,7 +12432,7 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             All templates mean:
@@ -12410,6 +12440,7 @@
             2) for bound function segment, we have qualified function call and unqualified function call.
             </summary>
             <param name="path">The given path template.</param>
+            <param name="options">The route options.</param>
             <returns>All path templates.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">

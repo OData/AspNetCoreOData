@@ -269,7 +269,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            context.Action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+            context.Action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.RouteOptions);
         }
 
         private static IDictionary<string, string> GetRequiredFunctionParamters(IEdmOperation operation, ActionModel action)
