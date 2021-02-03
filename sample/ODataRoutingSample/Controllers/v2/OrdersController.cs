@@ -60,7 +60,7 @@ namespace ODataRoutingSample.Controllers.v2
             return _context.Orders;
         }
 
-        //[HttpGet] // ~/Oders({key})
+        [HttpGet] // ~/Oders({key})
         [EnableQuery]
         public Order Get(int key)
         {
@@ -87,6 +87,7 @@ namespace ODataRoutingSample.Controllers.v2
         }
 
        // [Http] // ~/Oders({key})
+        [HttpPatch]
         public string Patch(int key)
         {
             return $"Patch Order at {key}";
@@ -135,6 +136,7 @@ namespace ODataRoutingSample.Controllers.v2
             return "PostToCategoryFromUnknowOrder + " + key;
         }
 
+        [HttpPost]
         public string CreateRefToCategory(int key)
         {
             return "CreateRefToCategory";

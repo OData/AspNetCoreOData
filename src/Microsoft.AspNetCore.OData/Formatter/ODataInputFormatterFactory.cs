@@ -72,7 +72,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataInputFormatter CreateRawValue()
         {
-            return CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
+            ODataInputFormatter formatter = CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
+
+            formatter.SupportedMediaTypes.Add("text/plain");
+            return formatter;
         }
 
         private static ODataInputFormatter CreateFormatterWithoutMediaTypes(params ODataPayloadKind[] payloadKinds)

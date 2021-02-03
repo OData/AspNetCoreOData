@@ -88,6 +88,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
         private static ODataOutputFormatter CreateRawValue()
         {
             ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(ODataPayloadKind.Value);
+
+            formatter.SupportedMediaTypes.Add("text/plain");
+            formatter.SupportedMediaTypes.Add("application/octet-stream");
+
             formatter.MediaTypeMappings.Add(new ODataPrimitiveValueMediaTypeMapping());
             formatter.MediaTypeMappings.Add(new ODataEnumValueMediaTypeMapping());
             formatter.MediaTypeMappings.Add(new ODataBinaryValueMediaTypeMapping());

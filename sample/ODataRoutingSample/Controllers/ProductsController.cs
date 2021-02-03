@@ -63,6 +63,7 @@ namespace ODataRoutingSample.Controllers
         }
 
         [EnableQuery]
+        [HttpGet]
         public IActionResult Get(int key)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -85,6 +86,7 @@ namespace ODataRoutingSample.Controllers
             return Created(product);
         }
 
+        [HttpPut]
         public IActionResult Put(int key, [FromBody]Delta<Product> product)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -98,6 +100,7 @@ namespace ODataRoutingSample.Controllers
             return Updated(original);
         }
 
+        [HttpPatch]
         public IActionResult Patch(int key, Delta<Product> product)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -113,6 +116,7 @@ namespace ODataRoutingSample.Controllers
             return Updated(original);
         }
 
+        [HttpDelete]
         public IActionResult Delete(int key)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);

@@ -64,6 +64,8 @@ namespace ODataRoutingSample
                 .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
                 //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
                 );
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,6 +78,12 @@ namespace ODataRoutingSample
 
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+            });
 
             app.UseRouting();
 

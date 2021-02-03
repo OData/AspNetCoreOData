@@ -38,6 +38,7 @@ namespace ODataRoutingSample.Controllers
             return Ok(_persons);
         }
 
+        [HttpGet]
         [EnableQuery]
         public IActionResult Get(string keyFirstName, string keyLastName)
         {
