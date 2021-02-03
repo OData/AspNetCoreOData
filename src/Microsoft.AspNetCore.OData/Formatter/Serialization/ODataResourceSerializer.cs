@@ -390,7 +390,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     else
                     {
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
-                        await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer);
+                        await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
                         await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
