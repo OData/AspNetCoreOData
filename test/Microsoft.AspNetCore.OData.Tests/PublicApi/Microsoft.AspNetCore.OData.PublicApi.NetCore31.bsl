@@ -2533,7 +2533,14 @@ public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataContro
 public class Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	public MetadataController ()
 
+	[
+	HttpGetAttribute(),
+	]
 	public Microsoft.OData.Edm.IEdmModel GetMetadata ()
+
+	[
+	HttpGetAttribute(),
+	]
 	public Microsoft.OData.ODataServiceDocument GetServiceDocument ()
 }
 
