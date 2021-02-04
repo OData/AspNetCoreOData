@@ -96,6 +96,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             formatter.MediaTypeMappings.Add(new ODataEnumValueMediaTypeMapping());
             formatter.MediaTypeMappings.Add(new ODataBinaryValueMediaTypeMapping());
             formatter.MediaTypeMappings.Add(new ODataCountMediaTypeMapping());
+            formatter.MediaTypeMappings.Add(new ODataStreamMediaTypeMapping());
             return formatter;
         }
 

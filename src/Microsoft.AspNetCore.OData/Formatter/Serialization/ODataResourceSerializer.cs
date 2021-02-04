@@ -1029,6 +1029,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
                 {
+                    if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
+                    {
+                        // skip the stream property, the stream property is written in its own logic
+                        continue;
+                    }
+
                     ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
                     if (property != null)
                     {
@@ -1071,7 +1077,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // TODO: we need to return ODataStreamReferenceValue if
             // 1) If we have the EditLink link builder
             // 2) If we have the ReadLink link builder
-            // 3) If we have the Core.AcceptableMediaTypes annotation associated with the Stream property
+            // 3) If we have the Core.AcceptableMediaTypes annotation associated with the Stream property,
 
             // So far, let's return null and let OData.lib to calculate the ODataStreamReferenceValue by conventions.
             return null;

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -120,9 +121,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 bool isCountRequest = path != null && path.LastSegment is CountSegment;
                 bool isRawValueRequest = path != null && path.LastSegment is ValueSegment;
+                bool isStreamRequest = path.IsStreamPropertyPath();
 
-                if (((edmType.IsPrimitive() || edmType.IsEnum()) && isRawValueRequest) || isCountRequest)
+                if (((edmType.IsPrimitive() || edmType.IsEnum()) && isRawValueRequest) || isCountRequest || isStreamRequest)
                 {
+                    // Should rethink about the stream property serializer
                     return _serviceProvider.GetRequiredService<ODataRawValueSerializer>();
                 }
                 else
