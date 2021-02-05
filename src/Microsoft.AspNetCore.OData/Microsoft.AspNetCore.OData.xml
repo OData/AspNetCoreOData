@@ -2329,6 +2329,13 @@
             <param name="request">The http request.</param>
             <returns>null or the time zone info.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the bool value indicating whether the non-dollar prefix query option.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>True/false.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets a value indicating if this is a count request.
@@ -5590,6 +5597,11 @@
             <param name="maxTopValue">The max top value.</param>
             <returns>The calling itself.</returns>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
+            <summary>
+            Gets and sets the optional-$-sign-prefix for OData system query option.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildDefaultQuerySettings">
             <summary>
             Build the default QueryOption settings
@@ -8508,6 +8520,14 @@
             use in stand-alone scenarios.
             </remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetFilterBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <param name="querySettings">The query setting.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
             This defines a composite OData query options that can be used to perform query composition.
@@ -10380,8 +10400,23 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter">
             <summary>
-            Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1"/> instances to JSON.
+            Supports converting <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1"/> types by using a factory pattern.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            determines whether the converter instance can convert the specified object type.
+            </summary>
+            <param name="typeToConvert">The type of the object to check whether it can be converted by this converter instance.</param>
+            <returns>true if the instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1">
             <summary>
@@ -10480,6 +10515,14 @@
             Returns an enumerator that iterates through a collection.
             </summary>
             <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResultValueConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ResultHelpers.GenerateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.Object,System.Boolean)">
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>

@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 if (bindingContext == null)
                 {
-                    throw Error.ArgumentNull("bindingContext");
+                    throw Error.ArgumentNull(nameof(bindingContext));
                 }
 
                 HttpRequest request = bindingContext.HttpContext.Request;
@@ -95,8 +95,10 @@ namespace Microsoft.AspNetCore.OData.Query
                         entityClrType = GetEntityClrTypeFromActionReturnType(actionDescriptor);
                     }
 
+                    // In 7.x, GetModel() from request will return "EdmCoreModel.Instance" for non-model scenario
+                    // In 8.x, GetModel() return null.
                     IEdmModel userModel = request.GetModel();
-                    IEdmModel model = userModel != EdmCoreModel.Instance ? userModel : GetEdmModel(actionDescriptor, request, entityClrType);
+                    IEdmModel model = userModel ?? actionDescriptor.GetEdmModel(request, entityClrType);
                     ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, request.ODataFeature().Path);
 
                     Func<ODataQueryContext, HttpRequest, ODataQueryOptions> createODataQueryOptions;
@@ -171,28 +173,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 return entityClrType;
-            }
-
-            internal static IEdmModel GetEdmModel(ActionDescriptor actionDescriptor, HttpRequest request, Type entityClrType)
-            {
-                if (actionDescriptor == null)
-                {
-                    throw Error.ArgumentNull("actionDescriptor");
-                }
-
-                if (request == null)
-                {
-                    throw Error.ArgumentNull("request");
-                }
-
-                if (entityClrType == null)
-                {
-                    throw Error.ArgumentNull("entityClrType");
-                }
-
-                IEdmModel model = null;
-
-                return model;
             }
         }
     }

@@ -19,7 +19,6 @@ namespace Microsoft.AspNetCore.OData.Results
     /// </remarks>
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Collection suffix not appropriate")]
     [DataContract]
-    // [JsonObject]
     public class PageResult<T> : PageResult, IEnumerable<T>
     {
         /// <summary>

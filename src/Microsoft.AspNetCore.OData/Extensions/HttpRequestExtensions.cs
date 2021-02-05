@@ -93,6 +93,27 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the bool value indicating whether the non-dollar prefix query option.
+        /// </summary>
+        /// <param name="request">The http request.</param>
+        /// <returns>True/false.</returns>
+        public static bool IsNoDollarQueryEnable(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value != null)
+            {
+                return odataOptions.Value.EnableNoDollarQueryOptions;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets a value indicating if this is a count request.
         /// </summary>
         /// <returns></returns>
@@ -230,6 +251,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             ODataOptions options = odataOptionsOptions.Value;
+
+            // if the prefixName == null, it's a non-model scenario
+            if (request.ODataFeature().PrefixName == null)
+            {
+                return null;
+            }
 
             return options.GetODataServiceProvider(request.ODataFeature().PrefixName);
 

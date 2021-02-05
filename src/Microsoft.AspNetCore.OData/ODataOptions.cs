@@ -216,7 +216,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The root service provider for the route (prefix) name.</returns>
         public IServiceProvider GetODataServiceProvider(string prefix)
         {
-            if (Models.ContainsKey(prefix))
+            if (prefix != null && Models.ContainsKey(prefix))
             {
                 return Models[prefix].Item2;
             }
@@ -354,6 +354,11 @@ namespace Microsoft.AspNetCore.OData
             MaxTop = maxTopValue;
             return this;
         }
+
+        /// <summary>
+        /// Gets and sets the optional-$-sign-prefix for OData system query option.
+        /// </summary>
+        public bool EnableNoDollarQueryOptions { get; set; } = true;
 
         /// <summary>
         /// Build the default QueryOption settings

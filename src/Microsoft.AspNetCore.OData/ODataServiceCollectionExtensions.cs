@@ -6,6 +6,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -130,8 +132,13 @@ namespace Microsoft.AspNetCore.OData
 
                 // Add the value provider.
                 // options.ValueProviderFactories.Insert(0, new ODataValueProviderFactory());
+            })
+            .AddJsonOptions(options =>
+            {
+                // Add the Select expand wrapper convert factory
+                options.JsonSerializerOptions.Converters.Add(new SelectExpandWrapperConverter());
+                options.JsonSerializerOptions.Converters.Add(new PageResultValueConverter());
             });
-
 
             services.AddODataRouting();
 

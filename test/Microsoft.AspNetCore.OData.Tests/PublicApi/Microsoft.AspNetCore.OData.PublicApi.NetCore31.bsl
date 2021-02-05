@@ -47,6 +47,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableCount  { public get; public set; }
 	bool EnableExpand  { public get; public set; }
 	bool EnableFilter  { public get; public set; }
+	bool EnableNoDollarQueryOptions  { public get; public set; }
 	bool EnableOrderBy  { public get; public set; }
 	bool EnableSelect  { public get; public set; }
 	bool EnableSkipToken  { public get; public set; }
@@ -641,6 +642,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	ExtensionAttribute(),
 	]
 	public static bool IsCountRequest (Microsoft.AspNetCore.Http.HttpRequest request)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static bool IsNoDollarQueryEnable (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
 	ExtensionAttribute(),
