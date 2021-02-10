@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -78,6 +82,23 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         public IEdmTypeReference GetEdmType()
         {
             return Model.GetEdmTypeReference(typeof(T));
+        }
+    }
+
+    internal class ComputeWrapperConverter<T> : JsonConverter<ComputeWrapper<T>>
+    {
+        public override ComputeWrapper<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Contract.Assert(false, "ComputeWrapper{T} is internal and should never be deserialized into.");
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, ComputeWrapper<T> value, JsonSerializerOptions options)
+        {
+            if (value != null)
+            {
+                JsonSerializer.Serialize(writer, value.Values, options);
+            }
         }
     }
 }

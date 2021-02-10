@@ -135,9 +135,10 @@ namespace Microsoft.AspNetCore.OData
             })
             .AddJsonOptions(options =>
             {
-                // Add the Select expand wrapper convert factory
+                // Add the Select expand and other wrapper converter factory
                 options.JsonSerializerOptions.Converters.Add(new SelectExpandWrapperConverter());
                 options.JsonSerializerOptions.Converters.Add(new PageResultValueConverter());
+                options.JsonSerializerOptions.Converters.Add(new DynamicTypeWrapperConverter());
             });
 
             services.AddODataRouting();

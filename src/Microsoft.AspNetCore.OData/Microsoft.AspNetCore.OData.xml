@@ -10327,8 +10327,23 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter">
             <summary>
-            Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> instances to JSON.
+            Supports converting <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> types by using a factory pattern.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            determines whether the converter instance can convert the specified object type.
+            </summary>
+            <param name="typeToConvert">The type of the object to check whether it can be converted by this converter instance.</param>
+            <returns>true if the instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GroupByContainer">
             <summary>

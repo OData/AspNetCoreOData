@@ -10,7 +10,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
     /// <summary>
-    /// Supports converting <see cref=" SelectExpandWrapper{T}"/> types by using a factory pattern.
+    /// Supports converting <see cref="SelectExpandWrapper{T}"/> types by using a factory pattern.
     /// </summary>
     internal class SelectExpandWrapperConverter : JsonConverterFactory
     {
@@ -55,6 +55,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         /// <returns>A converter for which T is compatible with typeToConvert.</returns>
         public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
         {
+            if (type == null || !type.IsGenericType)
+            {
+                return null;
+            }
+
             // Since 'type' is tested in 'CanConvert()', it must be a generic type
             Type generaticType = type.GetGenericTypeDefinition();
             Type entityType = type.GetGenericArguments()[0];

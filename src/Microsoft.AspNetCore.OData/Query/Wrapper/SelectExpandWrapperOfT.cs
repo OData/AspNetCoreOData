@@ -2,6 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.Contracts;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
@@ -33,6 +36,20 @@ property selection combination possible. */
         protected override Type GetElementType()
         {
             return UntypedInstance == null ? typeof(TElement) : UntypedInstance.GetType();
+        }
+    }
+
+    internal class SelectExpandWrapperConverter<TEntity> : JsonConverter<SelectExpandWrapper<TEntity>>
+    {
+        public override SelectExpandWrapper<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Contract.Assert(false, "SelectExpandWrapper{TEntity} is internal and should never be deserialized into.");
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value.ToDictionary(SelectExpandWrapperConverter.MapperProvider), options);
         }
     }
 }
