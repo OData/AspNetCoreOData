@@ -54,3 +54,43 @@ Known issue: It seems there are some issues related to the complex property sele
 
 `http://localhost:5000/api/accounts?$select=HomeAddress`
 `http://localhost:5000/api/accounts?$select=HomeAddress($select=City)`
+
+## Raw OpenAPI/Swagger
+
+If you run the sample and send the following request in a Web brower:
+
+`/v1/$openapi`, you will get the following (simiar) swagger page:
+
+```json
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OData Service for namespace Default",
+    "description": "This OData service is located at http://localhost:5000/v1",
+    "version": "1.0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/v1"
+    }
+  ],
+  "paths": {
+    "/Companies": {
+      "get": {
+        "tags": [
+          "Companies.Company"
+        ],
+        "summary": "Get entities from Companies",
+        "operationId": "Companies.Company.ListCompany",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/top"
+          },
+          {
+            "$ref": "#/components/parameters/skip"
+          },
+
+          
+```
+
+You can use `$format=application/{yaml|json};version={2.0|3.0}` to get different openApi in format and version.

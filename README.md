@@ -21,7 +21,10 @@ Example:
    
    - **`~/swagger`** gives a swagger/openapi page
  
-
+   - Append **`~/$openapi`** to each route gives a raw openapi OData page, for example, **`~/v1/$openapi`**
+   
+   
+	
 ## 2. Basic Usage
 
 In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
