@@ -16,6 +16,8 @@ using Microsoft.OData;
 using Microsoft.AspNetCore.Routing;
 using ODataRoutingSample.Extensions;
 using ODataRoutingSample.Models;
+using ODataRoutingSample.OpenApi;
+using Microsoft.OpenApi.Models;
 
 namespace ODataRoutingSample
 {
@@ -75,6 +77,8 @@ namespace ODataRoutingSample
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseODataOpenApi();
 
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();

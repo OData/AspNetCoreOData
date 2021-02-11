@@ -77,7 +77,7 @@ namespace ODataRoutingSample.Extensions
 
             string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
             output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
-            context.Response.Headers["Content_Type"] = "text/html";
+            context.Response.Headers["Content-Type"] = "text/html";
 
             await context.Response.WriteAsync(output);
 
