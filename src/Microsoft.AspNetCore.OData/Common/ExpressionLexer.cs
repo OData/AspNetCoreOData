@@ -166,6 +166,12 @@ namespace Microsoft.AspNetCore.OData.Common
                     t = ExpressionTokenKind.Literal;
                     break;
 
+                case '[':
+                    NextChar();
+                    AdvanceThroughBalancedExpression('[', ']');
+                    t = ExpressionTokenKind.Literal;
+                    break;
+
                 default:
                     if (this.IsValidWhiteSpace)
                     {
