@@ -619,6 +619,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found an unbalanced bracket &apos;{0}&apos; and &apos;{1}&apos; expression..
+        /// </summary>
+        internal static string ExpressionLexer_UnbalancedBracketExpression {
+            get {
+                return ResourceManager.GetString("ExpressionLexer_UnbalancedBracketExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Syntax error at position {0} in &apos;{1}&apos;..
         /// </summary>
         internal static string ExpressionLexerSyntaxError {

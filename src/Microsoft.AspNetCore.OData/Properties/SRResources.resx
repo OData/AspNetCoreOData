@@ -647,6 +647,9 @@
   <data name="ExpressionLexerSyntaxError" xml:space="preserve">
     <value>Syntax error at position {0} in '{1}'.</value>
   </data>
+  <data name="ExpressionLexer_UnbalancedBracketExpression" xml:space="preserve">
+    <value>Found an unbalanced bracket '{0}' and '{1}' expression.</value>
+  </data>
   <data name="MultipleSingleLiteralNotAllowed" xml:space="preserve">
     <value>'{0}' is not a valid expression.Single literal is only for single key. Multiple keys should use key=value.</value>
   </data>

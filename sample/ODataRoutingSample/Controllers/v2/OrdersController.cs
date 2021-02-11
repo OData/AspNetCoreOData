@@ -94,9 +94,14 @@ namespace ODataRoutingSample.Controllers.v2
         }
 
         [HttpGet]
-        public bool CanMoveToAddress(int key, [FromODataUri] Address address)
+        public IActionResult CanMoveToAddress(int key, [FromODataUri] Address address)
         {
-            return true;
+            if (address == null)
+            {
+                return NotFound("address is null");
+            }
+
+            return Ok(System.Text.Json.JsonSerializer.Serialize(address));
         }
 
         [HttpGet]

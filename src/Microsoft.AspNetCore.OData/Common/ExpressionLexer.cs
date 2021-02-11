@@ -160,6 +160,12 @@ namespace Microsoft.AspNetCore.OData.Common
                     t = ExpressionTokenKind.Literal;
                     break;
 
+                case '{':
+                    NextChar();
+                    AdvanceThroughBalancedExpression('{', '}');
+                    t = ExpressionTokenKind.Literal;
+                    break;
+
                 default:
                     if (this.IsValidWhiteSpace)
                     {
@@ -195,6 +201,36 @@ namespace Microsoft.AspNetCore.OData.Common
             while (_char.HasValue && (_char != endingValue))
             {
                 NextChar();
+            }
+        }
+
+        /// <summary>
+        /// Parses an expression of text that we do not know how to handle in this class, which is between a
+        /// <paramref name="startingCharacter"></paramref> and an <paramref name="endingCharacter"/>.
+        /// </summary>
+        /// <param name="startingCharacter">the starting delimiter</param>
+        /// <param name="endingCharacter">the ending delimiter.</param>
+        private void AdvanceThroughBalancedExpression(char startingCharacter, char endingCharacter)
+        {
+            int currentBracketDepth = 1;
+
+            while (currentBracketDepth > 0)
+            {
+                if (_char == startingCharacter)
+                {
+                    currentBracketDepth++;
+                }
+                else if (_char == endingCharacter)
+                {
+                    currentBracketDepth--;
+                }
+
+                if (_char == null)
+                {
+                    throw new ODataException(Error.Format(SRResources.ExpressionLexer_UnbalancedBracketExpression, startingCharacter, endingCharacter));
+                }
+
+                this.NextChar();
             }
         }
 

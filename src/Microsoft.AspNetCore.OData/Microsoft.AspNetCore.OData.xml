@@ -1173,6 +1173,14 @@
             </summary>
             <param name="endingValue">the ending delimiter.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.AdvanceThroughBalancedExpression(System.Char,System.Char)">
+            <summary>
+            Parses an expression of text that we do not know how to handle in this class, which is between a
+            <paramref name="startingCharacter"></paramref> and an <paramref name="endingCharacter"/>.
+            </summary>
+            <param name="startingCharacter">the starting delimiter</param>
+            <param name="endingCharacter">the ending delimiter.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ParseLiteral">
             <summary>
             Parses a literal be checking for delimiting characters '\0', ',',')' and ' '
@@ -6027,6 +6035,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpandFilterExpressionNotLambdaExpression">
             <summary>
               Looks up a localized string similar to $filter in $expand of reference navigation property &apos;{0}&apos; is not expected type &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexer_UnbalancedBracketExpression">
+            <summary>
+              Looks up a localized string similar to Found an unbalanced bracket &apos;{0}&apos; and &apos;{1}&apos; expression..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexerSyntaxError">
