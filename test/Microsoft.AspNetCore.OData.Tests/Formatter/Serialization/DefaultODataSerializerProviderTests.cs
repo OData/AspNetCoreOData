@@ -29,6 +29,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         private static IEdmModel _edmModel = GetEdmModel();
 
+        private static IEdmModel _edmDollarCountModel = GetDollarCountEdmModel();
+
         public static TheoryDataSet<Type, EdmPrimitiveTypeKind> EdmPrimitiveMappingData
         {
             get
@@ -166,9 +168,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void GetODataPayloadSerializer_ReturnsRawValueSerializer_ForDollarCountRequests(string uri, Type elementType)
         {
             // Arrange
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<DollarCountEntity>("DollarCountEntities");
-            IEdmModel model = builder.GetEdmModel();
+            IEdmModel model = _edmDollarCountModel;
 
             Type type = typeof(ICollection<>).MakeGenericType(elementType);
             ODataUriParser parser = new ODataUriParser(model, new Uri(uri, UriKind.Relative));
@@ -186,12 +186,69 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(ODataPayloadKind.Value, rawValueSerializer.ODataPayloadKind);
         }
 
+        public static IEdmModel GetDollarCountEdmModel()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            var entityCollection = builder.EntitySet<DollarCountEntity>("DollarCountEntities").EntityType.Collection;
+
+            // Add unbound functions that return collection.
+            FunctionConfiguration function = builder.Function("UnboundFunctionReturnsPrimitveCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<int>();
+
+            function = builder.Function("UnboundFunctionReturnsEnumCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<Color>();
+
+            function = builder.Function("UnboundFunctionReturnsDateTimeOffsetCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<DateTimeOffset>();
+
+            function = builder.Function("UnboundFunctionReturnsDateCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<Date>();
+
+            function = builder.Function("UnboundFunctionReturnsComplexCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<DollarCountComplex>();
+
+            function = builder.Function("UnboundFunctionReturnsEntityCollection");
+            function.IsComposable = true;
+            function.ReturnsCollectionFromEntitySet<DollarCountEntity>("DollarCountEntities");
+
+            // Add bound functions that return collection.
+            function = entityCollection.Function("BoundFunctionReturnsPrimitveCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<DateTimeOffset>();
+
+            function = entityCollection.Function("BoundFunctionReturnsEnumCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<Color>();
+
+            function = entityCollection.Function("BoundFunctionReturnsDateTimeOffsetCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<DateTimeOffset>();
+
+            function = entityCollection.Function("BoundFunctionReturnsComplexCollection");
+            function.IsComposable = true;
+            function.ReturnsCollection<DollarCountComplex>();
+
+            function = entityCollection.Function("BoundFunctionReturnsEntityCollection");
+            function.IsComposable = true;
+            function.ReturnsCollectionFromEntitySet<DollarCountEntity>("DollarCountEntities");
+
+            return builder.GetEdmModel();
+        }
+
         private class DollarCountEntity
         {
             public int Id { get; set; }
-
+            public string[] StringCollectionProp { get; set; }
+            public Color[] EnumCollectionProp { get; set; }
+            public TimeSpan[] TimeSpanCollectionProp { get; set; }
             public DollarCountComplex[] ComplexCollectionProp { get; set; }
             public DollarCountEntity[] EntityCollectionProp { get; set; }
+            public int[] DollarCountNotAllowedCollectionProp { get; set; }
         }
 
         private class DollarCountComplex
