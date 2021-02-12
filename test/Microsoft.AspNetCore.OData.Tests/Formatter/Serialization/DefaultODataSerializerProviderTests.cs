@@ -146,27 +146,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Theory]
-        [InlineData("DollarCountEntities/$count", typeof(ODataCountTest.DollarCountEntity))]
+        [InlineData("DollarCountEntities/$count", typeof(DollarCountEntity))]
         [InlineData("DollarCountEntities(5)/StringCollectionProp/$count", typeof(string))]
         [InlineData("DollarCountEntities(5)/EnumCollectionProp/$count", typeof(Color))]
         [InlineData("DollarCountEntities(5)/TimeSpanCollectionProp/$count", typeof(TimeSpan))]
-        [InlineData("DollarCountEntities(5)/ComplexCollectionProp/$count", typeof(ODataCountTest.DollarCountComplex))]
-        [InlineData("DollarCountEntities(5)/EntityCollectionProp/$count", typeof(ODataCountTest.DollarCountEntity))]
+        [InlineData("DollarCountEntities(5)/ComplexCollectionProp/$count", typeof(DollarCountComplex))]
+        [InlineData("DollarCountEntities(5)/EntityCollectionProp/$count", typeof(DollarCountEntity))]
         [InlineData("UnboundFunctionReturnsPrimitveCollection()/$count", typeof(int))]
         [InlineData("UnboundFunctionReturnsEnumCollection()/$count", typeof(Color))]
         [InlineData("UnboundFunctionReturnsDateTimeOffsetCollection()/$count", typeof(DateTimeOffset))]
         [InlineData("UnboundFunctionReturnsDateCollection()/$count", typeof(Date))]
-        [InlineData("UnboundFunctionReturnsComplexCollection()/$count", typeof(ODataCountTest.DollarCountComplex))]
-        [InlineData("UnboundFunctionReturnsEntityCollection()/$count", typeof(ODataCountTest.DollarCountEntity))]
+        [InlineData("UnboundFunctionReturnsComplexCollection()/$count", typeof(DollarCountComplex))]
+        [InlineData("UnboundFunctionReturnsEntityCollection()/$count", typeof(DollarCountEntity))]
         [InlineData("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count", typeof(DateTimeOffset))]
         [InlineData("DollarCountEntities/Default.BoundFunctionReturnsEnumCollection()/$count", typeof(Color))]
         [InlineData("DollarCountEntities/Default.BoundFunctionReturnsDateTimeOffsetCollection()/$count", typeof(DateTimeOffset))]
-        [InlineData("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count", typeof(ODataCountTest.DollarCountComplex))]
-        [InlineData("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count", typeof(ODataCountTest.DollarCountEntity))]
+        [InlineData("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count", typeof(DollarCountComplex))]
+        [InlineData("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count", typeof(DollarCountEntity))]
         public void GetODataPayloadSerializer_ReturnsRawValueSerializer_ForDollarCountRequests(string uri, Type elementType)
         {
             // Arrange
-            IEdmModel model = ODataCountTest.GetEdmModel();
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<DollarCountEntity>("DollarCountEntities");
+            IEdmModel model = builder.GetEdmModel();
+
             Type type = typeof(ICollection<>).MakeGenericType(elementType);
             ODataUriParser parser = new ODataUriParser(model, new Uri(uri, UriKind.Relative));
             var path = parser.ParsePath();
@@ -181,6 +184,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.NotNull(serializer);
             var rawValueSerializer = Assert.IsType<ODataRawValueSerializer>(serializer);
             Assert.Equal(ODataPayloadKind.Value, rawValueSerializer.ODataPayloadKind);
+        }
+
+        private class DollarCountEntity
+        {
+            public int Id { get; set; }
+
+            public DollarCountComplex[] ComplexCollectionProp { get; set; }
+            public DollarCountEntity[] EntityCollectionProp { get; set; }
+        }
+
+        private class DollarCountComplex
+        {
+            public string StringProp { get; set; }
         }
 
         [Fact]
