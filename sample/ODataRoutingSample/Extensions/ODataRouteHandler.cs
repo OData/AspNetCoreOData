@@ -63,6 +63,7 @@ namespace ODataRoutingSample.Extensions
                 string httpMethods = string.Join(",", metadata.HttpMethods);
                 sb.Append($"<td>{httpMethods.ToUpper()}</td>");
 
+                // TODO: use the DisplayName?
                 // OData routing templates
                 RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
                 if (routeEndpoint != null)

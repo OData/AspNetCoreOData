@@ -365,16 +365,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             HttpRequest request = readContext.Request;
-            // IWebApiUrlHelper urlHelper = readContext.InternalUrlHelper;
+            string serviceRoot = request.CreateODataLink();
 
-            // DefaultODataPathHandler pathHandler = new DefaultODataPathHandler();
-            //string serviceRoot = urlHelper.CreateODataLink(
-            //    request.Context.RouteName,
-            //    request.PathHandler,
-            //    new List<ODataPathSegment>());
-            string serviceRoot = null; // TODOO
-
-            IEnumerable<KeyValuePair<string, object>> keyValues = GetKeys(request, serviceRoot, resource.Id/*, request.RequestContainer*/);
+            IEnumerable<KeyValuePair<string, object>> keyValues = GetKeys(request, serviceRoot, resource.Id, request.GetSubServiceProvider());
 
             IList<IEdmStructuralProperty> keys = entityTypeReference.Key().ToList();
 
@@ -402,12 +395,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return source;
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> GetKeys(/*DefaultODataPathHandler pathHandler,*/ HttpRequest request,
-            string serviceRoot, Uri uri)
+        private static IEnumerable<KeyValuePair<string, object>> GetKeys(HttpRequest request, string serviceRoot,
+            Uri uri, IServiceProvider requestContainer)
         {
             IEdmModel model = request.GetModel();
 
-            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri);
+            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri, requestContainer);
 
             //ODataPath odataPath = pathHandler.Parse(serviceRoot, uri.ToString(), requestContainer);
             ODataPath odataPath = uriParser.ParsePath();

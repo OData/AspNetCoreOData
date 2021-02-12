@@ -48,8 +48,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         protected override bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
-            Contract.Assert(operation.IsFunction());
             Contract.Assert(action != null);
+
+            if (!operation.IsFunction())
+            {
+                return false;
+            }
 
             // we can allow the action has other parameters except the functio parameters.
             foreach (var parameter in operation.Parameters.Skip(1))

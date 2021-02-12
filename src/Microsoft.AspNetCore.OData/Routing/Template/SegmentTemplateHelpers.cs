@@ -125,7 +125,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 if (routeValues.TryGetValue(parameterTemp, out object rawValue))
                 {
                     string strValue = rawValue as string;
-                    strValue = context.GetParameterAliasOrSelf(strValue);
+                    string newStrValue = context.GetParameterAliasOrSelf(strValue);
+                    if (newStrValue != strValue)
+                    {
+                        routeValues[parameterTemp] = newStrValue;
+                        strValue = newStrValue;
+                    }
 
                     // for resource or collection resource, this method will return "ODataResourceValue, ..." we should support it.
                     if (edmParameter.Type.IsResourceOrCollectionResource())

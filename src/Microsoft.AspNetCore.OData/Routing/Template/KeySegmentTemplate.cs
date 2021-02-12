@@ -122,8 +122,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 if (updateValues.TryGetValue(templateName, out object rawValue))
                 {
                     string strValue = rawValue as string;
-
-                    strValue = context.GetParameterAliasOrSelf(strValue);
+                    string newStrValue = context.GetParameterAliasOrSelf(strValue);
+                    if (newStrValue != strValue)
+                    {
+                        updateValues[templateName] = newStrValue;
+                        strValue = newStrValue;
+                    }
 
                     object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
 

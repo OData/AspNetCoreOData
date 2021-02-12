@@ -54,8 +54,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         protected override bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
-            Contract.Assert(operation.IsAction());
             Contract.Assert(action != null);
+
+            if (!operation.IsAction())
+            {
+                return false;
+            }
 
             // So far, we use the "ODataActionParameters" and "ODataUntypedActionParameters" to hold the action parameter values.
             // TODO: consider to use [FromODataBody] to seperate the parameters to each corresponding 

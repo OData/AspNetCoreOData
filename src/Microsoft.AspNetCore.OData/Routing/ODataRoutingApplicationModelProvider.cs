@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     }
 
                     // Apply to ODataModelAttribute
-                    if (!CanApply(route.Key, controller))
+                    if (!CanApply(route.Key, () => controller.GetAttribute<ODataModelAttribute>()))
                     {
                         continue;
                     }
@@ -89,6 +89,11 @@ namespace Microsoft.AspNetCore.OData.Routing
                     {
                         foreach (var action in controller.Actions.Where(a => !a.IsNonODataAction()))
                         {
+                            if (!CanApply(route.Key, () => action.GetAttribute<ODataModelAttribute>()))
+                            {
+                                continue;
+                            }
+
                             // Reset the action on the context.
                             odataContext.Action = action;
 
@@ -136,9 +141,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             return new ODataControllerActionContext(prefix, model, controller);
         }
 
-        private static bool CanApply(string prefix, ControllerModel controller)
+        private static bool CanApply(string prefix, Func<ODataModelAttribute> func)
         {
-            ODataModelAttribute odataModel = controller.GetAttribute<ODataModelAttribute>();
+            ODataModelAttribute odataModel = func?.Invoke();
             if (odataModel == null)
             {
                 return true; // apply to all model
