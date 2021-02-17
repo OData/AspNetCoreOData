@@ -13,22 +13,16 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
-using Microsoft.AspNetCore.Routing;
-using ODataRoutingSample.Extensions;
 using ODataRoutingSample.Models;
 using ODataRoutingSample.OpenApi;
-using Microsoft.OpenApi.Models;
 
 namespace ODataRoutingSample
 {
     public class Startup
     {
-        private IEdmModel model;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            model = EdmModelBuilder.GetEdmModel();
         }
 
         public IConfiguration Configuration { get; }
@@ -107,9 +101,6 @@ namespace ODataRoutingSample
 
             app.UseEndpoints(endpoints =>
             {
-                // A odata debuger route is only for debugger view of the all OData endpoint routing.
-                endpoints.MapGet("/$odata", ODataRouteHandler.HandleOData);
-
                 endpoints.MapControllers();
             });
         }

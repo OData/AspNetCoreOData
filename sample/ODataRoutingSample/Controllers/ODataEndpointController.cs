@@ -3,40 +3,40 @@
 
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace ODataRoutingSample.Extensions
+namespace ODataRoutingSample.Controllers
 {
-    public static class ODataRouteHandler
+    public class ODataEndpointController : ControllerBase
     {
-        /// <summary>
-        /// Handle ~/$odata request
-        /// </summary>
-        /// <param name="context">The http context.</param>
-        /// <returns>The task.</returns>
-        public static async Task HandleOData(HttpContext context)
-        {
-            EndpointDataSource dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
+        private EndpointDataSource _dataSource;
 
+        public ODataEndpointController(EndpointDataSource dataSource)
+        {
+            _dataSource = dataSource;
+        }
+
+        [HttpGet("$odata")]
+        public ContentResult GetAllRoutes()
+        {
             StringBuilder nonSb = new StringBuilder();
             StringBuilder sb = new StringBuilder();
-            foreach (var endpoint in dataSource.Endpoints)
+            foreach (var endpoint in _dataSource.Endpoints)
             {
+                ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+                if (controllerActionDescriptor == null)
+                {
+                    continue;
+                }
+
                 IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
                 if (metadata == null)
                 {
                     AppendNonODataRoute(nonSb, endpoint);
-                    continue;
-                }
-
-                ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-                if (controllerActionDescriptor == null)
-                {
                     continue;
                 }
 
@@ -78,15 +78,8 @@ namespace ODataRoutingSample.Extensions
 
             string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
             output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
-            context.Response.Headers["Content-Type"] = "text/html";
 
-            await context.Response.WriteAsync(output);
-
-            //string content = sb.ToString();
-            //byte[] requestBytes = Encoding.UTF8.GetBytes(content);
-            //context.Response.Headers.ContentLength = requestBytes.Length;
-            //context.Response.Body = new MemoryStream(requestBytes);
-            //await Task.CompletedTask;
+            return base.Content(output, "text/html");
         }
 
         /// <summary>
@@ -94,7 +87,7 @@ namespace ODataRoutingSample.Extensions
         /// </summary>
         /// <param name="sb">The string builder</param>
         /// <param name="endPoint">The endpoint.</param>
-        public static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
+        private static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
         {
             sb.Append("<tr>");
             sb.Append($"<td>{endpoint.DisplayName}</td>");
@@ -139,7 +132,7 @@ namespace ODataRoutingSample.Extensions
     </style>
   </head>
   <body>
-    <h1>OData Endpoint Mapping</h1>
+    <h1 id=""odataendpoint"">OData Endpoint Mapping <a href=""#nonodataendpoint""> >>> Go to non-odata endpoint mapping</a></h1>
     <table>
      <tr>
        <th> Controller </th>
@@ -149,7 +142,7 @@ namespace ODataRoutingSample.Extensions
     </tr>
     {CONTENT}
     </table>
-    <h1>Non-OData Endpoint Mapping</h1>
+    <h1 id=""nonodataendpoint"">Non-OData Endpoint Mapping <a href=""#odataendpoint""> >>> Back to odata endpoint mapping</a></h1>
     <table>
      <tr>
        <th> Controller </th>
