@@ -94,10 +94,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (property != null)
             {
                 navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
-                if (navigationProperty == null)
-                {
-                    return false;
-                }
+            }
+
+            if (navigationProperty == null)
+            {
+                return false;
             }
 
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();

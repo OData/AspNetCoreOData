@@ -23,9 +23,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         private readonly ILogger<NavigationRoutingConvention> _logger;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="NavigationRoutingConvention"/> class.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">The injected logger.</param>
         public NavigationRoutingConvention(ILogger<NavigationRoutingConvention> logger)
         {
             _logger = logger ?? throw Error.ArgumentNull(nameof(logger));
@@ -169,7 +169,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (declared != null)
             {
                 // It should be always single type
-                segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
+                if (entityType != declaringEntityType)
+                {
+                    segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
+                }
             }
 
             IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);

@@ -205,7 +205,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
 
                 case JsonValueKind.Undefined:
                 default:
-                    throw new ODataException($"Found a Undefined JSON element '{node.GetRawText()}'!");
+                    throw new ODataException($"Found an Undefined JSON element '{node.GetRawText()}'!");
             }
         }
 

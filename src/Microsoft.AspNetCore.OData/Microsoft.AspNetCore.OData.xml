@@ -3481,6 +3481,18 @@
             <param name="propertyName">The name of the property to get.</param>
             <returns>The value of the property if present.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1">
+            <summary>
+            An instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1"/> gets passed to the self link
+            and navigation link builders and can be used by the link builders to generate links.
+            </summary>
+            <typeparam name="TStructuredType">The structural type</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1"/> class.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext">
             <summary>
             Contains context information about the resource set currently being serialized.
@@ -10940,9 +10952,9 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention})">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention"/> class.
             </summary>
-            <param name="logger"></param>
+            <param name="logger">The injected logger.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.Order">
             <inheritdoc />
