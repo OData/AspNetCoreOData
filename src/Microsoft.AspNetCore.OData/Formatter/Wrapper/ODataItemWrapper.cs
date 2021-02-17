@@ -8,13 +8,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
     /// <summary>
     /// Base class for all classes that wrap an <see cref="ODataItem"/>.
     /// </summary>
-    public abstract class ODataItemBase
+    public abstract class ODataItemWrapper
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="ODataItemBase"/>.
+        /// Initializes a new instance of <see cref="ODataItemWrapper"/>.
         /// </summary>
         /// <param name="item">The wrapped item.</param>
-        protected ODataItemBase(ODataItem item)
+        protected ODataItemWrapper(ODataItem item)
         {
             Item = item;
         }

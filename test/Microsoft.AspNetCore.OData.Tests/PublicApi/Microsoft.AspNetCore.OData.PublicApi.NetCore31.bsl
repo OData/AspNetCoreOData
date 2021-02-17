@@ -2273,8 +2273,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject : I
 	public virtual bool TryGetPropertyValue (string propertyName, out System.Object& value)
 }
 
-public abstract class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase {
-	protected ODataItemBase (Microsoft.OData.ODataItem item)
+public abstract class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
+	protected ODataItemWrapper (Microsoft.OData.ODataItem item)
 
 	Microsoft.OData.ODataItem Item  { public get; }
 }
@@ -2286,36 +2286,36 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExte
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase ReadResourceOrResourceSet (Microsoft.OData.ODataReader reader)
+	public static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper ReadResourceOrResourceSet (Microsoft.OData.ODataReader reader)
 
 	[
 	AsyncStateMachineAttribute(),
 	ExtensionAttribute(),
 	]
-	public static System.Threading.Tasks.Task`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase]] ReadResourceOrResourceSetAsync (Microsoft.OData.ODataReader reader)
+	public static System.Threading.Tasks.Task`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper]] ReadResourceOrResourceSetAsync (Microsoft.OData.ODataReader reader)
 }
 
-public class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase {
-	public ODataEntityReferenceLinkBase (Microsoft.OData.ODataEntityReferenceLink item)
+public class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
+	public ODataEntityReferenceLinkWrapper (Microsoft.OData.ODataEntityReferenceLink item)
 
 	Microsoft.OData.ODataEntityReferenceLink EntityReferenceLink  { public get; }
 }
 
-public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase {
+public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataNestedResourceInfoWrapper (Microsoft.OData.ODataNestedResourceInfo item)
 
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase]] NestedItems  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper]] NestedItems  { public get; }
 	Microsoft.OData.ODataNestedResourceInfo NestedResourceInfo  { public get; }
 }
 
-public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase {
+public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataResourceSetWrapper (Microsoft.OData.ODataResourceSet item)
 
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper]] Resources  { public get; }
 	Microsoft.OData.ODataResourceSet ResourceSet  { public get; }
 }
 
-public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase {
+public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataResourceWrapper (Microsoft.OData.ODataResource item)
 
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }

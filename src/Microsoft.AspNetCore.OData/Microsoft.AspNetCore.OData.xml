@@ -5277,34 +5277,34 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
             <summary>
             Encapuslates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
             <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase"/>.
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="item">The wrapped entity reference item.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase.EntityReferenceLink">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.EntityReferenceLink">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper">
             <summary>
             Base class for all classes that wrap an <see cref="T:Microsoft.OData.ODataItem"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase.#ctor(Microsoft.OData.ODataItem)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper.#ctor(Microsoft.OData.ODataItem)">
             <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase"/>.
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper"/>.
             </summary>
             <param name="item">The wrapped item.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase.Item">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper.Item">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataItem"/>.
             </summary>

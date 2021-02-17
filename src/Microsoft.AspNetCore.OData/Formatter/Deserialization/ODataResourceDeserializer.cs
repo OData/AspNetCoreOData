@@ -312,7 +312,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
             }
 
-            foreach (ODataItemBase childItem in resourceInfoWrapper.NestedItems)
+            foreach (ODataItemWrapper childItem in resourceInfoWrapper.NestedItems)
             {
                 // it maybe null.
                 if (childItem == null)
@@ -329,7 +329,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     }
                 }
 
-                ODataEntityReferenceLinkBase entityReferenceLink = childItem as ODataEntityReferenceLinkBase;
+                ODataEntityReferenceLinkWrapper entityReferenceLink = childItem as ODataEntityReferenceLinkWrapper;
                 if (entityReferenceLink != null)
                 {
                     // ignore entity reference links.

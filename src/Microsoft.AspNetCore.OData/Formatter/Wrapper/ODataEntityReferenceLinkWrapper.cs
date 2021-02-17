@@ -8,13 +8,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
     /// <summary>
     /// Encapuslates an <see cref="ODataEntityReferenceLink"/>.
     /// </summary>
-    public class ODataEntityReferenceLinkBase : ODataItemBase
+    public class ODataEntityReferenceLinkWrapper : ODataItemWrapper
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="ODataEntityReferenceLinkBase"/>.
+        /// Initializes a new instance of <see cref="ODataEntityReferenceLinkWrapper"/>.
         /// </summary>
-        /// <param name="item">The wrapped item.</param>
-        public ODataEntityReferenceLinkBase(ODataEntityReferenceLink item)
+        /// <param name="item">The wrapped entity reference item.</param>
+        public ODataEntityReferenceLinkWrapper(ODataEntityReferenceLink item)
             : base(item)
         {
             EntityReferenceLink = item;

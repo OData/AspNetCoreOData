@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
     /// <summary>
     /// Encapsulates an <see cref="ODataResource"/> and the inner nested resource infos.
     /// </summary>
-    public sealed class ODataResourceWrapper : ODataItemBase
+    public sealed class ODataResourceWrapper : ODataItemWrapper
     {
         /// <summary>
         /// Initializes a new instance of <see cref="ODataResourceWrapper"/>.

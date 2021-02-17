@@ -19,15 +19,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// </summary>
         /// <param name="reader">The OData reader to read from.</param>
         /// <returns>The read resource or resource set.</returns>
-        public static ODataItemBase ReadResourceOrResourceSet(this ODataReader reader)
+        public static ODataItemWrapper ReadResourceOrResourceSet(this ODataReader reader)
         {
             if (reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
 
-            ODataItemBase topLevelItem = null;
-            Stack<ODataItemBase> itemsStack = new Stack<ODataItemBase>();
+            ODataItemWrapper topLevelItem = null;
+            Stack<ODataItemWrapper> itemsStack = new Stack<ODataItemWrapper>();
 
             while (reader.Read())
             {
@@ -44,15 +44,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// </summary>
         /// <param name="reader">The OData reader to read from.</param>
         /// <returns>The read resource or resource set.</returns>
-        public static async Task<ODataItemBase> ReadResourceOrResourceSetAsync(this ODataReader reader)
+        public static async Task<ODataItemWrapper> ReadResourceOrResourceSetAsync(this ODataReader reader)
         {
             if (reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
 
-            ODataItemBase topLevelItem = null;
-            Stack<ODataItemBase> itemsStack = new Stack<ODataItemBase>();
+            ODataItemWrapper topLevelItem = null;
+            Stack<ODataItemWrapper> itemsStack = new Stack<ODataItemWrapper>();
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             return topLevelItem;
         }
 
-        private static void ReadCollectionItem(ODataReader reader, Stack<ODataItemBase> itemsStack, ref ODataItemBase topLevelItem)
+        private static void ReadCollectionItem(ODataReader reader, Stack<ODataItemWrapper> itemsStack, ref ODataItemWrapper topLevelItem)
         {
             switch (reader.State)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     }
                     else
                     {
-                        ODataItemBase parentItem = itemsStack.Peek();
+                        ODataItemWrapper parentItem = itemsStack.Peek();
                         ODataResourceSetWrapper parentResourceSet = parentItem as ODataResourceSetWrapper;
                         if (parentResourceSet != null)
                         {
@@ -156,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 case ODataReaderState.EntityReferenceLink:
                     ODataEntityReferenceLink entityReferenceLink = (ODataEntityReferenceLink)reader.Item;
                     Contract.Assert(entityReferenceLink != null, "Entity reference link should never be null.");
-                    ODataEntityReferenceLinkBase entityReferenceLinkWrapper = new ODataEntityReferenceLinkBase(entityReferenceLink);
+                    ODataEntityReferenceLinkWrapper entityReferenceLinkWrapper = new ODataEntityReferenceLinkWrapper(entityReferenceLink);
 
                     Contract.Assert(itemsStack.Count > 0, "Entity reference link should never be reported as top-level item.");
                     {
@@ -170,7 +170,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     Contract.Assert(false, "We should never get here, it means the ODataReader reported a wrong state.");
                     break;
             }
-
         }
     }
 }
