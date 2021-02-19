@@ -230,8 +230,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         #region Nested query option on select
         [Theory]
         [InlineData("Taxes", "\"Taxes\":[7,5,9]")]
-        [InlineData("Taxes($filter=$it eq 5)", "\"Taxes\":[5]")]
-        [InlineData("Taxes($filter=$it le 8)", "\"Taxes\":[7,5]")]
+        // [InlineData("Taxes($filter=$this eq 5)", "\"Taxes\":[5]")]  "TODO: enable these three cases when ODL supports $this
+        // [InlineData("Taxes($filter=$this le 8)", "\"Taxes\":[7,5]")]
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyWithNestedFilter(string select, string value)
         {
             // Arrange
@@ -242,9 +242,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        [Theory]
-        [InlineData("Taxes($orderby=$it)", "\"Taxes\":[5,7,9]")]
-        [InlineData("Taxes($orderby =$it desc)", "\"Taxes\":[9,7,5]")]
+        [Theory(Skip = "TODO: enable these three cases when ODL supports $this")]
+        [InlineData("Taxes($orderby=$this)", "\"Taxes\":[5,7,9]")]
+        [InlineData("Taxes($orderby =$this desc)", "\"Taxes\":[9,7,5]")]
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyWithNestedOrderby(string select, string value)
         {
             // Arrange
@@ -269,9 +269,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        [Theory]
-        [InlineData("HomeLocation/Emails($filter=$it eq 'E3')")]
-        [InlineData("HomeLocation($select=Emails($filter=$it eq 'E3'))")]
+        [Theory(Skip = "TODO: enable these three cases when ODL supports $this")]
+        [InlineData("HomeLocation/Emails($filter=$this eq 'E3')")]
+        [InlineData("HomeLocation($select=Emails($filter=$this eq 'E3'))")]
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfComplexTypePropertyWithNestedFilter(string select)
         {
             // Arrange
@@ -284,9 +284,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        [Theory]
-        [InlineData("HomeLocation/Emails($orderby=$it)")]
-        [InlineData("HomeLocation($select=Emails($orderby=$it desc))")]
+        [Theory(Skip = "TODO: enable these three cases when ODL supports $this")]
+        [InlineData("HomeLocation/Emails($orderby=$this)")]
+        [InlineData("HomeLocation($select=Emails($orderby=$this desc))")]
         public void QueryEntityWithSelectOnCollectionPrimitivePropertyOfComplexPropertyWithNestedOrderby(string select)
         {
             // Arrange
@@ -322,9 +322,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        [Theory]
-        [InlineData("RepoLocations/Emails($filter=$it eq 'E3')")]
-        [InlineData("RepoLocations($select=Emails($filter=$it eq 'E3'))")]
+        [Theory(Skip = "TODO: enable these three cases when ODL supports $this")]
+        [InlineData("RepoLocations/Emails($filter=$this eq 'E3')")]
+        [InlineData("RepoLocations($select=Emails($filter=$this eq 'E3'))")]
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfCollectionComplexTypePropertyWithFilter(string select)
         {
             // Arrange
@@ -341,9 +341,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             ExecuteAndVerifyQueryRequest(requestUri, equals);
         }
 
-        [Theory]
-        [InlineData("RepoLocations/Emails($orderby=$it;$top=1;$skip=2)")]
-        [InlineData("RepoLocations($select=Emails($orderby=$it;$top=1;$skip=2))")]
+        [Theory(Skip = "TODO: enable these three cases when ODL supports $this")]
+        [InlineData("RepoLocations/Emails($orderby=$this;$top=1;$skip=2)")]
+        [InlineData("RepoLocations($select=Emails($orderby=$this;$top=1;$skip=2))")]
         public void QueryEntityWithSelectOnSubCollectionPrimitivePropertyOfCollectionComplexTypePropertyWithOrderByTopSkip(string select)
         {
             // Arrange
