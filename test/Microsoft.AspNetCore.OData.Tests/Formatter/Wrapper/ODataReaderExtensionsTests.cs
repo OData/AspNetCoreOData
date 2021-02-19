@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             EdmEntityType customer = new EdmEntityType("NS", "Customer");
             Model.AddElement(customer);
             customer.AddKeys(customer.AddStructuralProperty("CustomerID", EdmCoreModel.Instance.GetInt32(false)));
+            customer.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(true));
             customer.AddStructuralProperty("Location", new EdmComplexTypeReference(address, false));
 
             // Order
@@ -245,6 +246,104 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 {
                     Assert.Equal("Email", p.Name);
                     Assert.Equal("a@abc.com", p.Value);
+                });
+        }
+
+        [Fact]
+        public async Task ReadDeletedLinkInDeltaResourceSetWorksAsExpected()
+        {
+            // Arrange
+            string payload = "{" +
+                    "\"@odata.context\":\"http://localhost/$metadata#Customers/$delta\"," +
+                    "\"@odata.count\":5," +
+                    "\"value\":[" +
+                       "{" +
+                          "\"@odata.id\":\"Customers(42)\"," +
+                          "\"Name\":\"Sammy\"" +
+                       "}," +
+                       "{" +
+                          "\"@odata.context\":\"http://localhost/$metadata#Customers/$deletedLink\"," +
+                          "\"source\":\"Customers(39)\"," +
+                          "\"relationship\":\"Orders\"," +
+                          "\"target\":\"Orders(10643)\"" +
+                       "}," +
+                       "{" +
+                          "\"@odata.context\":\"http://localhost/$metadata#Customers/$link\"," +
+                          "\"source\":\"Customers(32)\"," +
+                          "\"relationship\":\"Orders\"," +
+                          "\"target\":\"Orders(10645)\"" +
+                       "}," +
+                       "{" +
+                          "\"@odata.context\":\"http://localhost/$metadata#Orders/$entity\"," +
+                          "\"@odata.id\":\"Orders(10643)\"," +
+                          "\"Price\": 82" +
+                       "}," +
+                       "{" +
+                          "\"@odata.context\":\"http://localhost/$metadata#Customers/$deletedEntity\"," +
+                          "\"id\":\"Customers(21)\"," +
+                          "\"reason\":\"deleted\"" +
+                       "}" +
+                    "]," +
+                    "\"@odata.deltaLink\":\"Customers?$expand=Orders&$deltatoken=8015\"" +
+                  "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
+
+            // Assert
+            Assert.NotNull(item);
+
+            // --- DeltaResourceSet
+            //      |--- Resource (1)
+            //      |--- Resource (2)
+            //      |--- DeletedResource (1)
+            //      |
+            //      |--- DeltaDeletedLink
+            //      |--- DeltaLink
+            ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
+
+            // Resources
+            Assert.Equal(3, deltaResourceSet.ResourceBases.Count);
+            Assert.Collection(deltaResourceSet.ResourceBases,
+                e =>
+                {
+                    ODataResourceWrapper resource1 = Assert.IsType<ODataResourceWrapper>(e);
+                    Assert.Equal("Customers(42)", resource1.Resource.Id.OriginalString);
+                    Assert.Equal("Sammy", resource1.Resource.Properties.First(p => p.Name == "Name").Value);
+                },
+                e =>
+                {
+                    ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(e);
+                    Assert.Equal("Orders(10643)", resource2.Resource.Id.OriginalString);
+                    Assert.Equal(82, resource2.Resource.Properties.First(p => p.Name == "Price").Value);
+                },
+                e =>
+                {
+                    ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(e);
+                    Assert.Equal("Customers(21)", deletedResource.DeletedResource.Id.OriginalString);
+                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.DeletedResource.Reason);
+                });
+
+            // DeltaLinks
+            Assert.Equal(2, deltaResourceSet.DeltaLinks.Count);
+            Assert.Collection(deltaResourceSet.DeltaLinks,
+                e =>
+                {
+                    ODataDeltaDeletedLinkWrapper deletedLinkWrapper = Assert.IsType<ODataDeltaDeletedLinkWrapper>(e);
+                    Assert.Equal("Customers(39)", deletedLinkWrapper.DeltaDeletedLink.Source.OriginalString);
+                    Assert.Equal("Orders(10643)", deletedLinkWrapper.DeltaDeletedLink.Target.OriginalString);
+                    Assert.Equal("Orders", deletedLinkWrapper.DeltaDeletedLink.Relationship);
+                },
+                e =>
+                {
+                    ODataDeltaLinkWrapper linkWrapper = Assert.IsType<ODataDeltaLinkWrapper>(e);
+                    Assert.Equal("Customers(32)", linkWrapper.DeltaLink.Source.OriginalString);
+                    Assert.Equal("Orders(10645)", linkWrapper.DeltaLink.Target.OriginalString);
+                    Assert.Equal("Orders", linkWrapper.DeltaLink.Relationship);
                 });
         }
 
