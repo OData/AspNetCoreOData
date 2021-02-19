@@ -39,6 +39,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             order.AddKeys(order.AddStructuralProperty("OrderId", EdmCoreModel.Instance.GetInt32(false)));
             order.AddStructuralProperty("Price", EdmCoreModel.Instance.GetInt32(false));
 
+            // VipOrder
+            EdmEntityType vipOrder = new EdmEntityType("NS", "VipOrder", order);
+            Model.AddElement(vipOrder);
+            vipOrder.AddKeys(vipOrder.AddStructuralProperty("Email", EdmCoreModel.Instance.GetString(false)));
+
             var orderNav = customer.AddUnidirectionalNavigation(
                 new EdmNavigationPropertyInfo
                 {
@@ -51,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 new EdmNavigationPropertyInfo
                 {
                     Name = "Orders",
-                    Target = customer,
+                    Target = order,
                     TargetMultiplicity = EdmMultiplicity.Many
                 });
 
@@ -121,7 +126,278 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal(new[] { "Location", "Order", "Orders" }, resource.NestedResourceInfos.Select(n => n.NestedResourceInfo.Name));
         }
 
-        private async Task<ODataItemWrapper> ReadPayloadAsync(string payload, IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader)
+        [Fact]
+        public async Task ReadResourceSetWithNestedResourceSetWorksAsExpected()
+        {
+            // Arrange
+            const string payload =
+            "{" +
+                "\"@odata.context\":\"http://localhost/$metadata#Customers\"," +
+                "\"value\": [" +
+                 "{" +
+                    "\"CustomerID\": 7," +
+                    "\"Location\": { \"Street\":\"154TH AVE\"}," +
+                    "\"Order\": {\"OrderId\": 8, \"Price\": 82 }," +
+                    "\"Orders\": [" +
+                        "{\"OrderId\": 8, \"Price\": 82 }," +
+                        "{\"@odata.type\": \"#NS.VipOrder\",\"OrderId\": 9, \"Price\": 42, \"Email\": \"abc@efg.com\" }" +
+                      "]" +
+                   "}" +
+                "]" +
+            "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
+
+            // Assert
+            Assert.NotNull(item);
+            ODataResourceSetWrapper resourceSet = Assert.IsType<ODataResourceSetWrapper>(item);
+            ODataResourceWrapper resource = Assert.Single(resourceSet.Resources);
+            Assert.Equal(new[] { "Location", "Order", "Orders" }, resource.NestedResourceInfos.Select(n => n.NestedResourceInfo.Name));
+
+            ODataNestedResourceInfoWrapper orders = resource.NestedResourceInfos.First(n => n.NestedResourceInfo.Name == "Orders");
+            Assert.Null(orders.NestedResource); // not a child resource
+            Assert.Null(orders.NestedLinks); // not a child reference link(s)
+            Assert.NotNull(orders.NestedResourceSet);
+
+            ODataResourceSetWrapper ordersSet = Assert.IsType<ODataResourceSetWrapper>(orders.NestedResourceSet);
+            Assert.Equal(2, ordersSet.Resources.Count);
+            Assert.Collection(ordersSet.Resources,
+                r =>
+                {
+                    Assert.Equal("NS.Order", r.Resource.TypeName);
+                    Assert.Equal(82, r.Resource.Properties.First(p => p.Name == "Price").Value);
+                },
+                r =>
+                {
+                    Assert.Equal("NS.VipOrder", r.Resource.TypeName);
+                    Assert.Equal("abc@efg.com", r.Resource.Properties.First(p => p.Name == "Email").Value);
+                });
+        }
+
+        [Fact]
+        public async Task ReadDeltaResourceSetWorksAsExpected()
+        {
+            // Arrange
+            string payload = "{\"@context\":\"http://example.com/$metadata#Customers/$delta\"," +
+                "\"value\":[" +
+                  "{" +
+                    "\"@removed\":{\"reason\":\"changed\"}," +
+                    "\"CustomerID\":1," +
+                    "\"Orders@delta\":[" +
+                      "{" +
+                        "\"@removed\":{\"reason\":\"deleted\"}," +
+                        "\"OrderId\":10" +
+                      "}," +
+                      "{" +
+                        "\"@type\":\"#NS.VipOrder\"," +
+                        "\"OrderId\":9," +
+                        "\"Email\":\"a@abc.com\"" +
+                      "}" +
+                    "]" +
+                  "}" +
+                "]" +
+              "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
+
+            // Assert
+            Assert.NotNull(item);
+
+            // --- DeltaResourceSet
+            //      |--- DeleteResource (1)
+            //          |--- NestedResourceInfo (1-1)
+            //               |--- DeltaResourceSet
+            //                     |--- DelteResource
+            //                     |--- Normal Resource
+            ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
+            ODataResourceBaseWrapper resourceBase = Assert.Single(deltaResourceSet.ResourceBases);
+            ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(resourceBase);
+            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.DeletedResource.Reason);
+
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResource.NestedResourceInfos);
+            Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
+            Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
+
+            ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            Assert.Equal(2, ordersDeltaResourceSet.ResourceBases.Count);
+            ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.ResourceBases.ElementAt(0));
+            Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.DeletedResource.Reason);
+
+            ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.ResourceBases.ElementAt(1));
+            Assert.Equal("NS.VipOrder", resource2.Resource.TypeName);
+            Assert.Collection(resource2.Resource.Properties,
+                p =>
+                {
+                    Assert.Equal("OrderId", p.Name);
+                    Assert.Equal(9, p.Value);
+                },
+                p =>
+                {
+                    Assert.Equal("Email", p.Name);
+                    Assert.Equal("a@abc.com", p.Value);
+                });
+        }
+
+        [Theory]
+        [InlineData(ODataVersion.V4, "\"Order@odata.bind\":\"http://svc/Orders(7)\"")]
+        [InlineData(ODataVersion.V401, "\"Order\": {\"@id\": \"http://svc/Orders(8)\"}")]
+        public async Task ReadSingleEntityReferenceLinkWorksAsExpected(ODataVersion version, string referenceLink)
+        {
+            // Arrange
+            string payload = "{" + // -> ResourceStart
+                "\"@odata.context\":\"http://localhost/$metadata#Customers/$entity\"," +
+                "\"CustomerID\": 7," +
+                referenceLink +
+            "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, version);
+
+            // Assert
+            Assert.NotNull(item);
+            ODataResourceWrapper resource = Assert.IsType<ODataResourceWrapper>(item);
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(resource.NestedResourceInfos);
+            Assert.Equal("Order", nestedResourceInfo.NestedResourceInfo.Name);
+            if (version == ODataVersion.V401)
+            {
+                // --- Resource
+                //     |--- NestedResourceInfo (Order)
+                //          |--- Resource
+                ODataResourceWrapper order = Assert.IsType<ODataResourceWrapper>(nestedResourceInfo.NestedResource);
+                Assert.Equal("http://svc/Orders(8)", order.Resource.Id.OriginalString);
+                Assert.Empty(order.Resource.Properties);
+            }
+            else
+            {
+                // --- Resource
+                //     |--- NestedResourceInfo (Order)
+                //          |--- EntityReferenceLink
+                ODataEntityReferenceLinkWrapper orderLink = Assert.IsType<ODataEntityReferenceLinkWrapper>(Assert.Single(nestedResourceInfo.NestedLinks));
+                Assert.Equal("http://svc/Orders(7)", orderLink.EntityReferenceLink.Url.OriginalString);
+            }
+        }
+
+        [Fact]
+        public async Task ReadEntityReferenceLinksSetWorksAsExpected_V40()
+        {
+            // Arrange
+            string payload = "{" + // -> ResourceStart
+                "\"@odata.context\":\"http://localhost/$metadata#Customers/$entity\"," +
+                "\"CustomerID\": 7," +
+                "\"Orders@odata.bind\":[" +  // -> NestedResourceInfoStart
+                    "\"http://svc/Orders(2)\"," +
+                    "\"http://svc/Orders(3)\"," +
+                    "\"http://svc/Orders(4)\"" +
+                "]" +
+            "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V4);
+
+            // Assert
+            Assert.NotNull(item);
+
+            // --- Resource
+            //     |--- NestedResourceInfo
+            //           |--- EntityReferceLink (2)
+            //           |--- EntityReferceLink (3)
+            //           |--- EntityReferceLink (4)
+            ODataResourceWrapper resource = Assert.IsType<ODataResourceWrapper>(item);
+
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(resource.NestedResourceInfos);
+            Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
+            Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
+
+            Assert.NotNull(nestedResourceInfo.NestedLinks);
+            Assert.Equal(3, nestedResourceInfo.NestedLinks.Count);
+            Assert.Collection(nestedResourceInfo.NestedLinks,
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(2)", r.EntityReferenceLink.Url.OriginalString);
+                },
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(3)", r.EntityReferenceLink.Url.OriginalString);
+                },
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(4)", r.EntityReferenceLink.Url.OriginalString);
+                });
+        }
+
+        [Fact]
+        public async Task ReadEntityReferenceLinksSetWorksAsExpected_V401()
+        {
+            // Arrange
+            string payload = "{" + // -> ResourceStart
+                "\"@odata.context\":\"http://localhost/$metadata#Customers/$entity\"," +
+                "\"CustomerID\": 7," +
+                "\"Orders\":[" +  // -> NestedResourceInfoStart
+                    "{ \"@id\": \"http://svc/Orders(2)\" }," +
+                    "{ \"@id\": \"http://svc/Orders(3)\" }," +
+                    "{ \"@id\": \"http://svc/Orders(4)\" }" +
+                "]" +
+            "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
+
+            // Assert
+            Assert.NotNull(item);
+
+            // --- Resource
+            //     |--- NestedResourceInfo
+            //        |--- NestedResourceSet
+            //              |--- Resource (2)
+            //              |--- Resource (3)
+            //              |--- Resource (4)
+            ODataResourceWrapper resource = Assert.IsType<ODataResourceWrapper>(item);
+
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(resource.NestedResourceInfos);
+            Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
+            Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
+
+            ODataResourceSetWrapper ordersResourceSet = Assert.IsType<ODataResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            Assert.Equal(3, ordersResourceSet.Resources.Count);
+            Assert.Collection(ordersResourceSet.Resources,
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(2)", r.Resource.Id.OriginalString);
+                },
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(3)", r.Resource.Id.OriginalString);
+                },
+                r =>
+                {
+                    Assert.Equal("http://svc/Orders(4)", r.Resource.Id.OriginalString);
+                });
+        }
+
+        private async Task<ODataItemWrapper> ReadPayloadAsync(string payload,
+            IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader, ODataVersion version = ODataVersion.V4)
         {
             var message = new InMemoryMessage()
             {
@@ -133,10 +409,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             {
                 BaseUri = new Uri("http://localhost/$metadata"),
                 EnableMessageStreamDisposal = true,
-                Version = ODataVersion.V4,
+                Version = version,
             };
 
-            using (var msgReader = new ODataMessageReader((IODataResponseMessageAsync)message, readerSettings, edmModel))
+            using (var msgReader = new ODataMessageReader((IODataRequestMessageAsync)message, readerSettings, edmModel))
             {
                 ODataReader reader = await createReader(msgReader);
                 return await reader.ReadResourceOrResourceSetAsync();

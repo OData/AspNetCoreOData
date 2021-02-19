@@ -5277,6 +5277,89 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeletedResource"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper.#ctor(Microsoft.OData.ODataDeletedResource)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper"/>.
+            </summary>
+            <param name="deletedResource">The wrapped deleted resource item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper.DeletedResource">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeletedResource"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaDeletedLink"/> deleted link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper.#ctor(Microsoft.OData.ODataDeltaDeletedLink)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper"/>.
+            </summary>
+            <param name="deltaDeletedLink">The wrapped deleted link.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper.DeltaDeletedLink">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaDeletedLink"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkBaseWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaLinkBase"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaLink"/> added link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper.#ctor(Microsoft.OData.ODataDeltaLink)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper"/>.
+            </summary>
+            <param name="deltaLink">The wrapped added link item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper.DeltaLink">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaLink"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/>.
+            </summary>
+            <remarks>
+            The Delta resource set could have normal resource or the deleted resource.
+            The Delta resource set could have delta link.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.#ctor(Microsoft.OData.ODataDeltaResourceSet)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper"/>.
+            </summary>
+            <param name="deltaResourceSet">The wrapped delta resource set item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaResourceSet">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.ResourceBases">
+            <summary>
+            Gets the nested resources (resource or deleted resource) of this delta resource set.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaLinks">
+            <summary>
+            Gets the nested delta links of this delta resource set.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
             <summary>
             Encapuslates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
@@ -5286,7 +5369,7 @@
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>.
             </summary>
-            <param name="item">The wrapped entity reference item.</param>
+            <param name="link">The wrapped entity reference item.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.EntityReferenceLink">
             <summary>
@@ -5298,40 +5381,37 @@
             Base class for all classes that wrap an <see cref="T:Microsoft.OData.ODataItem"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper.#ctor(Microsoft.OData.ODataItem)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper"/>.
-            </summary>
-            <param name="item">The wrapped item.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper.Item">
-            <summary>
-            Gets the wrapped <see cref="T:Microsoft.OData.ODataItem"/>.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper">
             <summary>
             Encapsulates an <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> and the list of nested items.
             </summary>
-            <remarks>
-            A nested resource info for a singleton nested property can only contain one item - either ODataResource or ODataEntityReferenceLink.
-            A nested resource info for a collection nested property can contain any number of items - each is either ODataResource or ODataEntityReferenceLink.
-            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.#ctor(Microsoft.OData.ODataNestedResourceInfo)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="nestedInfo">The wrapped nested resource info item.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceInfo">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/>.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedItems">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResource">
             <summary>
-            Gets the nested items that are part of this nested resource info.
+            Gets/sets the wrapped the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper"/> child.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceSet">
+            <summary>
+            Gets/sets the really wrapped the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper"/> child.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedLinks">
+            <summary>
+            Gets/set the nested entity reference(s) that are part of this nested resource info.
+            A nested resource info for a singleton nested property can only contain one ODataEntityReferenceLink.
+            A nested resource info for a collection nested property can contain any number of ODataEntityReferenceLink
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions">
@@ -5353,16 +5433,75 @@
             <param name="reader">The OData reader to read from.</param>
             <returns>The read resource or resource set.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadODataItem(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read OData item.
+            </summary>
+            <param name="reader">The odata reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResource(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the normal resource.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">the top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadDeletedResource(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper})">
+            <summary>
+            Read the deleted resource.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceSet(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the resource set.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadDeltaResourceSet(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the delta resource set.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceBase"/> and its nested resource infos.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper.NestedResourceInfos">
+            <summary>
+            Gets the inner nested resource infos.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSetBase"/> and the <see cref="T:Microsoft.OData.ODataResourceBase"/>'s that are part of it.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper">
             <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSet"/> and the <see cref="T:Microsoft.OData.ODataResource"/>'s that are part of it.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSet"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.#ctor(Microsoft.OData.ODataResourceSet)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="resourceSet">The wrapped resource set item.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ResourceSet">
             <summary>
@@ -5372,27 +5511,23 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Resources">
             <summary>
             Gets the nested resources of this ResourceSet.
+            Resource set only contains resources.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper">
             <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/> and the inner nested resource infos.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResource)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="resource">The wrapped resource item, it could be null.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataResource"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResourceInfos">
-            <summary>
-            Gets the inner nested resource infos.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">

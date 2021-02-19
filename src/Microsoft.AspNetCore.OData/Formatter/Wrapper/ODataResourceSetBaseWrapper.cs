@@ -6,9 +6,9 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 {
     /// <summary>
-    /// Base class for all classes that wrap an <see cref="ODataItem"/>.
+    /// Encapsulates an <see cref="ODataResourceSetBase"/> and the <see cref="ODataResourceBase"/>'s that are part of it.
     /// </summary>
-    public abstract class ODataItemWrapper
+    public abstract class ODataResourceSetBaseWrapper : ODataItemWrapper
     {
     }
 }

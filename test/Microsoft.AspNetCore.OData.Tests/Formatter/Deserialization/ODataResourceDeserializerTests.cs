@@ -518,7 +518,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             {
                 resourceSetWrapper.Resources.Add(new ODataResourceWrapper(complexResource));
             }
-            resourceInfoWrapper.NestedItems.Add(resourceSetWrapper);
+            resourceInfoWrapper.NestedResourceSet = resourceSetWrapper;
             topLevelResourceWrapper.NestedResourceInfos.Add(resourceInfoWrapper);
 
             // Act
@@ -850,7 +850,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Arrange
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
             ODataNestedResourceInfoWrapper resourceInfoWrapper = new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Supplier" });
-            resourceInfoWrapper.NestedItems.Add(new ODataResourceWrapper(new ODataResource()));
+            resourceInfoWrapper.NestedResource = new ODataResourceWrapper(new ODataResource());
             _readContext.ResourceType = typeof(Delta<Supplier>);
 
             // Act & Assert
@@ -865,7 +865,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Arrange
             var deserializer = new ODataResourceDeserializer(_deserializerProvider);
             ODataNestedResourceInfoWrapper resourceInfoWrapper = new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Products" });
-            resourceInfoWrapper.NestedItems.Add(new ODataResourceSetWrapper(new ODataResourceSet()));
+            resourceInfoWrapper.NestedResourceSet = new ODataResourceSetWrapper(new ODataResourceSet());
             _readContext.ResourceType = typeof(Delta<Supplier>);
 
             // Act & Assert

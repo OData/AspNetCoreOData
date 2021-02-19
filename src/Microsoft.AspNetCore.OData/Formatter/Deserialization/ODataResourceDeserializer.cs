@@ -312,31 +312,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
             }
 
-            foreach (ODataItemWrapper childItem in resourceInfoWrapper.NestedItems)
+            if (resourceInfoWrapper.NestedResourceSet != null)
             {
-                // it maybe null.
-                if (childItem == null)
-                {
-                    if (edmProperty == null)
-                    {
-                        // for the dynamic, OData.net has a bug. see https://github.com/OData/odata.net/issues/977
-                        ApplyDynamicResourceInNestedProperty(resourceInfoWrapper.NestedResourceInfo.Name, resource,
-                            structuredType, null, readContext);
-                    }
-                    else
-                    {
-                        ApplyResourceInNestedProperty(edmProperty, resource, null, readContext);
-                    }
-                }
-
-                ODataEntityReferenceLinkWrapper entityReferenceLink = childItem as ODataEntityReferenceLinkWrapper;
-                if (entityReferenceLink != null)
-                {
-                    // ignore entity reference links.
-                    continue;
-                }
-
-                ODataResourceSetWrapper resourceSetWrapper = childItem as ODataResourceSetWrapper;
+                // It's nested resource set.
+                // So far, delta resource set is not supported yet.
+                ODataResourceSetWrapper resourceSetWrapper = resourceInfoWrapper.NestedResourceSet as ODataResourceSetWrapper;
                 if (resourceSetWrapper != null)
                 {
                     if (edmProperty == null)
@@ -348,24 +328,44 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     {
                         ApplyResourceSetInNestedProperty(edmProperty, resource, resourceSetWrapper, readContext);
                     }
-
-                    continue;
                 }
-
-                // It must be resource by now.
-                ODataResourceWrapper resourceWrapper = (ODataResourceWrapper)childItem;
-                if (resourceWrapper != null)
+            }
+            else if (resourceInfoWrapper.NestedLinks == null)
+            {
+                // it's a nested resource, TODO, how to get rid of this logic?
+                if (resourceInfoWrapper.NestedResource == null)
                 {
                     if (edmProperty == null)
                     {
-                        ApplyDynamicResourceInNestedProperty(resourceInfoWrapper.NestedResourceInfo.Name, resource,
-                            structuredType, resourceWrapper, readContext);
+                        // for the dynamic, OData.net has a bug. see https://github.com/OData/odata.net/issues/977
+                        ApplyDynamicResourceInNestedProperty(resourceInfoWrapper.NestedResourceInfo.Name, resource, structuredType, null, readContext);
                     }
                     else
                     {
-                        ApplyResourceInNestedProperty(edmProperty, resource, resourceWrapper, readContext);
+                        ApplyResourceInNestedProperty(edmProperty, resource, null, readContext);
                     }
                 }
+                else
+                {
+                    // It must be resource by now. deleted resource is not supported yet.
+                    ODataResourceWrapper resourceWrapper = resourceInfoWrapper.NestedResource as ODataResourceWrapper;
+                    if (resourceWrapper != null)
+                    {
+                        if (edmProperty == null)
+                        {
+                            ApplyDynamicResourceInNestedProperty(resourceInfoWrapper.NestedResourceInfo.Name, resource,
+                                structuredType, resourceWrapper, readContext);
+                        }
+                        else
+                        {
+                            ApplyResourceInNestedProperty(edmProperty, resource, resourceWrapper, readContext);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // it's a nested reference link(s), ignore entity reference links.
             }
         }
 
