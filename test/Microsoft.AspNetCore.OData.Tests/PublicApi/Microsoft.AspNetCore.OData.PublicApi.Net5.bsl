@@ -1807,8 +1807,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionS
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
-public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer {
-	public ODataDeltaFeedSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider)
+public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer {
+	public ODataDeltaResourceSetSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider)
 
 	public virtual Microsoft.OData.ODataDeltaResourceSet CreateODataDeltaFeed (System.Collections.IEnumerable feedInstance, Microsoft.OData.Edm.IEdmCollectionTypeReference feedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 	[

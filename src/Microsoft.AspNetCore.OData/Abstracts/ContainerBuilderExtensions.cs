@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             // Serializers.
             builder.AddService<ODataEnumSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataPrimitiveSerializer>(ServiceLifetime.Singleton);
-            builder.AddService<ODataDeltaFeedSerializer>(ServiceLifetime.Singleton);
+            builder.AddService<ODataDeltaResourceSetSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataResourceSetSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataCollectionSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataResourceSerializer>(ServiceLifetime.Singleton);

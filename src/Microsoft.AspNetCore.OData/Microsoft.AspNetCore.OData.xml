@@ -3587,22 +3587,22 @@
             <param name="value">The collection value for which the annotations have to be added.</param>
             <param name="metadataLevel">The OData metadata level of the response.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
             <summary>
             OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" />
-            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaFeed payload.
+            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResource payload.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
             <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer"/>.
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer"/>.
             </summary>
             <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaFeedInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaFeedInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3612,7 +3612,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.GetNextLinkGenerator(Microsoft.OData.ODataDeltaResourceSet,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.GetNextLinkGenerator(Microsoft.OData.ODataDeltaResourceSet,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Creates a function that takes in an object and generates nextlink uri.
             </summary>
@@ -3622,7 +3622,7 @@
             <returns>The function that generates the NextLink from an object.</returns>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.CreateODataDeltaFeed(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.CreateODataDeltaFeed(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Create the <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> to be written for the given feed instance.
             </summary>
@@ -3631,7 +3631,7 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedEntryAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaDeletedEntryAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3640,7 +3640,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaDeletedLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3649,7 +3649,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3658,7 +3658,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.StringToUri(System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.StringToUri(System.String)">
             <summary>
             Safely returns the specified string as a relative or absolute Uri.
             </summary>

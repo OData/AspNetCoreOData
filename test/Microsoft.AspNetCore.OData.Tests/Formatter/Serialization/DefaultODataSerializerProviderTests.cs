@@ -398,7 +398,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();
-            services.AddSingleton<ODataDeltaFeedSerializer>();
+            services.AddSingleton<ODataDeltaResourceSetSerializer>();
             services.AddSingleton<ODataResourceSetSerializer>();
             services.AddSingleton<ODataCollectionSerializer>();
             services.AddSingleton<ODataResourceSerializer>();

@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
                     if (collectionType.Definition.IsDeltaFeed())
                     {
-                        return _serviceProvider.GetRequiredService<ODataDeltaFeedSerializer>();
+                        return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
                     }
                     else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
                     {

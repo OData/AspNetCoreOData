@@ -17,17 +17,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
     /// <summary>
     /// OData serializer for serializing a collection of <see cref="IEdmEntityType" />
-    /// The Collection is of <see cref="IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaFeed payload.
+    /// The Collection is of <see cref="IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResource payload.
     /// </summary>
-    public class ODataDeltaFeedSerializer : ODataEdmTypeSerializer
+    public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
     {
         private const string DeltaFeed = "deltafeed";
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ODataDeltaFeedSerializer"/>.
+        /// Initializes a new instance of <see cref="ODataDeltaResourceSetSerializer"/>.
         /// </summary>
         /// <param name="serializerProvider">The <see cref="ODataSerializerProvider"/> to use to write nested entries.</param>
-        public ODataDeltaFeedSerializer(ODataSerializerProvider serializerProvider)
+        public ODataDeltaResourceSetSerializer(ODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Delta, serializerProvider)
         {
         }
