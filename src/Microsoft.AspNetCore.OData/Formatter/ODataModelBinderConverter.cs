@@ -285,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     newEnumerable = CovertResourceSetIds(enumerable, resourceSet, collectionType, readContext);
                 }
 
-                if (readContext.IsUntyped)
+                if (readContext.IsNoClrType)
                 {
                     return newEnumerable.ConvertToEdmObject(collectionType);
                 }

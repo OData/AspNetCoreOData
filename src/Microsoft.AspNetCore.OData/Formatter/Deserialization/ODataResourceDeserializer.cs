@@ -217,7 +217,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.Argument("readContext", SRResources.ModelMissingFromReadContext);
             }
 
-            if (readContext.IsUntyped)
+            if (readContext.IsNoClrType)
             {
                 if (structuredType.IsEntity())
                 {
@@ -501,7 +501,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             };
 
             Type clrType;
-            if (readContext.IsUntyped)
+            if (readContext.IsNoClrType)
             {
                 clrType = structuredType.IsEntity()
                     ? typeof(EdmEntityObject)
@@ -578,7 +578,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             object result = value;
             if (value != null)
             {
-                if (readContext.IsUntyped)
+                if (readContext.IsNoClrType)
                 {
                     result = value.ConvertToEdmObject(collectionType);
                 }
@@ -608,7 +608,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Model = readContext.Model,
             };
 
-            if (readContext.IsUntyped)
+            if (readContext.IsNoClrType)
             {
                 if (structuredType.IsEntity())
                 {

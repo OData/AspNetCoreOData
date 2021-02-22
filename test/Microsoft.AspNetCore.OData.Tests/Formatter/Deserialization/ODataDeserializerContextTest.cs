@@ -19,7 +19,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [InlineData(typeof(Delta<Customer>), true)]
         public void Property_IsDeltaOfT_HasRightValue(Type resourceType, bool expectedResult)
         {
+            // Arrange & Act
             ODataDeserializerContext context = new ODataDeserializerContext { ResourceType = resourceType };
+
+            // Act
             Assert.Equal(expectedResult, context.IsDeltaOfT);
         }
 
@@ -34,10 +37,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [InlineData(typeof(EdmComplexObject), true)]
         [InlineData(typeof(EdmEntityObject), true)]
         [InlineData(typeof(ODataUntypedActionParameters), true)]
-        public void Property_IsUntyped_HasRightValue(Type resourceType, bool expectedResult)
+        public void Property_IsNoClrType_HasRightValue(Type resourceType, bool expectedResult)
         {
+            // Arrange & Act
             ODataDeserializerContext context = new ODataDeserializerContext { ResourceType = resourceType };
-            Assert.Equal(expectedResult, context.IsUntyped);
+
+            // Assert
+            Assert.Equal(expectedResult, context.IsNoClrType);
         }
     }
 }

@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         IEnumerable enumerable = result as IEnumerable;
                         if (enumerable != null)
                         {
-                            if (readContext.IsUntyped)
+                            if (readContext.IsNoClrType)
                             {
                                 payload[parameterName] = enumerable.ConvertToEdmObject(resourceSetType);
                             }

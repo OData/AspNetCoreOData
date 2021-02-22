@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEnumerable result = ReadCollectionValue(collection, elementType, readContext);
             if (result != null)
             {
-                if (readContext.IsUntyped && elementType.IsEnum())
+                if (readContext.IsNoClrType && elementType.IsEnum())
                 {
                     return result.ConvertToEdmObject(collectionType);
                 }

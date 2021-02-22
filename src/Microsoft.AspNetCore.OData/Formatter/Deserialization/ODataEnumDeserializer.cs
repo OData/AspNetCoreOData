@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             IEdmEnumTypeReference enumTypeReference = edmType.AsEnum();
             ODataEnumValue enumValue = item as ODataEnumValue;
-            if (readContext.IsUntyped)
+            if (readContext.IsNoClrType)
             {
                 Contract.Assert(edmType.TypeKind() == EdmTypeKind.Enum);
                 return new EdmEnumObject(enumTypeReference, enumValue.Value);

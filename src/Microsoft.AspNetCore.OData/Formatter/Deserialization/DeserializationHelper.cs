@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                if (!readContext.IsUntyped)
+                if (!readContext.IsNoClrType)
                 {
                     if (propertyKind == EdmTypeKind.Primitive)
                     {

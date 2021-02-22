@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     public class ODataDeserializerContext
     {
         private bool? _isDeltaOfT;
-        private bool? _isUntyped;
+        private bool? _isNoClrType;
 
         /// <summary>
         /// Gets or sets the type of the top-level object the request needs to be deserialized into.
@@ -61,17 +61,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
-        internal bool IsUntyped
+        internal bool IsNoClrType
         {
             get
             {
-                if (!_isUntyped.HasValue)
+                if (!_isNoClrType.HasValue)
                 {
-                    _isUntyped = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
+                    _isNoClrType = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
                         typeof(ODataUntypedActionParameters) == ResourceType;
                 }
 
-                return _isUntyped.Value;
+                return _isNoClrType.Value;
             }
         }
 
