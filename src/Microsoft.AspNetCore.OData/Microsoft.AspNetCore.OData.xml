@@ -2603,6 +2603,47 @@
             <param name="readContext">The deserializer context.</param>
             <returns>The deserialized collection.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData delta resource sets.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResourceSet(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="deltaResourceSet"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="deltaResourceSet">The delta resource set to deserialize.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The deserialized resource set object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaDeletedLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="deletedLink"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="deletedLink">The given deleted link.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="link"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="link">The given delta link.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer">
             <summary>
             An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> is used to read an ODataMessage into a CLR object.
@@ -3157,18 +3198,6 @@
             type are dissimilar enough making a common version more complex than separate versions.
             </remarks>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions">
-            <summary>
-            Adds the OData formatter related services into builder.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions.AddODataFormatter(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            Adds the odata formatter related services.
-            </summary>
-            <param name="builder">The OData builder.</param>
-            <returns>The IODataBuilder itself.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter">
             <summary>
             The implementation of <see cref="T:Microsoft.AspNetCore.Mvc.Formatters.TextInputFormatter"/> class to handle OData reading.
@@ -3590,7 +3619,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
             <summary>
             OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" />
-            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResource payload.
+            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResourceSet payload.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
@@ -3602,7 +3631,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaFeedInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaResourceSetInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3616,13 +3645,13 @@
             <summary>
             Creates a function that takes in an object and generates nextlink uri.
             </summary>
-            <param name="deltaFeed">The resource set describing a collection of structured objects.</param>
+            <param name="deltaResourceSet">The resource set describing a collection of structured objects.</param>
             <param name="enumerable">>The instance representing the resourceSet being written.</param>
             <param name="writeContext">The serializer context.</param>
             <returns>The function that generates the NextLink from an object.</returns>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.CreateODataDeltaFeed(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.CreateODataDeltaResourceSet(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Create the <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> to be written for the given feed instance.
             </summary>
@@ -3631,7 +3660,7 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaDeletedEntryAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeletedResourceAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -4622,8 +4651,14 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType">
             <summary>
-            Implementing IEdmCollectionType to identify collection of DeltaFeed.
+            Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.#ctor(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType"/> class.
+            </summary>
+            <param name="typeReference">The element type reference.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.TypeKind">
             <inheritdoc />
@@ -4656,49 +4691,10 @@
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Deleted Entry object in the Delta Feed Payload.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
-            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.Id">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.Reason">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.DeltaKind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.NavigationSource">
-            <summary>
-            The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Deleted Link object in the Delta Feed Payload.
+            Used to hold the Deleted Link object in the Delta ResourceSet Payload.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
@@ -4732,73 +4728,79 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.DeltaKind">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject">
             <summary>
-            The Kind of the object within the DeltaPayload used to distinguish between Entry/DeletedEntry/DeltaLink/AddedLink.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Deleted Resource object in the Delta Feed Payload.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.Entry">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
-            Corresponds to EdmEntityObject (Equivalent of ODataEntry in ODL).
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Reason">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.NavigationSource">
+            <summary>
+            The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.DeletedEntry">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind">
             <summary>
-            Corresponds to EdmDeltaDeletedEntityObject (Equivalent of ODataDeltaDeletedEntry in ODL).
+            The Kind of the object within the DeltaPayload used to distinguish between Resource/DeletedResource/DeltaDeletedLink/AddedLink.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.DeletedLinkEntry">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Resource">
+            <summary>
+            Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeletedResource">
+            <summary>
+            Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaDeletedLink">
             <summary>
             Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.LinkEntry">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaLink">
             <summary>
             Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.Unknown">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Unknown">
             <summary>
             Corresponds to any Unknown item added.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Entry object in the Delta Feed Payload.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
-            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.DeltaKind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.NavigationSource">
-            <summary>
-            The navigation source of the entity. If null, then the entity is from the current feed.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Added/Modified Link object in the Delta Feed Payload.
+            Used to hold the Added/Modified Link object in the Delta ResourceSet Payload.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
@@ -4832,9 +4834,42 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.DeltaKind">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Entry object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.NavigationSource">
+            <summary>
+            The navigation source of the entity. If null, then the entity is from the current feed.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType">
             <summary>
-            Implementing IEdmType to identify objects which are part of DeltaFeed Payload.
+            Implementing IEdmType to identify objects which are part of DeltaResourceSet Payload.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType.TypeKind">
@@ -4842,7 +4877,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType.DeltaKind">
             <summary>
-            Returning DeltaKind of the object within DeltaFeed payload
+            Returning DeltaKind of the object within DeltaResourceSet payload
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
@@ -4956,19 +4991,19 @@
             Extension methods for the <see cref="T:Microsoft.OData.Edm.IEdmType"/> interface.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaFeed(Microsoft.OData.Edm.IEdmType)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResourceSet(Microsoft.OData.Edm.IEdmType)">
             <summary>
-            Method to determine whether the current type is a Delta Feed
+            Method to determine whether the current type is a Delta resource set.
             </summary>
             <param name="type">IEdmType to be compared</param>
             <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType"/></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResource(Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject)">
             <summary>
-            Method to determine whether the current Edm object is a Delta Entry
+            Method to determine whether the current Edm object is a Delta resource
             </summary>
             <param name="resource">IEdmObject to be compared</param>
-            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject"/></returns>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject">
             <summary>
@@ -5084,12 +5119,12 @@
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
-            Base interface to be implemented by any Delta object required to be part of the DeltaFeed Payload.
+            Base interface to be implemented by any Delta object required to be part of the DeltaResourceSet Payload.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.DeltaKind">
             <summary>
-            DeltaKind for the objects part of the DeltaFeed Payload.
+            DeltaKind for the objects part of the DeltaResourceSet Payload.
             Used to determine which Delta object to create during serialization.
             </summary>
         </member>
@@ -5098,26 +5133,26 @@
             Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject">
-            <summary>
-            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
-            Holds the properties necessary to create the ODataDeltaDeletedEntry.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject.Id">
-            <summary>
-            The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject.Reason">
-            <summary>
-            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
             Holds the properties necessary to create the ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeletedResource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject.Id">
+            <summary>
+            The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject.Reason">
+            <summary>
+            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink">

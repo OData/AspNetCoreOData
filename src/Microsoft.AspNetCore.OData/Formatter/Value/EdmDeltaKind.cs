@@ -4,29 +4,29 @@
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
-    /// The Kind of the object within the DeltaPayload used to distinguish between Entry/DeletedEntry/DeltaLink/AddedLink.
+    /// The Kind of the object within the DeltaPayload used to distinguish between Resource/DeletedResource/DeltaDeletedLink/AddedLink.
     /// </summary>
-    public enum EdmDeltaEntityKind
+    public enum EdmDeltaKind
     {
         /// <summary>
-        /// Corresponds to EdmEntityObject (Equivalent of ODataEntry in ODL).
+        /// Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
         /// </summary>
-        Entry = 0,
+        Resource = 0,
 
         /// <summary>
-        /// Corresponds to EdmDeltaDeletedEntityObject (Equivalent of ODataDeltaDeletedEntry in ODL).
+        /// Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
         /// </summary>
-        DeletedEntry = 1,
+        DeletedResource = 1,
 
         /// <summary>
         /// Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
         /// </summary>
-        DeletedLinkEntry = 2,
- 
+        DeltaDeletedLink = 2,
+
         /// <summary>
         /// Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
         /// </summary>
-        LinkEntry = 3,
+        DeltaLink = 3,
 
         /// <summary>
         /// Corresponds to any Unknown item added.

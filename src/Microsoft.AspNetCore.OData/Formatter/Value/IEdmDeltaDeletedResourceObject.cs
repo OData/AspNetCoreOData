@@ -7,9 +7,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an <see cref="IEdmChangedObject"/>.
-    /// Holds the properties necessary to create the ODataDeltaDeletedEntry.
+    /// Holds the properties necessary to create the ODataDeletedResource.
     /// </summary>
-    public interface IEdmDeltaDeletedEntityObject : IEdmChangedObject
+    public interface IEdmDeltaDeletedResourceObject : IEdmChangedObject
     {
         /// <summary>
         /// The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.

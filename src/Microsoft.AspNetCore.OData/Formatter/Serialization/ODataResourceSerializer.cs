@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
             ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
-            EdmDeltaEntityObject deltaResource = graph as EdmDeltaEntityObject;
+            EdmDeltaResourceObject deltaResource = graph as EdmDeltaResourceObject;
             if (deltaResource != null && deltaResource.NavigationSource != null)
             {
                 resourceContext.NavigationSource = deltaResource.NavigationSource;
@@ -233,7 +233,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmProperty.Type.IsCollection())
                 {
                     ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                    await serializer.WriteDeltaFeedInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                    await serializer.WriteDeltaResourceSetInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
                         .ConfigureAwait(false);
                 }
                 else
@@ -465,7 +465,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
             };
 
-            if (resourceContext.EdmObject is EdmDeltaEntityObject && resourceContext.NavigationSource != null)
+            if (resourceContext.EdmObject is EdmDeltaResourceObject && resourceContext.NavigationSource != null)
             {
                 ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo();
                 serializationInfo.NavigationSourceName = resourceContext.NavigationSource.Name;
@@ -567,7 +567,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             bool nullDynamicPropertyEnabled = false;
-            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaEntityObject)
+            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaResourceObject)
             {
                 nullDynamicPropertyEnabled = true;
             }

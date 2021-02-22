@@ -17,11 +17,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
     /// <summary>
     /// OData serializer for serializing a collection of <see cref="IEdmEntityType" />
-    /// The Collection is of <see cref="IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResource payload.
+    /// The Collection is of <see cref="IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResourceSet payload.
     /// </summary>
     public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
     {
-        private const string DeltaFeed = "deltafeed";
+        private const string DeltaResourceSet = "DeltaResourceSet";
 
         /// <summary>
         /// Initializes a new instance of <see cref="ODataDeltaResourceSetSerializer"/>.
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (graph == null)
             {
-                throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
+                throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaResourceSet));
             }
 
             IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
@@ -63,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataWriter writer = await messageWriter.CreateODataDeltaResourceSetWriterAsync(entitySet, entityType.EntityDefinition())
                 .ConfigureAwait(false);
 
-            await WriteDeltaFeedInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
+            await WriteDeltaResourceSetInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaFeedInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        public virtual async Task WriteDeltaResourceSetInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (graph == null)
             {
-                throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
+                throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaResourceSet));
             }
 
             IEnumerable enumerable = graph as IEnumerable; // Data to serialize
@@ -140,18 +140,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
-                ODataDeltaResourceSet deltaFeed = CreateODataDeltaFeed(enumerable, feedType.AsCollection(), writeContext);
-                if (deltaFeed == null)
+                ODataDeltaResourceSet deltaResourceSet = CreateODataDeltaResourceSet(enumerable, feedType.AsCollection(), writeContext);
+                if (deltaResourceSet == null)
                 {
-                    throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
+                    throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaResourceSet));
                 }
 
                 // save the next page link for later to support JSON odata.streaming.
-                Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(deltaFeed, enumerable, writeContext);
-                deltaFeed.NextPageLink = null;
+                Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(deltaResourceSet, enumerable, writeContext);
+                deltaResourceSet.NextPageLink = null;
 
                 //Start writing of the Delta Feed
-                await writer.WriteStartAsync(deltaFeed).ConfigureAwait(false);
+                await writer.WriteStartAsync(deltaResourceSet).ConfigureAwait(false);
 
                 object lastResource = null;
                 //Iterate over all the entries present and select the appropriate write method.
@@ -173,16 +173,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     switch (edmChangedObject.DeltaKind)
                     {
-                        case EdmDeltaEntityKind.DeletedEntry:
-                            await WriteDeltaDeletedEntryAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case EdmDeltaKind.DeletedResource:
+                            await WriteDeletedResourceAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaEntityKind.DeletedLinkEntry:
+                        case EdmDeltaKind.DeltaDeletedLink:
                             await WriteDeltaDeletedLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaEntityKind.LinkEntry:
+                        case EdmDeltaKind.DeltaLink:
                             await WriteDeltaLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaEntityKind.Entry:
+                        case EdmDeltaKind.Resource:
                             {
                                 ODataResourceSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataResourceSerializer;
                                 if (entrySerializer == null)
@@ -205,7 +205,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 // object before calling WriteEnd(), the next page link will be written at the end, as required for
                 // odata.streaming=true support.
 
-                deltaFeed.NextPageLink = nextLinkGenerator(lastResource);
+                deltaResourceSet.NextPageLink = nextLinkGenerator(lastResource);
             }
 
             //End Writing of the Delta Feed
@@ -215,14 +215,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Creates a function that takes in an object and generates nextlink uri.
         /// </summary>
-        /// <param name="deltaFeed">The resource set describing a collection of structured objects.</param>
+        /// <param name="deltaResourceSet">The resource set describing a collection of structured objects.</param>
         /// <param name="enumerable">>The instance representing the resourceSet being written.</param>
         /// <param name="writeContext">The serializer context.</param>
         /// <returns>The function that generates the NextLink from an object.</returns>
         /// <returns></returns>
-        internal static Func<object, Uri> GetNextLinkGenerator(ODataDeltaResourceSet deltaFeed, IEnumerable enumerable, ODataSerializerContext writeContext)
+        internal static Func<object, Uri> GetNextLinkGenerator(ODataDeltaResourceSet deltaResourceSet, IEnumerable enumerable, ODataSerializerContext writeContext)
         {
-            return ODataResourceSetSerializer.GetNextLinkGenerator(deltaFeed, enumerable, writeContext);
+            return ODataResourceSetSerializer.GetNextLinkGenerator(deltaResourceSet, enumerable, writeContext);
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="feedType">The EDM type of the feed being written.</param>
         /// <param name="writeContext">The serializer context.</param>
         /// <returns>The created <see cref="ODataDeltaResourceSet"/> object.</returns>
-        public virtual ODataDeltaResourceSet CreateODataDeltaFeed(IEnumerable feedInstance, IEdmCollectionTypeReference feedType,
+        public virtual ODataDeltaResourceSet CreateODataDeltaResourceSet(IEnumerable feedInstance, IEdmCollectionTypeReference feedType,
             ODataSerializerContext writeContext)
         {
             if (writeContext == null)
@@ -274,14 +274,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="graph">The object to be written.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaDeletedEntryAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
+        public virtual async Task WriteDeletedResourceAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
         {
             if (writer == null)
             {
                 throw Error.ArgumentNull(nameof(writer));
             }
 
-            EdmDeltaDeletedEntityObject edmDeltaDeletedEntity = graph as EdmDeltaDeletedEntityObject;
+            EdmDeltaDeletedResourceObject edmDeltaDeletedEntity = graph as EdmDeltaDeletedResourceObject;
             if (edmDeltaDeletedEntity == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));

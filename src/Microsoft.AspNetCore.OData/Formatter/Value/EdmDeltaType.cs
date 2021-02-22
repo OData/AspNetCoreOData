@@ -6,49 +6,27 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
-    /// Implementing IEdmType to identify objects which are part of DeltaFeed Payload.
+    /// Implementing IEdmType to identify objects which are part of DeltaResourceSet Payload.
     /// </summary>
     internal class EdmDeltaType : IEdmType
     {
         private IEdmEntityType _entityType;
-        private EdmDeltaEntityKind _deltaKind;
+        private EdmDeltaKind _deltaKind;
 
-        internal EdmDeltaType(IEdmEntityType entityType, EdmDeltaEntityKind deltaKind)
+        internal EdmDeltaType(IEdmEntityType entityType, EdmDeltaKind deltaKind)
         {
-            if (entityType == null)
-            {
-                throw Error.ArgumentNull("entityType");
-            }
-            _entityType = entityType;
+            _entityType = entityType ?? throw Error.ArgumentNull("entityType");
             _deltaKind = deltaKind;
         }
 
         /// <inheritdoc />
-        public EdmTypeKind TypeKind
-        {
-            get 
-            {
-                return EdmTypeKind.Entity; 
-            }
-        }
+        public EdmTypeKind TypeKind => EdmTypeKind.Entity;
 
-        public IEdmEntityType EntityType
-        {
-            get
-            {
-                return _entityType;
-            }
-        }
+        public IEdmEntityType EntityType => _entityType;
 
         /// <summary>
-        /// Returning DeltaKind of the object within DeltaFeed payload
+        /// Returning DeltaKind of the object within DeltaResourceSet payload
         /// </summary>
-        public EdmDeltaEntityKind DeltaKind
-        {
-            get
-            {
-                return _deltaKind;
-            }
-        }
+        public EdmDeltaKind DeltaKind => _deltaKind;
     }
 }
