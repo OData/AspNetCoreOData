@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -16,11 +17,10 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
 
             ODataPath path = request.ODataFeature().Path;
-            IEdmNavigationSource targetNavigationSource = path == null ? null : path.GetNavigationSource();
+            IEdmNavigationSource targetNavigationSource = GetTargetNavigationSource(path, model);
             HttpResponse response = request.HttpContext.Response;
 
             // serialize a response
@@ -115,7 +115,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 // TODO: 1604 Convert webapi.odata's ODataPath to ODL's ODataPath, or use ODL's ODataPath.
                 SelectAndExpand = processedSelectExpandClause,
                 Apply = request.ODataFeature().ApplyClause,
-                //Path = (path == null || IsOperationPath(path)) ? null : path.Path,
                 Path = path
             };
 
@@ -191,6 +190,30 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return serializer;
+        }
+
+        private static IEdmNavigationSource GetTargetNavigationSource(ODataPath path, IEdmModel model)
+        {
+            if (path == null)
+            {
+                return null;
+            }
+
+            Contract.Assert(model != null);
+
+            OperationSegment operationSegment = path.LastSegment as OperationSegment;
+            if (operationSegment != null)
+            {
+                // OData modelbuilder uses an annotation to save the function returned entity set.
+                // TODO: we need to refactor it later.
+                ReturnedEntitySetAnnotation entitySetAnnotation = model.GetAnnotationValue<ReturnedEntitySetAnnotation>(operationSegment.Operations.Single());
+                if (entitySetAnnotation != null)
+                {
+                    return model.EntityContainer.FindEntitySet(entitySetAnnotation.EntitySetName);
+                }
+            }
+
+            return path.GetNavigationSource();
         }
 
         private static string GetRootElementName(ODataPath path)
