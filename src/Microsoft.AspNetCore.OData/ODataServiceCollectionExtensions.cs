@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -159,6 +160,10 @@ namespace Microsoft.AspNetCore.OData
             {
                 throw Error.ArgumentNull(nameof(services));
             }
+
+
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IApiDescriptionProvider, ODataApiDescriptionProvider>());
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());

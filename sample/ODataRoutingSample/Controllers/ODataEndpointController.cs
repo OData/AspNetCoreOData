@@ -56,15 +56,16 @@ namespace ODataRoutingSample.Controllers
                 string actionName = controllerActionDescriptor.MethodInfo.Name;
 
                 sb.Append("<tr>");
-                sb.Append($"<td>{controllerActionDescriptor.ControllerTypeInfo.FullName}</td>");
-                sb.Append($"<td>{action}</td>");
+                sb.Append($"<td>{GetActionDesciption(controllerActionDescriptor)}</td>");
 
                 // http methods
                 string httpMethods = string.Join(",", metadata.HttpMethods);
                 sb.Append($"<td>{httpMethods.ToUpper()}</td>");
 
-                // TODO: use the DisplayName?
-                // OData routing templates
+                // display name
+                sb.Append("<td>~/").Append(metadata.TemplateDisplayName).Append("</td>");
+
+                // template name
                 RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
                 if (routeEndpoint != null)
                 {
@@ -80,6 +81,27 @@ namespace ODataRoutingSample.Controllers
             output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
 
             return base.Content(output, "text/html");
+        }
+
+        private static string GetActionDesciption(ControllerActionDescriptor actionDescriptor)
+        {
+            // controller and action details
+            StringBuilder action = new StringBuilder();
+            if (actionDescriptor.MethodInfo.ReturnType != null)
+            {
+                action.Append(actionDescriptor.MethodInfo.ReturnType.Name + " ");
+            }
+            else
+            {
+                action.Append("void ");
+            }
+
+            action.Append(actionDescriptor.ControllerTypeInfo.FullName);
+            action.Append(".");
+            action.Append(actionDescriptor.MethodInfo.Name + "(");
+            action.Append(string.Join(",", actionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
+            action.Append(")");
+            return action.ToString();
         }
 
         /// <summary>
@@ -135,9 +157,9 @@ namespace ODataRoutingSample.Controllers
     <h1 id=""odataendpoint"">OData Endpoint Mapping <a href=""#nonodataendpoint""> >>> Go to non-odata endpoint mapping</a></h1>
     <table>
      <tr>
-       <th> Controller </th>
-       <th> Action </th>
+       <th> Controller & Action </th>
        <th> HttpMethods </th>
+       <th> DisplayNames </th>
        <th> Templates </th>
     </tr>
     {CONTENT}

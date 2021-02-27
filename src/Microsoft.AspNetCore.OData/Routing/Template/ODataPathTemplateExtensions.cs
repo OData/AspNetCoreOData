@@ -15,6 +15,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// </summary>
     public static class ODataPathTemplateExtensions
     {
+        private struct TemplateInfo
+        {
+            public StringBuilder Template;
+
+            public StringBuilder Display;
+        }
+
         /// <summary>
         /// Generates all templates for the given <see cref="ODataPathTemplate"/>.
         /// All templates mean:
@@ -23,8 +30,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         /// <param name="path">The given path template.</param>
         /// <param name="options">The route options.</param>
-        /// <returns>All path templates.</returns>
-        public static IEnumerable<string> GetTemplates(this ODataPathTemplate path, ODataRouteOptions options = null)
+        /// <returns>All path template and its display name..</returns>
+        public static IEnumerable<(string, string)> GetTemplates(this ODataPathTemplate path, ODataRouteOptions options = null)
         {
             if (path == null)
             {
@@ -33,9 +40,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             options = options ?? ODataRouteOptions.Default;
 
-            IList<StringBuilder> templates = new List<StringBuilder>
+            IList<TemplateInfo> templates = new List<TemplateInfo>
             {
-                new StringBuilder()
+                new TemplateInfo
+                {
+                    Template = new StringBuilder(),
+                    Display = new StringBuilder()
+                }
             };
 
             int count = path.Segments.Count;
@@ -54,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
                 if (index != 0)
                 {
-                    templates = CombinateTemplate(templates, "/");
+                    templates = CombinateTemplate(templates, ("/", "/"));
                 }
 
                 // create =>  ~.../navigation/{key}/$ref
@@ -64,7 +75,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     if (index == count - 1)
                     {
                         // we don't have the other segment
-                        templates = CombinateTemplates(templates, $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref");
+                        string refTemp = $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref";
+                        templates = CombinateTemplates(templates, (refTemp, refTemp));
                     }
                     else
                     {
@@ -72,19 +84,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         if (nextSegment.Kind == ODataSegmentKind.Key)
                         {
                             // append "navigation property"
-                            templates = CombinateTemplates(templates, navigationLinkSegment.Segment.NavigationProperty.Name);
+                            string navTemp = navigationLinkSegment.Segment.NavigationProperty.Name;
+                            templates = CombinateTemplates(templates, (navTemp, navTemp));
 
                             // append "key"
                             KeySegmentTemplate keySg = nextSegment as KeySegmentTemplate;
                             templates = AppendKeyTemplate(templates, keySg, options);
 
                             // append $ref
-                            templates = CombinateTemplates(templates, "/$ref");
+                            templates = CombinateTemplates(templates, ("/$ref", "/$ref"));
                             index++; // skip the key segment after $ref.
                         }
                         else
                         {
-                            templates = CombinateTemplates(templates, $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref");
+                            string refTemp = $"{navigationLinkSegment.Segment.NavigationProperty.Name}/$ref";
+                            templates = CombinateTemplates(templates, (refTemp, refTemp));
                         }
                     }
 
@@ -103,29 +117,35 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
                 else
                 {
-                    templates = CombinateTemplate(templates, segment.Literal);
+                    templates = CombinateTemplate(templates, (segment.Literal, segment.Literal));
                 }
             }
 
-            return templates.Select(t => t.ToString());
+            foreach (var template in templates)
+            {
+                yield return (template.Template.ToString(), template.Display.ToString());
+            }
+
+            //return templates.Select(t => t.ToString());
         }
 
-        private static IList<StringBuilder> AppendKeyTemplate(IList<StringBuilder> templates, KeySegmentTemplate segment, ODataRouteOptions options)
+        private static IList<TemplateInfo> AppendKeyTemplate(IList<TemplateInfo> templates, KeySegmentTemplate segment, ODataRouteOptions options)
         {
             Contract.Assert(segment != null);
             Contract.Assert(options != null);
 
+            string displayName = GetDisplayName(segment);
             if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
             {
-                return CombinateTemplates(templates, $"({segment.Literal})", $"/{segment.Literal}");
+                return CombinateTemplates(templates, ($"({segment.Literal})", $"({displayName})"), ($"/{segment.Literal}", $"/{displayName}"));
             }
             else if (options.EnableKeyInParenthesis)
             {
-                return CombinateTemplate(templates, $"({segment.Literal})");
+                return CombinateTemplate(templates, ($"({segment.Literal})", $"({displayName})"));
             }
             else if (options.EnableKeyAsSegment)
             {
-                return CombinateTemplate(templates, $"/{segment.Literal}");
+                return CombinateTemplate(templates, ($"/{segment.Literal}", $"/{displayName}"));
             }
             else
             {
@@ -133,22 +153,37 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
         }
 
-        private static IList<StringBuilder> AppendActionTemplate(IList<StringBuilder> templates, ActionSegmentTemplate segment, ODataRouteOptions options)
+        private static string GetDisplayName(this KeySegmentTemplate segment)
+        {
+            Contract.Assert(segment != null);
+
+            if (segment.KeyMappings.Count == 1)
+            {
+                return $"{{{segment.KeyMappings.First().Value}}}";
+            }
+
+            return string.Join(",", segment.KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+        }
+
+        private static IList<TemplateInfo> AppendActionTemplate(IList<TemplateInfo> templates, ActionSegmentTemplate segment, ODataRouteOptions options)
         {
             Contract.Assert(segment != null);
             Contract.Assert(options != null);
 
+            string fullName = segment.Action.FullName();
+            string name = segment.Action.Name;
+
             if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
             {
-                return CombinateTemplates(templates, segment.Action.FullName(), segment.Action.Name);
+                return CombinateTemplates(templates, (fullName, fullName), (name, name));
             }
             else if (options.EnableQualifiedOperationCall)
             {
-                return CombinateTemplate(templates, segment.Action.FullName());
+                return CombinateTemplate(templates, (fullName, fullName));
             }
             else if (options.EnableUnqualifiedOperationCall)
             {
-                return CombinateTemplate(templates, segment.Action.Name);
+                return CombinateTemplate(templates, (name, name));
             }
             else
             {
@@ -156,26 +191,44 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
         }
 
-        private static IList<StringBuilder> AppendFunctionTemplate(IList<StringBuilder> templates, FunctionSegmentTemplate segment, ODataRouteOptions options)
+        private static IList<TemplateInfo> AppendFunctionTemplate(IList<TemplateInfo> templates, FunctionSegmentTemplate segment, ODataRouteOptions options)
         {
             Contract.Assert(segment != null);
             Contract.Assert(options != null);
 
+            string qualified = segment.GetDisplayName(true);
+            string unqulified = segment.GetDisplayName(false);
+
             if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
             {
-                return CombinateTemplates(templates, segment.Literal, segment.UnqualifiedIdentifier);
+                return CombinateTemplates(templates, (segment.Literal, qualified), (segment.UnqualifiedIdentifier, unqulified));
             }
             else if (options.EnableQualifiedOperationCall)
             {
-                return CombinateTemplate(templates, segment.Literal);
+                return CombinateTemplate(templates, (segment.Literal, qualified));
             }
             else if (options.EnableUnqualifiedOperationCall)
             {
-                return CombinateTemplate(templates, segment.UnqualifiedIdentifier);
+                return CombinateTemplate(templates, (segment.UnqualifiedIdentifier, unqulified));
             }
             else
             {
                 throw new ODataException(Error.Format(SRResources.RouteOptionDisabledOperationSegment, "function"));
+            }
+        }
+
+        private static string GetDisplayName(this FunctionSegmentTemplate segment, bool qualified)
+        {
+            Contract.Assert(segment != null);
+
+            string parameters = "(" + string.Join(",", segment.ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+            if (qualified)
+            {
+                return segment.Function.FullName() + parameters;
+            }
+            else
+            {
+                return segment.Function.Name + parameters;
             }
         }
 
@@ -185,14 +238,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="templates">The existing templates.</param>
         /// <param name="nextTemplate">The nexte template.</param>
         /// <returns>The templates.</returns>
-        private static IList<StringBuilder> CombinateTemplate(IList<StringBuilder> templates, string nextTemplate)
+        private static IList<TemplateInfo> CombinateTemplate(IList<TemplateInfo> templates, (string, string) nextTemplate)
         {
             Contract.Assert(templates != null);
-            Contract.Assert(nextTemplate != null);
 
-            foreach (StringBuilder sb in templates)
+            foreach (TemplateInfo sb in templates)
             {
-                sb.Append(nextTemplate);
+                sb.Template.Append(nextTemplate.Item1);
+                sb.Display.Append(nextTemplate.Item2);
             }
 
             return templates;
@@ -204,18 +257,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="templates">The existing templates.</param>
         /// <param name="nextTemplates">The next templates.</param>
         /// <returns>The new templates.</returns>
-        private static IList<StringBuilder> CombinateTemplates(IList<StringBuilder> templates, params string[] nextTemplates)
+        private static IList<TemplateInfo> CombinateTemplates(IList<TemplateInfo> templates, params (string, string)[] nextTemplates)
         {
             Contract.Assert(templates != null);
 
-            IList<StringBuilder> newList = new List<StringBuilder>(templates.Count * nextTemplates.Length);
+            IList<TemplateInfo> newList = new List<TemplateInfo>(templates.Count * nextTemplates.Length);
 
-            foreach (StringBuilder sb in templates)
+            foreach (TemplateInfo sb in templates)
             {
-                string oldTemplate = sb.ToString();
-                foreach (string newTemplate in nextTemplates)
+                string oldTemplate = sb.Template.ToString();
+                string oldDisplay = sb.Display.ToString();
+                foreach ((string, string) newTemplate in nextTemplates)
                 {
-                    newList.Add(new StringBuilder(oldTemplate).Append(newTemplate));
+                    TemplateInfo templateInfo = new TemplateInfo();
+                    templateInfo.Template = new StringBuilder(oldTemplate).Append(newTemplate.Item1);
+                    templateInfo.Display = new StringBuilder(oldDisplay).Append(newTemplate.Item2);
+                    newList.Add(templateInfo);
                 }
             }
 

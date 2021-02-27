@@ -11389,10 +11389,37 @@
             Gets the supported Http methods.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.TemplateDisplayName">
+            <summary>
+            Gets/sets the template display name.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider">
+            <summary>
+            Defines a contract for specifying <see cref="T:Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescription"/> instances.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.Order">
+            <summary>
+            Gets the order value for determining the order of execution of providers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext)">
+            <summary>
+            Execute for second pass for OData API description.
+            </summary>
+            <param name="context">The ApiDescriptionProviderContext.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext)">
+            <summary>
+            Execute for first pass for OData API description.
+            </summary>
+            <param name="context">The ApiDescriptionProviderContext.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">
             <summary>
@@ -11823,6 +11850,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.TemplateDisplayName">
+            <summary>
+            Gets/sets the template display name.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.HttpMethods">
@@ -12709,9 +12741,9 @@
             </summary>
             <param name="path">The given path template.</param>
             <param name="options">The route options.</param>
-            <returns>All path templates.</returns>
+            <returns>All path template and its display name..</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.TemplateInfo},System.ValueTuple{System.String,System.String})">
             <summary>
             Combinates the next template to the existing templates.
             </summary>
@@ -12719,7 +12751,7 @@
             <param name="nextTemplate">The nexte template.</param>
             <returns>The templates.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates(System.Collections.Generic.IList{System.Text.StringBuilder},System.String[])">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates(System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.TemplateInfo},System.ValueTuple{System.String,System.String}[])">
             <summary>
             Combinates the next templates with existing templates.
             </summary>

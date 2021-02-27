@@ -29,11 +29,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 KeySegmentTemplate.CreateKeySegment(customer, entitySet));
 
             // Act
-            IEnumerable<string> actual = template.GetTemplates();
+            IEnumerable<(string, string)> actual = template.GetTemplates();
 
             // Assert
             Assert.Equal(2, actual.Count());
-            Assert.Equal(new[] { "Customers({key})", "Customers/{key}" }, actual);
+            Assert.Equal(new[] { "Customers({key})", "Customers/{key}" }, actual.Select(a => a.Item1));
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new NavigationLinkSegmentTemplate(navigation, entitySet));
 
             // Act
-            IEnumerable<string> actual = template.GetTemplates();
+            IEnumerable<(string, string)> actual = template.GetTemplates();
 
             // Assert
             Assert.Equal(2, actual.Count());
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 {
                     "Customers({key})/SubCustomer/$ref",
                     "Customers/{key}/SubCustomer/$ref"
-                }, actual);
+                }, actual.Select(a => a.Item1));
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new KeySegmentTemplate(keySegment));
 
             // Act
-            IEnumerable<string> actual = template.GetTemplates();
+            IEnumerable<(string, string)> actual = template.GetTemplates();
 
             // Assert
             Assert.Equal(4, actual.Count());
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                     "Customers({key})/SubCustomers/{nextKey}/$ref",
                     "Customers/{key}/SubCustomers({nextKey})/$ref",
                     "Customers/{key}/SubCustomers/{nextKey}/$ref"
-                }, actual);
+                }, actual.Select(a => a.Item1));
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new FunctionSegmentTemplate(getSalaray, null));
 
             // Act
-            IEnumerable<string> actual = template.GetTemplates();
+            IEnumerable<(string, string)> actual = template.GetTemplates();
 
             Assert.Equal(4, actual.Count());
             Assert.Equal(new[]
@@ -144,7 +144,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 "Customers({key})/NS.VipCustomer/GetWholeSalary({salary;minSalary;maxSalary})",
                 "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary({salary;minSalary;maxSalary})",
                 "Customers/{key}/NS.VipCustomer/GetWholeSalary({salary;minSalary;maxSalary})",
-            }, actual);
+            }, actual.Select(a => a.Item1));
+
+            Assert.Equal(new[]
+            {
+                "Customers({key})/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
+                "Customers({key})/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
+                "Customers/{key}/NS.VipCustomer/NS.GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
+                "Customers/{key}/NS.VipCustomer/GetWholeSalary(salary={salary},minSalary={minSalary},maxSalary={maxSalary})",
+            }, actual.Select(a => a.Item2));
         }
 
 
@@ -187,11 +195,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             }
 
             // Act
-            IEnumerable<string> items = template.GetTemplates();
+            IEnumerable<(string, string)> items = template.GetTemplates();
 
             // Assert
             Assert.Equal(expects.Length, items.Count());
-            Assert.Equal(expects, items);
+            Assert.Equal(expects, items.Select(a => a.Item1));
         }
 
         public static TheoryDataSet<bool, string[]> FunctionWithoutOptionalParametersData
@@ -239,11 +247,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             }
 
             // Act
-            IEnumerable<string> items = template.GetTemplates();
+            IEnumerable<(string, string)> items = template.GetTemplates();
 
             // Assert
             Assert.Equal(expects.Length, items.Count());
-            Assert.Equal(expects, items);
+            Assert.Equal(expects, items.Select(a => a.Item1));
         }
 
         public static TheoryDataSet<bool, string[]> FunctionWithOptionalParametersData
@@ -303,11 +311,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             }
 
             // Act
-            IEnumerable<string> items = template.GetTemplates();
+            IEnumerable<(string, string)> items = template.GetTemplates();
 
             // Assert
             Assert.Equal(expects.Length, items.Count());
-            Assert.Equal(expects, items);
+            Assert.Equal(expects, items.Select(a => a.Item1));
         }
         #endregion
     }

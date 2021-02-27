@@ -191,10 +191,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
-            AddHttpMethod(odataMetadata, httpMethod);
-
-            foreach (string template in path.GetTemplates(options))
+            foreach ((string template, string display) in path.GetTemplates(options))
             {
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
@@ -202,6 +199,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                     selectorModel = CreateSelectorModel(action.Attributes);
                     action.Selectors.Add(selectorModel);
                 }
+
+                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path)
+                {
+                    TemplateDisplayName = string.IsNullOrEmpty(prefix) ? display : $"{prefix}/{display}"
+                };
+
+                AddHttpMethod(odataMetadata, httpMethod);
 
                 selectorModel.EndpointMetadata.Add(odataMetadata);
 

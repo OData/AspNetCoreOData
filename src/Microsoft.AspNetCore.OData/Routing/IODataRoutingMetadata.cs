@@ -29,6 +29,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         ISet<string> HttpMethods { get; }
 
         /// <summary>
+        /// Gets/sets the template display name.
+        /// </summary>
+        public string TemplateDisplayName { get; set; }
+
+        /// <summary>
         /// Gets the OData path template
         /// </summary>
         ODataPathTemplate Template { get; }

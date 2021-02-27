@@ -1443,6 +1443,7 @@ public interface Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata {
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; }
 	string Prefix  { public abstract get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public abstract get; }
+	string TemplateDisplayName  { public abstract get; public abstract set; }
 }
 
 [
@@ -1500,6 +1501,15 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds {
 	public static string UnboundFunction = "unboundfunction"
 	public static string Unresolved = "unresolved"
 	public static string Value = "$value"
+}
+
+public class Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider : IApiDescriptionProvider {
+	public ODataApiDescriptionProvider ()
+
+	int Order  { public virtual get; }
+
+	public virtual void OnProvidersExecuted (Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext context)
+	public virtual void OnProvidersExecuting (Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler : Microsoft.OData.UriParser.PathSegmentHandler {
@@ -1573,6 +1583,7 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IO
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
+	string TemplateDisplayName  { public virtual get; public virtual set; }
 }
 
 public abstract class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer {
@@ -2811,7 +2822,7 @@ public sealed class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplat
 	[
 	ExtensionAttribute(),
 	]
-	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
+	public static System.Collections.Generic.IEnumerable`1[[System.ValueTuple`2[[System.String],[System.String]]]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
