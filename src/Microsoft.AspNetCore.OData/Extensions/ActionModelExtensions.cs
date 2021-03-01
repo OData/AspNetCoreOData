@@ -211,6 +211,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
                 string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
 
+                // OData convention route template doesn't get combined with the route template applied to the controller.
+                // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
+                templateStr = "/" + templateStr;
+
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
 
                 // Check with .NET Team whether the "Endpoint name metadata"
