@@ -57,26 +57,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "CreateRefToOrder",
                         new[]
                         {
-                            "RefCustomers({key})/Order/$ref",
-                            "RefCustomers/{key}/Order/$ref"
+                            "/RefCustomers({key})/Order/$ref",
+                            "/RefCustomers/{key}/Order/$ref"
                         }
                     },
                     {
                         "DeleteRefToOrder",
                         new[]
                         {
-                            "RefCustomers({key})/Order/$ref",
-                            "RefCustomers/{key}/Order/$ref"
+                            "/RefCustomers({key})/Order/$ref",
+                            "/RefCustomers/{key}/Order/$ref"
                         }
                     },
                     {
                         "DeleteRefToOrders",
                         new[]
                         {
-                            "RefCustomers({key})/Orders({relatedKey})/$ref",
-                            "RefCustomers({key})/Orders/{relatedKey}/$ref",
-                            "RefCustomers/{key}/Orders({relatedKey})/$ref",
-                            "RefCustomers/{key}/Orders/{relatedKey}/$ref"
+                            "/RefCustomers({key})/Orders({relatedKey})/$ref",
+                            "/RefCustomers({key})/Orders/{relatedKey}/$ref",
+                            "/RefCustomers/{key}/Orders({relatedKey})/$ref",
+                            "/RefCustomers/{key}/Orders/{relatedKey}/$ref"
                         }
                     }
                 };

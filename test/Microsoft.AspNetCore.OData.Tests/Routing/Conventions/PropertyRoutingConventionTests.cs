@@ -48,53 +48,53 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetName",
                         new[]
                         {
-                            "Customers({key})/Name",
-                            "Customers/{key}/Name",
-                            "Customers({key})/Name/$value",
-                            "Customers/{key}/Name/$value"
+                            "/Customers({key})/Name",
+                            "/Customers/{key}/Name",
+                            "/Customers({key})/Name/$value",
+                            "/Customers/{key}/Name/$value"
                         }
                     },
-                    { typeof(MeController), "GetName", new[] { "Me/Name", "Me/Name/$value" } },
+                    { typeof(MeController), "GetName", new[] { "/Me/Name", "/Me/Name/$value" } },
                     {
                         typeof(CustomersController),
                         "GetEmails",
                         new[]
                         {
-                            "Customers({key})/Emails",
-                            "Customers/{key}/Emails",
-                            "Customers({key})/Emails/$count",
-                            "Customers/{key}/Emails/$count"
+                            "/Customers({key})/Emails",
+                            "/Customers/{key}/Emails",
+                            "/Customers({key})/Emails/$count",
+                            "/Customers/{key}/Emails/$count"
                         }
                     },
-                    { typeof(MeController), "GetEmails", new[] { "Me/Emails", "Me/Emails/$count" } },
+                    { typeof(MeController), "GetEmails", new[] { "/Me/Emails", "/Me/Emails/$count" } },
 
                     // Get complex property
-                    { typeof(CustomersController), "GetAddress", new[] { "Customers({key})/Address", "Customers/{key}/Address" } },
-                    { typeof(MeController), "GetAddress", new[] { "Me/Address" } },
+                    { typeof(CustomersController), "GetAddress", new[] { "/Customers({key})/Address", "/Customers/{key}/Address" } },
+                    { typeof(MeController), "GetAddress", new[] { "/Me/Address" } },
                     {
                         typeof(CustomersController),
                         "GetLocations",
                         new[]
                         {
-                            "Customers({key})/Locations",
-                            "Customers/{key}/Locations",
-                            "Customers({key})/Locations/$count",
-                            "Customers/{key}/Locations/$count"
+                            "/Customers({key})/Locations",
+                            "/Customers/{key}/Locations",
+                            "/Customers({key})/Locations/$count",
+                            "/Customers/{key}/Locations/$count"
                         }
                     },
-                    { typeof(MeController), "GetLocations", new[] { "Me/Locations", "Me/Locations/$count" } },
+                    { typeof(MeController), "GetLocations", new[] { "/Me/Locations", "/Me/Locations/$count" } },
 
                     // Post
-                    { typeof(CustomersController), "PostToEmails", new[] { "Customers({key})/Emails", "Customers/{key}/Emails" } },
-                    { typeof(MeController), "PostToEmails", new[] { "Me/Emails" } },
+                    { typeof(CustomersController), "PostToEmails", new[] { "/Customers({key})/Emails", "/Customers/{key}/Emails" } },
+                    { typeof(MeController), "PostToEmails", new[] { "/Me/Emails" } },
 
                     // Put, Patch, Delete
-                    { typeof(CustomersController), "PutToName", new[] { "Customers({key})/Name", "Customers/{key}/Name" } },
-                    { typeof(CustomersController), "PatchToName", new[] { "Customers({key})/Name", "Customers/{key}/Name" } },
-                    { typeof(CustomersController), "DeleteToName", new[] { "Customers({key})/Name", "Customers/{key}/Name" } },
-                    { typeof(MeController), "PutToName", new[] { "Me/Name" } },
-                    { typeof(MeController), "PatchToName", new[] { "Me/Name" } },
-                    { typeof(MeController), "DeleteToName", new[] { "Me/Name" } },
+                    { typeof(CustomersController), "PutToName", new[] { "/Customers({key})/Name", "/Customers/{key}/Name" } },
+                    { typeof(CustomersController), "PatchToName", new[] { "/Customers({key})/Name", "/Customers/{key}/Name" } },
+                    { typeof(CustomersController), "DeleteToName", new[] { "/Customers({key})/Name", "/Customers/{key}/Name" } },
+                    { typeof(MeController), "PutToName", new[] { "/Me/Name" } },
+                    { typeof(MeController), "PatchToName", new[] { "/Me/Name" } },
+                    { typeof(MeController), "DeleteToName", new[] { "/Me/Name" } },
 
                     // with type cast
                     {
@@ -102,8 +102,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetSubAddressFromVipCustomer",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/SubAddress",
-                            "Customers/{key}/NS.VipCustomer/SubAddress"
+                            "/Customers({key})/NS.VipCustomer/SubAddress",
+                            "/Customers/{key}/NS.VipCustomer/SubAddress"
                         }
                     },
                     {
@@ -111,8 +111,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PutToLocationsOfUsAddress",
                         new[]
                         {
-                            "Customers({key})/Locations/NS.UsAddress",
-                            "Customers/{key}/Locations/NS.UsAddress"
+                            "/Customers({key})/Locations/NS.UsAddress",
+                            "/Customers/{key}/Locations/NS.UsAddress"
                         }
                     },
                     {
@@ -120,8 +120,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PatchToSubAddressOfCnAddressFromVipCustomer",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/SubAddress/NS.CnAddress",
-                            "Customers/{key}/NS.VipCustomer/SubAddress/NS.CnAddress"
+                            "/Customers({key})/NS.VipCustomer/SubAddress/NS.CnAddress",
+                            "/Customers/{key}/NS.VipCustomer/SubAddress/NS.CnAddress"
                         }
                     },
                     {
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PutToSubAddressOfCnAddressFromVipCustomer",
                         new[]
                         {
-                            "Me/NS.VipCustomer/SubAddress/NS.CnAddress"
+                            "/Me/NS.VipCustomer/SubAddress/NS.CnAddress"
                         }
                     },
                     {
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PostToSubLocationsOfUsAddressFromVipCustomer",
                         new[]
                         {
-                            "Me/NS.VipCustomer/SubLocations/NS.UsAddress"
+                            "/Me/NS.VipCustomer/SubLocations/NS.UsAddress"
                         }
                     },
                     {
@@ -145,8 +145,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetSubLocationsOfUsAddressFromVipCustomer",
                         new[]
                         {
-                            "Me/NS.VipCustomer/SubLocations/NS.UsAddress",
-                            "Me/NS.VipCustomer/SubLocations/NS.UsAddress/$count"
+                            "/Me/NS.VipCustomer/SubLocations/NS.UsAddress",
+                            "/Me/NS.VipCustomer/SubLocations/NS.UsAddress/$count"
                         }
                     }
                 };

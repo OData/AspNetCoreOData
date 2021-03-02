@@ -55,15 +55,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(2, action.Selectors.Count);
             Assert.Equal(new[]
                 {
-                    $"{expectedTemplate}",
-                    $"{expectedTemplate}/$count"
+                    $"/{expectedTemplate}",
+                    $"/{expectedTemplate}/$count"
                 },
                 action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
         [Theory]
-        [InlineData("Post", "Customers")]
-        [InlineData("PostFromVipCustomer", "Customers/NS.VipCustomer")]
+        [InlineData("Post", "/Customers")]
+        [InlineData("PostFromVipCustomer", "/Customers/NS.VipCustomer")]
         public void AppliesToActionForPostActionWorksAsExpected(string actionName, string expected)
         {
             // Arrange
