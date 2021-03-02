@@ -221,8 +221,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             //                     |--- DelteResource
             //                     |--- Normal Resource
             ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
-            ODataResourceBaseWrapper resourceBase = Assert.Single(deltaResourceSet.ResourceBases);
-            ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(resourceBase);
+            ODataItemWrapper deltaItem = Assert.Single(deltaResourceSet.DeltaItems);
+            ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(deltaItem);
             Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.DeletedResource.Reason);
 
             ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResource.NestedResourceInfos);
@@ -230,11 +230,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
             ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
-            Assert.Equal(2, ordersDeltaResourceSet.ResourceBases.Count);
-            ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.ResourceBases.ElementAt(0));
+            Assert.Equal(2, ordersDeltaResourceSet.DeltaItems.Count);
+            ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
             Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.DeletedResource.Reason);
 
-            ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.ResourceBases.ElementAt(1));
+            ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(1));
             Assert.Equal("NS.VipOrder", resource2.Resource.TypeName);
             Assert.Collection(resource2.Resource.Properties,
                 p =>
@@ -299,40 +299,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
 
             // --- DeltaResourceSet
             //      |--- Resource (1)
+            //      |--- DeltaDeletedLink
+            //      |--- DeltaLink
             //      |--- Resource (2)
             //      |--- DeletedResource (1)
             //      |
-            //      |--- DeltaDeletedLink
-            //      |--- DeltaLink
             ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
 
             // Resources
-            Assert.Equal(3, deltaResourceSet.ResourceBases.Count);
-            Assert.Collection(deltaResourceSet.ResourceBases,
+            Assert.Equal(5, deltaResourceSet.DeltaItems.Count);
+            Assert.Collection(deltaResourceSet.DeltaItems,
                 e =>
                 {
+                    // 1) Resource
                     ODataResourceWrapper resource1 = Assert.IsType<ODataResourceWrapper>(e);
                     Assert.Equal("Customers(42)", resource1.Resource.Id.OriginalString);
                     Assert.Equal("Sammy", resource1.Resource.Properties.First(p => p.Name == "Name").Value);
                 },
                 e =>
                 {
-                    ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(e);
-                    Assert.Equal("Orders(10643)", resource2.Resource.Id.OriginalString);
-                    Assert.Equal(82, resource2.Resource.Properties.First(p => p.Name == "Price").Value);
-                },
-                e =>
-                {
-                    ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(e);
-                    Assert.Equal("Customers(21)", deletedResource.DeletedResource.Id.OriginalString);
-                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.DeletedResource.Reason);
-                });
-
-            // DeltaLinks
-            Assert.Equal(2, deltaResourceSet.DeltaLinks.Count);
-            Assert.Collection(deltaResourceSet.DeltaLinks,
-                e =>
-                {
+                    // 2) Deleted Link
                     ODataDeltaDeletedLinkWrapper deletedLinkWrapper = Assert.IsType<ODataDeltaDeletedLinkWrapper>(e);
                     Assert.Equal("Customers(39)", deletedLinkWrapper.DeltaDeletedLink.Source.OriginalString);
                     Assert.Equal("Orders(10643)", deletedLinkWrapper.DeltaDeletedLink.Target.OriginalString);
@@ -340,10 +326,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 },
                 e =>
                 {
+                    // 3) Added Link
                     ODataDeltaLinkWrapper linkWrapper = Assert.IsType<ODataDeltaLinkWrapper>(e);
                     Assert.Equal("Customers(32)", linkWrapper.DeltaLink.Source.OriginalString);
                     Assert.Equal("Orders(10645)", linkWrapper.DeltaLink.Target.OriginalString);
                     Assert.Equal("Orders", linkWrapper.DeltaLink.Relationship);
+                },
+                e =>
+                {
+                    // 4) Resource
+                    ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(e);
+                    Assert.Equal("Orders(10643)", resource2.Resource.Id.OriginalString);
+                    Assert.Equal(82, resource2.Resource.Properties.First(p => p.Name == "Price").Value);
+                },
+                e =>
+                {
+                    // 5) Deleted resource
+                    ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(e);
+                    Assert.Equal("Customers(21)", deletedResource.DeletedResource.Id.OriginalString);
+                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.DeletedResource.Reason);
                 });
         }
 

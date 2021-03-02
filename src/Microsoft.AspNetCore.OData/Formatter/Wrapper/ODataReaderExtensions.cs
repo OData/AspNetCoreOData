@@ -186,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     // Should never add a delta link to a non-delta resource set.
                     ODataDeltaResourceSetWrapper linkResourceSetWrapper = (ODataDeltaResourceSetWrapper)itemsStack.Peek();
                     Contract.Assert(linkResourceSetWrapper != null, "ODataDeltaResourceSetWrapper for delta link should not be null.");
-                    linkResourceSetWrapper.DeltaLinks.Add(linkBaseWrapper);
+                    linkResourceSetWrapper.DeltaItems.Add(linkBaseWrapper);
                     break;
 
                 default:
@@ -231,7 +231,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 else if (parentDeletaResourceSet != null)
                 {
                     // Delta resource set could have the normal resource
-                    parentDeletaResourceSet.ResourceBases.Add(resourceWrapper);
+                    parentDeletaResourceSet.DeltaItems.Add(resourceWrapper);
                 }
                 else
                 {
@@ -270,7 +270,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             ODataDeltaResourceSetWrapper parentDeletaResourceSet = parentItem as ODataDeltaResourceSetWrapper;
             if (parentDeletaResourceSet != null)
             {
-                parentDeletaResourceSet.ResourceBases.Add(deletedResourceWrapper);
+                parentDeletaResourceSet.DeltaItems.Add(deletedResourceWrapper);
             }
             else
             {

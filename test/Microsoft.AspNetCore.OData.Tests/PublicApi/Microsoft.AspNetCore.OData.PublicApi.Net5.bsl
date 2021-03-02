@@ -2359,9 +2359,8 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkW
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper {
 	public ODataDeltaResourceSetWrapper (Microsoft.OData.ODataDeltaResourceSet deltaResourceSet)
 
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkBaseWrapper]] DeltaLinks  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper]] DeltaItems  { public get; }
 	Microsoft.OData.ODataDeltaResourceSet DeltaResourceSet  { public get; }
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper]] ResourceBases  { public get; }
 }
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {

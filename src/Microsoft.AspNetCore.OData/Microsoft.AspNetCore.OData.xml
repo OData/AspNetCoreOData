@@ -5385,14 +5385,10 @@
             Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/>.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.ResourceBases">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaItems">
             <summary>
-            Gets the nested resources (resource or deleted resource) of this delta resource set.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaLinks">
-            <summary>
-            Gets the nested delta links of this delta resource set.
+            Gets the nested delta items (resource, or delted resource, or deleted link, or added link).
+            Since the order or the delta items matter.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">

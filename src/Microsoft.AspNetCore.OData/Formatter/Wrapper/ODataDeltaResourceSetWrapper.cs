@@ -21,9 +21,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// <param name="deltaResourceSet">The wrapped delta resource set item.</param>
         public ODataDeltaResourceSetWrapper(ODataDeltaResourceSet deltaResourceSet)
         {
-            ResourceBases = new List<ODataResourceBaseWrapper>();
-            DeltaLinks = new List<ODataDeltaLinkBaseWrapper>();
             DeltaResourceSet = deltaResourceSet;
+            DeltaItems = new List<ODataItemWrapper>();
         }
 
         /// <summary>
@@ -32,13 +31,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         public ODataDeltaResourceSet DeltaResourceSet { get; }
 
         /// <summary>
-        /// Gets the nested resources (resource or deleted resource) of this delta resource set.
+        /// Gets the nested delta items (resource, or delted resource, or deleted link, or added link).
+        /// The order of the delta items matters.
         /// </summary>
-        public IList<ODataResourceBaseWrapper> ResourceBases { get; }
-
-        /// <summary>
-        /// Gets the nested delta links of this delta resource set.
-        /// </summary>
-        public IList<ODataDeltaLinkBaseWrapper> DeltaLinks { get; }
+        public IList<ODataItemWrapper> DeltaItems { get; }
     }
 }

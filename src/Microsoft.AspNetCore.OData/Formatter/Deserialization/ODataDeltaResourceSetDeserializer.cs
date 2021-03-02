@@ -140,11 +140,33 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(readContext));
             }
 
-            // resource
-            foreach (ODataResourceBaseWrapper resourceBaseWrapper in deltaResourceSet.ResourceBases)
+            // Delta Items
+            foreach (ODataItemWrapper itemWrapper in deltaResourceSet.DeltaItems)
             {
-                ODataResourceWrapper resourceWrapper = resourceBaseWrapper as ODataResourceWrapper;
-                ODataDeletedResourceWrapper deletedResourceWrapper = resourceBaseWrapper as ODataDeletedResourceWrapper;
+                // Deleted Link
+                ODataDeltaDeletedLinkWrapper deletedLinkWrapper = itemWrapper as ODataDeltaDeletedLinkWrapper;
+                if (deletedLinkWrapper != null)
+                {
+                    yield return ReadDeltaDeletedLink(deletedLinkWrapper, readContext);
+                }
+
+                // Added Link
+                ODataDeltaLinkWrapper deltaLinkWrapper = itemWrapper as ODataDeltaLinkWrapper;
+                if (deltaLinkWrapper != null)
+                {
+                    yield return ReadDeltaLink(deltaLinkWrapper, readContext);
+                }
+
+                // DeletedResource
+                ODataDeletedResourceWrapper deletedResourceWrapper = itemWrapper as ODataDeletedResourceWrapper;
+                if (deletedResourceWrapper != null)
+                {
+                    // TODO: deleted resource
+                    yield return null;
+                }
+
+                // Added resource or updated resource
+                ODataResourceWrapper resourceWrapper = itemWrapper as ODataResourceWrapper;
                 if (resourceWrapper != null)
                 {
                     IEdmModel model = readContext.Model;
@@ -169,24 +191,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
                     // TODO: normal resource
                     yield return deserializer.ReadInline(resourceWrapper, edmTypeReference, readContext);
-                }
-                else
-                {
-                    // TODO: deleted resource
-                }
-            }
-
-            // Delta links
-            foreach (ODataDeltaLinkBaseWrapper deltaLinkBaseWrapper in deltaResourceSet.DeltaLinks)
-            {
-                ODataDeltaDeletedLinkWrapper deletedLinkWrapper = deltaLinkBaseWrapper as ODataDeltaDeletedLinkWrapper;
-                if (deletedLinkWrapper != null)
-                {
-                    yield return ReadDeltaDeletedLink(deletedLinkWrapper, readContext);
-                }
-                else
-                {
-                    yield return ReadDeltaLink((ODataDeltaLinkWrapper)deltaLinkBaseWrapper, readContext);
                 }
             }
         }
