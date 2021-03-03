@@ -11,9 +11,9 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (expandedItem != null)
                 {
                     // Handle Delta resource; currently not value based.
-                    if (TypedDelta.IsDeltaOfT(context.ExpandedResource.GetType()))
+                    if (DeltaHelper.IsDeltaOfT(context.ExpandedResource.GetType()))
                     {
                         return GetNextPageHelper.GetNextPageLink(baseUri, pageSize);
                     }

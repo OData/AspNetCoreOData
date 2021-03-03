@@ -71,6 +71,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<ODataCollectionDeserializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataEntityReferenceLinkDeserializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataActionPayloadDeserializer>(ServiceLifetime.Singleton);
+            builder.AddService<ODataDeltaResourceSetDeserializer>(ServiceLifetime.Singleton);
 
             // Serializers.
             builder.AddService<ODataEnumSerializer>(ServiceLifetime.Singleton);

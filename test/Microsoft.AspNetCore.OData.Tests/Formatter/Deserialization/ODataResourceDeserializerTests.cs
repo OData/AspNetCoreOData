@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;

@@ -4,6 +4,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -54,7 +55,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 if (!_isDeltaOfT.HasValue)
                 {
-                    _isDeltaOfT = ResourceType != null && TypeHelper.IsGenericType(ResourceType) && ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
+                    _isDeltaOfT = ResourceType != null && TypeHelper.IsGenericType(ResourceType) &&
+                        (ResourceType.GetGenericTypeDefinition() == typeof(Delta<>) ||
+                        ResourceType.GetGenericTypeDefinition() == typeof(DeltaSet<>));
                 }
 
                 return _isDeltaOfT.Value;

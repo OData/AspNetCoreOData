@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// <summary>
         /// Gets the wrapped <see cref="ODataResourceSet"/>.
         /// </summary>
-        public ODataResourceSetBase ResourceSet { get; }
+        public ODataResourceSet ResourceSet { get; }
 
         /// <summary>
         /// Gets the nested resources of this ResourceSet.

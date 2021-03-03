@@ -1596,6 +1596,498 @@
             <param name="messageArgs">An object array that contains zero or more objects to format.</param>
             <returns>The logged <see cref="T:System.Exception"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta">
+            <summary>
+            Base class for the Delta resource
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta.Kind">
+            <summary>
+            DeltaKind for the objects part of the DeltaResourceSet Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.Clear">
+            <summary>
+            Clears the Delta and resets the underlying Entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            <remarks>
+            Only properties that exist on Entity can be set.
+            If there is a type mismatch the request will fail.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>True if the Property was found</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
+            <summary>
+            Overrides the DynamicObject TrySetMember method, so that only the properties
+            of Entity can be set.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
+            <summary>
+            Overrides the DynamicObject TryGetMember method, so that only the properties
+            of Entity can be got.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1" /> allows and tracks changes to delta deleted link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1"/>.
+            </summary>
+            <param name="structuralType"></param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1" /> allows and tracks changes to a delta deleted resource.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Reason">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaHelper">
+            <summary>
+            The delta helpers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaHelper.IsDeltaOfT(System.Type)">
+            <summary>
+            Helper method to check whether the given type is Delta generic type.
+            </summary>
+            <param name="type">The type to check.</param>
+            <returns>True if it is a Delta generic type; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaKind">
+            <summary>
+            The Kind of the object within the DeltaPayload used to distinguish between
+            Resource/DeletedResource/DeltaDeletedLink/AddedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown">
+            <summary>
+            Corresponds to any Unknown item added.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaResource">
+            <summary>
+            Corresponds to ODataResource.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedResource">
+            <summary>
+            Corresponds to ODataDeletedResource.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedLink">
+            <summary>
+            Corresponds to ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaLink">
+            <summary>
+            Corresponds to ODataDeltaLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1">
+            <summary>
+            Base class for delta link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1"/>.
+            </summary>
+            <param name="structuralType">The derived structural type for which the changes would be tracked.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.StructuredType">
+            <summary>
+             Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1" /> allows and tracks changes to delta added link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
+            </summary>
+            <param name="structuralType">The derived structural type for which the changes would be tracked.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta`1">
+            <summary>
+            A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">T is the type of the instance this delta tracks changes for.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.StructuredType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyType(System.String,System.Type@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance">
+            <summary>
+            Returns the instance that holds all the changes (and original values) being tracked by this Delta.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetChangedPropertyNames">
+            <summary>
+            Returns the known properties that have been modified through this <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names.
+            Includes the structural properties at current level.
+            Does not include the names of the changed dynamic properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetUnchangedPropertyNames">
+            <summary>
+            Returns the known properties that have not been modified through this <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names. Does not include the names of the changed dynamic
+            properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyChangedValues(`0)">
+            <summary>
+            Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity recursively.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
+            <summary>
+            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Put(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
+            <summary>
+            Attempts to get the property by the specified name.
+            </summary>
+            <param name="structural">The structural object.</param>
+            <param name="propertyName">Name of the property.</param>
+            <param name="propertyRef">Output for property value.</param>
+            <returns>true if the property is found; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet">
+            <summary>
+            Represents a delta resource set.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1" /> allows and tracks changes to a delta resource set.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.StructuredType">
+            <summary>
+            Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.Patch(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+             Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
+            </summary>
+            <param name="originalSet">The original set.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaItem,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Find the related instance.
+            </summary>
+            <param name="deltaItem"></param>
+            <param name="originalSet"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to an object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>Returns <c>true</c> if successful and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.Clear">
+            <summary>
+            Clears the <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" />.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource" /> allows and tracks changes to a deleted resource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaItem">
+            <summary>
+            The delta item base.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaItem.Kind">
+            <summary>
+            Gets the delta item kind.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink" /> allows and tracks changes to an added link.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to delta link.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.ITypedDelta">
+            <summary>
+            The typed delta.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.ITypedDelta.StructuredType">
+            <summary>
+            Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.ITypedDelta.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder">
             <summary>
             This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
@@ -2620,27 +3112,30 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResourceSet(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResourceSet(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the given <paramref name="deltaResourceSet"/> under the given <paramref name="readContext"/>.
             </summary>
             <param name="deltaResourceSet">The delta resource set to deserialize.</param>
+            <param name="elementType">The element type.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The deserialized resource set object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaDeletedLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaDeletedLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the given <paramref name="deletedLink"/> under the given <paramref name="readContext"/>.
             </summary>
             <param name="deletedLink">The given deleted link.</param>
+            <param name="elementType">The element type.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the given <paramref name="link"/> under the given <paramref name="readContext"/>.
             </summary>
             <param name="link">The given delta link.</param>
+            <param name="elementType">The element type.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink"/>.</returns>
         </member>
@@ -4397,192 +4892,6 @@
             <param name="segments">The segments.</param>
             <returns></returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta">
-            <summary>
-            A class the tracks changes (i.e. the Delta) for an entity.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.Clear">
-            <summary>
-            Clears the Delta and resets the underlying Entity.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TrySetPropertyValue(System.String,System.Object)">
-            <summary>
-            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
-            <remarks>
-            Only properties that exist on Entity can be set.
-            If there is a type mismatch the request will fail.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
-            <returns>True if successful</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetPropertyValue(System.String,System.Object@)">
-            <summary>
-            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
-            <remarks>
-            Only properties that exist on Entity can be retrieved.
-            Both modified and unmodified properties can be retrieved.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The value of the Property</param>
-            <returns>True if the Property was found</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetPropertyType(System.String,System.Type@)">
-            <summary>
-            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
-            <remarks>
-            Only properties that exist on Entity can be retrieved.
-            Both modified and unmodified properties can be retrieved.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="type">The type of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
-            <summary>
-            Overrides the DynamicObject TrySetMember method, so that only the properties
-            of Entity can be set.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
-            <summary>
-            Overrides the DynamicObject TryGetMember method, so that only the properties
-            of Entity can be got.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.GetChangedPropertyNames">
-            <summary>
-            Returns the Properties that have been modified through this Delta as an
-            enumeration of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.GetUnchangedPropertyNames">
-            <summary>
-            Returns the Properties that have not been modified through this Delta as an
-            enumeration of Property Names
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1">
-            <summary>
-            A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="TStructuralType"/>.
-            </summary>
-            <typeparam name="TStructuralType">TStructuralType is the type of the instance this delta tracks changes for.</typeparam>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
-            names, including those of dynamic properties, are ignored.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
-            names, including those of dynamic properties, are ignored.</param>
-            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
-            properties. <c>null</c> means this entity type is not open.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.StructuredType">
-            <inheritdoc/>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.ExpectedClrType">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Clear">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TrySetPropertyValue(System.String,System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyType(System.String,System.Type@)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance">
-            <summary>
-            Returns the instance that holds all the changes (and original values) being tracked by this Delta.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetChangedPropertyNames">
-            <summary>
-            Returns the known properties that have been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> as an
-            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names.
-            Includes the structural properties at current level.
-            Does not include the names of the changed dynamic properties.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetUnchangedPropertyNames">
-            <summary>
-            Returns the known properties that have not been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> as an
-            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names. Does not include the names of the changed dynamic
-            properties.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.CopyChangedValues(`0)">
-            <summary>
-            Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity recursively.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.CopyUnchangedValues(`0)">
-            <summary>
-            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Patch(`0)">
-            <summary>
-            Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
-            <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Put(`0)">
-            <summary>
-            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
-            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
-            <summary>
-            Attempts to get the property by the specified name.
-            </summary>
-            <param name="structural">The structural object.</param>
-            <param name="propertyName">Name of the property.</param>
-            <param name="propertyRef">Output for property value.</param>
-            <returns>true if the property is found; false otherwise.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollection">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>s.
@@ -5029,6 +5338,9 @@
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredTypeReference"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind">
+            <inheritdoc/>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.ExpectedEdmType">
             <summary>
             Gets or sets the expected <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of the entity or complex type of this object.
@@ -5069,52 +5381,6 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetEdmType">
             <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta">
-            <summary>
-            <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta" /> allows and tracks changes to an object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.GetChangedPropertyNames">
-            <summary>
-            Returns the Properties that have been modified through this IDelta as an
-            enumerable of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.GetUnchangedPropertyNames">
-            <summary>
-            Returns the Properties that have not been modified through this IDelta as an
-            enumerable of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TrySetPropertyValue(System.String,System.Object)">
-            <summary>
-            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
-            <returns>Returns <c>true</c> if successful and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TryGetPropertyValue(System.String,System.Object@)">
-            <summary>
-            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The value of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TryGetPropertyType(System.String,System.Type@)">
-            <summary>
-            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="type">The type of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.Clear">
-            <summary>
-            Clears the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta" />.
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject">
             <summary>
@@ -5233,29 +5499,6 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.GetEdmType">
             <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta">
-            <summary>
-            Represents a <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> that can be used when a backing CLR type exists for
-            the entity type and complex type whose changes are tracked.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.StructuredType">
-            <summary>
-            Gets the actual type of the structural object for which the changes are tracked.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.ExpectedClrType">
-            <summary>
-            Gets the expected type of the entity for which the changes are tracked.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.IsDeltaOfT(System.Type)">
-            <summary>
-            Helper method to check whether the given type is Delta generic type.
-            </summary>
-            <param name="type">The type to check.</param>
-            <returns>True if it is a Delta generic type; false otherwise.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmComplexObject">
             <summary>
@@ -5388,7 +5631,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaItems">
             <summary>
             Gets the nested delta items (resource, or delted resource, or deleted link, or added link).
-            Since the order or the delta items matter.
+            The order of the delta items matters.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
@@ -11025,6 +11268,7 @@
             GET ~/entityset/cast/$count
             POST ~/entityset
             POST ~/entityset/cast
+            PATCH ~/entityset   ==> Delta resource set patch
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.Order">

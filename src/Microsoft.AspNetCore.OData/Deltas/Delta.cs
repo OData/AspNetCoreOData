@@ -1,19 +1,22 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using Microsoft.AspNetCore.OData.Abstracts;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Deltas
 {
     /// <summary>
-    /// A class the tracks changes (i.e. the Delta) for an entity.
+    /// Base class for the Delta resource
     /// </summary>
-    [NonValidatingParameterBinding]
     public abstract class Delta : DynamicObject, IDelta
     {
+        /// <summary>
+        /// DeltaKind for the objects part of the DeltaResourceSet Payload.
+        /// </summary>
+        public abstract DeltaKind Kind { get; }
+
         /// <summary>
         /// Clears the Delta and resets the underlying Entity.
         /// </summary>

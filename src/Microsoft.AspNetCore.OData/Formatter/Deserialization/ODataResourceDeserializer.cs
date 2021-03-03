@@ -16,6 +16,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Edm;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {

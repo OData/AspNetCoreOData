@@ -3,8 +3,10 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -32,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             switch (edmType.TypeKind())
@@ -68,12 +70,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (type == null)
             {
-                throw new ArgumentNullException(nameof(type));
+                throw Error.ArgumentNull(nameof(type));
             }
 
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (type == typeof(Uri))
@@ -84,6 +86,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             if (type == typeof(ODataActionParameters) || type == typeof(ODataUntypedActionParameters))
             {
                 return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
+            }
+
+            if (type == typeof(EdmChangedObjectCollection) || 
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+            {
+                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
             }
 
             IEdmModel model = request.GetModel();

@@ -22,9 +22,4 @@ namespace ODataRoutingSample.Models
     {
         public IList<string> Emails { get; set; }
     }
-
-    public class Organization
-    {
-        public int OrganizationId { get; set; }
-    }
 }

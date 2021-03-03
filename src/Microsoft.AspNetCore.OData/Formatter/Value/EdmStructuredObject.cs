@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -59,6 +60,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             _actualEdmType = edmType;
             IsNullable = isNullable;
         }
+
+        /// <inheritdoc/>
+        public override DeltaKind Kind => DeltaKind.DeltaResource;
 
         /// <summary>
         /// Gets or sets the expected <see cref="IEdmStructuredType"/> of the entity or complex type of this object.

@@ -51,6 +51,7 @@ namespace ODataRoutingSample.Models
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Organization>("Organizations");
+            builder.EntitySet<Department>("Departments");
             builder.EntitySet<Company>("Companies");
             builder.EntitySet<Customer>("Customers");
             builder.Singleton<Customer>("Me");

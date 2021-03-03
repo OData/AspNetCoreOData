@@ -398,6 +398,142 @@ public class Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler : Micr
 	public virtual System.Threading.Tasks.Task ProcessBatchAsync (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.RequestDelegate nextHandler)
 }
 
+public enum Microsoft.AspNetCore.OData.Deltas.DeltaKind : int {
+	DeltaDeletedLink = 3
+	DeltaDeletedResource = 2
+	DeltaLink = 4
+	DeltaResource = 1
+	Unknown = 0
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaItem {
+	void Clear ()
+	System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
+	bool TryGetPropertyType (string name, out System.Type& type)
+	bool TryGetPropertyValue (string name, out System.Object& value)
+	bool TrySetPropertyValue (string name, object value)
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink : IDeltaItem, IDeltaLinkBase {
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource : IDelta, IDeltaItem {
+	System.Uri Id  { public abstract get; public abstract set; }
+	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public abstract get; public abstract set; }
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaItem {
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLink : IDeltaItem, IDeltaLinkBase {
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase : IDeltaItem {
+	string Relationship  { public abstract get; public abstract set; }
+	System.Uri Source  { public abstract get; public abstract set; }
+	System.Uri Target  { public abstract get; public abstract set; }
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.ITypedDelta {
+	System.Type ExpectedClrType  { public abstract get; }
+	System.Type StructuredType  { public abstract get; }
+}
+
+public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.DynamicObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem {
+	protected Delta ()
+
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+
+	public abstract void Clear ()
+	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
+	public virtual bool TryGetMember (System.Dynamic.GetMemberBinder binder, out System.Object& result)
+	public abstract bool TryGetPropertyType (string name, out System.Type& type)
+	public abstract bool TryGetPropertyValue (string name, out System.Object& value)
+	public virtual bool TrySetMember (System.Dynamic.SetMemberBinder binder, object value)
+	public abstract bool TrySetPropertyValue (string name, object value)
+}
+
+public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1 : IDeltaItem, IDeltaLinkBase, ITypedDelta {
+	protected DeltaLinkBase`1 ()
+	protected DeltaLinkBase`1 (System.Type structuralType)
+
+	System.Type ExpectedClrType  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+	string Relationship  { public virtual get; public virtual set; }
+	System.Uri Source  { public virtual get; public virtual set; }
+	System.Type StructuredType  { public virtual get; }
+	System.Uri Target  { public virtual get; public virtual set; }
+}
+
+public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaSet : System.Collections.ObjectModel.Collection`1[[Microsoft.AspNetCore.OData.Deltas.IDeltaItem]], ICollection, IEnumerable, IList, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
+	protected DeltaSet ()
+}
+
+[
+NonValidatingParameterBindingAttribute(),
+]
+public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaItem, ITypedDelta {
+	public Delta`1 ()
+	public Delta`1 (System.Type structuralType)
+	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
+	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
+
+	System.Type ExpectedClrType  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+	System.Type StructuredType  { public virtual get; }
+
+	public virtual void Clear ()
+	public void CopyChangedValues (T original)
+	public void CopyUnchangedValues (T original)
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	public T GetInstance ()
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
+	public void Patch (T original)
+	public void Put (T original)
+	public virtual bool TryGetPropertyType (string name, out System.Type& type)
+	public virtual bool TryGetPropertyValue (string name, out System.Object& value)
+	public virtual bool TrySetPropertyValue (string name, object value)
+}
+
+public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1 : DeltaLinkBase`1, IDeltaDeletedLink, IDeltaItem, IDeltaLinkBase, ITypedDelta {
+	public DeltaDeletedLink`1 ()
+	public DeltaDeletedLink`1 (System.Type structuralType)
+
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+}
+
+public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1 : Delta`1, IDynamicMetaObjectProvider, IDelta, IDeltaDeletedResource, IDeltaItem, ITypedDelta {
+	public DeltaDeletedResource`1 ()
+	public DeltaDeletedResource`1 (System.Type structuralType)
+
+	System.Uri Id  { public virtual get; public virtual set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public virtual get; public virtual set; }
+}
+
+public class Microsoft.AspNetCore.OData.Deltas.DeltaLink`1 : DeltaLinkBase`1, IDeltaItem, IDeltaLink, IDeltaLinkBase, ITypedDelta {
+	public DeltaLink`1 ()
+	public DeltaLink`1 (System.Type structuralType)
+
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+}
+
+[
+NonValidatingParameterBindingAttribute(),
+]
+public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : Microsoft.AspNetCore.OData.Deltas.DeltaSet, ICollection, IEnumerable, IList, ITypedDelta, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
+	public DeltaSet`1 ()
+
+	System.Type ExpectedClrType  { public virtual get; }
+	System.Type StructuredType  { public virtual get; }
+
+	protected virtual T GetOriginal (Microsoft.AspNetCore.OData.Deltas.IDeltaItem deltaItem, IEnumerable`1 originalSet)
+	public virtual void Patch (IEnumerable`1 originalSet)
+}
+
 [
 ExtensionAttribute(),
 ]
@@ -1648,9 +1784,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaReso
 	]
 	public virtual System.Threading.Tasks.Task`1[[System.Object]] ReadAsync (Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 
-	public virtual Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink ReadDeltaDeletedLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper deletedLink, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
-	public virtual Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink ReadDeltaLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper link, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
-	public virtual System.Collections.IEnumerable ReadDeltaResourceSet (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper deltaResourceSet, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual object ReadDeltaDeletedLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper deletedLink, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual object ReadDeltaLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper link, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual System.Collections.IEnumerable ReadDeltaResourceSet (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper deltaResourceSet, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object ReadInline (object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 }
 
@@ -2024,15 +2160,6 @@ public enum Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind : int {
 	Unknown = 4
 }
 
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IDelta {
-	void Clear ()
-	System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
-	System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
-	bool TryGetPropertyType (string name, out System.Type& type)
-	bool TryGetPropertyValue (string name, out System.Object& value)
-	bool TrySetPropertyValue (string name, object value)
-}
-
 public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject : IEdmObject, IEdmStructuredObject {
 	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public abstract get; }
 }
@@ -2074,23 +2201,7 @@ public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public abstract class Microsoft.AspNetCore.OData.Formatter.Value.Delta : System.Dynamic.DynamicObject, IDynamicMetaObjectProvider, IDelta {
-	protected Delta ()
-
-	public abstract void Clear ()
-	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
-	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
-	public virtual bool TryGetMember (System.Dynamic.GetMemberBinder binder, out System.Object& result)
-	public abstract bool TryGetPropertyType (string name, out System.Type& type)
-	public abstract bool TryGetPropertyValue (string name, out System.Object& value)
-	public virtual bool TrySetMember (System.Dynamic.SetMemberBinder binder, object value)
-	public abstract bool TrySetPropertyValue (string name, object value)
-}
-
-[
-NonValidatingParameterBindingAttribute(),
-]
-public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject : Microsoft.AspNetCore.OData.Formatter.Value.Delta, IDynamicMetaObjectProvider, IDelta, IEdmObject, IEdmStructuredObject {
+public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmObject, IEdmStructuredObject {
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredType edmType)
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredTypeReference edmType)
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredType edmType, bool isNullable)
@@ -2098,6 +2209,7 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredOb
 	Microsoft.OData.Edm.IEdmStructuredType ActualEdmType  { public get; public set; }
 	Microsoft.OData.Edm.IEdmStructuredType ExpectedEdmType  { public get; public set; }
 	bool IsNullable  { public get; public set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
 
 	public virtual void Clear ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
@@ -2107,13 +2219,6 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredOb
 	public virtual bool TryGetPropertyType (string name, out System.Type& type)
 	public virtual bool TryGetPropertyValue (string name, out System.Object& value)
 	public virtual bool TrySetPropertyValue (string name, object value)
-}
-
-public abstract class Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta : Microsoft.AspNetCore.OData.Formatter.Value.Delta, IDynamicMetaObjectProvider, IDelta {
-	protected TypedDelta ()
-
-	System.Type ExpectedClrType  { public abstract get; }
-	System.Type StructuredType  { public abstract get; }
 }
 
 [
@@ -2134,31 +2239,6 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.Delta`1 : Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta, IDynamicMetaObjectProvider, IDelta {
-	public Delta`1 ()
-	public Delta`1 (System.Type structuralType)
-	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
-	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
-
-	System.Type ExpectedClrType  { public virtual get; }
-	System.Type StructuredType  { public virtual get; }
-
-	public virtual void Clear ()
-	public void CopyChangedValues (TStructuralType original)
-	public void CopyUnchangedValues (TStructuralType original)
-	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
-	public TStructuralType GetInstance ()
-	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
-	public void Patch (TStructuralType original)
-	public void Put (TStructuralType original)
-	public virtual bool TryGetPropertyType (string name, out System.Type& type)
-	public virtual bool TryGetPropertyValue (string name, out System.Object& value)
-	public virtual bool TrySetPropertyValue (string name, object value)
-}
-
-[
-NonValidatingParameterBindingAttribute(),
-]
 public class Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollection : System.Collections.ObjectModel.Collection`1[[Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject]], ICollection, IEnumerable, IList, IEdmObject, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
 	public EdmChangedObjectCollection (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmChangedObjectCollection (Microsoft.OData.Edm.IEdmEntityType entityType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject]] changedObjectList)
@@ -2169,7 +2249,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollecti
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType)
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexTypeReference edmType)
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType, bool isNullable)
@@ -2188,7 +2268,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollecti
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject, IDynamicMetaObjectProvider, IDelta, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType)
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexTypeReference edmType)
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType, bool isNullable)
@@ -2197,7 +2277,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IEdmChangedObject, IEdmDeltaDeletedLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaDeletedLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
@@ -2211,7 +2291,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Mi
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IEdmChangedObject, IEdmDeltaDeletedResourceObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaDeletedResourceObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
@@ -2225,7 +2305,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceO
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IEdmChangedObject, IEdmDeltaLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
@@ -2239,7 +2319,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
@@ -2251,7 +2331,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject :
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityType edmType)
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityTypeReference edmType)
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityType edmType, bool isNullable)
@@ -2376,7 +2456,7 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSe
 	public ODataResourceSetWrapper (Microsoft.OData.ODataResourceSet resourceSet)
 
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper]] Resources  { public get; }
-	Microsoft.OData.ODataResourceSetBase ResourceSet  { public get; }
+	Microsoft.OData.ODataResourceSet ResourceSet  { public get; }
 }
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper {

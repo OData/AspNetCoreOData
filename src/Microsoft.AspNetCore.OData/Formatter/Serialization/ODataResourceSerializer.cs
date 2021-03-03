@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
@@ -23,6 +21,7 @@ using Microsoft.OData.UriParser;
 using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation;
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {

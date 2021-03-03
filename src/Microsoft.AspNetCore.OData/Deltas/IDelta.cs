@@ -1,29 +1,26 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Deltas
 {
     /// <summary>
     /// <see cref="IDelta" /> allows and tracks changes to an object.
     /// </summary>
-    public interface IDelta
+    public interface IDelta : IDeltaItem
     {
         /// <summary>
         /// Returns the Properties that have been modified through this IDelta as an
         /// enumerable of Property Names
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate to be a property")]
         IEnumerable<string> GetChangedPropertyNames();
 
         /// <summary>
         /// Returns the Properties that have not been modified through this IDelta as an
         /// enumerable of Property Names
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate to be a property")]
         IEnumerable<string> GetUnchangedPropertyNames();
 
         /// <summary>
@@ -40,8 +37,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <param name="name">The name of the Property</param>
         /// <param name="value">The value of the Property</param>
         /// <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Generics not appropriate here")]
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "Out param is appropriate here")]
         bool TryGetPropertyValue(string name, out object value);
 
         /// <summary>
