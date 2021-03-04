@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -48,12 +47,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 return new TheoryDataSet<string, string[]>()
                 {
                     // Bound to single
-                    { "Get", new[] { "Me" } },
-                    { "GetFromVipCustomer", new[] { "Me/NS.VipCustomer" } },
-                    { "Put", new[] { "Me" } },
-                    { "PutFromVipCustomer", new[] { "Me/NS.VipCustomer" } },
-                    { "Patch", new[] { "Me" } },
-                    { "PatchFromVipCustomer", new[] { "Me/NS.VipCustomer" } },
+                    { "Get", new[] { "/Me" } },
+                    { "GetFromVipCustomer", new[] { "/Me/NS.VipCustomer" } },
+                    { "Put", new[] { "/Me" } },
+                    { "PutFromVipCustomer", new[] { "/Me/NS.VipCustomer" } },
+                    { "Patch", new[] { "/Me" } },
+                    { "PatchFromVipCustomer", new[] { "/Me/NS.VipCustomer" } },
                 };
             }
         }

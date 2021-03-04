@@ -36,10 +36,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(4, action.Selectors.Count);
             Assert.Equal(new[]
                 {
-                    "Customers({key})",
-                    "Customers/{key}",
-                    "Customers({key})/Name",
-                    "Customers/{key}/Name"
+                    "/Customers({key})",
+                    "/Customers/{key}",
+                    "/Customers({key})/Name",
+                    "/Customers/{key}/Name"
                 },
                 action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
@@ -62,12 +62,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(6, action.Selectors.Count);
             Assert.Equal(new[]
                 {
-                    "Customers({key})",
-                    "Customers/{key}",
-                    "Customers",
-                    "Orders({key})",
-                    "Orders/{key}",
-                    "Orders",
+                    "/Customers({key})",
+                    "/Customers/{key}",
+                    "/Customers",
+                    "/Orders({key})",
+                    "/Orders/{key}",
+                    "/Orders",
                 },
                 action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
@@ -90,18 +90,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(4, action.Selectors.Count);
             Assert.Equal(new[]
                 {
-                    "Customers({key})/Orders({relatedKey})/NS.MyOrder/Title",
-                    "Customers({key})/Orders/{relatedKey}/NS.MyOrder/Title",
-                    "Customers/{key}/Orders({relatedKey})/NS.MyOrder/Title",
-                    "Customers/{key}/Orders/{relatedKey}/NS.MyOrder/Title"
+                    "/Customers({key})/Orders({relatedKey})/NS.MyOrder/Title",
+                    "/Customers({key})/Orders/{relatedKey}/NS.MyOrder/Title",
+                    "/Customers/{key}/Orders({relatedKey})/NS.MyOrder/Title",
+                    "/Customers/{key}/Orders/{relatedKey}/NS.MyOrder/Title"
                 },
                 action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
         [Theory]
-        [InlineData("GetVipCustomerWithPrefix", "VipCustomer")]
-        [InlineData("GetVipCustomerOrdersWithPrefix", "VipCustomer/Orders")]
-        [InlineData("GetVipCustomerNameWithPrefix", "VipCustomer/Name")]
+        [InlineData("GetVipCustomerWithPrefix", "/VipCustomer")]
+        [InlineData("GetVipCustomerOrdersWithPrefix", "/VipCustomer/Orders")]
+        [InlineData("GetVipCustomerNameWithPrefix", "/VipCustomer/Name")]
         public void AppliesToControllerForSingletonWorksAsExpected(string actionName, string expectedTemplate)
         {
             // Arrange

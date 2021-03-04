@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Empty(e.Parameters);
                     Assert.Equal(2, e.Selectors.Count);
-                    Assert.Equal(new[] { "odata/Customers", "odata/Customers/$count" }, e.Selectors.Select(s => s.AttributeRouteModel.Template));
+                    Assert.Equal(new[] { "/odata/Customers", "/odata/Customers/$count" }, e.Selectors.Select(s => s.AttributeRouteModel.Template));
                 },
                 e =>
                 {
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Single(e.Parameters);
                     Assert.Equal(2, e.Selectors.Count);
-                    Assert.Equal(new[] { "odata/Customers({key})", "odata/Customers/{key}" }, e.Selectors.Select(s => s.AttributeRouteModel.Template));
+                    Assert.Equal(new[] { "/odata/Customers({key})", "/odata/Customers/{key}" }, e.Selectors.Select(s => s.AttributeRouteModel.Template));
                 });
         }
 
@@ -173,7 +173,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.Equal("AnyMethodNameHere", action.ActionMethod.Name);
             Assert.Single(action.Parameters);
             Assert.Equal(2, action.Selectors.Count);
-            Assert.Equal(new[] { "odata/Customers({key})/Name", "odata/Customers/{key}/Name" }, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+            Assert.Equal(new[] { "/odata/Customers({key})/Name", "/odata/Customers/{key}/Name" }, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
         private static ODataRoutingApplicationModelProvider CreateProvider(ODataOptions options,

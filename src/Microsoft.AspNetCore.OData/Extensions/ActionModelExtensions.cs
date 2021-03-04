@@ -193,6 +193,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             foreach ((string template, string display) in path.GetTemplates(options))
             {
+                // We have to check the selector model on controller?
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
                 {
@@ -210,6 +211,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 selectorModel.EndpointMetadata.Add(odataMetadata);
 
                 string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+                // OData convention route template doesn't get combined with the route template applied to the controller.
+                // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
+                templateStr = "/" + templateStr;
 
                 selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
 

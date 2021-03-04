@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         public void AppliesToActionAddTemplateForMetadataWithPrefix(string prefix)
         {
             // Arrange
-            string expected = string.IsNullOrEmpty(prefix) ? "$metadata" : $"{prefix}/$metadata";
+            string expected = string.IsNullOrEmpty(prefix) ? "/$metadata" : $"/{prefix}/$metadata";
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<MetadataController>("GetMetadata");
             ActionModel action = controller.Actions.First();
 
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         public void AppliesToActionAddTemplateForServiceDocumentWithPrefix(string prefix)
         {
             // Arrange
-            string expected = string.IsNullOrEmpty(prefix) ? "" : $"{prefix}/";
+            string expected = string.IsNullOrEmpty(prefix) ? "/" : $"/{prefix}/";
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<MetadataController>("GetServiceDocument");
             ActionModel action = controller.Actions.First();
 
