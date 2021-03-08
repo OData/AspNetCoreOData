@@ -35,11 +35,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
             MemoryStream stream = new MemoryStream();
             IODataResponseMessage message = new ODataMessageWrapper(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
+            ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
+            {
+                EnableMessageStreamDisposal = false
+            };
             IEdmModel model = new EdmModel();
 
             // Act
-            await serializer.WriteObjectAsync("42", typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            using (ODataMessageWriter msgWriter = new ODataMessageWriter(message, settings, model))
+            {
+                await serializer.WriteObjectAsync("42", typeof(IEdmModel),msgWriter, new ODataSerializerContext());
+            }
 
             // Assert
             stream.Seek(0, SeekOrigin.Begin);
@@ -58,10 +64,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
             MemoryStream stream = new MemoryStream();
             IODataResponseMessage message = new ODataMessageWrapper(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
+            ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
+            {
+                EnableMessageStreamDisposal = false
+            };
 
             // Act
-            await serializer.WriteObjectAsync(model, typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            using (ODataMessageWriter msgWriter = new ODataMessageWriter(message, settings, model))
+            {
+                await serializer.WriteObjectAsync(model, typeof(IEdmModel), msgWriter, new ODataSerializerContext());
+            }
 
             // Assert
             stream.Seek(0, SeekOrigin.Begin);
