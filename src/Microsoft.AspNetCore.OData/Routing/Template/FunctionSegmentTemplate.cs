@@ -51,9 +51,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // Parameters should include all required parameter, but maybe include the optional parameter.
             ParameterMappings = function.VerifyAndBuildParameterMappings(parameters);
 
-            string routeKey = ParameterMappings.BuildRouteKey();
-
-            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
+            // Join the parameters as p1={p1}
+            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             UnqualifiedIdentifier = function.Name + parameterStr;
 
@@ -87,9 +86,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             ParameterMappings = OperationHelper.BuildParameterMappings(operationSegment.Parameters, operation.FullName());
 
             // join the parameters as p1={p1}
-            string routeKey = ParameterMappings.BuildRouteKey();
-
-            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
+            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             UnqualifiedIdentifier = Function.Name + parameterStr;
 
@@ -144,9 +141,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return new OperationSegment(Function, NavigationSource as IEdmEntitySetBase);
             }
 
-            if (!SegmentTemplateHelpers.TryParseRouteKey(context.RouteValues, context.UpdatedValues, ParameterMappings))
+            if (HasOptionalMissing())
             {
-                return null;
+                // If this function template has the optional parameter missing,
+                // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
+                // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
+                // In this request, the comming route data has:
+                // min = 1
+                // max = 2,ave=3
+                // so, let's combine the route data together and separate them using "," again.
+                if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
+                {
+                    return null;
+                }
             }
 
             IList<OperationSegmentParameter> parameters = SegmentTemplateHelpers.Match(context, Function, ParameterMappings);
@@ -156,6 +163,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
+        }
+
+        private bool HasOptionalMissing()
+        {
+            return ParameterMappings.Count != Function.Parameters.Count() - 1;
         }
     }
 }

@@ -44,9 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // parameters should include all required parameter, but maybe include the optional parameter.
             ParameterMappings = functionImport.Function.VerifyAndBuildParameterMappings(parameters);
 
-            string routeKey = ParameterMappings.BuildRouteKey();
-            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
-            Literal = functionImport.Name + parameterStr;
+            Literal = functionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             IsSingle = functionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
@@ -75,9 +73,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             ParameterMappings = OperationHelper.BuildParameterMappings(segment.Parameters, operationImport.Name);
 
             // join the parameters as p1={p1}
-            string routeKey = ParameterMappings.BuildRouteKey();
-            string parameterStr = ParameterMappings.Count == 0 ? "()" : $"({{{routeKey}}})";
-            Literal = FunctionImport.Name + parameterStr;
+            Literal = FunctionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             IsSingle = FunctionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
@@ -124,9 +120,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase);
             }
 
-            if (!SegmentTemplateHelpers.TryParseRouteKey(context.RouteValues, context.UpdatedValues, ParameterMappings))
+            if (HasOptionalMissing())
             {
-                return null;
+                // If this function template has the optional parameter missing,
+                // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
+                // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
+                // In this request, the comming route data has:
+                // min = 1
+                // max = 2,ave=3
+                // so, let's combine the route data together and separate them using "," again.
+                if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
+                {
+                    return null;
+                }
             }
 
             IList<OperationSegmentParameter> parameters = SegmentTemplateHelpers.Match(context, FunctionImport.Function, ParameterMappings);
@@ -136,6 +142,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             return new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase, parameters);
+        }
+
+        private bool HasOptionalMissing()
+        {
+            return ParameterMappings.Count != FunctionImport.Function.Parameters.Count() - 1;
         }
     }
 }

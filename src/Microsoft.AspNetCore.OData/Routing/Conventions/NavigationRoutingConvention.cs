@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -256,7 +257,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             public static void AddedODataSelector(ILogger logger, ActionModel action, ODataPathTemplate template)
             {
-                string message = action.DisplayName + ": " + template.Template;
+                string message = action.DisplayName + ": " + template.GetTemplates().FirstOrDefault();
                 _addedODataSelector(logger, message, null);
             }
         }

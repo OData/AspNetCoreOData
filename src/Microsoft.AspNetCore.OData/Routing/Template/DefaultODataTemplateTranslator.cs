@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             // calculate every time
             IList<ODataPathSegment> segments = new List<ODataPathSegment>();
-            foreach (var segment in path.Segments)
+            foreach (var segment in path)
             {
                 ODataPathSegment odataSegment = segment.Translate(context);
                 if (odataSegment == null)

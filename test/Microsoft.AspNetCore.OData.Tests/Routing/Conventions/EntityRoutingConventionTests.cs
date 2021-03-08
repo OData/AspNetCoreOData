@@ -59,11 +59,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Collection(action.Selectors,
                 e =>
                 {
-                    Assert.Equal("/Customers({keyFirstName;keyLastName})", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers(FirstName={keyFirstName},LastName={keyLastName})", e.AttributeRouteModel.Template);
                 },
                 e =>
                 {
-                    Assert.Equal("/Customers/{keyFirstName;keyLastName}", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}", e.AttributeRouteModel.Template);
                 });
         }
 
@@ -92,19 +92,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Collection(action.Selectors,
                 e =>
                 {
-                    Assert.Equal("/Customers({keyFirstName;keyLastName})", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers(FirstName={keyFirstName},LastName={keyLastName})", e.AttributeRouteModel.Template);
                 },
                 e =>
                 {
-                    Assert.Equal("/Customers/{keyFirstName;keyLastName}", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}", e.AttributeRouteModel.Template);
                 },
                 e =>
                 {
-                    Assert.Equal("/Customers({keyFirstName;keyLastName})/NS.Customer", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers(FirstName={keyFirstName},LastName={keyLastName})/NS.Customer", e.AttributeRouteModel.Template);
                 },
                 e =>
                 {
-                    Assert.Equal("/Customers/{keyFirstName;keyLastName}/NS.Customer", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}/NS.Customer", e.AttributeRouteModel.Template);
                 });
         }
 
@@ -133,11 +133,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Collection(action.Selectors,
                 e =>
                 {
-                    Assert.Equal("/Customers({keyFirstName;keyLastName})/NS.VipCustomer", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers(FirstName={keyFirstName},LastName={keyLastName})/NS.VipCustomer", e.AttributeRouteModel.Template);
                 },
                 e =>
                 {
-                    Assert.Equal("/Customers/{keyFirstName;keyLastName}/NS.VipCustomer", e.AttributeRouteModel.Template);
+                    Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}/NS.VipCustomer", e.AttributeRouteModel.Template);
                 });
         }
 

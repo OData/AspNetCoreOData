@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionImportSegmentTemplate functionImportSegment = new FunctionImportSegmentTemplate(_functionImport, null);
 
             // Act & Assert
-            Assert.Equal("MyFunctionImport({name;title})", functionImportSegment.Literal);
+            Assert.Equal("MyFunctionImport(name={name},title={title})", functionImportSegment.Literal);
             Assert.Equal(ODataSegmentKind.FunctionImport, functionImportSegment.Kind);
             Assert.True(functionImportSegment.IsSingle);
             Assert.Same(IntPrimitive.Definition, functionImportSegment.EdmType);
@@ -116,10 +116,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             };
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
 
-            RouteValueDictionary routeValues = new RouteValueDictionary
-            {
-                { "nameTemp;titleTemp;minTemp", "name='pt' , title= 'abc', min = 42" }
-            };
+            RouteValueDictionary routeValues = new RouteValueDictionary(new { nameTemp = "'pt'", titleTemp = "'abc'", minTemp = "42" });
 
             HttpContext httpContext = new DefaultHttpContext();
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);

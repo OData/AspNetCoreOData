@@ -11629,37 +11629,10 @@
             Gets the supported Http methods.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.TemplateDisplayName">
-            <summary>
-            Gets/sets the template display name.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
             </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider">
-            <summary>
-            Defines a contract for specifying <see cref="T:Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescription"/> instances.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.Order">
-            <summary>
-            Gets the order value for determining the order of execution of providers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext)">
-            <summary>
-            Execute for second pass for OData API description.
-            </summary>
-            <param name="context">The ApiDescriptionProviderContext.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext)">
-            <summary>
-            Execute for first pass for OData API description.
-            </summary>
-            <param name="context">The ApiDescriptionProviderContext.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">
             <summary>
@@ -12090,11 +12063,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.TemplateDisplayName">
-            <summary>
-            Gets/sets the template display name.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.HttpMethods">
@@ -12957,33 +12925,18 @@
             </summary>
             <param name="segments">The path segments for the path.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Segments">
-            <summary>
-            Gets the path segments for the OData path.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Template">
-            <summary>
-            Gets the OData path template literal.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions">
-            <summary>
-            The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             All templates mean:
             1) for key segment, we have key in parenthesis and key as segment.
-            2) for bound function segment, we have qualified function call and unqualified function call.
+            2) for bound function/action segment, we have qualified function call and unqualified function call.
+            All of such might be based on route options.
             </summary>
-            <param name="path">The given path template.</param>
             <param name="options">The route options.</param>
-            <returns>All path template and its display name..</returns>
+            <returns>All path template.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.TemplateInfo},System.ValueTuple{System.String,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
             <summary>
             Combinates the next template to the existing templates.
             </summary>
@@ -12991,7 +12944,7 @@
             <param name="nextTemplate">The nexte template.</param>
             <returns>The templates.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates(System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.TemplateInfo},System.ValueTuple{System.String,System.String}[])">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.CombinateTemplates(System.Collections.Generic.IList{System.Text.StringBuilder},System.String[])">
             <summary>
             Combinates the next templates with existing templates.
             </summary>
@@ -13338,31 +13291,22 @@
             Helper methods for segment template
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.BuildRouteKey(System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.Match(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext,Microsoft.OData.Edm.IEdmFunction,System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
-            Builds the route key. The route key pattern:  parameterTemp;parameterTemp;parameterTemp;...
-            It could be an empty string if this function has no parameter
-            RouteKey is used to retrieve the route value from request route data.
+            Match the function parameter
             </summary>
-            <param name="parameterMappings">The parameter (request key) and argument (parameter name in the action) mapping.</param>
-            <returns>the route key string.</returns>
+            <param name="context">The context.</param>
+            <param name="function">The Edm function.</param>
+            <param name="parameterMappings">The parameter mapping.</param>
+            <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.TryParseRouteKey(Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.AspNetCore.Routing.RouteValueDictionary,System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.IsMatchParameters(Microsoft.AspNetCore.Routing.RouteValueDictionary,System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
-            Try to parse the route key value from route values and save the parsed values into update values.
+            
             </summary>
-            <param name="routeValues">The original route value from request.</param>
-            <param name="updateValues">The updated/parsed route value.</param>
-            <param name="parameterMappings">The parameter (request key) and argument (parameter name in the action) mapping.</param>
-            <returns>true/false.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.IsRouteKeyAndParameterMatch(System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
-            <summary>
-            Compare the route key and the key/value from request
-            </summary>
-            <param name="parameterMappings">The route key map.</param>
-            <param name="requestKeyValues">The key value map from request.</param>
-            <returns>True/False.</returns>
+            <param name="routeValues"></param>
+            <param name="parameterMappings"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate">
             <summary>

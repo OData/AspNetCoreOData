@@ -161,10 +161,6 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(services));
             }
 
-
-            services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<IApiDescriptionProvider, ODataApiDescriptionProvider>());
-
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
 

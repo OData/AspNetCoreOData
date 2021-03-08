@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            ODataSegmentTemplate pathSegment = Assert.Single(path.Segments);
+            ODataSegmentTemplate pathSegment = Assert.Single(path);
             EntitySetSegmentTemplate setSegment = Assert.IsType<EntitySetSegmentTemplate>(pathSegment);
 
             Assert.Equal("Customers", setSegment.Literal);
@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            ODataSegmentTemplate pathSegment = Assert.Single(path.Segments);
+            ODataSegmentTemplate pathSegment = Assert.Single(path);
             SingletonSegmentTemplate singletonSegment = Assert.IsType<SingletonSegmentTemplate>(pathSegment);
 
             Assert.Equal("VipCustomer", singletonSegment.Literal);
@@ -71,8 +71,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(2, path.Segments.Count);
-            KeySegmentTemplate keySegment = Assert.IsType<KeySegmentTemplate>(path.Segments[1]);
+            Assert.Equal(2, path.Count);
+            KeySegmentTemplate keySegment = Assert.IsType<KeySegmentTemplate>(path[1]);
             var keyMap = Assert.Single(keySegment.KeyMappings);
 
             Assert.Equal("Id", keyMap.Key);
@@ -102,8 +102,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(2, path.Segments.Count);
-            KeySegmentTemplate keySegment = Assert.IsType<KeySegmentTemplate>(path.Segments[1]);
+            Assert.Equal(2, path.Count);
+            KeySegmentTemplate keySegment = Assert.IsType<KeySegmentTemplate>(path[1]);
             Assert.Equal(2, keySegment.KeyMappings.Count);
 
             Assert.Equal(new[] { "firstName", "lastName" }, keySegment.KeyMappings.Keys);
@@ -124,8 +124,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(count, path.Segments.Count);
-            PropertySegmentTemplate propertySegment = Assert.IsType<PropertySegmentTemplate>(path.Segments[count - 1]);
+            Assert.Equal(count, path.Count);
+            PropertySegmentTemplate propertySegment = Assert.IsType<PropertySegmentTemplate>(path[count - 1]);
 
             Assert.Equal("Name", propertySegment.Literal);
         }
@@ -144,8 +144,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(count, path.Segments.Count);
-            NavigationSegmentTemplate navigationSegment = Assert.IsType<NavigationSegmentTemplate>(path.Segments[count - 1]);
+            Assert.Equal(count, path.Count);
+            NavigationSegmentTemplate navigationSegment = Assert.IsType<NavigationSegmentTemplate>(path[count - 1]);
 
             Assert.Equal("Orders", navigationSegment.Literal);
         }
@@ -164,8 +164,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(count, path.Segments.Count);
-            NavigationLinkSegmentTemplate navigationLinkSegment = Assert.IsType<NavigationLinkSegmentTemplate>(path.Segments[count - 1]);
+            Assert.Equal(count, path.Count);
+            NavigationLinkSegmentTemplate navigationLinkSegment = Assert.IsType<NavigationLinkSegmentTemplate>(path[count - 1]);
 
             Assert.Equal("Orders", navigationLinkSegment.Literal);
         }
@@ -198,8 +198,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(2, path.Segments.Count);
-            FunctionSegmentTemplate functionSegment = Assert.IsType<FunctionSegmentTemplate>(path.Segments[1]);
+            Assert.Equal(2, path.Count);
+            FunctionSegmentTemplate functionSegment = Assert.IsType<FunctionSegmentTemplate>(path[1]);
             Assert.Equal(count, functionSegment.ParameterMappings.Count);
 
             if (count == 2)
@@ -240,8 +240,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            Assert.Equal(2, path.Segments.Count);
-            ActionSegmentTemplate actionSegment = Assert.IsType<ActionSegmentTemplate>(path.Segments[1]);
+            Assert.Equal(2, path.Count);
+            ActionSegmentTemplate actionSegment = Assert.IsType<ActionSegmentTemplate>(path[1]);
             Assert.Equal("NS.SetWholeSalary", actionSegment.Literal);
         }
 
@@ -267,7 +267,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            ODataSegmentTemplate segmentTemplate = Assert.Single(path.Segments);
+            ODataSegmentTemplate segmentTemplate = Assert.Single(path);
             FunctionImportSegmentTemplate functionImportSegment = Assert.IsType<FunctionImportSegmentTemplate>(segmentTemplate);
 
             if (parameterCount == 2)
@@ -302,7 +302,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
 
             // Assert
             Assert.NotNull(path);
-            ODataSegmentTemplate segmentTemplate = Assert.Single(path.Segments);
+            ODataSegmentTemplate segmentTemplate = Assert.Single(path);
             ActionImportSegmentTemplate actionImportSegment = Assert.IsType<ActionImportSegmentTemplate>(segmentTemplate);
             Assert.Equal("SetWholeSalaryImport", actionImportSegment.Literal);
         }

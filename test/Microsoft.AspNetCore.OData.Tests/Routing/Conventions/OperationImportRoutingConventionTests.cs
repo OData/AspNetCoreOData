@@ -46,10 +46,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 return new TheoryDataSet<MethodInfo, string[]>()
                 {
                     {
-                        method1, new[] { "/CalcByRating({order})" }
+                        method1, new[] { "/CalcByRating(order={order})" }
                     },
                     {
-                        method2, new[] { "/CalcByRating({name})" }
+                        method2, new[] { "/CalcByRating(name={name})" }
                     },
                     {
                         controller.GetMethod("CalcByRatingAction"), new[] { "/CalcByRatingAction" }

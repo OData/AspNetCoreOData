@@ -69,9 +69,6 @@ namespace ODataCustomizedSample.Controllers
                     string httpMethods = string.Join(",", metadata.HttpMethods);
                     sb.Append($"<td>{httpMethods.ToUpper()}</td>");
 
-                    // display name
-                    sb.Append("<td>~/").Append(metadata.TemplateDisplayName).Append("</td>");
-
                     // template name
                     RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
                     if (routeEndpoint != null)
@@ -166,7 +163,6 @@ namespace ODataCustomizedSample.Controllers
      <tr>
        <th> Controller & Action </th>
        <th> HttpMethods </th>
-       <th> DisplayNames </th>
        <th> Templates </th>
     </tr>
     {CONTENT}

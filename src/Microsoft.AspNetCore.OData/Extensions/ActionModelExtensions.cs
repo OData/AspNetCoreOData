@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
-using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
@@ -191,7 +190,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            foreach ((string template, string display) in path.GetTemplates(options))
+            foreach (string template in path.GetTemplates(options))
             {
                 // We have to check the selector model on controller?
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
@@ -201,11 +200,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                     action.Selectors.Add(selectorModel);
                 }
 
-                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path)
-                {
-                    TemplateDisplayName = string.IsNullOrEmpty(prefix) ? display : $"{prefix}/{display}"
-                };
-
+                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
                 AddHttpMethod(odataMetadata, httpMethod);
 
                 selectorModel.EndpointMetadata.Add(odataMetadata);

@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionSegmentTemplate functionSegment = new FunctionSegmentTemplate(function, null);
 
             // Act & Assert
-            Assert.Equal("NS.MyFunction({name;title})", functionSegment.Literal);
+            Assert.Equal("NS.MyFunction(name={name},title={title})", functionSegment.Literal);
             Assert.Equal(ODataSegmentKind.Function, functionSegment.Kind);
             Assert.True(functionSegment.IsSingle);
             Assert.Same(primitive.Definition, functionSegment.EdmType);
@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionSegmentTemplate functionSegment = new FunctionSegmentTemplate(parameters, function, null);
 
             // Act & Assert
-            Assert.Equal("NS.MyFunction({nameTemp;titleTemp;option2Temp})", functionSegment.Literal);
+            Assert.Equal("NS.MyFunction(name={nameTemp},title={titleTemp},option2={option2Temp})", functionSegment.Literal);
             Assert.Equal(ODataSegmentKind.Function, functionSegment.Kind);
             Assert.True(functionSegment.IsSingle);
             Assert.Same(primitive.Definition, functionSegment.EdmType);
@@ -129,11 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             RouteValueDictionary routeValue;
             if (hasRouteData)
             {
-                // routeValue = new RouteValueDictionary(new { age = "34", price = "9" });
-                routeValue = new RouteValueDictionary
-                {
-                    { "age;price", "age=34,price=9" }
-                };
+                routeValue = new RouteValueDictionary(new { age = "34", price = "9" });
             }
             else
             {

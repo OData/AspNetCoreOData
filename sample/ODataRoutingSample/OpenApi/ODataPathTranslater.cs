@@ -14,14 +14,14 @@ namespace ODataRoutingSample.OpenApi
     {
         public static ODataPath Translate(this ODataPathTemplate pathTemplate)
         {
-            if (pathTemplate.Segments.Count == 0)
+            if (pathTemplate.Count == 0)
             {
                 // It's service root, so far, let's skip it.
                 return null;
             }
 
             IList<ODataSegment> newSegments = new List<ODataSegment>();
-            foreach (var segment in pathTemplate.Segments)
+            foreach (var segment in pathTemplate)
             {
                 switch (segment.Kind)
                 {

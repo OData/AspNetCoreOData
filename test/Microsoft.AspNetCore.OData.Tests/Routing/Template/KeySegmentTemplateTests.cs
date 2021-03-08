@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // Assert
             Assert.Equal(ODataSegmentKind.Key, template.Kind);
-            Assert.Equal("{key1;key2}", template.Literal);
+            Assert.Equal("firstName={key1},lastName={key2}", template.Literal);
             Assert.True(template.IsSingle);
             Assert.Same(customerType, template.EdmType);
             Assert.Null(template.NavigationSource);
@@ -149,11 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             EdmEntitySet customers = container.AddEntitySet("Customers", customerType);
             model.AddElement(container);
-
-            RouteValueDictionary routeValueDictionary = new RouteValueDictionary
-            {
-                { "key1;key2", "firstName='Peter',lastName='Sam'" }
-            };
+            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { key1 = "'Peter'", key2 = "'Sam'" });
 
             KeySegmentTemplate template = new KeySegmentTemplate(keys, customerType, customers);
 
@@ -187,7 +183,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             // Assert
             Assert.NotNull(template);
             Assert.Equal(2, template.Count);
-            Assert.Equal("{keyfirstName;keylastName}", template.Literal);
+            Assert.Equal("firstName={keyfirstName},lastName={keylastName}", template.Literal);
         }
 
         [Fact]

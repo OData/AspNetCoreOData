@@ -1579,7 +1579,6 @@ public interface Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata {
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; }
 	string Prefix  { public abstract get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public abstract get; }
-	string TemplateDisplayName  { public abstract get; public abstract set; }
 }
 
 [
@@ -1637,15 +1636,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds {
 	public static string UnboundFunction = "unboundfunction"
 	public static string Unresolved = "unresolved"
 	public static string Value = "$value"
-}
-
-public class Microsoft.AspNetCore.OData.Routing.ODataApiDescriptionProvider : IApiDescriptionProvider {
-	public ODataApiDescriptionProvider ()
-
-	int Order  { public virtual get; }
-
-	public virtual void OnProvidersExecuted (Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext context)
-	public virtual void OnProvidersExecuting (Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescriptionProviderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler : Microsoft.OData.UriParser.PathSegmentHandler {
@@ -1719,7 +1709,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IO
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
-	string TemplateDisplayName  { public virtual get; public virtual set; }
 }
 
 public abstract class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer {
@@ -2894,16 +2883,6 @@ public abstract class Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTe
 	public abstract Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
-[
-ExtensionAttribute(),
-]
-public sealed class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions {
-	[
-	ExtensionAttribute(),
-	]
-	public static System.Collections.Generic.IEnumerable`1[[System.ValueTuple`2[[System.String],[System.String]]]] GetTemplates (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
-}
-
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public ActionImportSegmentTemplate (Microsoft.OData.Edm.IEdmActionImport actionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
@@ -3075,13 +3054,12 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTempla
 	public virtual Microsoft.OData.UriParser.ODataPathSegment Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
-public class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate {
+public class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate : System.Collections.Generic.List`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]], ICollection, IEnumerable, IList, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
 	public ODataPathTemplate (Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate[] segments)
 	public ODataPathTemplate (System.Collections.Generic.IEnumerable`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] segments)
 	public ODataPathTemplate (System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] segments)
 
-	System.Collections.ObjectModel.ReadOnlyCollection`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] Segments  { public get; }
-	string Template  { public get; }
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext {

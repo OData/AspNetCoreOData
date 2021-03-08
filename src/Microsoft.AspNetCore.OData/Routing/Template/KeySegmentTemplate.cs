@@ -36,8 +36,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType);
 
-            string routeKey = KeyMappings.BuildRouteKey();
-            Literal = $"{{{routeKey}}}";
+            Literal = KeyMappings.Count == 1 ?
+                $"{{{KeyMappings.First().Value}}}" :
+                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
@@ -56,9 +57,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(segment.Keys, EntityType);
 
-            string routeKey = KeyMappings.BuildRouteKey();
-
-            Literal = $"{{{routeKey}}}";
+            Literal = KeyMappings.Count == 1 ?
+                $"{{{KeyMappings.First().Value}}}" :
+                string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
@@ -102,11 +103,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (!SegmentTemplateHelpers.TryParseRouteKey(context.RouteValues, context.UpdatedValues, KeyMappings))
-            {
-                return null;
-            }
-
+            RouteValueDictionary routeValues = context.RouteValues;
             RouteValueDictionary updateValues = context.UpdatedValues;
 
             IDictionary<string, object> keysValues = new Dictionary<string, object>();
@@ -119,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 Contract.Assert(keyProperty != null);
 
                 IEdmTypeReference edmType = keyProperty.Type;
-                if (updateValues.TryGetValue(templateName, out object rawValue))
+                if (routeValues.TryGetValue(templateName, out object rawValue))
                 {
                     string strValue = rawValue as string;
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
