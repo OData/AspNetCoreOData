@@ -1915,6 +1915,9 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSe
 
 	Microsoft.OData.ODataPayloadKind ODataPayloadKind  { public get; }
 
+	[
+	AsyncStateMachineAttribute(),
+	]
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
@@ -2021,6 +2024,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerial
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer {
 	public ODataMetadataSerializer ()
 
+	[
+	AsyncStateMachineAttribute(),
+	]
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
@@ -2029,12 +2035,18 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSe
 
 	public virtual Microsoft.OData.ODataPrimitiveValue CreateODataPrimitiveValue (object graph, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 	public virtual Microsoft.OData.ODataValue CreateODataValue (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+	[
+	AsyncStateMachineAttribute(),
+	]
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer {
 	public ODataRawValueSerializer ()
 
+	[
+	AsyncStateMachineAttribute(),
+	]
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 

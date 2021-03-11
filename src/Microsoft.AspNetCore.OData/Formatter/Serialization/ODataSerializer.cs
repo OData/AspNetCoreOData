@@ -40,9 +40,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="type">The type of the object to be written.</param>
         /// <param name="messageWriter">The <see cref="ODataMessageWriter"/> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        public virtual async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
-            throw Error.NotSupported(SRResources.WriteObjectNotSupported, GetType().Name);
+            await Task.Run(() => throw Error.NotSupported(SRResources.WriteObjectNotSupported, GetType().Name)).ConfigureAwait(false);
         }
     }
 }

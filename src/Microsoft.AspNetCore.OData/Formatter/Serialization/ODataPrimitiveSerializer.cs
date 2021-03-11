@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc/>
-        public override Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
             if (messageWriter == null)
             {
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            return messageWriter.WritePropertyAsync(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext));
+            await messageWriter.WritePropertyAsync(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
