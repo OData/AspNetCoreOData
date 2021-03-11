@@ -642,17 +642,12 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static void AddSelector (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethod, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
+	public static void AddSelector (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethods, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, params Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 
 	[
 	ExtensionAttribute(),
 	]
 	public static T GetAttribute (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static System.Collections.Generic.IEnumerable`1[[System.String]] GetSupportedHttpMethods (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
 
 	[
 	ExtensionAttribute(),
@@ -1575,7 +1570,6 @@ public sealed class Microsoft.AspNetCore.OData.Results.SingleResult`1 : Microsof
 }
 
 public interface Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata {
-	System.Collections.Generic.ISet`1[[System.String]] HttpMethods  { public abstract get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; }
 	string Prefix  { public abstract get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public abstract get; }
@@ -1705,7 +1699,6 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IODataRoutingMetadata {
 	public ODataRoutingMetadata (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate template)
 
-	System.Collections.Generic.ISet`1[[System.String]] HttpMethods  { public virtual get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
@@ -2641,26 +2634,13 @@ public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.NonODataContro
 [
 AttributeUsageAttribute(),
 ]
-public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute : System.Attribute {
-	public ODataRouteAttribute ()
-	public ODataRouteAttribute (string template)
-	public ODataRouteAttribute (string template, string prefix)
-
-	string PathTemplate  { public get; }
-	string RoutePrefix  { public get; }
+public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute : System.Attribute {
+	public ODataRoutingAttribute ()
 }
 
 [
-AttributeUsageAttribute(),
+ODataRoutingAttribute(),
 ]
-public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute : System.Attribute {
-	public ODataRoutePrefixAttribute (string template)
-	public ODataRoutePrefixAttribute (string template, string prefix)
-
-	string PathPrefixTemplate  { public get; }
-	string RoutePrefix  { public get; }
-}
-
 public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	protected ODataController ()
 
@@ -2774,8 +2754,8 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActio
 	Microsoft.OData.Edm.IEdmEntitySet EntitySet  { public get; }
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
+	Microsoft.AspNetCore.OData.ODataOptions Options  { public get; public set; }
 	string Prefix  { public get; }
-	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; public set; }
 	System.IServiceProvider ServiceProvider  { public get; public set; }
 	Microsoft.OData.Edm.IEdmSingleton Singleton  { public get; }
 }

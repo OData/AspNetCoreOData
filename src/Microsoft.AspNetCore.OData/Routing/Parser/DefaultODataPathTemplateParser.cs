@@ -41,6 +41,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
             uriParser.EnableUriTemplateParsing = true;
 
+            uriParser.Resolver = new UnqualifiedODataUriResolver { EnableCaseInsensitive = true };
+
             uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in paraenthese and key as segment.
 
             ODataPath path = uriParser.ParsePath();

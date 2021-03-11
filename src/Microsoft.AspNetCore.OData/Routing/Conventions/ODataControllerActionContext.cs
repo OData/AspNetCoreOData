@@ -110,8 +110,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         public IServiceProvider ServiceProvider { get; set; }
 
         /// <summary>
-        /// Gets/sets the route build options.
+        /// Gets/sets the OData Options.
         /// </summary>
-        public ODataRouteOptions RouteOptions { get; set; }
+        public ODataOptions Options { get; set; }
     }
 }

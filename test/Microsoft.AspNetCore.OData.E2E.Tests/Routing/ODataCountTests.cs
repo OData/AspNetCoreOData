@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+#if NET5_0
+// .NET CoreAPP 3.1 : An item with the same key has already been added. Key: Get
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             IEdmModel edmModel = GetEdmModel();
-            services.ConfigureControllers(typeof(DollarCountEntitiesController));
+            services.ConfigureControllers(typeof(DollarCountEntitiesController), typeof(ODataEndpointController));
             services.AddOData(opt => opt.AddModel(edmModel).Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
         }
 
@@ -291,8 +292,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             return Ok(result);
         }
 
-        [HttpGet]
-        [ODataRoute("DollarCountEntities({key})/EnumCollectionProp/$count")]
+        [HttpGet("DollarCountEntities({key})/EnumCollectionProp/$count")]
         public IActionResult GetCountForEnumCollectionProp(int key, ODataQueryOptions<DollarColor> options)
         {
             IQueryable<DollarColor> result = Entities.Single(e => e.Id == key).EnumCollectionProp.AsQueryable();
@@ -329,98 +329,85 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             return Ok(Entities.Single(e => e.Id == key).EntityCollectionProp);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsPrimitveCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsPrimitveCollection()/$count")]
         public IActionResult UnboundFunctionReturnsPrimitveCollectionWithDollarCount()
         {
             return Ok(6);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsEnumCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsEnumCollection()/$count")]
         public IActionResult UnboundFunctionReturnsEnumCollectionWithDollarCount()
         {
             return Ok(7);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsDateTimeOffsetCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsDateTimeOffsetCollection()/$count")]
         public IActionResult UnboundFunctionReturnsDateTimeOffsetCollectionWithDollarCount()
         {
             return Ok(8);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsDateCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsDateCollection()/$count")]
         public IActionResult UnboundFunctionReturnsDateCollectionWithDollarCount()
         {
             return Ok(18);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsComplexCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsComplexCollection()/$count")]
         public IActionResult UnboundFunctionReturnsComplexCollectionWithDollarCount()
         {
             return Ok(9);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsEntityCollection()/$count")]
+        [HttpGet("UnboundFunctionReturnsEntityCollection()/$count")]
         public IActionResult UnboundFunctionReturnsEntityCollectionWithDollarCount()
         {
             return Ok(10);
         }
 
-        [HttpGet]
-        [ODataRoute("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.E2E.Tests.Routing.DerivedDollarCountEntity/$count")]
+        [HttpGet("UnboundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.E2E.Tests.Routing.DerivedDollarCountEntity/$count")]
         public IActionResult UnboundFunctionReturnsDerivedEntityCollectionWithDollarCount()
         {
             return Ok(11);
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count")]
         public IActionResult BoundFunctionReturnsPrimitveCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Enumerable.Range(1, 12).Select(_ => DateTimeOffset.Now));
         }
-
-        [HttpGet]
+        
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEnumCollection()/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsEnumCollection()/$count")]
         public IActionResult BoundFunctionReturnsEnumCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Enumerable.Range(1, 13).Select(_ => DollarColor.Green));
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsDateTimeOffsetCollection()/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsDateTimeOffsetCollection()/$count")]
         public IActionResult BoundFunctionReturnsDateTimeOffsetCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Enumerable.Range(1, 14).Select(_ => DateTimeOffset.Now));
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsComplexCollection()/$count")]
         public IActionResult BoundFunctionReturnsComplexCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Enumerable.Range(1, 15).Select(i => new DollarCountComplex { StringProp = i.ToString() }));
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/$count")]
         public IActionResult BoundFunctionReturnsEntityCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Entities);
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.E2E.Tests.Routing.DerivedDollarCountEntity/$count")]
+        [HttpGet("DollarCountEntities/Default.BoundFunctionReturnsEntityCollection()/Microsoft.AspNetCore.OData.E2E.Tests.Routing.DerivedDollarCountEntity/$count")]
         public IActionResult BoundFunctionReturnsDerivedEntityCollectionOnCollectionOfDollarCountEntity()
         {
             return Ok(Entities.OfType<DerivedDollarCountEntity>());
@@ -456,3 +443,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         public string StringProp { get; set; }
     }
 }
+#endif

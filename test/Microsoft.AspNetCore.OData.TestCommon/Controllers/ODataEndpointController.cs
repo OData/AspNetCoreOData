@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Routing;
@@ -30,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
 
             // Assert
             response.EnsureSuccessStatusCode();
+            string payload = await response.Content.ReadAsStringAsync();
         }
         */
         private EndpointDataSource _dataSource;
@@ -81,6 +83,9 @@ namespace Microsoft.AspNetCore.OData.TestCommon
                 routeInfo.ActionFullName = action.ToString();
                 routeInfo.Template = routeEndpoint.RoutePattern.RawText;
 
+                var httpMethods = GetHttpMethods(endpoint);
+                routeInfo.HttpMethods = string.Join(",", httpMethods);
+
                 IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
                 if (metadata == null)
                 {
@@ -95,6 +100,17 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             }
 
             return routeInfos;
+        }
+
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        {
+            HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
+            if (metadata != null)
+            {
+                return metadata.HttpMethods;
+            }
+
+            return new[] { "No HttpMethod" };
         }
     }
 }

@@ -207,7 +207,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.RouteOptions);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.Options?.RouteOptions);
         }
 
         // Split the property such as "GetCityOfSubAddressFromVipCustomer"

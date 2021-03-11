@@ -80,17 +80,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                IHttpMethodMetadata httpMetadata = candidate.Endpoint.Metadata.GetMetadata<IHttpMethodMetadata>();
-                if (httpMetadata == null)
-                {
-                    // Check the http method
-                    if (metadata.HttpMethods != null && !metadata.HttpMethods.Contains(httpContext.Request.Method))
-                    {
-                        candidates.SetValidity(i, false);
-                        continue;
-                    }
-                }
-
                 ODataTemplateTranslateContext translatorContext =
                     new ODataTemplateTranslateContext(httpContext, candidate.Values, metadata.Model);
 

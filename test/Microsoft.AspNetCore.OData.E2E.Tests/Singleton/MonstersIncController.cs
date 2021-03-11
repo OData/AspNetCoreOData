@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     /// Present a singleton named "MonstersInc"
     /// Use attribute routing
     /// </summary>
-    [ODataRoutePrefix("MonstersInc")]
+    [Route("odata/MonstersInc")]
     public class MonstersIncController : ODataController
     {
         public static Company MonstersInc;
@@ -43,15 +43,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
 
         #region Query
         [EnableQuery]
-        [HttpGet]
-        [ODataRoute]
+        [HttpGet("")]
         public IActionResult QueryCompany()
         {
             return Ok(MonstersInc);
         }
 
-        [HttpGet]
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany")]
+        [HttpGet("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany")]
         public IActionResult QueryCompanyFromDerivedType()
         {
             var subCompany = MonstersInc as SubCompany;
@@ -62,14 +60,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return BadRequest("The target cannot be casted");
         }
 
-        [ODataRoute("Revenue")]
+        [HttpGet("Revenue")]
         public IActionResult GetCompanyRevenue()
         {
             return Ok(MonstersInc.Revenue);
         }
 
-        [HttpGet]
-        [ODataRoute("Branches/$count")]
+        [HttpGet("Branches/$count")]
         public IActionResult GetBranchesCount(ODataQueryOptions<Office> options)
         {
             IQueryable<Office> eligibleBranches = MonstersInc.Branches.AsQueryable();
@@ -80,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return Ok(eligibleBranches.Count());
         }
 
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany/Location")]
+        [HttpGet("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany/Location")]
         public IActionResult GetDerivedTypeProperty()
         {
             var subCompany = MonstersInc as SubCompany;
@@ -91,8 +88,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return BadRequest("The target cannot be casted");
         }
 
-        [HttpGet]
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany/Office")]
+        [HttpGet("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany/Office")]
         public IActionResult QueryDerivedTypeComplexProperty()
         {
             var subCompany = MonstersInc as SubCompany;
@@ -103,8 +99,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return BadRequest("The target cannot be casted");
         }
 
-        [HttpGet]
-        [ODataRoute("Partners")]
+        [HttpGet("Partners")]
         public IActionResult QueryNavigationProperty()
         {
             return Ok(MonstersInc.Partners);
@@ -112,24 +107,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         #endregion
 
         #region Update
-        [HttpPut]
-        [ODataRoute]
+        [HttpPut("")]
         public IActionResult UpdateCompanyByPut([FromBody] Company newCompany)
         {
             MonstersInc = newCompany;
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPut]
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany")]
+        [HttpPut("Microsoft.Test.E2E.AspNet.OData.Singleton.SubCompany")]
         public IActionResult UpdateCompanyByPutWithDerivedTypeObject([FromBody] SubCompany newCompany)
         {
             MonstersInc = newCompany;
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPatch]
-        [ODataRoute]
+        [HttpPatch("")]
         public IActionResult UpdateCompanyByPatch([FromBody]Delta<Company> item)
         {
             item.Patch(MonstersInc);
@@ -138,8 +130,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         #endregion
 
         #region Navigation link
-        [HttpPost]
-        [ODataRoute("Partners/$ref")]
+        [HttpPost("Partners/$ref")]
         public IActionResult AddOrUpdateNavigationLink([FromBody] Uri link)
         {
             int relatedKey = Request.GetKeyValue<int>(link);
@@ -149,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [ODataRoute("Partners({relatedKey})/$ref")]
+        [HttpDelete("Partners({relatedKey})/$ref")]
         public IActionResult DeleteNavigationLink(string relatedKey)
         {
             int key = int.Parse(relatedKey);
@@ -159,15 +150,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [AcceptVerbs("GET")]
-        [ODataRoute("Partners/$ref")]
+        [HttpGet("Partners/$ref")]
         public IActionResult GetNavigationLink()
         {
             return Ok();
         }
 
-        [HttpPost]
-        [ODataRoute("Partners")]
+        [HttpPost("Partners")]
         public IActionResult AddPartnersToCompany([FromBody] Partner partner)
         {
             PartnersController.Partners.Add(partner);
@@ -185,16 +174,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         #endregion
 
         #region Action and function
-        [HttpPost]
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.ResetDataSource")]
+        [HttpPost("Microsoft.Test.E2E.AspNet.OData.Singleton.ResetDataSource")]
         public IActionResult CallActionResetDataSource()
         {
             InitData();
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpGet]
-        [ODataRoute("Microsoft.Test.E2E.AspNet.OData.Singleton.GetPartnersCount()")]
+        [HttpGet("Microsoft.Test.E2E.AspNet.OData.Singleton.GetPartnersCount()")]
         public IActionResult CallFunctionGetPartnersCount()
         {
             return Ok(MonstersInc.Partners.Count);

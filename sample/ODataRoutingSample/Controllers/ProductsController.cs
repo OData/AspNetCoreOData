@@ -7,7 +7,6 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataRoutingSample.Models;
 
@@ -182,15 +181,13 @@ namespace ODataRoutingSample.Controllers
             return $"GetOptional without parameter value: param = {param}";
         }
 
-        [HttpGet]
-        [ODataRoute("CalculateSalary(minSalary={min},maxSalary={max})", prefix: "")]
+        [HttpGet("CalculateSalary(minSalary={min},maxSalary={max})")]
         public string CalculateSalary(int min, int max)
         {
             return $"Unbound function call on CalculateSalary: min={min}, max={max}";
         }
 
-        [HttpGet]
-        [ODataRoute("CalculateSalary(minSalary={min},maxSalary={max},wholeName={name})", prefix: "")]
+        [HttpGet("CalculateSalary(minSalary={min},maxSalary={max},wholeName={name})")]
         public string CalculateSalary(int min, int max, string name)
         {
             return $"Unbound function call on CalculateSalary: min={min}, max={max}, name={name}";

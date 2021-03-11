@@ -1,144 +1,150 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace ODataCustomizedSample.Controllers
 {
-    // Copyright (c) Microsoft Corporation.  All rights reserved.
-    // Licensed under the MIT License.  See License.txt in the project root for license information.
-
-    using System.Linq;
-    using System.Text;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.AspNetCore.OData.Routing;
-    using Microsoft.AspNetCore.Routing;
-
-    namespace ODataRoutingSample.Controllers
+    public class ODataEndpointController : ControllerBase
     {
-        public class ODataEndpointController : ControllerBase
+        private EndpointDataSource _dataSource;
+
+        public ODataEndpointController(EndpointDataSource dataSource)
         {
-            private EndpointDataSource _dataSource;
+            _dataSource = dataSource;
+        }
 
-            public ODataEndpointController(EndpointDataSource dataSource)
+        [HttpGet("$odata")]
+        public ContentResult GetAllRoutes()
+        {
+            StringBuilder nonSb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
+            foreach (var endpoint in _dataSource.Endpoints)
             {
-                _dataSource = dataSource;
-            }
-
-            [HttpGet("$odata")]
-            public ContentResult GetAllRoutes()
-            {
-                StringBuilder nonSb = new StringBuilder();
-                StringBuilder sb = new StringBuilder();
-                foreach (var endpoint in _dataSource.Endpoints)
+                ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+                if (controllerActionDescriptor == null)
                 {
-                    ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-                    if (controllerActionDescriptor == null)
-                    {
-                        continue;
-                    }
-
-                    IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
-                    if (metadata == null)
-                    {
-                        AppendNonODataRoute(nonSb, endpoint);
-                        continue;
-                    }
-
-                    // controller and action details
-                    StringBuilder action = new StringBuilder();
-                    if (controllerActionDescriptor.MethodInfo.ReturnType != null)
-                    {
-                        action.Append(controllerActionDescriptor.MethodInfo.ReturnType.Name + " ");
-                    }
-                    else
-                    {
-                        action.Append("void ");
-                    }
-                    action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
-                    action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
-                    action.Append(")");
-                    string actionName = controllerActionDescriptor.MethodInfo.Name;
-
-                    sb.Append("<tr>");
-                    sb.Append($"<td>{GetActionDesciption(controllerActionDescriptor)}</td>");
-
-                    // http methods
-                    string httpMethods = string.Join(",", metadata.HttpMethods);
-                    sb.Append($"<td>{httpMethods.ToUpper()}</td>");
-
-                    // template name
-                    RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
-                    if (routeEndpoint != null)
-                    {
-                        sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td></tr>");
-                    }
-                    else
-                    {
-                        sb.Append("<td>---NON RouteEndpoint---</td></tr>");
-                    }
+                    continue;
                 }
 
-                string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
-                output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
+                IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
+                if (metadata == null)
+                {
+                    AppendNonODataRoute(nonSb, endpoint);
+                    continue;
+                }
 
-                return base.Content(output, "text/html");
-            }
-
-            private static string GetActionDesciption(ControllerActionDescriptor actionDescriptor)
-            {
                 // controller and action details
                 StringBuilder action = new StringBuilder();
-                if (actionDescriptor.MethodInfo.ReturnType != null)
+                if (controllerActionDescriptor.MethodInfo.ReturnType != null)
                 {
-                    action.Append(actionDescriptor.MethodInfo.ReturnType.Name + " ");
+                    action.Append(controllerActionDescriptor.MethodInfo.ReturnType.Name + " ");
                 }
                 else
                 {
                     action.Append("void ");
                 }
-
-                action.Append(actionDescriptor.ControllerTypeInfo.FullName);
-                action.Append(".");
-                action.Append(actionDescriptor.MethodInfo.Name + "(");
-                action.Append(string.Join(",", actionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
+                action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
+                action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
                 action.Append(")");
-                return action.ToString();
-            }
+                string actionName = controllerActionDescriptor.MethodInfo.Name;
 
-            /// <summary>
-            /// Process the non-odata route
-            /// </summary>
-            /// <param name="sb">The string builder</param>
-            /// <param name="endPoint">The endpoint.</param>
-            private static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
-            {
                 sb.Append("<tr>");
-                sb.Append($"<td>{endpoint.DisplayName}</td>");
+                sb.Append($"<td>{GetActionDesciption(controllerActionDescriptor)}</td>");
 
+                // http methods
+                sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
+
+                // template name
                 RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
                 if (routeEndpoint != null)
                 {
-                    if (routeEndpoint.RoutePattern.RawText.StartsWith("/"))
-                    {
-                        sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
-                    }
-                    else
-                    {
-                        sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
-                    }
+                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td></tr>");
                 }
                 else
                 {
                     sb.Append("<td>---NON RouteEndpoint---</td></tr>");
                 }
-
-                sb.Append("</tr>");
             }
 
-            private static string ODataRouteMappingHtmlTemplate = @"<html>
+            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
+            output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
+
+            return base.Content(output, "text/html");
+        }
+
+        private static string GetActionDesciption(ControllerActionDescriptor actionDescriptor)
+        {
+            // controller and action details
+            StringBuilder action = new StringBuilder();
+            if (actionDescriptor.MethodInfo.ReturnType != null)
+            {
+                action.Append(actionDescriptor.MethodInfo.ReturnType.Name + " ");
+            }
+            else
+            {
+                action.Append("void ");
+            }
+
+            action.Append(actionDescriptor.ControllerTypeInfo.FullName);
+            action.Append(".");
+            action.Append(actionDescriptor.MethodInfo.Name + "(");
+            action.Append(string.Join(",", actionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
+            action.Append(")");
+            return action.ToString();
+        }
+
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        {
+            HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
+            if (metadata != null)
+            {
+                return metadata.HttpMethods;
+            }
+
+            return new[] { "No HttpMethodMetadata" };
+        }
+
+        /// <summary>
+        /// Process the non-odata route
+        /// </summary>
+        /// <param name="sb">The string builder</param>
+        /// <param name="endPoint">The endpoint.</param>
+        private static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
+        {
+            sb.Append("<tr>");
+            sb.Append($"<td>{endpoint.DisplayName}</td>");
+
+            sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
+
+            RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
+            if (routeEndpoint != null)
+            {
+                if (routeEndpoint.RoutePattern.RawText.StartsWith("/"))
+                {
+                    sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
+                }
+                else
+                {
+                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
+                }
+            }
+            else
+            {
+                sb.Append("<td>---NON RouteEndpoint---</td></tr>");
+            }
+
+            sb.Append("</tr>");
+        }
+
+        private static string ODataRouteMappingHtmlTemplate = @"<html>
   <head>
     <title>OData Endpoint Routing Debugger</title>
     <style>
@@ -171,13 +177,13 @@ namespace ODataCustomizedSample.Controllers
     <table>
      <tr>
        <th> Controller </th>
+       <th> HttpMethods </th>
        <th> Templates </th>
     </tr>
     {NONENDPOINTCONTENT}
     </table>
    </body>
 </html>";
-        }
     }
-
 }
+

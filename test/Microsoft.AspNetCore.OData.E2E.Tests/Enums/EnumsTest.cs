@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+#if NET5_0
+// .NET CoreAPP 3.1 : An item with the same key has already been added. Key: Get
 using System;
 using System.Linq;
 using System.Net;
@@ -20,29 +22,27 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
-    public class EnumsTest : WebODataTestBase<EnumsTest.EnumsTestStartup>
+    public class EnumsTest : WebApiTestBase<EnumsTest>
     {
-        public class EnumsTestStartup : TestStartupBase
+        // following the Fixture convention.
+        protected static void UpdateConfigureServices(IServiceCollection services)
         {
-            public override void ConfigureServices(IServiceCollection services)
-            {
-                services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
+            services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
-                services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+            services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddModel("convention", model1)
                 .AddModel("explicit", model2));
-            }
         }
 
-        public EnumsTest(WebODataTestFixture<EnumsTestStartup> factory)
-            : base(factory)
+        public EnumsTest(WebApiTestFixture<EnumsTest> fixture)
+           : base(fixture)
         {
         }
 
-        #region ModelBuilder
+#region ModelBuilder
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
@@ -50,9 +50,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             // Arrange
             string requestUri = string.Format("{0}/$metadata", modelMode);
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
 
             // Assert
             var stream = await response.Content.ReadAsStreamAsync();
@@ -126,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(EdmTypeKind.Enum, iEdmOperationParameterOfHasAccessLevel.Type.Definition.TypeKind);
         }
 
-        #endregion
+#endregion
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -136,9 +137,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             // Arrange
             await ResetDatasource();
             string requestUri = "/convention/Employees?$format=" + format;
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
@@ -163,9 +165,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             // Arrange
             await ResetDatasource();
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
@@ -180,9 +183,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             // Arrange
             await ResetDatasource();
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
@@ -198,8 +202,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             await ResetDatasource();
             string requestUri = "/convention/Employees(1)/AccessLevel?$format=" + format;
+            HttpClient client = CreateClient();
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
 
             var json = await response.Content.ReadAsObject<JObject>();
@@ -212,7 +217,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
 
             requestUri = "/convention/Employees(1)/SkillSet?$format=" + format;
-            response = await this.Client.GetAsync(requestUri);
+            response = await client.GetAsync(requestUri);
             json = await response.Content.ReadAsObject<JObject>();
             JArray skillSet = json["value"] as JArray;
             Assert.Equal(2, skillSet.Count);
@@ -233,8 +238,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEnumPropertyValueInEntityType(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
+
             var requestUri = "/convention/Employees(1)/AccessLevel/$value?$format=" + format;
-            var response = await this.Client.GetAsync(requestUri);
+            var response = await client.GetAsync(requestUri);
 
             response.EnsureSuccessStatusCode();
 
@@ -251,9 +258,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEnumPropertyInComplexType(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
+
             string requestUri = "/convention/Employees(1)/FavoriteSports?$format=" + format;
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.Content.ReadAsObject<JObject>();
@@ -268,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
 
             requestUri = "/convention/Employees(1)/FavoriteSports/LikeMost?$format=" + format;
-            response = await this.Client.GetAsync(requestUri);
+            response = await client.GetAsync(requestUri);
             result = await response.Content.ReadAsObject<JObject>();
             value = result.GetValue("value").ToString();
             Assert.Equal("Pingpong", value);
@@ -281,9 +290,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEntity(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
             string requestUri = "/convention/Employees(1)?$format=" + format;
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.Content.ReadAsObject<JObject>();
@@ -304,12 +314,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task QueryEntitiesFilterByEnum(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
+
             // in the template {0}: operation, {1}: typename, {2}: enum value, {3}: format
             string uriTemplate = "/convention/Employees?$filter=AccessLevel {0} {1}'{2}'&$format={3}";
             string uriEq = string.Format(uriTemplate, "eq", typeof(AccessLevel).FullName, AccessLevel.Read.ToString(), format);
             string uriHas = string.Format(uriTemplate, "has", typeof(AccessLevel).FullName, AccessLevel.Read.ToString(), format);
 
-            using (var response = await this.Client.GetAsync(uriEq))
+            using (var response = await client.GetAsync(uriEq))
             {
                 // http://<siteurl>/convention/Employees?$filter=AccessLevel eq Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'Read'&$format=<Format>
                 Assert.True(response.IsSuccessStatusCode);
@@ -320,7 +332,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 Assert.Single(value);
             }
 
-            using (var response = await this.Client.GetAsync(uriHas))
+            using (var response = await client.GetAsync(uriHas))
             {
                 // http://<siteurl>/convention/Employees?$filter=AccessLevel has Microsoft.Test.E2E.AspNet.OData.Enums.AccessLevel'Read'&$format=<Format>
                 Assert.True(response.IsSuccessStatusCode);
@@ -339,9 +351,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInSelect(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
+
             string requestUri = "/convention/Employees?$select=AccessLevel,SkillSet,FavoriteSports&$format=" + format;
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.Content.ReadAsObject<JObject>();
@@ -357,9 +371,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInOrderBy(string format)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
             string requestUri = "/convention/Employees?$orderby=AccessLevel,FavoriteSports/LikeMost&$format=" + format;
 
-            HttpResponseMessage response = await this.Client.GetAsync(requestUri);
+            HttpResponseMessage response = await client.GetAsync(requestUri);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.Content.ReadAsObject<JObject>();
@@ -374,7 +389,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(3, secondEmployee["ID"]);
         }
 
-        #region Update
+#region Update
 
         //[Fact]
         //public async Task AddEntity()
@@ -422,10 +437,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             //Arrange
             await ResetDatasource();
+            HttpClient client = CreateClient();
             string requestUri = "/convention/Employees/2/SkillSet?$format=application/json;odata.metadata=none";
             //Get the count before the post
             int count = 0;
-            using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
+            using (HttpResponseMessage response = await client.GetAsync(requestUri))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -442,13 +458,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             requestForPost.Content.Headers.ContentLength = 10;
 
             //Act
-            using (HttpResponseMessage response = await this.Client.SendAsync(requestForPost))
+            using (HttpResponseMessage response = await client.SendAsync(requestForPost))
             {
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }
 
             //Assert
-            using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
+            using (HttpResponseMessage response = await client.GetAsync(requestUri))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -466,9 +482,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task UpdateEntity()
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
             string getUri = "/convention/Employees(2)?$format=application/json;odata.metadata=none";
 
-            using (HttpResponseMessage response = await Client.GetAsync(getUri))
+            using (HttpResponseMessage response = await client.GetAsync(getUri))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -496,12 +513,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                             ""LikeMost"":""Basketball"",
                             ""Like"":[""Pingpong"",""Basketball""]
                     }}");
-            using (HttpResponseMessage response = await Client.PutAsJsonAsync(putUri, putContent))
+            using (HttpResponseMessage response = await client.PutAsJsonAsync(putUri, putContent))
             {
                 response.EnsureSuccessStatusCode();
             }
 
-            using (HttpResponseMessage response = await Client.GetAsync(getUri))
+            using (HttpResponseMessage response = await client.GetAsync(getUri))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -527,6 +544,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task UpsertEntity(string method)
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
 
             var requestUri = "/convention/Employees(20)";
             var requestContent = @"{""ID"":20,
@@ -543,7 +561,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
             request.Content.Headers.ContentLength = requestContent.Length;
             request.Headers.Add("Prefer", "return=minimal");
-            using (HttpResponseMessage response = await Client.SendAsync(request))
+            using (HttpResponseMessage response = await client.SendAsync(request))
             {
                 Assert.True(HttpStatusCode.NoContent == response.StatusCode,
                     string.Format("Response code is not right, expected: {0}, actual: {1}", HttpStatusCode.NoContent, response.StatusCode));
@@ -553,17 +571,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-        #endregion
+#endregion
 
-        #region Delete
+#region Delete
 
         [Fact]
         public async Task DeleteEntity()
         {
             await ResetDatasource();
+            HttpClient client = CreateClient();
             string uriGet = "/convention/Employees?$format=application/json;odata.metadata=none";
 
-            using (HttpResponseMessage response = await Client.GetAsync(uriGet))
+            using (HttpResponseMessage response = await client.GetAsync(uriGet))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -573,12 +592,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
 
             var uriDelete = "/convention/Employees(1)";
-            using (HttpResponseMessage response = await Client.DeleteAsync(uriDelete))
+            using (HttpResponseMessage response = await client.DeleteAsync(uriDelete))
             {
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }
 
-            using (HttpResponseMessage response = await Client.GetAsync(uriGet))
+            using (HttpResponseMessage response = await client.GetAsync(uriGet))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -588,9 +607,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-        #endregion
+#endregion
 
-        #region Enum with action
+#region Enum with action
 
         [Fact]
         public async Task EnumInActionParameter()
@@ -601,9 +620,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             var postContent = new StringContent(payload);
             postContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
             postContent.Headers.ContentLength = payload.Length;
+            HttpClient client = CreateClient();
 
             // Act
-            var response = await Client.PostAsync(postUri, postContent);
+            var response = await client.PostAsync(postUri, postContent);
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -613,11 +633,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInActionOutput()
         {
             // Arrange
-            var postUri = Client.BaseAddress + "convention/SetAccessLevel";
+            HttpClient client = CreateClient();
+            var postUri = client.BaseAddress + "convention/SetAccessLevel";
             var postContent = JObject.Parse(@"{""accessLevel"":""Read,Execute"",""ID"":7}");
 
             // Act
-            var response = await Client.PostAsJsonAsync(postUri, postContent);
+            var response = await client.PostAsJsonAsync(postUri, postContent);
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -628,16 +649,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal("Read, Write", value);
         }
 
-        #endregion
+#endregion
 
-        #region Enum with function
+#region Enum with function
 
         [Fact]
         public async Task EnumInFunctionOutput()
         {
             // Arrange
+            HttpClient client = CreateClient();
             var getUri = "/convention/Employees(9)/Microsoft.AspNetCore.OData.E2E.Tests.Enums.FindAccessLevel()";
-            var response = await this.Client.GetAsync(getUri);
+            var response = await client.GetAsync(getUri);
 
             // Act & Assert
             response.EnsureSuccessStatusCode();
@@ -653,7 +675,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public async Task EnumInFunctionParameter(string requestUri, bool expectedValue)
         {
             // Arrange
-            var response = await this.Client.GetAsync(requestUri);
+            HttpClient client = CreateClient();
+            var response = await client.GetAsync(requestUri);
 
             // Act & Assert
             response.EnsureSuccessStatusCode();
@@ -663,13 +686,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(expectedValue, actualValue);
         }
 
-        #endregion
+#endregion
 
         private async Task<HttpResponseMessage> ResetDatasource()
         {
-            var response = await this.Client.PostAsync("convention/ResetDataSource", null);
+            HttpClient client = CreateClient();
+            var response = await client.PostAsync("convention/ResetDataSource", null);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
         }
     }
 }
+#endif

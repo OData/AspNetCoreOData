@@ -19,6 +19,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
         private readonly IODataControllerActionConvention[] _controllerActionConventions;
+        private readonly IEnumerable<IODataControllerActionConvention> _conventions;
         private readonly ODataOptions _options;
 
         /// <summary>
@@ -30,17 +31,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             IEnumerable<IODataControllerActionConvention> conventions,
             IOptions<ODataOptions> options)
         {
+            _conventions = conventions;
             _options = options.Value;
-
-            if (!_options.EnableAttributeRouting)
-            {
-                Type attributeType = typeof(AttributeRoutingConvention);
-                _controllerActionConventions = conventions.Where(c => c.GetType() != attributeType).OrderBy(p => p.Order).ToArray();
-            }
-            else
-            {
-                _controllerActionConventions = conventions.OrderBy(p => p.Order).ToArray();
-            }
+            _controllerActionConventions = conventions.Where(c => c.GetType() != typeof(AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
         }
 
         /// <summary>
@@ -54,6 +47,13 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
+            // apply attribute routing.
+            if (_options.EnableAttributeRouting)
+            {
+                ApplyAttributeRouting(context.Result.Controllers);
+            }
+
+            // apply non-attribute convention routing.
             var routes = _options.Models;
             foreach (var route in routes)
             {
@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                     ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
                     odataContext.ServiceProvider = route.Value.Item2;
-                    odataContext.RouteOptions = _options.RouteOptions;
+                    odataContext.Options = _options;
 
                     // consider to replace the Linq with others?
                     IODataControllerActionConvention[] conventions =
@@ -119,10 +119,40 @@ namespace Microsoft.AspNetCore.OData.Routing
             // Nothing here.
         }
 
+        /// <summary>
+        /// Apply Default OData attribute routing
+        /// </summary>
+        /// <param name="controllers">The controller models</param>
+        internal void ApplyAttributeRouting(IList<ControllerModel> controllers)
+        {
+            AttributeRoutingConvention attributeRouting = _conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
+            if (attributeRouting == null)
+            {
+                return;
+            }
+
+            ODataControllerActionContext controllerActionContext = new ODataControllerActionContext
+            {
+                Options = _options
+            };
+
+            foreach (var controllerModel in controllers.Where(c => !c.IsNonODataController()))
+            {
+                controllerActionContext.Controller = controllerModel;
+
+                foreach (var actionModel in controllerModel.Actions.Where(a => !a.IsNonODataAction()))
+                {
+                    controllerActionContext.Action = actionModel;
+
+                    attributeRouting.AppliesToAction(controllerActionContext);
+                }
+            }
+        }
+
         private static ODataControllerActionContext BuildContext(string prefix, IEdmModel model, ControllerModel controller)
         {
             // The reason why to create a context is that:
-            // We don't need to call te FindEntitySet or FindSingleton before every convention.
+            // We don't need to call the FindEntitySet or FindSingleton before every convention.
             // So, for a controller, we try to call "FindEntitySet" or "FindSingleton" once.
             string controllerName = controller.ControllerName;
 

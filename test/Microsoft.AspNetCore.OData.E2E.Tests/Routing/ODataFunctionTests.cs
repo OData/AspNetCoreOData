@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+#if NET5_0
+// .NET CoreAPP 3.1 : An item with the same key has already been added. Key: Get
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         {
         }
 
-        #region Bound Function
+#region Bound Function
         public static TheoryDataSet<string> BoundFunctionRouteData
         {
             get
@@ -134,9 +136,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             string responseString = await response.Content.ReadAsStringAsync();
             Assert.Equal("{\"@odata.context\":\"http://localhost/attribute/$metadata#Edm.Boolean\",\"value\":true}", responseString);
         }
-        #endregion
+#endregion
 
-        #region Unbound Function
+#region Unbound Function
         public static TheoryDataSet<string> UnboundFunctionRouteData
         {
             get
@@ -190,7 +192,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             string responseString = await response.Content.ReadAsStringAsync();
             Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#Edm.Boolean\",\"value\":true}", responseString);
         }
-        #endregion
+#endregion
 
         private static IEdmModel GetTypelessEdmModel()
         {
@@ -331,62 +333,58 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             return Ok(customers);
         }
 
-        #region Bound Function using attribute routing
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.IntCollectionFunction(intValues={intValues})", "attribute")]
+#region Bound Function using attribute routing
+        [HttpGet("attribute/FCustomers({key})/NS.IntCollectionFunction(intValues={intValues})")]
         public bool IntCollectionFunctionOnAttriubte(int key, [FromODataUri] IEnumerable<int?> intValues)
         {
             return IntCollectionFunction(key, intValues);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.EnumFunction(color={color})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.EnumFunction(color={color})")]
         public bool EnumFunctionOnAttribute(int key, [FromODataUri] EdmEnumObject color)
         {
             return EnumFunction(key, color);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.EnumCollectionFunction(colors={colors})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.EnumCollectionFunction(colors={colors})")]
         public bool EnumCollectionFunctionOnAttribute(int key, [FromODataUri] EdmEnumObjectCollection colors)
         {
             return EnumCollectionFunction(key, colors);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.ComplexFunction(address={address})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.ComplexFunction(address={address})")]
         public bool ComplexFunctionOnAttribute(int key, [FromODataUri] EdmComplexObject address)
         {
             return ComplexFunction(key, address);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.ComplexCollectionFunction(addresses={addresses})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.ComplexCollectionFunction(addresses={addresses})")]
         public bool ComplexCollectionFunctionOnAttribute(int key, [FromODataUri] EdmComplexObjectCollection addresses)
         {
             return ComplexCollectionFunction(key, addresses);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.EntityFunction(customer={customer})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.EntityFunction(customer={customer})")]
         public bool EntityFunctionOnAttribute(int key, [FromODataUri] EdmEntityObject customer)
         {
             return EntityFunction(key, customer);
         }
 
-        [HttpGet]
-        [ODataRoute("FCustomers({key})/NS.CollectionEntityFunction(customers={customers})", "attribute")]
+        [HttpGet("attribute/FCustomers({key})/NS.CollectionEntityFunction(customers={customers})")]
         public bool CollectionEntityFunctionOnAttribute(int key, [FromODataUri] EdmEntityObjectCollection customers)
         {
             return CollectionEntityFunction(key, customers);
         }
 
-        #endregion
+#endregion
 
-        #region Bound function using convention routing & Unbound function using Attribute routing
+#region Bound function using convention routing & Unbound function using Attribute routing
+        // Here's the note:
+        // [HttpGet] & [ODataModel] will create an odata convention routing for this method.
+        // [HttpGet("odata/....")] will create an attribute routing.
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundIntCollectionFunction(key={key},intValues={intValues})")]
+        [HttpGet("odata/UnboundIntCollectionFunction(key={key},intValues={intValues})")]
         public bool IntCollectionFunction(int key, [FromODataUri] IEnumerable<int?> intValues)
         {
             Assert.NotNull(intValues);
@@ -403,7 +401,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundEnumFunction(key={key},color={color})")]
+        [HttpGet("odata/UnboundEnumFunction(key={key},color={color})")]
         public bool EnumFunction(int key, [FromODataUri] EdmEnumObject color)
         {
             Assert.NotNull(color);
@@ -414,7 +412,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundEnumCollectionFunction(key={key},colors={colors})")]
+        [HttpGet("odata/UnboundEnumCollectionFunction(key={key},colors={colors})")]
         public bool EnumCollectionFunction(int key, [FromODataUri] EdmEnumObjectCollection colors)
         {
             Assert.NotNull(colors);
@@ -438,7 +436,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundComplexFunction(key={key},address={address})")]
+        [HttpGet("odata/UnboundComplexFunction(key={key},address={address})")]
         public bool ComplexFunction(int key, [FromODataUri] EdmComplexObject address)
         {
             if (key == 99)
@@ -457,7 +455,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundComplexCollectionFunction(key={key},addresses={addresses})")]
+        [HttpGet("odata/UnboundComplexCollectionFunction(key={key},addresses={addresses})")]
         public bool ComplexCollectionFunction(int key, [FromODataUri] EdmComplexObjectCollection addresses)
         {
             Assert.NotNull(addresses);
@@ -488,7 +486,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundEntityFunction(key={key},customer={customer})")]
+        [HttpGet("odata/UnboundEntityFunction(key={key},customer={customer})")]
         public bool EntityFunction(int key, [FromODataUri] EdmEntityObject customer)
         {
             Assert.NotNull(customer);
@@ -521,7 +519,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
         [HttpGet]
         [ODataModel("odata")]
-        [ODataRoute("UnboundCollectionEntityFunction(key={key},customers={customers})")]
+        [HttpGet("odata/UnboundCollectionEntityFunction(key={key},customers={customers})")]
         public bool CollectionEntityFunction(int key, [FromODataUri] EdmEntityObjectCollection customers)
         {
             Assert.NotNull(customers);
@@ -582,6 +580,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
 
             return true;
         }
-        #endregion
+#endregion
     }
 }
+#endif

@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -50,14 +52,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                     // Get()
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Empty(e.Parameters);
-                    Assert.Empty(e.Selectors);
+                    Assert.Single(e.Selectors);
                 },
                 e =>
                 {
                     // Get(int key)
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Single(e.Parameters);
-                    Assert.Empty(e.Selectors);
+                    Assert.Single(e.Selectors);
                 });
         }
 
@@ -99,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                     // Get(int key)
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Single(e.Parameters);
-                    Assert.Empty(e.Selectors);
+                    Assert.Single(e.Selectors);
                 });
         }
 
@@ -133,7 +135,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
                     // Get()
                     Assert.Equal("Get", e.ActionMethod.Name);
                     Assert.Empty(e.Parameters);
-                    Assert.Empty(e.Selectors);
+                    var selector = Assert.Single(e.Selectors);
+                    Assert.Null(selector.AttributeRouteModel);
                 },
                 e =>
                 {
@@ -172,8 +175,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             ActionModel action = Assert.Single(controller.Actions);
             Assert.Equal("AnyMethodNameHere", action.ActionMethod.Name);
             Assert.Single(action.Parameters);
-            Assert.Equal(2, action.Selectors.Count);
-            Assert.Equal(new[] { "/odata/Customers({key})/Name", "/odata/Customers/{key}/Name" }, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+            SelectorModel selectorModel = Assert.Single(action.Selectors);
+            Assert.Equal("/odata/Customers({key})/Name", selectorModel.AttributeRouteModel.Template);
+            Assert.Contains(selectorModel.EndpointMetadata, a => a is ODataRoutingMetadata);
         }
 
         private static ODataRoutingApplicationModelProvider CreateProvider(ODataOptions options,
@@ -215,9 +219,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             }
         }
 
-        public class AttributeRoutingController
+        public class AttributeRoutingController : ODataController
         {
-            [ODataRoute("Customers({key})/Name")]
+            [HttpGet("odata/Customers({key})/Name")]
             public void AnyMethodNameHere(int key)
             {
             }

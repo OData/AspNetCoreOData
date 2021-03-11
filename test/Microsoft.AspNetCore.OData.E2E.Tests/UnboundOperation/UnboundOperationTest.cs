@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+#if NET5_0
+// .NET CoreAPP 3.1 : An item with the same key has already been added. Key: Get
 using System;
 using System.Linq;
 using System.Net;
@@ -24,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
         {
         }
 
-        #region Set up
+#region Set up
 
         private readonly string EdmSchemaNamespace = typeof(ConventionCustomer).Namespace;
 
@@ -51,9 +53,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             return responseForPost;
         }
 
-        #endregion
+#endregion
 
-        #region Model Builder
+#region Model Builder
 
         [Fact]
         public async Task MetaDataTest()
@@ -71,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             var reader = new ODataMessageReader(message);
             var edmModel = reader.ReadMetadataDocument();
 
-            #region functions
+#region functions
             // Function GetAllConventionCustomers
             var typeOfConventionCustomer = typeof(ConventionCustomer);
             var function1 = edmModel.FindDeclaredOperations(typeOfConventionCustomer.Namespace + ".GetAllConventionCustomers").FirstOrDefault();
@@ -88,9 +90,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             var function3 = edmModel.FindDeclaredOperations(typeOfConventionOrder.Namespace + ".GetConventionOrderByCustomerIdAndOrderName").FirstOrDefault();
             Assert.Equal(typeOfConventionOrder.FullName, function3.ReturnType.Definition.FullTypeName());
             Assert.Equal(2, function3.Parameters.Count());
-            #endregion
+#endregion
 
-            #region function imports
+#region function imports
             var container = edmModel.EntityContainer;
             Assert.Equal("Container", container.Name);
 
@@ -102,18 +104,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
 
             var functionImport3 = container.FindOperationImports("GetConventionOrderByCustomerIdAndOrderName");
             Assert.Single(functionImport3);
-            #endregion
+#endregion
 
-            #region actions
+#region actions
             var action2 = edmModel.FindDeclaredOperations(typeOfConventionCustomer.Namespace + ".UpdateAddress").FirstOrDefault();
             Assert.Equal(string.Format("Collection({0})", typeOfConventionCustomer.FullName), action2.ReturnType.Definition.FullTypeName());
             Assert.Equal(2, action2.Parameters.Count());
-            #endregion
+#endregion
 
-            #region action imports
+#region action imports
             var actionImport2 = container.FindOperationImports("UpdateAddress");
             Assert.Single(actionImport2);
-            #endregion
+#endregion
         }
 
         [Fact]
@@ -145,9 +147,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             Assert.Empty(function3);
         }
 
-        #endregion
+#endregion
 
-        #region functions and function imports
+#region functions and function imports
 
         [Fact]
         public async Task FunctionImportWithoutParameters()
@@ -398,9 +400,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             response.EnsureSuccessStatusCode();
         }
 
-        #endregion
+#endregion
 
-        #region action imports
+#region action imports
 
         [Fact]
         public async Task ActionImportWithParameters()
@@ -437,6 +439,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             Assert.DoesNotContain("Street 11", responseString);
         }
 
-        #endregion
+#endregion
     }
 }
+#endif

@@ -48,10 +48,5 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the OData path template
         /// </summary>
         public ODataPathTemplate Template { get; }
-
-        /// <summary>
-        /// Gets the supported Http methods.
-        /// </summary>
-        public ISet<string> HttpMethods { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 }

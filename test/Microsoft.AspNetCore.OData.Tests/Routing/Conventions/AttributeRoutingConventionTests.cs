@@ -3,8 +3,11 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -17,111 +20,179 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 {
     public class AttributeRoutingConventionTests
     {
-        private static IEdmModel EdmModel = GetEdmModel();
+        private static IEdmModel _edmModel;
+        private static ODataOptions _options;
+        private static AttributeRoutingConvention _attributeConvention;
+
+        static AttributeRoutingConventionTests()
+        {
+            _edmModel = GetEdmModel();
+            _options = new ODataOptions();
+            _options.AddModel(_edmModel);
+            _attributeConvention = CreateConvention();
+        }
 
         [Fact]
-        public void AppliesToControllerWithoutRoutePrefixWorksAsExpected()
+        public void AppliesToActionWithoutRoutePrefixWorksAsExpected()
         {
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithoutPrefixController>("MyAction");
             ActionModel action = controller.Actions.First();
+            Assert.Collection(action.Selectors, // Guard
+                e =>
+                {
+                    Assert.Equal("Customers({key})", e.AttributeRouteModel.Template);
+                    Assert.DoesNotContain(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("Customers/{key}/Name", e.AttributeRouteModel.Template);
+                    Assert.DoesNotContain(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                });
 
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
-            AttributeRoutingConvention attributeConvention = CreateConvention();
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller);
+            context.Action = action;
+            context.Options = _options;
 
             // Act
-            bool ok = attributeConvention.AppliesToController(context);
+            bool ok = _attributeConvention.AppliesToAction(context);
             Assert.False(ok);
 
-            Assert.Equal(4, action.Selectors.Count);
-            Assert.Equal(new[]
+            Assert.Equal(2, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
                 {
-                    "/Customers({key})",
-                    "/Customers/{key}",
-                    "/Customers({key})/Name",
-                    "/Customers/{key}/Name"
+                    Assert.Equal("/Customers({key})", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 },
-                action.Selectors.Select(s => s.AttributeRouteModel.Template));
+                e =>
+                {
+                    Assert.Equal("/Customers/{key}/Name", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                });
         }
 
         [Fact]
-        public void AppliesToControllerWithRoutePrefixWorksAsExpected()
-        {
-            // Arrange
-            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithPrefixController>("List");
-            ActionModel action = controller.Actions.First();
-
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
-            AttributeRoutingConvention attributeConvention = CreateConvention();
-
-            // Act
-            bool ok = attributeConvention.AppliesToController(context);
-            Assert.False(ok);
-
-            // Assert
-            Assert.Equal(6, action.Selectors.Count);
-            Assert.Equal(new[]
-                {
-                    "/Customers({key})",
-                    "/Customers/{key}",
-                    "/Customers",
-                    "/Orders({key})",
-                    "/Orders/{key}",
-                    "/Orders",
-                },
-                action.Selectors.Select(s => s.AttributeRouteModel.Template));
-        }
-
-        [Fact]
-        public void AppliesToControllerWithLongTemplateWorksAsExpected()
+        public void AppliesToActionWithLongTemplateWorksAsExpected()
         {
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithoutPrefixController>("LongAction");
             ActionModel action = controller.Actions.First();
 
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
+            SelectorModel selectorModel = Assert.Single(action.Selectors); // Guard
+            Assert.Equal("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title", selectorModel.AttributeRouteModel.Template);
+            Assert.DoesNotContain(selectorModel.EndpointMetadata, a => a is ODataRoutingMetadata);
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller)
+            {
+                Action = action,
+                Options = _options,
+            };
+
+            // Act
+            bool ok = _attributeConvention.AppliesToAction(context);
+            Assert.False(ok);
+
+            // Assert
+            SelectorModel actualSelectorModel = Assert.Single(action.Selectors);
+            Assert.Equal("/Customers({key})/Orders({relatedKey})/NS.MyOrder/Title", actualSelectorModel.AttributeRouteModel.Template);
+            Assert.Contains(actualSelectorModel.EndpointMetadata, a => a is ODataRoutingMetadata);
+        }
+
+        [Fact]
+        public void AppliesToActionWithRoutePrefixWorksAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithPrefixController>("List");
+            ActionModel action = controller.Actions.First();
+            Assert.Equal(2, action.Selectors.Count);
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller)
+            {
+                Action = action,
+                Options = _options,
+            };
+
             AttributeRoutingConvention attributeConvention = CreateConvention();
 
             // Act
-            bool ok = attributeConvention.AppliesToController(context);
+            bool ok = _attributeConvention.AppliesToAction(context);
             Assert.False(ok);
 
             // Assert
             Assert.Equal(4, action.Selectors.Count);
-            Assert.Equal(new[]
+            Assert.Collection(action.Selectors,
+                e =>
                 {
-                    "/Customers({key})/Orders({relatedKey})/NS.MyOrder/Title",
-                    "/Customers({key})/Orders/{relatedKey}/NS.MyOrder/Title",
-                    "/Customers/{key}/Orders({relatedKey})/NS.MyOrder/Title",
-                    "/Customers/{key}/Orders/{relatedKey}/NS.MyOrder/Title"
+                    Assert.Equal("/Customers/{key}", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 },
-                action.Selectors.Select(s => s.AttributeRouteModel.Template));
+                e =>
+                {
+                    Assert.Equal("/Orders/{key}", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("/Customers", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("/Orders", e.AttributeRouteModel.Template);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                });
         }
 
         [Theory]
         [InlineData("GetVipCustomerWithPrefix", "/VipCustomer")]
         [InlineData("GetVipCustomerOrdersWithPrefix", "/VipCustomer/Orders")]
         [InlineData("GetVipCustomerNameWithPrefix", "/VipCustomer/Name")]
-        public void AppliesToControllerForSingletonWorksAsExpected(string actionName, string expectedTemplate)
+        public void AppliesToActionForSingletonWorksAsExpected(string actionName, string expectedTemplate)
         {
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<SingletonTestControllerWithPrefix>(actionName);
             ActionModel action = controller.Actions.First();
 
-            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, EdmModel, controller);
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller);
+            context.Action = action;
+            context.Options = _options;
             AttributeRoutingConvention attributeConvention = CreateConvention();
 
             // Act
-            bool ok = attributeConvention.AppliesToController(context);
+            bool ok = _attributeConvention.AppliesToAction(context);
             Assert.False(ok);
 
             // Assert
             SelectorModel selector = Assert.Single(action.Selectors);
             Assert.NotNull(selector.AttributeRouteModel);
             Assert.Equal(expectedTemplate, selector.AttributeRouteModel.Template);
+            Assert.Contains(selector.EndpointMetadata, a => a is ODataRoutingMetadata);
         }
 
-        private AttributeRoutingConvention CreateConvention()
+        [Fact]
+        public void AppliesToActionForSingletonDoesnotWorksAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<SingletonTestControllerWithPrefix>("GetVipCustomerAliasWithPrefix");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller);
+            context.Action = action;
+            context.Options = _options;
+
+            // Act
+            bool ok = _attributeConvention.AppliesToAction(context);
+            Assert.False(ok);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.NotNull(selector.AttributeRouteModel);
+            Assert.Equal("Alias", selector.AttributeRouteModel.Template);
+            Assert.DoesNotContain(selector.EndpointMetadata, a => a is ODataRoutingMetadata);
+        }
+
+        private static AttributeRoutingConvention CreateConvention()
         {
             var services = new ServiceCollection()
                 .AddLogging();
@@ -140,6 +211,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             EdmEntityType customer = new EdmEntityType("NS", "Customer");
             customer.AddKeys(customer.AddStructuralProperty("ID", EdmPrimitiveTypeKind.String));
             customer.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+            customer.AddStructuralProperty("Alias", EdmPrimitiveTypeKind.String);
             model.AddElement(customer);
 
             // Order
@@ -172,47 +244,57 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             return model;
         }
 
-        private class WithoutPrefixController
+        private class WithoutPrefixController : ODataController
         {
-            [ODataRoute("Customers({key})")]
-            [ODataRoute("Customers/{key}/Name")]
+            [HttpGet("Customers({key})")]
+            [Route("Customers/{key}/Name")]
+            [HttpPost]
+            [HttpPatch]
             public void MyAction(int key)
             {
             }
 
-            [ODataRoute("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title")]
+            [HttpGet("Customers({key})/Orders({relatedKey})/NS.MyOrder/Title")]
             public void LongAction()
             {
-
             }
         }
 
-        [ODataRoutePrefix("Customers")]
-        [ODataRoutePrefix("Orders")]
+        [ODataRouting] // using this attribute if not derived from ODataController
+        [Route("Customers")]
+        [Route("Orders")]
         private class WithPrefixController
         {
-            [ODataRoute("({key})")]
-            [ODataRoute("")]
+            [HttpGet("{key}")]
+            [HttpPost("")]
             public void List(int key)
             {
             }
         }
 
-        [ODataRoutePrefix("VipCustomer")]
+        [Route("VipCustomer")]
         public class SingletonTestControllerWithPrefix
         {
-            [ODataRoute("")]
+            [ODataRouting]
+            [HttpGet("")]
             public void GetVipCustomerWithPrefix()
             {
             }
 
-            [ODataRoute("Orders")]
+            [ODataRouting]
+            [HttpPost("Orders")]
             public void GetVipCustomerOrdersWithPrefix()
             {
             }
 
-            [ODataRoute("Name")]
+            [ODataRouting]
+            [HttpGet("Name")]
             public void GetVipCustomerNameWithPrefix()
+            {
+            }
+
+            [HttpGet("Alias")]
+            public void GetVipCustomerAliasWithPrefix()
             {
             }
         }

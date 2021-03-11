@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action, httpMethod, context.RouteOptions);
+            AddSelector(entitySet, entityType, castType, context.Prefix, context.Model, action, httpMethod, context.Options?.RouteOptions);
             return true;
         }
 

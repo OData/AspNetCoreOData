@@ -186,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.RouteOptions);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
             Log.AddedODataSelector(_logger, action, template);
         }

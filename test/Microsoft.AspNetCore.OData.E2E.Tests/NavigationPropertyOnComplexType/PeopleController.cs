@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
@@ -81,14 +80,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
         }
 
         [EnableQuery]
-        [ODataRoute("People({id})/OrderInfo")]
+        [HttpGet("People({id})/OrderInfo")]
         public IActionResult GetOrdeInfoFromPerson([FromODataUri]int id)
         {
             return Ok(_repo.People.FirstOrDefault(p => p.Id == id).OrderInfo);
         }
 
-        [HttpGet]
-        [ODataRoute("People({id})/HomeLocation/ZipCode")]
+        [HttpGet("People({id})/HomeLocation/ZipCode")]
         public IActionResult GetZipCode([FromODataUri]int id)
         {
             Person person = _repo.People.FirstOrDefault(p => p.Id == id);
@@ -100,8 +98,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             return Ok(person.HomeLocation.ZipCode);
         }
 
-        [HttpPost]
-        [ODataRoute("People({id})/HomeLocation/ZipCode/$ref")]
+        [HttpPost("People({id})/HomeLocation/ZipCode/$ref")]
         public IActionResult CreateRefToZipCode([FromODataUri] int id, [FromBody] ZipCode zip)
         {
             return Ok(zip);

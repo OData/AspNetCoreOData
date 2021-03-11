@@ -9,12 +9,13 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 {
-    public class EmployeesController : Controller
+    [Route("AttributeRouting")]
+    public class EmployeesController : ODataController
     {
         private static List<Employee> _employees = null;
         private static List<Manager> _managers = null;
@@ -95,13 +96,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees/Namespace.GetCount()
-        [HttpGet]
-        [ODataRoute("Employees/Default.GetCount()")]
+        [HttpGet("Employees/Default.GetCount()")]
         public int GetCountAttributeRouting()
         {
             return this.GetCount() * 2;// multiplied by 2 is to make it easy to verify if it is returned by attribute routing function.
         }
 
+        /*
         // ~/Employees/Namespace.GetCount(Name='Name1')
         [HttpGet]
         public int GetCount(string name)
@@ -111,8 +112,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees/Namespace.GetCount(Name='Name1')
-        [HttpGet]
-        [ODataRoute("Employees/Default.GetCount(Name={name})")]
+        [HttpGet("Employees/Default.GetCount(Name={name})")]
         public int GetCountAttributeRouting([FromODataUri]string name)
         {
             return this.GetCount(name) * 2;
@@ -126,8 +126,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees/Namesapce.Manager/Namespace.GetCount()
-        [HttpGet]
-        [ODataRoute("Employees/NS.Manager/Default.GetCount()")]
+        [HttpGet("Employees/NS.Manager/Default.GetCount()")]
         public int GetCountOnCollectionOfManagerAttributeRouting()
         {
             return this.GetCountOnCollectionOfManager() * 2;
@@ -150,12 +149,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         // ~/Employees(1)/OptionalAddresses/$count
         // ~/Employees(1)/Microsoft.Test.E2E.AspNet.OData.BoundOperation.GetOptionalAddresses()")]
         // ~/Employees(1)/Microsoft.Test.E2E.AspNet.OData.BoundOperation.GetOptionalAddresses()/$count")]
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("Employees({key})/OptionalAddresses")]
-        [ODataRoute("Employees({key})/OptionalAddresses/$count")]
-        [ODataRoute("Employees({key})/Default.GetOptionalAddresses()")]
-        [ODataRoute("Employees({key})/Default.GetOptionalAddresses()/$count")]
+        [HttpGet("Employees({key})/OptionalAddresses")]
+        [HttpGet("Employees({key})/OptionalAddresses/$count")]
+        [HttpGet("Employees({key})/Default.GetOptionalAddresses()")]
+        [HttpGet("Employees({key})/Default.GetOptionalAddresses()/$count")]
         public IActionResult GetOptionalAddressesAttributeRouting(int key)
         {
             IList<Address> addresses = new List<Address>();
@@ -181,11 +179,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         // ~/Employees(1)/Emails/$count
         // ~/Employees(1)/Microsoft.Test.E2E.AspNet.OData.BoundOperation.GetEmails()
         // ~/Employees(1)/Microsoft.Test.E2E.AspNet.OData.BoundOperation.GetEmails()/$count
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("Employees({key})/Emails")]
-        [ODataRoute("Employees({key})/Emails/$count")]
-        [ODataRoute("Employees({key})/Default.GetEmails()")]
+        [HttpGet("Employees({key})/Emails")]
+        [HttpGet("Employees({key})/Emails/$count")]
+        [HttpGet("Employees({key})/Default.GetEmails()")]
         public IActionResult GetEmailsAttributeRouting([FromODataUri]int key)
         {
             IList<string> emails = new List<string>();
@@ -202,8 +199,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees(1)/Namesapce.GetEmailsCount()
-        [HttpGet]
-        [ODataRoute("Employees({key})/Default.GetEmailsCount()")]
+        [HttpGet("Employees({key})/Default.GetEmailsCount()")]
         public int GetEmailsCountAttributeRouting([FromODataUri]int key)
         {
             return this.GetEmailsCount(key) * 2;
@@ -217,16 +213,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees(1)/Namespace.Manager/Namesapce.GetEmailsCount()
-        [HttpGet]
-        [ODataRoute("Employees({key})/NS.Manager/Default.GetEmailsCount()")]
+        [HttpGet("Employees({key})/NS.Manager/Default.GetEmailsCount()")]
         public int GetEmailsCountOnManagerAttributeRouting(int key)
         {
             return this.GetEmailsCountOnManager(key) * 2;
         }
 
         // using [FromODataUri] or not is non-sense for primitive. except for string type.
-        [HttpGet]
-        [ODataRoute("Employees/Default.PrimitiveFunction(param={param},price={price},name={name},names={names})")]
+        [HttpGet("Employees/Default.PrimitiveFunction(param={param},price={price},name={name},names={names})")]
         public string PrimitiveFunction(int param, double? price, [FromODataUri]string name, [FromODataUri]IEnumerable<string> names)
         {
             StringBuilder sb = new StringBuilder("(param=" + param);
@@ -240,8 +234,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // using [FromODataUri] or not is non-sense for primitive. except for string type.
-        [HttpGet]
-        [ODataRoute("Employees/Default.EnumFunction(bkColor={bkColor},frColor={frColor},colors={colors})")]
+        [HttpGet("Employees/Default.EnumFunction(bkColor={bkColor},frColor={frColor},colors={colors})")]
         public string EnumFunction([FromODataUri]Color bkColor, [FromODataUri]Color? frColor, [FromODataUri]IEnumerable<Color> colors)
         {
             StringBuilder sb = new StringBuilder("(bkColor='" + bkColor);
@@ -253,15 +246,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return sb.ToString();
         }
 
-        [HttpGet]
-        [ODataRoute("Employees/Default.ComplexFunction(address={address},location={location},addresses={addresses})")]
+        [HttpGet("Employees/Default.ComplexFunction(address={address},location={location},addresses={addresses})")]
         public IActionResult ComplexFunction([FromODataUri]Address address, [FromODataUri]Address location, [FromODataUri]IEnumerable<Address> addresses)
         {
             return Ok(new[] { address, location }.Concat(addresses));
         }
 
-        [HttpGet]
-        [ODataRoute("Employees/Default.EntityFunction(person={person},guard={guard},staff={staff})")]
+        [HttpGet("Employees/Default.EntityFunction(person={person},guard={guard},staff={staff})")]
         public IActionResult EntityFunction([FromODataUri]Employee person, [FromODataUri]Employee guard, [FromODataUri]IEnumerable<Employee> staff)
         {
             VerifyEmployee(person);
@@ -274,22 +265,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return Ok();
         }
 
-        [HttpGet]
-        [ODataRoute("Employees/Default.GetWholeSalary(minSalary={min})")]
+        [HttpGet("Employees/Default.GetWholeSalary(minSalary={min})")]
         public string GetWholeSalaryWithMin(double min)
         {
             return GetWholeSalary(min);
         }
 
-        [HttpGet]
-        [ODataRoute("Employees/Default.GetWholeSalary(minSalary={min},maxSalary={max})")]
+        [HttpGet("Employees/Default.GetWholeSalary(minSalary={min},maxSalary={max})")]
         public string GetWholeSalaryWithMinAndMax(double min, double max)
         {
             return GetWholeSalary(min, max);
         }
 
-        [HttpGet]
-        [ODataRoute("Employees/Default.GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})")]
+        [HttpGet("Employees/Default.GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})")]
         public string GetWholeSalary(double minSalary, double maxSalary = 0, double aveSalary = 8.9)
         {
             return String.Format(CultureInfo.InvariantCulture, "GetWholeSalary({0}, {1}, {2})", minSalary, maxSalary, aveSalary);
@@ -324,8 +312,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             }
         }
 
-        [HttpPost]
-        [ODataRoute("ResetDataSource")]
+        [HttpPost("ResetDataSource")]
         public IActionResult ResetDataSource()
         {
             if (!ModelState.IsValid)
@@ -348,9 +335,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees/Namespace.IncreaseSalary
-        [HttpPost]
         [EnableQuery]
-        [ODataRoute("Employees/Default.IncreaseSalary")]
+        [HttpPost("Employees/Default.IncreaseSalary")]
         public IActionResult IncreaseSalaryAttributeRouting([FromBody]ODataUntypedActionParameters odataActionParameters)
         {
             string name = odataActionParameters["Name"] as string;
@@ -370,9 +356,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees/Namespace.Manager/Namesapce.IncreaseSalary
-        [HttpPost]
         [EnableQuery]
-        [ODataRoute("Employees/NS.Manager/Default.IncreaseSalary")]
+        [HttpPost("Employees/NS.Manager/Default.IncreaseSalary")]
         public IActionResult IncreaseSalaryOnCollectionOfManagerAttributeRouting([FromBody]ODataUntypedActionParameters odataActionParameters)
         {
             string name = odataActionParameters["Name"] as string;
@@ -392,8 +377,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees(1)/Namespace.IncreaseSalary
-        [HttpPost]
-        [ODataRoute("Employees({key})/Default.IncreaseSalary")]
+        [HttpPost("Employees({key})/Default.IncreaseSalary")]
         public IActionResult IncreaseSalaryOnEmployeeAttributeRouting([FromODataUri]int key)
         {
             var employee = _employees.Where(e => e.ID == key).First();
@@ -411,8 +395,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         }
 
         // ~/Employees(1)/Namespace.Manager/Namespace.IncreaseSalary
-        [HttpPost]
-        [ODataRoute("Employees({key})/NS.Manager/Default.IncreaseSalary")]
+        [HttpPost("Employees({key})/NS.Manager/Default.IncreaseSalary")]
         public IActionResult IncreaseSalaryOnManagerAttributeRouting([FromODataUri] int key)
         {
             var manager = _managers.Where(m => m.ID == key).First();
@@ -420,8 +403,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return Ok(manager.Salary);
         }
 
-        [HttpPost]
-        [ODataRoute("Employees/Default.PrimitiveAction")]
+        [HttpPost("Employees/Default.PrimitiveAction")]
         public IActionResult PrimitiveAction([FromBody]ODataActionParameters parameters)
         {
             Assert.Equal(4, parameters.Count);
@@ -440,8 +422,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return Ok(true);
         }
 
-        [HttpPost]
-        [ODataRoute("Employees/Default.EnumAction")]
+        [HttpPost("Employees/Default.EnumAction")]
         public IActionResult EnumAction([FromBody]ODataActionParameters parameters)
         {
             Assert.Equal(3, parameters.Count);
@@ -458,8 +439,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return Ok(true);
         }
 
-        [HttpPost]
-        [ODataRoute("Employees/Default.ComplexAction")]
+        [HttpPost("Employees/Default.ComplexAction")]
         public IActionResult ComplexAction([FromBody]ODataActionParameters parameters)
         {
             Assert.Equal(3, parameters.Count);
@@ -486,8 +466,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             return Ok(true);
         }
 
-        [HttpPost]
-        [ODataRoute("Employees/Default.EntityAction")]
+        [HttpPost("Employees/Default.EntityAction")]
         public IActionResult EntityAction([FromBody]ODataActionParameters parameters)
         {
             Assert.Equal(3, parameters.Count);
@@ -514,6 +493,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
             }
 
             return Ok(true);
-        }
+        }*/
     }
 }

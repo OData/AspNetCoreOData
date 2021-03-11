@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector("Get", context.Prefix, context.Model, template, context.RouteOptions);
+                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
                 // GET ~/Customers/$count or GET ~/Customers/Ns.VipCustomer/$count
                 segments = new List<ODataSegmentTemplate>
@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(CountSegmentTemplate.Instance);
 
                 template = new ODataPathTemplate(segments);
-                action.AddSelector("Get", context.Prefix, context.Model, template, context.RouteOptions);
+                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
             else if (actionName == "Post" || actionName == $"Post{entitySet.EntityType().Name}")
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector("Post", context.Prefix, context.Model, template, context.RouteOptions);
+                action.AddSelector("Post", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
             else if (actionName == "Patch" || actionName == $"Patch{entitySet.Name}")
@@ -156,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
 
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector("Patch", context.Prefix, context.Model, template, context.RouteOptions);
+                action.AddSelector("Patch", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
 

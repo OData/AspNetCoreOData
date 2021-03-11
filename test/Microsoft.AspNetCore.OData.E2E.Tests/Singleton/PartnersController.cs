@@ -108,8 +108,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPut]
-        [ODataRoute("Partners({key})/Company")]
+        [HttpPut("Partners({key})/Company")]
         public IActionResult PutToCompany(int key, [FromBody]Company company)
         {
             var navigateCompany = Partners.First(e => e.ID == key).Company;
@@ -125,8 +124,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPatch]
-        [ODataRoute("Partners({key})/Company")]
+        [HttpPatch("Partners({key})/Company")]
         public IActionResult PatchToCompany(int key, Delta<Company> company)
         {
             var navigateCompany = Partners.First(e => e.ID == key).Company;

@@ -2663,11 +2663,6 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel"/>.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.SupportedHttpMethodConventions">
-            <summary>
-            Gets the collection of supported HTTP methods for conventions.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsNonODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
             Tests whether the action is not suitable for OData action.
@@ -2701,19 +2696,12 @@
             <param name="keyPrefix">The key prefix for the action parameter.</param>
             <returns>True/false.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetSupportedHttpMethods(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            Gets the supported Http method on the action or by convention using the action name.
-            </summary>
-            <param name="action">The action model.</param>
-            <returns>The supported http methods.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Adds the OData selector model to the action.
             </summary>
             <param name="action">The given action model.</param>
-            <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
+            <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="path">The OData path template.</param>
@@ -11065,6 +11053,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute">
             <summary>
             The attribute to specify a controller to an Edm model using the model name.
+            It affects for convention routing, doesn't affect the attribute routing.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute.#ctor">
@@ -11083,67 +11072,9 @@
             Gets the specified model name.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute">
             <summary>
-            Represents an attribute that can be placed on an action of an Controller to specify
-            the OData URLs that the action handles.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this action handles, it could be null.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this action handles. It could be null, For example: "customers({key})".</param>
-            <param name="prefix">The OData routing prefix setting. For example: "v{version}". It could be null which means this attribute be suitable for routes.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.PathTemplate">
-            <summary>
-            Gets the OData URL path template that this action handles.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.RoutePrefix">
-            <summary>
-            Gets or sets the OData route with which to associate the attribute.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute">
-            <summary>
-            Represents an attribute that can be placed on an OData controller to specify
-            the route template prefix that will be used for all actions of that controller.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this controller handles.For example: "customers({key})".</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this controller handles. For example: "customers({key})".</param>
-            <param name="prefix">The OData routing prefix setting. For example: "v{version}". It could be null which means this attribute be suitable for routes.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.PathPrefixTemplate">
-            <summary>
-            Gets the OData URL path prefix template that this controller handles.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.RoutePrefix">
-            <summary>
-            Gets or sets the route prefix with which to associate the attribute.
+            Represents an attribute that can be placed on Controller or action to specify that's OData controller or OData action.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController">
@@ -11165,7 +11096,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController">
             <summary>
-            
+            The base controller class for OData.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created``1(``0)">
@@ -11207,7 +11138,8 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
             <summary>
             The convention for an odata template string.
-            It looks for the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> on controller and <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> on action.
+            It looks for the <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> on controller
+            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http attribute for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention},Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">
@@ -11225,14 +11157,6 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.GetODataPathTemplatePrefixes(System.String,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
-            <summary>
-            Gets the route prefix on the controller.
-            </summary>
-            <param name="routePrefix">The route prefix.</param>
-            <param name="controller">The controller.</param>
-            <returns>The prefix string list.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention">
             <summary>
@@ -11473,9 +11397,9 @@
             Gets/sets the odata service provider, used for the attribute routing parser or others.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.RouteOptions">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Options">
             <summary>
-            Gets/sets the route build options.
+            Gets/sets the OData Options.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
@@ -11622,11 +11546,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Model">
             <summary>
             Gets the Edm model.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.HttpMethods">
-            <summary>
-            Gets the supported Http methods.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
@@ -12000,6 +11919,12 @@
             </summary>
             <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.ApplyAttributeRouting(System.Collections.Generic.IList{Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel})">
+            <summary>
+            Apply Default OData attribute routing
+            </summary>
+            <param name="controllers">The controller models</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
             <summary>
             Defines a policy that applies behaviors to the OData Uri matcher.
@@ -12063,11 +11988,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.HttpMethods">
-            <summary>
-            Gets the supported Http methods.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds">

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Xunit;
 
@@ -61,19 +60,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
         }
 
         // It's a top level function without parameters
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("GetAllConventionCustomers()")]
-        [ODataRoute("GetAllConventionCustomersImport()")]
+        [HttpGet("odata/GetAllConventionCustomers()")]
+        [HttpGet("odata/GetAllConventionCustomersImport()")]
         public IEnumerable<ConventionCustomer> GetAllConventionCustomers()
         {
             return _customers;
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("GetAllConventionCustomersImport(CustomerName={customerName})")]
-        [ODataRoute("GetAllConventionCustomersImport(CustomerName={customerName})/$count")]
+        [HttpGet("odata/GetAllConventionCustomersImport(CustomerName={customerName})")]
+        [HttpGet("odata/GetAllConventionCustomersImport(CustomerName={customerName})/$count")]
         // [FromODataUri] can not be deleted within below line, or the value of OrderName will be enclosed by single quote mark('). 
         public IEnumerable<ConventionCustomer> GetAllConventionCustomers([FromODataUri]String CustomerName)
         {
@@ -82,33 +79,29 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
         }
 
         // It's a top level function with one parameter]
-        [HttpGet]
-        [ODataRoute("GetConventionCustomerById(CustomerId={CustomerId})")]
-        [ODataRoute("GetConventionCustomerByIdImport(CustomerId={CustomerId})")]
+        [HttpGet("odata/GetConventionCustomerById(CustomerId={CustomerId})")]
+        [HttpGet("odata/GetConventionCustomerByIdImport(CustomerId={CustomerId})")]
         public ConventionCustomer GetConventionCustomerById(int CustomerId)
         {
             return _customers.Where(c => c.ID == CustomerId).FirstOrDefault();
         }
 
-        [HttpGet]
-        [ODataRoute("GetConventionCustomerNameByIdImport(CustomerId={CustomerId})")]
-        [ODataRoute("GetConventionCustomerByIdImport(CustomerId={CustomerId})/Name")]
+        [HttpGet("odata/GetConventionCustomerNameByIdImport(CustomerId={CustomerId})")]
+        [HttpGet("odata/GetConventionCustomerByIdImport(CustomerId={CustomerId})/Name")]
         public String GetConventionCustomerNameById([FromODataUri]int CustomerId)
         {
             return _customers.Where(c => c.ID == CustomerId).FirstOrDefault().Name;
         }
 
-        [HttpGet]
-        [ODataRoute("GetConventionOrderByCustomerIdAndOrderName(CustomerId={CustomerId},OrderName={OrderName})")]
-        [ODataRoute("GetConventionOrderByCustomerIdAndOrderNameImport(CustomerId={CustomerId},OrderName={OrderName})")]
+        [HttpGet("odata/GetConventionOrderByCustomerIdAndOrderName(CustomerId={CustomerId},OrderName={OrderName})")]
+        [HttpGet("odata/GetConventionOrderByCustomerIdAndOrderNameImport(CustomerId={CustomerId},OrderName={OrderName})")]
         public ConventionOrder GetConventionOrderByCustomerIdAndOrderName(int CustomerId, [FromODataUri]string OrderName)
         {
             ConventionCustomer customer = _customers.Where(c => c.ID == CustomerId).FirstOrDefault();
             return customer.Orders.Where(o => o.OrderName == OrderName).FirstOrDefault();
         }
 
-        [HttpGet]
-        [ODataRoute("AdvancedFunction(nums={numbers},genders={genders},location={address},addresses={addresses},customer={customer},customers={customers})")]
+        [HttpGet("odata/AdvancedFunction(nums={numbers},genders={genders},location={address},addresses={addresses},customer={customer},customers={customers})")]
         public bool AdvancedFunction([FromODataUri]IEnumerable<int> numbers,
             [FromODataUri]IEnumerable<ConventionGender> genders,
             [FromODataUri]ConventionAddress address, [FromODataUri]IEnumerable<ConventionAddress> addresses,
@@ -138,10 +131,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             return true;
         }
 
-        [HttpGet]
         [EnableQuery]
-        [ODataRoute("GetDefinedGenders()")]
-        [ODataRoute("GetDefinedGenders()/$count")]
+        [HttpGet("odata/GetDefinedGenders()")]
+        [HttpGet("odata/GetDefinedGenders()/$count")]
         public IActionResult GetDefinedGenders()
         {
             IList<ConventionGender> genders = new List<ConventionGender>();
@@ -150,10 +142,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             return Ok(genders);
         }
 
-        [HttpPost]
         [EnableQuery]
-        [ODataRoute("UpdateAddress")]
-        [ODataRoute("UpdateAddressImport")]
+        [HttpPost("odata/UpdateAddress")]
+        [HttpPost("odata/UpdateAddressImport")]
         public IActionResult UpdateAddress([FromBody]ODataUntypedActionParameters parameters)
         {
             if (!ModelState.IsValid)
@@ -186,9 +177,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
         }
 
         /*
-        [HttpPost]
-        [ODataRoute("CreateCustomer")]
-        [ODataRoute("CreateCustomerImport")]
+        [HttpPost("odata/CreateCustomer")]
+        [HttpPost("odata/CreateCustomerImport")]
         public IActionResult CreateCustomer(ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
@@ -202,8 +192,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
         }
          * */
 
-        [HttpPost]
-        [ODataRoute("AdvancedAction")]
+        [HttpPost("odata/AdvancedAction")]
         public IActionResult AdvancedAction([FromBody]ODataActionParameters parameters)
         {
             Assert.NotNull(parameters);

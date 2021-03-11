@@ -54,8 +54,12 @@ namespace ODataRoutingSample.OpenApi
 
                 if (tempateToPathDict.TryGetValue(routePathTemplate, out ODataPath pathValue))
                 {
-                    string method = GetHttpMethod(metadata, endpoint);
-                    pathValue.HttpMethods.Add(method);
+                    var methods = GetHttpMethods(endpoint);
+                    foreach (var method in methods)
+                    {
+                        pathValue.HttpMethods.Add(method);
+                    }
+
                     continue;
                 }
 
@@ -68,8 +72,11 @@ namespace ODataRoutingSample.OpenApi
                 path.PathTemplate = routePathTemplate;
                 provider.Add(path);
 
-                string method1 = GetHttpMethod(metadata, endpoint);
-                path.HttpMethods.Add(method1);
+                var method1 = GetHttpMethods(endpoint);
+                foreach (var method in method1)
+                {
+                    path.HttpMethods.Add(method);
+                }
                 tempateToPathDict[routePathTemplate] = path;
             }
 
@@ -82,18 +89,12 @@ namespace ODataRoutingSample.OpenApi
             return model.ConvertToOpenApi(settings);
         }
 
-        private static string GetHttpMethod(IODataRoutingMetadata metadata, Endpoint endpoint)
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
         {
-            string method = metadata.HttpMethods.FirstOrDefault();
-            if (method != null)
-            {
-                return method;
-            }
-
             HttpMethodMetadata methodMetadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
             if (methodMetadata != null)
             {
-                return methodMetadata.HttpMethods.First();
+                return methodMetadata.HttpMethods;
             }
 
             throw new Exception();

@@ -148,7 +148,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.False(returnValue);
 
             // Assert
-            Assert.Empty(action.Selectors);
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
         }
 
         [Theory]

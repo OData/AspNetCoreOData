@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -59,8 +60,10 @@ namespace ODataRoutingSample.Controllers
                 sb.Append($"<td>{GetActionDesciption(controllerActionDescriptor)}</td>");
 
                 // http methods
-                string httpMethods = string.Join(",", metadata.HttpMethods);
-                sb.Append($"<td>{httpMethods.ToUpper()}</td>");
+                //  string httpMethods = string.Join(",", metadata.HttpMethods);
+                //  sb.Append($"<td>{httpMethods.ToUpper()}</td>");
+
+                sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
 
                 // template name
                 RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
@@ -101,6 +104,17 @@ namespace ODataRoutingSample.Controllers
             return action.ToString();
         }
 
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        {
+            HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
+            if (metadata != null)
+            {
+                return metadata.HttpMethods;
+            }
+
+            return new[] { "No HttpMethodMetadata" };
+        }
+
         /// <summary>
         /// Process the non-odata route
         /// </summary>
@@ -110,6 +124,8 @@ namespace ODataRoutingSample.Controllers
         {
             sb.Append("<tr>");
             sb.Append($"<td>{endpoint.DisplayName}</td>");
+
+            sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
 
             RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
             if (routeEndpoint != null)
@@ -164,6 +180,7 @@ namespace ODataRoutingSample.Controllers
     <table>
      <tr>
        <th> Controller </th>
+       <th> HttpMethods </th>
        <th> Templates </th>
     </tr>
     {NONENDPOINTCONTENT}

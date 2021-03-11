@@ -18,6 +18,12 @@ namespace ODataCustomizedSample.Extensions
 
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
+            if (context.Prefix == "v{version}")
+            {
+                // let's only allow this prefix
+                return false;
+            }
+
             if (context.Action.ActionName != "GetTest")
             {
                 return false;

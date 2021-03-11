@@ -28,6 +28,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         // following the Fixture convention.
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
             IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();
@@ -921,21 +923,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         #endregion
     }
 
-    public class MyAttributeRoutingConvention : AttributeRoutingConvention
+    public class MyAttributeRoutingConvention : IODataControllerActionConvention
     {
-        public MyAttributeRoutingConvention(ILogger<AttributeRoutingConvention> logger, IODataPathTemplateParser parser)
-            : base(logger, parser)
-        {
-        }
+        /// <summary>
+        /// Metadata's order is 0, make a order a little bit bigger than 0 can make metadata routing convention go
+        /// </summary>
+        public int Order => 10;
 
-        public override bool AppliesToController(ODataControllerActionContext context)
+        public bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context.Prefix == "AttributeRouting")
             {
-                return base.AppliesToController(context);
+                // stop all others
+                return true;
             }
 
             return false;
+        }
+
+        public bool AppliesToController(ODataControllerActionContext context)
+        {
+            return true;
         }
     }
 }

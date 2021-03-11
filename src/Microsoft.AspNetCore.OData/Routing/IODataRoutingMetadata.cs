@@ -24,11 +24,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         IEdmModel Model { get; }
 
         /// <summary>
-        /// Gets the supported Http methods.
-        /// </summary>
-        ISet<string> HttpMethods { get; }
-
-        /// <summary>
         /// Gets the OData path template
         /// </summary>
         ODataPathTemplate Template { get; }

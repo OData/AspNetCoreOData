@@ -46,7 +46,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.Equal("prefix", metadata.Prefix);
             Assert.Same(model, metadata.Model);
             Assert.Same(path, metadata.Template);
-            Assert.NotNull(metadata.HttpMethods);
         }
     }
 }
