@@ -258,7 +258,16 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return null;
             }
 
-            return options.GetODataServiceProvider(request.ODataFeature().PrefixName);
+            string prefix = request.ODataFeature().PrefixName;
+            IServiceProvider sp = options.GetODataServiceProvider(prefix);
+            if (sp != null)
+            {
+                return sp;
+            }
+
+            IEdmModel model = request.ODataFeature().Model;
+            options.AddModel(prefix, model);
+            return options.GetODataServiceProvider(prefix);
 
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
             // return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);

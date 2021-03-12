@@ -26,6 +26,59 @@ namespace Microsoft.AspNetCore.OData
     public static class ODataServiceCollectionExtensions
     {
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDynamicOData(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+            services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
+
+            // Configure MvcCore to use formatters. The OData formatters do go into the global service
+            // provider and get picked up by the AspNetCore MVC framework. However, they ignore non-OData
+            // requests so they won't be used for non-OData formatting.
+            services.AddControllers(options =>
+            {
+                // Add OData input formatters at index 0, which overrides the built-in json and xml formatters.
+                // Add in reverse order at index 0 to preserve order from the factory in the final list.
+                foreach (ODataInputFormatter inputFormatter in ODataInputFormatterFactory.Create().Reverse())
+                {
+                    options.InputFormatters.Insert(0, inputFormatter);
+                }
+
+                // Add OData output formatters at index 0, which overrides the built-in json and xml formatters.
+                // Add in reverse order at index 0 to preserve order from the factory in the final list.
+                foreach (ODataOutputFormatter outputFormatter in ODataOutputFormatterFactory.Create().Reverse())
+                {
+                    options.OutputFormatters.Insert(0, outputFormatter);
+                }
+            })
+            .AddJsonOptions(options =>
+            {
+                // Add the Select expand and other wrapper converter factory
+                options.JsonSerializerOptions.Converters.Add(new SelectExpandWrapperConverter());
+                options.JsonSerializerOptions.Converters.Add(new PageResultValueConverter());
+                options.JsonSerializerOptions.Converters.Add(new DynamicTypeWrapperConverter());
+            });
+
+            services.TryAddEnumerable(
+               ServiceDescriptor.Transient<IApplicationModelProvider, ODataDynamicApplicationModelProvider>());
+
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
+
+            services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
+            services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
+
+            return services;
+        }
+
+        /// <summary>
         /// Adds essential OData services to the specified <see cref="IServiceCollection" />.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>

@@ -6045,6 +6045,13 @@
             Provides extension methods to add OData services.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddDynamicOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+            <param name="services"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
@@ -11077,6 +11084,11 @@
             Represents an attribute that can be placed on Controller or action to specify that's OData controller or OData action.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.IODataModelProvider.SeviceProvider">
+            <summary>
+            The Service provider for OData
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController">
             <summary>
             Represents a controller for generating OData servicedoc and metadata document ($metadata).
@@ -11551,6 +11563,39 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider">
+            <summary>
+            Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for OData convention action discovery.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider.#ctor(System.IServiceProvider,Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser,Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider})">
+            <summary>
+            
+            </summary>
+            <param name="sp"></param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider.Order">
+            <summary>
+            Gets the order value for determining the order of execution of providers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
+            <summary>
+            Executed for the second pass of <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel"/> built.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
+            <summary>
+            Executed for the first pass of <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel"/> building.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataDynamicApplicationModelProvider.GetODataRouteTemplate(System.String,System.String)">
+            <summary>
+            Apply Default OData attribute routing
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">

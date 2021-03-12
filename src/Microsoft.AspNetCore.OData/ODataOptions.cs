@@ -386,7 +386,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="model">The Edm model.</param>
         /// <param name="setupAction">The setup config.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildContainBuilder(IEdmModel model, Action<IContainerBuilder> setupAction)
+        internal IServiceProvider BuildContainBuilder(IEdmModel model, Action<IContainerBuilder> setupAction)
         {
             Contract.Assert(model != null);
 
