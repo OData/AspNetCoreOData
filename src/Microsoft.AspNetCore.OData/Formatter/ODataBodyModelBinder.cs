@@ -94,12 +94,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataDeserializerContext context = BuildDeserializerContext(bindingContext);
             HttpRequest request = bindingContext.HttpContext.Request;
 
-            var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
-            if (body != null)
-            {
-                body.AllowSynchronousIO = true;
-            }
-
             IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(request.Body, request.Headers);
             IEdmModel model = request.GetModel();
