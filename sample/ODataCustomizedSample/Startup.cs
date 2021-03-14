@@ -52,6 +52,8 @@ namespace ODataCustomizedSample
 
             app.UseRouting();
 
+            app.UseOData();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

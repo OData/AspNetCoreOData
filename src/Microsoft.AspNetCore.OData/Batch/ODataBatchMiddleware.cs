@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
                 // If a batch handler is present, register the route with the batch path mapper. This will be used
                 // by the batching middleware to handle the batch request. Batching still requires the injection
-                // of the batching middleware via UseODataBatching().
+                // of the batching middleware via UseOData(batching: true).
                 ODataBatchHandler batchHandler = subServiceProvider.GetService<ODataBatchHandler>();
                 if (batchHandler != null)
                 {

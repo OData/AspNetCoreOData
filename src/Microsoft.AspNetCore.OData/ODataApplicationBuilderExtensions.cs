@@ -13,18 +13,27 @@ namespace Microsoft.AspNetCore.OData
     public static class ODataApplicationBuilderExtensions
     {
         /// <summary>
-        /// Use OData batching middleware.
+        /// Use OData middleware.
+        /// </summary>
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+        /// <param name="batching">Value which determines whether OData batching is enabled.</param>
         /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
-        public static IApplicationBuilder UseODataBatching(this IApplicationBuilder app)
+        public static IApplicationBuilder UseOData(this IApplicationBuilder app, bool batching = false)
         {
             if (app == null)
             {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            return app.UseMiddleware<ODataBatchMiddleware>();
+            app.UseMiddleware<ODataMiddleware>();
+
+            if (batching)
+            {
+                app.UseMiddleware<ODataBatchMiddleware>();
+            }
+
+            return app;
         }
     }
 }

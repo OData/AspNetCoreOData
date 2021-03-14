@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
         /// For OData paths enable query should work with expansion.
         /// </summary>
         /// <returns>Task tracking operation.</returns>
-        ////[Fact] - Commented out as running this test right now throws 'Concurrent reads or writes are not supported' exception
+        [Fact]
         public async Task ConcurrentQueryExecutionIsThreadSafe()
         {
             // Arrange
@@ -61,7 +61,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
                     request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
                     HttpResponseMessage response = await this.Client.SendAsync(request);
-
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
                     List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();

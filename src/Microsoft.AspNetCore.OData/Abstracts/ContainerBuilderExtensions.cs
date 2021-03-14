@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // QueryValidators.
             builder.AddService<CountQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<FilterQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<FilterQueryValidator>(ServiceLifetime.Scoped);
             builder.AddService<ODataQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<OrderByQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<SelectExpandQueryValidator>(ServiceLifetime.Singleton);
