@@ -794,8 +794,8 @@ Accept-Charset: UTF-8
                         applicationPartManager.ApplicationParts.Add(part);
                     }
 
-                    app.UseRouting();
                     app.UseOData(batching: true);
+                    app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapControllers();
