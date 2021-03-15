@@ -413,9 +413,6 @@ namespace Microsoft.AspNetCore.OData
             // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();
 
-            // Inject the customized services.
-            setupAction?.Invoke(odataContainerBuilder);
-
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton,
                 typeof(ODataUriResolver),
@@ -423,6 +420,9 @@ namespace Microsoft.AspNetCore.OData
 
             // Inject the Edm model.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
+
+            // Inject the customized services.
+            setupAction?.Invoke(odataContainerBuilder);
 
             return odataContainerBuilder.BuildContainer();
         }

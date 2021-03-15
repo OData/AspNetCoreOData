@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -70,6 +71,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     }
                     else
                     {
+                        if (edmParameter.Type.IsEnum() && strValue.StartsWith("'", StringComparison.Ordinal) && strValue.EndsWith("'", StringComparison.Ordinal))
+                        {
+                            // related implementation at: https://github.com/OData/odata.net/blob/master/src/Microsoft.OData.Core/UriParser/Resolver/StringAsEnumResolver.cs#L131
+                            strValue = edmParameter.Type.FullName() + strValue;
+                        }
+
                         object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmParameter.Type);
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
