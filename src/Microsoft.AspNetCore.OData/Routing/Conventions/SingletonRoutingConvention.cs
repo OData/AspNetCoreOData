@@ -98,12 +98,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else if (actionName == "Put" || actionName == $"Put{singletonName}")
             {
-                httpMethod = "put";
+                httpMethod = "Put";
                 return true;
             }
             else if (actionName == "Patch" || actionName == $"Patch{singletonName}")
             {
-                httpMethod = "patch";
+                httpMethod = "Patch";
                 return true;
             }
 

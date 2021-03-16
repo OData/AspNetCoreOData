@@ -259,13 +259,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (edmOperation.IsAction())
             {
                 segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetset));
-                httpMethod = "post";
+                httpMethod = "Post";
             }
             else
             {
                 IDictionary<string, string> required = GetRequiredFunctionParamters(edmOperation, context.Action);
                 segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetset));
-                httpMethod = "get";
+                httpMethod = "Get";
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);

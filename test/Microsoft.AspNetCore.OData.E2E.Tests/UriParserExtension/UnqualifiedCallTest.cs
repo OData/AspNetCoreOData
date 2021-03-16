@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-#if NET5_0
-// .NET CoreAPP 3.1 : An item with the same key has already been added. Key: Get
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -104,4 +102,3 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
         }
     }
 }
-#endif

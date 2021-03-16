@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <returns>The Http Request.</returns>
         public static HttpRequest Create(Action<ODataOptions> setupAction)
         {
-            return Create("GET", "http://localhost", setupAction);
+            return Create("Get", "http://localhost", setupAction);
         }
 
         /// <summary>

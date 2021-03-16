@@ -159,19 +159,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
             {
                 method = "CreateRef";
-                httpMethod = "post,patch";
+                httpMethod = "Post,Patch";
                 remaining = actionName.Substring(9);
             }
             else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))
             {
                 method = "GetRef";
-                httpMethod = "get";
+                httpMethod = "Get";
                 remaining = actionName.Substring(6);
             }
             else if (actionName.StartsWith("DeleteRef", StringComparison.Ordinal))
             {
                 method = "DeleteRef";
-                httpMethod = "delete";
+                httpMethod = "Delete";
                 remaining = actionName.Substring(9);
             }
             else

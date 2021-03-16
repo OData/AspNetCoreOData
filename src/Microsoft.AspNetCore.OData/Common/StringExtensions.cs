@@ -19,16 +19,16 @@ namespace Microsoft.AspNetCore.OData.Common
             switch (method.ToUpperInvariant())
             {
                 case "POSTTO":
-                    return "POST";
+                    return "Post";
 
                 case "PUTTO":
-                    return "PUT";
+                    return "Put";
 
                 case "PATCHTO":
-                    return "PATCH";
+                    return "Patch";
 
                 case "DELETETO":
-                    return "DELETE";
+                    return "Delete";
 
                 default:
                     return method;
