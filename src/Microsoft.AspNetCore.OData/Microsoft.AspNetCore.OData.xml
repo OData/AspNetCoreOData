@@ -5797,18 +5797,24 @@
             Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseOData(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Boolean)" -->
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseOData(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Boolean)">
+            <summary>
+            Use OData middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <param name="batching">Value which determines whether OData batching is enabled.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMiddleware">
             <summary>
             Defines a middleware for dealing with general per-request
             init and cleanup functionality related to OData queries.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiddleware.#ctor(System.IServiceProvider,Microsoft.AspNetCore.Http.RequestDelegate)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.ODataMiddleware"/>.
             </summary>
-            <param name="serviceProvider">The service provider, we don't inject the ODataOptions.</param>
             <param name="next">The next middleware.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiddleware.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext)">

@@ -15,7 +15,6 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Use OData middleware.
         /// </summary>
-        /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
         /// <param name="batching">Value which determines whether OData batching is enabled.</param>
         /// <returns>The <see cref="IApplicationBuilder "/>.</returns>

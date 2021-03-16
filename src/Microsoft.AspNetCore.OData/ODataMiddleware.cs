@@ -19,9 +19,8 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Instantiates a new instance of <see cref="ODataMiddleware"/>.
         /// </summary>
-        /// <param name="serviceProvider">The service provider, we don't inject the ODataOptions.</param>
         /// <param name="next">The next middleware.</param>
-        public ODataMiddleware(IServiceProvider serviceProvider, RequestDelegate next)
+        public ODataMiddleware(RequestDelegate next)
         {
             _next = next;
         }
