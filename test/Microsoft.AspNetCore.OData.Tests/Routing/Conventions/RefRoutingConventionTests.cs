@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
@@ -27,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Arranges & Act & Assert
             string actionMethodName = "CreateRef";
             string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string httpMethod, out string prop, out string declaring);
-            Assert.Equal("post,patch", httpMethod);
+            Assert.Equal("Post,Patch", httpMethod);
             Assert.Equal("CreateRef", method);
             Assert.Null(prop);
             Assert.Null(declaring);
@@ -35,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Arranges & Act & Assert
             actionMethodName = "GetRefToPropertyFromAbc";
             method = RefRoutingConvention.SplitRefActionName(actionMethodName, out httpMethod, out prop, out declaring);
-            Assert.Equal("get", httpMethod);
+            Assert.Equal("Get", httpMethod);
             Assert.Equal("GetRef", method);
             Assert.Equal("Property", prop);
             Assert.Equal("Abc", declaring);
