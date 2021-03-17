@@ -13,6 +13,11 @@ namespace ODataRoutingSample.Controllers.v1
     [ODataModel("v1")]
     public class OrganizationsController : Controller
     {
+        public IActionResult Post([FromBody]Organization org)
+        {
+            return Ok();
+        }
+
         [HttpPatch]
         [EnableQuery]
        // public IActionResult Patch(EdmChangedObjectCollection changes)

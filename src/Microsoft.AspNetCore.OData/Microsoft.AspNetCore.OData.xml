@@ -12090,6 +12090,30 @@
             Represents a segment that is not understood.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parses the specified OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="odataPath">The OData path template to parse.</param>
+            <param name="requestProvider">The OData service provider.</param>
+            <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser">
+            <summary>
+            Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parse the string like "/users/{id}/contactFolders/{contactFolderId}/contacts"
+            to segments
+            </summary>
+            <param name="model">the Edm model.</param>
+            <param name="odataPath">the setting.</param>
+            <param name="requestProvider">The service provider.</param>
+            <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser">
             <summary>
             Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
