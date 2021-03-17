@@ -13,9 +13,11 @@ namespace ODataRoutingSample.Controllers.v1
     [ODataModel("v1")]
     public class OrganizationsController : Controller
     {
+        [EnableQuery]
         public IActionResult Post([FromBody]Organization org)
         {
-            return Ok();
+            org.OrganizationId = 99;
+            return Ok(org);
         }
 
         [HttpPatch]

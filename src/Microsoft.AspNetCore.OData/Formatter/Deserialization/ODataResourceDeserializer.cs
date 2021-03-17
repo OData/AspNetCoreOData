@@ -116,6 +116,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
+            resourceWrapper = UpdateResourceWrapper(resourceWrapper, readContext);
+
             return ReadResource(resourceWrapper, edmType.AsStructured(), readContext);
         }
 
@@ -447,6 +449,49 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             return new ODataResourceWrapper(resource);
         }
 
+        private ODataResourceWrapper UpdateResourceWrapper(ODataResourceWrapper resourceWrapper, ODataDeserializerContext readContext)
+        {
+            Contract.Assert(readContext != null);
+
+            if (resourceWrapper == null || resourceWrapper.Resource == null)
+            {
+                return resourceWrapper;
+            }
+
+            if (resourceWrapper.Resource.Id == null)
+            {
+                return resourceWrapper;
+            }
+
+            Uri id = resourceWrapper.Resource.Id;
+            Uri serviceRootUri = null;
+            if (id.IsAbsoluteUri)
+            {
+                string serviceRoot = readContext.Request.CreateODataLink();
+                serviceRootUri = new Uri(serviceRoot, UriKind.Absolute);
+            }
+
+            var request = readContext.Request;
+            IEdmModel model = readContext.Model;
+            DefaultODataPathParser pathParser = new DefaultODataPathParser();
+            var path = pathParser.Parse(model, serviceRootUri, id, request.GetSubServiceProvider());
+
+            KeySegment keySegment = path.OfType<KeySegment>().LastOrDefault();
+            if (keySegment == null)
+            {
+                return null;
+            }
+
+            resourceWrapper.Resource.Properties = resourceWrapper.Resource.Properties.Concat(
+                keySegment.Keys.Select(k => new ODataProperty
+                {
+                    Name = k.Key,
+                    Value = k.Value
+                }));
+
+            return resourceWrapper;
+        }
+
         /// <summary>
         /// Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
@@ -576,6 +621,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 Path = readContext.Path,
                 Model = readContext.Model,
+                Request = readContext.Request,
+                TimeZone = readContext.TimeZone
             };
 
             Type clrType;
@@ -684,6 +731,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 Path = readContext.Path,
                 Model = readContext.Model,
+                Request = readContext.Request,
+                TimeZone = readContext.TimeZone
             };
 
             if (readContext.IsNoClrType)

@@ -37,7 +37,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <summary>
         /// Gets or sets the EDM model associated with the request.
         /// </summary>
-        public IEdmModel Model { get; set; }
+        public IEdmModel Model { get;
+            set; }
 
         /// <summary>
         /// Gets or sets the HTTP Request whose response is being serialized.

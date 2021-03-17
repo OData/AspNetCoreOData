@@ -51,7 +51,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             uriParser.Resolver = new UnqualifiedODataUriResolver { EnableCaseInsensitive = true };
             uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parenthese and key as segment.
 
-            return uriParser.ParsePath();
+            try
+            {
+                return uriParser.ParsePath();
+            }
+            catch (ODataException ex)
+            {
+                return null;
+            }
         }
     }
 }
