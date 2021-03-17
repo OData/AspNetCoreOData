@@ -60,6 +60,18 @@
             Gets the services collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope">
+            <summary>
+            Provides access to the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest"/>
+            to which the OData service container instance is scoped.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest">
+            <summary>
+            Provides access to the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest"/>
+            to which the OData service container instance is scoped.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
             <summary>
             Exposes the ability to convert a collection of concurrency property names and values into an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/>

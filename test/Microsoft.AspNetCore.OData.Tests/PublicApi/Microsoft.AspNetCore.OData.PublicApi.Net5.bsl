@@ -120,6 +120,12 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider 
 	System.Type MapTo (System.Type clrType)
 }
 
+public class Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope {
+	public HttpRequestScope ()
+
+	Microsoft.AspNetCore.Http.HttpRequest HttpRequest  { public get; public set; }
+}
+
 [
 AttributeUsageAttribute(),
 ]

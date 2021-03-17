@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
@@ -92,8 +93,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<FilterBinder>(ServiceLifetime.Transient);
 
             // HttpRequestScope.
-            //builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
-            //builder.AddService(ServiceLifetime.Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest);
+            builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
+            builder.AddService(ServiceLifetime.Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest);
             return builder;
         }
     }
