@@ -8,8 +8,8 @@ namespace ODataCustomizedSample.Controllers
 {
     public class AnyODataController : ODataController
     {
-        [HttpGet("Players/$count")]
-        [Route("Players")]
+        [HttpGet("Players/$count")] // ~/players/$count
+        [Route("Players")] // It will combine as two routes: [Post,Patch] ~/Players
         [HttpPost]
         [HttpPatch]
         public IActionResult Dosomething()

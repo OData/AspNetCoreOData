@@ -1,27 +1,27 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System;
-using System.Linq;
 
-namespace ODataCustomizedSample.Extensions
+namespace ODataDynamicModel.Extensions
 {
     public class EntitySetTemplateSegment : ODataSegmentTemplate
     {
-        public override string Literal => "{classname}";
+        public override string Literal => "{entityset}";
 
         public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
 
         public override IEdmType EdmType => null;
 
-        public override bool IsSingle => false;
+        public override bool IsSingle => true;
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("classname", out object classname))
+            if (!context.RouteValues.TryGetValue("entityset", out object classname))
             {
                 return false;
             }
@@ -35,7 +35,8 @@ namespace ODataCustomizedSample.Extensions
             //var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
             if (edmEntitySet != null)
             {
-                context.Segments.Add(new EntitySetSegment(edmEntitySet));
+                EntitySetSegment segment = new EntitySetSegment(edmEntitySet);
+                context.Segments.Add(segment);
                 return true;
             }
 

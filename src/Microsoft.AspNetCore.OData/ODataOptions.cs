@@ -419,6 +419,8 @@ namespace Microsoft.AspNetCore.OData
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
             // Inject the Edm model.
+            // From Current ODL implment, such injection only be used in reader and writer if the input
+            // model is null.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
 
             // Inject the customized services.

@@ -10,18 +10,20 @@ namespace ODataCustomizedSample.Controllers
     [ODataRouting]
     public class AnyController : ControllerBase
     {
-        [HttpGet("Players")]
+        [HttpGet("Players")] // ~Players
         public IActionResult DoAnything()
         {
             return Ok("DoAnything");
         }
 
-        [HttpGet("/v{version}/Players")]
+        // Use Absolute route template
+        [HttpGet("/v{version}/Players")] // v{version}/Players
         public IActionResult DoAnything(string version)
         {
             return Ok($"DoAnything at version={version}");
         }
 
+        // Use Absolute route template
         [HttpGet("/v{version}/Players/{playerKey}/Default.PlayPiano(kind={kind},name={name})")]
         [HttpGet("/v{version}/Players/{playerKey}/PlayPiano(kind={kind},name={name})")]
         public string DoPlayPiano(int playerKey, int kind, string name)

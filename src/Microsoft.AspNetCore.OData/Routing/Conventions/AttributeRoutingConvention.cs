@@ -183,6 +183,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 string warning = string.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
                     originalTemplate, actionName, controllerName, ex.Message);
 
+                // Whether we throw exception or mark it as warning is a design pattern.
+                // throw new ODataException(warning);
                 _logger.LogWarning(warning);
                 return null;
             }
