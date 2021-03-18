@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateEntitySetSegmentTemplate_ReturnsODataEntitySetSegment()
+        public void TryTranslateEntitySetSegmentTemplate_ReturnsODataEntitySetSegment()
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
@@ -55,10 +55,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             EntitySetSegment setSegment = Assert.IsType<EntitySetSegment>(actual);
             Assert.Same(entityset, setSegment.EntitySet);
         }

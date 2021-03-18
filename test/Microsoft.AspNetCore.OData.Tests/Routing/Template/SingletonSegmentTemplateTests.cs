@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateSingletonSegmentTemplate_ReturnsSingletonSegment()
+        public void TryTranslateSingletonSegmentTemplate_ReturnsSingletonSegment()
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
@@ -54,10 +54,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             SingletonSegmentTemplate template = new SingletonSegmentTemplate(new SingletonSegment(singleton));
 
             // Act
-            ODataPathSegment segment = template.Translate(context);
+            Assert.True(template.TryTranslate(context));
 
             // Assert
-            Assert.NotNull(segment);
+            ODataPathSegment segment = Assert.Single(context.Segments);
             SingletonSegment singletonTemplate = Assert.IsType<SingletonSegment>(segment);
             Assert.Same(singleton, singletonTemplate.Singleton);
         }

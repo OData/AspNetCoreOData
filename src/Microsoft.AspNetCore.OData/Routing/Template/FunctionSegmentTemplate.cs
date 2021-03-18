@@ -128,7 +128,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
@@ -138,7 +138,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // If the function has no parameter, we don't need to do anything and just return an operation segment.
             if (ParameterMappings.Count == 0)
             {
-                return new OperationSegment(Function, NavigationSource as IEdmEntitySetBase);
+                context.Segments.Add(new OperationSegment(Function, NavigationSource as IEdmEntitySetBase));
+                return true;
             }
 
             if (HasOptionalMissing())
@@ -152,17 +153,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // so, let's combine the route data together and separate them using "," again.
                 if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
                 {
-                    return null;
+                    return false;
                 }
             }
 
             IList<OperationSegmentParameter> parameters = SegmentTemplateHelpers.Match(context, Function, ParameterMappings);
             if (parameters == null)
             {
-                return null;
+                return false;
             }
 
-            return new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase);
+            context.Segments.Add(new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase));
+            return true;
         }
 
         private bool HasOptionalMissing()

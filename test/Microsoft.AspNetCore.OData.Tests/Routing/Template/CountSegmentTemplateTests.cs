@@ -22,16 +22,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateCountSegmentTemplate_ReturnsODataCountSegment()
+        public void TryTranslateCountSegmentTemplate_ReturnsODataCountSegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment actual = CountSegmentTemplate.Instance.Translate(context);
+            bool ok = CountSegmentTemplate.Instance.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             CountSegment countSegment = Assert.IsType<CountSegment>(actual);
             Assert.Same(CountSegment.Instance, countSegment);
         }

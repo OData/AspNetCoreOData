@@ -58,7 +58,15 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (httpContext == null)
             {
-                throw new ArgumentNullException(nameof(httpContext));
+                throw Error.ArgumentNull(nameof(httpContext));
+            }
+
+            IODataFeature odataFeature = httpContext.ODataFeature();
+            if (odataFeature.Path != null)
+            {
+                // If we have the OData path setting, it means there's some Policy working.
+                // Let's skip this default OData matcher policy.
+                return Task.CompletedTask;
             }
 
             // The goal of this method is to perform the final matching:
@@ -88,7 +96,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                     ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                     if (odataPath != null)
                     {
-                        IODataFeature odataFeature = httpContext.ODataFeature();
                         odataFeature.PrefixName = metadata.Prefix;
                         odataFeature.Model = metadata.Model;
                         odataFeature.Path = odataPath;
@@ -100,15 +107,11 @@ namespace Microsoft.AspNetCore.OData.Routing
                         candidates.SetValidity(i, false);
                     }
                 }
-#if DEBUG
                 catch (Exception ex)
                 {
+#if DEBUG
                     Console.WriteLine(ex.Message);
-#else
-                catch (Exception)
-                {
 #endif
-                    candidates.SetValidity(i, false);
                 }
             }
 

@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataKeySegment()
+        public void TryTranslate_ReturnsODataKeySegment()
         {
             // Arrange
             EdmModel model = new EdmModel();
@@ -121,10 +121,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             KeySegment keySegment = Assert.IsType<KeySegment>(actual);
             var actualKey = Assert.Single(keySegment.Keys);
             Assert.Equal("customerId", actualKey.Key);
@@ -132,7 +133,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataKeySegment_ForCompositeKey()
+        public void TryTranslate_ReturnsODataKeySegment_ForCompositeKey()
         {
             // Arrange
             EdmModel model = new EdmModel();
@@ -157,10 +158,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             KeySegment keySegment = Assert.IsType<KeySegment>(actual);
             Assert.Equal(2, keySegment.Keys.Count());
             Assert.Equal(new[] { "firstName", "lastName" }, keySegment.Keys.Select(c => c.Key));

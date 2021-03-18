@@ -21,15 +21,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateMetadataTemplate_ReturnsODataMetadataSegment()
+        public void TryTranslateMetadataTemplate_ReturnsODataMetadataSegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment segment = MetadataSegmentTemplate.Instance.Translate(context);
+            bool ok = MetadataSegmentTemplate.Instance.TryTranslate(context);
 
             // Assert
+            Assert.True(ok);
+            ODataPathSegment segment = Assert.Single(context.Segments);
             Assert.Same(MetadataSegment.Instance, segment);
         }
     }

@@ -40,8 +40,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Translate the template into a real OData path segment, <see cref="ODataPathSegment"/>
         /// </summary>
-        /// <param name="context">The translate context.</param>
-        /// <returns>null or ODataPathSegment.</returns>
-        public abstract ODataPathSegment Translate(ODataTemplateTranslateContext context);
+        /// <param name="context">The translate context, the translated in context.</param>
+        /// <returns>True if translated. false if no.</returns>
+        public abstract bool TryTranslate(ODataTemplateTranslateContext context);
     }
 }

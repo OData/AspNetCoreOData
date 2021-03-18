@@ -112,7 +112,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Translate_ReturnsODataFunctionSegment(bool hasRouteData)
+        public void TryTranslate_ReturnsODataFunctionSegment(bool hasRouteData)
         {
             // Arrange
             var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
@@ -139,12 +139,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValue, edmModel);
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
             if (hasRouteData)
             {
-                Assert.NotNull(actual);
+                Assert.True(ok);
+                ODataPathSegment actual = Assert.Single(context.Segments);
                 OperationSegment functionSegment = Assert.IsType<OperationSegment>(actual);
                 Assert.Same(function, functionSegment.Operations.First());
                 Assert.Equal(2, functionSegment.Parameters.Count());
@@ -152,7 +153,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             }
             else
             {
-                Assert.Null(actual);
+                Assert.False(ok);
+                Assert.Empty(context.Segments);
             }
         }
     }

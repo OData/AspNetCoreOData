@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         [InlineData(EdmPrimitiveTypeKind.Double)]
         [InlineData(EdmPrimitiveTypeKind.Guid)]
         [InlineData(EdmPrimitiveTypeKind.Date)]
-        public void TranslateValueSegmentTemplate_ReturnsValueSegment(EdmPrimitiveTypeKind kind)
+        public void TryTranslateValueSegmentTemplate_ReturnsValueSegment(EdmPrimitiveTypeKind kind)
         {
             // Arrange
             IEdmPrimitiveType primitive = EdmCoreModel.Instance.GetPrimitiveType(kind);
@@ -47,9 +47,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ValueSegmentTemplate valueSegment = new ValueSegmentTemplate(primitive);
 
             // Act
-            ODataPathSegment segment = valueSegment.Translate(context);
+            Assert.True(valueSegment.TryTranslate(context));
 
             // Assert
+            ODataPathSegment segment = Assert.Single(context.Segments);
             ValueSegment odataValueSegment = Assert.IsType<ValueSegment>(segment);
             Assert.Same(primitive, odataValueSegment.EdmType);
         }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -17,28 +15,24 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw Error.ArgumentNull(nameof(path));
             }
 
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             // calculate every time
-            IList<ODataPathSegment> segments = new List<ODataPathSegment>();
             foreach (var segment in path)
             {
-                ODataPathSegment odataSegment = segment.Translate(context);
-                if (odataSegment == null)
+                if (!segment.TryTranslate(context))
                 {
                     return null;
                 }
-
-                segments.Add(odataSegment);
             }
 
-            return new ODataPath(segments);
+            return new ODataPath(context.Segments);
         }
     }
 }

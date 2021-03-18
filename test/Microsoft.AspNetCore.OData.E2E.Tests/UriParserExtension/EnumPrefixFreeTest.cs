@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
                 return new TheoryDataSet<string, string, int>()
                 {
                     { "gEnDeR=Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'mAlE'", "GeNdEr='MaLe'", (int)HttpStatusCode.OK },
-                    { "GeNdEr=Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'UnknownValue'", "gEnDeR='UnknownValue'", (int)HttpStatusCode.NotFound },
+                    { "GeNdEr=Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'UnknownValue'", "gEnDeR='UnknownValue'", (int)HttpStatusCode.BadRequest },
                 };
             }
         }

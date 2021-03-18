@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataFunctionImportSegment()
+        public void TryTranslate_ReturnsODataFunctionImportSegment()
         {
             // Arrange
             EdmFunction function = new EdmFunction("NS", "MyFunctionImport", IntPrimitive, false, null, false);
@@ -90,16 +90,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 new RouteValueDictionary(), edmModel.Object);
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             OperationImportSegment functionImportSegment = Assert.IsType<OperationImportSegment>(actual);
             Assert.Same(function, functionImportSegment.OperationImports.First().Operation);
         }
 
         [Fact]
-        public void TranslateFunctionImportSegmentTemplate_ReturnsODataFunctionImportSegment_WithOptionalParameter()
+        public void TryTranslateFunctionImportSegmentTemplate_ReturnsODataFunctionImportSegment_WithOptionalParameter()
         {
             // Arrange
             _function.AddOptionalParameter("min", IntPrimitive);
@@ -122,10 +123,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
 
             // Act
-             ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             OperationImportSegment functionImportSegment = Assert.IsType<OperationImportSegment>(actual);
             Assert.Same(_function, functionImportSegment.OperationImports.First().Operation);
             Assert.Equal(3, functionImportSegment.Parameters.Count());
@@ -137,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateFunctionImportSegmentTemplate_ReturnsNull_WithOptionalParameterMisMatch()
+        public void TryTranslateFunctionImportSegmentTemplate_ReturnsNull_WithOptionalParameterMisMatch()
         {
             // Arrange
             _function.AddOptionalParameter("min", IntPrimitive);
@@ -159,10 +161,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.Null(actual);
+            Assert.False(ok);
+            Assert.Empty(context.Segments);
         }
     }
 }

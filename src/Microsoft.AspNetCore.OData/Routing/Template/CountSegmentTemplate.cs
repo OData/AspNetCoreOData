@@ -40,9 +40,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override IEdmNavigationSource NavigationSource => null;
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return CountSegment.Instance;
+            context?.Segments.Add(CountSegment.Instance);
+            return true;
         }
     }
 }

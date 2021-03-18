@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => true;
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
@@ -139,7 +139,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            return new KeySegment(keysValues, EntityType, NavigationSource);
+            context.Segments.Add(new KeySegment(keysValues, EntityType, NavigationSource));
+            return true;
         }
 
         /// <summary>

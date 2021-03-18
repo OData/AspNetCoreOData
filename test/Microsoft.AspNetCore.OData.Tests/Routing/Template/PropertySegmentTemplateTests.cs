@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslatePropertySegmentTemplate_ReturnsPropertySegment()
+        public void TryTranslatePropertySegmentTemplate_ReturnsPropertySegment()
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
@@ -50,9 +50,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             PropertySegmentTemplate propertySegment = new PropertySegmentTemplate(property);
 
             // Act
-            ODataPathSegment segment = propertySegment.Translate(context);
+            bool ok = propertySegment.TryTranslate(context);
 
             // Assert
+            Assert.True(ok);
+            ODataPathSegment segment = Assert.Single(context.Segments);
             PropertySegment odataPropertySegment = Assert.IsType<PropertySegment>(segment);
             Assert.Equal("Edm.String", odataPropertySegment.EdmType.FullTypeName());
         }
