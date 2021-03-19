@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,17 +11,28 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
 
-namespace ODataDynamicModel.Controllers
+namespace ODataSampleCommon
 {
+    /// <summary>
+    /// A debug controller to show the OData endpoint.
+    /// </summary>
     public class ODataEndpointController : ControllerBase
     {
         private EndpointDataSource _dataSource;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataEndpointController" /> class.
+        /// </summary>
+        /// <param name="dataSource">The data source.</param>
         public ODataEndpointController(EndpointDataSource dataSource)
         {
             _dataSource = dataSource;
         }
 
+        /// <summary>
+        /// Get all routes.
+        /// </summary>
+        /// <returns>The content result.</returns>
         [HttpGet("$odata")]
         public ContentResult GetAllRoutes()
         {
@@ -74,8 +86,8 @@ namespace ODataDynamicModel.Controllers
                 }
             }
 
-            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString());
-            output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString());
+            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString(), StringComparison.OrdinalIgnoreCase);
+            output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString(), StringComparison.OrdinalIgnoreCase);
 
             return base.Content(output, "text/html");
         }
@@ -116,7 +128,7 @@ namespace ODataDynamicModel.Controllers
         /// Process the non-odata route
         /// </summary>
         /// <param name="sb">The string builder</param>
-        /// <param name="endPoint">The endpoint.</param>
+        /// <param name="endpoint">The endpoint.</param>
         private static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
         {
             sb.Append("<tr>");
@@ -127,7 +139,7 @@ namespace ODataDynamicModel.Controllers
             RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
             if (routeEndpoint != null)
             {
-                if (routeEndpoint.RoutePattern.RawText.StartsWith("/"))
+                if (routeEndpoint.RoutePattern.RawText.StartsWith("/", StringComparison.OrdinalIgnoreCase))
                 {
                     sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
                 }
@@ -186,4 +198,3 @@ namespace ODataDynamicModel.Controllers
 </html>";
     }
 }
-

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj" />
+    <ProjectReference Include="..\ODataSampleCommon\ODataSampleCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>
