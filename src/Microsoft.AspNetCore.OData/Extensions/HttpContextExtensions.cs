@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (httpContext == null)
             {
-                throw new ArgumentNullException(nameof(httpContext));
+                throw Error.ArgumentNull(nameof(httpContext));
             }
 
             IODataFeature odataFeature = httpContext.Features.Get<IODataFeature>();
@@ -48,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (httpContext == null)
             {
-                throw new ArgumentNullException(nameof(httpContext));
+                throw Error.ArgumentNull(nameof(httpContext));
             }
 
             IODataBatchFeature odataBatchFeature = httpContext.Features.Get<IODataBatchFeature>();
@@ -70,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (httpContext == null)
             {
-                throw new ArgumentNullException(nameof(httpContext));
+                throw Error.ArgumentNull(nameof(httpContext));
             }
 
             // Get an IUrlHelper from the global service provider.

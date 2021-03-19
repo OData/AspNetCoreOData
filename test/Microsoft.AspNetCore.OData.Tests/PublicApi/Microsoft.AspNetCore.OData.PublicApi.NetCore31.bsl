@@ -634,14 +634,6 @@ public class Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1 {
 }
 
 [
-FlagsAttribute(),
-]
-public enum Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions : int {
-	AllowNextLinkWithNonPositiveTopValue = 1
-	None = 0
-}
-
-[
 ExtensionAttribute(),
 ]
 public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions {

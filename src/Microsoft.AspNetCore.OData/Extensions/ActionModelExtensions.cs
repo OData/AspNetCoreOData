@@ -291,22 +291,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
             return selectorModel;
         }
 
-        /// <summary>
-        /// Gets the supported Http method on the action or by convention using the action name.
-        /// </summary>
-        /// <param name="action">The action model.</param>
-        /// <returns>The supported http methods.</returns>
-        internal static bool HasHttpMethod(this ActionModel action)
-        {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            // Determine the supported methods.
-            return action.Attributes.Any(a => a is IActionHttpMethodProvider);
-        }
-
         private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
         {
             foreach (var item in items)

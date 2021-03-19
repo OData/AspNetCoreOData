@@ -2719,28 +2719,6 @@
             <param name="path">The OData path template.</param>
             <param name="options">The route build options.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasHttpMethod(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            Gets the supported Http method on the action or by convention using the action name.
-            </summary>
-            <param name="action">The action model.</param>
-            <returns>The supported http methods.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions">
-            <summary>
-            Contains bitmasks for features that need backward compatibilty.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.None">
-            <summary>
-            No compatibility options are selected.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.AllowNextLinkWithNonPositiveTopValue">
-            <summary>
-             Generate nextlink even if the top value specified in request is less than page size when the request extension method is directly called.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions">
             <summary>
             The extension methods for the <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel"/>.

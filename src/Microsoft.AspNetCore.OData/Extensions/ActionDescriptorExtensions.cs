@@ -25,17 +25,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (actionDescriptor == null)
             {
-                throw new ArgumentNullException(nameof(actionDescriptor));
+                throw Error.ArgumentNull(nameof(actionDescriptor));
             }
 
             if (request == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (entityClrType == null)
             {
-                throw new ArgumentNullException(nameof(entityClrType));
+                throw Error.ArgumentNull(nameof(entityClrType));
             }
 
             IEdmModel model;
