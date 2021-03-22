@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public class MetadataSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// Gets the static instace of $metadata
+        /// Gets the static instance of $metadata
         /// </summary>
         public static MetadataSegmentTemplate Instance { get; } = new MetadataSegmentTemplate();
 

@@ -12697,7 +12697,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Instance">
             <summary>
-            Gets the static instace of $metadata
+            Gets the static instance of $metadata
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.#ctor">

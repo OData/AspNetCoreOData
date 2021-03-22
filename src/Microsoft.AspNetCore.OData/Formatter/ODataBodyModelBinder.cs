@@ -71,6 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             HttpRequest request = bindingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;
             IEdmModel edmModel = request.GetModel();
+            TimeZoneInfo tzi = request.GetTimeZoneInfo();
 
             return new ODataDeserializerContext
             {
@@ -78,7 +79,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Model = edmModel,
                 Request = request,
                 ResourceType = bindingContext.ModelType,
-        //        ResourceEdmType = edmTypeReference,
+                TimeZone = tzi,
+                //        ResourceEdmType = edmTypeReference,
             };
         }
 

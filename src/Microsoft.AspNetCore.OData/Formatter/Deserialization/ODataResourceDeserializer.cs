@@ -499,6 +499,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 Path = readContext.Path,
                 Model = readContext.Model,
+                Request = readContext.Request,
+                TimeZone = readContext.TimeZone
             };
 
             Type clrType;
@@ -607,6 +609,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 Path = readContext.Path,
                 Model = readContext.Model,
+                Request = readContext.Request,
+                TimeZone = readContext.TimeZone
             };
 
             if (readContext.IsNoClrType)
