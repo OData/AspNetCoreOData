@@ -76,7 +76,7 @@ namespace ODataRoutingSample
             //app.UseODataOpenApi();
 
             // Add the OData Batch middleware to support OData $Batch
-            app.UseODataBatching();
+            app.UseOData(batching: true);
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

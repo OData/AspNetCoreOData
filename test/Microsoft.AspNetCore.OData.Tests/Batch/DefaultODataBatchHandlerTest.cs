@@ -587,7 +587,7 @@ Host: example.com
                 })
                 .Configure(app =>
                 {
-                    app.UseODataBatching();
+                    app.UseOData(batching: true);
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {
@@ -794,7 +794,7 @@ Accept-Charset: UTF-8
                         applicationPartManager.ApplicationParts.Add(part);
                     }
 
-                    app.UseODataBatching();
+                    app.UseOData(batching: true);
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {
@@ -890,7 +890,7 @@ Accept-Charset: UTF-8
                         applicationPartManager.ApplicationParts.Add(part);
                     }
 
-                    app.UseODataBatching();
+                    app.UseOData(batching: true);
                     app.UseRouting();
                     app.UseEndpoints(endpoints =>
                     {

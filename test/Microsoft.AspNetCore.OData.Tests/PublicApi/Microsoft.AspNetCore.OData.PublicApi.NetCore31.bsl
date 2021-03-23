@@ -5,7 +5,7 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseOData (Microsoft.AspNetCore.Builder.IApplicationBuilder app, params bool batching)
 }
 
 [
@@ -36,6 +36,15 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
+}
+
+public class Microsoft.AspNetCore.OData.ODataMiddleware {
+	public ODataMiddleware (Microsoft.AspNetCore.Http.RequestDelegate next)
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public System.Threading.Tasks.Task InvokeAsync (Microsoft.AspNetCore.Http.HttpContext context)
 }
 
 public class Microsoft.AspNetCore.OData.ODataOptions {

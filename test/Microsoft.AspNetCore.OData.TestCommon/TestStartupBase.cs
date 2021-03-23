@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
@@ -21,6 +22,8 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             ConfigureBeforeRouting(app, env);
 
             app.UseRouting();
+
+            app.UseOData();
 
             ConfigureInRouting(app, env);
 
