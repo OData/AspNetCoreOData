@@ -3071,9 +3071,8 @@ public class Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemp
 	bool IsSingle  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
-	string PropertyName  { public get; }
+	string ParameterName  { public get; }
 	Microsoft.OData.UriParser.PathTemplateSegment Segment  { public get; }
-	string SegmentName  { public get; }
 
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
