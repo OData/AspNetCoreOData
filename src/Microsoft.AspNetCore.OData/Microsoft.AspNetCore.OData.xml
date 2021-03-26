@@ -1716,9 +1716,29 @@
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
             </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <param name="structuralType">The derived entity type which the changes would be tracked.
             <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
             </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Id">
             <inheritdoc />
@@ -3022,7 +3042,7 @@
             </summary>
             <param name="serviceProvider">The service provider.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
@@ -3099,6 +3119,16 @@
             <param name="readContext">The deserializer context.</param>
             <returns>The deserialized resource set object.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResource(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="resource"/> under the given <paramref name="readContext"/>.
+            The given resource could be "Added Resource", "Updated Resource" or "Deleted Resource".
+            </summary>
+            <param name="resource">The Added Updated or Deleted Resource.</param>
+            <param name="elementType">The element type.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created object.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaDeletedLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the given <paramref name="deletedLink"/> under the given <paramref name="readContext"/>.
@@ -3106,7 +3136,7 @@
             <param name="deletedLink">The given deleted link.</param>
             <param name="elementType">The element type.</param>
             <param name="readContext">The deserializer context.</param>
-            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/>.</returns>
+            <returns>The created object.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
@@ -3115,7 +3145,7 @@
             <param name="link">The given delta link.</param>
             <param name="elementType">The element type.</param>
             <param name="readContext">The deserializer context.</param>
-            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink"/>.</returns>
+            <returns>The created object.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer">
             <summary>
@@ -3195,11 +3225,12 @@
             <param name="request">The request being deserialized.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> for the given EDM type.
             </summary>
             <param name="edmType">The EDM type.</param>
+            <param name="isDelta">Is delta</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer">
@@ -3320,6 +3351,14 @@
             <param name="structuredType">The EDM type of the resource to create.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The created CLR object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyDeletedResource(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the nested properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the nested properties.</param>
+            <param name="readContext">The deserializer context.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyNestedProperties(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
@@ -5533,22 +5572,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper">
-            <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataDeletedResource"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper.#ctor(Microsoft.OData.ODataDeletedResource)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper"/>.
-            </summary>
-            <param name="deletedResource">The wrapped deleted resource item.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper.DeletedResource">
-            <summary>
-            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeletedResource"/>.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper">
             <summary>
             Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaDeletedLink"/> deleted link.
@@ -5608,8 +5631,8 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaItems">
             <summary>
-            Gets the nested delta items (resource, or delted resource, or deleted link, or added link).
-            The order of the delta items matters.
+            Gets the nested delta items (resource, or deleted resource, or deleted link, or added link).
+            Be noted: the order of the delta items matters.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
@@ -5712,21 +5735,6 @@
             <param name="itemsStack">The item stack.</param>
             <param name="topLevelItem">The top level item.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper">
-            <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceBase"/> and its nested resource infos.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper.NestedResourceInfos">
-            <summary>
-            Gets the inner nested resource infos.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper">
             <summary>
             Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSetBase"/> and the <see cref="T:Microsoft.OData.ODataResourceBase"/>'s that are part of it.
@@ -5759,7 +5767,7 @@
             Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResource)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResourceBase)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/>.
             </summary>
@@ -5768,6 +5776,16 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataResource"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.IsDeletedResource">
+            <summary>
+            Gets a boolean indicating whether the resource is deleted resource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResourceInfos">
+            <summary>
+            Gets the inner nested resource infos.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">

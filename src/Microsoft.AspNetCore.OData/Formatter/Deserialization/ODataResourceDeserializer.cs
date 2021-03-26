@@ -190,6 +190,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 object resource = CreateResourceInstance(structuredType, readContext);
                 ApplyResourceProperties(resource, resourceWrapper, structuredType, readContext);
+                ApplyDeletedResource(resource, resourceWrapper, readContext);
                 return resource;
             }
         }
@@ -204,12 +205,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (structuredType == null)
             {
-                throw new ArgumentNullException(nameof(structuredType));
+                throw Error.ArgumentNull(nameof(structuredType));
             }
 
             if (readContext == null)
             {
-                throw new ArgumentNullException(nameof(readContext));
+                throw Error.ArgumentNull(nameof(readContext));
             }
 
             IEdmModel model = readContext.Model;
@@ -222,7 +223,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 if (structuredType.IsEntity())
                 {
-                    return new EdmEntityObject(structuredType.AsEntity());
+                    if (readContext.IsDeltaDeleted)
+                    {
+                        return new EdmDeltaDeletedResourceObject(structuredType.AsEntity());
+                    }
+                    else
+                    {
+                        return new EdmEntityObject(structuredType.AsEntity());
+                    }
                 }
 
                 return new EdmComplexObject(structuredType.AsComplex());
@@ -236,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         Error.Format(SRResources.MappingDoesNotContainResourceType, structuredType.FullName()));
                 }
 
-                if (readContext.IsDeltaOfT)
+                if (readContext.IsDeltaOfT || readContext.IsDeltaDeleted)
                 {
                     IEnumerable<string> structuralProperties = structuredType.StructuralProperties()
                         .Select(edmProperty => model.GetClrPropertyName(edmProperty));
@@ -262,6 +270,46 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
+        /// Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// </summary>
+        /// <param name="resource">The object into which the nested properties should be read.</param>
+        /// <param name="resourceWrapper">The resource object containing the nested properties.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        public virtual void ApplyDeletedResource(object resource, ODataResourceWrapper resourceWrapper, ODataDeserializerContext readContext)
+        {
+            if (resourceWrapper == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceWrapper));
+            }
+
+            if (readContext == null)
+            {
+                throw Error.ArgumentNull(nameof(readContext));
+            }
+
+            if (!resourceWrapper.IsDeletedResource)
+            {
+                return;
+            }
+
+            if (resourceWrapper.Resource is ODataDeletedResource deletedResource)
+            {
+                if (resource is IDeltaDeletedResource deltaDeletedResource)
+                {
+                    // typed scenario
+                    deltaDeletedResource.Id = deletedResource.Id;
+                    deltaDeletedResource.Reason = deletedResource.Reason;
+                }
+                else if (resource is IEdmDeltaDeletedResourceObject deletedObject)
+                {
+                    // non-typed scenario
+                    deletedObject.Id = deletedResource.Id;
+                    deletedObject.Reason = deletedResource.Reason ?? DeltaDeletedEntryReason.Deleted;
+                }
+            }
+        }
+
+        /// <summary>
         /// Deserializes the nested properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
         /// <param name="resource">The object into which the nested properties should be read.</param>
@@ -273,7 +321,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceWrapper == null)
             {
-                throw new ArgumentNullException(nameof(resourceWrapper));
+                throw Error.ArgumentNull(nameof(resourceWrapper));
             }
 
             foreach (ODataNestedResourceInfoWrapper nestedResourceInfo in resourceWrapper.NestedResourceInfos)
@@ -294,12 +342,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resource == null)
             {
-                throw new ArgumentNullException(nameof(resource));
+                throw Error.ArgumentNull(nameof(resource));
             }
 
             if (resourceInfoWrapper == null)
             {
-                throw new ArgumentNullException(nameof(resourceInfoWrapper));
+                throw Error.ArgumentNull(nameof(resourceInfoWrapper));
             }
 
             IEdmProperty edmProperty = structuredType.FindProperty(resourceInfoWrapper.NestedResourceInfo.Name);
@@ -350,6 +398,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         ApplyResourceSetInNestedProperty(edmProperty, resource, resourceSetWrapper, readContext);
                     }
 
+                    continue;
+                }
+
+                if (childItem is ODataDeltaResourceSetWrapper deltaResourceSetWrapper)
+                {
+                    Contract.Assert(edmProperty != null, "nested delta resource cannot be dynamic property!");
+                    ApplyNestedDeltaResourceSet(edmProperty, resource, deltaResourceSetWrapper, readContext);
                     continue;
                 }
 
@@ -438,17 +493,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            if (readContext.IsDeltaOfT)
-            {
-                IEdmNavigationProperty navigationProperty = nestedProperty as IEdmNavigationProperty;
-                if (navigationProperty != null)
-                {
-                    string message = Error.Format(SRResources.CannotPatchNavigationProperties, navigationProperty.Name,
-                        navigationProperty.DeclaringEntityType().FullName());
-                    throw new ODataException(message);
-                }
-            }
-
             object value = ReadNestedResourceInline(resourceWrapper, nestedProperty.Type, readContext);
 
             // First resolve Data member alias or annotation, then set the regular
@@ -534,17 +578,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            if (readContext.IsDeltaOfT)
-            {
-                IEdmNavigationProperty navigationProperty = nestedProperty as IEdmNavigationProperty;
-                if (navigationProperty != null)
-                {
-                    string message = Error.Format(SRResources.CannotPatchNavigationProperties, navigationProperty.Name,
-                        navigationProperty.DeclaringEntityType().FullName());
-                    throw new ODataException(message);
-                }
-            }
-
             object value = ReadNestedResourceSetInline(resourceSetWrapper, nestedProperty.Type, readContext);
 
             string propertyName = readContext.Model.GetClrPropertyName(nestedProperty);
@@ -605,13 +638,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             IEdmStructuredTypeReference structuredType = edmType.AsCollection().ElementType().AsStructured();
-            var nestedReadContext = new ODataDeserializerContext
-            {
-                Path = readContext.Path,
-                Model = readContext.Model,
-                Request = readContext.Request,
-                TimeZone = readContext.TimeZone
-            };
+            ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
 
             if (readContext.IsNoClrType)
             {
@@ -638,6 +665,46 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             return deserializer.ReadInline(resourceSetWrapper, edmType, nestedReadContext);
+        }
+
+        private void ApplyNestedDeltaResourceSet(IEdmProperty nestedProperty, object resource,
+            ODataDeltaResourceSetWrapper deltaResourceSetWrapper, ODataDeserializerContext readContext)
+        {
+            Contract.Assert(nestedProperty != null);
+            Contract.Assert(resource != null);
+            Contract.Assert(readContext != null);
+
+            IEdmTypeReference edmType = nestedProperty.Type;
+            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType, true);
+            if (deserializer == null)
+            {
+                throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
+            }
+
+            IEdmStructuredTypeReference structuredType = edmType.AsCollection().ElementType().AsStructured();
+            ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
+
+            if (readContext.IsNoClrType)
+            {
+                nestedReadContext.ResourceType = typeof(EdmChangedObjectCollection);
+            }
+            else
+            {
+                Type clrType = readContext.Model.GetClrType(structuredType);
+
+                if (clrType == null)
+                {
+                    throw new ODataException(
+                        Error.Format(SRResources.MappingDoesNotContainResourceType, structuredType.FullName()));
+                }
+
+                nestedReadContext.ResourceType = typeof(DeltaSet<>).MakeGenericType(clrType);
+            }
+
+            object value = deserializer.ReadInline(deltaResourceSetWrapper, edmType, nestedReadContext);
+
+            string propertyName = readContext.Model.GetClrPropertyName(nestedProperty);
+            DeserializationHelpers.SetCollectionProperty(resource, nestedProperty, value, propertyName);
         }
     }
 }

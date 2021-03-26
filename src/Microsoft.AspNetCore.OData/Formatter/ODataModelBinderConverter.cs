@@ -353,7 +353,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        private static object CovertResourceId(object source, ODataResource resource,
+        private static object CovertResourceId(object source, ODataResourceBase resource,
             IEdmEntityTypeReference entityTypeReference, ODataDeserializerContext readContext)
         {
             Contract.Assert(resource != null);

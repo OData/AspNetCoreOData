@@ -99,9 +99,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 
                 case ODataReaderState.DeletedResourceEnd:
                     Contract.Assert(itemsStack.Count > 0, "The deleted resource which is ending should be on the top of the items stack.");
-                    ODataDeletedResourceWrapper deletedResourceWrapper = itemsStack.Peek() as ODataDeletedResourceWrapper;
+                    ODataResourceWrapper deletedResourceWrapper = itemsStack.Peek() as ODataResourceWrapper;
                     Contract.Assert(deletedResourceWrapper != null, "The top object in the stack should be delete resource wrapper.");
-                    Contract.Assert(deletedResourceWrapper.DeletedResource == reader.Item, "The deleted resource should be the same item in the reader.");
+                    Contract.Assert(deletedResourceWrapper.Resource == reader.Item, "The deleted resource should be the same item in the reader.");
                     itemsStack.Pop();
                     break;
 
@@ -112,7 +112,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     ODataNestedResourceInfoWrapper nestedResourceInfoWrapper = new ODataNestedResourceInfoWrapper(nestedResourceInfo);
                     Contract.Assert(itemsStack.Count > 0, "nested resource info can't appear as top-level item.");
                     {
-                        ODataResourceBaseWrapper parentResource = (ODataResourceBaseWrapper)itemsStack.Peek();
+                        ODataResourceWrapper parentResource = (ODataResourceWrapper)itemsStack.Peek();
                         parentResource.NestedResourceInfos.Add(nestedResourceInfoWrapper);
                     }
 
@@ -257,7 +257,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             ODataDeletedResource deletedResource = (ODataDeletedResource)reader.Item;
             Contract.Assert(deletedResource != null, "Deleted resource should not be null");
 
-            ODataDeletedResourceWrapper deletedResourceWrapper = new ODataDeletedResourceWrapper(deletedResource);
+            ODataResourceWrapper deletedResourceWrapper = new ODataResourceWrapper(deletedResource);
 
             // top-level resource should never be deleted.
             Contract.Assert(itemsStack.Count != 0, "Deleted Resource should not be top level item");

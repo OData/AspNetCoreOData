@@ -50,10 +50,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <inheritdoc />
-        public string Id { get; set; }
+        public Uri Id { get; set; }
 
         /// <inheritdoc />
-        public DeltaDeletedEntryReason Reason { get; set; }
+        public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
         public EdmDeltaKind DeltaKind

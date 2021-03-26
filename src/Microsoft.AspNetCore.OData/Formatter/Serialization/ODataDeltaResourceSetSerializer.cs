@@ -287,8 +287,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));
             }
 
-            Uri id = StringToUri(edmDeltaDeletedEntity.Id);
-            ODataDeletedResource deletedResource = new ODataDeletedResource(id, edmDeltaDeletedEntity.Reason);
+            Uri id = edmDeltaDeletedEntity.Id;
+            DeltaDeletedEntryReason reason = edmDeltaDeletedEntity.Reason ?? DeltaDeletedEntryReason.Deleted;
+            ODataDeletedResource deletedResource = new ODataDeletedResource(id, reason);
 
             if (edmDeltaDeletedEntity.NavigationSource != null)
             {

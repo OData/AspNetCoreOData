@@ -101,6 +101,10 @@ namespace Microsoft.AspNetCore.OData.Routing
                         odataFeature.Path = odataPath;
 
                         MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
+
+                        // Shall we break the remaining candidates?
+                        // So far the answer is no. Because we can use this matcher to obsolete the unmatched endpoint.
+                        // break;
                     }
                     else
                     {

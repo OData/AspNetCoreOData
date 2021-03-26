@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             // Arrange
             Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
-            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(ColorType)).Returns<ODataResourceDeserializer>(null);
+            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(ColorType, false)).Returns<ODataResourceDeserializer>(null);
             var deserializer = new ODataCollectionDeserializer(deserializerProvider.Object);
 
             // Act & Assert

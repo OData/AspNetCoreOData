@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     [NonValidatingParameterBinding]
     public class EdmDeltaLink : EdmEntityObject, IEdmDeltaLink
     {
+        // TODO: Why derived from EdmEntityObject, it doesn't make sense?
         private EdmDeltaType _edmType;
 
         /// <summary>

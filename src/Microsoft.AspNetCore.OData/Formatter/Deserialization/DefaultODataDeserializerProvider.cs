@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType)
+        public override ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
         {
             if (edmType == null)
             {
@@ -50,6 +50,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
 
                 case EdmTypeKind.Collection:
+                    if (isDelta)
+                    {
+                        return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+                    }
+
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
                     if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
                     {
@@ -88,11 +93,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
             }
 
-            if (type == typeof(EdmChangedObjectCollection) || 
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
-            {
-                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
-            }
 
             IEdmModel model = request.GetModel();
             //IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
@@ -107,8 +107,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                return GetEdmTypeDeserializer(edmType);
+                bool isDelta = IsDelta(type);
+                return GetEdmTypeDeserializer(edmType, isDelta);
             }
+        }
+
+        private static bool IsDelta(Type type)
+        {
+            if (type == typeof(EdmChangedObjectCollection) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

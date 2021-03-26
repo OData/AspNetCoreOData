@@ -220,18 +220,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             //                     |--- Normal Resource
             ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
             ODataItemWrapper deltaItem = Assert.Single(deltaResourceSet.DeltaItems);
-            ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(deltaItem);
-            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.DeletedResource.Reason);
+            ODataResourceWrapper deletedResourceWrapper = Assert.IsType<ODataResourceWrapper>(deltaItem);
+            ODataDeletedResource deletedResource = Assert.IsType<ODataDeletedResource>(deletedResourceWrapper.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.Reason);
 
-            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResource.NestedResourceInfos);
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResourceWrapper.NestedResourceInfos);
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
             ODataItemWrapper nestedItem = Assert.Single(nestedResourceInfo.NestedItems);
             ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedItem);
             Assert.Equal(2, ordersDeltaResourceSet.DeltaItems.Count);
-            ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
-            Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.DeletedResource.Reason);
+            ODataResourceWrapper resource1 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
+            ODataDeletedResource deletedResource1 = Assert.IsType<ODataDeletedResource>(resource1.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.Reason);
 
             ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(1));
             Assert.Equal("NS.VipOrder", resource2.Resource.TypeName);
@@ -341,9 +343,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 e =>
                 {
                     // 5) Deleted resource
-                    ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(e);
-                    Assert.Equal("Customers(21)", deletedResource.DeletedResource.Id.OriginalString);
-                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.DeletedResource.Reason);
+                    ODataResourceWrapper deletedResourceWrapper = Assert.IsType<ODataResourceWrapper>(e);
+                    ODataDeletedResource deletedResource = Assert.IsType<ODataDeletedResource>(deletedResourceWrapper.Resource);
+                    Assert.Equal("Customers(21)", deletedResource.Id.OriginalString);
+                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.Reason);
                 });
         }
 

@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     [NonValidatingParameterBinding]
     public class EdmDeltaResourceObject : EdmEntityObject, IEdmChangedObject
     {
+        // TODO: this class should remove, use the EdmEntityObject.
         private EdmDeltaType _edmType;
 
         /// <summary>
