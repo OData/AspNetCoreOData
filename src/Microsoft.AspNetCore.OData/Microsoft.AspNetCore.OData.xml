@@ -2905,9 +2905,9 @@
             <param name="prefixName">The prefix name.</param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Gets thes OData version for the response.
+            Gets the OData version from the request context.
             </summary>
             <param name="request">The request.</param>
             <returns>The OData version.</returns>

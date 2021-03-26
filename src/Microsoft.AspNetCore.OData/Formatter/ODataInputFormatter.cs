@@ -123,7 +123,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 Uri baseAddress = GetBaseAddressInternal(request);
 
-                object result = await ReadFromStreamAsync(type, defaultValue, baseAddress, request, toDispose).ConfigureAwait(false);
+                object result = await ReadFromStreamAsync(
+                    type, 
+                    defaultValue,
+                    baseAddress,
+                    request.GetODataVersion(),
+                    request,
+                    toDispose).ConfigureAwait(false);
 
                 foreach (IDisposable obj in toDispose)
                 {
@@ -164,7 +170,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is sent to the logger, which may throw it.")]
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "oDataMessageReader mis registered for disposal.")]
-        internal static async Task<object> ReadFromStreamAsync(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
+        internal static async Task<object> ReadFromStreamAsync(
+            Type type,
+            object defaultValue,
+            Uri baseAddress,
+            ODataVersion version,
+            HttpRequest request,
+            IList<IDisposable> disposes)
         {
             object result;
             IEdmModel model = request.GetModel();
@@ -180,6 +192,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataMessageReaderSettings oDataReaderSettings = request.GetReaderSettings();
                 oDataReaderSettings.BaseUri = baseAddress;
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
+                oDataReaderSettings.Version = version;
 
                 // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
                 // In ODL 8.x, ReadUntypedAsString option will be deleted.

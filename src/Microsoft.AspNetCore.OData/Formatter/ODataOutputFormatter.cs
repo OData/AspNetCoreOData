@@ -191,7 +191,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             // Add version header.
-            response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(request.GetODataResponseVersion());
+            response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(request.GetODataVersion());
         }
 
         /// <inheritdoc/>
@@ -235,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 type,
                 context.Object,
                 request.GetModel(),
-                request.GetODataResponseVersion(),
+                request.GetODataVersion(),
                 baseAddress,
                 contentType,
                 request,
