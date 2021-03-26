@@ -745,7 +745,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.OData.ODataVersion GetODataResponseVersion (Microsoft.AspNetCore.Http.HttpRequest request)
+	public static Microsoft.OData.ODataVersion GetODataVersion (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
 	ExtensionAttribute(),
