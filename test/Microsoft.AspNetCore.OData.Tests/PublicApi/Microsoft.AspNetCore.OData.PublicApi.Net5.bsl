@@ -2438,10 +2438,8 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResou
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataNestedResourceInfoWrapper (Microsoft.OData.ODataNestedResourceInfo nestedInfo)
 
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper]] NestedLinks  { public get; }
-	Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper NestedResource  { public get; public set; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper]] NestedItems  { public get; }
 	Microsoft.OData.ODataNestedResourceInfo NestedResourceInfo  { public get; }
-	Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper NestedResourceSet  { public get; public set; }
 }
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper {

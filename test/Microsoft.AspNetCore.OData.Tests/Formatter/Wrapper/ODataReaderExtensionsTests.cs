@@ -161,11 +161,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal(new[] { "Location", "Order", "Orders" }, resource.NestedResourceInfos.Select(n => n.NestedResourceInfo.Name));
 
             ODataNestedResourceInfoWrapper orders = resource.NestedResourceInfos.First(n => n.NestedResourceInfo.Name == "Orders");
-            Assert.Null(orders.NestedResource); // not a child resource
-            Assert.Null(orders.NestedLinks); // not a child reference link(s)
-            Assert.NotNull(orders.NestedResourceSet);
+            ODataItemWrapper nestedItem = Assert.Single(orders.NestedItems);
 
-            ODataResourceSetWrapper ordersSet = Assert.IsType<ODataResourceSetWrapper>(orders.NestedResourceSet);
+            ODataResourceSetWrapper ordersSet = Assert.IsType<ODataResourceSetWrapper>(nestedItem);
             Assert.Equal(2, ordersSet.Resources.Count);
             Assert.Collection(ordersSet.Resources,
                 r =>
@@ -229,7 +227,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            ODataItemWrapper nestedItem = Assert.Single(nestedResourceInfo.NestedItems);
+            ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedItem);
             Assert.Equal(2, ordersDeltaResourceSet.DeltaItems.Count);
             ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
             Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.DeletedResource.Reason);
@@ -377,7 +376,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 // --- Resource
                 //     |--- NestedResourceInfo (Order)
                 //          |--- Resource
-                ODataResourceWrapper order = Assert.IsType<ODataResourceWrapper>(nestedResourceInfo.NestedResource);
+                ODataResourceWrapper order = Assert.IsType<ODataResourceWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
                 Assert.Equal("http://svc/Orders(8)", order.Resource.Id.OriginalString);
                 Assert.Empty(order.Resource.Properties);
             }
@@ -386,7 +385,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 // --- Resource
                 //     |--- NestedResourceInfo (Order)
                 //          |--- EntityReferenceLink
-                ODataEntityReferenceLinkWrapper orderLink = Assert.IsType<ODataEntityReferenceLinkWrapper>(Assert.Single(nestedResourceInfo.NestedLinks));
+                ODataEntityReferenceLinkWrapper orderLink = Assert.IsType<ODataEntityReferenceLinkWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
                 Assert.Equal("http://svc/Orders(7)", orderLink.EntityReferenceLink.Url.OriginalString);
             }
         }
@@ -426,9 +425,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            Assert.NotNull(nestedResourceInfo.NestedLinks);
-            Assert.Equal(3, nestedResourceInfo.NestedLinks.Count);
-            Assert.Collection(nestedResourceInfo.NestedLinks,
+            Assert.NotNull(nestedResourceInfo.NestedItems);
+            Assert.Equal(3, nestedResourceInfo.NestedItems.Count);
+            ODataEntityReferenceLinkWrapper[] links = nestedResourceInfo.NestedItems.OfType<ODataEntityReferenceLinkWrapper>().ToArray();
+            Assert.Equal(3, links.Length);
+            Assert.Collection(links,
                 r =>
                 {
                     Assert.Equal("http://svc/Orders(2)", r.EntityReferenceLink.Url.OriginalString);
@@ -479,7 +480,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            ODataResourceSetWrapper ordersResourceSet = Assert.IsType<ODataResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            ODataResourceSetWrapper ordersResourceSet = Assert.IsType<ODataResourceSetWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
             Assert.Equal(3, ordersResourceSet.Resources.Count);
             Assert.Collection(ordersResourceSet.Resources,
                 r =>

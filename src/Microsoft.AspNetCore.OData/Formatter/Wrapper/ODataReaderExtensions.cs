@@ -159,9 +159,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     Contract.Assert(itemsStack.Count > 0, "Entity reference link should never be reported as top-level item.");
                     {
                         ODataNestedResourceInfoWrapper parentNestedResource = (ODataNestedResourceInfoWrapper)itemsStack.Peek();
-                        Contract.Assert(parentNestedResource.NestedResourceSet == null, "Each reference nested property can not contain resource set as its direct child.");
-                        Contract.Assert(parentNestedResource.NestedResource == null, "Each reference nested property can not contain resource as its direct child.");
-                        parentNestedResource.AppendReferenceLink(entityReferenceLinkWrapper);
+                        parentNestedResource.NestedItems.Add(entityReferenceLinkWrapper);
                     }
 
                     break;
@@ -237,10 +235,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 {
                     ODataNestedResourceInfoWrapper parentNestedResource = (ODataNestedResourceInfoWrapper)parentItem;
                     Contract.Assert(parentNestedResource.NestedResourceInfo.IsCollection == false, "Only singleton nested properties can contain resource as their child.");
-                    Contract.Assert(parentNestedResource.NestedResourceSet == null, "Each single nested property can not contain resource set.");
-                    Contract.Assert(parentNestedResource.NestedResource == null, "Each single nested property can not contain multiple resources as its direct child.");
-                    Contract.Assert(parentNestedResource.NestedLinks == null, "Each single nested property can not contain reference link as its direct child.");
-                    parentNestedResource.NestedResource = resourceWrapper;
+                    Contract.Assert(parentNestedResource.NestedItems.Count == 0, "Each nested property can contain only one resource as its direct child.");
+                    parentNestedResource.NestedItems.Add(resourceWrapper);
                 }
             }
 
@@ -276,10 +272,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             {
                 ODataNestedResourceInfoWrapper parentNestedResource = (ODataNestedResourceInfoWrapper)itemsStack.Peek();
                 Contract.Assert(parentNestedResource.NestedResourceInfo.IsCollection == false, "Only singleton nested properties can contain resource as their child.");
-                Contract.Assert(parentNestedResource.NestedResourceSet == null, "Each single nested property can not contain resource set.");
-                Contract.Assert(parentNestedResource.NestedResource == null, "Each single nested property can not contain multiple resources as its direct child.");
-                Contract.Assert(parentNestedResource.NestedLinks == null, "Each single nested property can not contain reference link as its direct child.");
-                parentNestedResource.NestedResource = deletedResourceWrapper;
+                Contract.Assert(parentNestedResource.NestedItems.Count == 0, "Each nested property can contain only one deleted resource as its direct child.");
+                parentNestedResource.NestedItems.Add(deletedResourceWrapper);
             }
 
             itemsStack.Push(deletedResourceWrapper);
@@ -306,11 +300,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 ODataNestedResourceInfoWrapper parentNestedResourceInfo = (ODataNestedResourceInfoWrapper)itemsStack.Peek();
                 Contract.Assert(parentNestedResourceInfo != null, "this has to be an inner resource set. inner resource sets always have a nested resource info.");
                 Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain resource set as their child.");
-
-                Contract.Assert(parentNestedResourceInfo.NestedLinks == null, "collection single nested property can not contain reference link as its direct child.");
-                Contract.Assert(parentNestedResourceInfo.NestedResource == null, "collection nested properties can not contain other resource as their child.");
-                Contract.Assert(parentNestedResourceInfo.NestedResourceSet == null, "collection nested properties can not contain multiple resource set as their child.");
-                parentNestedResourceInfo.NestedResourceSet = resourceSetWrapper;
+                Contract.Assert(parentNestedResourceInfo.NestedItems.Count == 0, "Each nested property can contain only one resource set as its direct child.");
+                parentNestedResourceInfo.NestedItems.Add(resourceSetWrapper);
             }
             else
             {
@@ -341,10 +332,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 ODataNestedResourceInfoWrapper parentNestedResourceInfo = (ODataNestedResourceInfoWrapper)itemsStack.Peek();
                 Contract.Assert(parentNestedResourceInfo != null, "this has to be an inner delta resource set. inner delta resource sets always have a nested resource info.");
                 Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain delta resource set as their child.");
-                Contract.Assert(parentNestedResourceInfo.NestedLinks == null, "collection single nested property can not contain reference link as its direct child.");
-                Contract.Assert(parentNestedResourceInfo.NestedResource == null, "collection nested properties can not contain other resource as their child.");
-                Contract.Assert(parentNestedResourceInfo.NestedResourceSet == null, "collection nested properties can not contain multiple delta resource set as their child.");
-                parentNestedResourceInfo.NestedResourceSet = deltaResourceSetWrapper;
+                Contract.Assert(parentNestedResourceInfo.NestedItems.Count == 0, "Each nested property can contain only one delta resource set as its direct child.");
+                parentNestedResourceInfo.NestedItems.Add(deltaResourceSetWrapper);
             }
             else
             {

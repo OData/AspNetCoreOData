@@ -5649,21 +5649,9 @@
             Gets the wrapped <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/>.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResource">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedItems">
             <summary>
-            Gets/sets the wrapped the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper"/> child.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceSet">
-            <summary>
-            Gets/sets the really wrapped the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper"/> child.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedLinks">
-            <summary>
-            Gets/set the nested entity reference(s) that are part of this nested resource info.
-            A nested resource info for a singleton nested property can only contain one ODataEntityReferenceLink.
-            A nested resource info for a collection nested property can contain any number of ODataEntityReferenceLink
+            Gets the nested items that are part of this nested resource info.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions">
