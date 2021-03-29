@@ -1998,6 +1998,10 @@
             <summary>
              Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
             </summary>
+            <remarks>
+            TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to 
+            patch the deltaset to the original data source.
+            </remarks>
             <param name="originalSet">The original set.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaItem,System.Collections.Generic.IEnumerable{`0})">
@@ -3395,6 +3399,40 @@
             <param name="structuralProperty">The structural property.</param>
             <param name="structuredType">The type of the resource.</param>
             <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateResourceSetWrapper(Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper[],Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Create <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/> from a set of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>
+            </summary>
+            <param name="edmPropertyType">The Edm property type.</param>
+            <param name="refLinks">The reference links.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateResourceWrapper(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Create <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/> from a <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>
+            </summary>
+            <param name="edmPropertyType">The Edm property type.</param>
+            <param name="refLink">The reference link.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.UpdateResourceWrapper(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Update the resource wrapper if it's have the "Id" value.
+            </summary>
+            <param name="resourceWrapper">The resource wrapper.</param>
+            <param name="readContext">The read context.</param>
+            <returns>The resource wrapper.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateKeyProperties(System.Uri,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Do uri parsing to get the key values.
+            </summary>
+            <param name="id">The key Id.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The key properties.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer">
             <summary>
@@ -12086,6 +12124,22 @@
             Represents a segment that is not understood.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser">
+            <summary>
+            Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parse the string like "/users/1/contactFolders/..."
+            to segments
+            </summary>
+            <param name="model">the Edm model.</param>
+            <param name="serviceRoot">The service root uri.</param>
+            <param name="odataPath">the setting.</param>
+            <param name="requestProvider">The service provider.</param>
+            <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser">
             <summary>
             Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
@@ -12100,6 +12154,16 @@
             <param name="odataPath">the setting.</param>
             <param name="requestProvider">The service provider.</param>
             <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parses the specified OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="serviceRoot">The service root uri.</param>
+            <param name="odataPath">The OData path template to parse.</param>
+            <param name="requestProvider">The OData service provider.</param>
+            <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser">
             <summary>

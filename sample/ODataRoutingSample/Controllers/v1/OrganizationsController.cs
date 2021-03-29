@@ -13,6 +13,38 @@ namespace ODataRoutingSample.Controllers.v1
     [ODataModel("v1")]
     public class OrganizationsController : Controller
     {
+        [EnableQuery]
+        public IActionResult Post([FromBody]Organization org)
+        {
+            /*
+             * You can send a Post request with the request body as follows (v4.0):
+            {
+              "@odata.context":"http://localhost:5000/v1/$metadata#Organizations/$entity",
+              "Name": "Peter",
+              "Departs@odata.bind":[ "Departments(4)", "Departments(5)"]
+            }
+
+            or 4.01 request body as follows:
+
+            {
+              "@odata.context":"http://localhost:5000/v1/$metadata#Organizations/$entity",
+              "Name": "Peter",
+              "Departs": [{
+                 "@odata.id": "Departments(4)"
+              },
+              {
+                  "@odata.id": "Departments(5)"
+                  "Alias": "No2"
+              }
+              ]
+            }
+
+            */
+
+            org.OrganizationId = 99; // 99 is just for testing
+            return Ok(org);
+        }
+
         [HttpPatch]
         [EnableQuery]
        // public IActionResult Patch(EdmChangedObjectCollection changes)
