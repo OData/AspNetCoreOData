@@ -28,6 +28,10 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         ///  Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
         /// </summary>
+        /// <remarks>
+        /// TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to 
+        /// patch the deltaset to the original data source.
+        /// </remarks>
         /// <param name="originalSet">The original set.</param>
         public virtual void Patch(IEnumerable<T> originalSet)
         {
