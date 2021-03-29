@@ -111,11 +111,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                         candidates.SetValidity(i, false);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-#if DEBUG
-                    Console.WriteLine(ex.Message);
-#endif
                 }
             }
 

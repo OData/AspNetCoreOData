@@ -843,7 +843,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="readContext">The reader context.</param>
         /// <returns>The key properties.</returns>
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-        private IList<ODataProperty> CreateKeyProperties(Uri id, ODataDeserializerContext readContext)
+        private static IList<ODataProperty> CreateKeyProperties(Uri id, ODataDeserializerContext readContext)
         {
             Contract.Assert(id != null);
             Contract.Assert(readContext != null);
