@@ -745,7 +745,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="refLinks">The reference links.</param>
         /// <param name="readContext">The reader context.</param>
         /// <returns>The created <see cref="ODataResourceSetWrapper"/>.</returns>
-        private ODataResourceSetWrapper CreateResourceSetWrapper(IEdmCollectionTypeReference edmPropertyType,
+        private static ODataResourceSetWrapper CreateResourceSetWrapper(IEdmCollectionTypeReference edmPropertyType,
             ODataEntityReferenceLinkWrapper[] refLinks, ODataDeserializerContext readContext)
         {
             Contract.Assert(edmPropertyType != null);
@@ -775,7 +775,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="refLink">The reference link.</param>
         /// <param name="readContext">The reader context.</param>
         /// <returns>The created <see cref="ODataResourceSetWrapper"/>.</returns>
-        private ODataResourceWrapper CreateResourceWrapper(IEdmTypeReference edmPropertyType, ODataEntityReferenceLinkWrapper refLink, ODataDeserializerContext readContext)
+        private static ODataResourceWrapper CreateResourceWrapper(IEdmTypeReference edmPropertyType, ODataEntityReferenceLinkWrapper refLink, ODataDeserializerContext readContext)
         {
             Contract.Assert(edmPropertyType != null);
             Contract.Assert(refLink != null);

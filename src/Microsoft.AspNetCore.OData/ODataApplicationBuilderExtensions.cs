@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -21,10 +21,26 @@ namespace Microsoft.AspNetCore.OData
         {
             if (app == null)
             {
-                throw new ArgumentNullException(nameof(app));
+                throw Error.ArgumentNull(nameof(app));
             }
 
             return app.UseMiddleware<ODataBatchMiddleware>();
+        }
+
+        /// <summary>
+        /// Use OData query request middleware. An OData query request is a Http Post request ending with /$query.
+        /// The Request body contains the query options.
+        /// </summary>
+        /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+        /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
+        public static IApplicationBuilder UseODataQueryRequest(this IApplicationBuilder app)
+        {
+            if (app == null)
+            {
+                throw Error.ArgumentNull(nameof(app));
+            }
+
+            return app.UseMiddleware<ODataQueryRequestMiddleware>();
         }
     }
 }

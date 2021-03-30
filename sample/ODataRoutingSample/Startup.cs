@@ -75,6 +75,9 @@ namespace ODataRoutingSample
             // If you want to use middle, enable the middleware.
             //app.UseODataOpenApi();
 
+            // Add OData /$query middleware
+            app.UseODataQueryRequest();
+
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();
 

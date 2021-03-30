@@ -6,6 +6,11 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataQueryRequest (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
 }
 
 [
@@ -1075,6 +1080,11 @@ public enum Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption : int {
 	True = 1
 }
 
+public interface Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser {
+	bool CanParse (Microsoft.AspNetCore.Http.HttpRequest request)
+	System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
+}
+
 public abstract class Microsoft.AspNetCore.OData.Query.OrderByNode {
 	protected OrderByNode (Microsoft.OData.UriParser.OrderByClause orderByClause)
 	protected OrderByNode (Microsoft.OData.UriParser.OrderByDirection direction)
@@ -1128,6 +1138,16 @@ public class Microsoft.AspNetCore.OData.Query.CountQueryOption {
 
 	public System.Nullable`1[[System.Int64]] GetEntityCount (System.Linq.IQueryable query)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : IODataQueryRequestParser {
+	public DefaultODataQueryRequestParser ()
+
+	public virtual bool CanParse (Microsoft.AspNetCore.Http.HttpRequest request)
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
 public class Microsoft.AspNetCore.OData.Query.DefaultQuerySettings {
@@ -1336,6 +1356,15 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1 : Microsoft.As
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query)
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	internal virtual Microsoft.AspNetCore.OData.Query.ETag GetETag (Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue)
+}
+
+public class Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware {
+	public ODataQueryRequestMiddleware (Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser queryRequestParser, Microsoft.AspNetCore.Http.RequestDelegate next)
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public System.Threading.Tasks.Task Invoke (Microsoft.AspNetCore.Http.HttpContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.ODataQuerySettings {

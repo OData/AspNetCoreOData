@@ -313,6 +313,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to parse query request payload..
+        /// </summary>
+        internal static string CannotParseQueryRequestPayload {
+            get {
+                return ResourceManager.GetString("CannotParseQueryRequestPayload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
         /// </summary>
         internal static string CannotPatchNavigationProperties {

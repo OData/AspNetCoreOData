@@ -2896,6 +2896,13 @@
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsODataQueryRequest(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Checks whether the request is a POST targeted at a resource path ending in /$query.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>true if the request path has $query segment.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the dependency injection container for the OData request.
@@ -5838,6 +5845,14 @@
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataQueryRequest(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Use OData query request middleware. An OData query request is a Http Post request ending with /$query.
+            The Request body contains the query options.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
@@ -6308,6 +6323,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotInstantiateAbstractResourceType">
             <summary>
               Looks up a localized string similar to An instance of the abstract resource type &apos;{0}&apos; was found. Abstract resource types cannot be instantiated..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotParseQueryRequestPayload">
+            <summary>
+              Looks up a localized string similar to Unable to parse query request payload..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotPatchNavigationProperties">
@@ -7642,6 +7662,19 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.TotalCount">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser">
+            <summary>
+            Exposes the ability to read and parse the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" />
+            into a query options part of an OData URL. Query options may be passed
+            in the request body to a resource path ending in /$query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings">
             <summary>
             This class describes the default settings to use during query composition.
@@ -8722,6 +8755,28 @@
             Gets a value representing the total count of the collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser">
+            <summary>
+            Exposes the ability to read and parse the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" />
+            into a query options part of an OData URL. Query options may be passed
+            in the request body to a resource path ending in /$query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Determines whether this <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser"/> can parse the http request.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>true if this <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser"/> can parse the http request; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Reads and parses the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>
+            into a query options part of an OData URL.
+            </summary>
+            <param name="request">A http request containing the query options.</param>
+            <returns>A string representing the query options part of an OData URL.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings">
             <summary>
             This class describes the model bound settings to use during query composition.
@@ -9271,6 +9326,34 @@
             <summary>
             Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute"/> class.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware">
+            <summary>
+            Defines the middleware for handling OData $query requests.
+            This middleware essentially transforms the incoming request (Post) to a "Get" request.
+            Be noted: should put this middle ware before "UseRouting()".
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.#ctor(Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware"/>.
+            </summary>
+            <param name="queryRequestParser">The query request parser.</param>
+            <param name="next">The next middleware.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the OData $query middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.TransformQueryRequestAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Transforms a POST request targeted at a resource path ending in $query into a GET request.
+            The query options are parsed from the request body and appended to the request URL.
+            </summary>
+            <param name="request">The Http request.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings">
             <summary>

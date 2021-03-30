@@ -659,4 +659,7 @@
   <data name="RouteOptionDisabledOperationSegment" xml:space="preserve">
     <value>Found a '{0}' segment in a OData path. The route option disables qualified and unqualified operation call.</value>
   </data>
+  <data name="CannotParseQueryRequestPayload" xml:space="preserve">
+    <value>Unable to parse query request payload.</value>
+  </data>
 </root>

@@ -3,10 +3,10 @@
 
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
@@ -109,6 +109,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(services));
             }
 
+            services.TryAddSingleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>();
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
             services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
