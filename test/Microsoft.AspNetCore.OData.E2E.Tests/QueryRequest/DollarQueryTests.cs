@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -16,14 +17,14 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
 {
-    public class DollarQueryTests : WebApiTestBase<DollarQueryTests>
+    public class DollarQueryTests : WebHostTestBase<DollarQueryTests>
     {
         private const string CustomersResourcePath = "odata/DollarQueryCustomers";
         private const string SingleCustomerResourcePath = "odata/DollarQueryCustomers(1)";
         private const string ApplicationJsonODataMinimalMetadataStreamingTrue = "application/json;odata.metadata=minimal;odata.streaming=true";
         private const string ApplicationJsonODataMinimalMetadataStreamingFalse = "application/json;odata.metadata=minimal;odata.streaming=false";
 
-        public DollarQueryTests(WebApiTestFixture<DollarQueryTests> fixture)
+        public DollarQueryTests(WebHostTestFixture<DollarQueryTests> fixture)
             : base(fixture)
         {
         }
@@ -91,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_ForSupportedMediaType(string resourcePath, string queryOptionsPayload)
         {
             // Arrange
-            string requestUri = resourcePath + "/$query";
+            string requestUri = $"{this.BaseAddress}/{resourcePath}/$query";
             var contentType = "text/plain";
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -100,10 +101,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = queryOptionsPayload.Length;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Arrange
             Assert.True(response.IsSuccessStatusCode);
@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_ReturnsExpectedResult()
         {
             // Arrange
-            string requestUri = CustomersResourcePath + "/$query";
+            string requestUri = $"{this.BaseAddress}/{CustomersResourcePath}/$query";
             var contentType = "text/plain";
             var queryOptionsPayload = "$filter=Id eq 1";
 
@@ -123,10 +123,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = queryOptionsPayload.Length;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
@@ -137,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_PlusQueryOptionsOnRequestUrl()
         {
             // Arrange
-            string requestUri = CustomersResourcePath + "/$query?$orderby=Id desc";
+            string requestUri = $"{this.BaseAddress}/{CustomersResourcePath}/$query?$orderby=Id desc";
             var contentType = "text/plain";
             string payload = "$filter=Id eq 1 or Id eq 9";
 
@@ -147,10 +146,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = payload.Length;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
@@ -163,7 +161,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_RepeatedOnRequestUrl()
         {
             // Arrange
-            string requestUri = CustomersResourcePath + "/$query?$filter=Id eq 1";
+            string requestUri = $"{this.BaseAddress}/{CustomersResourcePath}/$query?$filter=Id eq 1";
             var contentType = "text/plain";
             string payload = "$filter=Id eq 1";
 
@@ -173,10 +171,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = payload.Length;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Assert
             Assert.False(response.IsSuccessStatusCode);
@@ -187,7 +184,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_ForUnsupportedMediaType()
         {
             // Arrange
-            string requestUri = CustomersResourcePath + "/$query";
+            string requestUri = $"{this.BaseAddress}/{CustomersResourcePath}/$query";
             var contentType = "application/xml";
             var queryOptionsPayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><QueryOptions><filter>Id le 5</filter></QueryOptions>";
 
@@ -197,10 +194,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = queryOptionsPayload.Length;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Assert
             Assert.False(response.IsSuccessStatusCode);
@@ -210,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         public async Task ODataQueryOptionsInRequestBody_Empty()
         {
             // Arrange
-            string requestUri = CustomersResourcePath + "/$query";
+            string requestUri = $"{this.BaseAddress}/{CustomersResourcePath}/$query";
             var contentType = "text/plain";
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -219,25 +215,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             request.Content.Headers.ContentLength = 0;
 
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var response = await client.SendAsync(request);
+            var response = await this.Client.SendAsync(request);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
         }
 
-        [Fact(Skip = "It seems the 8192 can't make the long query options failing, need more investigation!")]
+        [Fact]
         public async Task ODataQueryOptionsInRequestBody_MitigateLimitViolationOnLongUrl()
         {
-            // KestrelServerLimits.MaxRequestLineSize equals 8192 so setting query string length to that value
-            // should be enough to make us breach the threshold
-            // NOTE: Change of limit could cause test to start failing
-            var queryStringLength = 8192;
+            var queryStringLength = new Server.Kestrel.Core.KestrelServerLimits().MaxRequestLineSize;
 
             // Arrange
-            var baseUri = CustomersResourcePath;
+            var baseUri = $"{this.BaseAddress}/{CustomersResourcePath}";
             var builder = new StringBuilder();
             var loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
@@ -254,13 +246,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
 
             var getRequest = new HttpRequestMessage(HttpMethod.Get, baseUri + '?' + queryOptionsString);
             getRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(ApplicationJsonODataMinimalMetadataStreamingTrue));
-            HttpClient client = CreateClient();
 
             // Act
-            var getResponse = await client.SendAsync(getRequest);
+            var getResponse = await this.Client.SendAsync(getRequest);
 
             // Assert: Should fail because threshold is exceeed
             Assert.False(getResponse.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.RequestUriTooLong, getResponse.StatusCode);
 
             // Arrange: Now send the same query string in the request body
             var postRequest = new HttpRequestMessage(HttpMethod.Post, baseUri + "/$query");
@@ -269,7 +261,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
             postRequest.Content.Headers.ContentType = new MediaTypeWithQualityHeaderValue(contentType);
 
             // Act
-            var postResponse = await client.SendAsync(postRequest);
+            var postResponse = await this.Client.SendAsync(postRequest);
 
             // Assert: Should pass because the query options were sent in the request body
             Assert.True(postResponse.IsSuccessStatusCode);
