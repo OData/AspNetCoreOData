@@ -179,7 +179,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 {
                     type = value == null ? type : value.GetType();
                 }
-                type = value == null ? type : value.GetType();
 
                 serializer = serializerProvider.GetODataPayloadSerializer(type, request);
                 if (serializer == null)
