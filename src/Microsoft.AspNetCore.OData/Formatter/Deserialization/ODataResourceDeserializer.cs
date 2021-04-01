@@ -787,7 +787,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             };
 
             resource.Properties = CreateKeyProperties(refLink.EntityReferenceLink.Url, readContext) ?? Array.Empty<ODataProperty>();
-            return new ODataResourceWrapper(resource);
+            ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(resource);
+
+            foreach (var instanceAnnotation in refLink.EntityReferenceLink.InstanceAnnotations)
+            {
+                resource.InstanceAnnotations.Add(instanceAnnotation);
+            }
+
+            return resourceWrapper;
         }
 
         /// <summary>
