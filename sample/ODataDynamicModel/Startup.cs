@@ -49,6 +49,9 @@ namespace ODataDynamicModel
                 app.UseDeveloperExceptionPage();
             }
 
+            // Use odata route debug, /$odata
+            app.UseODataRouteDebug();
+
             app.UseRouting();
 
             app.UseAuthorization();

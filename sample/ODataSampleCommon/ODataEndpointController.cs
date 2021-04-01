@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,68 +48,18 @@ namespace ODataSampleCommon
                 IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
                 if (metadata == null)
                 {
-                    AppendNonODataRoute(nonSb, endpoint);
-                    continue;
-                }
-
-                // controller and action details
-                StringBuilder action = new StringBuilder();
-                if (controllerActionDescriptor.MethodInfo.ReturnType != null)
-                {
-                    action.Append(controllerActionDescriptor.MethodInfo.ReturnType.Name + " ");
+                    AppendRoute(nonSb, endpoint);
                 }
                 else
                 {
-                    action.Append("void ");
-                }
-                action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
-                action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
-                action.Append(")");
-                string actionName = controllerActionDescriptor.MethodInfo.Name;
-
-                sb.Append("<tr>");
-                sb.Append($"<td>{GetActionDesciption(controllerActionDescriptor)}</td>");
-
-                // http methods
-                sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
-
-                // template name
-                RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
-                if (routeEndpoint != null)
-                {
-                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td></tr>");
-                }
-                else
-                {
-                    sb.Append("<td>---NON RouteEndpoint---</td></tr>");
+                    AppendRoute(sb, endpoint);
                 }
             }
 
-            string output = ODataRouteMappingHtmlTemplate.Replace("{CONTENT}", sb.ToString(), StringComparison.OrdinalIgnoreCase);
-            output = output.Replace("{NONENDPOINTCONTENT}", nonSb.ToString(), StringComparison.OrdinalIgnoreCase);
+            string output = ODataRouteMappingHtmlTemplate.Replace("ODATACONTENT", sb.ToString(), StringComparison.OrdinalIgnoreCase);
+            output = output.Replace("NONENDPOINTCONTENT", nonSb.ToString(), StringComparison.OrdinalIgnoreCase);
 
             return base.Content(output, "text/html");
-        }
-
-        private static string GetActionDesciption(ControllerActionDescriptor actionDescriptor)
-        {
-            // controller and action details
-            StringBuilder action = new StringBuilder();
-            if (actionDescriptor.MethodInfo.ReturnType != null)
-            {
-                action.Append(actionDescriptor.MethodInfo.ReturnType.Name + " ");
-            }
-            else
-            {
-                action.Append("void ");
-            }
-
-            action.Append(actionDescriptor.ControllerTypeInfo.FullName);
-            action.Append(".");
-            action.Append(actionDescriptor.MethodInfo.Name + "(");
-            action.Append(string.Join(",", actionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
-            action.Append(")");
-            return action.ToString();
         }
 
         private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
@@ -125,11 +74,11 @@ namespace ODataSampleCommon
         }
 
         /// <summary>
-        /// Process the non-odata route
+        /// Process the endpoint
         /// </summary>
         /// <param name="sb">The string builder</param>
         /// <param name="endpoint">The endpoint.</param>
-        private static void AppendNonODataRoute(StringBuilder sb, Endpoint endpoint)
+        private static void AppendRoute(StringBuilder sb, Endpoint endpoint)
         {
             sb.Append("<tr>");
             sb.Append($"<td>{endpoint.DisplayName}</td>");
@@ -183,7 +132,7 @@ namespace ODataSampleCommon
        <th> HttpMethods </th>
        <th> Templates </th>
     </tr>
-    {CONTENT}
+    ODATACONTENT
     </table>
     <h1 id=""nonodataendpoint"">Non-OData Endpoint Mapping <a href=""#odataendpoint""> >>> Back to odata endpoint mapping</a></h1>
     <table>
@@ -192,7 +141,7 @@ namespace ODataSampleCommon
        <th> HttpMethods </th>
        <th> Templates </th>
     </tr>
-    {NONENDPOINTCONTENT}
+    NONENDPOINTCONTENT
     </table>
    </body>
 </html>";

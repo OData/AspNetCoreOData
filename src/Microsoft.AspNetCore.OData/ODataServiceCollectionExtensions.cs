@@ -165,10 +165,6 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
 
-            // for debug only
-            //services.TryAddEnumerable(
-            //    ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelDebugProvider>());
-
             services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
 
             // OData Routing conventions

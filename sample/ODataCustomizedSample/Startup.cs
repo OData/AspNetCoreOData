@@ -60,6 +60,10 @@ namespace ODataCustomizedSample
 
             app.UseRouting();
 
+            // for route debug page. be noted: you can put the middleware after UseRouting.
+            // and you can use different route pattern name.
+            app.UseODataRouteDebug("$odata2");
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

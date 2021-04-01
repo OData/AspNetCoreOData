@@ -5853,6 +5853,23 @@
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Use OData route debug middleware. You can send request "~/$odata" after enabling this middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)">
+            <summary>
+            Use OData route debug middleware using the given route pattern.
+            For example, if the given route pattern is "myrouteinfo", then you can send request "~/myrouteinfo" after enabling this middleware.
+            Please use basic (literal) route pattern.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <param name="routePattern">The given route pattern.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
@@ -11968,6 +11985,25 @@
             <param name="parameterAliasNodes"></param>
             <returns></returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware">
+            <summary>
+            An OData route debug middleware
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware.#ctor(System.String,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware"/> class.
+            </summary>
+            <param name="routePattern">The route pattern.</param>
+            <param name="next">The next middleware.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the OData Route debug middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions">
             <summary>
             Represents the configurable options on a route.
@@ -11992,20 +12028,6 @@
             <summary>
             Gets or sets a value indicating whether to generate odata path template as ~/MyFunction(parameters...)
             </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
-            <summary>
-            Use for debug for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.Order">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
-            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider">
             <summary>

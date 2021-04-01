@@ -72,7 +72,10 @@ namespace ODataRoutingSample
                 app.UseDeveloperExceptionPage();
             }
 
-            // If you want to use middle, enable the middleware.
+            // Use odata route debug, /$odata
+            app.UseODataRouteDebug();
+
+            // If you want to use /$openapi, enable the middleware.
             //app.UseODataOpenApi();
 
             // Add OData /$query middleware

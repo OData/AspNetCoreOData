@@ -11,6 +11,16 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataQueryRequest (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataRouteDebug (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataRouteDebug (Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern)
 }
 
 [
