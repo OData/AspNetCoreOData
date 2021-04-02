@@ -14,9 +14,9 @@ namespace ODataDynamicModel.Extensions
 {
     public class EntitySetWithKeyTemplateSegment : ODataSegmentTemplate
     {
-        public override string Literal => "{entityset}({key})";
+        public override string Literal => "{key}";
 
-        public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
+        public override ODataSegmentKind Kind => ODataSegmentKind.Key;
 
         public override IEdmType EdmType => null;
 

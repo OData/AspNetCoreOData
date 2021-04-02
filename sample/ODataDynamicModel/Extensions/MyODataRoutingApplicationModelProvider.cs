@@ -54,6 +54,7 @@ namespace ODataDynamicModel.Extensions
                 if (actionModel.ActionName == "GetNavigation")
                 {
                     ODataPathTemplate path = new ODataPathTemplate(
+                        new EntitySetTemplateSegment(),
                         new EntitySetWithKeyTemplateSegment(),
                         new NavigationTemplateSegment());
 
@@ -62,6 +63,7 @@ namespace ODataDynamicModel.Extensions
                 else if (actionModel.ActionName == "GetName")
                 {
                     ODataPathTemplate path = new ODataPathTemplate(
+                        new EntitySetTemplateSegment(),
                         new EntitySetWithKeyTemplateSegment(),
                         new StaticNameSegment());
 
@@ -76,7 +78,7 @@ namespace ODataDynamicModel.Extensions
                     }
                     else
                     {
-                        ODataPathTemplate path = new ODataPathTemplate(new EntitySetWithKeyTemplateSegment());
+                        ODataPathTemplate path = new ODataPathTemplate(new EntitySetTemplateSegment(), new EntitySetWithKeyTemplateSegment());
                         actionModel.AddSelector("get", prefix, model, path);
                     }
                 }
