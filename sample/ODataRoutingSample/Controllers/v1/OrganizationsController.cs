@@ -94,12 +94,14 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok($"Caculated the price using {organizationId} and {partId}");
         }
 
+        [ODataRouting]
         [HttpGet("v1/Organizations/GetPrice2(organizationId={orgId},partId={parId})")]
         public IActionResult GetMorePrice(string orgId, string parId)
         {
             return Ok($"Caculated the price using {orgId} and {parId}");
         }
 
+        [ODataRouting]
         [HttpGet("v1/Organizations/GetPrice2(organizationId={orgId},partId={parId})/GetPrice2(organizationId={orgId2},partId={parId2})")]
         public IActionResult GetMorePrice2(string orgId, string parId, string orgId2, string parId2)
         {
