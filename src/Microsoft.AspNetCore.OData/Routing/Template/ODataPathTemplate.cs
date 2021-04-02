@@ -70,8 +70,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     // for key segment, if it's single key, let's add key as segment template also
                     // otherwise, we only add the key in parenthesis template.
-                    KeySegmentTemplate keySg = segment as KeySegmentTemplate;
-                    templates = AppendKeyTemplate(templates, keySg, options);
+                    templates = AppendKeyTemplate(templates, segment, options);
                     continue;
                 }
 
@@ -98,8 +97,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                             templates = CombinateTemplates(templates, navigationLinkSegment.Segment.NavigationProperty.Name);
 
                             // append "key"
-                            KeySegmentTemplate keySg = nextSegment as KeySegmentTemplate;
-                            templates = AppendKeyTemplate(templates, keySg, options);
+                            templates = AppendKeyTemplate(templates, nextSegment, options);
 
                             // append $ref
                             templates = CombinateTemplates(templates, "/$ref");
@@ -133,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             return templates.Select(t => t.ToString());
         }
 
-        private static IList<StringBuilder> AppendKeyTemplate(IList<StringBuilder> templates, KeySegmentTemplate segment, ODataRouteOptions options)
+        private static IList<StringBuilder> AppendKeyTemplate(IList<StringBuilder> templates, ODataSegmentTemplate segment, ODataRouteOptions options)
         {
             Contract.Assert(segment != null);
             Contract.Assert(options != null);
