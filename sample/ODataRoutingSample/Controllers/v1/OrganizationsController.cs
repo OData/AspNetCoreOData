@@ -105,5 +105,16 @@ namespace ODataRoutingSample.Controllers.v1
         {
             return Ok($"Caculated the price using {orgId} and {parId} | using {orgId2} and {parId2}");
         }
+
+        [ODataRouting]
+        [HttpPost("v1/Organizations/GetByAccount(accountId={aId})/MarkAsFavourite")]
+        public IActionResult MarkAsFavouriteAfterGetByAccount(string aId)
+        {
+            /*
+             * It works for the following request;
+             * POST http://localhost:5000/v1/Organizations/GetByAccount(accountId=99)/MarkAsFavourite
+             * */
+            return Ok($"MarkAsFavouriteAfterGetByAccount after {aId}");
+        }
     }
 }

@@ -86,6 +86,17 @@ namespace ODataRoutingSample.Models
             productPrice.Parameter<string>("partId").Required();
             productPrice.IsComposable = true;
 
+            // Add a composable function
+            var getOrgByAccount =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount")
+                .ReturnsFromEntitySet<Organization>("Organizations");
+            getOrgByAccount.Parameter<int>("accountId").Required();
+            getOrgByAccount.IsComposable = true;
+
+            builder.EntityType<Organization>().Action("MarkAsFavourite");
+
             return builder.GetEdmModel();
         }
 
