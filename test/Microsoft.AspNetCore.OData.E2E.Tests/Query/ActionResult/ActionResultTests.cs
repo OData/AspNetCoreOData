@@ -89,5 +89,30 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
             Assert.Equal("CustId", customers.First().Id);
             Assert.Null(customers.First().Books);
         }
+
+        /// <summary>
+        /// $filter should work with $count.
+        /// </summary>
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(0, 0)]
+        public async Task ActionResultShouldAllowCountInFilter(int filterParam, int expectedItemsCount)
+        {
+            // Arrange
+            string queryUrl = string.Format($"odata/Customers?$filter=Books/$count eq {filterParam}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = await this.Client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+
+            Assert.Equal(expectedItemsCount, customers.Count());
+
+        }
     }
 }
