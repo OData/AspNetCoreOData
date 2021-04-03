@@ -97,6 +97,15 @@ namespace ODataRoutingSample.Models
 
             builder.EntityType<Organization>().Action("MarkAsFavourite");
 
+            // Add another composable function
+            var getOrgByAccount2 =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount2")
+                .ReturnsCollectionFromEntitySet<Organization>("Organizations"); // be noted, it returns collection.
+            getOrgByAccount2.Parameter<int>("accountId").Required();
+            getOrgByAccount2.IsComposable = true;
+
             return builder.GetEdmModel();
         }
 
