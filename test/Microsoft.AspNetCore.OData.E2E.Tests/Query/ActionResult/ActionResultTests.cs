@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
         public async Task ActionResultODataPathReturnsExpansion()
         {
             // Arrange
-            string queryUrl = string.Format("odata/Customers?$expand=books");
+            string queryUrl = "odata/Customers?$expand=books";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
         public async Task ActionResultODataPathReturnsBaseWithoutExpansion()
         {
             // Arrange
-            string queryUrl = string.Format("odata/Customers");
+            string queryUrl = "odata/Customers";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
@@ -99,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
         public async Task ActionResultShouldAllowCountInFilter(int filterParam, int expectedItemsCount)
         {
             // Arrange
-            string queryUrl = string.Format($"odata/Customers?$filter=Books/$count eq {filterParam}");
+            string queryUrl = $"odata/Customers?$filter=Books/$count eq {filterParam}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
