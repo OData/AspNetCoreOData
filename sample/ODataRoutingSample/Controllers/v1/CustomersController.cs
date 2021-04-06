@@ -81,6 +81,7 @@ namespace ODataRoutingSample.Controllers.v1
             {
                 new Customer
                 {
+                    Id = 1,
                     Name = "Jonier",
                     FavoriteColor = Color.Red,
                     HomeAddress = new Address { City = "Redmond", Street = "156 AVE NE" },
@@ -92,6 +93,7 @@ namespace ODataRoutingSample.Controllers.v1
                 },
                 new Customer
                 {
+                    Id = 2,
                     Name = "Sam",
                     FavoriteColor = Color.Blue,
                     HomeAddress = new CnAddress { City = "Bellevue", Street = "Main St NE", Postcode = "201100" },
@@ -103,6 +105,7 @@ namespace ODataRoutingSample.Controllers.v1
                 },
                 new Customer
                 {
+                    Id = 3,
                     Name = "Peter",
                     FavoriteColor = Color.Green,
                     HomeAddress = new UsAddress { City = "Hollewye", Street = "Main St NE", Zipcode = "98029" },
