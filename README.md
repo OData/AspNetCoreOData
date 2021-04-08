@@ -84,7 +84,9 @@ The nightly build process will upload a NuGet packages for ASP.NET Core OData to
 
 To connect to webapinightly feed, use this feed URL:
 
-* https://www.myget.org/F/webapinetcore
+* https://www.myget.org/F/webapinetcore/api/v3/index.json (Your NuGet V3 feed URL (Visual Studio 2015+)
+
+* https://www.myget.org/F/webapinetcore/api/v2 Your NuGet V2 feed URL (Visual Studio 2012+)
 
 ## 4. Documentation
 
