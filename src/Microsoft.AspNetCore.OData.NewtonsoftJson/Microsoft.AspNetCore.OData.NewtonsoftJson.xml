@@ -154,6 +154,35 @@
             <param name="propertyName">The given property name.</param>
             <returns>The mapped property name.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions">
+            <summary>
+            Extension methods for adding OData Json converter to Newtonsoft.Json to <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The OData builder.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions})">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The OData builder.</param>
+            <param name="setupAction">Callback to configure <see cref="T:Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder,System.Action{Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions},System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper})">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The OData builder.</param>
+            <param name="setupAction">Callback to configure <see cref="T:Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions"/>.</param>
+            <param name="mapperProvider">The property mapper provider.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
