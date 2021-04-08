@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (_defaultQuerySettings == null)
                 {
                     _defaultQuerySettings = RequestContainer == null
-                        ? new DefaultQuerySettings()
+                        ? GetDefaultQuerySettings()
                         : RequestContainer.GetRequiredService<DefaultQuerySettings>();
                 }
 
@@ -220,6 +220,22 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 TargetStructuredType = ElementType as IEdmStructuredType;
             }
+        }
+
+        private DefaultQuerySettings GetDefaultQuerySettings()
+        {
+            if (Request is null)
+            {
+                return new DefaultQuerySettings();
+            }
+
+            IOptions<ODataOptions> odataOptions = Request.HttpContext?.RequestServices?.GetService<IOptions<ODataOptions>>();
+            if (odataOptions is  null || odataOptions.Value is null)
+            {
+                return new DefaultQuerySettings();
+            }
+
+            return odataOptions.Value.BuildDefaultQuerySettings();
         }
     }
 }
