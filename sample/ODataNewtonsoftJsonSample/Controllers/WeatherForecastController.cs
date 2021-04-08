@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ODataNewtonsoftJsonSample.Controllers
 {
@@ -18,10 +19,12 @@ namespace ODataNewtonsoftJsonSample.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IOptions<MvcNewtonsoftJsonOptions> _options;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IOptions<MvcNewtonsoftJsonOptions> options)
         {
             _logger = logger;
+            _options = options;
         }
 
         [HttpGet]

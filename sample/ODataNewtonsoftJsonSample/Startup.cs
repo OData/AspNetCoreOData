@@ -28,10 +28,17 @@ namespace ODataNewtonsoftJsonSample
         {
             services.AddControllers();
 
-            services.AddOData(opt => opt.Select().Filter()).AddNewtonsoftJson();
+            services.AddOData(opt => opt.Select().Filter()).AddNewtonsoftJson(
+                options =>
+                {
+                    options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    //options.SerializerSettings.ContractResolver = WebApiJsonResolver.Instance;
+                });
 
-            services.AddControllers().AddNewtonsoftJson(
-                opt => opt.SerializerSettings.Converters.Add(new JDynamicTypeWrapperConverter()));
+            // You can also add the converter one by one using followings:
+            //services.AddControllers().AddNewtonsoftJson(
+            //    opt => opt.SerializerSettings.Converters.Add(new JDynamicTypeWrapperConverter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
