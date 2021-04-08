@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Results
@@ -62,5 +63,11 @@ namespace Microsoft.AspNetCore.OData.Results
                 _count = value;
             }
         }
+
+        /// <summary>
+        /// Projects the result to a <see cref="IDictionary{TKey,TValue}" />.
+        /// </summary>
+        /// <returns>An <see cref="IDictionary{TKey,TValue}"/> representing the page result.</returns>
+        public abstract IDictionary<string, object> ToDictionary();
     }
 }
