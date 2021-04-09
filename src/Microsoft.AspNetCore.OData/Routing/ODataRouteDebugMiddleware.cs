@@ -217,6 +217,10 @@ namespace Microsoft.AspNetCore.OData.Routing
                 {
                     sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
                 }
+                else if (routeEndpoint.RoutePattern.RawText.StartsWith("~/", StringComparison.OrdinalIgnoreCase))
+                {
+                    sb.Append("<td>").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
+                }
                 else
                 {
                     sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");

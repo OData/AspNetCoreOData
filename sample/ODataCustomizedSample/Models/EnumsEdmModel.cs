@@ -74,6 +74,10 @@ namespace ODataCustomizedSample.Models
 
             var functionConfiguration = employee.Function("FindAccessLevel");
             functionConfiguration.Returns<AccessLevel>();
+
+            var function = employee.Function("Goto").Returns<string>();
+            function.Parameter<double>("lat");
+            function.Parameter<double>("lon");
         }
 
         private static void AddUnboundActionsAndFunctions(ODataModelBuilder odataModelBuilder)
