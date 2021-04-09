@@ -11274,7 +11274,7 @@
             <summary>
             The convention for an odata template string.
             It looks for the <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> on controller
-            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http attribute for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
+            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http Verb attribute, for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention},Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">
