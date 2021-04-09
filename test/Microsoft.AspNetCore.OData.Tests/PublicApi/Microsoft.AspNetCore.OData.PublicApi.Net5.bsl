@@ -1369,7 +1369,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1 : Microsoft.As
 }
 
 public class Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware {
-	public ODataQueryRequestMiddleware (Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser queryRequestParser, Microsoft.AspNetCore.Http.RequestDelegate next)
+	public ODataQueryRequestMiddleware (System.Collections.Generic.IEnumerable`1[[Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser]] queryRequestParsers, Microsoft.AspNetCore.Http.RequestDelegate next)
 
 	[
 	AsyncStateMachineAttribute(),

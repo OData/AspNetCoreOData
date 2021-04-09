@@ -109,7 +109,8 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(services));
             }
 
-            services.TryAddSingleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>();
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>());
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
             services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 

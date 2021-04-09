@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
@@ -25,7 +26,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         {
             services.ConfigureControllers(typeof(DollarQueryCustomersController));
             services.AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
-            services.AddSingleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>();
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>());
+            // NOTE: The following statement also does what is expected
+            // services.AddSingleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>();
         }
 
         protected static void UpdateConfigure(IApplicationBuilder app)

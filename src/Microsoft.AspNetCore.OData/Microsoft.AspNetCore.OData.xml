@@ -9351,11 +9351,11 @@
             Be noted: should put this middle ware before "UseRouting()".
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.#ctor(Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser,Microsoft.AspNetCore.Http.RequestDelegate)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser},Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware"/>.
             </summary>
-            <param name="queryRequestParser">The query request parser.</param>
+            <param name="queryRequestParsers">The query request parsers.</param>
             <param name="next">The next middleware.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
@@ -9365,11 +9365,12 @@
             <param name="context">The http context.</param>
             <returns>A task that can be awaited.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.TransformQueryRequestAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.TransformQueryRequestAsync(Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Transforms a POST request targeted at a resource path ending in $query into a GET request.
             The query options are parsed from the request body and appended to the request URL.
             </summary>
+            <param name="parser">The query request parser.</param>
             <param name="request">The Http request.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings">
@@ -11273,7 +11274,7 @@
             <summary>
             The convention for an odata template string.
             It looks for the <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> on controller
-            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http attribute for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
+            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http Verb attribute, for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention},Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">

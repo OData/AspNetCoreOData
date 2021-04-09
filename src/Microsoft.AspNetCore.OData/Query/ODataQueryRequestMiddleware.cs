@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -15,17 +16,17 @@ namespace Microsoft.AspNetCore.OData.Query
     /// </summary>
     public class ODataQueryRequestMiddleware
     {
-        private IODataQueryRequestParser _parser;
+        private IEnumerable<IODataQueryRequestParser> _parsers;
         private readonly RequestDelegate _next;
 
         /// <summary>
         /// Instantiates a new instance of <see cref="ODataQueryRequestMiddleware"/>.
         /// </summary>
-        /// <param name="queryRequestParser">The query request parser.</param>
+        /// <param name="queryRequestParsers">The query request parsers.</param>
         /// <param name="next">The next middleware.</param>
-        public ODataQueryRequestMiddleware(IODataQueryRequestParser queryRequestParser, RequestDelegate next)
+        public ODataQueryRequestMiddleware(IEnumerable<IODataQueryRequestParser> queryRequestParsers, RequestDelegate next)
         {
-            _parser = queryRequestParser;
+            _parsers = queryRequestParsers;
             _next = next;
         }
 
@@ -50,9 +51,13 @@ namespace Microsoft.AspNetCore.OData.Query
             HttpRequest request = context.Request;
             if (request.IsODataQueryRequest())
             {
-                if (_parser.CanParse(context.Request))
+                foreach (IODataQueryRequestParser parser in _parsers)
                 {
-                    await TransformQueryRequestAsync(request).ConfigureAwait(false);
+                    if (parser.CanParse(request))
+                    {
+                        await TransformQueryRequestAsync(parser, request).ConfigureAwait(false);
+                        break;
+                    }
                 }
             }
 
@@ -63,8 +68,9 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Transforms a POST request targeted at a resource path ending in $query into a GET request.
         /// The query options are parsed from the request body and appended to the request URL.
         /// </summary>
+        /// <param name="parser">The query request parser.</param>
         /// <param name="request">The Http request.</param>
-        internal async Task TransformQueryRequestAsync(HttpRequest request)
+        internal async Task TransformQueryRequestAsync(IODataQueryRequestParser parser, HttpRequest request)
         {
             if (request == null)
             {
@@ -72,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             // Parse query options in request body
-            string queryOptions = await _parser.ParseAsync(request).ConfigureAwait(false);
+            string queryOptions = await parser.ParseAsync(request).ConfigureAwait(false);
 
             string requestPath = request.Path.Value.TrimEnd('/');
             string queryString = request.QueryString.Value;
