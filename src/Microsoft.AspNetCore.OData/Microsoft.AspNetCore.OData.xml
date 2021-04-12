@@ -10864,7 +10864,7 @@
             Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> instances to JSON.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.ModelID">
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Model">
             <summary>
             The Edm Model associated with the wrapper.
             </summary>

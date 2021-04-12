@@ -1218,8 +1218,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEnumerable<Customer> customers = CustomerApplyTestData;
 
             // Act
-            IQueryable queryable = applyOption.ApplyTo(customers.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True });
 
+            IQueryable queryable = null;
+
+            try
+            {
+                queryable = applyOption.ApplyTo(customers.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"{ex.Message}\n{ex.StackTrace}");
+                queryable = applyOption.ApplyTo(customers.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True });
+            }
             // Assert
             Assert.NotNull(queryable);
             var actualCustomers = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();

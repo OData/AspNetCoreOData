@@ -43,11 +43,11 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// </remakrs>
     internal class AggregationPropertyContainer : NamedProperty<object>
     {
-        public AggregationWrapper NestedValue
+        public GroupByWrapper NestedValue
         {
             get
             {
-                return (AggregationWrapper)this.Value;
+                return (GroupByWrapper)this.Value;
             }
             set
             {
