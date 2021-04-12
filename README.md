@@ -11,12 +11,25 @@ This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0-preview) is a server side library built upon ODataLib and ASP.NET Core.
 
 Blogs:
-1) [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
-2) [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
+
+* [Attribute Routing in ASP.NET Core OData 8.0 RC](https://devblogs.microsoft.com/odata/attribute-routing-in-asp-net-core-odata-8-0-rc/)
+
+* [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
+
+* [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
+
 
 Example:
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/master/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
-
+  
+   - **`~/$odata`** gives a static routing table page of the service
+   
+   - **`~/swagger`** gives a swagger/openapi page
+ 
+   - Append **`~/$openapi`** to each route gives a raw openapi OData page, for example, **`~/v1/$openapi`**
+   
+   
+	
 ## 2. Basic Usage
 
 In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
@@ -71,7 +84,9 @@ The nightly build process will upload a NuGet packages for ASP.NET Core OData to
 
 To connect to webapinightly feed, use this feed URL:
 
-* https://www.myget.org/F/webapinetcore
+* https://www.myget.org/F/webapinetcore/api/v3/index.json (Your NuGet V3 feed URL (Visual Studio 2015+)
+
+* https://www.myget.org/F/webapinetcore/api/v2 Your NuGet V2 feed URL (Visual Studio 2012+)
 
 ## 4. Documentation
 

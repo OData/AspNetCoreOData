@@ -4,6 +4,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -16,7 +17,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     public class ODataDeserializerContext
     {
         private bool? _isDeltaOfT;
-        private bool? _isUntyped;
+        private bool? _isDeltaDeleted;
+        private bool? _isNoClrType;
 
         /// <summary>
         /// Gets or sets the type of the top-level object the request needs to be deserialized into.
@@ -43,30 +45,58 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// </summary>
         public HttpRequest Request { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; }
+
         internal bool IsDeltaOfT
         {
             get
             {
                 if (!_isDeltaOfT.HasValue)
                 {
-                    _isDeltaOfT = ResourceType != null && TypeHelper.IsGenericType(ResourceType) && ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
+                    _isDeltaOfT = ResourceType != null && ResourceType.IsGenericType &&
+                        ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
                 }
 
                 return _isDeltaOfT.Value;
             }
         }
 
-        internal bool IsUntyped
+        internal bool IsDeltaDeleted
         {
             get
             {
-                if (!_isUntyped.HasValue)
+                if (_isDeltaDeleted == null)
                 {
-                    _isUntyped = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
+                    if (typeof(IEdmDeltaDeletedResourceObject).IsAssignableFrom(ResourceType))
+                    {
+                        _isDeltaDeleted = true;
+                    }
+                    else
+                    {
+                        _isDeltaDeleted = ResourceType != null &&
+                            ResourceType.IsGenericType &&
+                            ResourceType.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>);
+                    }
+                }
+
+                return _isDeltaDeleted.Value;
+            }
+        }
+
+        internal bool IsNoClrType
+        {
+            get
+            {
+                if (!_isNoClrType.HasValue)
+                {
+                    _isNoClrType = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
                         typeof(ODataUntypedActionParameters) == ResourceType;
                 }
 
-                return _isUntyped.Value;
+                return _isNoClrType.Value;
             }
         }
 
@@ -78,6 +108,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             return EdmLibHelper.GetExpectedPayloadType(type, Path, Model);
+        }
+
+        internal ODataDeserializerContext CloneWithoutType()
+        {
+            return new ODataDeserializerContext
+            {
+                Path = this.Path,
+                Model = this.Model,
+                Request = this.Request,
+                TimeZone = this.TimeZone
+            };
         }
     }
 }

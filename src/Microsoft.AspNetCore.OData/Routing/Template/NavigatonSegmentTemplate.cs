@@ -60,9 +60,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationPropertySegment Segment { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return Segment;
+            context?.Segments.Add(Segment);
+            return true;
         }
     }
 }

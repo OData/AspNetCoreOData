@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -21,20 +21,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
     /// </summary>
     public static class ActionModelExtensions
     {
-        /// <summary>
-        /// Gets the collection of supported HTTP methods for conventions.
-        /// </summary>
-        private static readonly string[] SupportedHttpMethodConventions = new string[]
-        {
-            "GET",
-            "PUT",
-            "POST",
-            "DELETE",
-            "PATCH",
-            "HEAD",
-            "OPTIONS",
-        };
-
         /// <summary>
         /// Tests whether the action is not suitable for OData action.
         /// </summary>
@@ -133,50 +119,24 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Gets the supported Http method on the action or by convention using the action name.
-        /// </summary>
-        /// <param name="action">The action model.</param>
-        /// <returns>The supported http methods.</returns>
-        public static IEnumerable<string> GetSupportedHttpMethods(this ActionModel action)
-        {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            // Determine the supported methods.
-            IEnumerable<string> httpMethods = action.Attributes.OfType<IActionHttpMethodProvider>()
-                .FirstOrDefault()?.HttpMethods;
-
-            if (httpMethods == null)
-            {
-                // If no IActionHttpMethodProvider is specified, fall back to convention the way AspNet does.
-                httpMethods = SupportedHttpMethodConventions
-                    .Where(method => action.ActionMethod.Name.StartsWith(method, StringComparison.OrdinalIgnoreCase));
-
-                // Use POST as the default method.
-                if (!httpMethods.Any())
-                {
-                    httpMethods = new string[] { "POST" };
-                }
-            }
-
-            return httpMethods;
-        }
-
-        /// <summary>
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
+        /// <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>
-        public static void AddSelector(this ActionModel action, string httpMethod, string prefix, IEdmModel model, ODataPathTemplate path)
+        /// <param name="options">The route build options.</param>
+        public static void AddSelector(this ActionModel action, string httpMethods, string prefix, IEdmModel model, ODataPathTemplate path, ODataRouteOptions options = null)
         {
             if (action == null)
             {
                 throw Error.ArgumentNull(nameof(action));
+            }
+
+            if (string.IsNullOrEmpty(httpMethods))
+            {
+                throw Error.ArgumentNullOrEmpty(nameof(httpMethods));
             }
 
             if (model == null)
@@ -189,81 +149,146 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            foreach (string template in path.GetTemplates())
+            // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,
+            // It will throw "An item with the same key has already been added. Key: GET", in
+            // HttpMethodMatcherPolicy.BuildJumpTable(Int32 exitDestination, IReadOnlyList`1 edges)
+            // Another root cause is that in attribute routing, we reuse the HttpMethodMetadata, the method name is always "upper" case.
+            // Therefore, we upper the http method name always.
+            string[] methods = httpMethods.ToUpperInvariant().Split(',');
+            foreach (string template in path.GetTemplates(options))
             {
+                // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
+                // No matter whether the action selector model is absolute route template, the controller's attribute will apply automatically
+                // So, let's only create/update the action selector model
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
                 if (selectorModel == null)
                 {
-                    selectorModel = CreateSelectorModel(action.Attributes);
+                    // Create a new selector model.
+                    selectorModel = CreateSelectorModel(action, methods);
                     action.Selectors.Add(selectorModel);
                 }
-
-                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-                selectorModel.AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(templateStr) { Name = templateStr });
+                else
+                {
+                    // Update the existing non attribute routing selector model.
+                    selectorModel = UpdateSelectorModel(selectorModel, methods);
+                }
 
                 ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
                 selectorModel.EndpointMetadata.Add(odataMetadata);
 
-                AddHttpMethod(odataMetadata, httpMethod);
+                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
 
-                // Check with .NET Team whether the "Endpoint name metadata"
-                selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString()));
+                selectorModel.AttributeRouteModel = new AttributeRouteModel
+                {
+                    // OData convention route template doesn't get combined with the route template applied to the controller.
+                    // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
+                    Template = $"/{templateStr}",
+                    Name = templateStr // do we need this?
+                };
+
+                // Check with .NET Team whether the "Endpoint name metadata" needed?
+                selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString())); // Do we need this?
             }
         }
 
-        // this method refers to the similar method in ASP.NET Core
-        internal static SelectorModel CreateSelectorModel(IReadOnlyList<object> attributes)
+        internal static SelectorModel UpdateSelectorModel(SelectorModel selectorModel, string[] httpMethods)
         {
-            var selectorModel = new SelectorModel();
+            Contract.Assert(selectorModel != null);
 
-            AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
-            AddRange(selectorModel.EndpointMetadata, attributes);
-
-            // Simple case, all HTTP method attributes apply
-            var httpMethods = attributes
-                .OfType<IActionHttpMethodProvider>()
-                .SelectMany(a => a.HttpMethods)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-
-            if (httpMethods.Length > 0)
+            // remove the unused constraints (just for safe)
+            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
             {
-                selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-                selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+                if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.ActionConstraints.RemoveAt(i);
+                }
             }
+
+            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
+                {
+                    selectorModel.ActionConstraints.RemoveAt(i);
+                }
+            }
+
+            // remove the unused metadata
+            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.EndpointMetadata.RemoveAt(i);
+                }
+            }
+
+            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
+                {
+                    selectorModel.EndpointMetadata.RemoveAt(i);
+                }
+            }
+
+            // append the http method metadata.
+            Contract.Assert(httpMethods.Length >= 1);
+            selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+
+            // append controller attributes to action selector model? -- NO
+            // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
 
             return selectorModel;
         }
 
-        /// <summary>
-        /// Gets the supported Http method on the action or by convention using the action name.
-        /// </summary>
-        /// <param name="action">The action model.</param>
-        /// <returns>The supported http methods.</returns>
-        internal static bool HasHttpMethod(this ActionModel action)
+        internal static SelectorModel CreateSelectorModel(ActionModel actionModel, string[] httpMethods)
         {
-            if (action == null)
+            Contract.Assert(actionModel != null);
+
+            SelectorModel selectorModel = new SelectorModel();
+            IReadOnlyList<object> attributes = actionModel.Attributes;
+
+            AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
+
+            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
             {
-                throw Error.ArgumentNull(nameof(action));
+                if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.ActionConstraints.RemoveAt(i);
+                }
             }
 
-            // Determine the supported methods.
-            return action.Attributes.Any(a => a is IActionHttpMethodProvider);
-        }
-
-        private static void AddHttpMethod(ODataRoutingMetadata metadata, string httpMethod)
-        {
-            if (string.IsNullOrEmpty(httpMethod))
+            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
             {
-                return;
+                if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
+                {
+                    selectorModel.ActionConstraints.RemoveAt(i);
+                }
             }
 
-            string[] methods = httpMethod.Split(',');
-            foreach (var method in methods)
+            AddRange(selectorModel.EndpointMetadata, attributes);
+            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
             {
-                metadata.HttpMethods.Add(method);
+                if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.EndpointMetadata.RemoveAt(i);
+                }
             }
+
+            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
+                {
+                    selectorModel.EndpointMetadata.RemoveAt(i);
+                }
+            }
+
+            Contract.Assert(httpMethods.Length >= 1);
+            selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+
+            // append controller attributes to action selector model? -- NO
+            // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
+            return selectorModel;
         }
 
         private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
@@ -275,4 +300,3 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
     }
 }
-

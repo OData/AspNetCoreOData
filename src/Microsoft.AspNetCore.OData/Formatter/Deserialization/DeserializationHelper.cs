@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
@@ -85,12 +86,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                if (!readContext.IsUntyped)
+                if (!readContext.IsNoClrType)
                 {
                     if (propertyKind == EdmTypeKind.Primitive)
                     {
                         propertyValue = EdmPrimitiveHelper.ConvertPrimitiveValue(propertyValue,
-                            GetPropertyType(resource, propertyName));
+                            GetPropertyType(resource, propertyName), readContext.TimeZone);
                     }
                 }
 

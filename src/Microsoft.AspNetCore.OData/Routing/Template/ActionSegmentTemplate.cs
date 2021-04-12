@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Linq;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -85,9 +85,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public OperationSegment Segment { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return Segment;
+            context?.Segments.Add(Segment);
+            return true;
         }
     }
 }

@@ -66,9 +66,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public TypeSegment TypeSegment { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return TypeSegment;
+            context?.Segments.Add(TypeSegment);
+            return true;
         }
 
         private static TypeSegment BuildSegment(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)

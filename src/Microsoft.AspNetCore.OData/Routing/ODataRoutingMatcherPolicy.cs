@@ -58,7 +58,15 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (httpContext == null)
             {
-                throw new ArgumentNullException(nameof(httpContext));
+                throw Error.ArgumentNull(nameof(httpContext));
+            }
+
+            IODataFeature odataFeature = httpContext.ODataFeature();
+            if (odataFeature.Path != null)
+            {
+                // If we have the OData path setting, it means there's some Policy working.
+                // Let's skip this default OData matcher policy.
+                return Task.CompletedTask;
             }
 
             // The goal of this method is to perform the final matching:
@@ -80,17 +88,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                IHttpMethodMetadata httpMetadata = candidate.Endpoint.Metadata.GetMetadata<IHttpMethodMetadata>();
-                if (httpMetadata == null)
-                {
-                    // Check the http method
-                    if (metadata.HttpMethods != null && !metadata.HttpMethods.Contains(httpContext.Request.Method))
-                    {
-                        candidates.SetValidity(i, false);
-                        continue;
-                    }
-                }
-
                 ODataTemplateTranslateContext translatorContext =
                     new ODataTemplateTranslateContext(httpContext, candidate.Values, metadata.Model);
 
@@ -99,10 +96,15 @@ namespace Microsoft.AspNetCore.OData.Routing
                     ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                     if (odataPath != null)
                     {
-                        IODataFeature odataFeature = httpContext.ODataFeature();
                         odataFeature.PrefixName = metadata.Prefix;
                         odataFeature.Model = metadata.Model;
                         odataFeature.Path = odataPath;
+
+                        MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
+
+                        // Shall we break the remaining candidates?
+                        // So far the answer is no. Because we can use this matcher to obsolete the unmatched endpoint.
+                        // break;
                     }
                     else
                     {
@@ -111,11 +113,18 @@ namespace Microsoft.AspNetCore.OData.Routing
                 }
                 catch (Exception)
                 {
-                    candidates.SetValidity(i, false);
                 }
             }
 
             return Task.CompletedTask;
+        }
+
+        private static void MergeRouteValues(RouteValueDictionary updates, RouteValueDictionary source)
+        {
+            foreach (var data in updates)
+            {
+                source[data.Key] = data.Value;
+            }
         }
     }
 }

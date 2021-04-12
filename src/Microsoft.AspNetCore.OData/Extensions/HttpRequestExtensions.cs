@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -68,6 +67,49 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             return request.ODataFeature().Model;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="TimeZoneInfo"/> setting.
+        /// </summary>
+        /// <param name="request">The http request.</param>
+        /// <returns>null or the time zone info.</returns>
+        public static TimeZoneInfo GetTimeZoneInfo(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            TimeZoneInfo timeZone = null;
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value != null)
+            {
+                timeZone = odataOptions.Value.TimeZone;
+            }
+
+            return timeZone;
+        }
+
+        /// <summary>
+        /// Gets the bool value indicating whether the non-dollar prefix query option.
+        /// </summary>
+        /// <param name="request">The http request.</param>
+        /// <returns>True/false.</returns>
+        public static bool IsNoDollarQueryEnable(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
+            if (odataOptions != null && odataOptions.Value != null)
+            {
+                return odataOptions.Value.EnableNoDollarQueryOptions;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -184,6 +226,28 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Checks whether the request is a POST targeted at a resource path ending in /$query.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>true if the request path has $query segment.</returns>
+        internal static bool IsODataQueryRequest(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            // Requests to paths ending in /$query MUST use the POST verb.
+            if (!string.Equals(request.Method, HttpMethods.Post, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            string path = request.Path.Value.TrimEnd('/');
+            return path.EndsWith("/$query", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// Gets the dependency injection container for the OData request.
         /// </summary>
         /// <param name="request">The request.</param>
@@ -201,18 +265,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return requestContainer;
             }
 
-            IOptions<ODataOptions> odataOptionsOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
-            if (odataOptionsOptions == null)
+            // if the prefixName == null, it's a non-model scenario
+            if (request.ODataFeature().PrefixName == null)
             {
-                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(ODataOptions));
+                return null;
             }
 
-            ODataOptions options = odataOptionsOptions.Value;
-
-            return options.GetODataServiceProvider(request.ODataFeature().PrefixName);
-
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
-            // return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
+            return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
         }
 
         /// <summary>
@@ -225,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (request.ODataFeature().SubServiceProvider != null)
@@ -285,22 +345,22 @@ namespace Microsoft.AspNetCore.OData.Extensions
             IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
             // Bind scoping request into the OData container.
-            //if (!string.IsNullOrEmpty(routeName))
-            //{
-            //    scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
-            //}
+            if (!string.IsNullOrEmpty(prefixName))
+            {
+                scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
+            }
 
             return scope;
         }
 
         /// <summary>
-        /// Gets thes OData version for the response.
+        /// Gets the OData version from the request context.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>The OData version.</returns>
-        public static ODataVersion GetODataResponseVersion(this HttpRequest request)
+        public static ODataVersion GetODataVersion(this HttpRequest request)
         {
-            Contract.Assert(request != null, "GetODataResponseVersion called with a null request");
+            Contract.Assert(request != null, $"{nameof(GetODataVersion)} called with a null request");
             return request.ODataMaxServiceVersion() ??
                 request.ODataMinServiceVersion() ??
                 request.ODataServiceVersion() ??

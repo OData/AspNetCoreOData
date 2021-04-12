@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -21,10 +22,59 @@ namespace Microsoft.AspNetCore.OData
         {
             if (app == null)
             {
-                throw new ArgumentNullException(nameof(app));
+                throw Error.ArgumentNull(nameof(app));
             }
 
             return app.UseMiddleware<ODataBatchMiddleware>();
+        }
+
+        /// <summary>
+        /// Use OData query request middleware. An OData query request is a Http Post request ending with /$query.
+        /// The Request body contains the query options.
+        /// </summary>
+        /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+        /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
+        public static IApplicationBuilder UseODataQueryRequest(this IApplicationBuilder app)
+        {
+            if (app == null)
+            {
+                throw Error.ArgumentNull(nameof(app));
+            }
+
+            return app.UseMiddleware<ODataQueryRequestMiddleware>();
+        }
+
+        /// <summary>
+        /// Use OData route debug middleware. You can send request "~/$odata" after enabling this middleware.
+        /// </summary>
+        /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseODataRouteDebug(this IApplicationBuilder app)
+        {
+            return app.UseODataRouteDebug("$odata");
+        }
+
+        /// <summary>
+        /// Use OData route debug middleware using the given route pattern.
+        /// For example, if the given route pattern is "myrouteinfo", then you can send request "~/myrouteinfo" after enabling this middleware.
+        /// Please use basic (literal) route pattern.
+        /// </summary>
+        /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+        /// <param name="routePattern">The given route pattern.</param>
+        /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
+        public static IApplicationBuilder UseODataRouteDebug(this IApplicationBuilder app, string routePattern)
+        {
+            if (app == null)
+            {
+                throw Error.ArgumentNull(nameof(app));
+            }
+
+            if (routePattern == null)
+            {
+                throw Error.ArgumentNull(nameof(routePattern));
+            }
+
+            return app.UseMiddleware<ODataRouteDebugMiddleware>(routePattern);
         }
     }
 }

@@ -641,4 +641,25 @@
   <data name="SegmentShouldBeKind" xml:space="preserve">
     <value>The input segment should be '{0}' in '{1}'.</value>
   </data>
+  <data name="ExpressionLexerUnterminatedStringLiteral" xml:space="preserve">
+    <value>There is an unterminated string literal at position {0} in '{1}'.</value>
+  </data>
+  <data name="ExpressionLexerSyntaxError" xml:space="preserve">
+    <value>Syntax error at position {0} in '{1}'.</value>
+  </data>
+  <data name="ExpressionLexer_UnbalancedBracketExpression" xml:space="preserve">
+    <value>Found an unbalanced bracket '{0}' and '{1}' expression.</value>
+  </data>
+  <data name="MultipleSingleLiteralNotAllowed" xml:space="preserve">
+    <value>'{0}' is not a valid expression.Single literal is only for single key. Multiple keys should use key=value.</value>
+  </data>
+  <data name="RouteOptionDisabledKeySegment" xml:space="preserve">
+    <value>Found a key segment in a OData path. The route option disables key in parenthesis and key as segment.</value>
+  </data>
+  <data name="RouteOptionDisabledOperationSegment" xml:space="preserve">
+    <value>Found a '{0}' segment in a OData path. The route option disables qualified and unqualified operation call.</value>
+  </data>
+  <data name="CannotParseQueryRequestPayload" xml:space="preserve">
+    <value>Unable to parse query request payload.</value>
+  </data>
 </root>

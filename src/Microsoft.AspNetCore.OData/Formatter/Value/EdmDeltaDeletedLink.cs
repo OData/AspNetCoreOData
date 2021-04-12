@@ -11,14 +11,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
     /// Represents an <see cref="IEdmDeltaDeletedLink"/> with no backing CLR <see cref="Type"/>.
-    /// Used to hold the Deleted Link object in the Delta Feed Payload.
+    /// Used to hold the Deleted Link object in the Delta ResourceSet Payload.
     /// </summary>
     [NonValidatingParameterBinding]
     public class EdmDeltaDeletedLink : EdmEntityObject, IEdmDeltaDeletedLink
     {
-        private Uri _source;
-        private Uri _target;
-        private string _relationship;
+        // TODO: Why derived from EdmEntityObject, it doesn't make sense?
         private EdmDeltaType _edmType;
 
         /// <summary>
@@ -48,50 +46,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedLink(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaEntityKind.DeletedLinkEntry);
+            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.DeltaDeletedLink);
         }
 
         /// <inheritdoc />
-        public Uri Source
-        {
-            get
-            {
-                return _source;
-            }
-            set
-            {
-                _source = value;
-            }
-        }
+        public Uri Source { get; set; }
 
         /// <inheritdoc />
-        public Uri Target
-        {
-            get
-            {
-                return _target;
-            }
-            set
-            {
-                _target = value;
-            }
-        }
+        public Uri Target { get; set; }
 
         /// <inheritdoc />
-        public string Relationship
-        {
-            get
-            {
-                return _relationship;
-            }
-            set
-            {
-                _relationship = value;
-            }
-        }
+        public string Relationship { get; set; }
 
         /// <inheritdoc />
-        public EdmDeltaEntityKind DeltaKind
+        public EdmDeltaKind DeltaKind
         {
             get
             {

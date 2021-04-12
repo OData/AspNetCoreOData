@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="context">The HttpContext.</param>
         internal ODataTemplateTranslateContext(HttpContext context)
         {
-            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
+            HttpContext = context ?? throw Error.ArgumentNull(nameof(context));
         }
 
         /// <summary>
@@ -40,13 +40,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="context">The HttpContext.</param>
         /// <param name="routeValues">The route values.</param>
         /// <param name="model">The Edm model.</param>
-        internal ODataTemplateTranslateContext(HttpContext context, RouteValueDictionary routeValues, IEdmModel model)
+        public ODataTemplateTranslateContext(HttpContext context, RouteValueDictionary routeValues, IEdmModel model)
         {
-            HttpContext = context ?? throw new ArgumentNullException(nameof(context));
-
-            RouteValues = routeValues ?? throw new ArgumentNullException(nameof(routeValues));
-
-            Model = model ?? throw new ArgumentNullException(nameof(model));
+            HttpContext = context ?? throw Error.ArgumentNull(nameof(context));
+            RouteValues = routeValues ?? throw Error.ArgumentNull(nameof(routeValues));
+            Model = model ?? throw Error.ArgumentNull(nameof(model));
         }
 
         /// <summary>
@@ -63,6 +61,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Gets the Edm model.
         /// </summary>
         public IEdmModel Model { get; }
+
+        /// <summary>
+        /// Gets the updated route values. This will include the updated route values.
+        /// </summary>
+        public RouteValueDictionary UpdatedValues { get; } = new RouteValueDictionary();
+
+        /// <summary>
+        /// Gets the generated path segments.
+        /// </summary>
+        public IList<ODataPathSegment> Segments { get; } = new List<ODataPathSegment>();
 
         /// <summary>
         /// Gets the parameter alias or the alias name itself.

@@ -7,9 +7,8 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Formatter.MediaType
 {
     /// <summary>
-    /// Media type mapping that associates requests with $count.
+    /// Media type mapping that associates requests with $value on primitive property.
     /// </summary>
-    /// <remarks>This class derives from a platform-specific class.</remarks>
     public class ODataPrimitiveValueMediaTypeMapping : ODataRawValueMediaTypeMapping
     {
         /// <summary>
@@ -25,7 +24,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         {
             return propertySegment != null &&
                    propertySegment.Property.Type.IsPrimitive() &&
-                   !propertySegment.Property.Type.IsBinary();
+                   !propertySegment.Property.Type.IsBinary() &&
+                   !propertySegment.Property.Type.IsStream();
         }
     }
 }

@@ -187,5 +187,23 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             request.Content.Headers.ContentLength = content.Length;
             return client.SendAsync(request, CancellationToken.None);
         }
+
+        public static async Task<HttpResponseMessage> GetWithAcceptAsync(this HttpClient client, string uri, string acceptHeader)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Clear();
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(acceptHeader));
+
+            return await client.SendAsync(request);
+        }
+
+        public static async Task<HttpResponseMessage> GetWithAcceptAsync(this HttpClient client, Uri uri, string acceptHeader)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Clear();
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(acceptHeader));
+
+            return await client.SendAsync(request);
+        }
     }
 }

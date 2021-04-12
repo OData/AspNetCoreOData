@@ -29,8 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// <summary>
     /// Expose functionality to convert an function parameter value into a CLR object.
     /// </summary>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
-        Justification = "Relies on many ODataLib classes.")]
     internal static class ODataModelBinderConverter
     {
         private static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
@@ -85,14 +83,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
             if (edmTypeReference.IsPrimitive())
             {
                 ConstantNode node = graph as ConstantNode;
-                return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType);
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType, readContext.TimeZone);
             }
 
             // Resource, ResourceSet, Entity Reference or collection of entity reference
             return ConvertResourceOrResourceSet(graph, edmTypeReference, readContext);
         }
 
-        internal static object ConvertTo(string valueString, Type type)
+        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone)
         {
             if (valueString == null)
             {
@@ -160,7 +158,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             if (isNonStandardEdmPrimitive)
             {
-                return EdmPrimitiveHelper.ConvertPrimitiveValue(value, type);
+                // shall we get the timezone?
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(value, type, timeZone);
             }
             else
             {
@@ -286,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     newEnumerable = CovertResourceSetIds(enumerable, resourceSet, collectionType, readContext);
                 }
 
-                if (readContext.IsUntyped)
+                if (readContext.IsNoClrType)
                 {
                     return newEnumerable.ConvertToEdmObject(collectionType);
                 }
@@ -320,7 +319,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataReader resourceReader = oDataMessageReader.CreateODataUriParameterResourceReader(tempEntitySet,
                 edmTypeReference.ToStructuredType());
 
-            object item = resourceReader.ReadResourceOrResourceSetAsync();
+            object item = resourceReader.ReadResourceOrResourceSet();
 
             ODataResourceWrapper topLevelResource = item as ODataResourceWrapper;
             Contract.Assert(topLevelResource != null);
@@ -354,7 +353,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        private static object CovertResourceId(object source, ODataResource resource,
+        private static object CovertResourceId(object source, ODataResourceBase resource,
             IEdmEntityTypeReference entityTypeReference, ODataDeserializerContext readContext)
         {
             Contract.Assert(resource != null);
@@ -366,16 +365,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             HttpRequest request = readContext.Request;
-            // IWebApiUrlHelper urlHelper = readContext.InternalUrlHelper;
+            string serviceRoot = request.CreateODataLink();
 
-            // DefaultODataPathHandler pathHandler = new DefaultODataPathHandler();
-            //string serviceRoot = urlHelper.CreateODataLink(
-            //    request.Context.RouteName,
-            //    request.PathHandler,
-            //    new List<ODataPathSegment>());
-            string serviceRoot = null; // TODOO
-
-            IEnumerable<KeyValuePair<string, object>> keyValues = GetKeys(request, serviceRoot, resource.Id/*, request.RequestContainer*/);
+            IEnumerable<KeyValuePair<string, object>> keyValues = GetKeys(request, serviceRoot, resource.Id, request.GetSubServiceProvider());
 
             IList<IEdmStructuralProperty> keys = entityTypeReference.Key().ToList();
 
@@ -403,12 +395,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return source;
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> GetKeys(/*DefaultODataPathHandler pathHandler,*/ HttpRequest request,
-            string serviceRoot, Uri uri)
+        private static IEnumerable<KeyValuePair<string, object>> GetKeys(HttpRequest request, string serviceRoot,
+            Uri uri, IServiceProvider requestContainer)
         {
             IEdmModel model = request.GetModel();
 
-            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri);
+            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri, requestContainer);
 
             //ODataPath odataPath = pathHandler.Parse(serviceRoot, uri.ToString(), requestContainer);
             ODataPath odataPath = uriParser.ParsePath();

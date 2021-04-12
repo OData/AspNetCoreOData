@@ -6,10 +6,12 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Query.Container;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Common;
+using System.Text.Json;
+using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    [JsonConverter(typeof(DynamicTypeWrapperConverter))]
     internal class GroupByWrapper : DynamicTypeWrapper
     {
         private Dictionary<string, object> _values;
@@ -77,6 +79,23 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                 {
                     _values.MergeWithReplace(this.Container.ToDictionary(DefaultPropertyMapper));
                 }
+            }
+        }
+    }
+
+    internal class GroupByWrapperConverter : JsonConverter<GroupByWrapper>
+    {
+        public override GroupByWrapper Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Contract.Assert(false, "EntitySetAggregationWrapper is internal and should never be deserialized into.");
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, GroupByWrapper value, JsonSerializerOptions options)
+        {
+            if (value != null)
+            {
+                JsonSerializer.Serialize(writer, value.Values, options);
             }
         }
     }

@@ -1,14 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataRoutingSample.Models;
 
@@ -63,6 +61,7 @@ namespace ODataRoutingSample.Controllers
         }
 
         [EnableQuery]
+        [HttpGet]
         public IActionResult Get(int key)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -85,6 +84,7 @@ namespace ODataRoutingSample.Controllers
             return Created(product);
         }
 
+        [HttpPut]
         public IActionResult Put(int key, [FromBody]Delta<Product> product)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -98,6 +98,7 @@ namespace ODataRoutingSample.Controllers
             return Updated(original);
         }
 
+        [HttpPatch]
         public IActionResult Patch(int key, Delta<Product> product)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -113,6 +114,7 @@ namespace ODataRoutingSample.Controllers
             return Updated(original);
         }
 
+        [HttpDelete]
         public IActionResult Delete(int key)
         {
             var original = _context.Products.FirstOrDefault(p => p.Id == key);
@@ -179,15 +181,13 @@ namespace ODataRoutingSample.Controllers
             return $"GetOptional without parameter value: param = {param}";
         }
 
-        [HttpGet]
-        [ODataRoute("CalculateSalary(minSalary={min},maxSalary={max})", prefix: "")]
+        [HttpGet("CalculateSalary(minSalary={min},maxSalary={max})")]
         public string CalculateSalary(int min, int max)
         {
             return $"Unbound function call on CalculateSalary: min={min}, max={max}";
         }
 
-        [HttpGet]
-        [ODataRoute("CalculateSalary(minSalary={min},maxSalary={max},wholeName={name})", prefix: "")]
+        [HttpGet("CalculateSalary(minSalary={min},maxSalary={max},wholeName={name})")]
         public string CalculateSalary(int min, int max, string name)
         {
             return $"Unbound function call on CalculateSalary: min={min}, max={max}, name={name}";

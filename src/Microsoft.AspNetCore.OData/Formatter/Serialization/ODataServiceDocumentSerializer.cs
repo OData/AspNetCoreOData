@@ -40,8 +40,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type?.Name));
             }
 
-            // TODO: Call Async version?
-            // messageWriter.WriteServiceDocumentAsync(serviceDocument);
             await messageWriter.WriteServiceDocumentAsync(serviceDocument).ConfigureAwait(false);
         }
     }

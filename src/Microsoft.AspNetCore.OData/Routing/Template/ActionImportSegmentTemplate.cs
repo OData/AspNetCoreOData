@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -76,9 +75,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public OperationImportSegment Segment { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return Segment;
+            context?.Segments.Add(Segment);
+            return true;
         }
 
         private static OperationImportSegment BuildSegment(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)

@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     public class MetadataSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// Gets the static instace of $metadata
+        /// Gets the static instance of $metadata
         /// </summary>
         public static MetadataSegmentTemplate Instance { get; } = new MetadataSegmentTemplate();
 
@@ -38,9 +38,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => true;
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            return MetadataSegment.Instance;
+            context?.Segments.Add(MetadataSegment.Instance);
+            return true;
         }
     }
 }

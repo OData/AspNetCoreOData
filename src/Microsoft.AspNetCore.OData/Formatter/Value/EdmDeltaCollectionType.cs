@@ -6,37 +6,23 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
-    /// Implementing IEdmCollectionType to identify collection of DeltaFeed.
+    /// Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
     /// </summary>
     internal class EdmDeltaCollectionType : IEdmCollectionType
     {
-        private IEdmTypeReference _entityTypeReference;
-
-        internal EdmDeltaCollectionType(IEdmTypeReference entityTypeReference)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EdmDeltaCollectionType"/> class.
+        /// </summary>
+        /// <param name="typeReference">The element type reference.</param>
+        internal EdmDeltaCollectionType(IEdmTypeReference typeReference)
         {
-            if (entityTypeReference == null)
-            {
-                throw Error.ArgumentNull("entityTypeReference");
-            }
-            _entityTypeReference = entityTypeReference;
+            ElementType = typeReference ?? throw Error.ArgumentNull("typeReference");
         }
 
         /// <inheritdoc />
-        public EdmTypeKind TypeKind
-        {
-            get
-            {
-                return EdmTypeKind.Collection;
-            }
-        }
+        public EdmTypeKind TypeKind => EdmTypeKind.Collection;
 
         /// <inheritdoc />
-        public IEdmTypeReference ElementType
-        {
-            get
-            {
-                return _entityTypeReference;
-            }
-        }
+        public IEdmTypeReference ElementType { get; }
     }
 }

@@ -10,7 +10,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
     /// <summary>
     /// Media type mapping that associates requests with $count.
     /// </summary>
-    /// <remarks>This class derives from a platform-specific class.</remarks>
     public class ODataCountMediaTypeMapping : MediaTypeMapping
     {
         /// <summary>
@@ -31,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             return IsCountRequest(request.ODataFeature().Path) ? 1 : 0;

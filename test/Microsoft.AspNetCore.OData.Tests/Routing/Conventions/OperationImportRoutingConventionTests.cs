@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -47,13 +46,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 return new TheoryDataSet<MethodInfo, string[]>()
                 {
                     {
-                        method1, new[] { "CalcByRating(order={order})" }
+                        method1, new[] { "/CalcByRating(order={order})" }
                     },
                     {
-                        method2, new[] { "CalcByRating(name={name})" }
+                        method2, new[] { "/CalcByRating(name={name})" }
                     },
                     {
-                        controller.GetMethod("CalcByRatingAction"), new[] { "CalcByRatingAction" }
+                        controller.GetMethod("CalcByRatingAction"), new[] { "/CalcByRatingAction" }
                     }
                 };
             }
@@ -95,7 +94,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.True(returnValue);
 
             // Assert
-            Assert.Empty(action.Selectors);
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
         }
 
         private static IEdmModel GetEdmModel()

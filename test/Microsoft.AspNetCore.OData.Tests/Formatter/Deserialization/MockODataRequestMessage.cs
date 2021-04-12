@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             get
             {
-                return "GET";
+                return "Get";
             }
             set
             {

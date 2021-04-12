@@ -313,6 +313,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to parse query request payload..
+        /// </summary>
+        internal static string CannotParseQueryRequestPayload {
+            get {
+                return ResourceManager.GetString("CannotParseQueryRequestPayload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
         /// </summary>
         internal static string CannotPatchNavigationProperties {
@@ -615,6 +624,33 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ExpandFilterExpressionNotLambdaExpression {
             get {
                 return ResourceManager.GetString("ExpandFilterExpressionNotLambdaExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found an unbalanced bracket &apos;{0}&apos; and &apos;{1}&apos; expression..
+        /// </summary>
+        internal static string ExpressionLexer_UnbalancedBracketExpression {
+            get {
+                return ResourceManager.GetString("ExpressionLexer_UnbalancedBracketExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Syntax error at position {0} in &apos;{1}&apos;..
+        /// </summary>
+        internal static string ExpressionLexerSyntaxError {
+            get {
+                return ResourceManager.GetString("ExpressionLexerSyntaxError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is an unterminated string literal at position {0} in &apos;{1}&apos;..
+        /// </summary>
+        internal static string ExpressionLexerUnterminatedStringLiteral {
+            get {
+                return ResourceManager.GetString("ExpressionLexerUnterminatedStringLiteral", resourceCulture);
             }
         }
         
@@ -957,6 +993,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string MultipleMatchingClrTypesForEdmType {
             get {
                 return ResourceManager.GetString("MultipleMatchingClrTypesForEdmType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid expression.Single literal is only for single key. Multiple keys should use key=value..
+        /// </summary>
+        internal static string MultipleSingleLiteralNotAllowed {
+            get {
+                return ResourceManager.GetString("MultipleSingleLiteralNotAllowed", resourceCulture);
             }
         }
         
@@ -1434,6 +1479,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string RootElementNameMissing {
             get {
                 return ResourceManager.GetString("RootElementNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+        /// </summary>
+        internal static string RouteOptionDisabledKeySegment {
+            get {
+                return ResourceManager.GetString("RouteOptionDisabledKeySegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
+        /// </summary>
+        internal static string RouteOptionDisabledOperationSegment {
+            get {
+                return ResourceManager.GetString("RouteOptionDisabledOperationSegment", resourceCulture);
             }
         }
         

@@ -108,5 +108,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// Gets/sets the odata service provider, used for the attribute routing parser or others.
         /// </summary>
         public IServiceProvider ServiceProvider { get; set; }
+
+        /// <summary>
+        /// Gets/sets the OData Options.
+        /// </summary>
+        public ODataOptions Options { get; set; }
     }
 }

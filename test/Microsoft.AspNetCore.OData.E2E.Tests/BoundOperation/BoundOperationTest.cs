@@ -19,26 +19,25 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 {
-    public class BoundOperationTest : WebODataTestBase<BoundOperationTest.Startup>
+    public class BoundOperationTest : WebApiTestBase<BoundOperationTest>
     {
-        public class Startup : TestStartupBase
+        // following the Fixture convention.
+        protected static void UpdateConfigureServices(IServiceCollection services)
         {
-            public override void ConfigureServices(IServiceCollection services)
-            {
-                services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
+            services.AddControllers();
 
-                IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();
+            services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
-                services.AddOData(opt => opt.AddModel("AttributeRouting", edmModel)
-                    .AddModel("ConventionRouting", edmModel).SetAttributeRouting(false));
+            IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();
 
-                services.TryAddEnumerable(ServiceDescriptor.Transient<IODataControllerActionConvention, MyAttributeRoutingConvention>());
-            }
+            services.AddOData(opt => opt.AddModel("AttributeRouting", edmModel)
+                .AddModel("ConventionRouting", edmModel).SetAttributeRouting(false));
+
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IODataControllerActionConvention, MyAttributeRoutingConvention>());
         }
 
         private const string CollectionOfEmployee = "Collection(NS.Employee)";
@@ -46,17 +45,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         private const string Employee = "NS.Employee";
         private const string Manager = "NS.Manager";
 
-        public BoundOperationTest(WebODataTestFixture<Startup> factory)
-            :base(factory)
+        public BoundOperationTest(WebApiTestFixture<BoundOperationTest> fixture)
+            : base(fixture)
         {
         }
-
-        private string BaseAddress => this.Client.BaseAddress.AbsoluteUri;
 
         private async Task<HttpResponseMessage> ResetDatasource()
         {
             var requestUriForPost = "AttributeRouting/ResetDataSource";
-            var responseForPost = await this.Client.PostAsync(requestUriForPost, new StringContent(""));
+            HttpClient client = CreateClient();
+            var responseForPost = await client.PostAsync(requestUriForPost, new StringContent(""));
             Assert.True(responseForPost.IsSuccessStatusCode);
             return responseForPost;
         }
@@ -69,9 +67,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         {
             // Arrange
             var typeOfEmployee = typeof(Employee);
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await Client.GetAsync($"{routing}/$metadata");
+            HttpResponseMessage response = await client.GetAsync($"{routing}/$metadata");
             var stream = await response.Content.ReadAsStreamAsync();
             IODataResponseMessage message = new ODataMessageWrapper(stream, response.Content.Headers);
             var reader = new ODataMessageReader(message);
@@ -398,7 +397,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         public async Task BoundFunctionInDollarFilter(string url)
         {
             // Arrange & Act
-            HttpResponseMessage response = await Client.GetAsync(url);
+            HttpClient client = CreateClient();
+            HttpResponseMessage response = await client.GetAsync(url);
             string responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -923,21 +923,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         #endregion
     }
 
-    public class MyAttributeRoutingConvention : AttributeRoutingConvention
+    public class MyAttributeRoutingConvention : IODataControllerActionConvention
     {
-        public MyAttributeRoutingConvention(ILogger<AttributeRoutingConvention> logger, IODataPathTemplateParser parser)
-            : base(logger, parser)
-        {
-        }
+        /// <summary>
+        /// Metadata's order is 0, make a order a little bit bigger than 0 can make metadata routing convention go
+        /// </summary>
+        public int Order => 10;
 
-        public override bool AppliesToController(ODataControllerActionContext context)
+        public bool AppliesToAction(ODataControllerActionContext context)
         {
             if (context.Prefix == "AttributeRouting")
             {
-                return base.AppliesToController(context);
+                // stop all others
+                return true;
             }
 
             return false;
+        }
+
+        public bool AppliesToController(ODataControllerActionContext context)
+        {
+            return true;
         }
     }
 }

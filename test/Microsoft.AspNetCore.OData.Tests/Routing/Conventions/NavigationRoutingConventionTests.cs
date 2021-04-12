@@ -47,10 +47,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetOrders",
                         new[]
                         {
-                            "Customers({key})/Orders",
-                            "Customers/{key}/Orders",
-                            "Customers({key})/Orders/$count",
-                            "Customers/{key}/Orders/$count"
+                            "/Customers({key})/Orders",
+                            "/Customers/{key}/Orders",
+                            "/Customers({key})/Orders/$count",
+                            "/Customers/{key}/Orders/$count"
                         }
                     },
                     {
@@ -58,10 +58,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "GetSubOrdersFromVipCustomer",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/SubOrders",
-                            "Customers/{key}/NS.VipCustomer/SubOrders",
-                            "Customers({key})/NS.VipCustomer/SubOrders/$count",
-                            "Customers/{key}/NS.VipCustomer/SubOrders/$count"
+                            "/Customers({key})/NS.VipCustomer/SubOrders",
+                            "/Customers/{key}/NS.VipCustomer/SubOrders",
+                            "/Customers({key})/NS.VipCustomer/SubOrders/$count",
+                            "/Customers/{key}/NS.VipCustomer/SubOrders/$count"
                         }
                     },
                     {
@@ -69,8 +69,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PostToOrders",
                         new[]
                         {
-                            "Customers({key})/Orders",
-                            "Customers/{key}/Orders"
+                            "/Customers({key})/Orders",
+                            "/Customers/{key}/Orders"
                         }
                     },
                     {
@@ -78,8 +78,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PutToSubOrderFromVipCustomer",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/SubOrder",
-                            "Customers/{key}/NS.VipCustomer/SubOrder"
+                            "/Customers({key})/NS.VipCustomer/SubOrder",
+                            "/Customers/{key}/NS.VipCustomer/SubOrder"
                         }
                     },
                     // singleton
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PostToSubOrdersFromVipCustomer",
                         new[]
                         {
-                            "Me/NS.VipCustomer/SubOrders"
+                            "/Me/NS.VipCustomer/SubOrders"
                         }
                     },
                     {
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PutToOrder",
                         new[]
                         {
-                            "Me/Order"
+                            "/Me/Order"
                         }
                     },
                     {
@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "PatchToSubOrderFromVipCustomer",
                         new[]
                         {
-                            "Me/NS.VipCustomer/SubOrder"
+                            "/Me/NS.VipCustomer/SubOrder"
                         }
                     },
                 };
@@ -148,7 +148,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.False(returnValue);
 
             // Assert
-            Assert.Empty(action.Selectors);
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
         }
 
         [Theory]

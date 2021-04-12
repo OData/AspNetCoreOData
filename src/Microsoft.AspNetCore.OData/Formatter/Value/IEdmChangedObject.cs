@@ -5,14 +5,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an <see cref="IEdmChangedObject"/>.
-    /// Base interface to be implemented by any Delta object required to be part of the DeltaFeed Payload.
+    /// Base interface to be implemented by any Delta object required to be part of the DeltaResourceSet Payload.
     /// </summary>
     public interface IEdmChangedObject : IEdmStructuredObject
     {
         /// <summary>
-        /// DeltaKind for the objects part of the DeltaFeed Payload.
+        /// DeltaKind for the objects part of the DeltaResourceSet Payload.
         /// Used to determine which Delta object to create during serialization.
         /// </summary>
-        EdmDeltaEntityKind DeltaKind { get; }
+        EdmDeltaKind DeltaKind { get; }
     }
 }

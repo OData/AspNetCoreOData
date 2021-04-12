@@ -49,10 +49,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsBaseUpgraded",
                         new[]
                         {
-                            "Customers({key})/NS.IsBaseUpgraded",
-                            "Customers({key})/IsBaseUpgraded",
-                            "Customers/{key}/NS.IsBaseUpgraded",
-                            "Customers/{key}/IsBaseUpgraded",
+                            "/Customers({key})/NS.IsBaseUpgraded",
+                            "/Customers({key})/IsBaseUpgraded",
+                            "/Customers/{key}/NS.IsBaseUpgraded",
+                            "/Customers/{key}/IsBaseUpgraded",
                         }
                     },
                     {
@@ -60,8 +60,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsBaseUpgraded",
                         new[]
                         {
-                            "Me/NS.IsBaseUpgraded",
-                            "Me/IsBaseUpgraded"
+                            "/Me/NS.IsBaseUpgraded",
+                            "/Me/IsBaseUpgraded"
                         }
                     },
                     {
@@ -69,10 +69,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsUpgraded",
                         new[]
                         {
-                            "Customers({key})/NS.IsUpgraded",
-                            "Customers({key})/IsUpgraded",
-                            "Customers/{key}/NS.IsUpgraded",
-                            "Customers/{key}/IsUpgraded"
+                            "/Customers({key})/NS.IsUpgraded",
+                            "/Customers({key})/IsUpgraded",
+                            "/Customers/{key}/NS.IsUpgraded",
+                            "/Customers/{key}/IsUpgraded"
                         }
                     },
                     {
@@ -80,8 +80,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsUpgraded",
                         new[]
                         {
-                            "Me/NS.IsUpgraded",
-                            "Me/IsUpgraded"
+                            "/Me/NS.IsUpgraded",
+                            "/Me/IsUpgraded"
                         }
                     },
                     {
@@ -89,10 +89,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipUpgraded",
                         new[]
                         {
-                            "Customers({key})/NS.VipCustomer/NS.IsVipUpgraded",
-                            "Customers({key})/NS.VipCustomer/IsVipUpgraded",
-                            "Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded",
-                            "Customers/{key}/NS.VipCustomer/IsVipUpgraded"
+                            "/Customers({key})/NS.VipCustomer/NS.IsVipUpgraded",
+                            "/Customers({key})/NS.VipCustomer/IsVipUpgraded",
+                            "/Customers/{key}/NS.VipCustomer/NS.IsVipUpgraded",
+                            "/Customers/{key}/NS.VipCustomer/IsVipUpgraded"
                         }
                     },
                     {
@@ -100,8 +100,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipUpgraded",
                         new[]
                         {
-                            "Me/NS.VipCustomer/NS.IsVipUpgraded",
-                            "Me/NS.VipCustomer/IsVipUpgraded"
+                            "/Me/NS.VipCustomer/NS.IsVipUpgraded",
+                            "/Me/NS.VipCustomer/IsVipUpgraded"
                         }
                     },
                     // bound to collection
@@ -110,8 +110,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsBaseAllUpgraded",
                         new[]
                         {
-                            "Customers/NS.IsBaseAllUpgraded",
-                            "Customers/IsBaseAllUpgraded"
+                            "/Customers/NS.IsBaseAllUpgraded",
+                            "/Customers/IsBaseAllUpgraded"
                         }
                     },
                     {
@@ -119,8 +119,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsAllCustomersUpgraded",
                         new[]
                         {
-                            "Customers/NS.IsAllCustomersUpgraded",
-                            "Customers/IsAllCustomersUpgraded"
+                            "/Customers/NS.IsAllCustomersUpgraded",
+                            "/Customers/IsAllCustomersUpgraded"
                         }
                     },
                     {
@@ -128,8 +128,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "IsVipAllUpgraded",
                         new[]
                         {
-                            "Customers/NS.VipCustomer/NS.IsVipAllUpgraded",
-                            "Customers/NS.VipCustomer/IsVipAllUpgraded"
+                            "/Customers/NS.VipCustomer/NS.IsVipAllUpgraded",
+                            "/Customers/NS.VipCustomer/IsVipAllUpgraded"
                         }
                     },
                     // overload
@@ -138,10 +138,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "UpgradedAllOnCustomer",
                         new[]
                         {
-                            "Customers({key})/NS.UpgradedAll",
-                            "Customers({key})/UpgradedAll",
-                            "Customers/{key}/NS.UpgradedAll",
-                            "Customers/{key}/UpgradedAll"
+                            "/Customers({key})/NS.UpgradedAll",
+                            "/Customers({key})/UpgradedAll",
+                            "/Customers/{key}/NS.UpgradedAll",
+                            "/Customers/{key}/UpgradedAll"
                         }
                     },
                     {
@@ -149,8 +149,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "UpgradedAllOnCollectionOfCustomer",
                         new[]
                         {
-                            "Customers/NS.UpgradedAll",
-                            "Customers/UpgradedAll"
+                            "/Customers/NS.UpgradedAll",
+                            "/Customers/UpgradedAll"
                         }
                     },
                     {
@@ -158,8 +158,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                         "UpgradedAllOnCollectionOfVipCustomer",
                         new[]
                         {
-                            "Customers/NS.VipCustomer/NS.UpgradedAll",
-                            "Customers/NS.VipCustomer/UpgradedAll"
+                            "/Customers/NS.VipCustomer/NS.UpgradedAll",
+                            "/Customers/NS.VipCustomer/UpgradedAll"
                         }
                     }
                 };
@@ -202,7 +202,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.False(returnValue);
 
             // Assert
-            Assert.Empty(action.Selectors);
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
         }
 
         private static IEdmModel GetEdmModel()

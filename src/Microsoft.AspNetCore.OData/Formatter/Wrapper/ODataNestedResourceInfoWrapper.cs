@@ -9,21 +9,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
     /// <summary>
     /// Encapsulates an <see cref="ODataNestedResourceInfo"/> and the list of nested items.
     /// </summary>
-    /// <remarks>
-    /// A nested resource info for a singleton nested property can only contain one item - either ODataResource or ODataEntityReferenceLink.
-    /// A nested resource info for a collection nested property can contain any number of items - each is either ODataResource or ODataEntityReferenceLink.
-    /// </remarks>
-    public sealed class ODataNestedResourceInfoWrapper : ODataItemBase
+    public sealed class ODataNestedResourceInfoWrapper : ODataItemWrapper
     {
         /// <summary>
         /// Initializes a new instance of <see cref="ODataNestedResourceInfoWrapper"/>.
         /// </summary>
-        /// <param name="item">The wrapped item.</param>
-        public ODataNestedResourceInfoWrapper(ODataNestedResourceInfo item)
-            : base(item)
+        /// <param name="nestedInfo">The wrapped nested resource info item.</param>
+        public ODataNestedResourceInfoWrapper(ODataNestedResourceInfo nestedInfo)
         {
-            NestedItems = new List<ODataItemBase>();
-            NestedResourceInfo = item;
+            NestedResourceInfo = nestedInfo;
+            NestedItems = new List<ODataItemWrapper>();
         }
 
         /// <summary>
@@ -34,6 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// <summary>
         /// Gets the nested items that are part of this nested resource info.
         /// </summary>
-        public IList<ODataItemBase> NestedItems { get; }
+        public IList<ODataItemWrapper> NestedItems { get; }
     }
 }

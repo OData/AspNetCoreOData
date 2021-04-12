@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             {
                 // ~/Me
                 ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton));
-                action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+                action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
                 // processed
                 return true;
@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                         new SingletonSegmentTemplate(context.Singleton),
                         new CastSegmentTemplate(castType, entityType, context.Singleton));
 
-                    action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+                    action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
                     return true;
                 }
             }
@@ -98,12 +98,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
             else if (actionName == "Put" || actionName == $"Put{singletonName}")
             {
-                httpMethod = "put";
+                httpMethod = "Put";
                 return true;
             }
             else if (actionName == "Patch" || actionName == $"Patch{singletonName}")
             {
-                httpMethod = "patch";
+                httpMethod = "Patch";
                 return true;
             }
 

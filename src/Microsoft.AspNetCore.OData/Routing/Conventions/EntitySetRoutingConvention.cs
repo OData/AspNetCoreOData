@@ -20,6 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// GET ~/entityset/cast/$count
     /// POST ~/entityset
     /// POST ~/entityset/cast
+    /// PATCH ~/entityset   ==> Delta resource set patch
     /// </summary>
     public class EntitySetRoutingConvention : IODataControllerActionConvention
     {
@@ -58,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             string actionName = action.ActionMethod.Name;
 
             // 1. Without type case
-            if (ProcessEntitySetAction(actionName, entitySet, null, context.Prefix, context.Model, action))
+            if (ProcessEntitySetAction(actionName, entitySet, null, context, action))
             {
                 return true;
             }
@@ -79,13 +80,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string actionPrefix = actionName.Substring(0, index);
-            return ProcessEntitySetAction(actionPrefix, entitySet, castType, context.Prefix, context.Model, action);
+            return ProcessEntitySetAction(actionPrefix, entitySet, castType, context, action);
         }
 
-        private static bool ProcessEntitySetAction(string actionName,
-            IEdmEntitySet entitySet, IEdmStructuredType castType,
-            string prefix, IEdmModel model,
-            ActionModel action)
+        private static bool ProcessEntitySetAction(string actionName, IEdmEntitySet entitySet, IEdmStructuredType castType,
+            ODataControllerActionContext context, ActionModel action)
         {
             if (actionName == "Get" || actionName == $"Get{entitySet.Name}")
             {
@@ -107,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector("Get", prefix, model, template);
+                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
                 // GET ~/Customers/$count or GET ~/Customers/Ns.VipCustomer/$count
                 segments = new List<ODataSegmentTemplate>
@@ -121,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 segments.Add(CountSegmentTemplate.Instance);
 
                 template = new ODataPathTemplate(segments);
-                action.AddSelector("Get", prefix, model, template);
+                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
             else if (actionName == "Post" || actionName == $"Post{entitySet.EntityType().Name}")
@@ -138,7 +137,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
-                action.AddSelector("Post", prefix, model, template);
+                action.AddSelector("Post", context.Prefix, context.Model, template, context.Options?.RouteOptions);
+                return true;
+            }
+            else if (actionName == "Patch" || actionName == $"Patch{entitySet.Name}")
+            {
+                // PATCH ~/Patch  , ~/PatchCustomers
+                IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
+                {
+                    new EntitySetSegmentTemplate(entitySet)
+                };
+
+                if (castType != null)
+                {
+                    IEdmCollectionType castCollectionType = castType.ToCollection(true);
+                    IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+                    segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
+                }
+
+                ODataPathTemplate template = new ODataPathTemplate(segments);
+                action.AddSelector("Patch", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
 

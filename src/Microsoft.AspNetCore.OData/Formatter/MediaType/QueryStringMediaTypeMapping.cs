@@ -13,7 +13,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
     /// <summary>
     /// Class that provides <see cref="MediaTypeHeaderValue"/>s from query strings.
     /// </summary>
-    /// <remarks>This class derives from a platform-specific class.</remarks>
     public class QueryStringMediaTypeMapping : MediaTypeMapping
     {
         /// <summary>
@@ -23,14 +22,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         /// <param name="mediaType">The media type to use if the query parameter specified by <paramref name="queryStringParameterName"/> is present
         /// and assigned the value specified by <paramref name="mediaType"/>.</param>
         public QueryStringMediaTypeMapping(string queryStringParameterName, string mediaType)
-            : base(mediaType)
+            : this(queryStringParameterName, null, mediaType)
         {
-            if (queryStringParameterName == null)
-            {
-                throw Error.ArgumentNull("queryStringParameterName");
-            }
-
-            QueryStringParameterName = queryStringParameterName;
         }
 
         /// <summary>
@@ -45,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         {
             if (queryStringParameterName == null)
             {
-                throw Error.ArgumentNull("queryStringParameterName");
+                throw Error.ArgumentNull(nameof(queryStringParameterName));
             }
 
             QueryStringParameterName = queryStringParameterName;
@@ -67,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             double quality = 0;

@@ -3,12 +3,14 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace Microsoft.AspNetCore.OData.Routing.Controllers
 {
     /// <summary>
-    /// 
+    /// The base controller class for OData.
     /// </summary>
+    [ODataRouting]
     public abstract class ODataController : ControllerBase
     {
         /// <summary>

@@ -11,31 +11,33 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     public static class EdmTypeExtensions
     {
         /// <summary>
-        /// Method to determine whether the current type is a Delta Feed
+        /// Method to determine whether the current type is a Delta resource set.
         /// </summary>
         /// <param name="type">IEdmType to be compared</param>
         /// <returns>True or False if type is same as <see cref="EdmDeltaCollectionType"/></returns>
-        public static bool IsDeltaFeed(this IEdmType type)
+        public static bool IsDeltaResourceSet(this IEdmType type)
         {
             if (type == null)
             {
                 throw Error.ArgumentNull("type");
             }
+
             return (type.GetType() == typeof(EdmDeltaCollectionType));
         }
 
         /// <summary>
-        /// Method to determine whether the current Edm object is a Delta Entry
+        /// Method to determine whether the current Edm object is a Delta resource
         /// </summary>
         /// <param name="resource">IEdmObject to be compared</param>
-        /// <returns>True or False if type is same as <see cref="EdmDeltaEntityObject"/> or <see cref="EdmDeltaComplexObject"/></returns>
+        /// <returns>True or False if type is same as <see cref="EdmDeltaResourceObject"/> or <see cref="EdmDeltaComplexObject"/></returns>
         public static bool IsDeltaResource(this IEdmObject resource)
         {
             if (resource == null)
             {
                 throw Error.ArgumentNull("resource");
             }
-            return (resource is EdmDeltaEntityObject || resource is EdmDeltaComplexObject);
+
+            return (resource is EdmDeltaResourceObject || resource is EdmDeltaComplexObject);
         }
     }
 }

@@ -34,26 +34,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Assert
             Assert.Equal(expected, actual);
         }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void HasHttpMethod_ReturnsAsExpected(bool expected)
-        {
-            // Arrange
-            List<object> attributes = new List<object>();
-            if (expected)
-            {
-                attributes.Add(new HttpGetAttribute());
-            }
-            ActionModel action = new ActionModel(_methodInfo, attributes);
-
-            // Act
-            bool actual = action.HasHttpMethod();
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
     }
 
     internal class TestController

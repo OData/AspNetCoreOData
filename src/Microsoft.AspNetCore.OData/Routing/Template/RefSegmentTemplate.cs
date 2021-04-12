@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override IEdmNavigationSource NavigationSource { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
@@ -56,7 +56,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             context.RouteValues["navigationProperty"] = Navigation.Name;
 
             // ODL implementation is complex, here i just use the NavigationPropertyLinkSegment
-            return new NavigationPropertyLinkSegment(Navigation, NavigationSource);
+            context.Segments.Add(new NavigationPropertyLinkSegment(Navigation, NavigationSource));
+            return true;
         }
     }
 }

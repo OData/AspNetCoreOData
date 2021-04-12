@@ -13,20 +13,16 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
-using Microsoft.AspNetCore.Routing;
-using ODataRoutingSample.Extensions;
 using ODataRoutingSample.Models;
+using ODataRoutingSample.OpenApi;
 
 namespace ODataRoutingSample
 {
     public class Startup
     {
-        private IEdmModel model;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            model = EdmModelBuilder.GetEdmModel();
         }
 
         public IConfiguration Configuration { get; }
@@ -62,7 +58,10 @@ namespace ODataRoutingSample
                 .AddModel(model0)
                 .AddModel("v1", model1)
                 .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
+                //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
                 );
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,8 +72,23 @@ namespace ODataRoutingSample
                 app.UseDeveloperExceptionPage();
             }
 
+            // Use odata route debug, /$odata
+            app.UseODataRouteDebug();
+
+            // If you want to use /$openapi, enable the middleware.
+            //app.UseODataOpenApi();
+
+            // Add OData /$query middleware
+            app.UseODataQueryRequest();
+
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+            });
 
             app.UseRouting();
 
@@ -94,9 +108,6 @@ namespace ODataRoutingSample
 
             app.UseEndpoints(endpoints =>
             {
-                // A odata debuger route is only for debugger view of the all OData endpoint routing.
-                endpoints.MapGet("/$odata", ODataRouteHandler.HandleOData);
-
                 endpoints.MapControllers();
             });
         }

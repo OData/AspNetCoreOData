@@ -163,14 +163,6 @@ namespace Microsoft.AspNetCore.OData.Results
             return odataLink == null ? null : new Uri(odataLink);
         }
 
-        internal static ODataVersion GetODataResponseVersion(HttpRequest request)
-        {
-            Contract.Assert(request != null, "GetODataResponseVersion called with a null request");
-            return request.ODataMaxServiceVersion() ??
-                request.ODataMinServiceVersion() ??
-                request.ODataServiceVersion() ??
-                ODataVersionConstraint.DefaultODataVersion;
-        }
 
         private static IEdmEntityTypeReference GetEntityType(IEdmModel model, object entity)
         {

@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -109,6 +110,27 @@ namespace Microsoft.AspNetCore.OData
             TimeZone = timeZoneInfo;
             return this;
         }
+
+        /// <summary>
+        /// Configure the route options.
+        /// </summary>
+        public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
+
+        /// <summary>
+        /// Configure the route options.
+        /// </summary>
+        /// <param name="configureAction">The action to config route options.</param>
+        /// <returns>The calling itself.</returns>
+        public ODataOptions ConfigureRoute(Action<ODataRouteOptions> configureAction)
+        {
+            if (configureAction == null)
+            {
+                throw Error.ArgumentNull(nameof(configureAction));
+            }
+
+            configureAction(RouteOptions);
+            return this;
+        }
         #endregion
 
         #region Models
@@ -194,7 +216,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The root service provider for the route (prefix) name.</returns>
         public IServiceProvider GetODataServiceProvider(string prefix)
         {
-            if (Models.ContainsKey(prefix))
+            if (prefix != null && Models.ContainsKey(prefix))
             {
                 return Models[prefix].Item2;
             }
@@ -334,6 +356,11 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
+        /// Gets and sets the optional-$-sign-prefix for OData system query option.
+        /// </summary>
+        public bool EnableNoDollarQueryOptions { get; set; } = true;
+
+        /// <summary>
         /// Build the default QueryOption settings
         /// </summary>
         /// <returns>The default query options settings.</returns>
@@ -386,16 +413,18 @@ namespace Microsoft.AspNetCore.OData
             // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();
 
-            // Inject the customized services.
-            setupAction?.Invoke(odataContainerBuilder);
-
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton,
                 typeof(ODataUriResolver),
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
             // Inject the Edm model.
+            // From Current ODL implment, such injection only be used in reader and writer if the input
+            // model is null.
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
+
+            // Inject the customized services.
+            setupAction?.Invoke(odataContainerBuilder);
 
             return odataContainerBuilder.BuildContainer();
         }

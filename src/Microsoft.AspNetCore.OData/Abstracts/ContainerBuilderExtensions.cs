@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
@@ -49,7 +50,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // QueryValidators.
             builder.AddService<CountQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<FilterQueryValidator>(ServiceLifetime.Singleton);
+
+            // FilterQueryValidator should be scoped, otherwise some instance field (for example:_currentNodeCount) should be a problem.
+            builder.AddService<FilterQueryValidator>(ServiceLifetime.Scoped);
+
             builder.AddService<ODataQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<OrderByQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<SelectExpandQueryValidator>(ServiceLifetime.Singleton);
@@ -71,11 +75,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<ODataCollectionDeserializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataEntityReferenceLinkDeserializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataActionPayloadDeserializer>(ServiceLifetime.Singleton);
+            builder.AddService<ODataDeltaResourceSetDeserializer>(ServiceLifetime.Singleton);
 
             // Serializers.
             builder.AddService<ODataEnumSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataPrimitiveSerializer>(ServiceLifetime.Singleton);
-            builder.AddService<ODataDeltaFeedSerializer>(ServiceLifetime.Singleton);
+            builder.AddService<ODataDeltaResourceSetSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataResourceSetSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataCollectionSerializer>(ServiceLifetime.Singleton);
             builder.AddService<ODataResourceSerializer>(ServiceLifetime.Singleton);
@@ -91,8 +96,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<FilterBinder>(ServiceLifetime.Transient);
 
             // HttpRequestScope.
-            //builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
-            //builder.AddService(ServiceLifetime.Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest);
+            builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
+            builder.AddService(ServiceLifetime.Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest);
             return builder;
         }
     }

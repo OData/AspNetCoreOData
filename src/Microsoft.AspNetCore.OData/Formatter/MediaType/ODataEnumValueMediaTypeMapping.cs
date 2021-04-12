@@ -10,7 +10,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
     /// <summary>
     /// Media type mapping that associates requests with $count.
     /// </summary>
-    /// <remarks>This class derives from a platform-specific class.</remarks>
     public class ODataEnumValueMediaTypeMapping : ODataRawValueMediaTypeMapping
     {
         /// <summary>

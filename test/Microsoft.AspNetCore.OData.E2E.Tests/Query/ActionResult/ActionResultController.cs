@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
     public class CustomersController : ControllerBase
     {
         [HttpGet]
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Expand)]
+        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Expand | AllowedQueryOptions.Filter)]
         public async Task<ActionResult<IEnumerable<Customer>>> Get()
         {
             return await Task.FromResult(new List<Customer>

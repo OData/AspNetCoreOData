@@ -427,6 +427,21 @@ namespace Microsoft.AspNetCore.OData.Edm
             return false;
         }
 
+        internal static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
+        {
+            if (edmType.IsEnum())
+            {
+                return true;
+            }
+
+            if (edmType.IsCollection())
+            {
+                return IsEnumOrCollectionEnum(edmType.AsCollection().ElementType());
+            }
+
+            return false;
+        }
+
         internal static string GetNavigationSourceUrl(this IEdmModel model, IEdmNavigationSource navigationSource)
         {
             if (model == null)

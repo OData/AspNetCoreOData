@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
@@ -23,6 +21,7 @@ using Microsoft.OData.UriParser;
 using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation;
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -124,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
             ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
-            EdmDeltaEntityObject deltaResource = graph as EdmDeltaEntityObject;
+            EdmDeltaResourceObject deltaResource = graph as EdmDeltaResourceObject;
             if (deltaResource != null && deltaResource.NavigationSource != null)
             {
                 resourceContext.NavigationSource = deltaResource.NavigationSource;
@@ -232,8 +231,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 // }
                 if (edmProperty.Type.IsCollection())
                 {
-                    ODataDeltaFeedSerializer serializer = new ODataDeltaFeedSerializer(SerializerProvider);
-                    await serializer.WriteDeltaFeedInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                    ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
+                    await serializer.WriteDeltaResourceSetInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
                         .ConfigureAwait(false);
                 }
                 else
@@ -390,6 +389,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     else
                     {
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
+                        await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
                         await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
@@ -464,7 +464,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
             };
 
-            if (resourceContext.EdmObject is EdmDeltaEntityObject && resourceContext.NavigationSource != null)
+            if (resourceContext.EdmObject is EdmDeltaResourceObject && resourceContext.NavigationSource != null)
             {
                 ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo();
                 serializationInfo.NavigationSourceName = resourceContext.NavigationSource.Name;
@@ -566,7 +566,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             bool nullDynamicPropertyEnabled = false;
-            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaEntityObject)
+            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaResourceObject)
             {
                 nullDynamicPropertyEnabled = true;
             }
@@ -790,6 +790,32 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             await serializer.WriteObjectInlineAsync(propertyValue, edmType, writer, nestedWriteContext).ConfigureAwait(false);
         }
 
+        private async Task WriteStreamPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        {
+            Contract.Assert(selectExpandNode != null);
+            Contract.Assert(resourceContext != null);
+            Contract.Assert(writer != null);
+
+            if (selectExpandNode.SelectedStructuralProperties != null)
+            {
+                IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
+
+                foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
+                {
+                    if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
+                    {
+                        ODataStreamPropertyInfo property = CreateStreamProperty(structuralProperty, resourceContext);
+
+                        if (property != null)
+                        {
+                            await writer.WriteStartAsync(property).ConfigureAwait(false);
+                            await writer.WriteEndAsync().ConfigureAwait(false);
+                        }
+                    }
+                }
+            }
+        }
+
         private async Task WriteComplexPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(selectExpandNode != null);
@@ -1002,6 +1028,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
                 {
+                    if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
+                    {
+                        // skip the stream property, the stream property is written in its own logic
+                        continue;
+                    }
+
                     ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
                     if (property != null)
                     {
@@ -1011,6 +1043,43 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return properties;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataStreamPropertyInfo"/> to be written for the given stream property.
+        /// </summary>
+        /// <param name="structuralProperty">The EDM structural property being written.</param>
+        /// <param name="resourceContext">The context for the entity instance being written.</param>
+        /// <returns>The <see cref="ODataStreamPropertyInfo"/> to write.</returns>
+        public virtual ODataStreamPropertyInfo CreateStreamProperty(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext)
+        {
+            if (structuralProperty == null)
+            {
+                throw Error.ArgumentNull("structuralProperty");
+            }
+
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull("resourceContext");
+            }
+
+            if (structuralProperty.Type == null || !structuralProperty.Type.IsStream())
+            {
+                return null;
+            }
+
+            if (resourceContext.SerializerContext.MetadataLevel != ODataMetadataLevel.Full)
+            {
+                return null;
+            }
+
+            // TODO: we need to return ODataStreamReferenceValue if
+            // 1) If we have the EditLink link builder
+            // 2) If we have the ReadLink link builder
+            // 3) If we have the Core.AcceptableMediaTypes annotation associated with the Stream property,
+
+            // So far, let's return null and let OData.lib to calculate the ODataStreamReferenceValue by conventions.
+            return null;
         }
 
         /// <summary>

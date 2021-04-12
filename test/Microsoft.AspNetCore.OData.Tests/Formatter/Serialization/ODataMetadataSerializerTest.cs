@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -33,18 +34,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
-            MemoryStream stream = new MemoryStream();
-            IODataResponseMessage message = new ODataMessageWrapper(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
             IEdmModel model = new EdmModel();
 
+            // 1) XML
             // Act
-            await serializer.WriteObjectAsync("42", typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            string payload = await this.WriteAndGetPayloadAsync(model, "application/xml", async omWriter =>
+            {
+                await serializer.WriteObjectAsync("42" /*useless*/, typeof(IEdmModel), omWriter, new ODataSerializerContext());
+            });
 
             // Assert
-            stream.Seek(0, SeekOrigin.Begin);
-            XElement element = XElement.Load(stream);
-            Assert.Equal("Edmx", element.Name.LocalName);
+            Assert.Contains("<edmx:Edmx Version=\"4.0\"", payload);
+
+            // 2) JSON
+            // Act
+            payload = await this.WriteAndGetPayloadAsync(model, "application/json", async omWriter =>
+            {
+                await serializer.WriteObjectAsync("42" /*useless*/, typeof(IEdmModel), omWriter, new ODataSerializerContext());
+            });
+
+            // Assert
+            Assert.Equal(@"{
+  ""$Version"": ""4.0""
+}", payload);
         }
 
         [Fact]
@@ -54,19 +66,61 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.Singleton<Customer>("Me");
             IEdmModel model = builder.GetEdmModel();
-
             ODataMetadataSerializer serializer = new ODataMetadataSerializer();
-            MemoryStream stream = new MemoryStream();
-            IODataResponseMessage message = new ODataMessageWrapper(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
 
+            // XML
             // Act
-            await serializer.WriteObjectAsync(model, typeof(IEdmModel), new ODataMessageWriter(message, settings, model), new ODataSerializerContext());
+            string payload = await this.WriteAndGetPayloadAsync(model, "application/xml", async omWriter =>
+            {
+                await serializer.WriteObjectAsync(model, typeof(IEdmModel), omWriter, new ODataSerializerContext());
+            });
 
             // Assert
+            Assert.Contains("<Singleton Name=\"Me\" Type=\"Microsoft.AspNetCore.OData.Tests.Formatter.Serialization.Customer\" />", payload);
+
+            // JSON
+            // Act
+            payload = await this.WriteAndGetPayloadAsync(model, "application/json", async omWriter =>
+            {
+                await serializer.WriteObjectAsync(model, typeof(IEdmModel), omWriter, new ODataSerializerContext());
+            });
+
+            // Assert
+            Assert.Contains(@"  ""Default"": {
+    ""Container"": {
+      ""$Kind"": ""EntityContainer"",
+      ""Me"": {
+        ""$Type"": ""Microsoft.AspNetCore.OData.Tests.Formatter.Serialization.Customer""
+      }
+    }
+  }", payload);
+        }
+
+        private async Task<string> WriteAndGetPayloadAsync(IEdmModel edmModel, string contentType, Func<ODataMessageWriter, Task> test)
+        {
+            MemoryStream stream = new MemoryStream();
+            Dictionary<string, string> headers = new Dictionary<string, string>
+            {
+                // the content type is necessary to write the metadata in async?
+                { "Content-Type", contentType}
+            };
+
+            IODataResponseMessage message = new ODataMessageWrapper(stream, headers);
+
+            ODataMessageWriterSettings writerSettings = new ODataMessageWriterSettings();
+            writerSettings.EnableMessageStreamDisposal = false;
+            writerSettings.BaseUri = new Uri("http://www.example.com/");
+
+            using (var msgWriter = new ODataMessageWriter((IODataResponseMessageAsync)message, writerSettings, edmModel))
+            {
+                await test(msgWriter);
+            }
+
             stream.Seek(0, SeekOrigin.Begin);
-            string result = new StreamReader(stream).ReadToEnd();
-            Assert.Contains("<Singleton Name=\"Me\" Type=\"Microsoft.AspNetCore.OData.Tests.Formatter.Serialization.Customer\" />", result);
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         private class Customer

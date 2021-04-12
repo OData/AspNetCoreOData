@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -321,7 +322,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             // Arrange
             Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
-            deserializerProvider.Setup(d => d.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>())).Returns<ODataEdmTypeDeserializer>(null);
+            deserializerProvider.Setup(d => d.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>(), false)).Returns<ODataEdmTypeDeserializer>(null);
             var deserializer = new ODataResourceDeserializer(deserializerProvider.Object);
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { TypeName = _supplierEdmType.FullName() });
 
@@ -340,7 +341,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             var deserializer = new ODataResourceDeserializer(deserializerProvider.Object);
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { TypeName = _supplierEdmType.FullName() });
 
-            deserializerProvider.Setup(d => d.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>())).Returns(supplierDeserializer.Object);
+            deserializerProvider.Setup(d => d.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>(), false)).Returns(supplierDeserializer.Object);
             supplierDeserializer
                 .Setup(d => d.ReadInline(resourceWrapper, It.Is<IEdmTypeReference>(e => _supplierEdmType.Definition == e.Definition), _readContext))
                 .Returns(42).Verifiable();
@@ -844,6 +845,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 "Cannot find nested property 'SomeProperty' on the resource type 'ODataDemo.Product'.");
         }
 
+        /* Never valid test cases
         [Fact]
         public void ApplyNestedProperty_ThrowsODataException_WhenPatchingNavigationProperty()
         {
@@ -873,6 +875,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 () => deserializer.ApplyNestedProperty(42, resourceInfoWrapper, _supplierEdmType, _readContext),
                 "Cannot apply PATCH to navigation property 'Products' on entity type 'ODataDemo.Supplier'.");
         }
+        */
 
         /*
         [Fact]

@@ -47,8 +47,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Literal = functionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             IsSingle = functionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-            HasOptionalMissing = ParameterMappings.Count != FunctionImport.Function.Parameters.Count();
         }
 
         /// <summary>
@@ -74,18 +72,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             ParameterMappings = OperationHelper.BuildParameterMappings(segment.Parameters, operationImport.Name);
 
+            // join the parameters as p1={p1}
             Literal = FunctionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
 
             IsSingle = FunctionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-            HasOptionalMissing = ParameterMappings.Count != FunctionImport.Function.Parameters.Count();
         }
 
         /// <summary>
         /// Gets the dictionary representing the mappings from the parameter names in the current function segment to the 
         /// parameter names in route data.
         /// </summary>
-        public IDictionary<string, string> ParameterMappings { get; private set; }
+        public IDictionary<string, string> ParameterMappings { get; }
 
         /// <inheritdoc />
         public override string Literal { get; }
@@ -109,25 +106,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override bool IsSingle { get; }
 
-        /// <summary>
-        /// Gets the function import segment.
-        /// </summary>
-        public OperationImportSegment Segment { get; }
-
-        /// <summary>
-        /// Gets the boolean value indcating whether there's an optional parameter missed.
-        /// </summary>
-        internal bool HasOptionalMissing { get; }
-
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (HasOptionalMissing)
+            // If the function has no parameter, we don't need to do anything and just return an operation import segment.
+            if (ParameterMappings.Count == 0)
+            {
+                context.Segments.Add(new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase));
+                return true;
+            }
+
+            if (HasOptionalMissing())
             {
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
@@ -136,19 +130,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // min = 1
                 // max = 2,ave=3
                 // so, let's combine the route data together and separate them using "," again.
-                if (!FunctionSegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
+                if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
                 {
-                    return null;
+                    return false;
                 }
             }
 
-            IList<OperationSegmentParameter> parameters = FunctionSegmentTemplateHelpers.Match(context, FunctionImport.Function, ParameterMappings);
+            IList<OperationSegmentParameter> parameters = SegmentTemplateHelpers.Match(context, FunctionImport.Function, ParameterMappings);
             if (parameters == null)
             {
-                return null;
+                return false;
             }
 
-            return new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase, parameters);
+            context.Segments.Add(new OperationImportSegment(FunctionImport, NavigationSource as IEdmEntitySetBase, parameters));
+            return true;
+        }
+
+        private bool HasOptionalMissing()
+        {
+            return ParameterMappings.Count != FunctionImport.Function.Parameters.Count() - 1;
         }
     }
 }

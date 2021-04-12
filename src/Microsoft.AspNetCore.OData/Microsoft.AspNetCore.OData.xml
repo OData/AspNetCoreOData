@@ -60,6 +60,18 @@
             Gets the services collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope">
+            <summary>
+            Provides access to the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest"/>
+            to which the OData service container instance is scoped.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest">
+            <summary>
+            Provides access to the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest"/>
+            to which the OData service container instance is scoped.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler">
             <summary>
             Exposes the ability to convert a collection of concurrency property names and values into an <see cref="T:Microsoft.Net.Http.Headers.EntityTagHeaderValue"/>
@@ -200,6 +212,13 @@
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider">
             <summary>
             Provides the mapping between CLR type and Edm type.
+            TODO: 
+            1) How to map the property
+            2) dynamic container
+            3) instance annotation container
+            4) enum member mapping
+            5) Navigation property link builder
+            6) stream entity, stream property edit/read link builder....
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.MapTo(System.Type)">
@@ -1075,11 +1094,147 @@
             Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input. No checking for other types.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.Text">
-            <summary>Text being parsed.</summary>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind">
+            <summary>
+            Enumeration values for token kinds.
+            </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.TextLen">
-            <summary>Length of text being parsed.</summary>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Unknown">
+            <summary>Unknown.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.TextEnd">
+            <summary>End of text.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Literal">
+            <summary>Literal, could be an identifier, a number, null, guid, etc.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Comma">
+            <summary>Comma ','</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind.Equal">
+            <summary>Equal '='</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionToken">
+            <summary>
+            Use this struct to represent a lexical expression token.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Kind">
+            <summary>InternalKind of token.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Text">
+            <summary>Token text.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionToken.Position">
+            <summary>Position of token.</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer">
+            <summary>
+            Components to parse an expression into token.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer._rawText">
+            <summary>The raw input text being parsed.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer._length">
+            <summary>Length of raw input text being parsed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._char">
+            <summary>Character being processed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._token">
+            <summary>Token being processed.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Common.ExpressionLexer._textPos">
+            <summary>Position on text being parsed.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer" /> class.
+            </summary>
+            <param name="expression">The expression to lexer.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.CurrentToken">
+            <summary>Token being processed. </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.NextToken">
+            <summary>
+            Reads the next token, skipping whitespace as necessary, advancing the Lexer.
+            </summary>
+            <returns>The parsed token.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ValidateToken(Microsoft.AspNetCore.OData.Common.ExpressionTokenKind)">
+            <summary>Validates the current token is of the specified kind.</summary>
+            <param name="kind">Expected token kind.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Common.ExpressionLexer.IsValidWhiteSpace">
+            <summary>
+            Gets if the current char is whitespace.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ReadNextToken(System.Exception@)">
+            <summary>
+            Reads the next token, skipping whitespace as necessary.
+            </summary>
+            <param name="error">The potential error.</param>
+            <returns>The next token, which may be 'bad' if an error occurs.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.AdvanceToNextOccurenceOf(System.Char)">
+            <summary>
+            Advance the pointer to the next occurence of the given value, swallowing all characters in between.
+            </summary>
+            <param name="endingValue">the ending delimiter.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.AdvanceThroughBalancedExpression(System.Char,System.Char)">
+            <summary>
+            Parses an expression of text that we do not know how to handle in this class, which is between a
+            <paramref name="startingCharacter"></paramref> and an <paramref name="endingCharacter"/>.
+            </summary>
+            <param name="startingCharacter">the starting delimiter</param>
+            <param name="endingCharacter">the ending delimiter.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ParseLiteral">
+            <summary>
+            Parses a literal be checking for delimiting characters '\0', ',',')' and ' '
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.NextChar">
+            <summary>
+            Advanced to the next character.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.SetTextPos(System.Int32)">
+            <summary>
+            Sets the text position.
+            </summary>
+            <param name="pos">The new position.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.ParseWhitespace">
+            <summary>
+            Parses (skip) white spaces
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer">
+            <summary>This class implements IEqualityComparer for UnicodeCategory</summary>
+            <remarks>
+            Using this class rather than EqualityComparer&lt;T&gt;.Default
+            saves from JIT'ing it in each AppDomain.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer.Equals(System.Globalization.UnicodeCategory,System.Globalization.UnicodeCategory)">
+            <summary>
+            Checks whether two unicode categories are equal
+            </summary>
+            <param name="x">first unicode category</param>
+            <param name="y">second unicode category</param>
+            <returns>true if they are equal, false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.UnicodeCategoryEqualityComparer.GetHashCode(System.Globalization.UnicodeCategory)">
+            <summary>
+            Gets a hash code for the specified unicode category
+            </summary>
+            <param name="obj">the input value</param>
+            <returns>The hash code for the given input unicode category, the underlying int</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.FastPropertyAccessor`1">
             <summary>
@@ -1087,6 +1242,26 @@
             a Getter and Setter for the PropertyInfo of TEntityType provided via the constructor.
             </summary>
             <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Common.KeyValuePairParser">
+            <summary>
+            Parsing function parameters and entity key in paths.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.KeyValuePairParser.Parse(System.String)">
+            <summary>
+            Parse the expression string into key/value pairs
+            </summary>
+            <param name="expression">The contents of the key/value pairs.</param>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.KeyValuePairParser.TryParse(System.String,System.Collections.Generic.IDictionary{System.String,System.String}@)">
+            <summary>
+            Tries to parse the expression string into key/value pairs
+            </summary>
+            <param name="expression">The contents of the key/value pairs.</param>
+            <param name="pairs">the output key/value pair</param>
+            <returns>true/false</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.ListWrapperCollection`1">
             <summary>
@@ -1433,6 +1608,522 @@
             <param name="messageArgs">An object array that contains zero or more objects to format.</param>
             <returns>The logged <see cref="T:System.Exception"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta">
+            <summary>
+            Base class for the Delta resource
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta.Kind">
+            <summary>
+            DeltaKind for the objects part of the DeltaResourceSet Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.Clear">
+            <summary>
+            Clears the Delta and resets the underlying Entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            <remarks>
+            Only properties that exist on Entity can be set.
+            If there is a type mismatch the request will fail.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>True if the Property was found</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Both modified and unmodified properties can be retrieved.
+            </remarks>
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
+            <summary>
+            Overrides the DynamicObject TrySetMember method, so that only the properties
+            of Entity can be set.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
+            <summary>
+            Overrides the DynamicObject TryGetMember method, so that only the properties
+            of Entity can be got.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this Delta as an
+            enumeration of Property Names
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1" /> allows and tracks changes to delta deleted link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1"/>.
+            </summary>
+            <param name="structuralType"></param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1" /> allows and tracks changes to a delta deleted resource.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Reason">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaHelper">
+            <summary>
+            The delta helpers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaHelper.IsDeltaOfT(System.Type)">
+            <summary>
+            Helper method to check whether the given type is Delta generic type.
+            </summary>
+            <param name="type">The type to check.</param>
+            <returns>True if it is a Delta generic type; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaKind">
+            <summary>
+            The Kind of the object within the DeltaPayload used to distinguish between
+            Resource/DeletedResource/DeltaDeletedLink/AddedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown">
+            <summary>
+            Corresponds to any Unknown item added.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaResource">
+            <summary>
+            Corresponds to ODataResource.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedResource">
+            <summary>
+            Corresponds to ODataDeletedResource.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedLink">
+            <summary>
+            Corresponds to ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaLink">
+            <summary>
+            Corresponds to ODataDeltaLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1">
+            <summary>
+            Base class for delta link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1"/>.
+            </summary>
+            <param name="structuralType">The derived structural type for which the changes would be tracked.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.StructuredType">
+            <summary>
+             Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1" /> allows and tracks changes to delta added link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
+            </summary>
+            <param name="structuralType">The derived structural type for which the changes would be tracked.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta`1">
+            <summary>
+            A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">T is the type of the instance this delta tracks changes for.</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.StructuredType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyType(System.String,System.Type@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance">
+            <summary>
+            Returns the instance that holds all the changes (and original values) being tracked by this Delta.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetChangedPropertyNames">
+            <summary>
+            Returns the known properties that have been modified through this <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names.
+            Includes the structural properties at current level.
+            Does not include the names of the changed dynamic properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetUnchangedPropertyNames">
+            <summary>
+            Returns the known properties that have not been modified through this <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta"/> as an
+            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names. Does not include the names of the changed dynamic
+            properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyChangedValues(`0)">
+            <summary>
+            Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity recursively.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
+            <summary>
+            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Put(`0)">
+            <summary>
+            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
+            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
+            <summary>
+            Attempts to get the property by the specified name.
+            </summary>
+            <param name="structural">The structural object.</param>
+            <param name="propertyName">Name of the property.</param>
+            <param name="propertyRef">Output for property value.</param>
+            <returns>true if the property is found; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet">
+            <summary>
+            Represents a delta resource set.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1" /> allows and tracks changes to a delta resource set.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.StructuredType">
+            <summary>
+            Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.Patch(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+             Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
+            </summary>
+            <remarks>
+            TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to 
+            patch the deltaset to the original data source.
+            </remarks>
+            <param name="originalSet">The original set.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaItem,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Find the related instance.
+            </summary>
+            <param name="deltaItem"></param>
+            <param name="originalSet"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to an object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetChangedPropertyNames">
+            <summary>
+            Returns the Properties that have been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetUnchangedPropertyNames">
+            <summary>
+            Returns the Properties that have not been modified through this IDelta as an
+            enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TrySetPropertyValue(System.String,System.Object)">
+            <summary>
+            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The new value of the Property</param>
+            <returns>Returns <c>true</c> if successful and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyType(System.String,System.Type@)">
+            <summary>
+            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.Clear">
+            <summary>
+            Clears the <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" />.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource" /> allows and tracks changes to a deleted resource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaItem">
+            <summary>
+            The delta item base.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaItem.Kind">
+            <summary>
+            Gets the delta item kind.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink" /> allows and tracks changes to an added link.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to delta link.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.ITypedDelta">
+            <summary>
+            The typed delta.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.ITypedDelta.StructuredType">
+            <summary>
+            Gets the actual type of the structural object for which the changes are tracked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.ITypedDelta.ExpectedClrType">
+            <summary>
+            Gets the expected type of the entity for which the changes are tracked.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder">
             <summary>
             This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
@@ -1639,6 +2330,14 @@
             <summary>
             The extensions for the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> for the annotations.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAcceptableMediaTypes(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.Vocabularies.IEdmVocabularyAnnotatable)">
+            <summary>
+            Gets the Org.OData.Core.V1.AcceptableMediaTypes
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="target">The vocabulary annotatable target.</param>
+            <returns>null or the collection of media type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
@@ -2000,11 +2699,6 @@
             The extension methods for <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel"/>.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.SupportedHttpMethodConventions">
-            <summary>
-            Gets the collection of supported HTTP methods for conventions.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsNonODataAction(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
             Tests whether the action is not suitable for OData action.
@@ -2038,44 +2732,16 @@
             <param name="keyPrefix">The key prefix for the action parameter.</param>
             <returns>True/false.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetSupportedHttpMethods(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            Gets the supported Http method on the action or by convention using the action name.
-            </summary>
-            <param name="action">The action model.</param>
-            <returns>The supported http methods.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Adds the OData selector model to the action.
             </summary>
             <param name="action">The given action model.</param>
-            <param name="httpMethod">The supported http methods, if mulitple, using ',' to separate.</param>
+            <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="path">The OData path template.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasHttpMethod(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
-            <summary>
-            Gets the supported Http method on the action or by convention using the action name.
-            </summary>
-            <param name="action">The action model.</param>
-            <returns>The supported http methods.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions">
-            <summary>
-            Contains bitmasks for features that need backward compatibilty.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.None">
-            <summary>
-            No compatibility options are selected.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Extensions.CompatibilityOptions.AllowNextLinkWithNonPositiveTopValue">
-            <summary>
-             Generate nextlink even if the top value specified in request is less than page size when the request extension method is directly called.
-            </summary>
+            <param name="options">The route build options.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions">
             <summary>
@@ -2165,6 +2831,20 @@
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:System.TimeZoneInfo"/> setting.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>null or the time zone info.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the bool value indicating whether the non-dollar prefix query option.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>True/false.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets a value indicating if this is a count request.
@@ -2216,6 +2896,13 @@
             <param name="request">The request.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsODataQueryRequest(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Checks whether the request is a POST targeted at a resource path ending in /$query.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>true if the request path has $query segment.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the dependency injection container for the OData request.
@@ -2249,9 +2936,9 @@
             <param name="prefixName">The prefix name.</param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataResponseVersion(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Gets thes OData version for the response.
+            Gets the OData version from the request context.
             </summary>
             <param name="request">The request.</param>
             <returns>The OData version.</returns>
@@ -2366,7 +3053,7 @@
             </summary>
             <param name="serviceProvider">The service provider.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
@@ -2416,6 +3103,60 @@
             <param name="elementType">The element type of the collection to read.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The deserialized collection.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData delta resource sets.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer"/> class.
+            </summary>
+            <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResourceSet(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="deltaResourceSet"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="deltaResourceSet">The delta resource set to deserialize.</param>
+            <param name="elementType">The element type.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The deserialized resource set object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaResource(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="resource"/> under the given <paramref name="readContext"/>.
+            The given resource could be "Added Resource", "Updated Resource" or "Deleted Resource".
+            </summary>
+            <param name="resource">The Added Updated or Deleted Resource.</param>
+            <param name="elementType">The element type.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaDeletedLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="deletedLink"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="deletedLink">The given deleted link.</param>
+            <param name="elementType">The element type.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadDeltaLink(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the given <paramref name="link"/> under the given <paramref name="readContext"/>.
+            </summary>
+            <param name="link">The given delta link.</param>
+            <param name="elementType">The element type.</param>
+            <param name="readContext">The deserializer context.</param>
+            <returns>The created object.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer">
             <summary>
@@ -2477,6 +3218,11 @@
             Gets or sets the HTTP Request whose response is being serialized.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider">
             <summary>
             Represents a factory that creates an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/>.
@@ -2490,11 +3236,12 @@
             <param name="request">The request being deserialized.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> for the given EDM type.
             </summary>
             <param name="edmType">The EDM type.</param>
+            <param name="isDelta">Is delta</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer">
@@ -2616,6 +3363,14 @@
             <param name="readContext">The deserializer context.</param>
             <returns>The created CLR object.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyDeletedResource(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the nested properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the nested properties.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyNestedProperties(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the nested properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
@@ -2651,6 +3406,40 @@
             <param name="structuralProperty">The structural property.</param>
             <param name="structuredType">The type of the resource.</param>
             <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateResourceSetWrapper(Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper[],Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Create <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/> from a set of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>
+            </summary>
+            <param name="edmPropertyType">The Edm property type.</param>
+            <param name="refLinks">The reference links.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateResourceWrapper(Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Create <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/> from a <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>
+            </summary>
+            <param name="edmPropertyType">The Edm property type.</param>
+            <param name="refLink">The reference link.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.UpdateResourceWrapper(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Update the resource wrapper if it's have the "Id" value.
+            </summary>
+            <param name="resourceWrapper">The resource wrapper.</param>
+            <param name="readContext">The read context.</param>
+            <returns>The resource wrapper.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateKeyProperties(System.Uri,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Do uri parsing to get the key values.
+            </summary>
+            <param name="id">The key Id.</param>
+            <param name="readContext">The reader context.</param>
+            <returns>The key properties.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer">
             <summary>
@@ -2843,7 +3632,6 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataCountMediaTypeMapping.#ctor">
             <summary>
@@ -2857,7 +3645,6 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataEnumValueMediaTypeMapping.#ctor">
             <summary>
@@ -2874,9 +3661,8 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataPrimitiveValueMediaTypeMapping">
             <summary>
-            Media type mapping that associates requests with $count.
+            Media type mapping that associates requests with $value on primitive property.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataPrimitiveValueMediaTypeMapping.#ctor">
             <summary>
@@ -2890,12 +3676,14 @@
             <summary>
             Media type mapping that associates requests with $count.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.#ctor(System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping"/> class.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.IsMatch(Microsoft.OData.UriParser.PropertySegment)">
             <summary>
@@ -2904,14 +3692,23 @@
             <param name="propertySegment">The <see cref="T:Microsoft.OData.UriParser.PropertySegment"/> of the path.</param>
             <returns>True if the request is an OData raw value request.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping">
+            <summary>
+            Media type mapping that associates requests with stream property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping">
             <summary>
             Class that provides <see cref="T:System.Net.Http.Headers.MediaTypeHeaderValue"/>s from query strings.
             </summary>
-            <remarks>This class derives from a platform-specific class.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping.#ctor(System.String,System.String)">
             <summary>
@@ -2957,18 +3754,6 @@
             This class is similar to ODataModelBinderProvider in AspNet. The flow is similar but the
             type are dissimilar enough making a common version more complex than separate versions.
             </remarks>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions">
-            <summary>
-            Adds the OData formatter related services into builder.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataFormatterServiceCollectionExtensions.AddODataFormatter(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            Adds the odata formatter related services.
-            </summary>
-            <param name="builder">The OData builder.</param>
-            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter">
             <summary>
@@ -3282,6 +4067,18 @@
             <param name="propertyName">The name of the property to get.</param>
             <returns>The value of the property if present.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1">
+            <summary>
+            An instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1"/> gets passed to the self link
+            and navigation link builders and can be used by the link builders to generate links.
+            </summary>
+            <typeparam name="TStructuredType">The structural type</typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext`1"/> class.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext">
             <summary>
             Contains context information about the resource set currently being serialized.
@@ -3376,22 +4173,22 @@
             <param name="value">The collection value for which the annotations have to be added.</param>
             <param name="metadataLevel">The OData metadata level of the response.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
             <summary>
             OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" />
-            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaFeed payload.
+            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResourceSet payload.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
             <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer"/>.
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer"/>.
             </summary>
             <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaFeedInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaResourceSetInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given object specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3401,17 +4198,17 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.GetNextLinkGenerator(Microsoft.OData.ODataDeltaResourceSet,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.GetNextLinkGenerator(Microsoft.OData.ODataDeltaResourceSet,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Creates a function that takes in an object and generates nextlink uri.
             </summary>
-            <param name="deltaFeed">The resource set describing a collection of structured objects.</param>
+            <param name="deltaResourceSet">The resource set describing a collection of structured objects.</param>
             <param name="enumerable">>The instance representing the resourceSet being written.</param>
             <param name="writeContext">The serializer context.</param>
             <returns>The function that generates the NextLink from an object.</returns>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.CreateODataDeltaFeed(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.CreateODataDeltaResourceSet(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Create the <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> to be written for the given feed instance.
             </summary>
@@ -3420,7 +4217,7 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedEntryAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeletedResourceAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3429,7 +4226,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaDeletedLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaDeletedLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3438,7 +4235,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.WriteDeltaLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaLinkAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
@@ -3447,7 +4244,7 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaFeedSerializer.StringToUri(System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.StringToUri(System.String)">
             <summary>
             Safely returns the specified string as a relative or absolute Uri.
             </summary>
@@ -3697,6 +4494,14 @@
             <param name="navigationProperty">The navigation property for which the navigation link is being created.</param>
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The navigation link to be written.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStreamProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to be written for the given stream property.
+            </summary>
+            <param name="structuralProperty">The EDM structural property being written.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to write.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -4149,192 +4954,6 @@
             <param name="segments">The segments.</param>
             <returns></returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta">
-            <summary>
-            A class the tracks changes (i.e. the Delta) for an entity.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.Clear">
-            <summary>
-            Clears the Delta and resets the underlying Entity.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TrySetPropertyValue(System.String,System.Object)">
-            <summary>
-            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
-            <remarks>
-            Only properties that exist on Entity can be set.
-            If there is a type mismatch the request will fail.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
-            <returns>True if successful</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetPropertyValue(System.String,System.Object@)">
-            <summary>
-            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
-            <remarks>
-            Only properties that exist on Entity can be retrieved.
-            Both modified and unmodified properties can be retrieved.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The value of the Property</param>
-            <returns>True if the Property was found</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetPropertyType(System.String,System.Type@)">
-            <summary>
-            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
-            <remarks>
-            Only properties that exist on Entity can be retrieved.
-            Both modified and unmodified properties can be retrieved.
-            </remarks>
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="type">The type of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TrySetMember(System.Dynamic.SetMemberBinder,System.Object)">
-            <summary>
-            Overrides the DynamicObject TrySetMember method, so that only the properties
-            of Entity can be set.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
-            <summary>
-            Overrides the DynamicObject TryGetMember method, so that only the properties
-            of Entity can be got.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.GetChangedPropertyNames">
-            <summary>
-            Returns the Properties that have been modified through this Delta as an
-            enumeration of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta.GetUnchangedPropertyNames">
-            <summary>
-            Returns the Properties that have not been modified through this Delta as an
-            enumeration of Property Names
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1">
-            <summary>
-            A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="TStructuralType"/>.
-            </summary>
-            <typeparam name="TStructuralType">TStructuralType is the type of the instance this delta tracks changes for.</typeparam>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
-            names, including those of dynamic properties, are ignored.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1"/>.
-            </summary>
-            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
-            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="TStructuralType"/>.
-            </param>
-            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
-            names, including those of dynamic properties, are ignored.</param>
-            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
-            properties. <c>null</c> means this entity type is not open.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.StructuredType">
-            <inheritdoc/>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.ExpectedClrType">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Clear">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TrySetPropertyValue(System.String,System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyType(System.String,System.Type@)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance">
-            <summary>
-            Returns the instance that holds all the changes (and original values) being tracked by this Delta.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetChangedPropertyNames">
-            <summary>
-            Returns the known properties that have been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> as an
-            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names.
-            Includes the structural properties at current level.
-            Does not include the names of the changed dynamic properties.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetUnchangedPropertyNames">
-            <summary>
-            Returns the known properties that have not been modified through this <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> as an
-            <see cref="T:System.Collections.Generic.IEnumerable`1" /> of property Names. Does not include the names of the changed dynamic
-            properties.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.CopyChangedValues(`0)">
-            <summary>
-            Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity recursively.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.CopyUnchangedValues(`0)">
-            <summary>
-            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Patch(`0)">
-            <summary>
-            Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
-            <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.Put(`0)">
-            <summary>
-            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
-            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
-            <summary>
-            Attempts to get the property by the specified name.
-            </summary>
-            <param name="structural">The structural object.</param>
-            <param name="propertyName">Name of the property.</param>
-            <param name="propertyRef">Output for property value.</param>
-            <returns>true if the property is found; false otherwise.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollection">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>s.
@@ -4403,8 +5022,14 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType">
             <summary>
-            Implementing IEdmCollectionType to identify collection of DeltaFeed.
+            Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.#ctor(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType"/> class.
+            </summary>
+            <param name="typeReference">The element type reference.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.TypeKind">
             <inheritdoc />
@@ -4437,49 +5062,10 @@
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Deleted Entry object in the Delta Feed Payload.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
-            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.Id">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.Reason">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.DeltaKind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedEntityObject.NavigationSource">
-            <summary>
-            The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Deleted Link object in the Delta Feed Payload.
+            Used to hold the Deleted Link object in the Delta ResourceSet Payload.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
@@ -4513,73 +5099,79 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.DeltaKind">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject">
             <summary>
-            The Kind of the object within the DeltaPayload used to distinguish between Entry/DeletedEntry/DeltaLink/AddedLink.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Deleted Resource object in the Delta Feed Payload.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.Entry">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
-            Corresponds to EdmEntityObject (Equivalent of ODataEntry in ODL).
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaDeletedEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Reason">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.NavigationSource">
+            <summary>
+            The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.DeletedEntry">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind">
             <summary>
-            Corresponds to EdmDeltaDeletedEntityObject (Equivalent of ODataDeltaDeletedEntry in ODL).
+            The Kind of the object within the DeltaPayload used to distinguish between Resource/DeletedResource/DeltaDeletedLink/AddedLink.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.DeletedLinkEntry">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Resource">
+            <summary>
+            Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeletedResource">
+            <summary>
+            Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaDeletedLink">
             <summary>
             Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.LinkEntry">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaLink">
             <summary>
             Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityKind.Unknown">
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Unknown">
             <summary>
             Corresponds to any Unknown item added.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Entry object in the Delta Feed Payload.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
-            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.DeltaKind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject.NavigationSource">
-            <summary>
-            The navigation source of the entity. If null, then the entity is from the current feed.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Added/Modified Link object in the Delta Feed Payload.
+            Used to hold the Added/Modified Link object in the Delta ResourceSet Payload.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
@@ -4613,9 +5205,42 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.DeltaKind">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Entry object in the Delta Feed Payload.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityTypeReference">The <see cref="T:Microsoft.OData.Edm.IEdmEntityTypeReference"/> of this DeltaEntityObject.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
+            </summary>
+            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
+            <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.DeltaKind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.NavigationSource">
+            <summary>
+            The navigation source of the entity. If null, then the entity is from the current feed.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType">
             <summary>
-            Implementing IEdmType to identify objects which are part of DeltaFeed Payload.
+            Implementing IEdmType to identify objects which are part of DeltaResourceSet Payload.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType.TypeKind">
@@ -4623,7 +5248,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaType.DeltaKind">
             <summary>
-            Returning DeltaKind of the object within DeltaFeed payload
+            Returning DeltaKind of the object within DeltaResourceSet payload
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
@@ -4737,19 +5362,19 @@
             Extension methods for the <see cref="T:Microsoft.OData.Edm.IEdmType"/> interface.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaFeed(Microsoft.OData.Edm.IEdmType)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResourceSet(Microsoft.OData.Edm.IEdmType)">
             <summary>
-            Method to determine whether the current type is a Delta Feed
+            Method to determine whether the current type is a Delta resource set.
             </summary>
             <param name="type">IEdmType to be compared</param>
             <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType"/></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResource(Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject)">
             <summary>
-            Method to determine whether the current Edm object is a Delta Entry
+            Method to determine whether the current Edm object is a Delta resource
             </summary>
             <param name="resource">IEdmObject to be compared</param>
-            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaEntityObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject"/></returns>
+            <returns>True or False if type is same as <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> or <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject">
             <summary>
@@ -4774,6 +5399,9 @@
             </summary>
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredTypeReference"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind">
+            <inheritdoc/>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.ExpectedEdmType">
             <summary>
@@ -4816,61 +5444,15 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetEdmType">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta">
-            <summary>
-            <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta" /> allows and tracks changes to an object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.GetChangedPropertyNames">
-            <summary>
-            Returns the Properties that have been modified through this IDelta as an
-            enumerable of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.GetUnchangedPropertyNames">
-            <summary>
-            Returns the Properties that have not been modified through this IDelta as an
-            enumerable of Property Names
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TrySetPropertyValue(System.String,System.Object)">
-            <summary>
-            Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
-            <returns>Returns <c>true</c> if successful and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TryGetPropertyValue(System.String,System.Object@)">
-            <summary>
-            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="value">The value of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.TryGetPropertyType(System.String,System.Type@)">
-            <summary>
-            Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
-            </summary>
-            <param name="name">The name of the Property</param>
-            <param name="type">The type of the Property</param>
-            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IDelta.Clear">
-            <summary>
-            Clears the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IDelta" />.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
-            Base interface to be implemented by any Delta object required to be part of the DeltaFeed Payload.
+            Base interface to be implemented by any Delta object required to be part of the DeltaResourceSet Payload.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.DeltaKind">
             <summary>
-            DeltaKind for the objects part of the DeltaFeed Payload.
+            DeltaKind for the objects part of the DeltaResourceSet Payload.
             Used to determine which Delta object to create during serialization.
             </summary>
         </member>
@@ -4879,26 +5461,26 @@
             Represents an instance of an <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject">
-            <summary>
-            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
-            Holds the properties necessary to create the ODataDeltaDeletedEntry.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject.Id">
-            <summary>
-            The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedEntityObject.Reason">
-            <summary>
-            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
             Holds the properties necessary to create the ODataDeltaDeletedLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeletedResource.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject.Id">
+            <summary>
+            The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject.Reason">
+            <summary>
+            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink">
@@ -4980,29 +5562,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.GetEdmType">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta">
-            <summary>
-            Represents a <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.Delta"/> that can be used when a backing CLR type exists for
-            the entity type and complex type whose changes are tracked.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.StructuredType">
-            <summary>
-            Gets the actual type of the structural object for which the changes are tracked.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.ExpectedClrType">
-            <summary>
-            Gets the expected type of the entity for which the changes are tracked.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedDelta.IsDeltaOfT(System.Type)">
-            <summary>
-            Helper method to check whether the given type is Delta generic type.
-            </summary>
-            <param name="type">The type to check.</param>
-            <returns>True if it is a Delta generic type; false otherwise.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmComplexObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> backed by a CLR object with a one-to-one mapping.
@@ -5058,52 +5617,100 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaDeletedLink"/> deleted link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper.#ctor(Microsoft.OData.ODataDeltaDeletedLink)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper"/>.
+            </summary>
+            <param name="deltaDeletedLink">The wrapped deleted link.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper.DeltaDeletedLink">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaDeletedLink"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkBaseWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaLinkBase"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaLink"/> added link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper.#ctor(Microsoft.OData.ODataDeltaLink)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper"/>.
+            </summary>
+            <param name="deltaLink">The wrapped added link item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper.DeltaLink">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaLink"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/>.
+            </summary>
+            <remarks>
+            The Delta resource set could have normal resource or the deleted resource.
+            The Delta resource set could have delta link.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.#ctor(Microsoft.OData.ODataDeltaResourceSet)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper"/>.
+            </summary>
+            <param name="deltaResourceSet">The wrapped delta resource set item.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaResourceSet">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper.DeltaItems">
+            <summary>
+            Gets the nested delta items (resource, or deleted resource, or deleted link, or added link).
+            Be noted: the order of the delta items matters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
             <summary>
             Encapuslates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
             <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase"/>.
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="link">The wrapped entity reference item.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkBase.EntityReferenceLink">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.EntityReferenceLink">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper">
             <summary>
             Base class for all classes that wrap an <see cref="T:Microsoft.OData.ODataItem"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase.#ctor(Microsoft.OData.ODataItem)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase"/>.
-            </summary>
-            <param name="item">The wrapped item.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemBase.Item">
-            <summary>
-            Gets the wrapped <see cref="T:Microsoft.OData.ODataItem"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper">
             <summary>
             Encapsulates an <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> and the list of nested items.
             </summary>
-            <remarks>
-            A nested resource info for a singleton nested property can only contain one item - either ODataResource or ODataEntityReferenceLink.
-            A nested resource info for a collection nested property can contain any number of items - each is either ODataResource or ODataEntityReferenceLink.
-            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.#ctor(Microsoft.OData.ODataNestedResourceInfo)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="nestedInfo">The wrapped nested resource info item.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceInfo">
             <summary>
@@ -5134,16 +5741,60 @@
             <param name="reader">The OData reader to read from.</param>
             <returns>The read resource or resource set.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadODataItem(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read OData item.
+            </summary>
+            <param name="reader">The odata reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResource(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the normal resource.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">the top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadDeletedResource(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper})">
+            <summary>
+            Read the deleted resource.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceSet(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the resource set.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadDeltaResourceSet(Microsoft.OData.ODataReader,System.Collections.Generic.Stack{Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper},Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper@)">
+            <summary>
+            Read the delta resource set.
+            </summary>
+            <param name="reader">The OData reader.</param>
+            <param name="itemsStack">The item stack.</param>
+            <param name="topLevelItem">The top level item.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper">
+            <summary>
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSetBase"/> and the <see cref="T:Microsoft.OData.ODataResourceBase"/>'s that are part of it.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper">
             <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSet"/> and the <see cref="T:Microsoft.OData.ODataResource"/>'s that are part of it.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResourceSet"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.#ctor(Microsoft.OData.ODataResourceSet)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="resourceSet">The wrapped resource set item.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ResourceSet">
             <summary>
@@ -5153,22 +5804,28 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Resources">
             <summary>
             Gets the nested resources of this ResourceSet.
+            Resource set only contains resources.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper">
             <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/> and the inner nested resource infos.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResource)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResourceBase)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/>.
             </summary>
-            <param name="item">The wrapped item.</param>
+            <param name="resource">The wrapped resource item, it could be null.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataResource"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.IsDeletedResource">
+            <summary>
+            Gets a boolean indicating whether the resource is deleted resource.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResourceInfos">
@@ -5186,6 +5843,31 @@
             Use OData batching middleware.
             </summary>
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataQueryRequest(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Use OData query request middleware. An OData query request is a Http Post request ending with /$query.
+            The Request body contains the query options.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Use OData route debug middleware. You can send request "~/$odata" after enabling this middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)">
+            <summary>
+            Use OData route debug middleware using the given route pattern.
+            For example, if the given route pattern is "myrouteinfo", then you can send request "~/myrouteinfo" after enabling this middleware.
+            Please use basic (literal) route pattern.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <param name="routePattern">The given route pattern.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
@@ -5257,6 +5939,18 @@
             Sets the <see cref="T:System.TimeZoneInfo"/> in route builder.
             </summary>
             <param name="timeZoneInfo">The <see cref="T:System.TimeZoneInfo"/></param>
+            <returns>The calling itself.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions">
+            <summary>
+            Configure the route options.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.ConfigureRoute(System.Action{Microsoft.AspNetCore.OData.Routing.ODataRouteOptions})">
+            <summary>
+            Configure the route options.
+            </summary>
+            <param name="configureAction">The action to config route options.</param>
             <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
@@ -5392,6 +6086,11 @@
             </summary>
             <param name="maxTopValue">The max top value.</param>
             <returns>The calling itself.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
+            <summary>
+            Gets and sets the optional-$-sign-prefix for OData system query option.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildDefaultQuerySettings">
             <summary>
@@ -5643,6 +6342,11 @@
               Looks up a localized string similar to An instance of the abstract resource type &apos;{0}&apos; was found. Abstract resource types cannot be instantiated..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotParseQueryRequestPayload">
+            <summary>
+              Looks up a localized string similar to Unable to parse query request payload..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotPatchNavigationProperties">
             <summary>
               Looks up a localized string similar to Cannot apply PATCH to navigation property &apos;{0}&apos; on entity type &apos;{1}&apos;..
@@ -5811,6 +6515,21 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpandFilterExpressionNotLambdaExpression">
             <summary>
               Looks up a localized string similar to $filter in $expand of reference navigation property &apos;{0}&apos; is not expected type &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexer_UnbalancedBracketExpression">
+            <summary>
+              Looks up a localized string similar to Found an unbalanced bracket &apos;{0}&apos; and &apos;{1}&apos; expression..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexerSyntaxError">
+            <summary>
+              Looks up a localized string similar to Syntax error at position {0} in &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ExpressionLexerUnterminatedStringLiteral">
+            <summary>
+              Looks up a localized string similar to There is an unterminated string literal at position {0} in &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull">
@@ -6001,6 +6720,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleMatchingClrTypesForEdmType">
             <summary>
               Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleSingleLiteralNotAllowed">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; is not a valid expression.Single literal is only for single key. Multiple keys should use key=value..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NavigationSourceMissingDuringDeserialization">
@@ -6266,6 +6990,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.RootElementNameMissing">
             <summary>
               Looks up a localized string similar to The &apos;RootElementName&apos; property is required on &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledKeySegment">
+            <summary>
+              Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledOperationSegment">
+            <summary>
+              Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SegmentShouldBeKind">
@@ -6945,6 +7679,19 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.TotalCount">
             <inheritdoc />
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser">
+            <summary>
+            Exposes the ability to read and parse the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" />
+            into a query options part of an OData URL. Query options may be passed
+            in the request body to a resource path ending in /$query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultQuerySettings">
             <summary>
             This class describes the default settings to use during query composition.
@@ -7271,18 +8018,6 @@
             Gets or sets the maximum number of expressions that can be present in the $orderby.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute._queryValidationRunBeforeActionExecution">
-            <summary>
-            Marks if the query validation was run before the action execution. This is not always possible.
-            For cases where the run failed before action execution. We will run validation on result.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute._processedQueryOptions">
-            <summary>
-            Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
-            This is because ValidateQuery internally modifies query options (expands are prime example of this).
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>
             Performs the query composition before action is executing.
@@ -7448,6 +8183,29 @@
             <param name="request">The request message to retrieve a model for.</param>
             <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
             <returns>The EDM model for the given type and request.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData">
+            <summary>
+            Holds request level query information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.QueryValidationRunBeforeActionExecution">
+            <summary>
+            Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
+            </summary>
+            <remarks>
+            Marks if the query validation was run before the action execution. This is not always possible.
+            For cases where the run failed before action execution. We will run validation on result.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.ProcessedQueryOptions">
+            <summary>
+            Gets or sets the processed query options.
+            </summary>
+            <remarks>
+            Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
+            This is because ValidateQuery internally modifies query options (expands are prime example of this).
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ETag">
             <summary>
@@ -8014,6 +8772,28 @@
             Gets a value representing the total count of the collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser">
+            <summary>
+            Exposes the ability to read and parse the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" />
+            into a query options part of an OData URL. Query options may be passed
+            in the request body to a resource path ending in /$query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Determines whether this <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser"/> can parse the http request.
+            </summary>
+            <param name="request">The http request.</param>
+            <returns>true if this <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser"/> can parse the http request; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Reads and parses the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>
+            into a query options part of an OData URL.
+            </summary>
+            <param name="request">A http request containing the query options.</param>
+            <returns>A string representing the query options part of an OData URL.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings">
             <summary>
             This class describes the model bound settings to use during query composition.
@@ -8118,6 +8898,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions">
             <summary>
             This class describes the settings to use during query composition.
+            TODO: it seems this class is never been used?? we need use it to replace "DefaultQuerySettings"??
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableExpand">
@@ -8237,6 +9018,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.QueryableOptions">
             <summary>
             Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions"/>.
+            TODO: it seems this one is never been used??
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model">
@@ -8272,6 +9054,14 @@
             The services container may not be present. See the constructor in this file for
             use in stand-alone scenarios.
             </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetFilterBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <param name="querySettings">The query setting.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
@@ -8553,6 +9343,35 @@
             <summary>
             Instantiates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute"/> class.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware">
+            <summary>
+            Defines the middleware for handling OData $query requests.
+            This middleware essentially transforms the incoming request (Post) to a "Get" request.
+            Be noted: should put this middle ware before "UseRouting()".
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser},Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware"/>.
+            </summary>
+            <param name="queryRequestParsers">The query request parsers.</param>
+            <param name="next">The next middleware.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the OData $query middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware.TransformQueryRequestAsync(Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Transforms a POST request targeted at a resource path ending in $query into a GET request.
+            The query options are parsed from the request body and appended to the request URL.
+            </summary>
+            <param name="parser">The query request parser.</param>
+            <param name="request">The Http request.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings">
             <summary>
@@ -10070,8 +10889,23 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter">
             <summary>
-            Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> instances to JSON.
+            Supports converting <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> types by using a factory pattern.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            determines whether the converter instance can convert the specified object type.
+            </summary>
+            <param name="typeToConvert">The type of the object to check whether it can be converted by this converter instance.</param>
+            <returns>true if the instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GroupByContainer">
             <summary>
@@ -10150,8 +10984,23 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter">
             <summary>
-            Represents a custom <see cref="T:System.Text.Json.Serialization.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1"/> instances to JSON.
+            Supports converting <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1"/> types by using a factory pattern.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            determines whether the converter instance can convert the specified object type.
+            </summary>
+            <param name="typeToConvert">The type of the object to check whether it can be converted by this converter instance.</param>
+            <returns>true if the instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1">
             <summary>
@@ -10251,6 +11100,14 @@
             </summary>
             <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResultValueConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ResultHelpers.GenerateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.Object,System.Boolean)">
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
@@ -10336,6 +11193,7 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute">
             <summary>
             The attribute to specify a controller to an Edm model using the model name.
+            It affects for convention routing, doesn't affect the attribute routing.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute.#ctor">
@@ -10354,67 +11212,9 @@
             Gets the specified model name.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute">
             <summary>
-            Represents an attribute that can be placed on an action of an Controller to specify
-            the OData URLs that the action handles.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this action handles, it could be null.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this action handles. It could be null, For example: "customers({key})".</param>
-            <param name="prefix">The OData routing prefix setting. For example: "v{version}". It could be null which means this attribute be suitable for routes.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.PathTemplate">
-            <summary>
-            Gets the OData URL path template that this action handles.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute.RoutePrefix">
-            <summary>
-            Gets or sets the OData route with which to associate the attribute.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute">
-            <summary>
-            Represents an attribute that can be placed on an OData controller to specify
-            the route template prefix that will be used for all actions of that controller.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this controller handles.For example: "customers({key})".</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> class.
-            </summary>
-            <param name="template">The OData URL path template that this controller handles. For example: "customers({key})".</param>
-            <param name="prefix">The OData routing prefix setting. For example: "v{version}". It could be null which means this attribute be suitable for routes.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.PathPrefixTemplate">
-            <summary>
-            Gets the OData URL path prefix template that this controller handles.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute.RoutePrefix">
-            <summary>
-            Gets or sets the route prefix with which to associate the attribute.
+            Represents an attribute that can be placed on Controller or action to specify that's OData controller or OData action.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController">
@@ -10436,7 +11236,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController">
             <summary>
-            
+            The base controller class for OData.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created``1(``0)">
@@ -10478,7 +11278,8 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
             <summary>
             The convention for an odata template string.
-            It looks for the <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutePrefixAttribute"/> on controller and <see cref="T:Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteAttribute"/> on action.
+            It looks for the <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> on controller
+            and <see cref="T:Microsoft.AspNetCore.Mvc.RouteAttribute"/> or other Http Verb attribute, for example <see cref="T:Microsoft.AspNetCore.Mvc.HttpGetAttribute"/> on action.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention},Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">
@@ -10496,14 +11297,6 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.GetODataPathTemplatePrefixes(System.String,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel)">
-            <summary>
-            Gets the route prefix on the controller.
-            </summary>
-            <param name="routePrefix">The route prefix.</param>
-            <param name="controller">The controller.</param>
-            <returns>The prefix string list.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.EntityRoutingConvention">
             <summary>
@@ -10539,6 +11332,7 @@
             GET ~/entityset/cast/$count
             POST ~/entityset
             POST ~/entityset/cast
+            PATCH ~/entityset   ==> Delta resource set patch
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.Order">
@@ -10632,9 +11426,9 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.#ctor(Microsoft.Extensions.Logging.ILogger{Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention})">
             <summary>
-            
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention"/> class.
             </summary>
-            <param name="logger"></param>
+            <param name="logger">The injected logger.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.Order">
             <inheritdoc />
@@ -10741,6 +11535,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ServiceProvider">
             <summary>
             Gets/sets the odata service provider, used for the attribute routing parser or others.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Options">
+            <summary>
+            Gets/sets the OData Options.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention">
@@ -10889,11 +11688,6 @@
             Gets the Edm model.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.HttpMethods">
-            <summary>
-            Gets the supported Http methods.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
@@ -10903,6 +11697,13 @@
             <summary>
              Extension methods for <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.IsStreamPropertyPath(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Gets a boolean value indicating whether the given path is a stream property path.
+            </summary>
+            <param name="path">The given odata path.</param>
+            <returns>true/false</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetEdmType(Microsoft.OData.UriParser.ODataPath)">
             <summary>
@@ -11190,19 +11991,49 @@
             <param name="parameterAliasNodes"></param>
             <returns></returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware">
             <summary>
-            Use for debug for OData convention action discovery on <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" />.
+            An OData route debug middleware
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.Order">
-            <inheritdoc />
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware.#ctor(System.String,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware"/> class.
+            </summary>
+            <param name="routePattern">The route pattern.</param>
+            <param name="next">The next middleware.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
-            <inheritdoc />
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteDebugMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the OData Route debug middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelDebugProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext)">
-            <inheritdoc />
+        <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions">
+            <summary>
+            Represents the configurable options on a route.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/entityset({key})
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/entityset/{key}
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableQualifiedOperationCall">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/Namespace.MyFunction(parameters...)
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall">
+            <summary>
+            Gets or sets a value indicating whether to generate odata path template as ~/MyFunction(parameters...)
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider">
             <summary>
@@ -11232,6 +12063,12 @@
             Executed for the first pass of <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel"/> building.
             </summary>
             <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModelProviderContext"/>.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.ApplyAttributeRouting(System.Collections.Generic.IList{Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel})">
+            <summary>
+            Apply Default OData attribute routing
+            </summary>
+            <param name="controllers">The controller models</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingMatcherPolicy">
             <summary>
@@ -11296,11 +12133,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.HttpMethods">
-            <summary>
-            Gets the supported Http methods.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds">
@@ -11403,6 +12235,22 @@
             Represents a segment that is not understood.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser">
+            <summary>
+            Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parse the string like "/users/1/contactFolders/..."
+            to segments
+            </summary>
+            <param name="model">the Edm model.</param>
+            <param name="serviceRoot">The service root uri.</param>
+            <param name="odataPath">the setting.</param>
+            <param name="requestProvider">The service provider.</param>
+            <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser">
             <summary>
             Exposes the ability to parse an OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
@@ -11417,6 +12265,16 @@
             <param name="odataPath">the setting.</param>
             <param name="requestProvider">The service provider.</param>
             <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathParser.Parse(Microsoft.OData.Edm.IEdmModel,System.Uri,System.Uri,System.IServiceProvider)">
+            <summary>
+            Parses the specified OData path template as an <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="serviceRoot">The service root uri.</param>
+            <param name="odataPath">The OData path template to parse.</param>
+            <param name="requestProvider">The OData service provider.</param>
+            <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser">
             <summary>
@@ -11591,7 +12449,7 @@
             Gets the action import segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate">
@@ -11637,7 +12495,7 @@
             Gets the action segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate">
@@ -11689,7 +12547,7 @@
             Gets the expected type.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate">
@@ -11722,7 +12580,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.NavigationSource">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator">
@@ -11736,6 +12594,8 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate">
             <summary>
             Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.DynamicPathSegment"/>.
+            Be noted:
+            a dynamic path segment is a real segment (not a template), its literal is dynamic property name.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.#ctor(Microsoft.OData.UriParser.DynamicPathSegment)">
@@ -11761,17 +12621,7 @@
             Gets or sets the open property segment.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.PropertyName">
-            <summary>
-            The parameter name of the dynamic property.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.TreatPropertyNameAsParameterName">
-            <summary>
-            Indicates whether the template should match the name, or treat it as a parameter.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate">
@@ -11816,7 +12666,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate">
@@ -11873,17 +12723,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Segment">
-            <summary>
-            Gets the function import segment.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.HasOptionalMissing">
-            <summary>
-            Gets the boolean value indcating whether there's an optional parameter missed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate">
@@ -11943,18 +12783,8 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.RequiredParameters">
-            <summary>
-            Gets the required parameter names.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplateHelpers">
-            <summary>
-            Helper methods for function segment template
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator">
             <summary>
@@ -11992,6 +12822,8 @@
             <summary>
             Gets the dictionary representing the mappings from the key names in the current key segment to the 
             key names in route data.
+            the key in dict could be the string used in request
+            the value in dict could be the string used in action of controller
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Literal">
@@ -12019,7 +12851,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.CreateKeySegment(Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource,System.String)">
@@ -12038,7 +12870,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Instance">
             <summary>
-            Gets the static instace of $metadata
+            Gets the static instance of $metadata
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.#ctor">
@@ -12061,7 +12893,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate">
@@ -12102,7 +12934,7 @@
             Gets or sets the navigation property link segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate">
@@ -12150,7 +12982,7 @@
             Gets the navigation property segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate">
@@ -12176,32 +13008,18 @@
             </summary>
             <param name="segments">The path segments for the path.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Segments">
-            <summary>
-            Gets the path segments for the OData path.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.Template">
-            <summary>
-            Gets the OData path template literal.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions">
-            <summary>
-            The extension methods for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.GetTemplates(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <summary>
             Generates all templates for the given <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.
             All templates mean:
             1) for key segment, we have key in parenthesis and key as segment.
-            2) for bound function segment, we have qualified function call and unqualified function call.
+            2) for bound function/action segment, we have qualified function call and unqualified function call.
+            All of such might be based on route options.
             </summary>
-            <param name="path">The given path template.</param>
-            <returns>All path templates.</returns>
+            <param name="options">The route options.</param>
+            <returns>All path template.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.CombinateTemplate(System.Collections.Generic.IList{System.Text.StringBuilder},System.String)">
             <summary>
             Combinates the next template to the existing templates.
             </summary>
@@ -12209,7 +13027,7 @@
             <param name="nextTemplate">The nexte template.</param>
             <returns>The templates.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplateExtensions.CombinateTemplates(System.Collections.Generic.IList{System.Text.StringBuilder},System.String[])">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.CombinateTemplates(System.Collections.Generic.IList{System.Text.StringBuilder},System.String[])">
             <summary>
             Combinates the next templates with existing templates.
             </summary>
@@ -12314,7 +13132,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Literal">
             <summary>
-            Gets the segment URL literal.
+            Gets the segment URL template literal.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Kind">
@@ -12337,12 +13155,12 @@
             Gets a value indicating whether the output value is single value or collection value of this segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <summary>
             Translate the template into a real OData path segment, <see cref="T:Microsoft.OData.UriParser.ODataPathSegment"/>
             </summary>
-            <param name="context">The translate context.</param>
-            <returns>null or ODataPathSegment.</returns>
+            <param name="context">The translate context, the translated in context.</param>
+            <returns>True if translated. false if no.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext">
             <summary>
@@ -12385,6 +13203,16 @@
             Gets the Edm model.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.UpdatedValues">
+            <summary>
+            Gets the updated route values. This will include the updated route values.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Segments">
+            <summary>
+            Gets the generated path segments.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.GetParameterAliasOrSelf(System.String)">
             <summary>
             Gets the parameter alias or the alias name itself.
@@ -12395,6 +13223,16 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate">
             <summary>
              Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.PathTemplateSegment"/>.
+             From OData Lib:
+             If template parseing enabled, any literal wrappered with "{" and "}" is considered as PathTemplateSegment.
+             So, here's the design (so far, we can add more later):
+             {property} ==> declared property
+             {dynamicproperty} => dynamic property
+             TODO: we can change to use route constraint, for example:
+             {name:odataproperty}
+             {name:odatadynamic}
+             {name:odatacast}
+             {name:odataentityset} ...
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.#ctor(Microsoft.OData.UriParser.PathTemplateSegment)">
@@ -12415,19 +13253,9 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.PropertyName">
-            <summary>
-            The parameter name of the dynamic property.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.SegmentName">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.ParameterName">
             <summary>
             Gets the segment name
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.TreatPropertyNameAsParameterName">
-            <summary>
-            Indicates whether the template should match the name, or treat it as a parameter.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Segment">
@@ -12435,7 +13263,7 @@
             The parameter name of the dynamic property.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate">
@@ -12466,7 +13294,7 @@
             Gets the declared type for this property template.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate">
@@ -12508,7 +13336,7 @@
             Gets the property segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate">
@@ -12543,8 +13371,30 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.NavigationSource">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers">
+            <summary>
+            Helper methods for segment template
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.Match(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext,Microsoft.OData.Edm.IEdmFunction,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Match the function parameter
+            </summary>
+            <param name="context">The context.</param>
+            <param name="function">The Edm function.</param>
+            <param name="parameterMappings">The parameter mapping.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.IsMatchParameters(Microsoft.AspNetCore.Routing.RouteValueDictionary,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            
+            </summary>
+            <param name="routeValues"></param>
+            <param name="parameterMappings"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate">
             <summary>
@@ -12588,7 +13438,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.IsSingle">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate">
@@ -12628,7 +13478,7 @@
             Gets the value segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
     </members>

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -23,9 +24,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         private readonly ILogger<NavigationRoutingConvention> _logger;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="NavigationRoutingConvention"/> class.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">The injected logger.</param>
         public NavigationRoutingConvention(ILogger<NavigationRoutingConvention> logger)
         {
             _logger = logger ?? throw Error.ArgumentNull(nameof(logger));
@@ -133,17 +134,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             //ODataPathTemplate template = new ODataPathTemplate(segments);
             //action.AddSelector(method, context.Prefix, context.Model, template);
 
-            AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
+            AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
 
             if (CanApplyDollarCount(navigationProperty, method))
             {
-                AddSelector(method, context.Prefix, context.Model, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
+                AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
             }
 
             return true;
         }
 
-        private void AddSelector(string httpMethod, string prefix, IEdmModel model, ActionModel action,
+        private void AddSelector(string httpMethod, ODataControllerActionContext context, ActionModel action,
             IEdmNavigationSource navigationSource, string declared, IEdmEntityType declaringEntityType,
             IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
         {
@@ -169,7 +170,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (declared != null)
             {
                 // It should be always single type
-                segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
+                if (entityType != declaringEntityType)
+                {
+                    segments.Add(new CastSegmentTemplate(declaringEntityType, entityType, navigationSource));
+                }
             }
 
             IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
@@ -182,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod.NormalizeHttpMethod(), prefix, model, template);
+            action.AddSelector(httpMethod.NormalizeHttpMethod(), context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
             Log.AddedODataSelector(_logger, action, template);
         }
@@ -253,7 +257,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             public static void AddedODataSelector(ILogger logger, ActionModel action, ODataPathTemplate template)
             {
-                string message = action.DisplayName + ": " + template.Template;
+                string message = action.DisplayName + ": " + template.GetTemplates().FirstOrDefault();
                 _addedODataSelector(logger, message, null);
             }
         }

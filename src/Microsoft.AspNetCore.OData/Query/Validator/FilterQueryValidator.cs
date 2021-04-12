@@ -858,6 +858,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     // No setting validations
                     break;
 
+                case QueryNodeKind.Count:
+                    // No setting validations
+                    break;
+
                 case QueryNodeKind.NamedFunctionParameter:
                 case QueryNodeKind.ParameterAlias:
                 case QueryNodeKind.EntitySet:

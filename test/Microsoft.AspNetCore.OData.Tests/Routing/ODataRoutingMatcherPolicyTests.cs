@@ -59,21 +59,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             // Arrange
             IEdmModel model = EdmCoreModel.Instance;
             IODataRoutingMetadata routingMetadata = new ODataRoutingMetadata("odata", model, new ODataPathTemplate());
-            routingMetadata.HttpMethods.Add("post");
 
             Endpoint[] endpoints = new[]
             {
-                CreateEndpoint("/", new ODataRoutingMetadata()),
-                CreateEndpoint("/", routingMetadata),
-                CreateEndpoint("/", new ODataRoutingMetadata())
+                CreateEndpoint("/", routingMetadata, new HttpMethodMetadata(new[] { "get" })),
+                CreateEndpoint("/", routingMetadata, new HttpMethodMetadata(new[] { "post" })),
+                CreateEndpoint("/", routingMetadata, new HttpMethodMetadata(new[] { "delete" }))
             };
 
             CandidateSet candidateSet = CreateCandidateSet(endpoints);
 
             HttpContext httpContext = CreateHttpContext("POST");
+
+            HttpMethodMatcherPolicy httpMethodPolicy = new HttpMethodMatcherPolicy();
+
             ODataRoutingMatcherPolicy policy = CreatePolicy();
 
             // Act
+            await httpMethodPolicy.ApplyAsync(httpContext, candidateSet);
             await policy.ApplyAsync(httpContext, candidateSet);
 
             // Assert

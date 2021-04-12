@@ -7,8 +7,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Attributes
 {
     /// <summary>
     /// The attribute to specify a controller to an Edm model using the model name.
+    /// It affects for convention routing, doesn't affect the attribute routing.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class ODataModelAttribute : Attribute
     {
         /// <summary>

@@ -1,14 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -16,6 +14,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 {
+    [Route("convention")]
+    [Route("explicit")]
     public class EmployeesController : ODataController
     {
         public EmployeesController()
@@ -117,8 +117,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(employee.FavoriteSports);
         }
 
-        [HttpGet]
-        [ODataRoute("Employees({key})/FavoriteSports/LikeMost")]
+        [HttpGet("Employees({key})/FavoriteSports/LikeMost")]
         public IActionResult GetFavoriteSportLikeMost(int key)
         {
             var firstOrDefault = Employees.FirstOrDefault(e => e.ID == key);
@@ -133,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Created(employee);
         }
 
-        [ODataRoute("Employees({key})/FavoriteSports/LikeMost")]
+        [HttpPost("Employees({key})/FavoriteSports/LikeMost")]
         public IActionResult PostToSkillSet(int key, [FromBody]Skill newSkill)
         {
             Employee employee = Employees.FirstOrDefault(e => e.ID == key);
@@ -217,16 +216,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(employee.SkillSet);
         }
 
-        [HttpPost]
-        [ODataRoute("ResetDataSource")]
+        [HttpPost("ResetDataSource")]
         public IActionResult ResetDataSource()
         {
             this.InitEmployees();
             return this.StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPost]
-        [ODataRoute("SetAccessLevel")]
+        [HttpPost("SetAccessLevel")]
         public IActionResult SetAccessLevel([FromBody]ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
@@ -261,8 +258,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(employee.AccessLevel);
         }
 
-        [HttpGet]
-        [ODataRoute("HasAccessLevel(ID={id},AccessLevel={accessLevel})")]
+        [HttpGet("HasAccessLevel(ID={id},AccessLevel={accessLevel})")]
         public IActionResult HasAccessLevel([FromODataUri] int id, [FromODataUri] AccessLevel accessLevel)
         {
             if (!ModelState.IsValid)

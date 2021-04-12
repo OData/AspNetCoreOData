@@ -49,7 +49,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                 "application/json;odata.streaming=true",
                 "application/json;odata.streaming=false",
                 "application/json",
-                "application/xml"
+                "application/xml",
+                "text/plain"
             };
 
             // Act

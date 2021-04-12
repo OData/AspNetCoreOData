@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Translate_ReturnsODataActionImportSegment()
+        public void TryTranslate_ReturnsODataActionImportSegment()
         {
             // Arrange
             EdmAction action = new EdmAction("NS", "action", null);
@@ -43,10 +43,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment actual = template.Translate(context);
+            bool ok = template.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             OperationSegment actionSegment = Assert.IsType<OperationSegment>(actual);
             Assert.Same(action, actionSegment.Operations.First());
         }

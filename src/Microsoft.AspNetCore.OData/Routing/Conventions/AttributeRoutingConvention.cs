@@ -3,22 +3,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for an odata template string.
-    /// It looks for the <see cref="ODataRoutePrefixAttribute"/> on controller and <see cref="ODataRouteAttribute"/> on action.
+    /// It looks for the <see cref="RouteAttribute"/> on controller
+    /// and <see cref="RouteAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -43,131 +45,244 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            // It allows to use attribute routing without ODataRoutePrefixAttribute.
-            // In this case, we only use the ODataRouteAttrbute to construct the route template.
-            // Otherwise, we combine each route prefix with each route attribute to construct the route template.
-            foreach (var pathTemplatePrefix in GetODataPathTemplatePrefixes(context.Prefix, context.Controller))
-            {
-                foreach (var action in context.Controller.Actions)
-                {
-                    var routeAttributes = action.Attributes.OfType<ODataRouteAttribute>();
-
-                    foreach (ODataRouteAttribute routeAttribute in routeAttributes)
-                    {
-                        // If we have the route prefix name setting, make sure we only let the attribute with the same route prefx to pass.
-                        if (routeAttribute.RoutePrefix != null &&
-                            !string.Equals(routeAttribute.RoutePrefix, context.Prefix, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        try
-                        {
-                            string routeTemplate = GetODataPathTemplateString(pathTemplatePrefix, routeAttribute.PathTemplate);
-
-                            ODataPathTemplate pathTemplate = _templateParser.Parse(context.Model, routeTemplate, context.ServiceProvider);
-
-                            // Add the httpMethod?
-                            action.AddSelector(null, context.Prefix, context.Model, pathTemplate);
-                        }
-                        catch (ODataException ex)
-                        {
-                            // use the logger to log the wrong odata attribute template. Shall we log the others?
-                            string warning = string.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
-                                routeAttribute.PathTemplate, action.ActionMethod.Name, context.Controller.ControllerName, ex.Message);
-
-                            _logger.LogWarning(warning);
-                        }
-                    }
-                }
-            }
-
-            // We execute this convention on all actions in the controller level.
-            // So, returns false to make sure we don't want to call the AppliesToAction for this convention.
-            return false;
+            return true;
         }
 
         /// <inheritdoc />
         public virtual bool AppliesToAction(ODataControllerActionContext context)
         {
-            // Actually, we will never call here. So, we can throw exception here.
-            // However, let's just return false to let this action go to other conventions.
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the route prefix on the controller.
-        /// </summary>
-        /// <param name="routePrefix">The route prefix.</param>
-        /// <param name="controller">The controller.</param>
-        /// <returns>The prefix string list.</returns>
-        private IEnumerable<string> GetODataPathTemplatePrefixes(string routePrefix, ControllerModel controller)
-        {
-            Contract.Assert(controller != null);
-
-            var prefixAttributes = controller.Attributes.OfType<ODataRoutePrefixAttribute>();
-            if (!prefixAttributes.Any())
+            if (context == null)
             {
-                yield return null;
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            foreach (ODataRoutePrefixAttribute prefixAttribute in prefixAttributes)
+            // Be noted, the validation checks (non OData controller, non OData action) are done before calling this method.
+            ControllerModel controllerModel = context.Controller;
+            ActionModel actionModel = context.Action;
+
+            bool isODataController = controllerModel.Attributes.Any(a => a is ODataRoutingAttribute);
+            bool isODataAction = actionModel.Attributes.Any(a => a is ODataRoutingAttribute);
+
+            // At least one of controller or action has "ODataRoutingAttribute"
+            // The best way is to derive your controller from ODataController.
+            if (!isODataController && !isODataAction)
             {
-                // If we have the route prefix setting, make sure we only let the attribute with the same route prefix (ignore case) to pass.
-                if (prefixAttribute.RoutePrefix != null &&
-                    !string.Equals(prefixAttribute.RoutePrefix, routePrefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                string template = prefixAttribute.PathPrefixTemplate;
-                if (template != null && template.StartsWith("/", StringComparison.Ordinal))
-                {
-                    // So skip it? or let's remove the "/" and let it go?
-                    _logger.LogWarning($"The OData route prefix '{template}' on the controller '{controller.ControllerName}' starts with a '/'. Route prefixes cannot start with a '/'.");
-
-                    template = template.TrimStart('/');
-                }
-
-                if (template != null && template.EndsWith("/", StringComparison.Ordinal))
-                {
-                    template = template.TrimEnd('/');
-                }
-
-                yield return template;
+                return false;
             }
-        }
 
-        private string GetODataPathTemplateString(string routePrefix, string pathTemplate)
-        {
-            if (routePrefix != null && !pathTemplate.StartsWith("/", StringComparison.Ordinal))
+            // TODO: Which one is better? input from context or inject from constructor?
+            IEnumerable<string> prefixes = context.Options.Models.Keys;
+
+            // Loop through all attribute routes defined on the controller.
+            var controllerSelectors = controllerModel.Selectors.Where(sm => sm.AttributeRouteModel != null).ToList();
+            if (controllerSelectors.Count == 0)
             {
-                if (String.IsNullOrEmpty(pathTemplate))
+                // If no controller route template, we still need to go through action to process the action route template.
+                controllerSelectors.Add(null);
+            }
+
+            // In order to avoiding pollute the action selectors, we use a Dictionary to save the intermediate results.
+            IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors = new Dictionary<SelectorModel, IList<SelectorModel>>();
+            foreach (var actionSelector in actionModel.Selectors)
+            {
+                if (actionSelector.AttributeRouteModel != null && actionSelector.AttributeRouteModel.IsAbsoluteTemplate)
                 {
-                    pathTemplate = routePrefix;
-                }
-                else if (pathTemplate.StartsWith("(", StringComparison.Ordinal))
-                {
-                    // We don't need '/' when the pathTemplate starts with a key segment.
-                    pathTemplate = routePrefix + pathTemplate;
+                    ProcessAttributeModel(actionSelector.AttributeRouteModel, prefixes, context, actionSelector, actionModel, controllerModel, updatedSelectors);
                 }
                 else
                 {
-                    pathTemplate = routePrefix + "/" + pathTemplate;
+                    foreach (var controllerSelector in controllerSelectors)
+                    {
+                        var combinedRouteModel = AttributeRouteModel.CombineAttributeRouteModel(controllerSelector?.AttributeRouteModel, actionSelector.AttributeRouteModel);
+                        ProcessAttributeModel(combinedRouteModel, prefixes, context, actionSelector, actionModel, controllerModel, updatedSelectors);
+                    }
                 }
             }
 
-            if (pathTemplate.StartsWith("/", StringComparison.Ordinal))
+            // remove the old one.
+            foreach (var selector in updatedSelectors)
             {
-                pathTemplate = pathTemplate.TrimStart('/');
+                actionModel.Selectors.Remove(selector.Key);
             }
 
-            return pathTemplate;
+            // add new one.
+            foreach (var selector in updatedSelectors)
+            {
+                foreach (var newSelector in selector.Value)
+                {
+                    actionModel.Selectors.Add(newSelector);
+                }
+            }
+
+            // let's just return false to let this action go to other conventions.
+            return false;
+        }
+
+        private void ProcessAttributeModel(AttributeRouteModel attributeRouteModel, IEnumerable<string> prefixes,
+            ODataControllerActionContext context, SelectorModel actionSelector, ActionModel actionModel, ControllerModel controllerModel,
+            IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors)
+        {
+            if (attributeRouteModel == null)
+            {
+                // not an attribute routing, skip it.
+                return;
+            }
+
+            string prefix = FindRelatedODataPrefix(attributeRouteModel.Template, prefixes, out string newRouteTemplate);
+            if (prefix == null)
+            {
+                return;
+            }
+
+            IEdmModel model = context.Options.Models[prefix].Item1;
+            IServiceProvider sp = context.Options.Models[prefix].Item2;
+
+            SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
+                        attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);
+            if (newSelectorModel != null)
+            {
+                IList<SelectorModel> selectors;
+                if (!updatedSelectors.TryGetValue(actionSelector, out selectors))
+                {
+                    selectors = new List<SelectorModel>();
+                    updatedSelectors[actionSelector] = selectors;
+                }
+
+                selectors.Add(newSelectorModel);
+            }
+        }
+
+        private SelectorModel CreateActionSelectorModel(string prefix, IEdmModel model, IServiceProvider sp,
+            string routeTemplate, SelectorModel actionSelectorModel,
+            string originalTemplate, string actionName, string controllerName)
+        {
+            try
+            {
+                // Do the uri parser, it will throw exception if the route template is not a OData path.
+                ODataPathTemplate pathTemplate = _templateParser.Parse(model, routeTemplate, sp);
+                if (pathTemplate != null)
+                {
+                    // Create a new selector model?
+                    SelectorModel newSelectorModel = new SelectorModel(actionSelectorModel);
+                    // Shall we remove any certain attributes/metadata?
+                    ClearMetadata(newSelectorModel);
+
+                    // Add OData routing metadata
+                    ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, pathTemplate);
+                    newSelectorModel.EndpointMetadata.Add(odataMetadata);
+
+                    // replace the attribute routing template using absolute routing template to avoid appending any controller route template
+                    newSelectorModel.AttributeRouteModel = new AttributeRouteModel()
+                    {
+                        Template = $"/{originalTemplate}" // add a "/" to make sure it's absolute template, don't combine with controller
+                    };
+
+                    return newSelectorModel;
+                }
+
+                return null;
+            }
+            catch (ODataException ex)
+            {
+                // use the logger to log the wrong odata attribute template. Shall we log the others?
+                string warning = string.Format(CultureInfo.CurrentCulture, SRResources.InvalidODataRouteOnAction,
+                    originalTemplate, actionName, controllerName, ex.Message);
+
+                // Whether we throw exception or mark it as warning is a design pattern.
+                // throw new ODataException(warning);
+                _logger.LogWarning(warning);
+                return null;
+            }
+        }
+
+        private static void ClearMetadata(SelectorModel selectorModel)
+        {
+            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.ActionConstraints.RemoveAt(i);
+                }
+            }
+
+            //for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+            //{
+            //    if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
+            //    {
+            //        selectorModel.ActionConstraints.RemoveAt(i);
+            //    }
+            //}
+
+            // remove the unused metadata
+            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+            {
+                if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
+                {
+                    selectorModel.EndpointMetadata.RemoveAt(i);
+                }
+            }
+
+            //for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+            //{
+            //    if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
+            //    {
+            //        selectorModel.EndpointMetadata.RemoveAt(i);
+            //    }
+            //}
+        }
+
+        private static string FindRelatedODataPrefix(string routeTemplate, IEnumerable<string> prefixes, out string newRouteTemplate)
+        {
+            if (routeTemplate.StartsWith('/'))
+            {
+                routeTemplate = routeTemplate.Substring(1);
+            }
+            else if (routeTemplate.StartsWith("~/", StringComparison.Ordinal))
+            {
+                routeTemplate = routeTemplate.Substring(2);
+            }
+
+            // the input route template could be:
+            // #1) odata/Customers/{key}
+            // #2) orders({key})
+            // So, #1 matches the "odata" prefix route
+            //     #2 matches the non-odata prefix route
+            // Since #1 and #2 can be considered starting with "",
+            // In order to avoiding ambugious, let's compare non-empty route prefix first,
+            // If no match, then compare empty route prefix.
+            string emptyPrefix = null;
+            foreach (var prefix in prefixes)
+            {
+                if (string.IsNullOrEmpty(prefix))
+                {
+                    emptyPrefix = prefix;
+                    continue;
+                }
+                else if (routeTemplate.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    // we hit: "odata/Customers/{key}" scenario, let's remove the "odata" route prefix
+                    newRouteTemplate = routeTemplate.Substring(prefix.Length);
+
+                    // why do like this: because the input route template could be "odata", after remove the prefix, it's empty string.
+                    if (newRouteTemplate.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        newRouteTemplate = newRouteTemplate.Substring(1);
+                    }
+
+                    return prefix;
+                }
+            }
+
+            // we are here because no non-empty prefix matches.
+            if (emptyPrefix != null)
+            {
+                // So, if we have empty prefix route, it could match all OData route template.
+                newRouteTemplate = routeTemplate;
+                return emptyPrefix;
+            }
+
+            newRouteTemplate = null;
+            return null;
         }
     }
 }

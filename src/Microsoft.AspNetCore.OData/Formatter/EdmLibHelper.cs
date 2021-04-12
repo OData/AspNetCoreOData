@@ -8,6 +8,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {
@@ -59,6 +60,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         internal static bool TryGetInnerTypeForDelta(ref Type type)
         {
             if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(Delta<>))
+            {
+                type = type.GetGenericArguments()[0];
+                return true;
+            }
+
+            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(DeltaSet<>))
             {
                 type = type.GetGenericArguments()[0];
                 return true;

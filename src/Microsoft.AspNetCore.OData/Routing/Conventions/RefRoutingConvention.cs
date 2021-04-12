@@ -94,10 +94,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (property != null)
             {
                 navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
-                if (navigationProperty == null)
-                {
-                    return false;
-                }
+            }
+
+            if (navigationProperty == null)
+            {
+                return false;
             }
 
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
@@ -140,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, context.Prefix, context.Model, template);
+            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
             // processed
             return true;
@@ -158,19 +159,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
             {
                 method = "CreateRef";
-                httpMethod = "post,patch";
+                httpMethod = "Post,Patch";
                 remaining = actionName.Substring(9);
             }
             else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))
             {
                 method = "GetRef";
-                httpMethod = "get";
+                httpMethod = "Get";
                 remaining = actionName.Substring(6);
             }
             else if (actionName.StartsWith("DeleteRef", StringComparison.Ordinal))
             {
                 method = "DeleteRef";
-                httpMethod = "delete";
+                httpMethod = "Delete";
                 remaining = actionName.Substring(9);
             }
             else

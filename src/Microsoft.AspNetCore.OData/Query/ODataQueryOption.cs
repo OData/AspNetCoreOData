@@ -262,11 +262,19 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNullOrEmpty(nameof(queryOptionName));
             }
 
-            ODataUriResolver resolver = _queryOptionParser != null
-                ? _queryOptionParser.Resolver
-                : Request.GetSubServiceProvider().GetRequiredService<ODataUriResolver>();
+            ODataUriResolver resolver = null;
+            if (_queryOptionParser != null)
+            {
+                resolver = _queryOptionParser.Resolver;
+            }
 
-            if (!resolver.EnableCaseInsensitive)
+            if (resolver == null && Context.RequestContainer != null)
+            {
+                resolver = Context.RequestContainer.GetService<ODataUriResolver>();
+            }
+
+            // If we don't have the resolver setting, by default we support case-insensitive
+            if (resolver != null && !resolver.EnableCaseInsensitive)
             {
                 return IsSystemQueryOption(queryOptionName, this._enableNoDollarSignQueryOptions);
             }
@@ -787,7 +795,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     Context.ElementType,
                     Context.NavigationSource,
                     queryParameters,
-                    Context.RequestContainer);
+                    Context.RequestContainer); // the Context.RequestContainer could be null for non-edm model
                 var originalSelectExpand = SelectExpand;
                 SelectExpand = new SelectExpandQueryOption(
                     autoSelectRawValue,
@@ -1059,11 +1067,20 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             Contract.Assert(context != null);
 
-            // ODataUriResolver uriResolver = context.RequestContainer.GetRequiredService<ODataUriResolver>();
-            ODataUriResolver uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
+            ODataUriResolver uriResolver = null;
+            if (context.RequestContainer != null)
+            {
+                uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
+            }
+
             if (uriResolver != null)
             {
                 _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
+            }
+            else
+            {
+                // Use the global setting
+                _enableNoDollarSignQueryOptions = context.Request.IsNoDollarQueryEnable();
             }
 
             // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
@@ -1077,9 +1094,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.ElementType,
                 context.NavigationSource,
                 normalizedQueryParameters);
-
-            // Note: the context.RequestContainer must be set by the ODataQueryOptions constructor.
-            Contract.Assert(context.RequestContainer != null);
 
             if (uriResolver != null)
             {

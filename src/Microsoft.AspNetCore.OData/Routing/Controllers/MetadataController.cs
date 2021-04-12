@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
@@ -22,8 +21,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// Generates the OData $metadata document.
         /// </summary>
         /// <returns>The <see cref="IEdmModel"/> representing $metadata.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
-            Justification = "Property not appropriate")]
+        [HttpGet]
         public IEdmModel GetMetadata()
         {
             return GetModel();
@@ -33,8 +31,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// Generates the OData service document.
         /// </summary>
         /// <returns>The service document for the service.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
-            Justification = "Property not appropriate")]
+        [HttpGet]
         public ODataServiceDocument GetServiceDocument()
         {
             IEdmModel model = GetModel();

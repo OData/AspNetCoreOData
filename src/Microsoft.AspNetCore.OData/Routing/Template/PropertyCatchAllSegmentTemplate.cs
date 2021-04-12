@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
@@ -39,11 +39,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmStructuredType StructuredType { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (context.RouteValues.TryGetValue("property", out object value))
@@ -52,11 +52,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 IEdmProperty edmProperty = StructuredType.FindProperty(rawValue);
                 if (edmProperty != null && edmProperty.PropertyKind == EdmPropertyKind.Structural)
                 {
-                    return new PropertySegment((IEdmStructuralProperty)edmProperty);
+                    context.Segments.Add(new PropertySegment((IEdmStructuralProperty)edmProperty));
+                    return true;
                 }
             }
 
-            return null;
+            return false;
         }
     }
 }

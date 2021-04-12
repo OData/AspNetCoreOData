@@ -8,6 +8,13 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 {
     /// <summary>
     /// Provides the mapping between CLR type and Edm type.
+    /// TODO: 
+    /// 1) How to map the property
+    /// 2) dynamic container
+    /// 3) instance annotation container
+    /// 4) enum member mapping
+    /// 5) Navigation property link builder
+    /// 6) stream entity, stream property edit/read link builder....
     /// </summary>
     public interface IODataTypeMappingProvider
     {

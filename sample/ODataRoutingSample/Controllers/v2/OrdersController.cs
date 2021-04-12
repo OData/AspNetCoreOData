@@ -60,7 +60,7 @@ namespace ODataRoutingSample.Controllers.v2
             return _context.Orders;
         }
 
-        //[HttpGet] // ~/Oders({key})
+        [HttpGet] // ~/Oders({key})
         [EnableQuery]
         public Order Get(int key)
         {
@@ -87,15 +87,36 @@ namespace ODataRoutingSample.Controllers.v2
         }
 
        // [Http] // ~/Oders({key})
+        [HttpPatch]
         public string Patch(int key)
         {
             return $"Patch Order at {key}";
         }
 
+        // http://localhost:5000/v21/Orders(2)/CanMoveToAddress(address={"City":"abc","Street":"fdsfg"})
+        // http://localhost:5000/v21/Orders(2)/CanMoveToAddress(address=@p)?@p={"City":"abc","Street":"fdsfg"}
         [HttpGet]
-        public bool CanMoveToAddress(int key, [FromODataUri] Address address)
+        public IActionResult CanMoveToAddress(int key, [FromODataUri] Address address)
         {
-            return true;
+            if (address == null)
+            {
+                return NotFound("address is null");
+            }
+
+            return Ok(System.Text.Json.JsonSerializer.Serialize(address));
+        }
+
+        // http://localhost:5000/v21/Orders/CanMoveToManyAddress(addresses=[{"City":"abc","Street":"sfg"},{"City":"ab2c","Street":"fdsfg"}])
+        // http://localhost:5000/v21/Orders/CanMoveToManyAddress(addresses=@p)?@p=[{"City":"abc","Street":"sfg"},{"City":"ab2c","Street":"fdsfg"}]
+        [HttpGet]
+        public IActionResult CanMoveToManyAddress([FromODataUri] IEnumerable<Address> addresses)
+        {
+            if (addresses == null)
+            {
+                return NotFound("addresses is null");
+            }
+
+            return Ok(System.Text.Json.JsonSerializer.Serialize(addresses));
         }
 
         [HttpGet]
@@ -135,6 +156,7 @@ namespace ODataRoutingSample.Controllers.v2
             return "PostToCategoryFromUnknowOrder + " + key;
         }
 
+        [HttpPost]
         public string CreateRefToCategory(int key)
         {
             return "CreateRefToCategory";

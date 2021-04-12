@@ -51,11 +51,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationPropertyLinkSegment Segment { get; }
 
         /// <inheritdoc />
-        public override ODataPathSegment Translate(ODataTemplateTranslateContext context)
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             // TODO: maybe save the property name.
             // or create the PropertySegment using the information in the context.
-            return Segment;
+            context?.Segments.Add(Segment);
+            return true;
         }
     }
 }

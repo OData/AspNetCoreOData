@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Logging;
 
 namespace ODataRoutingSample.Controllers
@@ -24,6 +24,8 @@ namespace ODataRoutingSample.Controllers
         }
 
         [HttpGet]
+        [EnableQuery] // it supports odata query: for example, http://localhost:5000/WeatherForecast?$select=TemperatureC
+        // You can get: [{"TemperatureC":3},{"TemperatureC":1},{"TemperatureC":18},{"TemperatureC":48},{"TemperatureC":8}]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();

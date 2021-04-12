@@ -10,6 +10,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -204,13 +205,22 @@ namespace Microsoft.AspNetCore.OData.Edm
             {
                 if (testCollections)
                 {
+                    Type entityType;
+                    if (IsDeltaSetWrapper(clrType, out entityType))
+                    {
+                        IEdmType elementType = GetEdmType(edmModel, entityType, testCollections: false);
+                        if (elementType != null)
+                        {
+                            return new EdmCollectionType(elementType.ToEdmTypeReference(IsNullable(entityType)));
+                        }
+                    }
+
                     Type enumerableOfT = ExtractGenericInterface(clrType, typeof(IEnumerable<>));
                     if (enumerableOfT != null)
                     {
                         Type elementClrType = enumerableOfT.GetGenericArguments()[0];
 
                         // IEnumerable<SelectExpandWrapper<T>> is a collection of T.
-                        Type entityType;
                         if (IsSelectExpandWrapper(elementClrType, out entityType))
                         {
                             elementClrType = entityType;
@@ -417,6 +427,8 @@ namespace Microsoft.AspNetCore.OData.Edm
             Func<Type, bool> matchesInterface = t => TypeHelper.IsGenericType(t) && t.GetGenericTypeDefinition() == interfaceType;
             return matchesInterface(queryType) ? queryType : queryType.GetInterfaces().FirstOrDefault(matchesInterface);
         }
+
+        private static bool IsDeltaSetWrapper(Type type, out Type entityType) => IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
 
         private static bool IsSelectExpandWrapper(Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
 

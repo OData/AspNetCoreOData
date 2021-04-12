@@ -624,7 +624,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
             ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
-            var request = RequestFactory.Create(method: "get", uri: "http://IgnoreMetadataPath", opt => opt.AddModel(model));
+            var request = RequestFactory.Create(method: "Get", uri: "http://IgnoreMetadataPath", opt => opt.AddModel(model));
 
             ODataSerializerContext context = new ODataSerializerContext
             {
@@ -767,7 +767,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             var operationLinkBuilder = new OperationLinkBuilder(functionLinkFactory, followConventions);
             model.SetOperationLinkBuilder(edmFunction, operationLinkBuilder);
 
-            var request = RequestFactory.Create(method: "get", uri: "http://any", opt => opt.AddModel(model));
+            var request = RequestFactory.Create(method: "Get", uri: "http://any", opt => opt.AddModel(model));
             ResourceSetContext resourceSetContext = new ResourceSetContext
             {
                 EntitySetBase = customers,

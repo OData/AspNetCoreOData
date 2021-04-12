@@ -19,6 +19,52 @@ namespace Microsoft.AspNetCore.OData.Edm
     public static class EdmModelAnnotationExtensions
     {
         /// <summary>
+        /// Gets the Org.OData.Core.V1.AcceptableMediaTypes
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="target">The vocabulary annotatable target.</param>
+        /// <returns>null or the collection of media type.</returns>
+        internal static IList<string> GetAcceptableMediaTypes(this IEdmModel model, IEdmVocabularyAnnotatable target)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (target == null)
+            {
+                throw Error.ArgumentNull(nameof(target));
+            }
+
+            IList<string> mediaTypes = null;
+            var annotations = model.FindVocabularyAnnotations<IEdmVocabularyAnnotation>(target, CoreVocabularyModel.AcceptableMediaTypesTerm);
+            IEdmVocabularyAnnotation annotation = annotations.FirstOrDefault();
+            if (annotation != null)
+            {
+                IEdmCollectionExpression properties = annotation.Value as IEdmCollectionExpression;
+                if (properties != null)
+                {
+                    mediaTypes = new List<string>();
+                    foreach (var element in properties.Elements)
+                    {
+                        IEdmStringConstantExpression elementValue = element as IEdmStringConstantExpression;
+                        if (elementValue != null)
+                        {
+                            mediaTypes.Add(elementValue.Value);
+                        }
+                    }
+                }
+            }
+
+            if (mediaTypes == null || mediaTypes.Count == 0)
+            {
+                return null;
+            }
+
+            return mediaTypes;
+        }
+
+        /// <summary>
         /// Get concurrency properties.
         /// </summary>
         /// <param name="model">The Edm model.</param>

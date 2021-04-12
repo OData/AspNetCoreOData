@@ -7,25 +7,32 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 {
     /// <summary>
-    /// Encapsulates an <see cref="ODataResource"/> and the inner nested resource infos.
+    /// Encapsulates an <see cref="ODataResource"/>.
     /// </summary>
-    public sealed class ODataResourceWrapper : ODataItemBase
+    public sealed class ODataResourceWrapper : ODataItemWrapper
     {
         /// <summary>
         /// Initializes a new instance of <see cref="ODataResourceWrapper"/>.
         /// </summary>
-        /// <param name="item">The wrapped item.</param>
-        public ODataResourceWrapper(ODataResource item)
-            : base(item)
+        /// <param name="resource">The wrapped resource item, it could be null.</param>
+        public ODataResourceWrapper(ODataResourceBase resource)
         {
+            Resource = resource;
+
+            IsDeletedResource = resource != null && resource is ODataDeletedResource;
+
             NestedResourceInfos = new List<ODataNestedResourceInfoWrapper>();
-            Resource = item;
         }
 
         /// <summary>
         /// Gets the wrapped <see cref="ODataResource"/>.
         /// </summary>
-        public ODataResource Resource { get; }
+        public ODataResourceBase Resource { get; }
+
+        /// <summary>
+        /// Gets a boolean indicating whether the resource is deleted resource.
+        /// </summary>
+        public bool IsDeletedResource { get; }
 
         /// <summary>
         /// Gets the inner nested resource infos.

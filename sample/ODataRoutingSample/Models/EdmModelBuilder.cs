@@ -51,6 +51,7 @@ namespace ODataRoutingSample.Models
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Organization>("Organizations");
+            builder.EntitySet<Department>("Departments");
             builder.EntitySet<Company>("Companies");
             builder.EntitySet<Customer>("Customers");
             builder.Singleton<Customer>("Me");
@@ -79,6 +80,32 @@ namespace ODataRoutingSample.Models
             productPrice.Parameter<string>("organizationId").Required();
             productPrice.Parameter<string>("partId").Required();
 
+            productPrice = builder.EntityType<Organization>().Collection.
+                Function("GetPrice2").ReturnsCollectionFromEntitySet<Organization>("Organizations");
+            productPrice.Parameter<string>("organizationId").Required();
+            productPrice.Parameter<string>("partId").Required();
+            productPrice.IsComposable = true;
+
+            // Add a composable function
+            var getOrgByAccount =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount")
+                .ReturnsFromEntitySet<Organization>("Organizations");
+            getOrgByAccount.Parameter<int>("accountId").Required();
+            getOrgByAccount.IsComposable = true;
+
+            builder.EntityType<Organization>().Action("MarkAsFavourite");
+
+            // Add another composable function
+            var getOrgByAccount2 =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount2")
+                .ReturnsCollectionFromEntitySet<Organization>("Organizations"); // be noted, it returns collection.
+            getOrgByAccount2.Parameter<int>("accountId").Required();
+            getOrgByAccount2.IsComposable = true;
+
             return builder.GetEdmModel();
         }
 
@@ -92,6 +119,9 @@ namespace ODataRoutingSample.Models
 
             var functionWithComplexTypeParameter = builder.EntityType<Order>().Function("CanMoveToAddress").Returns<bool>();
             functionWithComplexTypeParameter.Parameter<Address>("address");
+
+            var functionWithCollectionComplexTypeParameter = builder.EntityType<Order>().Collection.Function("CanMoveToManyAddress").Returns<bool>();
+            functionWithCollectionComplexTypeParameter.CollectionParameter<Address>("addresses");
 
             // function with optional parameters
             var functionWithOptional = builder.EntityType<Order>().Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");

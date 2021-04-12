@@ -6,6 +6,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -106,6 +109,8 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(services));
             }
 
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>());
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
             services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
@@ -130,8 +135,14 @@ namespace Microsoft.AspNetCore.OData
 
                 // Add the value provider.
                 // options.ValueProviderFactories.Insert(0, new ODataValueProviderFactory());
+            })
+            .AddJsonOptions(options =>
+            {
+                // Add the Select expand and other wrapper converter factory
+                options.JsonSerializerOptions.Converters.Add(new SelectExpandWrapperConverter());
+                options.JsonSerializerOptions.Converters.Add(new PageResultValueConverter());
+                options.JsonSerializerOptions.Converters.Add(new DynamicTypeWrapperConverter());
             });
-
 
             services.AddODataRouting();
 
@@ -154,10 +165,6 @@ namespace Microsoft.AspNetCore.OData
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
-
-            // for debug only
-            //services.TryAddEnumerable(
-            //    ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelDebugProvider>());
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
 

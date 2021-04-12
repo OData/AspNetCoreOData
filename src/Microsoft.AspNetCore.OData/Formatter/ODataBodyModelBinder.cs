@@ -71,6 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             HttpRequest request = bindingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;
             IEdmModel edmModel = request.GetModel();
+            TimeZoneInfo tzi = request.GetTimeZoneInfo();
 
             return new ODataDeserializerContext
             {
@@ -78,7 +79,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Model = edmModel,
                 Request = request,
                 ResourceType = bindingContext.ModelType,
-        //        ResourceEdmType = edmTypeReference,
+                TimeZone = tzi,
+                //        ResourceEdmType = edmTypeReference,
             };
         }
 
@@ -93,12 +95,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             ODataDeserializerContext context = BuildDeserializerContext(bindingContext);
             HttpRequest request = bindingContext.HttpContext.Request;
-
-            var body = request.HttpContext.Features.Get<Http.Features.IHttpBodyControlFeature>();
-            if (body != null)
-            {
-                body.AllowSynchronousIO = true;
-            }
 
             IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(request.Body, request.Headers);

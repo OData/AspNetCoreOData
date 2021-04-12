@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void TranslateNavigationSegmentTemplate_ReturnsODataNavigationSegment()
+        public void TryTranslateNavigationSegmentTemplate_ReturnsODataNavigationSegment()
         {
             // Arrange
             EdmEntityType employee = new EdmEntityType("NS", "Employee");
@@ -64,10 +64,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
-            ODataPathSegment actual = navigationSegment.Translate(context);
+            bool ok = navigationSegment.TryTranslate(context);
 
             // Assert
-            Assert.NotNull(actual);
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
             NavigationPropertySegment navSegment = Assert.IsType<NavigationPropertySegment>(actual);
             Assert.Same(navigation, navSegment.NavigationProperty);
             Assert.Null(navSegment.NavigationSource);

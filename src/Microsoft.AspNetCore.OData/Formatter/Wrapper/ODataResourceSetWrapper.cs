@@ -7,19 +7,18 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 {
     /// <summary>
-    /// Encapsulates an <see cref="ODataResourceSet"/> and the <see cref="ODataResource"/>'s that are part of it.
+    /// Encapsulates an <see cref="ODataResourceSet"/>.
     /// </summary>
-    public sealed class ODataResourceSetWrapper : ODataItemBase
+    public sealed class ODataResourceSetWrapper : ODataResourceSetBaseWrapper
     {
         /// <summary>
         /// Initializes a new instance of <see cref="ODataResourceSetWrapper"/>.
         /// </summary>
-        /// <param name="item">The wrapped item.</param>
-        public ODataResourceSetWrapper(ODataResourceSet item)
-            : base(item)
+        /// <param name="resourceSet">The wrapped resource set item.</param>
+        public ODataResourceSetWrapper(ODataResourceSet resourceSet)
         {
             Resources = new List<ODataResourceWrapper>();
-            ResourceSet = item;
+            ResourceSet = resourceSet;
         }
 
         /// <summary>
@@ -29,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 
         /// <summary>
         /// Gets the nested resources of this ResourceSet.
+        /// Resource set only contains resources.
         /// </summary>
         public IList<ODataResourceWrapper> Resources { get; }
     }

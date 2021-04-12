@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -190,7 +191,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             // Add version header.
-            response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(request.GetODataResponseVersion());
+            response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(request.GetODataVersion());
         }
 
         /// <inheritdoc/>
@@ -216,6 +217,15 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             HttpResponse response = context.HttpContext.Response;
+            if (typeof(Stream).IsAssignableFrom(type))
+            {
+                // Ideally, it should go into the "ODataRawValueSerializer"
+                // However, OData lib doesn't provide the method to overwrite/copyto stream
+                // So, Here's the workaround
+                Stream objStream = context.Object as Stream;
+                return CopyStreamAsync(objStream, response);
+            }
+
             Uri baseAddress = GetBaseAddressInternal(request);
             MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
@@ -225,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 type,
                 context.Object,
                 request.GetModel(),
-                request.GetODataResponseVersion(),
+                request.GetODataVersion(),
                 baseAddress,
                 contentType,
                 request,
@@ -391,6 +401,16 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return null;
+        }
+
+        private static async Task CopyStreamAsync(Stream source, HttpResponse response)
+        {
+            if (source != null)
+            {
+                await source.CopyToAsync(response.Body).ConfigureAwait(false);
+            }
+
+            await response.Body.FlushAsync().ConfigureAwait(false);
         }
     }
 }

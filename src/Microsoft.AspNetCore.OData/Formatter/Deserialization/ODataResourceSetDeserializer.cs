@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEnumerable result = ReadResourceSet(resourceSet, elementType, readContext);
             if (result != null && elementType.IsComplex())
             {
-                if (readContext.IsUntyped)
+                if (readContext.IsNoClrType)
                 {
                     EdmComplexObjectCollection complexCollection = new EdmComplexObjectCollection(edmType.AsCollection());
                     foreach (EdmComplexObject complexObject in result)

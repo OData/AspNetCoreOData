@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (controller == null)
             {
-                throw new ArgumentNullException(nameof(controller));
+                throw Error.ArgumentNull(nameof(controller));
             }
 
             return controller.Attributes.Any(a => a is NonODataControllerAttribute);
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (controller == null)
             {
-                throw new ArgumentNullException(nameof(controller));
+                throw Error.ArgumentNull(nameof(controller));
             }
 
             return controller.Attributes.Any(a => a is T);
@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (controller == null)
             {
-                throw new ArgumentNullException(nameof(controller));
+                throw Error.ArgumentNull(nameof(controller));
             }
 
             return controller.Attributes.OfType<T>().FirstOrDefault();
