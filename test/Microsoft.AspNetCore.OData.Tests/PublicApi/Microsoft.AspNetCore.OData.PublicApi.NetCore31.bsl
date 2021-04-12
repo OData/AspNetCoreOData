@@ -135,6 +135,15 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider 
 	System.Type MapTo (System.Type clrType)
 }
 
+[
+AttributeUsageAttribute(),
+]
+public class Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute : Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute, IActionFilter, IAsyncActionFilter, IAsyncResultFilter, IFilterMetadata, IOrderedFilter, IResultFilter {
+	public ETagActionFilterAttribute ()
+
+	public virtual void OnActionExecuted (Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext)
+}
+
 public class Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope {
 	public HttpRequestScope ()
 

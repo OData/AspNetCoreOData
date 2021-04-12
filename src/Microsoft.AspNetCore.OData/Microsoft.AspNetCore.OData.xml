@@ -60,6 +60,15 @@
             Gets the services collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute">
+            <summary>
+            Defines a <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute"/> to add an ETag header value to an OData response when the response
+            is a single resource that has an ETag defined.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope">
             <summary>
             Provides access to the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest"/>
