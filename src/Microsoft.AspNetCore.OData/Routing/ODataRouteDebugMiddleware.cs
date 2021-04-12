@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
-        internal async Task HandleJsonEndpointsAsync(HttpContext context)
+        internal static async Task HandleJsonEndpointsAsync(HttpContext context)
         {
             if (context == null)
             {
@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
-        internal async Task HandleEndpointsAsync(HttpContext context)
+        internal static async Task HandleEndpointsAsync(HttpContext context)
         {
             if (context == null)
             {

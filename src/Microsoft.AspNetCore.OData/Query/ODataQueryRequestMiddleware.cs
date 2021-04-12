@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         /// <param name="parser">The query request parser.</param>
         /// <param name="request">The Http request.</param>
-        internal async Task TransformQueryRequestAsync(IODataQueryRequestParser parser, HttpRequest request)
+        internal static async Task TransformQueryRequestAsync(IODataQueryRequestParser parser, HttpRequest request)
         {
             if (request == null)
             {
