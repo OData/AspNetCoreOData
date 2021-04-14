@@ -1,0 +1,79 @@
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
+{
+    public abstract class OrderedItem
+    {
+        public int ExpectedOrder { get; set; }
+    }
+
+    public class Item : OrderedItem
+    {
+        [Key]
+        [Column(Order = 2)]
+        public int A { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        public int C { get; set; }
+
+        [Key]
+        [Column(Order = 3)]
+        public int B { get; set; }
+    }
+
+    public class Item2 : OrderedItem
+    {
+        [Key]
+        [Column(Order = 3)]
+        public string A { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        public string C { get; set; }
+
+        [Key]
+        [Column(Order = 2)]
+        public int B { get; set; }
+    }
+
+    public class ItemWithEnum : OrderedItem
+    {
+        [Key]
+        [Column(Order = 3)]
+        public SmallNumber A { get; set; }
+
+        [Key]
+        [Column(Order = 2)]
+        public string B { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        public SmallNumber C { get; set; }
+    }
+
+    public class ItemWithoutColumn : OrderedItem
+    {
+        [Key]
+        public int C { get; set; }
+
+        [Key]
+        public int B { get; set; }
+
+        [Key]
+        public int A { get; set; }
+    }
+
+    public enum SmallNumber
+    {
+        One,
+        Two,
+        Three,
+        Four
+    }
+}
+
