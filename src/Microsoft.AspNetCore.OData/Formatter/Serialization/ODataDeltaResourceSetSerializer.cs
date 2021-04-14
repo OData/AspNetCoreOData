@@ -63,18 +63,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataWriter writer = await messageWriter.CreateODataDeltaResourceSetWriterAsync(entitySet, entityType.EntityDefinition())
                 .ConfigureAwait(false);
 
-            await WriteDeltaResourceSetInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
+            await WriteObjectInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Writes the given object specified by the parameter graph as a part of an existing OData message using the given
-        /// messageWriter and the writeContext.
-        /// </summary>
-        /// <param name="graph">The object to be written.</param>
-        /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-        /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
-        /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaResourceSetInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        /// <inheritdoc />
+        public override async Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -104,10 +97,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            await WriteFeedAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
+            await WriteDeltaResourceSetAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
         }
 
-        private async Task WriteFeedAsync(IEnumerable enumerable, IEdmTypeReference feedType, ODataWriter writer,
+        private async Task WriteDeltaResourceSetAsync(IEnumerable enumerable, IEdmTypeReference feedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             Contract.Assert(writer != null);
@@ -387,29 +380,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataResourceSetSerializer).Name, feedType.FullName());
+            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataDeltaResourceSetSerializer).Name, feedType.FullName());
             throw new SerializationException(message);
-        }
-
-        /// <summary>
-        /// Safely returns the specified string as a relative or absolute Uri.
-        /// </summary>
-        /// <param name="uriString">The string to convert to a Uri.</param>
-        /// <returns>The string as a Uri.</returns>
-        internal static Uri StringToUri(string uriString)
-        {
-            Uri uri;
-            try
-            {
-                uri = new Uri(uriString, UriKind.RelativeOrAbsolute);
-            }
-            catch (FormatException)
-            {
-                // The Uri constructor throws a format exception if it can't figure out the type of Uri
-                uri = new Uri(uriString, UriKind.Relative);
-            }
-
-            return uri;
         }
     }
 }

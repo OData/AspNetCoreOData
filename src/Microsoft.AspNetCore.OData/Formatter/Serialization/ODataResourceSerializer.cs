@@ -232,7 +232,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmProperty.Type.IsCollection())
                 {
                     ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                    await serializer.WriteDeltaResourceSetInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                    await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
                         .ConfigureAwait(false);
                 }
                 else
