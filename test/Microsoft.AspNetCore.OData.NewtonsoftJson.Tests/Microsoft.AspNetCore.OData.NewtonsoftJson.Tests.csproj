@@ -20,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj" />
   </ItemGroup>

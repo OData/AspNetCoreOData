@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
         /// <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            if (objectType == null)
+            if (objectType is null)
             {
                 throw new ArgumentNullException(nameof(objectType));
             }
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
             SingleResult singleResult = value as SingleResult;
             if (singleResult != null)
             {
-                // TODO: make sure the implementation is correct?
+                // TODO: make sure the implementation (to get the first object) is correct?
                 var singleObject = singleResult.Queryable.Cast<object>().FirstOrDefault();
                 if (singleObject is not null)
                 {

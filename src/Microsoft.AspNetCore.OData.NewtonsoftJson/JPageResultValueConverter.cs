@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Represents a custom <see cref="JsonConverter"/> to serialize <see cref="PageResult"/> instances to JSON.
     /// </summary>
-    public class JPageResultNewtonsoftConverter : JsonConverter
+    public class JPageResultValueConverter : JsonConverter
     {
         /// <summary>
         /// Determines whether this instance can convert the specified <see cref="PageResult"/> type.
@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
         /// <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            if (objectType == null)
+            if (objectType is null)
             {
                 throw new ArgumentNullException(nameof(objectType));
             }

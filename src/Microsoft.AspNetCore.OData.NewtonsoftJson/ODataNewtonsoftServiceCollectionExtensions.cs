@@ -46,12 +46,12 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
         public static IODataBuilder AddNewtonsoftJson(this IODataBuilder builder, Action<MvcNewtonsoftJsonOptions> setupAction,
             Func<IEdmModel, IEdmStructuredType, IPropertyMapper> mapperProvider)
         {
-            if (builder == null)
+            if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            if (setupAction == null)
+            if (setupAction is null)
             {
                 throw new ArgumentNullException(nameof(setupAction));
             }
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
             {
                 setupAction(opt);
 
-                if (mapperProvider == null)
+                if (mapperProvider is null)
                 {
                     opt.SerializerSettings.Converters.Add(new JSelectExpandWrapperConverter());
                 }
@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
                 }
 
                 opt.SerializerSettings.Converters.Add(new JDynamicTypeWrapperConverter());
-                opt.SerializerSettings.Converters.Add(new JPageResultNewtonsoftConverter());
+                opt.SerializerSettings.Converters.Add(new JPageResultValueConverter());
                 opt.SerializerSettings.Converters.Add(new JSingleResultValueConverter());
             };
 

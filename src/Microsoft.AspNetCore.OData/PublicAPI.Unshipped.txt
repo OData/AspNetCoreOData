@@ -21,6 +21,7 @@ abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.I
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption) -> System.Linq.IQueryable<T>
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.GenerateNextPageLink(System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Uri
 abstract Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.Values.get -> System.Collections.Generic.Dictionary<string, object>
+abstract Microsoft.AspNetCore.OData.Results.PageResult.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.Order.get -> int
@@ -1485,6 +1486,7 @@ override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Mic
 override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValuePropertyAccessNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
 override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.UnaryOperatorNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
 override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNetCore.OData.Results.PageResult<T>.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 override Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool

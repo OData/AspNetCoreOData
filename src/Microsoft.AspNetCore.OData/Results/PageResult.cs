@@ -37,11 +37,7 @@ namespace Microsoft.AspNetCore.OData.Results
         /// Gets the link for the next page of items in the feed.
         /// </summary>
         [DataMember]
-        public Uri NextPageLink
-        {
-            get;
-            private set;
-        }
+        public Uri NextPageLink { get; }
 
         /// <summary>
         /// Gets the total count of items in the feed.
