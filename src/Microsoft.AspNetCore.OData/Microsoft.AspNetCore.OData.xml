@@ -11055,6 +11055,12 @@
             Gets the total count of items in the feed.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult.ToDictionary">
+            <summary>
+            Projects the result to a <see cref="T:System.Collections.Generic.IDictionary`2" />.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IDictionary`2"/> representing the page result.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.PageResult`1">
             <summary>Represents a feed of entities that includes additional information that OData formats support.</summary>
             <remarks>
@@ -11089,6 +11095,12 @@
             Returns an enumerator that iterates through a collection.
             </summary>
             <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult`1.ToDictionary">
+            <summary>
+            Projects the result to a <see cref="T:System.Collections.Generic.IDictionary`2" />.
+            </summary>
+            <returns>An <see cref="T:System.Collections.Generic.IDictionary`2"/> representing the page result.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.PageResultValueConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
             <summary>

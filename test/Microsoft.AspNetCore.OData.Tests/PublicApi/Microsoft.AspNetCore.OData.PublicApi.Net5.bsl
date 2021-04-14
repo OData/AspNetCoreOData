@@ -1564,6 +1564,8 @@ public abstract class Microsoft.AspNetCore.OData.Results.PageResult {
 	DataMemberAttribute(),
 	]
 	System.Uri NextPageLink  { public get; }
+
+	public abstract System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
 }
 
 public abstract class Microsoft.AspNetCore.OData.Results.SingleResult {
@@ -1598,6 +1600,7 @@ public class Microsoft.AspNetCore.OData.Results.PageResult`1 : Microsoft.AspNetC
 
 	public virtual IEnumerator`1 GetEnumerator ()
 	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
 }
 
 public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {

@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31025.218
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7CF7AD39-D87E-4A17-B456-153F9EB8A096}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{93A485D5-58C4-40A1-B6E2-8EC4B8C85EE5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{CF12F50D-E612-4F0F-A85B-267487CAF0AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.NewtonsoftJson", "src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj", "{3044C3A0-9B45-47E6-B947-826E93828640}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData", "src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj", "{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.NewtonsoftJson.Tests", "test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj", "{02D57D20-FFAE-4089-A6D9-79E1B9B849BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataNewtonsoftJsonSample", "sample\ODataNewtonsoftJsonSample\ODataNewtonsoftJsonSample.csproj", "{ECEF87F8-A186-415E-A075-86A878B6CC5B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3044C3A0-9B45-47E6-B947-826E93828640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3044C3A0-9B45-47E6-B947-826E93828640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3044C3A0-9B45-47E6-B947-826E93828640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3044C3A0-9B45-47E6-B947-826E93828640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D57D20-FFAE-4089-A6D9-79E1B9B849BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D57D20-FFAE-4089-A6D9-79E1B9B849BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D57D20-FFAE-4089-A6D9-79E1B9B849BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D57D20-FFAE-4089-A6D9-79E1B9B849BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEF87F8-A186-415E-A075-86A878B6CC5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECEF87F8-A186-415E-A075-86A878B6CC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECEF87F8-A186-415E-A075-86A878B6CC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECEF87F8-A186-415E-A075-86A878B6CC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3044C3A0-9B45-47E6-B947-826E93828640} = {7CF7AD39-D87E-4A17-B456-153F9EB8A096}
+		{65F17B4F-A5E0-44CD-9C3D-5DC926C49D8E} = {7CF7AD39-D87E-4A17-B456-153F9EB8A096}
+		{02D57D20-FFAE-4089-A6D9-79E1B9B849BC} = {93A485D5-58C4-40A1-B6E2-8EC4B8C85EE5}
+		{ECEF87F8-A186-415E-A075-86A878B6CC5B} = {CF12F50D-E612-4F0F-A85B-267487CAF0AA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {03416544-8E51-4754-8E5D-2E7F0F39E678}
+	EndGlobalSection
+EndGlobal
