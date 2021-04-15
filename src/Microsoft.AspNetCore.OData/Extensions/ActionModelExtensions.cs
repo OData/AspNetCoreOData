@@ -149,6 +149,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(path));
             }
 
+            // if the controller has attribute route decorated, for example:
+            // [Route("api/[controller]")]
+            // public class CustomersController : Controller
+            // {}
+            // let's always create new selector model for action.
+            // Since the new created selector model is absolute attribute route, tthe controller attribute route doesn't apply to this selector model.
+            bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
+
             // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,
             // It will throw "An item with the same key has already been added. Key: GET", in
             // HttpMethodMatcherPolicy.BuildJumpTable(Int32 exitDestination, IReadOnlyList`1 edges)
@@ -161,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // No matter whether the action selector model is absolute route template, the controller's attribute will apply automatically
                 // So, let's only create/update the action selector model
                 SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-                if (selectorModel == null)
+                if (hasAttributeRouteOnController || selectorModel == null)
                 {
                     // Create a new selector model.
                     selectorModel = CreateSelectorModel(action, methods);
