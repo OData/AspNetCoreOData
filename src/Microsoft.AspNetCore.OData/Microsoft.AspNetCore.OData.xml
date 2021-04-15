@@ -4219,12 +4219,12 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataDeltaResourceSet"/> object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeletedResourceAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeltaDeletedResourceAsync(System.Object,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
             </summary>
-            <param name="graph">The object to be written.</param>
+            <param name="value">The object to be written.</param>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
@@ -4233,7 +4233,7 @@
             Writes the given deltaDeletedLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
             </summary>
-            <param name="graph">The object to be written.</param>
+            <param name="value">The object to be written.</param>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
@@ -4242,7 +4242,7 @@
             Writes the given deltaLink specified by the parameter graph as a part of an existing OData message using the given
             messageWriter and the writeContext.
             </summary>
-            <param name="graph">The object to be written.</param>
+            <param name="value">The object to be written.</param>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>

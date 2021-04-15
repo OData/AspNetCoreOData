@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -109,6 +110,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else if (TypeHelper.IsTypeAssignableFrom(typeof(IEdmModel), type))
             {
                 return _serviceProvider.GetRequiredService<ODataMetadataSerializer>();
+            }
+            else if (typeof(DeltaSet).IsAssignableFrom(type))
+            {
+                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
             }
 
             IEdmModel model = request.GetModel();
