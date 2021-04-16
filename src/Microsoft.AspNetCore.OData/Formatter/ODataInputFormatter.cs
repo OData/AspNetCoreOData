@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Runtime.ExceptionServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -241,10 +242,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ILogger logger = context.RequestServices.GetService<ILogger>();
             if (logger == null)
             {
-                throw ex;
+                ExceptionDispatchInfo.Capture(ex).Throw();
             }
 
-            logger.LogError(ex, String.Empty);
+            logger.LogError(ex, string.Empty);
         }
 
         /// <summary>

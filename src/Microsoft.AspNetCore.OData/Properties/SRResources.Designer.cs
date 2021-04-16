@@ -1276,6 +1276,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value cannot be converted to type {0}..
+        /// </summary>
+        internal static string PropertyCannotBeConverted {
+            get {
+                return ResourceManager.GetString("PropertyCannotBeConverted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of the property &apos;{1}&apos; on type &apos;{2}&apos; must be a collection..
         /// </summary>
         internal static string PropertyIsNotCollection {
@@ -1371,6 +1380,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string PropertyOrPathWasRemovedFromContext {
             get {
                 return ResourceManager.GetString("PropertyOrPathWasRemovedFromContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value has a value that is out of range of type {0}..
+        /// </summary>
+        internal static string PropertyTypeOverflow {
+            get {
+                return ResourceManager.GetString("PropertyTypeOverflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value has a format that is not recognized by type {0}..
+        /// </summary>
+        internal static string PropertyUnrecognizedFormat {
+            get {
+                return ResourceManager.GetString("PropertyUnrecognizedFormat", resourceCulture);
             }
         }
         

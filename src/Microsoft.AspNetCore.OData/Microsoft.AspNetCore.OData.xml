@@ -6872,6 +6872,11 @@
               Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; must be a collection..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyCannotBeConverted">
+            <summary>
+              Looks up a localized string similar to The value cannot be converted to type {0}..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyIsNotCollection">
             <summary>
               Looks up a localized string similar to The type &apos;{0}&apos; of the property &apos;{1}&apos; on type &apos;{2}&apos; must be a collection..
@@ -6925,6 +6930,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyOrPathWasRemovedFromContext">
             <summary>
               Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyTypeOverflow">
+            <summary>
+              Looks up a localized string similar to The value has a value that is out of range of type {0}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyUnrecognizedFormat">
+            <summary>
+              Looks up a localized string similar to The value has a format that is not recognized by type {0}..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.QueryCannotBeEmpty">
