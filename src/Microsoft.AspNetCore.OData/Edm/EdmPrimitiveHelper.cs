@@ -124,11 +124,24 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else
                 {
-                    Contract.Assert(type == typeof(uint) || type == typeof(ushort) || type == typeof(ulong));
-
-                    // Note that we are not casting the return value to nullable<T> as even if we do it
-                    // CLR would unbox it back to T.
-                    return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
+                    try
+                    {
+                        // Note that we are not casting the return value to nullable<T> as even if we do it
+                        // CLR would unbox it back to T.
+                        return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, type));
+                    }
+                    catch (FormatException)
+                    {
+                        throw new ValidationException(Error.Format(SRResources.PropertyUnrecognizedFormat, type));
+                    }
+                    catch (OverflowException)
+                    {
+                        throw new ValidationException(Error.Format(SRResources.PropertyTypeOverflow, type));
+                    }
                 }
             }
         }
