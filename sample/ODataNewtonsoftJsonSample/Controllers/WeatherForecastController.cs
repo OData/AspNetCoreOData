@@ -29,7 +29,15 @@ namespace ODataNewtonsoftJsonSample.Controllers
             _options = options;
         }
 
-        // For example: http://localhost:12197/weatherforecast?$select=TemperatureC
+        // For example: http://localhost:12197/weatherforecast?$select=TemperatureC  (IIS)
+        // For example: http://localhost:5000/weatherforecast?$select=TemperatureC  (Non-IIS)
+        // Be noted: since we register "WeatherForecast" as one entity set name.
+        // OData conventional routing will build a new route for this method.
+        // If you send "$odata" request, you will see this method has three routes:
+        // 1) ~/odata/WeatherForecast
+        // 2) ~/odata/WeatherForecast/$count
+        // 3) ~/WeatherForecast
+        // Try it and you will get different payload.
         [HttpGet]
         [EnableQuery]
         public IEnumerable<WeatherForecast> Get()

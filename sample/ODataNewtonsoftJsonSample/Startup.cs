@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.OData.NewtonsoftJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace ODataNewtonsoftJsonSample
 {
@@ -25,7 +27,7 @@ namespace ODataNewtonsoftJsonSample
         {
             services.AddControllers();
 
-            services.AddOData(opt => opt.Select().Filter()).AddNewtonsoftJson(
+            services.AddOData(opt => opt.Select().Filter().AddModel("odata", GetEdmModel())).AddNewtonsoftJson(
                 options =>
                 {
                     options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
@@ -56,6 +58,14 @@ namespace ODataNewtonsoftJsonSample
             {
                 endpoints.MapControllers();
             });
+        }
+
+        IEdmModel GetEdmModel()
+        {
+            var odataBuilder = new ODataConventionModelBuilder();
+
+            odataBuilder.EntitySet<WeatherForecast>(nameof(WeatherForecast));
+            return odataBuilder.GetEdmModel();
         }
     }
 }
