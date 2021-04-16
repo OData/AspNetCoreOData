@@ -10,7 +10,7 @@ ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstu
 This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0-preview) is a server side library built upon ODataLib and ASP.NET Core.
 
-Blogs:
+**Blogs**:
 
 * [Attribute Routing in ASP.NET Core OData 8.0 RC](https://devblogs.microsoft.com/odata/attribute-routing-in-asp-net-core-odata-8-0-rc/)
 
@@ -19,7 +19,7 @@ Blogs:
 * [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
 
 
-Example:
+**Example**:
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/master/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
   
    - **`~/$odata`** gives a static routing table page of the service
@@ -28,7 +28,16 @@ Example:
  
    - Append **`~/$openapi`** to each route gives a raw openapi OData page, for example, **`~/v1/$openapi`**
    
+   Please go to [sample](./sample) folder see more samples.
    
+ **Solution**:
+ * [AspNetCoreOData.sln](AspNetCoreOData.sln):
+ 
+   - Includes **Microsoft.AspNetCore.OData** project, Unit Test, E2E Test & Samples
+   
+ * [AspNetCoreOData.NewtonsoftJson.sln](AspNetCoreOData.NewtonsoftJson.sln)
+ 
+   - Includes **Microsoft.AspNetCore.OData.NewtonsoftJson** project, Unit Test, E2E Test & Samples
 	
 ## 2. Basic Usage
 
