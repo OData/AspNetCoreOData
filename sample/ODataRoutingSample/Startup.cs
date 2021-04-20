@@ -59,6 +59,7 @@ namespace ODataRoutingSample
                 .AddModel("v1", model1)
                 .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
                 //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
+                .Conventions.Add(new MyConvention())
                 );
 
             services.AddSwaggerGen();

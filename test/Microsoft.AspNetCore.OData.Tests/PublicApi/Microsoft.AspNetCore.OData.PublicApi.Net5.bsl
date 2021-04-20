@@ -30,11 +30,6 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddConvention (Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder)
-
-	[
-	ExtensionAttribute(),
-	]
 	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
 
 	[
@@ -57,6 +52,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public ODataOptions ()
 
 	System.Func`1[[Microsoft.OData.IContainerBuilder]] BuilderFactory  { public get; public set; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention]] Conventions  { public get; }
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableCount  { public get; public set; }
@@ -91,6 +87,12 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions SetTimeZoneInfo (System.TimeZoneInfo timeZoneInfo)
 	public Microsoft.AspNetCore.OData.ODataOptions SetUrlKeyDelimiter (Microsoft.OData.ODataUrlKeyDelimiter keyDelimiter)
 	public Microsoft.AspNetCore.OData.ODataOptions SkipToken ()
+}
+
+public class Microsoft.AspNetCore.OData.ODataOptionsSetup : IConfigureOptions`1 {
+	public ODataOptionsSetup (Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser parser)
+
+	public virtual void Configure (Microsoft.AspNetCore.OData.ODataOptions options)
 }
 
 public interface Microsoft.AspNetCore.OData.Abstracts.IETagHandler {

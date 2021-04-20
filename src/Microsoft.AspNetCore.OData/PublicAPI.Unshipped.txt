@@ -668,6 +668,7 @@ Microsoft.AspNetCore.OData.ODataOptions.AddModel(string prefix, Microsoft.OData.
 Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.get -> System.Func<Microsoft.OData.IContainerBuilder>
 Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.ConfigureRoute(System.Action<Microsoft.AspNetCore.OData.Routing.ODataRouteOptions> configureAction) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.Conventions.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention>
 Microsoft.AspNetCore.OData.ODataOptions.Count() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.set -> void
@@ -708,6 +709,9 @@ Microsoft.AspNetCore.OData.ODataOptions.TimeZone.get -> System.TimeZoneInfo
 Microsoft.AspNetCore.OData.ODataOptions.TimeZone.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter.get -> Microsoft.OData.ODataUrlKeyDelimiter
 Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter.set -> void
+Microsoft.AspNetCore.OData.ODataOptionsSetup
+Microsoft.AspNetCore.OData.ODataOptionsSetup.Configure(Microsoft.AspNetCore.OData.ODataOptions options) -> void
+Microsoft.AspNetCore.OData.ODataOptionsSetup.ODataOptionsSetup(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser parser) -> void
 Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions
 Microsoft.AspNetCore.OData.ODataUriFunctions
 Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators
@@ -1728,7 +1732,6 @@ static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataBatc
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataQueryRequest(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
-static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddConvention<T>(this Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder

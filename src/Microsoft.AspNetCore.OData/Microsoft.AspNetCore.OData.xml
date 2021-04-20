@@ -5936,6 +5936,11 @@
             <param name="timeZoneInfo">The <see cref="T:System.TimeZoneInfo"/></param>
             <returns>The calling itself.</returns>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Conventions">
+            <summary>
+            Gets the routing conventions.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions">
             <summary>
             Configure the route options.
@@ -6101,6 +6106,24 @@
             <param name="setupAction">The setup config.</param>
             <returns>The built service provider.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataOptionsSetup">
+            <summary>
+            Sets up default options for <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptionsSetup.#ctor(Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.ODataOptionsSetup" /> class.
+            </summary>
+            <param name="loggerFactory">The logger factory.</param>
+            <param name="parser">The OData path template parser.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptionsSetup.Configure(Microsoft.AspNetCore.OData.ODataOptions)">
+            <summary>
+            Configure the default <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/>
+            </summary>
+            <param name="options"></param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
             <summary>
             Provides extension methods to add OData services.
@@ -6130,27 +6153,12 @@
             <param name="setupAction">The OData options to configure the services with.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddConvention``1(Microsoft.AspNetCore.OData.Abstracts.IODataBuilder)">
-            <summary>
-            Adds OData routing convention.
-            </summary>
-            <typeparam name="T">The routing convention type.</typeparam>
-            <param name="builder">The OData service builder.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataCore(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Adds the core OData services required for OData requests, excluding the <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> configuration.
             </summary>
             <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataRouting(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            Adds the core odata routing services.
-            </summary>
-            <param name="services">The service collection.</param>
-            <returns>The IODataBuilder itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataUriFunctions">
             <summary>
@@ -12057,11 +12065,10 @@
             Builds or modifies <see cref="T:Microsoft.AspNetCore.Mvc.ApplicationModels.ApplicationModel" /> for OData convention action discovery.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(System.Collections.Generic.IEnumerable{Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention},Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.ODataOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.#ctor(Microsoft.Extensions.Options.IOptions{Microsoft.AspNetCore.OData.ODataOptions})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider" /> class.
             </summary>
-            <param name="conventions">The registered OData routing conventions.</param>
             <param name="options">The registered OData options.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider.Order">

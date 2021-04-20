@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +34,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             var services = new ServiceCollection();
+            services.AddLogging();
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
@@ -57,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             var services = new ServiceCollection();
+            services.AddLogging();
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             services.AddSingleton(_ => coreModel);
@@ -81,12 +82,12 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(model.Value.Item2);
         }
 
+        /*
         [Fact]
         public void AddConvention_RegistersODataRoutingConvention()
         {
             // Arrange
             var services = new ServiceCollection();
-            IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
             services.AddLogging();
@@ -102,6 +103,28 @@ namespace Microsoft.AspNetCore.OData.Tests
 
             Assert.IsType<MyConvention>(registeredConvention);
         }
+
+        [Fact]
+        public void ReplaceConventions_ReplaceBuiltInRoutingConvention()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            // Act
+            services.AddLogging();
+            services.AddOData().ReplaceConventions(typeof(MyConvention), typeof(MetadataRoutingConvention));
+
+            IServiceProvider provider = services.BuildServiceProvider();
+
+            // Assert
+            IODataControllerActionConvention[] conventions = provider.GetServices<IODataControllerActionConvention>().ToArray();
+            Assert.NotNull(conventions);
+
+            Assert.Equal(2, conventions.Length);
+            Assert.IsType<MyConvention>(conventions[0]);
+            Assert.IsType<MetadataRoutingConvention>(conventions[1]);
+        }
+        */
     }
 
     public class MyConvention : IODataControllerActionConvention

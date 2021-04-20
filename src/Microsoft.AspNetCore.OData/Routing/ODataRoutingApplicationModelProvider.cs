@@ -19,21 +19,17 @@ namespace Microsoft.AspNetCore.OData.Routing
     internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
         private readonly IODataControllerActionConvention[] _controllerActionConventions;
-        private readonly IEnumerable<IODataControllerActionConvention> _conventions;
         private readonly ODataOptions _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataRoutingApplicationModelProvider" /> class.
         /// </summary>
-        /// <param name="conventions">The registered OData routing conventions.</param>
         /// <param name="options">The registered OData options.</param>
-        public ODataRoutingApplicationModelProvider(
-            IEnumerable<IODataControllerActionConvention> conventions,
-            IOptions<ODataOptions> options)
+        public ODataRoutingApplicationModelProvider(IOptions<ODataOptions> options)
         {
-            _conventions = conventions;
             _options = options.Value;
-            _controllerActionConventions = conventions.Where(c => c.GetType() != typeof(AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
+            _controllerActionConventions = _options.Conventions
+                .Where(c => c.GetType() != typeof(AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
         }
 
         /// <summary>
@@ -125,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="controllers">The controller models</param>
         internal void ApplyAttributeRouting(IList<ControllerModel> controllers)
         {
-            AttributeRoutingConvention attributeRouting = _conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
+            AttributeRoutingConvention attributeRouting = _options.Conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
             if (attributeRouting == null)
             {
                 return;

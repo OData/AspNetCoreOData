@@ -38,8 +38,8 @@ namespace ODataCustomizedSample
                     .AddModel("odata", model2)
                     .AddModel("v{version}", model1)
                     .AddModel("convention", model3)
-                    .AddModel("explicit", model4))
-                .AddConvention<MyEntitySetRoutingConvention>();
+                    .AddModel("explicit", model4)
+                    .Conventions.Add(new MyEntitySetRoutingConvention()));
 
             services.AddSwaggerGen();
         }

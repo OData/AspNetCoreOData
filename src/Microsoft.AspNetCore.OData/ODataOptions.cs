@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -110,6 +111,11 @@ namespace Microsoft.AspNetCore.OData
             TimeZone = timeZoneInfo;
             return this;
         }
+
+        /// <summary>
+        /// Gets the routing conventions.
+        /// </summary>
+        public IList<IODataControllerActionConvention> Conventions { get; } = new List<IODataControllerActionConvention>();
 
         /// <summary>
         /// Configure the route options.
