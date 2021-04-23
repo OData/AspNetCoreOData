@@ -111,6 +111,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public string RawValue { get; private set; }
 
         /// <summary>
+        ///  Indicates that filtering is handled by the user and should not be applied. 
+        /// </summary>
+        public bool IsHandledByUser { get; set; }
+
+        /// <summary>
         /// Apply the filter query to the given IQueryable.
         /// </summary>
         /// <remarks>
@@ -126,6 +131,12 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 throw Error.ArgumentNull("query");
             }
+
+            if(IsHandledByUser)
+            {
+                return query;
+            }
+
             if (querySettings == null)
             {
                 throw Error.ArgumentNull("querySettings");
@@ -143,6 +154,21 @@ namespace Microsoft.AspNetCore.OData.Query
             Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
             query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
             return query;
+        }
+
+        ///<summary>
+        ///Builds expression that may be passed as a predicate LINQ Where method and filter values.
+        ///</summary>
+        public Expression<Func<TEnt, bool>> GetFilterExpression<TEnt>(ODataQuerySettings querySettings)
+        {
+            FilterClause filterClause = FilterClause;
+            Contract.Assert(filterClause != null);
+
+            var filterExpression = FilterBinder.BindFilterClause(Context.GetFilterBinder(querySettings), 
+                                                                 filterClause, 
+                                                                 typeof(TEnt));
+            
+            return (Expression<Func<TEnt, bool>>)filterExpression;         
         }
 
         /// <summary>
