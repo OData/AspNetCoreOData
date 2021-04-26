@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
 
             services.ConfigureControllers(typeof(FilesController));
 
-            services.AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
+            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
                 .AddModel("convention", DateTimeOffsetEdmModel.GetConventionModel())
                 .AddModel("explicit", DateTimeOffsetEdmModel.GetExplicitModel()));
         }

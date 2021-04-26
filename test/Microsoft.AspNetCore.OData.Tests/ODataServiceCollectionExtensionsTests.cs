@@ -21,8 +21,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             var services = new ServiceCollection();
 
             // Act
-            services.AddOData();
-            services.AddOData();
+            services.AddControllers().AddOData().AddOData();
 
             // Assert
             var registerd = services.Where(s => s.ServiceType == typeof(IAssemblyResolver));
@@ -38,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
-            services.AddOData(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", EdmCoreModel.Instance));
             IServiceProvider provider = services.BuildServiceProvider();
 
             // Assert
@@ -63,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             services.AddSingleton(_ => coreModel);
 
             // Act
-            services.AddOData((options, serviceProvider) =>
+            services.AddControllers().AddOData((options, serviceProvider) =>
             {
                 var edmModel = serviceProvider.GetRequiredService<IEdmModel>();
                 options.AddModel("odata", edmModel);

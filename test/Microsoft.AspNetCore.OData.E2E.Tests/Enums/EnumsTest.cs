@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
-            services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+            services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddModel("convention", model1)
                 .AddModel("explicit", model2));
         }

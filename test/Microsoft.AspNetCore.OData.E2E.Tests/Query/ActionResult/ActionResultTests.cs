@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = ActionResultEdmModel.GetEdmModel();
-                services.AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+                services.AddControllers().AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
             }
         }
 

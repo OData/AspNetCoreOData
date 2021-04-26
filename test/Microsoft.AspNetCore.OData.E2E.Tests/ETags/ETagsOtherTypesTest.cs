@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             IEdmModel edmModel1 = GetDoubleETagEdmModel();
             IEdmModel edmModel2 = GetShortETagEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController));
-            services.AddOData(opt => opt.Select().AddModel("double", edmModel1).AddModel("short", edmModel2));
+            services.AddControllers().AddOData(opt => opt.Select().AddModel("double", edmModel1).AddModel("short", edmModel2));
         }
 
         private static IEdmModel GetDoubleETagEdmModel()

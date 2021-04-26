@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
 
             services.ConfigureControllers(typeof(MetadataController), typeof(DateAndTimeOfDayModelsController));
 
-            services.AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
+            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
                 .AddModel("odata", BuildEdmModel()));
         }
 

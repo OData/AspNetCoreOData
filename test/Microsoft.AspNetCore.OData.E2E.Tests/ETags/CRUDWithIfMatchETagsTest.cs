@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController));
-            services.AddOData(opt => opt.AddModel("odata", edmModel));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel));
             services.AddControllers(opt => opt.Filters.Add(new ETagActionFilterAttribute()));
         }
 

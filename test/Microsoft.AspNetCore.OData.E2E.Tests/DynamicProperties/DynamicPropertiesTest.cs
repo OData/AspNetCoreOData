@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DynamicProperties
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(DynamicCustomersController), typeof(DynamicSingleCustomerController)/*, typeof(ODataEndpointController)*/);
-            services.AddOData(opt => opt.AddModel("odata", GetEdmModel()));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()));
         }
 
         //[Fact]

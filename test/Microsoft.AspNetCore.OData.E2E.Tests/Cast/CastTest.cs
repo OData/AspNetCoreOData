@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
 
                 IEdmModel edmModel = CastEdmModel.GetEdmModel();
 
-                services.AddOData(opt =>
+                services.AddControllers().AddOData(opt =>
                 {
                     opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5);
 

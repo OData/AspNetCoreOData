@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Configure the default <see cref="ODataOptions"/>
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The OData options.</param>
         public void Configure(ODataOptions options)
         {
             if (options == null)

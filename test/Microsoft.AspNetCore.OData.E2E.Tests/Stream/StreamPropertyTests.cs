@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.StreamProperty
 
             services.ConfigureControllers(typeof(MetadataController), typeof(StreamCustomersController));
 
-            services.AddOData(opt => opt.AddModel("odata", EdmModel));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", EdmModel));
         }
 
         public static byte[] ReadAllBytes(Stream instream)

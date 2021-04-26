@@ -89,6 +89,17 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok();
         }
 
+        public IActionResult GetName(int key)
+        {
+            Organization org = new Organization
+            {
+                OrganizationId = 9,
+                Name = null
+            };
+
+            return Ok(org.Name);
+        }
+
         [HttpGet]
         public IActionResult GetPrice([FromODataUri]string organizationId, [FromODataUri] string partId)
         {

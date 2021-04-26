@@ -30,9 +30,9 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>An <see cref="IODataBuilder"/> that can be used to further configure the OData services.</returns>
-        public static IODataBuilder AddOData(this IServiceCollection services)
+        public static IODataBuilder AddOData1(this IServiceCollection services)
         {
-            return services.AddOData(opt => { });
+            return services.AddOData1(opt => { });
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="setupAction">The OData options to configure the services with,
         /// including access to a service provider which you can resolve services from.</param>
         /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
-        public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions, IServiceProvider> setupAction)
+        public static IODataBuilder AddOData1(this IServiceCollection services, Action<ODataOptions, IServiceProvider> setupAction)
         {
             if (setupAction == null)
             {
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <param name="setupAction">The OData options to configure the services with.</param>
         /// <returns>The <see cref="IODataBuilder"/> so that additional calls can be chained.</returns>
-        public static IODataBuilder AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
+        public static IODataBuilder AddOData1(this IServiceCollection services, Action<ODataOptions> setupAction)
         {
             if (setupAction == null)
             {

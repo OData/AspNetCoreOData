@@ -26,26 +26,78 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 [
 ExtensionAttribute(),
 ]
+public sealed class Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
+}
+
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
+}
+
+[
+ExtensionAttribute(),
+]
 public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions {
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData1 (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData1 (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
+	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData1 (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
 }
 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
+}
+
+public class Microsoft.AspNetCore.OData.ODataJsonOptionsSetup : IConfigureOptions`1 {
+	public ODataJsonOptionsSetup ()
+
+	public virtual void Configure (Microsoft.AspNetCore.Mvc.JsonOptions options)
+}
+
+public class Microsoft.AspNetCore.OData.ODataMvcOptionsSetup : IConfigureOptions`1 {
+	public ODataMvcOptionsSetup ()
+
+	public virtual void Configure (Microsoft.AspNetCore.Mvc.MvcOptions options)
 }
 
 public class Microsoft.AspNetCore.OData.ODataOptions {

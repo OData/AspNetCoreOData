@@ -48,9 +48,9 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddControllers();
                     services.ConfigureControllers(controllers);
-                    services.AddOData(setupConfig);
+                    services.AddControllers()
+                        .AddOData(setupConfig);
                 })
                 .Configure(app =>
                 {

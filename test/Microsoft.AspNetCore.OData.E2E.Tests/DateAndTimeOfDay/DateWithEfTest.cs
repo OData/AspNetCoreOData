@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
             // TODO: modify it after implement the DI in Web API.
             // model.SetPayloadValueConverter(new MyConverter());
 
-            services.AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
+            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
                 .AddModel("odata", model));
         }
 

@@ -5865,6 +5865,88 @@
             <param name="routePattern">The given route pattern.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
+            <summary>
+            Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.JsonOptions)">
+            <summary>
+             Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>
+            </summary>
+            <param name="options">The Json Options.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
+            <summary>
+            Provides extension methods to add OData services based on <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcBuilder)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> to add services to.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions">
+            <summary>
+            Provides extension methods to add OData services based on <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" /> to add services to.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" />.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMvcOptionsSetup">
+            <summary>
+            Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.MvcOptions"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.MvcOptions)">
+            <summary>
+            Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.MvcOptions"/>
+            </summary>
+            <param name="options"></param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
@@ -6122,21 +6204,21 @@
             <summary>
             Configure the default <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/>
             </summary>
-            <param name="options"></param>
+            <param name="options">The OData options.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions">
             <summary>
             Provides extension methods to add OData services.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
             </summary>
             <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> that can be used to further configure the OData services.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
             <summary>
             Adds services required for OData requests.
             </summary>
@@ -6145,7 +6227,7 @@
             including access to a service provider which you can resolve services from.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBuilder"/> so that additional calls can be chained.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
             <summary>
             Adds services required for OData requests.
             </summary>

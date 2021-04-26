@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
             services.ConfigureControllers(typeof(CustomersController));
 
             var model = ConcurrentQueryEdmModel.GetEdmModel();
-            services.AddOData(opt => opt.AddModel("concurrentquery", model)
+            services.AddControllers().AddOData(opt => opt.AddModel("concurrentquery", model)
                 .Count().Filter().OrderBy().Expand().SetMaxTop(null));
         }
 

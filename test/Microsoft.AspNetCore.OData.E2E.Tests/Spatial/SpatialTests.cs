@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
                 services.ConfigureControllers(typeof(SpatialCustomersController), typeof(MetadataController));
 
                 IEdmModel model = IsofEdmModel.GetEdmModel();
-                services.AddOData(options => options.AddModel("odata", model));
+                services.AddControllers().AddOData(options => options.AddModel("odata", model));
             }
         }
 

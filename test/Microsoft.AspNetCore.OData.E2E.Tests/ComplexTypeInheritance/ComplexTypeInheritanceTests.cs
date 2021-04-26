@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
 
             var edmModel1 = ComplexTypeInheritanceEdmModels.GetConventionModel();
             var edmModel2 = ComplexTypeInheritanceEdmModels.GetExplicitModel();
-            services.AddOData(opt => opt.AddModel("convention", edmModel1)
+            services.AddControllers().AddOData(opt => opt.AddModel("convention", edmModel1)
                 .AddModel("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 

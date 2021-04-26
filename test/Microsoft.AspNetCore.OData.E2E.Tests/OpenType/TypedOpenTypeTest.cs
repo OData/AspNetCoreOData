@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
 
             IEdmModel model1 = OpenComplexTypeEdmModel.GetTypedConventionModel();
 
-            services.AddOData(opt =>
+            services.AddControllers().AddOData(opt =>
             {
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
                 .AddModel("convention", model1)
