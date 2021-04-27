@@ -317,9 +317,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            OperationLinkBuilder builder;
-            builder = model.GetOperationLinkBuilder(operation);
-
+            OperationLinkBuilder builder = model.GetOperationLinkBuilder(operation);
             if (builder == null)
             {
                 return null;

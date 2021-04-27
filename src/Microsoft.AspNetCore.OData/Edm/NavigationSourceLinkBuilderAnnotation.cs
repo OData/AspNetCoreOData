@@ -10,17 +10,12 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Edm
 {
     /// <summary>
-    /// <see cref="NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate an <see cref="IEdmNavigationSource" /> inside an <see cref="IEdmModel" />
+    /// <see cref="NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate
+    /// an <see cref="IEdmNavigationSource" /> inside an <see cref="IEdmModel" />
     /// with information about how to build links related to that navigation source.
     /// </summary>
     public class NavigationSourceLinkBuilderAnnotation
     {
-        //TODO: Need refactor the process about how to set the link builder?
-
-        private readonly SelfLinkBuilder<Uri> _idLinkBuilder;
-        private readonly SelfLinkBuilder<Uri> _editLinkBuilder;
-        private readonly SelfLinkBuilder<Uri> _readLinkBuilder;
-
         private readonly Dictionary<IEdmNavigationProperty, NavigationLinkBuilder> _navigationPropertyLinkBuilderLookup = new Dictionary<IEdmNavigationProperty, NavigationLinkBuilder>();
 
         /// <summary>
@@ -41,12 +36,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (navigationSource == null)
             {
-                throw new ArgumentNullException(nameof(navigationSource));
+                throw Error.ArgumentNull(nameof(navigationSource));
             }
 
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             IEdmEntityType elementType = navigationSource.EntityType();
@@ -75,31 +70,23 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             Func<ResourceContext, Uri> selfLinkFactory =
                 (resourceContext) => resourceContext.GenerateSelfLink(includeCast: derivedTypesDefineNavigationProperty);
-            _idLinkBuilder = new SelfLinkBuilder<Uri>(selfLinkFactory, followsConventions: true);
+            IdLinkBuilder = new SelfLinkBuilder<Uri>(selfLinkFactory, followsConventions: true);
         }
 
         /// <summary>
-        /// Constructs an instance of an <see cref="NavigationSourceLinkBuilderAnnotation" /> class.
+        /// Gets/sets the ID link builder.
         /// </summary>
-        /// <param name="navigationSource">The navigation source for which the link builder is being constructed.</param>
-        /// <param name="idLinkBuilder">The ID link builder which is used to build the ID link.</param>
-        /// <param name="editLinkBuilder">The Edit link builder which is used to build the Edit link.</param>
-        /// <param name="readLinkBuilder">The Read link builder which is used to build the Read link.</param>
-        public NavigationSourceLinkBuilderAnnotation(
-            IEdmNavigationSource navigationSource,
-            SelfLinkBuilder<Uri> idLinkBuilder,
-            SelfLinkBuilder<Uri> editLinkBuilder,
-            SelfLinkBuilder<Uri> readLinkBuilder)
-        {
-            if (navigationSource == null)
-            {
-                throw new ArgumentNullException(nameof(navigationSource));
-            }
+        public SelfLinkBuilder<Uri> IdLinkBuilder { get; set; }
 
-            _idLinkBuilder = idLinkBuilder;
-            _editLinkBuilder = editLinkBuilder;
-            _readLinkBuilder = readLinkBuilder;
-        }
+        /// <summary>
+        /// Gets/sets the read link builder.
+        /// </summary>
+        public SelfLinkBuilder<Uri> ReadLinkBuilder { get; set; }
+
+        /// <summary>
+        /// Gets/sets the edit link builder.
+        /// </summary>
+        public SelfLinkBuilder<Uri> EditLinkBuilder { get; set; }
 
         /// <summary>
         /// Register a link builder for a <see cref="IEdmNavigationProperty" /> that navigates from Entities in this navigation source. 
@@ -128,14 +115,14 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw new ArgumentNullException(nameof(instanceContext));
+                throw Error.ArgumentNull(nameof(instanceContext));
             }
 
-            if (_idLinkBuilder != null &&
+            if (IdLinkBuilder != null &&
                 (metadataLevel == ODataMetadataLevel.Full ||
-                (metadataLevel == ODataMetadataLevel.Minimal && !_idLinkBuilder.FollowsConventions)))
+                (metadataLevel == ODataMetadataLevel.Minimal && !IdLinkBuilder.FollowsConventions)))
             {
-                return _idLinkBuilder.Factory(instanceContext);
+                return IdLinkBuilder.Factory(instanceContext);
             }
 
             // Return null to let ODL decide when and how to build the id link.
@@ -155,16 +142,16 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw new ArgumentNullException(nameof(instanceContext));
+                throw Error.ArgumentNull(nameof(instanceContext));
             }
 
-            if (_editLinkBuilder != null &&
+            if (EditLinkBuilder != null &&
                 (metadataLevel == ODataMetadataLevel.Full ||
-                (metadataLevel == ODataMetadataLevel.Minimal && !_editLinkBuilder.FollowsConventions)))
+                (metadataLevel == ODataMetadataLevel.Minimal && !EditLinkBuilder.FollowsConventions)))
             {
                 // edit link is the not the same as id link. Generate if the client asked for it (full metadata modes) or
                 // if the client cannot infer it (not follow conventions).
-                return _editLinkBuilder.Factory(instanceContext);
+                return EditLinkBuilder.Factory(instanceContext);
             }
 
             // Return null to let ODL decide when and how to build the edit link.
@@ -184,16 +171,16 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw new ArgumentNullException(nameof(instanceContext));
+                throw Error.ArgumentNull(nameof(instanceContext));
             }
 
-            if (_readLinkBuilder != null &&
+            if (ReadLinkBuilder != null &&
                 (metadataLevel == ODataMetadataLevel.Full ||
-                (metadataLevel == ODataMetadataLevel.Minimal && !_readLinkBuilder.FollowsConventions)))
+                (metadataLevel == ODataMetadataLevel.Minimal && !ReadLinkBuilder.FollowsConventions)))
             {
                 // read link is not the same as edit link. Generate if the client asked for it (full metadata modes) or
                 // if the client cannot infer it (not follow conventions).
-                return _readLinkBuilder.Factory(instanceContext);
+                return ReadLinkBuilder.Factory(instanceContext);
             }
 
             // Return null to let ODL decide when and how to build the read link.
@@ -213,12 +200,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw new ArgumentNullException(nameof(instanceContext));
+                throw Error.ArgumentNull(nameof(instanceContext));
             }
 
             if (navigationProperty == null)
             {
-                throw new ArgumentNullException(nameof(navigationProperty));
+                throw Error.ArgumentNull(nameof(navigationProperty));
             }
 
             NavigationLinkBuilder navigationLinkBuilder;
@@ -238,12 +225,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (instanceContext == null)
             {
-                throw new ArgumentNullException(nameof(instanceContext));
+                throw Error.ArgumentNull(nameof(instanceContext));
             }
 
             if (navigationProperty == null)
             {
-                throw new ArgumentNullException(nameof(navigationProperty));
+                throw Error.ArgumentNull(nameof(navigationProperty));
             }
 
             NavigationLinkBuilder navigationLinkBuilder;

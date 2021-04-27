@@ -264,6 +264,7 @@ Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.AddMethod(string 
 Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.CustomAggregateMethodAnnotation() -> void
 Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.GetMethodInfo(string methodToken, System.Type returnType, out System.Reflection.MethodInfo methodInfo) -> bool
 Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions
+Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.EditLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.EditLink.set -> void
@@ -281,9 +282,14 @@ Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.FollowsConventions.get -> b
 Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.NavigationLinkBuilder(System.Func<Microsoft.AspNetCore.OData.Formatter.ResourceContext, Microsoft.OData.Edm.IEdmNavigationProperty, System.Uri> navigationLinkFactory, bool followsConventions) -> void
 Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation
 Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.AddNavigationPropertyLinkBuilder(Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder linkBuilder) -> void
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.EditLinkBuilder.get -> Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri>
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.EditLinkBuilder.set -> void
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.IdLinkBuilder.get -> Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri>
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.IdLinkBuilder.set -> void
 Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.NavigationSourceLinkBuilderAnnotation() -> void
-Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.NavigationSourceLinkBuilderAnnotation(Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> idLinkBuilder, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> editLinkBuilder, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> readLinkBuilder) -> void
 Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.NavigationSourceLinkBuilderAnnotation(Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmModel model) -> void
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.ReadLinkBuilder.get -> Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri>
+Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.ReadLinkBuilder.set -> void
 Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder
 Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.FollowsConventions.get -> bool
 Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.OperationLinkBuilder(System.Func<Microsoft.AspNetCore.OData.Formatter.ResourceContext, System.Uri> linkFactory, bool followsConventions) -> void
@@ -1681,6 +1687,14 @@ static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrenc
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetDynamicPropertyDictionary(this Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmStructuredType edmType) -> System.Reflection.PropertyInfo
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetModelName(this Microsoft.OData.Edm.IEdmModel model) -> string
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetModelName(this Microsoft.OData.Edm.IEdmModel model) -> string
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetOperationLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation) -> Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasEditLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> editLinkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasIdLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> idLinkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasNavigationPropertyLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder linkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasReadLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> readLinkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetNavigationSourceLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation navigationSourceLinkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetOperationLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder operationLinkBuilder) -> void
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethods, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> void
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> T
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, string keyPrefix = "key") -> bool

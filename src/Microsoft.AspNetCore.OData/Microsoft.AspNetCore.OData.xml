@@ -2393,43 +2393,6 @@
             </summary>
             <param name="model">The Edm model.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
-            links for the given navigation source.
-            </summary>
-            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
-            <param name="navigationSource">The navigation source.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
-            a new <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
-            </returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.SetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation)">
-            <summary>
-            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
-            links for the given navigation source.
-            </summary>
-            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
-            <param name="navigationSource">The navigation source.</param>
-            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used while generating operation links for the given action.
-            </summary>
-            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the operation.</param>
-            <param name="operation">The operation for which the link builder is needed.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
-            <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.SetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder)">
-            <summary>
-            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used for generating the OData operation link for the given operation.
-            </summary>
-            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the entity set.</param>
-            <param name="operation">The operation for which the operation link is to be generated.</param>
-            <param name="operationLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to set.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Resolve the navigation source using the input identifier
@@ -2488,6 +2451,81 @@
             <param name="entityType"></param>
             <param name="boundToCollection"></param>
             <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions">
+            <summary>
+            Extension methods to set the link builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasIdLink(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri})">
+            <summary>
+            Sets the ID link builder for the given <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="idLinkBuilder">The Id link builder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasEditLink(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri})">
+            <summary>
+            Sets the Edit link builder for the given <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="editLinkBuilder">The Edit link builder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasReadLink(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri})">
+            <summary>
+            Sets the Read link builder for the given <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="readLinkBuilder">The Read link builder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasNavigationPropertyLink(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder)">
+            <summary>
+            Sets the navigation property link builder for the given <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource"/> and <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="navigationProperty">The navigation property.</param>
+            <param name="linkBuilder">The navigation property link builder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            links for the given navigation source.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
+            a new <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetNavigationSourceLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation)">
+            <summary>
+            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
+            links for the given navigation source.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
+            <param name="navigationSource">The navigation source.</param>
+            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used while generating operation links for the given action.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the operation.</param>
+            <param name="operation">The operation for which the link builder is needed.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
+            <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder)">
+            <summary>
+            Sets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used for generating the OData operation link for the given operation.
+            </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the entity set.</param>
+            <param name="operation">The operation for which the operation link is to be generated.</param>
+            <param name="operationLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to set.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks">
             <summary>
@@ -2549,7 +2587,8 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation">
             <summary>
-            <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate an <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource" /> inside an <see cref="T:Microsoft.OData.Edm.IEdmModel" />
+            <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate
+            an <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource" /> inside an <see cref="T:Microsoft.OData.Edm.IEdmModel" />
             with information about how to build links related to that navigation source.
             </summary>
         </member>
@@ -2567,14 +2606,20 @@
             <param name="model">The EDM model that this navigation source belongs to.</param>
             <remarks>This constructor creates a link builder that generates URL's that follow OData conventions for the given navigation source.</remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor(Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri},Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri},Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder{System.Uri})">
+        <member name="P:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.IdLinkBuilder">
             <summary>
-            Constructs an instance of an <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> class.
+            Gets/sets the ID link builder.
             </summary>
-            <param name="navigationSource">The navigation source for which the link builder is being constructed.</param>
-            <param name="idLinkBuilder">The ID link builder which is used to build the ID link.</param>
-            <param name="editLinkBuilder">The Edit link builder which is used to build the Edit link.</param>
-            <param name="readLinkBuilder">The Read link builder which is used to build the Read link.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.ReadLinkBuilder">
+            <summary>
+            Gets/sets the read link builder.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.EditLinkBuilder">
+            <summary>
+            Gets/sets the edit link builder.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.AddNavigationPropertyLinkBuilder(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder)">
             <summary>
