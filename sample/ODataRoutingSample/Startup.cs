@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
 using ODataRoutingSample.Models;
 using ODataRoutingSample.OpenApi;
+using System.Collections.Generic;
+using System;
+using Microsoft.OData.ModelBuilder;
 
 namespace ODataRoutingSample
 {
@@ -54,13 +57,15 @@ namespace ODataRoutingSample
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
             */
 
-            services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                .AddModel(model0)
-                .AddModel("v1", model1)
-                .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
-                //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
-                .Conventions.Add(new MyConvention())
-                );
+            //services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+            //    .AddModel(model0)
+            //    .AddModel("v1", model1)
+            //    .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
+            //    //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
+            //    .Conventions.Add(new MyConvention())
+            //    );
+
+            services.AddOData(opt => opt.AddModel("odata", GetEdmModel()));
 
             services.AddSwaggerGen();
         }
@@ -112,6 +117,23 @@ namespace ODataRoutingSample
                 endpoints.MapControllers();
             });
         }
+
+        static IEdmModel GetEdmModel()
+        {
+            var odataBuilder = new ODataConventionModelBuilder();
+            odataBuilder.EntitySet<Student>("Student");
+            var entity = odataBuilder.EntityType<Student>();
+            entity.DerivesFrom<EntityBase>();
+            entity.Ignore(s => s.Test);
+            entity.Ignore(s => s.Test2);
+
+            var baseEntity = odataBuilder.EntityType<EntityBase>();
+            baseEntity.Abstract();
+            baseEntity.Ignore(s => s.Test);
+            baseEntity.Ignore(s => s.Test2);
+
+            return odataBuilder.GetEdmModel();
+        }
     }
 
     /// <summary>
@@ -143,5 +165,18 @@ namespace ODataRoutingSample
         {
             return false; // continue for all others
         }
+    }
+
+    public class Student : EntityBase
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public int Score { get; set; }
+    }
+
+    public abstract class EntityBase
+    {
+        public Dictionary<string, object> Test { get; set; }
+        public Dictionary<string, object> Test2 { get; set; }
     }
 }
