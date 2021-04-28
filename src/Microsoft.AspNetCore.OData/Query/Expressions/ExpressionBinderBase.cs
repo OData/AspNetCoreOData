@@ -39,8 +39,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal static readonly Expression TrueConstant = Expression.Constant(true);
         internal static readonly Expression ZeroConstant = Expression.Constant(0);
 
-        internal static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
-                        .Single(m => m.Name == "TryParse" && m.GetParameters().Length == 2);
+        // .NET 6 adds a new overload: TryParse<TEnum>(ReadOnlySpan<Char>, TEnum)
+        // Now, with `TryParse<TEnum>(String, TEnum)`, there will have two versions with two parameters
+        // So, the previous Single() will throw exception.
+        internal static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethod("TryParse",
+            new[]
+            {
+                typeof(string),
+                Type.MakeGenericMethodParameter(0).MakeByRefType()
+            });
 
         internal static readonly Dictionary<BinaryOperatorKind, ExpressionType> BinaryOperatorMapping = new Dictionary<BinaryOperatorKind, ExpressionType>
         {
