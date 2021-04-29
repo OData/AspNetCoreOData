@@ -680,28 +680,15 @@ Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableCount.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableCount.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableExpand.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableExpand.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableFilter.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableFilter.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableOrderBy.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableOrderBy.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableSelect.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableSelect.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.EnableSkipToken.get -> bool
-Microsoft.AspNetCore.OData.ODataOptions.EnableSkipToken.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.Expand() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(string prefix) -> System.IServiceProvider
-Microsoft.AspNetCore.OData.ODataOptions.MaxTop.get -> int?
-Microsoft.AspNetCore.OData.ODataOptions.MaxTop.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.Models.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel, System.IServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.SetAttributeRouting(bool enabled) -> Microsoft.AspNetCore.OData.ODataOptions

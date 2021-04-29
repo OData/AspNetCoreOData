@@ -6051,44 +6051,6 @@
             <param name="prefix">The route name (the route prefix name).</param>
             <returns>The root service provider for the route (prefix) name.</returns>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableExpand">
-            <summary>
-            Gets or sets a value indicating whether navigation property can be expanded.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableSelect">
-            <summary>
-            Gets or sets a value indicating whether property can be selected.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableCount">
-            <summary>
-            Gets or sets a value indicating whether entity set and property can apply $count.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableOrderBy">
-            <summary>
-            Gets or sets a value indicating whether property can apply $orderby.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableFilter">
-            <summary>
-            Gets or sets a value indicating whether property can apply $filter.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.MaxTop">
-            <summary>
-            Gets or sets the max value of $top that a client can request.
-            </summary>
-            <value>
-            The max value of $top that a client can request, or <c>null</c> if there is no limit.
-            </value>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableSkipToken">
-            <summary>
-            Gets or sets a value indicating whether the service will use skiptoken or not.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Expand">
             <summary>
             Enable $expand query options.
@@ -6137,11 +6099,10 @@
             Gets and sets the optional-$-sign-prefix for OData system query option.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildDefaultQuerySettings">
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
             <summary>
-            Build the default QueryOption settings
+            Gets the query setting.
             </summary>
-            <returns>The default query options settings.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainBuilder(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>

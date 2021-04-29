@@ -235,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 return new DefaultQuerySettings();
             }
 
-            return odataOptions.Value.BuildDefaultQuerySettings();
+            return odataOptions.Value.QuerySettings;
         }
     }
 }

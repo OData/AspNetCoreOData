@@ -232,66 +232,13 @@ namespace Microsoft.AspNetCore.OData
         #endregion
 
         #region Globle Query settings
-
-        private int? _maxTop = 0;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether navigation property can be expanded.
-        /// </summary>
-        public bool EnableExpand { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can be selected.
-        /// </summary>
-        public bool EnableSelect { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether entity set and property can apply $count.
-        /// </summary>
-        public bool EnableCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can apply $orderby.
-        /// </summary>
-        public bool EnableOrderBy { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can apply $filter.
-        /// </summary>
-        public bool EnableFilter { get; set; }
-
-        /// <summary>
-        /// Gets or sets the max value of $top that a client can request.
-        /// </summary>
-        /// <value>
-        /// The max value of $top that a client can request, or <c>null</c> if there is no limit.
-        /// </value>
-        public int? MaxTop
-        {
-            get => _maxTop;
-            set
-            {
-                if (value.HasValue && value < 0)
-                {
-                    throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, 0);
-                }
-
-                _maxTop = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the service will use skiptoken or not.
-        /// </summary>
-        public bool EnableSkipToken { get; set; }
-
         /// <summary>
         /// Enable $expand query options.
         /// </summary>
         /// <returns>The calling itself.</returns>
         public ODataOptions Expand()
         {
-            EnableExpand = true;
+            QuerySettings.EnableExpand = true;
             return this;
         }
 
@@ -301,7 +248,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Select()
         {
-            EnableSelect = true;
+            QuerySettings.EnableSelect = true;
             return this;
         }
 
@@ -311,7 +258,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Filter()
         {
-            EnableFilter = true;
+            QuerySettings.EnableFilter = true;
             return this;
         }
 
@@ -321,7 +268,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions OrderBy()
         {
-            EnableOrderBy = true;
+            QuerySettings.EnableOrderBy = true;
             return this;
         }
 
@@ -331,7 +278,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Count()
         {
-            EnableCount = true;
+            QuerySettings.EnableCount = true;
             return this;
         }
 
@@ -341,7 +288,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions SkipToken()
         {
-            EnableSkipToken = true;
+            QuerySettings.EnableSkipToken = true;
             return this;
         }
 
@@ -357,7 +304,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxTopValue), maxTopValue, 0);
             }
 
-            MaxTop = maxTopValue;
+            QuerySettings.MaxTop = maxTopValue;
             return this;
         }
 
@@ -367,23 +314,10 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableNoDollarQueryOptions { get; set; } = true;
 
         /// <summary>
-        /// Build the default QueryOption settings
+        /// Gets the query setting.
         /// </summary>
-        /// <returns>The default query options settings.</returns>
-        internal DefaultQuerySettings BuildDefaultQuerySettings()
-        {
-            DefaultQuerySettings settings = new DefaultQuerySettings();
+        public DefaultQuerySettings QuerySettings { get; } = new DefaultQuerySettings();
 
-            settings.EnableCount = EnableCount;
-            settings.EnableExpand = EnableExpand;
-            settings.EnableFilter = EnableFilter;
-            settings.EnableOrderBy = EnableOrderBy;
-            settings.EnableSelect = EnableSelect;
-            settings.EnableSkipToken = EnableSkipToken;
-            settings.MaxTop = MaxTop;
-
-            return settings;
-        }
         #endregion
 
         /// <summary>
@@ -414,7 +348,7 @@ namespace Microsoft.AspNetCore.OData
             odataContainerBuilder.AddDefaultODataServices();
 
             // Inject the default query setting from this options.
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => BuildDefaultQuerySettings());
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => this.QuerySettings);
 
             // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();
