@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(CustomersController));
-            services.AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         private static IEdmModel GetEdmModel()

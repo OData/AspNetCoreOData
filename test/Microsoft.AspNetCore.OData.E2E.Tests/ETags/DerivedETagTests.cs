@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             IEdmModel edmModel1 = GetEdmModel();
             IEdmModel edmModel2 = GetDerivedEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController), typeof(ETagsDerivedCustomersSingletonController), typeof(ETagsDerivedCustomersController));
-            services.AddOData(opt => opt.Select().AddModel("odata", edmModel1).AddModel("derivedEtag", edmModel2));
+            services.AddControllers().AddOData(opt => opt.Select().AddModel("odata", edmModel1).AddModel("derivedEtag", edmModel2));
             services.AddControllers(opt => opt.Filters.Add(new ETagActionFilterAttribute()));
         }
 

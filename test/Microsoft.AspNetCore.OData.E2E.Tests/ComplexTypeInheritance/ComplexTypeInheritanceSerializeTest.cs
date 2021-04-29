@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
             services.ConfigureControllers(typeof(InheritanceCustomersController));
 
             var edmModel1 = GetEdmModel();
-            services.AddOData(opt => opt.AddModel("odata", edmModel1));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel1));
         }
 
         [Fact]

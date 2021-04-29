@@ -30,9 +30,7 @@ namespace ODataCustomizedSample
             IEdmModel model3 = EnumsEdmModel.GetConventionModel();
             IEdmModel model4 = EnumsEdmModel.GetExplicitModel();
 
-            services.AddControllers();
-
-            services.AddOData(opt =>
+            services.AddControllers().AddOData(opt =>
                 opt
                     .AddModel(model1)
                     .AddModel("odata", model2)

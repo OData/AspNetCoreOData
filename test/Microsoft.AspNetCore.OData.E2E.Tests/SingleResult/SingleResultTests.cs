@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest
         {
             services.ConfigureControllers(typeof(CustomersController));
 
-            services.AddOData(opt => opt.AddModel("singleresult", SingleResultEdmModel.GetEdmModel())
+            services.AddControllers().AddOData(opt => opt.AddModel("singleresult", SingleResultEdmModel.GetEdmModel())
                 .Count().Filter().OrderBy().Expand().SetMaxTop(null));
         }
 

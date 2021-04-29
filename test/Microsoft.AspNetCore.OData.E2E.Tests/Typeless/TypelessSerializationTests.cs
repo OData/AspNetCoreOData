@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(TypelessCustomersController));
-            services.AddOData(opt => opt.Expand().AddModel("odata", edmModel));
+            services.AddControllers().AddOData(opt => opt.Expand().AddModel("odata", edmModel));
         }
 
         private static IEdmModel GetEdmModel()

@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
 
             services.ConfigureControllers(typeof(ConventionCustomersController), typeof(MetadataController));
 
-            services.AddOData(opt => opt.AddModel("odata", model)
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", model)
                 .Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 

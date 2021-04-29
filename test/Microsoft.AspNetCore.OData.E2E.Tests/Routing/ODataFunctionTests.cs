@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         {
             IEdmModel edmModel = GetTypelessEdmModel();
             services.ConfigureControllers(typeof(FCustomersController));
-            services.AddOData(opt => opt.AddModel("odata", edmModel).AddModel("attribute", edmModel));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).AddModel("attribute", edmModel));
         }
 
         public ODataFunctionTests(WebApiTestFixture<ODataFunctionTests> fixture)

@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
 
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(OrderByItemsController));
-            services.AddOData(opt => opt.AddModel("odata", edmModel).OrderBy().Expand().SetMaxTop(null));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).OrderBy().Expand().SetMaxTop(null));
         }
 
         public static IEdmModel GetEdmModel()

@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
 
             TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8:00
 
-            services.AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
+            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
                 .SetTimeZoneInfo(timeZoneInfo)
                 .AddModel("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
                 .AddModel("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel()));

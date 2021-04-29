@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
 
             IEdmModel model = UriParserExtenstionEdmModel.GetEdmModel();
 
-            services.AddOData(opt => opt.AddModel("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null));
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null));
         }
 
         public static TheoryDataSet<string, string, string> CaseInsensitiveCases

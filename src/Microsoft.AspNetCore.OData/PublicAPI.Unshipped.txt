@@ -665,6 +665,14 @@ Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResource
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.ODataResourceWrapper(Microsoft.OData.ODataResourceBase resource) -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource.get -> Microsoft.OData.ODataResourceBase
 Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
+Microsoft.AspNetCore.OData.ODataJsonOptionsSetup
+Microsoft.AspNetCore.OData.ODataJsonOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.JsonOptions options) -> void
+Microsoft.AspNetCore.OData.ODataJsonOptionsSetup.ODataJsonOptionsSetup() -> void
+Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions
+Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions
+Microsoft.AspNetCore.OData.ODataMvcOptionsSetup
+Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.MvcOptions options) -> void
+Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.ODataMvcOptionsSetup() -> void
 Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
@@ -1733,9 +1741,12 @@ static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataBatc
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataQueryRequest(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
-static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
-static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
-static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
+static Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcBuilder
+static Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcBuilder
+static Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcBuilder
+static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
+static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
+static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
 static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
 static Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> bool
 static Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(string message, System.Exception exception = null) -> Microsoft.AspNetCore.Mvc.SerializableError

@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.QueryValidationBeforeAction
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = QueryValidationBeforeActionEdmModel.GetEdmModel();
-                services.AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+                services.AddControllers().AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
             }
         }
 
