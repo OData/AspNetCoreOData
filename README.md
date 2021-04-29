@@ -49,12 +49,14 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<BookStoreContext>(opt => opt.UseInMemoryDatabase("BookLists"));
-        services.AddControllers();
-        services.AddOData(opt => opt.AddModel("odata", GetEdmModel()));
+        services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        // Send "~/$odata" to debug routing if enable the following middleware
+        // app.UseODataRouteDebug();
+
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
@@ -83,7 +85,9 @@ Coming soon.
 
 ### 3.3 Debug
 
-The symbol package is uploaded to nuget symbol server.
+The symbol package is uploaded to nuget symbol server. 
+
+It supports source link debug. Remember to make `Enable Source Link support` checked if you debug using Visual Studio.
 
 ### 3.4 Nightly Builds
 
