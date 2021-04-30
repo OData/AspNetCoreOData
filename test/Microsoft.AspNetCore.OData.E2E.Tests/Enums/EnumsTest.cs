@@ -453,7 +453,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             requestForPost.Content = new StringContent(content: @"{
                     'value':'Sql'
                     }", encoding: Encoding.UTF8, mediaType: "application/json");
-            requestForPost.Content.Headers.ContentLength = 10;
 
             //Act
             using (HttpResponseMessage response = await client.SendAsync(requestForPost))

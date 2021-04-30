@@ -109,14 +109,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.ReadFromStreamAsyncMustHaveRequest);
             }
 
-            // If content length is 0 then return default value for this type
-            RequestHeaders contentHeaders = request.GetTypedHeaders();
             object defaultValue = GetDefaultValueForType(type);
-            if (contentHeaders == null || contentHeaders.ContentLength == null)
-            {
-                return InputFormatterResult.Success(defaultValue);
-            }
-
             try
             {
 
@@ -125,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Uri baseAddress = GetBaseAddressInternal(request);
 
                 object result = await ReadFromStreamAsync(
-                    type, 
+                    type,
                     defaultValue,
                     baseAddress,
                     request.GetODataVersion(),

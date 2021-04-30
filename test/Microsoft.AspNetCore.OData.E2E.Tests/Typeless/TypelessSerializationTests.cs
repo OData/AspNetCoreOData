@@ -131,7 +131,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
             string payload = typelessCustomer.ToString();
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
@@ -163,7 +162,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
             string payload = (JToken.FromObject(obj) as JObject).ToString();
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);

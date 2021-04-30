@@ -315,7 +315,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             request.Content = new StringContent(payload);
 
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
 
             // Act
             using (var patchResponse = await client.SendAsync(request))
@@ -455,7 +454,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
                         'OtherProperty':'2016-02-01'
                   }");
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = 100;
 
             response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -508,7 +506,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
                         'CountryOrRegion':'NewCountry'
                   }");
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = 100; // 100 doesn't matter, we should set it a value.
 
             // Act
             response = await client.SendAsync(request);
@@ -569,7 +566,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
                         'OtherProperty':'2016-02-01'
                   }");
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = 100;
 
             // Act
             response = await client.SendAsync(request);

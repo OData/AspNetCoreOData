@@ -109,7 +109,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             string payload = string.Format(@"{{""@odata.type"":""#{0}"",""Id"":{1},""Name"":""{2}"",""Notes"":[""{3}""]}}", typeof(ETagsCustomer), 1, "Customer Name 1 updated", "This is note 1 updated");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
 
             // Act - 2
             response = await client.SendAsync(request);
@@ -123,7 +122,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             payload = string.Format(@"{{""@odata.type"":""#{0}"",""Id"":{1},""Name"":""{2}"",""Notes"":[""{3}""]}}", typeof(ETagsCustomer), 1, "Customer Name 1 updated again", "This is note 1 updated again");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
             request.Headers.IfMatch.ParseAdd(etagInPayload);
 
             // Act - 3
@@ -159,7 +157,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             string payload = string.Format(@"{{""@odata.type"":""#{0}"",""Id"":{1},""Name"":""{2}"",""Notes"":[""{3}""]}}", typeof(ETagsCustomer), 2, "Customer Name 2 updated", "This is note 2 updated");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
 
             // Act (2)
             response = await client.SendAsync(request);
@@ -173,7 +170,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             payload = string.Format(@"{{""@odata.type"":""#{0}"",""Id"":{1},""Name"":""{2}""}}", typeof(ETagsCustomer), 2, "Customer Name 2 updated again");
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = payload.Length;
             request.Headers.IfMatch.ParseAdd(etagInPayload);
 
             // Act (3)

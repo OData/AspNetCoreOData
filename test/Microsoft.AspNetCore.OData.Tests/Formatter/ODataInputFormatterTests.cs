@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         [InlineData(false)]
         [InlineData(0)]
         [InlineData("")]
-        public async Task ReadRequestBodyAsyncReturnsDefaultTypeValueWhenContentLengthIsZero<T>(T value)
+        public async Task ReadRequestBodyAsyncFailsWhenContentLengthIsZero<T>(T value)
         {
             // Arrange
             ODataInputFormatter formatter = GetInputFormatter();
@@ -129,17 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             InputFormatterResult result = await formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8);
 
             // Assert
-            Assert.False(result.HasError);
-            Type valueType = value.GetType();
-            if (valueType.IsValueType)
-            {
-                T actualResult = Assert.IsType<T>(result.Model);
-                Assert.Equal(default(T), actualResult);
-            }
-            else
-            {
-                Assert.Null(result.Model);
-            }
+            Assert.True(result.HasError);
         }
 
         [Fact]
@@ -175,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Fact]
-        public Task ReadRequestBodyAsyncReadsDataButDoesNotCloseStreamWhenContentLengthl()
+        public Task ReadRequestBodyAsyncReadsDataButDoesNotCloseStreamWhenContentLength()
         {
             // Arrange
             byte[] expectedSampleTypeByte = Encoding.UTF8.GetBytes(
@@ -192,7 +182,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             HttpContext httpContext = GetHttpContext(expectedSampleTypeByte, opt => opt.AddModel("odata", _edmModel));
             httpContext.Request.ContentType = "application/json;odata.metadata=minimal";
-            httpContext.Request.ContentLength = expectedSampleTypeByte.Length;
             httpContext.ODataFeature().Model = _edmModel;
             httpContext.ODataFeature().PrefixName = "odata";
             httpContext.ODataFeature().Path = new ODataPath(singletonSeg);
