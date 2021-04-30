@@ -11263,6 +11263,17 @@
             The <see cref="T:System.Linq.IQueryable`1"/> containing zero or one entities.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.SingleResultValueConverter.CanConvert(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.SingleResultValueConverter.CreateConverter(System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Creates a converter for a specified type.
+            </summary>
+            <param name="type">The type handled by the converter.</param>
+            <param name="options">The serialization options to use.</param>
+            <returns>A converter for which T is compatible with typeToConvert.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1">
             <summary>
             Represents an action result that is a response to a PUT, PATCH, or a MERGE operation on an OData entity.

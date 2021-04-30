@@ -113,17 +113,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Theory]
-        [InlineData(false)]
-        [InlineData(0)]
-        [InlineData("")]
-        public async Task ReadRequestBodyAsyncFailsWhenContentLengthIsZero<T>(T value)
+        [InlineData(typeof(bool))]
+        [InlineData(typeof(int))]
+        [InlineData(typeof(string))]
+        public async Task ReadRequestBodyAsyncFailsWhenContentLengthIsZero(Type type)
         {
             // Arrange
             ODataInputFormatter formatter = GetInputFormatter();
             byte[] contentBytes = Encoding.UTF8.GetBytes("");
             HttpContext httpContext = GetHttpContext(contentBytes);
 
-            InputFormatterContext formatterContext = CreateInputFormatterContext(typeof(T), httpContext);
+            InputFormatterContext formatterContext = CreateInputFormatterContext(type, httpContext);
 
             // Act
             InputFormatterResult result = await formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8);

@@ -27,6 +27,7 @@ namespace Microsoft.AspNetCore.OData
             options.JsonSerializerOptions.Converters.Add(new SelectExpandWrapperConverter());
             options.JsonSerializerOptions.Converters.Add(new PageResultValueConverter());
             options.JsonSerializerOptions.Converters.Add(new DynamicTypeWrapperConverter());
+            options.JsonSerializerOptions.Converters.Add(new SingleResultValueConverter());
         }
     }
 }
