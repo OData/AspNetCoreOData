@@ -133,6 +133,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
+        /// </summary>
+        internal static string AmbiguousPropertyNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousPropertyNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
         /// </summary>
         internal static string ApplyQueryOptionNotSupportedForLinq2SQL {

@@ -22,7 +22,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         internal static void ApplyProperty(ODataProperty property, IEdmStructuredTypeReference resourceType, object resource,
             ODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
-            IEdmProperty edmProperty = resourceType.FindProperty(property.Name);
+            IEdmStructuredType structuredType = resourceType.StructuredDefinition();
+            IEdmProperty edmProperty = structuredType == null ? null : structuredType.ResolveProperty(property.Name);
 
             bool isDynamicProperty = false;
             string propertyName = property.Name;
@@ -32,7 +33,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                IEdmStructuredType structuredType = resourceType.StructuredDefinition();
                 isDynamicProperty = structuredType != null && structuredType.IsOpen;
             }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Validation;
 
@@ -12,19 +13,49 @@ namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class EdmModelExtensions
     {
-        public static IEdmProperty ResolveProperty(this IEdmStructuredType type, string propertyName, bool enableCaseInsensitive = false)
+        /// <summary>
+        /// Resolve the <see cref="IEdmProperty"/> using the property name. This method supports the property name case insensitive.
+        /// However, ODL only support case-sensitive. Here's the logic:
+        /// 1) If we match
+        /// </summary>
+        /// <param name="structuredType">The given structural type </param>
+        /// <param name="propertyName">The given property name.</param>
+        /// <returns>The resolved <see cref="IEdmProperty"/>.</returns>
+        public static IEdmProperty ResolveProperty(this IEdmStructuredType structuredType, string propertyName)
         {
-            IEdmProperty property = type.FindProperty(propertyName);
-            if (property != null || !enableCaseInsensitive)
+            if (structuredType == null)
             {
-                return property;
+                throw Error.ArgumentNull(nameof(structuredType));
             }
 
-            var result = type.Properties()
-            .Where(_ => string.Equals(propertyName, _.Name, StringComparison.OrdinalIgnoreCase))
-            .ToList();
+            bool ambiguous = false;
+            IEdmProperty edmProperty = null;
+            foreach (var property in structuredType.StructuralProperties())
+            {
+                string name = property.Name;
+                if (name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (name.Equals(propertyName, StringComparison.Ordinal))
+                    {
+                        return property;
+                    }
+                    else if (edmProperty != null)
+                    {
+                        ambiguous = true;
+                    }
+                    else
+                    {
+                        edmProperty = property;
+                    }
+                }
+            }
 
-            return result.SingleOrDefault();
+            if (ambiguous)
+            {
+                throw new ODataException(Error.Format(SRResources.AmbiguousPropertyNameFound, propertyName));
+            }
+
+            return edmProperty;
         }
 
         public static IEdmSchemaType ResolveType(this IEdmModel model, string typeName, bool enableCaseInsensitive = false)

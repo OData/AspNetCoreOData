@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests
 {
-    public class ODataServiceCollectionExtensionsTests
+    public class ODataMvcBuilderExtensionsTests
     {
         [Fact]
         public void AddOData_RegistersRequiredServicesIdempotently()

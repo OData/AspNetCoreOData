@@ -713,7 +713,6 @@ Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter.set -> void
 Microsoft.AspNetCore.OData.ODataOptionsSetup
 Microsoft.AspNetCore.OData.ODataOptionsSetup.Configure(Microsoft.AspNetCore.OData.ODataOptions options) -> void
 Microsoft.AspNetCore.OData.ODataOptionsSetup.ODataOptionsSetup(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser parser) -> void
-Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions
 Microsoft.AspNetCore.OData.ODataUriFunctions
 Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators
 Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Add = 1 -> Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators

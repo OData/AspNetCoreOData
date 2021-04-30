@@ -2393,6 +2393,16 @@
             </summary>
             <param name="model">The Edm model.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveProperty(Microsoft.OData.Edm.IEdmStructuredType,System.String)">
+            <summary>
+            Resolve the <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> using the property name. This method supports the property name case insensitive.
+            However, ODL only support case-sensitive. Here's the logic:
+            1) If we match
+            </summary>
+            <param name="structuredType">The given structural type </param>
+            <param name="propertyName">The given property name.</param>
+            <returns>The resolved <see cref="T:Microsoft.OData.Edm.IEdmProperty"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Resolve the navigation source using the input identifier
@@ -6307,6 +6317,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.AggregationNotSupportedForType">
             <summary>
               Looks up a localized string similar to Aggregation &apos;{0}&apos; not supported for property &apos;{1}&apos; of type &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.AmbiguousPropertyNameFound">
+            <summary>
+              Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ApplyQueryOptionNotSupportedForLinq2SQL">

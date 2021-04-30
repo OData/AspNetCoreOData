@@ -273,6 +273,9 @@
   <data name="CannotDeserializeUnknownProperty" xml:space="preserve">
     <value>The property '{0}' does not exist on type '{1}'. Make sure to only use property names that are defined by the type.</value>
   </data>
+  <data name="AmbiguousPropertyNameFound" xml:space="preserve">
+    <value>Ambiguous property name '{0}' found. Please use correct property name case.</value>
+  </data>
   <data name="ODataPathMissing" xml:space="preserve">
     <value>The operation cannot be completed because no ODataPath is available for the request.</value>
   </data>
