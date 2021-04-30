@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Edm Property name mapper.
     /// </summary>
-    public class JsonPropertyNameMapper : IPropertyMapper
+    internal class JsonPropertyNameMapper : IPropertyMapper
     {
         private IEdmModel _model;
         private IEdmStructuredType _type;

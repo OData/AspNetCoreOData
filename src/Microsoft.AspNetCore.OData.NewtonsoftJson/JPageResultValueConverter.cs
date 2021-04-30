@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Represents a custom <see cref="JsonConverter"/> to serialize <see cref="PageResult"/> instances to JSON.
     /// </summary>
-    public class JPageResultValueConverter : JsonConverter
+    internal class JPageResultValueConverter : JsonConverter
     {
         /// <summary>
         /// Determines whether this instance can convert the specified <see cref="PageResult"/> type.

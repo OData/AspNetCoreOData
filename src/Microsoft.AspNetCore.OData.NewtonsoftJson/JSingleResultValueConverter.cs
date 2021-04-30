@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Represents a custom <see cref="JsonConverter"/> to serialize <see cref="SingleResult"/> instances to JSON.
     /// </summary>
-    public class JSingleResultValueConverter : JsonConverter
+    internal class JSingleResultValueConverter : JsonConverter
     {
         /// <summary>
         /// Determines whether this instance can convert the specified <see cref="SingleResult"/> type.

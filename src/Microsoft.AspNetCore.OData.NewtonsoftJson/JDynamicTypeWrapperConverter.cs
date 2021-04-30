@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Represents a custom <see cref="JsonConverter"/> to serialize <see cref="DynamicTypeWrapper"/> instances to JSON.
     /// </summary>
-    public class JDynamicTypeWrapperConverter : JsonConverter
+    internal class JDynamicTypeWrapperConverter : JsonConverter
     {
         /// <summary>
         /// Determines whether this instance can convert the specified <see cref="DynamicTypeWrapper"/> type.

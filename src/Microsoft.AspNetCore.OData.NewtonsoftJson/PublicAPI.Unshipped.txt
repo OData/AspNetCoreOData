@@ -1,28 +1,5 @@
-﻿Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter
-Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.JDynamicTypeWrapperConverter() -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter
-Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.JPageResultValueConverter() -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter
-Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.JSelectExpandWrapperConverter() -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.JSelectExpandWrapperConverter(System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> mapperProvider) -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter
-Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.JSingleResultValueConverter() -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper
-Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper.JsonPropertyNameMapper(Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmStructuredType type) -> void
-Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper.MapProperty(string propertyName) -> string
-Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.CanConvert(System.Type objectType) -> bool
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) -> object
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) -> void
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.CanConvert(System.Type objectType) -> bool
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) -> object
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) -> void
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.CanConvert(System.Type objectType) -> bool
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) -> object
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) -> void
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.CanConvert(System.Type objectType) -> bool
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) -> object
-override Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) -> void
-static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(this Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
-static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(this Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder, System.Action<Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions> setupAction) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
-static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftServiceCollectionExtensions.AddNewtonsoftJson(this Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder, System.Action<Microsoft.AspNetCore.Mvc.MvcNewtonsoftJsonOptions> setupAction, System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> mapperProvider) -> Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
+﻿Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions
+static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(this Microsoft.Extensions.DependencyInjection.IMvcBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcBuilder
+static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(this Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> mapperProvider) -> Microsoft.Extensions.DependencyInjection.IMvcBuilder
+static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
+static Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> mapperProvider) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder

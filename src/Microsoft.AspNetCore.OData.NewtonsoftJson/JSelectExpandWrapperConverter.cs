@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
     /// <summary>
     /// Represents a custom <see cref="JsonConverter"/> to serialize <see cref="ISelectExpandWrapper"/> instances to JSON.
     /// </summary>
-    public class JSelectExpandWrapperConverter : JsonConverter
+    internal class JSelectExpandWrapperConverter : JsonConverter
     {
         private Func<IEdmModel, IEdmStructuredType, IPropertyMapper> _mapperProvider;
 

@@ -25,19 +25,17 @@ namespace ODataNewtonsoftJsonSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
-            services.AddOData(opt => opt.Select().Filter().AddModel("odata", GetEdmModel())).AddNewtonsoftJson(
-                options =>
-                {
-                    options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    //options.SerializerSettings.ContractResolver = WebApiJsonResolver.Instance;
-                });
-
-            // You can also add the converter one by one using followings:
-            //services.AddControllers().AddNewtonsoftJson(
-            //    opt => opt.SerializerSettings.Converters.Add(new JDynamicTypeWrapperConverter()));
+            services.AddControllers()
+                .AddOData(opt => opt.Select().Filter().AddModel("odata", GetEdmModel()))
+                .AddODataNewtonsoftJson()
+                //.AddNewtonsoftJson(
+                //options =>
+                //{
+                //    options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                //    //options.SerializerSettings.ContractResolver = WebApiJsonResolver.Instance;
+                //})
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
