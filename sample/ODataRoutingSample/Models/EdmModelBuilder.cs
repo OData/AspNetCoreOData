@@ -106,6 +106,10 @@ namespace ODataRoutingSample.Models
             getOrgByAccount2.Parameter<int>("accountId").Required();
             getOrgByAccount2.IsComposable = true;
 
+            builder.EntityType<Organization>().Collection
+                .Action("AddEvidences").ReturnsCollectionFromEntitySet<Organization>("Organizations")
+                .CollectionEntityParameter<EvidenceScore>("evidenceScores");
+
             return builder.GetEdmModel();
         }
 

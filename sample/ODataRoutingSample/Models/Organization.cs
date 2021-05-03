@@ -22,4 +22,16 @@ namespace ODataRoutingSample.Models
 
         public string Name { get; set; }
     }
+
+    public class EvidenceScore
+    {
+        public int score { get; set; }
+        public IList<KeyValue> propertyBag { get; set; }
+    }
+
+    public class KeyValue
+    {
+        public string propertyName { get; set; }
+        public string propertyValue { get; set; }
+    }
 }

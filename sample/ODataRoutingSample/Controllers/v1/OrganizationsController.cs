@@ -138,5 +138,11 @@ namespace ODataRoutingSample.Controllers.v1
              * */
             return Ok($"MarkAsFavourite2AfterGetByAccount2 after {aId} with key={key}");
         }
+
+        [HttpPost]
+        public string AddEvidences(ODataActionParameters parameters)
+        {
+            return "OK";
+        }
     }
 }
