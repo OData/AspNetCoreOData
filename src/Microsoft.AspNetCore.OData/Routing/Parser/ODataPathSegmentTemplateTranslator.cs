@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -14,6 +15,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
     /// </summary>
     public class ODataPathSegmentTemplateTranslator : PathSegmentTranslator<ODataSegmentTemplate>
     {
+        private IEdmModel _model;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataPathSegmentTemplateTranslator" /> class.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        public ODataPathSegmentTemplateTranslator(IEdmModel model)
+        {
+            _model = model;
+        }
+
         /// <summary>
         /// Translate a TypeSegment
         /// </summary>
@@ -61,7 +73,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <returns>Translated the path segment template.</returns>
         public override ODataSegmentTemplate Translate(KeySegment segment)
         {
-            return new KeySegmentTemplate(segment);
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
+            try
+            {
+                return new KeySegmentTemplate(segment);
+            }
+            catch
+            {
+                if (_model != null)
+                {
+                    var alternateKeys = _model.ResolveAlternateKeyProperties(segment);
+                    if (alternateKeys != null)
+                    {
+                        return new KeySegmentTemplate(segment, alternateKeys);
+                    }
+                }
+
+                throw;
+            }
         }
 
         /// <summary>

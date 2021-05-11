@@ -1271,7 +1271,7 @@ Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Default
 Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser
 Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider) -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator
-Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.ODataPathSegmentTemplateTranslator() -> void
+Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.ODataPathSegmentTemplateTranslator(Microsoft.OData.Edm.IEdmModel model) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImport.get -> Microsoft.OData.Edm.IEdmActionImport
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImportSegmentTemplate(Microsoft.OData.Edm.IEdmActionImport actionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
@@ -1314,7 +1314,9 @@ Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Count.get -> int
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.EntityType.get -> Microsoft.OData.Edm.IEdmEntityType
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeyMappings.get -> System.Collections.Generic.IDictionary<string, string>
+Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeyProperties.get -> System.Collections.Generic.IDictionary<string, Microsoft.OData.Edm.IEdmProperty>
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(Microsoft.OData.UriParser.KeySegment segment) -> void
+Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(Microsoft.OData.UriParser.KeySegment segment, System.Collections.Generic.IDictionary<string, Microsoft.OData.Edm.IEdmProperty> keyProperties) -> void
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(System.Collections.Generic.IDictionary<string, string> keys, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate
@@ -1675,6 +1677,7 @@ static Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSet
 static Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadOperationRequestAsync(this Microsoft.OData.ODataBatchReader reader, Microsoft.AspNetCore.Http.HttpContext context, System.Guid batchId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Http.HttpContext>
 static Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler, Microsoft.AspNetCore.Http.HttpContext context, System.Collections.Generic.Dictionary<string, string> contentIdToLocationMapping) -> System.Threading.Tasks.Task
 static Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter writer, Microsoft.AspNetCore.Http.HttpContext context) -> System.Threading.Tasks.Task
+static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAlternateKeys(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmEntityType entityType) -> System.Collections.Generic.IEnumerable<System.Collections.Generic.IDictionary<string, Microsoft.OData.Edm.IEdmPathExpression>>
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrEnumMemberAnnotation(this Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmEnumType enumType) -> Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrPropertyName(this Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmProperty edmProperty) -> string
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrencyProperties(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> System.Collections.Generic.IEnumerable<Microsoft.OData.Edm.IEdmStructuralProperty>

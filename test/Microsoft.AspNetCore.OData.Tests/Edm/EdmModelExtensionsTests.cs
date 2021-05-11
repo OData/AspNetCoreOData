@@ -2,16 +2,20 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Vocabularies;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
 {
     public class EdmModelExtensionsTests
     {
+        private static IEdmModel _model = GetEdmModel();
+
         [Fact]
         public void ResolvePropertyTest_WorksForCaseSensitiveAndInsensitive()
         {
@@ -64,6 +68,75 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Act & Assert - Negative case
             Action test = () => structuredType.ResolveProperty("title");
             ExceptionAssert.Throws<ODataException>(test, "Ambiguous property name 'title' found. Please use correct property name case.");
+        }
+
+        [Theory]
+        [InlineData("Code", "Code")]
+        [InlineData("Location", "Location")]
+        [InlineData("Location/Street", "Street")]
+        [InlineData("Location/City", "City")]
+        [InlineData("Location/NS.VipAddress/ZipCode", "ZipCode")]
+        public void FindPropertyTest_WorksForDirectPropertyOnType(string pathStr, string name)
+        {
+            // Arrange
+            EdmPropertyPathExpression path = new EdmPropertyPathExpression(pathStr);
+            IEdmEntityType company = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Company");
+            Assert.NotNull(company);
+
+            // Act
+            IEdmProperty property = _model.FindProperty(company, path);
+
+            // Assert
+            Assert.NotNull(property);
+            Assert.Equal(name, property.Name);
+        }
+
+        [Fact]
+        public void FindPropertyTest_ThrowsForPropertyNotFoundOnPathExpression()
+        {
+            // Arrange
+            EdmPropertyPathExpression path = new EdmPropertyPathExpression("OtherPath");
+            IEdmEntityType company = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Company");
+            Assert.NotNull(company);
+
+            // Act & Assert
+            Action test = () => _model.FindProperty(company, path);
+            ExceptionAssert.Throws<ODataException>(test, "Can not resolve the property using property path 'OtherPath' from type 'NS.Company'.");
+        }
+
+        [Fact]
+        public void FindPropertyTest_ThrowsForResourceTypeNotInModel()
+        {
+            // Arrange
+            EdmPropertyPathExpression path = new EdmPropertyPathExpression("Location/NS.AnotherType");
+            IEdmEntityType company = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Company");
+            Assert.NotNull(company);
+
+            // Act & Assert
+            Action test = () => _model.FindProperty(company, path);
+            ExceptionAssert.Throws<ODataException>(test, "Cannot find the resource type 'NS.AnotherType' in the model.");
+        }
+
+        private static IEdmModel GetEdmModel()
+        {
+            EdmModel model = new EdmModel();
+
+            // complex type address
+            EdmComplexType address = new EdmComplexType("NS", "Address");
+            address.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
+            address.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
+            model.AddElement(address);
+
+            EdmComplexType vipAddress = new EdmComplexType("NS", "VipAddress");
+            vipAddress.AddStructuralProperty("ZipCode", EdmPrimitiveTypeKind.String);
+            model.AddElement(vipAddress);
+
+            EdmEntityType company = new EdmEntityType("NS", "Company");
+            company.AddKeys(company.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+            company.AddStructuralProperty("Code", EdmPrimitiveTypeKind.Int32);
+            company.AddStructuralProperty("Location", new EdmComplexTypeReference(address, isNullable: true));
+            model.AddElement(company);
+            return model;
         }
     }
 }

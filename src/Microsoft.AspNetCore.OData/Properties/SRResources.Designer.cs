@@ -142,6 +142,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambiguous type name &apos;{0}&apos; found. Please use correct type name case..
+        /// </summary>
+        internal static string AmbiguousTypeNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousTypeNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
         /// </summary>
         internal static string ApplyQueryOptionNotSupportedForLinq2SQL {
@@ -763,7 +772,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
         /// </summary>
         internal static string InputKeyNotMatchEntityTypeKey {
             get {
@@ -1380,6 +1389,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string PropertyNotFound {
             get {
                 return ResourceManager.GetString("PropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can not resolve the property using property path &apos;{0}&apos; from type &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyNotFoundOnPathExpression {
+            get {
+                return ResourceManager.GetString("PropertyNotFoundOnPathExpression", resourceCulture);
             }
         }
         

@@ -2393,15 +2393,48 @@
             </summary>
             <param name="model">The Edm model.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAlternateKeys(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Gets the declared alternate keys of the most defined entity with a declared key present.
+            Each entity type could define a set of alternate keys.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="entityType">The Edm entity type.</param>
+            <returns>Alternate Keys of this type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveAlternateKeyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.KeySegment)">
+            <summary>
+            Resolve the alternate key properties.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="keySegment">The key segment.</param>
+            <returns>The resolved Edm properties.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveProperty(Microsoft.OData.Edm.IEdmStructuredType,System.String)">
             <summary>
             Resolve the <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> using the property name. This method supports the property name case insensitive.
-            However, ODL only support case-sensitive. Here's the logic:
-            1) If we match
+            However, ODL only support case-sensitive.
             </summary>
             <param name="structuredType">The given structural type </param>
             <param name="propertyName">The given property name.</param>
             <returns>The resolved <see cref="T:Microsoft.OData.Edm.IEdmProperty"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveType(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Resolve the <see cref="T:Microsoft.OData.Edm.IEdmSchemaType"/> using the type name. This method supports the type name case insensitive.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="typeName">The type name.</param>
+            <returns>The Edm schema type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindProperty(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmPathExpression)">
+            <summary>
+            Find the property using the given <see cref="T:Microsoft.OData.Edm.IEdmPathExpression"/> starting from the given <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="structuredType">The structured type.</param>
+            <param name="path">The property path.</param>
+            <returns>Null or the found edm property.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveNavigationSource(Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
@@ -6324,6 +6357,11 @@
               Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.AmbiguousTypeNameFound">
+            <summary>
+              Looks up a localized string similar to Ambiguous type name &apos;{0}&apos; found. Please use correct type name case..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ApplyQueryOptionNotSupportedForLinq2SQL">
             <summary>
               Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
@@ -6671,7 +6709,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InputKeyNotMatchEntityTypeKey">
             <summary>
-              Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+              Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidAttributeRoutingTemplateSegment">
@@ -7012,6 +7050,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyNotFound">
             <summary>
               Looks up a localized string similar to The EDM instance of type &apos;{0}&apos; is missing the property &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyNotFoundOnPathExpression">
+            <summary>
+              Looks up a localized string similar to Can not resolve the property using property path &apos;{0}&apos; from type &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyOrPathWasRemovedFromContext">
@@ -12409,6 +12452,12 @@
             Translator an OData path to a path segment templates.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.#ctor(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator" /> class.
+            </summary>
+            <param name="model">The Edm model.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.TypeSegment)">
             <summary>
             Translate a TypeSegment
@@ -12519,6 +12568,23 @@
             </summary>
             <param name="segment">the segment to Translate</param>
             <returns>Translated the path segment template.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.UnqualifiedCallAndAlternateKeyResolver">
+            <summary>
+            The OData uri resolver wrapper for alternate key and unqualified function call.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Parser.UnqualifiedCallAndAlternateKeyResolver.EnableCaseInsensitive">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.UnqualifiedCallAndAlternateKeyResolver.ResolveUnboundOperations(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.UnqualifiedCallAndAlternateKeyResolver.ResolveBoundOperations(Microsoft.OData.Edm.IEdmModel,System.String,Microsoft.OData.Edm.IEdmType)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.UnqualifiedCallAndAlternateKeyResolver.ResolveKeys(Microsoft.OData.Edm.IEdmEntityType,System.Collections.Generic.IDictionary{System.String,System.String},System.Func{Microsoft.OData.Edm.IEdmTypeReference,System.String,System.Object})">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate">
             <summary>
@@ -12932,12 +12998,28 @@
             </summary>
             <param name="segment">The key segment, it should be a template key segment.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.#ctor(Microsoft.OData.UriParser.KeySegment,System.Collections.Generic.IDictionary{System.String,Microsoft.OData.Edm.IEdmProperty})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate" /> class.
+            Typically, it's for alternate key scenario.
+            </summary>
+            <param name="segment">The key segment, it should be a template key segment.</param>
+            <param name="keyProperties">The key properties, the key is the alias,
+            the value is the property list, it could be a property from the complex property. For example: address/city.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeyMappings">
             <summary>
             Gets the dictionary representing the mappings from the key names in the current key segment to the 
             key names in route data.
             the key in dict could be the string used in request
             the value in dict could be the string used in action of controller
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeyProperties">
+            <summary>
+            Gets the keys.
+            The key of dict is the key name or alias name.
+            The value of dict is the key property, it could be property on entity type or sub property on complex property.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Literal">
@@ -12976,6 +13058,15 @@
             <param name="navigationSource">The given navigation source.</param>
             <param name="keyPrefix">The prefix used before key template.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.BuildKeyMappings(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}},Microsoft.OData.Edm.IEdmEntityType,System.Collections.Generic.IDictionary{System.String,Microsoft.OData.Edm.IEdmProperty})">
+            <summary>
+            Build the key mappings
+            </summary>
+            <param name="keys">The Uri template parsing result. for example: SSN={ssnKey}</param>
+            <param name="entityType">The Edm entity type.</param>
+            <param name="keyProperties">The key properties.</param>
+            <returns>The mapping</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate">
             <summary>

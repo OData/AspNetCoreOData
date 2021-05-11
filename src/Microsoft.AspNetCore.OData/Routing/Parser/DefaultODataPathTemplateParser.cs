@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData;
@@ -41,23 +42,27 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
             uriParser.EnableUriTemplateParsing = true;
 
-            uriParser.Resolver = new UnqualifiedODataUriResolver { EnableCaseInsensitive = true };
+            uriParser.Resolver = new UnqualifiedCallAndAlternateKeyResolver(model)
+            {
+                EnableCaseInsensitive = true
+            };
 
             uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in paraenthese and key as segment.
 
             ODataPath path = uriParser.ParsePath();
 
-            return Templatify(path);
+            return Templatify(path, model);
         }
 
-        private static ODataPathTemplate Templatify(ODataPath path)
+        private static ODataPathTemplate Templatify(ODataPath path, IEdmModel model)
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw Error.ArgumentNull(nameof(path));
             }
+            Contract.Assert(model != null);
 
-            ODataPathSegmentTemplateTranslator translator = new ODataPathSegmentTemplateTranslator();
+            ODataPathSegmentTemplateTranslator translator = new ODataPathSegmentTemplateTranslator(model);
 
             var templates = path.WalkWith(translator);
 

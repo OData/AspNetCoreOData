@@ -8,15 +8,70 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Validation;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class EdmModelExtensions
     {
         /// <summary>
+        /// Resolve the alternate key properties.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="keySegment">The key segment.</param>
+        /// <returns>The resolved Edm properties.</returns>
+        public static IDictionary<string, IEdmProperty> ResolveAlternateKeyProperties(this IEdmModel model, KeySegment keySegment)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (keySegment == null)
+            {
+                throw Error.ArgumentNull(nameof(keySegment));
+            }
+
+            IEdmEntityType entityType = (IEdmEntityType)keySegment.EdmType;
+            var alternateKeys = model.GetAlternateKeys(entityType);
+
+            // It should be case-sensitive, then we can support "Id" & "ID", they are different, but it's valid.
+            HashSet<string> keyNames = keySegment.Keys.Select(k => k.Key).ToHashSet(/*StringComparer.OrdinalIgnoreCase*/);
+
+            // Let's find the alternate key in alternate keys
+            // The count should match
+            // The keys should match the alias
+            int count = keySegment.Keys.Count();
+            IDictionary<string, IEdmPathExpression> foundAlternateKey = alternateKeys.FirstOrDefault(a => a.Count == count && keyNames.SetEquals(a.Keys));
+
+            if (foundAlternateKey == null)
+            {
+                return null;
+            }
+
+            IDictionary<string, IEdmProperty> properties = null;
+            foreach (var alternateKey in foundAlternateKey)
+            {
+                IEdmProperty edmProperty = model.FindProperty(entityType, alternateKey.Value);
+                if (edmProperty == null)
+                {
+                    throw new ODataException(Error.Format(SRResources.PropertyNotFoundOnPathExpression, alternateKey.Value.Path, entityType.FullName()));
+                }
+
+                if (properties == null)
+                {
+                    properties = new Dictionary<string, IEdmProperty>();
+                }
+
+                properties[alternateKey.Key] = edmProperty;
+            }
+
+            return properties;
+        }
+
+        /// <summary>
         /// Resolve the <see cref="IEdmProperty"/> using the property name. This method supports the property name case insensitive.
-        /// However, ODL only support case-sensitive. Here's the logic:
-        /// 1) If we match
+        /// However, ODL only support case-sensitive.
         /// </summary>
         /// <param name="structuredType">The given structural type </param>
         /// <param name="propertyName">The given property name.</param>
@@ -58,31 +113,100 @@ namespace Microsoft.AspNetCore.OData.Edm
             return edmProperty;
         }
 
-        public static IEdmSchemaType ResolveType(this IEdmModel model, string typeName, bool enableCaseInsensitive = false)
+        /// <summary>
+        /// Resolve the <see cref="IEdmSchemaType"/> using the type name. This method supports the type name case insensitive.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The Edm schema type.</returns>
+        public static IEdmSchemaType ResolveType(this IEdmModel model, string typeName)
         {
             IEdmSchemaType type = model.FindType(typeName);
-            if (type != null || !enableCaseInsensitive)
+            if (type != null)
             {
                 return type;
             }
 
             var types = model.SchemaElements.OfType<IEdmSchemaType>()
-                .Where(e => string.Equals(typeName, e.FullName(), enableCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                .Where(e => string.Equals(typeName, e.FullName(), StringComparison.OrdinalIgnoreCase));
 
             foreach (var refModels in model.ReferencedModels)
             {
                 var refedTypes = refModels.SchemaElements.OfType<IEdmSchemaType>()
-                    .Where(e => string.Equals(typeName, e.FullName(), enableCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                    .Where(e => string.Equals(typeName, e.FullName(), StringComparison.OrdinalIgnoreCase));
 
                 types = types.Concat(refedTypes);
             }
 
             if (types.Count() > 1)
             {
-                throw new Exception($"Multiple type found from the model for '{typeName}'.");
+                throw new ODataException(Error.Format(SRResources.AmbiguousTypeNameFound, typeName));
             }
 
             return types.SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Find the property using the given <see cref="IEdmPathExpression"/> starting from the given <see cref="IEdmStructuredType"/>.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="structuredType">The structured type.</param>
+        /// <param name="path">The property path.</param>
+        /// <returns>Null or the found edm property.</returns>
+        public static IEdmProperty FindProperty(this IEdmModel model, IEdmStructuredType structuredType, IEdmPathExpression path)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (structuredType == null)
+            {
+                throw Error.ArgumentNull(nameof(structuredType));
+            }
+
+            if (path == null)
+            {
+                throw Error.ArgumentNull(nameof(path));
+            }
+
+            IEdmProperty property = null;
+            IEdmStructuredType startingType = structuredType;
+            foreach (var segment in path.PathSegments)
+            {
+                if (string.IsNullOrEmpty(segment))
+                {
+                    // Let's simply ignore the empty segment
+                    continue;
+                }
+
+                // So far, we only support "property and type cast in the path"
+                if (segment.Contains('.', StringComparison.Ordinal))
+                {
+                    startingType = model.ResolveType(segment) as IEdmStructuredType;
+                    if (startingType == null)
+                    {
+                        throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, segment));
+                    }
+                }
+                else
+                {
+                    if (startingType == null)
+                    {
+                        return null;
+                    }
+
+                    property = startingType.ResolveProperty(segment);
+                    if (property == null)
+                    {
+                        throw new ODataException(Error.Format(SRResources.PropertyNotFoundOnPathExpression, path.Path, structuredType.FullTypeName()));
+                    }
+
+                    startingType = property.Type.GetElementTypeOrSelf().Definition as IEdmStructuredType;
+                }
+            }
+
+            return property;
         }
 
         /// <summary>

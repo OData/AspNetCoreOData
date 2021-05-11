@@ -142,7 +142,7 @@
     <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
   </data>
   <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
-    <value>The input key count '{0}' doesn't match the number of the entity type key '{1}'.</value>
+    <value>The input key count '{0}' doesn't match the number '{1}' of the key of entity type '{2}'.</value>
   </data>
   <data name="CannotFindKeyInEntityType" xml:space="preserve">
     <value>Cannot find key '{0}' in the '{1}' type.</value>
@@ -275,6 +275,9 @@
   </data>
   <data name="AmbiguousPropertyNameFound" xml:space="preserve">
     <value>Ambiguous property name '{0}' found. Please use correct property name case.</value>
+  </data>
+  <data name="AmbiguousTypeNameFound" xml:space="preserve">
+    <value>Ambiguous type name '{0}' found. Please use correct type name case.</value>
   </data>
   <data name="ODataPathMissing" xml:space="preserve">
     <value>The operation cannot be completed because no ODataPath is available for the request.</value>
@@ -692,5 +695,8 @@
   </data>
   <data name="PropertyUnrecognizedFormat" xml:space="preserve">
     <value>The value has a format that is not recognized by type {0}.</value>
+  </data>
+  <data name="PropertyNotFoundOnPathExpression" xml:space="preserve">
+    <value>Can not resolve the property using property path '{0}' from type '{1}'.</value>
   </data>
 </root>

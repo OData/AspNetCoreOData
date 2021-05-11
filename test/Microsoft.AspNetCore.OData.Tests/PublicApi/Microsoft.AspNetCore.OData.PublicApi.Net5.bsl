@@ -601,6 +601,11 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Collections.Generic.IEnumerable`1[[System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmPathExpression]]]] GetAlternateKeys (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmEntityType entityType)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation GetClrEnumMemberAnnotation (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmEnumType enumType)
 
 	[
@@ -2936,7 +2941,7 @@ public class Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateP
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator : Microsoft.OData.UriParser.PathSegmentTranslator`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] {
-	public ODataPathSegmentTemplateTranslator ()
+	public ODataPathSegmentTemplateTranslator (Microsoft.OData.Edm.IEdmModel model)
 
 	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchReferenceSegment segment)
 	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchSegment segment)
@@ -3109,6 +3114,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate
 
 public class Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public KeySegmentTemplate (Microsoft.OData.UriParser.KeySegment segment)
+	public KeySegmentTemplate (Microsoft.OData.UriParser.KeySegment segment, System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmProperty]] keyProperties)
 	public KeySegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] keys, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	int Count  { public get; }
@@ -3116,6 +3122,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate : Mi
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	bool IsSingle  { public virtual get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] KeyMappings  { public get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmProperty]] KeyProperties  { public get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
 	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }

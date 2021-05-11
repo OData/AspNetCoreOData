@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Common;
@@ -33,8 +34,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             EntityType = entityType ?? throw Error.ArgumentNull(nameof(entityType));
             NavigationSource = navigationSource;
+            KeyProperties = EntityType.Key().ToDictionary(k => k.Name, k => (IEdmProperty)k);
 
-            KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType);
+            KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType, KeyProperties);
 
             Literal = KeyMappings.Count == 1 ?
                 $"{{{KeyMappings.First().Value}}}" :
@@ -54,12 +56,41 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             NavigationSource = segment.NavigationSource;
             EntityType = segment.EdmType as IEdmEntityType;
+            KeyProperties = EntityType.Key().ToDictionary(k => k.Name, k => (IEdmProperty)k);
 
-            KeyMappings = BuildKeyMappings(segment.Keys, EntityType);
+            KeyMappings = BuildKeyMappings(segment.Keys, EntityType, KeyProperties);
 
             Literal = KeyMappings.Count == 1 ?
                 $"{{{KeyMappings.First().Value}}}" :
                 string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
+        /// Typically, it's for alternate key scenario.
+        /// </summary>
+        /// <param name="segment">The key segment, it should be a template key segment.</param>
+        /// <param name="keyProperties">The key properties, the key is the alias,
+        /// the value is the property list, it could be a property from the complex property. For example: address/city.</param>
+        public KeySegmentTemplate(KeySegment segment, IDictionary<string, IEdmProperty> keyProperties)
+        {
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
+            if (keyProperties == null)
+            {
+                throw Error.ArgumentNull(nameof(keyProperties));
+            }
+
+            NavigationSource = segment.NavigationSource;
+            EntityType = segment.EdmType as IEdmEntityType;
+            KeyProperties = keyProperties;
+
+            KeyMappings = BuildKeyMappings(segment.Keys, EntityType, keyProperties);
+
+            Literal = string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
@@ -69,6 +100,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// the value in dict could be the string used in action of controller
         /// </summary>
         public IDictionary<string, string> KeyMappings { get; }
+
+        /// <summary>
+        /// Gets the keys.
+        /// The key of dict is the key name or alias name.
+        /// The value of dict is the key property, it could be property on entity type or sub property on complex property.
+        /// </summary>
+        public IDictionary<string, IEdmProperty> KeyProperties { get; }
 
         /// <inheritdoc />
         public override string Literal { get; }
@@ -96,6 +134,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override bool IsSingle => true;
 
         /// <inheritdoc />
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
             if (context == null)
@@ -111,13 +150,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             {
                 string keyName = key.Key;
                 string templateName = key.Value;
-
-                IEdmProperty keyProperty = EntityType.Key().FirstOrDefault(k => k.Name == keyName);
-                Contract.Assert(keyProperty != null);
-
-                IEdmTypeReference edmType = keyProperty.Type;
                 if (routeValues.TryGetValue(templateName, out object rawValue))
                 {
+                    IEdmProperty keyProperty = KeyProperties.FirstOrDefault(k => k.Key == keyName).Value;
+                    Contract.Assert(keyProperty != null);
+
+                    IEdmTypeReference edmType = keyProperty.Type;
                     string strValue = rawValue as string;
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
                     if (newStrValue != strValue)
@@ -126,7 +164,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         strValue = newStrValue;
                     }
 
-                    object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
+                    object newValue;
+                    try
+                    {
+                        newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
 
                     // for non FromODataUri, so update it, for example, remove the single quote for string value.
                     updateValues[templateName] = newValue;
@@ -178,24 +224,39 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         internal static IDictionary<string, string> BuildKeyMappings(IEnumerable<KeyValuePair<string, object>> keys, IEdmEntityType entityType)
         {
+            return BuildKeyMappings(keys, entityType, entityType.Key().ToDictionary(k => k.Name, k => (IEdmProperty)k));
+        }
+
+        /// <summary>
+        /// Build the key mappings
+        /// </summary>
+        /// <param name="keys">The Uri template parsing result. for example: SSN={ssnKey}</param>
+        /// <param name="entityType">The Edm entity type.</param>
+        /// <param name="keyProperties">The key properties.</param>
+        /// <returns>The mapping</returns>
+        internal static IDictionary<string, string> BuildKeyMappings(IEnumerable<KeyValuePair<string, object>> keys,
+            IEdmEntityType entityType, IDictionary<string, IEdmProperty> keyProperties)
+        {
             Contract.Assert(keys != null);
             Contract.Assert(entityType != null);
+            Contract.Assert(keyProperties != null);
 
             Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
 
             int count = keys.Count();
-            ISet<string> entityTypeKeys = entityType.Key().Select(c => c.Name).ToHashSet();
-            if (count != entityTypeKeys.Count)
+            if (count != keyProperties.Count)
             {
-                throw new ODataException(Error.Format(SRResources.InputKeyNotMatchEntityTypeKey, count, entityTypeKeys.Count));
+                throw new ODataException(Error.Format(SRResources.InputKeyNotMatchEntityTypeKey, count, keyProperties.Count, entityType.FullName()));
             }
 
+            // keys have:  SSN={ssn},Name={name}
+            // the key "SSN" or "Name" is the alias in alternate keys
             foreach (KeyValuePair<string, object> key in keys)
             {
                 string keyName = key.Key;
 
                 // key name is case-sensitive
-                if (!entityTypeKeys.Contains(key.Key))
+                if (!keyProperties.ContainsKey(key.Key))
                 {
                     throw new ODataException(Error.Format(SRResources.CannotFindKeyInEntityType, keyName, entityType.FullName()));
                 }
