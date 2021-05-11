@@ -1,0 +1,150 @@
+# Variable '__NugetSecurityAnalysisWarningLevel__' was defined in the Variables tab
+# Variable 'ProductBinPath' was defined in the Variables tab
+# Variable 'runCodesignValidationInjection' was defined in the Variables tab
+trigger:
+  branches:
+    include:
+    - master
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: master
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  timeoutInMinutes: 120
+  pool:
+    vmImage: windows-2019
+  steps:
+  - checkout: self
+  - task: PoliCheck@1
+    displayName: Run PoliCheck ".\src"
+    inputs:
+      inputType: CmdLine
+      cmdLineArgs: /F:$(Build.SourcesDirectory)/src /T:9 /Sev:"1|2" /PE:2 /O:poli_result_src.xml
+  - task: PoliCheck@1
+    displayName: Run PoliCheck ".\test"
+    inputs:
+      inputType: CmdLine
+      cmdLineArgs: /F:$(Build.SourcesDirectory)/test /T:9 /Sev:"1|2" /PE:2 /O:poli_result_test.xml
+  - task: NuGetToolInstaller@1
+    displayName: Use NuGet >=5.2.0
+    inputs:
+      versionSpec: '>=5.2.0'
+      checkLatest: true
+  - task: UseDotNet@2
+    displayName: Use .NET Core sdk 3.1
+    inputs:
+      version: 3.x
+  - task: UseDotNet@2
+    displayName: Use .NET Core sdk 5.x
+    inputs:
+      version: 5.x
+      includePreviewVersions: true
+  - task: DotNetCoreCLI@2
+    displayName: build Microsoft.AspNetCore.OData
+    inputs:
+      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: DotNetCoreCLI@2
+    displayName: build Microsoft.AspNetCore.OData.NewtonsoftJson
+    inputs:
+      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: DotNetCoreCLI@2
+    displayName: Build UT(Microsoft.AspNetCore.OData.Tests)
+    inputs:
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: DotNetCoreCLI@2
+    displayName: Build UT(Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
+    inputs:
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: DotNetCoreCLI@2
+    displayName: Build E2E(Microsoft.AspNetCore.OData.E2E.Tests)
+    inputs:
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: DotNetCoreCLI@2
+    displayName: Unit Tests (Microsoft.AspNetCore.OData.Tests)
+    inputs:
+      command: test
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-build
+  - task: DotNetCoreCLI@2
+    displayName: Unit Tests (Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
+    inputs:
+      command: test
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-build
+  - task: DotNetCoreCLI@2
+    displayName: E2E Tests (Microsoft.AspNetCore.OData.E2E.Tests)
+    inputs:
+      command: test
+      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+      arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
+  - task: DotNetCoreCLI@2
+    displayName: build Product(Microsoft.AspNetCore.OData.NewtonsoftJson)
+    enabled: False
+    inputs:
+      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
+      arguments: --configuration $(BuildConfiguration) --no-incremental
+  - task: CredScan@2
+    displayName: Run CredScan - src
+    inputs:
+      toolMajorVersion: V2
+      scanFolder: $(Build.SourcesDirectory)\src
+      debugMode: false
+      folderSuppression: false
+  - task: CredScan@2
+    displayName: Run CredScan - test
+    inputs:
+      toolMajorVersion: V2
+      scanFolder: $(Build.SourcesDirectory)\test
+      debugMode: false
+      folderSuppression: false
+  - task: CredScan@2
+    displayName: Run CredScan - tool
+    inputs:
+      toolMajorVersion: V2
+      scanFolder: $(Build.SourcesDirectory)\tool
+      debugMode: false
+      folderSuppression: false
+  - task: FxCop@2
+    displayName: Run FxCop - Product Binaries
+    enabled: False
+    inputs:
+      inputType: Basic
+      targets: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)\**\Microsoft.AspNetCore.OData.dll
+  - task: RoslynAnalyzers@2
+    displayName: Run Roslyn Analyzers
+    enabled: False
+  - task: AntiMalware@3
+    displayName: Run MpCmdRun.exe
+    inputs:
+      FileDirPath: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
+      EnableServices: true
+  - task: BinSkim@3
+    displayName: Run BinSkim - Product Binaries
+    inputs:
+      InputType: Basic
+      arguments: $(ProductBinPath)\**\Microsoft.OData.ModelBuilder.dll
+      AnalyzeTarget: $(ProductBinPath)\**\Microsoft.AspNetCore.OData.dll
+      AnalyzeSymPath: $(ProductBinPath)
+      AnalyzeVerbose: true
+      AnalyzeHashes: true
+      AnalyzeEnvironment: true
+  - task: PublishSecurityAnalysisLogs@2
+    displayName: Publish Security Analysis Logs
+    inputs:
+      ArtifactName: SecurityLogs
+  - task: PostAnalysis@1
+    displayName: Post Analysis
+    inputs:
+      BinSkim: true
+      CredScan: true
+      PoliCheck: true
+      RoslynAnalyzers: true
+...
