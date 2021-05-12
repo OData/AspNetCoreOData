@@ -34,8 +34,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 
             IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();
 
-            services.AddControllers().AddOData(opt => opt.AddModel("AttributeRouting", edmModel)
-                .AddModel("ConventionRouting", edmModel).SetAttributeRouting(false));
+            services.AddControllers().AddOData(opt =>
+            {
+                opt.AddModel("AttributeRouting", edmModel).AddModel("ConventionRouting", edmModel);
+                opt.EnableAttributeRouting = false;
+            });
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IODataControllerActionConvention, MyAttributeRoutingConvention>());
         }

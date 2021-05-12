@@ -30,32 +30,10 @@ namespace Microsoft.AspNetCore.OData
         public ODataUrlKeyDelimiter UrlKeyDelimiter { get; set; } = ODataUrlKeyDelimiter.Slash;
 
         /// <summary>
-        /// Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically whether to recognize keys as segments or not.
-        /// </summary>
-        /// <param name="keyDelimiter">The key demimiter.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetUrlKeyDelimiter(ODataUrlKeyDelimiter keyDelimiter)
-        {
-            UrlKeyDelimiter = keyDelimiter;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or Sets a value indicating if batch requests should continue on error.
         /// By default, it's false.
         /// </summary>
         public bool EnableContinueOnErrorHeader { get; set; }
-
-        /// <summary>
-        /// Sets a value indicating if batch requests should continue on error.
-        /// </summary>
-        /// <param name="enableContinueOnError">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetContinueOnErrorHeader(bool enableContinueOnError)
-        {
-            EnableContinueOnErrorHeader = enableContinueOnError;
-            return this;
-        }
 
         /// <summary>
         /// Gets or Sets a value indicating if attribute routing is enabled or not.
@@ -64,53 +42,15 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableAttributeRouting { get; set; } = true;
 
         /// <summary>
-        /// Sets a value indicating if attribute routing is enabled or not.
-        /// </summary>
-        /// <param name="enabled">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetAttributeRouting(bool enabled)
-        {
-            EnableAttributeRouting = enabled;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or sets a function to build an <see cref="IContainerBuilder"/>.
         /// Please call it before the "AddModel".
         /// </summary>
         public Func<IContainerBuilder> BuilderFactory { get; set; }
 
         /// <summary>
-        /// Sets the builder factory. Please call it before the "AddModel".
-        /// </summary>
-        /// <param name="factory">The builder factory.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetBuilderFactory(Func<IContainerBuilder> factory)
-        {
-            BuilderFactory = factory;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or sets a TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
         /// </summary>
         public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.Local;
-
-        /// <summary>
-        /// Sets the <see cref="TimeZoneInfo"/> in route builder.
-        /// </summary>
-        /// <param name="timeZoneInfo">The <see cref="TimeZoneInfo"/></param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetTimeZoneInfo(TimeZoneInfo timeZoneInfo)
-        {
-            if (timeZoneInfo == null)
-            {
-                throw Error.ArgumentNull(nameof(timeZoneInfo));
-            }
-
-            TimeZone = timeZoneInfo;
-            return this;
-        }
 
         /// <summary>
         /// Gets the routing conventions.
@@ -121,22 +61,6 @@ namespace Microsoft.AspNetCore.OData
         /// Configure the route options.
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
-
-        /// <summary>
-        /// Configure the route options.
-        /// </summary>
-        /// <param name="configureAction">The action to config route options.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions ConfigureRoute(Action<ODataRouteOptions> configureAction)
-        {
-            if (configureAction == null)
-            {
-                throw Error.ArgumentNull(nameof(configureAction));
-            }
-
-            configureAction(RouteOptions);
-            return this;
-        }
         #endregion
 
         #region Models
@@ -201,7 +125,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (Models.ContainsKey(prefix))

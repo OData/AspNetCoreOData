@@ -3,6 +3,8 @@
 
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Abstracts
@@ -12,8 +14,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         [Fact]
         public void CtorThrowsArgumentNullServices()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new DefaultODataBuilder(null), "services");
+        }
+
+        [Fact]
+        public void Ctor_SetServices()
+        {
+            // Arrange
+            var services = new Mock<IServiceCollection>();
+
+            // Act
+            DefaultODataBuilder builder = new DefaultODataBuilder(services.Object);
+
+            // Assert
+            Assert.Same(services.Object, builder.Services);
         }
     }
 }

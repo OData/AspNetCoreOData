@@ -6048,25 +6048,11 @@
             By default, it supports key as segment only if the key is single key.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetUrlKeyDelimiter(Microsoft.OData.ODataUrlKeyDelimiter)">
-            <summary>
-            Sets the <see cref="T:Microsoft.OData.ODataUrlKeyDelimiter"/> to use while parsing, specifically whether to recognize keys as segments or not.
-            </summary>
-            <param name="keyDelimiter">The key demimiter.</param>
-            <returns>The calling itself.</returns>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader">
             <summary>
             Gets or Sets a value indicating if batch requests should continue on error.
             By default, it's false.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetContinueOnErrorHeader(System.Boolean)">
-            <summary>
-            Sets a value indicating if batch requests should continue on error.
-            </summary>
-            <param name="enableContinueOnError">The boolean value.</param>
-            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting">
             <summary>
@@ -6074,37 +6060,16 @@
             By default, it's enabled.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetAttributeRouting(System.Boolean)">
-            <summary>
-            Sets a value indicating if attribute routing is enabled or not.
-            </summary>
-            <param name="enabled">The boolean value.</param>
-            <returns>The calling itself.</returns>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory">
             <summary>
             Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>.
             Please call it before the "AddModel".
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetBuilderFactory(System.Func{Microsoft.OData.IContainerBuilder})">
-            <summary>
-            Sets the builder factory. Please call it before the "AddModel".
-            </summary>
-            <param name="factory">The builder factory.</param>
-            <returns>The calling itself.</returns>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.TimeZone">
             <summary>
             Gets or sets a TimeZoneInfo for the <see cref="T:System.DateTime"/> serialization and deserialization.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetTimeZoneInfo(System.TimeZoneInfo)">
-            <summary>
-            Sets the <see cref="T:System.TimeZoneInfo"/> in route builder.
-            </summary>
-            <param name="timeZoneInfo">The <see cref="T:System.TimeZoneInfo"/></param>
-            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Conventions">
             <summary>
@@ -6115,13 +6080,6 @@
             <summary>
             Configure the route options.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.ConfigureRoute(System.Action{Microsoft.AspNetCore.OData.Routing.ODataRouteOptions})">
-            <summary>
-            Configure the route options.
-            </summary>
-            <param name="configureAction">The action to config route options.</param>
-            <returns>The calling itself.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
             <summary>

@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.OData.Query
     /// </summary>
     public class DefaultQuerySettings
     {
-        private int? _maxTop = 0;
+        private int? _maxTop;
 
         /// <summary>
         /// Gets or sets a value indicating whether navigation property can be expanded.
