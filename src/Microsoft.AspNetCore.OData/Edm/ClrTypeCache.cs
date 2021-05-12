@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Edm
@@ -12,10 +13,13 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// </summary>
     internal class ClrTypeCache
     {
-        private ConcurrentDictionary<Type, IEdmTypeReference> _clrToEdmTypeCache =
-            new ConcurrentDictionary<Type, IEdmTypeReference>();
+        private ConcurrentDictionary<Type, IEdmTypeReference> _clrToEdmTypeCache = new ConcurrentDictionary<Type, IEdmTypeReference>();
 
-        private ConcurrentDictionary<IEdmTypeReference, Type> _edmToClrTypeCache = new ConcurrentDictionary<IEdmTypeReference, Type>();
+        private ConcurrentDictionary<EdmTypeCacheItem, Type> _edmToClrTypeCache = new ConcurrentDictionary<EdmTypeCacheItem, Type>();
+
+        // for unit test only
+        internal ConcurrentDictionary<Type, IEdmTypeReference> ClrToEdmTypeCache => _clrToEdmTypeCache;
+        internal ConcurrentDictionary<EdmTypeCacheItem, Type> EdmToClrTypeCache => _edmToClrTypeCache;
 
         public IEdmTypeReference GetEdmType(Type clrType, IEdmModel model)
         {
@@ -33,13 +37,41 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             Type clrType;
 
-            if (!_edmToClrTypeCache.TryGetValue(edmType, out clrType))
+            EdmTypeCacheItem item = new EdmTypeCacheItem(edmType.Definition, edmType.IsNullable);
+            if (!_edmToClrTypeCache.TryGetValue(item, out clrType))
             {
                 clrType = edmModel.GetClrType(edmType);
-                _edmToClrTypeCache[edmType] = clrType;
+                _edmToClrTypeCache[item] = clrType;
             }
 
             return clrType;
+        }
+
+        internal struct EdmTypeCacheItem
+        {
+            public IEdmType EdmType { get; }
+
+            public bool Nullable { get; }
+
+            public EdmTypeCacheItem(IEdmType edmType, bool nullable)
+            {
+                EdmType = edmType;
+                Nullable = nullable;
+            }
+        }
+
+        internal class EdmTypeCacheItemComparer : IEqualityComparer<EdmTypeCacheItem>
+        {
+            public bool Equals(EdmTypeCacheItem x, EdmTypeCacheItem y)
+            {
+                return (x.EdmType == y.EdmType) && (x.Nullable == y.Nullable);
+            }
+
+            public int GetHashCode(EdmTypeCacheItem obj)
+            {
+                string combined = $"{obj.EdmType.FullTypeName()}~{obj.Nullable}";
+                return combined.GetHashCode(StringComparison.Ordinal);
+            }
         }
     }
 }
