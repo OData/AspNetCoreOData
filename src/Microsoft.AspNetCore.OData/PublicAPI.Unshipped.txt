@@ -4,11 +4,11 @@ abstract Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAs
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.Clear() -> void
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-abstract Microsoft.AspNetCore.OData.Deltas.Delta.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+abstract Microsoft.AspNetCore.OData.Deltas.Delta.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyType(string name, out System.Type type) -> bool
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyValue(string name, out object value) -> bool
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TrySetPropertyValue(string name, object value) -> bool
-abstract Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+abstract Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer
 abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer
 abstract Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest request) -> double
@@ -209,12 +209,12 @@ Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Id.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Id.set -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Reason.get -> Microsoft.OData.DeltaDeletedEntryReason?
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Reason.set -> void
-Microsoft.AspNetCore.OData.Deltas.DeltaKind
-Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeletedResource = 1 -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedLink = 2 -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaLink = 3 -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-Microsoft.AspNetCore.OData.Deltas.DeltaKind.Resource = 0 -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown = 4 -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeletedResource = 1 -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeltaDeletedLink = 2 -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeltaLink = 3 -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.Resource = 0 -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.Unknown = 4 -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>
 Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>.DeltaLink() -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>.DeltaLink(System.Type structuralType) -> void
@@ -227,11 +227,10 @@ Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Source.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Source.set -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Target.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Target.set -> void
-Microsoft.AspNetCore.OData.Deltas.DeltaSet
-Microsoft.AspNetCore.OData.Deltas.DeltaSet.DeltaSet() -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>
 Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.DeltaSet() -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.ExpectedClrType.get -> System.Type
+Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem deltaItem, System.Collections.IEnumerable originalSet) -> T
 Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.StructuredType.get -> System.Type
 Microsoft.AspNetCore.OData.Deltas.IDelta
 Microsoft.AspNetCore.OData.Deltas.IDelta.Clear() -> void
@@ -246,8 +245,6 @@ Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Id.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Id.set -> void
 Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason.get -> Microsoft.OData.DeltaDeletedEntryReason?
 Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason.set -> void
-Microsoft.AspNetCore.OData.Deltas.IDeltaItem
-Microsoft.AspNetCore.OData.Deltas.IDeltaItem.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
 Microsoft.AspNetCore.OData.Deltas.IDeltaLink
 Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase
 Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Relationship.get -> string
@@ -256,6 +253,9 @@ Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Source.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Source.set -> void
 Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Target.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Target.set -> void
+Microsoft.AspNetCore.OData.Deltas.IDeltaSet
+Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem
+Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta.ExpectedClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta.StructuredType.get -> System.Type
@@ -525,7 +525,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject.EdmDeltaComplex
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject.EdmDeltaComplexObject(Microsoft.OData.Edm.IEdmComplexType edmType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject.EdmDeltaComplexObject(Microsoft.OData.Edm.IEdmComplexTypeReference edmType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink
-Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLink(Microsoft.OData.Edm.IEdmEntityType entityType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLink(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLink(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
@@ -536,7 +536,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Source.set -> voi
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Target.get -> System.Uri
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Target.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject
-Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
@@ -547,7 +547,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Navigat
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Reason.get -> Microsoft.OData.DeltaDeletedEntryReason?
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Reason.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink
-Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.EdmDeltaLink(Microsoft.OData.Edm.IEdmEntityType entityType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.EdmDeltaLink(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.EdmDeltaLink(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
@@ -558,7 +558,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Source.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Target.get -> System.Uri
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Target.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject
-Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.EdmDeltaResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.EdmDeltaResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.EdmDeltaResourceObject(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
@@ -599,7 +599,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.IsNullable.set ->
 Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetDynamicProperties() -> System.Collections.Generic.Dictionary<string, object>
 Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject
-Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject
@@ -1385,13 +1385,13 @@ override Microsoft.AspNetCore.OData.Deltas.Delta.TrySetMember(System.Dynamic.Set
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.Clear() -> void
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-override Microsoft.AspNetCore.OData.Deltas.Delta<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+override Microsoft.AspNetCore.OData.Deltas.Delta<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.TryGetPropertyType(string name, out System.Type type) -> bool
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.TryGetPropertyValue(string name, out object value) -> bool
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.TrySetPropertyValue(string name, object value) -> bool
-override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
-override Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+override Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Threading.Tasks.Task<object>
@@ -1435,7 +1435,7 @@ override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocument
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Clear() -> void
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaKind
+override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetPropertyType(string name, out System.Type type) -> bool
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetPropertyValue(string name, out object value) -> bool
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TrySetPropertyValue(string name, object value) -> bool
@@ -1784,8 +1784,6 @@ virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.ExpectedClrType.get -> System
 virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.StructuredType.get -> System.Type
 virtual Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.ExpectedClrType.get -> System.Type
 virtual Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.StructuredType.get -> System.Type
-virtual Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaItem deltaItem, System.Collections.Generic.IEnumerable<T> originalSet) -> T
-virtual Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.Patch(System.Collections.Generic.IEnumerable<T> originalSet) -> void
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEditLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel, System.Uri idLink) -> System.Uri
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEntitySelfLinks(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> Microsoft.AspNetCore.OData.Edm.EntitySelfLinks
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildIdLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> System.Uri

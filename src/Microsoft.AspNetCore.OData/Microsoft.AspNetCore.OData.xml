@@ -1706,7 +1706,7 @@
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1"/>.
             </summary>
-            <param name="structuralType"></param>
+            <param name="structuralType">The actual structural type.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1.Kind">
             <inheritdoc />
@@ -1770,33 +1770,33 @@
             <param name="type">The type to check.</param>
             <returns>True if it is a Delta generic type; false otherwise.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaKind">
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind">
             <summary>
             The Kind of the object within the DeltaPayload used to distinguish between
             Resource/DeletedResource/DeltaDeletedLink/AddedLink.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Resource">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.Resource">
             <summary>
             Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeletedResource">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeletedResource">
             <summary>
             Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedLink">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeltaDeletedLink">
             <summary>
             Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaLink">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeltaLink">
             <summary>
             Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.Unknown">
             <summary>
             Corresponds to any Unknown item added.
             </summary>
@@ -1983,11 +1983,6 @@
             <param name="propertyRef">Output for property value.</param>
             <returns>true if the property is found; false otherwise.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet">
-            <summary>
-            Represents a delta resource set.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1">
             <summary>
             <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1" /> allows and tracks changes to a delta resource set.
@@ -2003,22 +1998,22 @@
             Gets the expected type of the entity for which the changes are tracked.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.Patch(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.Patch(System.Collections.IEnumerable)">
             <summary>
              Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
             </summary>
             <remarks>
-            TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to 
+            TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to
             patch the deltaset to the original data source.
             </remarks>
             <param name="originalSet">The original set.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaItem,System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem,System.Collections.IEnumerable)">
             <summary>
             Find the related instance.
             </summary>
-            <param name="deltaItem"></param>
-            <param name="originalSet"></param>
+            <param name="deltaItem">The delta item.</param>
+            <param name="originalSet">The original set.</param>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
@@ -2083,16 +2078,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaItem">
-            <summary>
-            The delta item base.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaItem.Kind">
-            <summary>
-            Gets the delta item kind.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink">
             <summary>
             <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaLink" /> allows and tracks changes to an added link.
@@ -2116,6 +2101,21 @@
         <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase.Relationship">
             <summary>
             The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaSet">
+            <summary>
+            The interface for a delta resource set.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem">
+            <summary>
+            The delta set item base.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.Kind">
+            <summary>
+            Gets the delta item kind.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.ITypedDelta">
@@ -4133,11 +4133,6 @@
             </summary>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.TimeZone">
-            <summary>
-            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.SkipExpensiveAvailabilityChecks">
             <summary>
             Gets or sets a value indicating whether ActionAvailabilityChecks should be performed or not.
@@ -4155,6 +4150,11 @@
             The key is the dynamic property name.
             The value is the dynamic property value.
             </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext.GetPropertyValue(System.String)">
             <summary>

@@ -15,6 +15,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// DeltaKind for the objects part of the DeltaResourceSet Payload.
         /// Used to determine which Delta object to create during serialization.
         /// </summary>
-        DeltaKind DeltaKind { get; }
+        DeltaItemKind DeltaKind { get; }
     }
 }

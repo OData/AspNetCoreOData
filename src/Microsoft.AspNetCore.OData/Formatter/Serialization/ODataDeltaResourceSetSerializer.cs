@@ -150,33 +150,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 object lastResource = null;
                 //Iterate over all the entries present and select the appropriate write method.
                 //Write method creates ODataDeltaDeletedEntry / ODataDeltaDeletedLink / ODataDeltaLink or ODataEntry.
-                foreach (object entry in enumerable)
+                foreach (object item in enumerable)
                 {
-                    if (entry == null)
+                    if (item == null)
                     {
                         throw new SerializationException(SRResources.NullElementInCollection);
                     }
 
-                    lastResource = entry;
-                    IEdmChangedObject edmChangedObject = entry as IEdmChangedObject;
-                    if (edmChangedObject == null)
+                    lastResource = item;
+                    DeltaItemKind kind = GetDelteItemKind(item);
+                    switch (kind)
                     {
-                        throw new SerializationException(Error.Format(
-                            SRResources.CannotWriteType, GetType().Name, enumerable.GetType().FullName));
-                    }
-
-                    switch (edmChangedObject.DeltaKind)
-                    {
-                        case DeltaKind.DeletedResource:
-                            await WriteDeltaDeletedResourceAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeletedResource:
+                            await WriteDeltaDeletedResourceAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case DeltaKind.DeltaDeletedLink:
-                            await WriteDeltaDeletedLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeltaDeletedLink:
+                            await WriteDeltaDeletedLinkAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case DeltaKind.DeltaLink:
-                            await WriteDeltaLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeltaLink:
+                            await WriteDeltaLinkAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case DeltaKind.Resource:
+                        case DeltaItemKind.Resource:
                             {
                                 ODataResourceSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataResourceSerializer;
                                 if (entrySerializer == null)
@@ -184,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                                     throw new SerializationException(
                                         Error.Format(SRResources.TypeCannotBeSerialized, elementType.FullName()));
                                 }
-                                await entrySerializer.WriteDeltaObjectInlineAsync(entry, elementType, writer, writeContext)
+                                await entrySerializer.WriteDeltaObjectInlineAsync(item, elementType, writer, writeContext)
                                     .ConfigureAwait(false);
                                 break;
                             }
@@ -382,6 +376,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 await writer.WriteDeltaLinkAsync(odataDeltaLink).ConfigureAwait(false);
             }
+        }
+
+        internal DeltaItemKind GetDelteItemKind(object item)
+        {
+            IEdmChangedObject edmChangedObject = item as IEdmChangedObject;
+            if (edmChangedObject != null)
+            {
+                return edmChangedObject.DeltaKind;
+            }
+
+            IDeltaSetItem deltaSetItem = item as IDeltaSetItem;
+            if (deltaSetItem != null)
+            {
+                return deltaSetItem.Kind;
+            }
+
+            throw new SerializationException(Error.Format(
+                SRResources.CannotWriteType, GetType().Name, item.GetType().FullName));
         }
 
         private static IEdmStructuredTypeReference GetResourceType(IEdmTypeReference feedType)

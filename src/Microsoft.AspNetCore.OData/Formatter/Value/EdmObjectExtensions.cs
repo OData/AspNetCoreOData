@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
@@ -35,6 +36,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             if (resource == null)
             {
                 throw Error.ArgumentNull("resource");
+            }
+
+            TypedEdmEntityObject obj = resource as TypedEdmEntityObject;
+            if (obj != null)
+            {
+                if (obj.Instance is IDeltaSetItem)
+                {
+                    return true;
+                }
+            }
+
+            if (resource is IDeltaSetItem)
+            {
+                return true;
             }
 
             return (resource is EdmDeltaResourceObject || resource is EdmDeltaComplexObject);

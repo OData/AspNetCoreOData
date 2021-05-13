@@ -128,10 +128,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     Type elementClrType = readContext.Model.GetClrType(elementType);
                     Type changedObjCollType = typeof(DeltaSet<>).MakeGenericType(elementClrType);
 
-                    DeltaSet deltaSet = Activator.CreateInstance(changedObjCollType) as DeltaSet;
+                    IDeltaSet deltaSet = Activator.CreateInstance(changedObjCollType) as IDeltaSet;
                     foreach (var delta in result)
                     {
-                        IDeltaItem deltaItem = delta as IDeltaItem;
+                        IDeltaSetItem deltaItem = delta as IDeltaSetItem;
                         if (deltaItem != null)
                         {
                             deltaSet.Add(deltaItem);

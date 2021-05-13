@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         }
 
         /// <inheritdoc />
-        public override DeltaKind Kind => DeltaKind.Resource;
+        public override DeltaItemKind Kind => DeltaItemKind.Resource;
 
         /// <inheritdoc/>
         public virtual Type StructuredType

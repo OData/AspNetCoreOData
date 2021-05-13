@@ -47,11 +47,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, DeltaKind.Resource);
+            _edmType = new EdmDeltaType(entityType, DeltaItemKind.Resource);
         }
 
         /// <inheritdoc />
-        public DeltaKind DeltaKind
+        public DeltaItemKind DeltaKind
         {
             get
             {

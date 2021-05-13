@@ -65,6 +65,6 @@ namespace Microsoft.AspNetCore.OData.Deltas
         public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
-        public override DeltaKind Kind => DeltaKind.DeletedResource;
+        public override DeltaItemKind Kind => DeltaItemKind.DeletedResource;
     }
 }

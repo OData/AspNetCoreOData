@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="DeltaDeletedLink{T}" /> allows and tracks changes to delta deleted link.
     /// </summary>
-    public class DeltaDeletedLink<T> : DeltaLinkBase<T>, IDeltaDeletedLink where T: class
+    public sealed class DeltaDeletedLink<T> : DeltaLinkBase<T>, IDeltaDeletedLink where T: class
     {
         /// <summary>
         /// Initializes a new instance of <see cref="DeltaDeletedLink{T}"/>.
@@ -21,13 +21,13 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         /// Initializes a new instance of <see cref="DeltaDeletedLink{T}"/>.
         /// </summary>
-        /// <param name="structuralType"></param>
+        /// <param name="structuralType">The actual structural type.</param>
         public DeltaDeletedLink(Type structuralType)
             : base(structuralType)
         {
         }
 
         /// <inheritdoc />
-        public override DeltaKind Kind => DeltaKind.DeltaDeletedLink;
+        public override DeltaItemKind Kind => DeltaItemKind.DeltaDeletedLink;
     }
 }

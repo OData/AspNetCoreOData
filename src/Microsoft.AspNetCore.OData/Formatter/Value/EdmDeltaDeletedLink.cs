@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedLink(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, DeltaKind.DeltaDeletedLink);
+            _edmType = new EdmDeltaType(entityType, DeltaItemKind.DeltaDeletedLink);
         }
 
         /// <inheritdoc />
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public string Relationship { get; set; }
 
         /// <inheritdoc />
-        public DeltaKind DeltaKind
+        public DeltaItemKind DeltaKind
         {
             get
             {

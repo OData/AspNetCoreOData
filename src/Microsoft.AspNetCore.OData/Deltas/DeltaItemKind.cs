@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// The Kind of the object within the DeltaPayload used to distinguish between
     /// Resource/DeletedResource/DeltaDeletedLink/AddedLink.
     /// </summary>
-    public enum DeltaKind
+    public enum DeltaItemKind
     {
         /// <summary>
         /// Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).

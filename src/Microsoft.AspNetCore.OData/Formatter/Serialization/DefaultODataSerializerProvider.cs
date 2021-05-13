@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 return _serviceProvider.GetRequiredService<ODataMetadataSerializer>();
             }
-            else if (typeof(DeltaSet).IsAssignableFrom(type))
+            else if (typeof(IDeltaSet).IsAssignableFrom(type))
             {
                 return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
             }

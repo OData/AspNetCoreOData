@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, DeltaKind.DeletedResource);
+            _edmType = new EdmDeltaType(entityType, DeltaItemKind.DeletedResource);
         }
 
         /// <inheritdoc />
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
-        public DeltaKind DeltaKind
+        public DeltaItemKind DeltaKind
         {
             get
             {

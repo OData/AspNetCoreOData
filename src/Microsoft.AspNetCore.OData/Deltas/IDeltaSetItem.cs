@@ -4,13 +4,13 @@
 namespace Microsoft.AspNetCore.OData.Deltas
 {
     /// <summary>
-    /// The delta item base.
+    /// The delta set item base.
     /// </summary>
-    public interface IDeltaItem
+    public interface IDeltaSetItem
     {
         /// <summary>
         /// Gets the delta item kind.
         /// </summary>
-        DeltaKind Kind { get; }
+        DeltaItemKind Kind { get; }
     }
 }

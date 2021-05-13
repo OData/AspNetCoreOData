@@ -12,9 +12,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     internal class EdmDeltaType : IEdmType
     {
         private IEdmEntityType _entityType;
-        private DeltaKind _deltaKind;
 
-        internal EdmDeltaType(IEdmEntityType entityType, DeltaKind deltaKind)
+        private DeltaItemKind _deltaKind;
+
+        internal EdmDeltaType(IEdmEntityType entityType, DeltaItemKind deltaKind)
         {
             _entityType = entityType ?? throw Error.ArgumentNull("entityType");
             _deltaKind = deltaKind;
@@ -28,6 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <summary>
         /// Returning DeltaKind of the object within DeltaResourceSet payload
         /// </summary>
-        public DeltaKind DeltaKind => _deltaKind;
+        public DeltaItemKind DeltaKind => _deltaKind;
     }
 }

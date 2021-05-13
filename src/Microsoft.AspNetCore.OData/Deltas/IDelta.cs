@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="IDelta" /> allows and tracks changes to an object.
     /// </summary>
-    public interface IDelta : IDeltaItem
+    public interface IDelta : IDeltaSetItem
     {
         /// <summary>
         /// Returns the Properties that have been modified through this IDelta as an
