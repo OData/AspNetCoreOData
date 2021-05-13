@@ -167,16 +167,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     switch (edmChangedObject.DeltaKind)
                     {
-                        case EdmDeltaKind.DeletedResource:
+                        case DeltaKind.DeletedResource:
                             await WriteDeltaDeletedResourceAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.DeltaDeletedLink:
+                        case DeltaKind.DeltaDeletedLink:
                             await WriteDeltaDeletedLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.DeltaLink:
+                        case DeltaKind.DeltaLink:
                             await WriteDeltaLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.Resource:
+                        case DeltaKind.Resource:
                             {
                                 ODataResourceSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataResourceSerializer;
                                 if (entrySerializer == null)

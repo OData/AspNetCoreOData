@@ -47,12 +47,12 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
                 switch (delta.Kind)
                 {
-                    case DeltaKind.DeltaResource:
+                    case DeltaKind.Resource:
                         // A Delta resource is a delta
                         IDelta deltaResource = (IDelta)delta;
                         break;
 
-                    case DeltaKind.DeltaDeletedResource:
+                    case DeltaKind.DeletedResource:
                         // A Delta deleted resource is a delta deleted resource
                         IDeltaDeletedResource deltaDeletedResource = (IDeltaDeletedResource)delta;
                         break;

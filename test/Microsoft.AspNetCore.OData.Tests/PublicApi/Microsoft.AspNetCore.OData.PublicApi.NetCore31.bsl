@@ -451,11 +451,11 @@ public class Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler : Micr
 }
 
 public enum Microsoft.AspNetCore.OData.Deltas.DeltaKind : int {
-	DeltaDeletedLink = 3
-	DeltaDeletedResource = 2
-	DeltaLink = 4
-	DeltaResource = 1
-	Unknown = 0
+	DeletedResource = 1
+	DeltaDeletedLink = 2
+	DeltaLink = 3
+	Resource = 0
+	Unknown = 4
 }
 
 public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaItem {
@@ -2274,16 +2274,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode
 	public static void GetStructuralProperties (Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.HashSet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] structuralProperties, System.Collections.Generic.HashSet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] nestedStructuralProperties)
 }
 
-public enum Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind : int {
-	DeletedResource = 1
-	DeltaDeletedLink = 2
-	DeltaLink = 3
-	Resource = 0
-	Unknown = 4
-}
-
 public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject : IEdmObject, IEdmStructuredObject {
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public abstract get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind DeltaKind  { public abstract get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject : IEdmObject, IEdmStructuredObject {
@@ -2404,7 +2396,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Mi
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind DeltaKind  { public virtual get; }
 	string Relationship  { public virtual get; public virtual set; }
 	System.Uri Source  { public virtual get; public virtual set; }
 	System.Uri Target  { public virtual get; public virtual set; }
@@ -2418,7 +2410,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceO
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind DeltaKind  { public virtual get; }
 	System.Uri Id  { public virtual get; public virtual set; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public virtual get; public virtual set; }
@@ -2432,7 +2424,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind DeltaKind  { public virtual get; }
 	string Relationship  { public virtual get; public virtual set; }
 	System.Uri Source  { public virtual get; public virtual set; }
 	System.Uri Target  { public virtual get; public virtual set; }
@@ -2446,7 +2438,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject :
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaKind DeltaKind  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 }
 

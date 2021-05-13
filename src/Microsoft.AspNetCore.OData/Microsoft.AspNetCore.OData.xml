@@ -1776,29 +1776,29 @@
             Resource/DeletedResource/DeltaDeletedLink/AddedLink.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Resource">
             <summary>
-            Corresponds to any Unknown item added.
+            Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaResource">
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeletedResource">
             <summary>
-            Corresponds to ODataResource.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedResource">
-            <summary>
-            Corresponds to ODataDeletedResource.
+            Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaDeletedLink">
             <summary>
-            Corresponds to ODataDeltaDeletedLink.
+            Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.DeltaLink">
             <summary>
-            Corresponds to ODataDeltaLink.
+            Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaKind.Unknown">
+            <summary>
+            Corresponds to any Unknown item added.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1">
@@ -5219,36 +5219,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.NavigationSource">
             <summary>
             The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind">
-            <summary>
-            The Kind of the object within the DeltaPayload used to distinguish between Resource/DeletedResource/DeltaDeletedLink/AddedLink.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Resource">
-            <summary>
-            Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeletedResource">
-            <summary>
-            Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaDeletedLink">
-            <summary>
-            Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.DeltaLink">
-            <summary>
-            Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind.Unknown">
-            <summary>
-            Corresponds to any Unknown item added.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink">

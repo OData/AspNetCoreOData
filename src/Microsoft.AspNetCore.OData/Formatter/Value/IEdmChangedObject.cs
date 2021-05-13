@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Deltas;
+
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
     /// <summary>
@@ -13,6 +15,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// DeltaKind for the objects part of the DeltaResourceSet Payload.
         /// Used to determine which Delta object to create during serialization.
         /// </summary>
-        EdmDeltaKind DeltaKind { get; }
+        DeltaKind DeltaKind { get; }
     }
 }

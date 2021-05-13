@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.DeletedResource);
+            _edmType = new EdmDeltaType(entityType, DeltaKind.DeletedResource);
         }
 
         /// <inheritdoc />
@@ -56,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
+        public DeltaKind DeltaKind
         {
             get
             {

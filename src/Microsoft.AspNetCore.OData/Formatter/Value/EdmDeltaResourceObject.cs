@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -46,11 +47,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.Resource);
+            _edmType = new EdmDeltaType(entityType, DeltaKind.Resource);
         }
 
         /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
+        public DeltaKind DeltaKind
         {
             get
             {

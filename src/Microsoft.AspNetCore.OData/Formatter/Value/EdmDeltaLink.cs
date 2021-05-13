@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaLink(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.DeltaLink);
+            _edmType = new EdmDeltaType(entityType, DeltaKind.DeltaLink);
         }
 
         /// <inheritdoc />
@@ -59,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public string Relationship { get; set; }
 
         /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
+        public DeltaKind DeltaKind
         {
             get
             {

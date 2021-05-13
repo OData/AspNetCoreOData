@@ -10,28 +10,28 @@ namespace Microsoft.AspNetCore.OData.Deltas
     public enum DeltaKind
     {
         /// <summary>
+        /// Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
+        /// </summary>
+        Resource = 0,
+
+        /// <summary>
+        /// Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
+        /// </summary>
+        DeletedResource = 1,
+
+        /// <summary>
+        /// Corresponds to EdmDeltaDeletedLink (Equivalent of ODataDeltaDeletedLink in ODL).
+        /// </summary>
+        DeltaDeletedLink = 2,
+
+        /// <summary>
+        /// Corresponds to EdmDeltaLink (Equivalent of ODataDeltaLink in ODL).
+        /// </summary>
+        DeltaLink = 3,
+
+        /// <summary>
         /// Corresponds to any Unknown item added.
         /// </summary>
-        Unknown,
-
-        /// <summary>
-        /// Corresponds to ODataResource.
-        /// </summary>
-        DeltaResource,
-
-        /// <summary>
-        /// Corresponds to ODataDeletedResource.
-        /// </summary>
-        DeltaDeletedResource,
-
-        /// <summary>
-        /// Corresponds to ODataDeltaDeletedLink.
-        /// </summary>
-        DeltaDeletedLink,
-
-        /// <summary>
-        /// Corresponds to ODataDeltaLink.
-        /// </summary>
-        DeltaLink
+        Unknown = 4
     }
 }

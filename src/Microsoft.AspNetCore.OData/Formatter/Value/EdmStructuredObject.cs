@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <inheritdoc/>
-        public override DeltaKind Kind => DeltaKind.DeltaResource;
+        public override DeltaKind Kind => DeltaKind.Resource;
 
         /// <summary>
         /// Gets or sets the expected <see cref="IEdmStructuredType"/> of the entity or complex type of this object.
