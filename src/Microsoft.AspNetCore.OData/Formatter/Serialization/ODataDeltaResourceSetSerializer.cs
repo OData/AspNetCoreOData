@@ -383,7 +383,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmChangedObject edmChangedObject = item as IEdmChangedObject;
             if (edmChangedObject != null)
             {
-                return edmChangedObject.DeltaKind;
+                return edmChangedObject.Kind;
             }
 
             IDeltaSetItem deltaSetItem = item as IDeltaSetItem;

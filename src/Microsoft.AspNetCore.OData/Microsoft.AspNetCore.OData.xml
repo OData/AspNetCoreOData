@@ -1770,6 +1770,13 @@
             <param name="type">The type to check.</param>
             <returns>True if it is a Delta generic type; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaHelper.IsDeltaResourceSet(System.Object)">
+            <summary>
+            Helper method to check whether the given object is Delta resource set.
+            </summary>
+            <param name="result">The given object.</param>
+            <returns>True/False.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind">
             <summary>
             The Kind of the object within the DeltaPayload used to distinguish between
@@ -4133,6 +4140,11 @@
             </summary>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.SkipExpensiveAvailabilityChecks">
             <summary>
             Gets or sets a value indicating whether ActionAvailabilityChecks should be performed or not.
@@ -4150,11 +4162,6 @@
             The key is the dynamic property name.
             The value is the dynamic property value.
             </remarks>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.TimeZone">
-            <summary>
-            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
-            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext.GetPropertyValue(System.String)">
             <summary>
@@ -5145,12 +5152,7 @@
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/> with no backing CLR <see cref="T:System.Type"/>.
-            Used to hold the Deleted Link object in the Delta ResourceSet Payload.
-            </summary>
-        </member>
+        <!-- Badly formed XML comment ignored for member "T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink" -->
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink"/> class.
@@ -5170,16 +5172,7 @@
             <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaDeletedLink.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Source">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Target">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Relationship">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.DeltaKind">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Kind">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject">
@@ -5246,16 +5239,56 @@
             <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaLink.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Source">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Kind">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Target">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase">
+            <summary>
+            The base class for delta link.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase"/> class.
+            </summary>
+            <param name="typeReference">The given entity type reference.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.#ctor(Microsoft.OData.Edm.IEdmEntityType,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase"/> class.
+            </summary>
+            <param name="entityType">The given entity type.</param>
+            <param name="isNullable">Nullable or not.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.EntityType">
+            <summary>
+            Gets the entity type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.IsNullable">
+            <summary>
+            Gets the nullable value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Source">
+            <summary>
+            The Uri of the entity from which the relationship is defined, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Target">
+            <summary>
+            The Uri of the related entity, which may be absolute or relative.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Relationship">
+            <summary>
+            The name of the relationship property on the parent object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Kind">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Relationship">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.DeltaKind">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.GetEdmType">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject">
@@ -5503,7 +5536,7 @@
             Base interface to be implemented by any Delta object required to be part of the DeltaResourceSet Payload.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.DeltaKind">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.Kind">
             <summary>
             DeltaKind for the objects part of the DeltaResourceSet Payload.
             Used to determine which Delta object to create during serialization.

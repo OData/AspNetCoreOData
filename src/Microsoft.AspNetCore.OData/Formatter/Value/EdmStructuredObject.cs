@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// Represents an <see cref="IEdmStructuredObject"/> with no backing CLR <see cref="Type"/>.
     /// </summary>
     [NonValidatingParameterBinding]
-    public abstract class EdmStructuredObject : Delta, IEdmStructuredObject
+    public abstract class EdmStructuredObject : Delta, IEdmStructuredObject, IEdmChangedObject
     {
         private Dictionary<string, object> _container = new Dictionary<string, object>();
         private HashSet<string> _setProperties = new HashSet<string>();

@@ -229,7 +229,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act
             await ExceptionAssert.ThrowsAsync<SerializationException>(
                 () => serializer.WriteObjectInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
-                "ODataDeltaResourceSetSerializer cannot write an object of type 'System.Object[]'.");
+                "ODataDeltaResourceSetSerializer cannot write an object of type 'System.Int32'.");
         }
 
         [Fact]
