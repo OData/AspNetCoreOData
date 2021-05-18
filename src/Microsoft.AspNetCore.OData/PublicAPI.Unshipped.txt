@@ -530,7 +530,6 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLi
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLink(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.EdmDeltaDeletedLink(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject
-Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.EdmDeltaDeletedResourceObject(Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference) -> void
@@ -1432,6 +1431,7 @@ override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSeri
 override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectInlineAsync(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.WriteObjectAsync(object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+override Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Clear() -> void
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>

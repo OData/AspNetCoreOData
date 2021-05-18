@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
+    /// <summary>
     /// Represents an <see cref="IEdmDeltaDeletedLink"/> with no backing CLR <see cref="Type"/>.
     /// Used to hold the Deleted Link object in the Delta ResourceSet Payload.
     /// </summary>

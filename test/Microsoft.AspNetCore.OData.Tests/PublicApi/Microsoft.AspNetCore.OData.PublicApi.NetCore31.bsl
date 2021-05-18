@@ -2419,8 +2419,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceO
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind DeltaKind  { public get; }
 	System.Uri Id  { public virtual get; public virtual set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public virtual get; public virtual set; }
 }

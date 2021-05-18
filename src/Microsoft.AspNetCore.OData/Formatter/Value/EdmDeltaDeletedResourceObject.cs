@@ -57,14 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
-        public DeltaItemKind DeltaKind
-        {
-            get
-            {
-                Contract.Assert(_edmType != null);
-                return _edmType.DeltaKind;
-            }
-        }
+        public override DeltaItemKind Kind => DeltaItemKind.DeletedResource;
 
         /// <summary>
         /// The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.

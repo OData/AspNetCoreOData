@@ -5152,7 +5152,12 @@
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink" -->
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink"/> with no backing CLR <see cref="T:System.Type"/>.
+            Used to hold the Deleted Link object in the Delta ResourceSet Payload.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink"/> class.
@@ -5206,7 +5211,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Reason">
             <inheritdoc />
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.DeltaKind">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.Kind">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject.NavigationSource">
