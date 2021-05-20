@@ -8,46 +8,83 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that can match a <see cref="NavigationPropertyLinkSegment"/>.
+    /// Represents a template that can match a <see cref="NavigationPropertyLinkSegment"/> and a potential key.
     /// </summary>
     public class NavigationLinkSegmentTemplate : ODataSegmentTemplate
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate"/> class.
+        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="navigationProperty">The navigation property this link or ref acts on</param>
-        /// <param name="navigationSource">The navigation source of entities linked to. This can be null.</param>
+        /// <param name="navigationProperty">The Edm navigation property.</param>
+        /// <param name="navigationSource">The Edm navigation source. This could be null.</param>
         public NavigationLinkSegmentTemplate(IEdmNavigationProperty navigationProperty, IEdmNavigationSource navigationSource)
             : this(new NavigationPropertyLinkSegment(navigationProperty, navigationSource))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate"/> class.
+        /// Initializes a new instance of the <see cref="NavigationLinkSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="segment">The navigation property link segment</param>
+        /// <param name="segment">The navigation link segment.</param>
         public NavigationLinkSegmentTemplate(NavigationPropertyLinkSegment segment)
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
         /// <summary>
-        /// Gets or sets the navigation property link segment.
+        /// Gets/sets the related key template.
+        /// </summary>
+        public KeySegmentTemplate Key { get; set; }
+
+        /// <summary>
+        /// Gets the Edm navigation property.
+        /// </summary>
+        public IEdmNavigationProperty NavigationProperty => Segment.NavigationProperty;
+
+        /// <summary>
+        /// Gets the navigation source.
+        /// </summary>
+        public IEdmNavigationSource NavigationSource => Segment.NavigationSource;
+
+        /// <summary>
+        /// Gets the navigation property link segment.
         /// </summary>
         public NavigationPropertyLinkSegment Segment { get; }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            yield return $"/{Segment.NavigationProperty.Name}/$ref";
+            if (Key != null)
+            {
+                IEnumerable<string> keyTemplates = Key.GetTemplates(options);
+                foreach (var keyTemplate in keyTemplates)
+                {
+                    yield return $"/{NavigationProperty.Name}{keyTemplate}/$ref";
+                }
+            }
+            else
+            {
+                yield return $"/{NavigationProperty.Name}/$ref";
+            }
         }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            // TODO: maybe save the property name.
-            // or create the PropertySegment using the information in the context.
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            // ODL path has the "NavigationPropertyLinkSegment" first.
+            context.Segments.Add(Segment);
+
+            // Then, append the key if apply.
+            if (Key != null)
+            {
+                return Key.TryTranslate(context);
+            }
+
             return true;
         }
     }

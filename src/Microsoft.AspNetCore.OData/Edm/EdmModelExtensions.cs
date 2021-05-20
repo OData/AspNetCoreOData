@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             bool ambiguous = false;
             IEdmProperty edmProperty = null;
-            foreach (var property in structuredType.StructuralProperties())
+            foreach (var property in structuredType.Properties())
             {
                 string name = property.Name;
                 if (name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))

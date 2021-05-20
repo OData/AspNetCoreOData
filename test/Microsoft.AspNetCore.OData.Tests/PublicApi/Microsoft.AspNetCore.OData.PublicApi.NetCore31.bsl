@@ -2932,27 +2932,6 @@ public class Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateP
 	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Parse (Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider)
 }
 
-public class Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator : Microsoft.OData.UriParser.PathSegmentTranslator`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] {
-	public ODataPathSegmentTemplateTranslator (Microsoft.OData.Edm.IEdmModel model)
-
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchReferenceSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.CountSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.DynamicPathSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.EntitySetSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.KeySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.MetadataSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.NavigationPropertySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.OperationImportSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.OperationSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.PathTemplateSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.PropertySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.SingletonSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.TypeSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.ValueSegment segment)
-}
-
 public interface Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator {
 	Microsoft.OData.UriParser.ODataPath Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
@@ -3078,7 +3057,21 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTe
 	public NavigationLinkSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
 	public NavigationLinkSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
+	Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate Key  { public get; public set; }
+	Microsoft.OData.Edm.IEdmNavigationProperty NavigationProperty  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	Microsoft.OData.UriParser.NavigationPropertyLinkSegment Segment  { public get; }
+
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
+	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public NavigationLinkTemplateSegmentTemplate (Microsoft.OData.Edm.IEdmStructuredType declaringType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
+
+	Microsoft.OData.Edm.IEdmStructuredType DeclaringType  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
+	string RelatedKey  { public get; public set; }
 
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
@@ -3090,18 +3083,6 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTempla
 
 	Microsoft.OData.Edm.IEdmNavigationProperty NavigationProperty  { public get; }
 	Microsoft.OData.UriParser.NavigationPropertySegment Segment  { public get; }
-
-	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
-	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
-}
-
-public class Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public NavigatioRefTemplateSegmentTemplate (Microsoft.OData.Edm.IEdmStructuredType declaredType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-	public NavigatioRefTemplateSegmentTemplate (Microsoft.OData.Edm.IEdmStructuredType declaredType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, string relatedKey)
-
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
-	string RelatedKey  { public get; }
-	Microsoft.OData.Edm.IEdmStructuredType StructuredType  { public get; }
 
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
@@ -3121,7 +3102,7 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateC
 	Microsoft.AspNetCore.Http.HttpContext HttpContext  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary RouteValues  { public get; }
-	System.Collections.Generic.ICollection`1[[Microsoft.OData.UriParser.ODataPathSegment]] Segments  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.OData.UriParser.ODataPathSegment]] Segments  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary UpdatedValues  { public get; }
 
 	public string GetParameterAliasOrSelf (string alias)
@@ -3152,16 +3133,6 @@ public class Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate
 
 	Microsoft.OData.Edm.IEdmStructuralProperty Property  { public get; }
 	Microsoft.OData.UriParser.PropertySegment Segment  { public get; }
-
-	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
-	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
-}
-
-public class Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public RefSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-
-	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)

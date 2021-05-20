@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // Process the generic scenario
             if (property == null)
             {
-                return ProcessNonNavigationProperty(context, action, navigationSource, entityType, declaringType);
+                return ProcessNonNavigationProperty(httpMethod, context, action, navigationSource, entityType, declaringType);
             }
 
             // Find the navigation property if have
@@ -118,28 +118,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
-
-            if (navigationProperty != null)
-            {
-                segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
-            }
-            else
-            {
-                //TODO: Add the navigation template segment template,
-                // Or add the template for all navigation properties? 
-                return false;
-            }
+            NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
 
             IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
             bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
-                segments.Add(KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey"));
+                linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
+            }
+            else
+            {
+                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedId");
+                if (hasNavigationPropertyKeyParameter)
+                {
+                    linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");
+                }
             }
 
-            segments.Add(new RefSegmentTemplate(navigationProperty, targetNavigationSource));
+            segments.Add(linkTemplate);
 
-            // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
             action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
@@ -147,7 +144,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return true;
         }
 
-        internal static bool ProcessNonNavigationProperty(ODataControllerActionContext context,
+        internal static bool ProcessNonNavigationProperty(string httpMethod, ODataControllerActionContext context,
             ActionModel action,
             IEdmNavigationSource navigationSource,
             IEdmEntityType entityType, IEdmStructuredType castType)
@@ -158,7 +155,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            // Let's only handle single key convention, for composite key, use attribute routing.
+            // Let's only handle single-key convention, for composite key, use attribute routing or non-generic navigation.
             bool hasRelatedKey = action.Parameters.Any(p => p.Name == "relatedKey"); // case sensitive?
             bool hasRelatedId = action.Parameters.Any(p => p.Name == "relatedId");
 
@@ -180,16 +177,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             if (hasRelatedKey)
             {
-                segments.Add(new NavigatioRefTemplateSegmentTemplate(entityType, navigationSource, "relatedKey"));
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
+                {
+                    RelatedKey = "relatedKey"
+                });
             }
             else if (hasRelatedId)
             {
-                segments.Add(new NavigatioRefTemplateSegmentTemplate(entityType, navigationSource, "relatedId"));
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
+                {
+                    RelatedKey = "relatedId"
+                });
             }
             else
             {
-                segments.Add(new NavigatioRefTemplateSegmentTemplate(entityType, navigationSource));
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource));
             }
+
+            ODataPathTemplate template = new ODataPathTemplate(segments);
+            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
             return true;
         }

@@ -77,12 +77,6 @@ namespace ODataRoutingSample.OpenApi
                         //newSegments.Add(value.ConvertTo());
                         //break;
 
-                    case RefSegmentTemplate refSeg:
-                        return null;
-                        //KeySegmentTemplate key = (KeySegmentTemplate)segment;
-                        //newSegments.Add(key.ConvertTo());
-                        //break;
-
                     case NavigationLinkSegmentTemplate navigationLink:
                         return null;
                         //NavigationLinkSegmentTemplate navigationLink = (NavigationLinkSegmentTemplate)segment;

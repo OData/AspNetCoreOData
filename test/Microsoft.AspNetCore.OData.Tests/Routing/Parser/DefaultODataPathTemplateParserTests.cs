@@ -147,9 +147,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
         }
 
         [Theory]
-        [InlineData("Customers({idKey})/Orders/$ref", 4)]
-        [InlineData("Customers/{idKey}/Orders/$ref", 4)]
-        [InlineData("VipCustomer/Orders/$ref", 3)]
+        [InlineData("Customers({idKey})/Orders/$ref", 3)]
+        [InlineData("Customers/{idKey}/Orders/$ref", 3)]
+        [InlineData("VipCustomer/Orders/$ref", 2)]
         public void ParseODataUriTemplate_ForNavigationPropertyLink(string template, int count)
         {
             // Arrange
@@ -161,10 +161,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
             // Assert
             Assert.NotNull(path);
             Assert.Equal(count, path.Count);
-            NavigationSegmentTemplate navigationSegment = Assert.IsType<NavigationSegmentTemplate>(path[count - 2]);
+            NavigationLinkSegmentTemplate navigationSegment = Assert.IsType<NavigationLinkSegmentTemplate>(path[count - 1]);
             Assert.Equal("Orders", navigationSegment.NavigationProperty.Name);
-
-            Assert.IsType<RefSegmentTemplate>(path[count - 1]);
         }
 
         [Theory]

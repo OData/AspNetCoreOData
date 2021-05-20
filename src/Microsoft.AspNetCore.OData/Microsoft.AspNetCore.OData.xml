@@ -12389,7 +12389,7 @@
             to segments
             </summary>
             <param name="model">the Edm model.</param>
-            <param name="odataPath">the setting.</param>
+            <param name="odataPath">the OData path.</param>
             <param name="requestProvider">The service provider.</param>
             <returns>Null or <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate"/>.</returns>
         </member>
@@ -12417,130 +12417,116 @@
             <param name="requestProvider">The OData service provider.</param>
             <returns>A parsed representation of the template, or <c>null</c> if the template does not match the model.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler">
+            <summary>
+            Handle an OData path to a path segment templates.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.#ctor(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator" /> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler" /> class.
             </summary>
             <param name="model">The Edm model.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Templates">
             <summary>
-            Translator an OData path to a path segment templates.
+            Gets the templates.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.#ctor(Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator" /> class.
-            </summary>
-            <param name="model">The Edm model.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.TypeSegment)">
-            <summary>
-            Translate a TypeSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.NavigationPropertySegment)">
-            <summary>
-            Translate a NavigationPropertySegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.EntitySetSegment)">
-            <summary>
-            Translate an EntitySetSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.SingletonSegment)">
-            <summary>
-            Translate an SingletonSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.KeySegment)">
-            <summary>
-            Translate a KeySegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.PropertySegment)">
-            <summary>
-            Translate a PropertySegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.PathTemplateSegment)">
-            <summary>
-            Handle a PropertySegment
-            </summary>
-            <param name="segment">the segment to handle</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.OperationImportSegment)">
-            <summary>
-            Translate a OperationImportSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.OperationSegment)">
-            <summary>
-            Translate a OperationSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.DynamicPathSegment)">
-            <summary>
-            Translate an OpenPropertySegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
-            <summary>
-            Visit a NavigationPropertyLinkSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.CountSegment)">
-            <summary>
-            Translate a CountSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.ValueSegment)">
-            <summary>
-            Translate a ValueSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.BatchSegment)">
-            <summary>
-            Translate a BatchSegment
-            </summary>
-            <param name="segment">the segment to Translate</param>
-            <returns>Translated the path segment template.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.MetadataSegment)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.MetadataSegment)">
             <summary>
             Translate a MetadataSegment
             </summary>
             <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.ValueSegment)">
+            <summary>
+            Translate a ValueSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
+            <summary>
+            Translate a NavigationPropertyLinkSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.CountSegment)">
+            <summary>
+            Translate a CountSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.DynamicPathSegment)">
+            <summary>
+            Translate a DynamicPathSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.OperationSegment)">
+            <summary>
+            Translate a OperationSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Translate a OperationImportSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.PropertySegment)">
+            <summary>
+            Translate a PropertySegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.KeySegment)">
+            <summary>
+            Translate a KeySegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.SingletonSegment)">
+            <summary>
+            Translate a SingletonSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.EntitySetSegment)">
+            <summary>
+            Translate a EntitySetSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.NavigationPropertySegment)">
+            <summary>
+            Translate a NavigationPropertySegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.TypeSegment)">
+            <summary>
+            Translate a TypeSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.PathTemplateSegment)">
+            <summary>
+            Translate a PathTemplateSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.BatchSegment)">
+            <summary>
+            Translate a BatchSegment.
+            </summary>
+            <param name="segment">the segment to Translate</param>
             <returns>Translated the path segment template.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.BatchReferenceSegment)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.BatchReferenceSegment)">
             <summary>
-            Translate a BatchReferenceSegment
+            Translate a BatchReferenceSegment.
             </summary>
             <param name="segment">the segment to Translate</param>
             <returns>Translated the path segment template.</returns>
@@ -12971,25 +12957,40 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate">
             <summary>
-            Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.NavigationPropertyLinkSegment"/>.
+            Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.NavigationPropertyLinkSegment"/> and a potential key.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate" /> class.
             </summary>
-            <param name="navigationProperty">The navigation property this link or ref acts on</param>
-            <param name="navigationSource">The navigation source of entities linked to. This can be null.</param>
+            <param name="navigationProperty">The Edm navigation property.</param>
+            <param name="navigationSource">The Edm navigation source. This could be null.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.#ctor(Microsoft.OData.UriParser.NavigationPropertyLinkSegment)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The navigation property link segment</param>
+            <param name="segment">The navigation link segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Key">
+            <summary>
+            Gets/sets the related key template.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.NavigationProperty">
+            <summary>
+            Gets the Edm navigation property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.NavigationSource">
+            <summary>
+            Gets the navigation source.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Segment">
             <summary>
-            Gets or sets the navigation property link segment.
+            Gets the navigation property link segment.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
@@ -12998,45 +12999,37 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate">
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate">
             <summary>
-            Represents a template that could match a $ref segment.
+            Represents a template that could match a $ref on a generic navigation segment.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate" /> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate" /> class.
             </summary>
-            <param name="declaredType">The Edm navigation property.</param>
+            <param name="declaringType">The declaring type.</param>
             <param name="navigationSource">The Edm navigation source.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate" /> class.
-            </summary>
-            <param name="declaredType">The Edm navigation property.</param>
-            <param name="navigationSource">The Edm navigation source.</param>
-            <param name="relatedKey">The related key mapping string.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.RelatedKey">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.RelatedKey">
             <summary>
             Gets the related key mapping.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.StructuredType">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.DeclaringType">
             <summary>
-            Gets the declared type for this property template.
+            Gets the declaring type for this property template.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.NavigationSource">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.NavigationSource">
             <summary>
             Gets the navigation source.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate">
@@ -13287,32 +13280,6 @@
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate">
-            <summary>
-            Represents a template that could match a $ref segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.#ctor(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.Edm.IEdmNavigationSource)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate" /> class.
-            </summary>
-            <param name="navigation">The Edm navigation property.</param>
-            <param name="navigationSource">The Edm navigation source.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Navigation">
-            <summary>
-            Gets the wrapped navigation property.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.NavigationSource">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers">

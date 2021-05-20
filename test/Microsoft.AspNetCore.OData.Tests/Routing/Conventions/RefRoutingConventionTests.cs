@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Arranges & Act & Assert
             string actionMethodName = "CreateRef";
             string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string httpMethod, out string prop, out string declaring);
-            Assert.Equal("Post,Patch", httpMethod);
+            Assert.Equal("Post,Put", httpMethod);
             Assert.Equal("CreateRef", method);
             Assert.Null(prop);
             Assert.Null(declaring);

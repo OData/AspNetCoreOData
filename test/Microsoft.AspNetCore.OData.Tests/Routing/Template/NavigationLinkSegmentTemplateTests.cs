@@ -1,76 +1,136 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class NavigationLinkSegmentTemplateTests
     {
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_Navigation()
+        private static IEdmEntityType _employee;
+        private static IEdmNavigationProperty _navigation;
+
+        static NavigationLinkSegmentTemplateTests()
         {
-            // Assert & Act & Assert
+            EdmEntityType employee = new EdmEntityType("NS", "Employee");
+            employee.AddKeys(employee.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+            _navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
+            {
+                Name = "DirectReports",
+                Target = employee,
+                TargetMultiplicity = EdmMultiplicity.Many
+            });
+
+            _employee = employee;
+        }
+
+        [Fact]
+        public void CtorNavigationLinkSegmentTemplate_ThrowsArgumentNull_NavigationProperty()
+        {
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => new NavigationLinkSegmentTemplate(navigationProperty: null, navigationSource: null), "navigationProperty");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorNavigationLinkSegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new NavigationLinkSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void GetTemplates_ReturnsTemplates()
+        public void CtorNavigationLinkSegmentTemplate_SetsProperties()
         {
-            // Assert
-            EdmEntityType employee = new EdmEntityType("NS", "Employee");
-            IEdmNavigationProperty navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
-            {
-                Name = "DirectReports",
-                Target = employee,
-                TargetMultiplicity = EdmMultiplicity.Many
-            });
+            // Arrange & Act
+            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(_navigation, null);
 
-            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(navigation, null);
+            // Assert
+            Assert.Null(linkSegment.Key);
+            Assert.Same(_navigation, linkSegment.NavigationProperty);
+            Assert.Null(linkSegment.NavigationSource);
+            Assert.NotNull(linkSegment.Segment);
+        }
+
+        [Fact]
+        public void GetTemplatesNavigationLinkSegmentTemplate_ReturnsTemplates()
+        {
+            // Arrange
+            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(_navigation, null);
 
             // Act & Assert
             IEnumerable<string> templates = linkSegment.GetTemplates();
             string template = Assert.Single(templates);
             Assert.Equal("/DirectReports/$ref", template);
+
+            // Act & Assert
+            linkSegment.Key = KeySegmentTemplate.CreateKeySegment(_employee, null);
+            templates = linkSegment.GetTemplates();
+            Assert.Collection(templates,
+                e => Assert.Equal("/DirectReports({key})/$ref", e),
+                e => Assert.Equal("/DirectReports/{key}/$ref", e));
         }
 
         [Fact]
-        public void TryTranslateNavigationSegmentTemplate_ReturnsODataNavigationSegment()
+        public void TryTranslateNavigationLinkSegmentTemplate_ThrowsArgumentNull_Context()
         {
             // Arrange
-            EdmEntityType employee = new EdmEntityType("NS", "Employee");
-            IEdmNavigationProperty navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
-            {
-                Name = "DirectReports",
-                Target = employee,
-                TargetMultiplicity = EdmMultiplicity.Many
-            });
+            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(_navigation, null);
 
-            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(navigation, null);
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => linkSegment.TryTranslate(null), "context");
+        }
 
-            // Act
+        [Fact]
+        public void TryTranslateNavigationLinkSegmentTemplate_ReturnsODataNavigationSegment()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            model.AddElement(_employee);
+
+            NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(_navigation, null);
+            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { id = "42" });
+            HttpContext httpContext = new DefaultHttpContext();
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+
+            // Without key segment
+            // Act & Assert
             bool ok = linkSegment.TryTranslate(context);
 
-            // Assert
             Assert.True(ok);
             ODataPathSegment actual = Assert.Single(context.Segments);
             NavigationPropertyLinkSegment navLinkSegment = Assert.IsType<NavigationPropertyLinkSegment>(actual);
-            Assert.Same(navigation, navLinkSegment.NavigationProperty);
+            Assert.Same(_navigation, navLinkSegment.NavigationProperty);
             Assert.Null(navLinkSegment.NavigationSource);
+
+            // With Key segment
+            // Act & Assert
+            context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+            linkSegment.Key = KeySegmentTemplate.CreateKeySegment(_employee, null, "id");
+            ok = linkSegment.TryTranslate(context);
+
+            Assert.True(ok);
+            Assert.Collection(context.Segments,
+                e =>
+                {
+                    NavigationPropertyLinkSegment navLinkSegment = Assert.IsType<NavigationPropertyLinkSegment>(e);
+                    Assert.Same(_navigation, navLinkSegment.NavigationProperty);
+                    Assert.Null(navLinkSegment.NavigationSource);
+                },
+                e =>
+                {
+                    KeySegment keySegment = Assert.IsType<KeySegment>(e);
+                    KeyValuePair<string, object> key = Assert.Single(keySegment.Keys);
+                    Assert.Equal("Id", key.Key);
+                    Assert.Equal(42, key.Value);
+                });
         }
     }
 }

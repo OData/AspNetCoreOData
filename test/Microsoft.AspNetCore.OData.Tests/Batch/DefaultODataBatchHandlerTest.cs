@@ -1026,7 +1026,7 @@ Prefer: return=representation
             return SingleResult.Create(BatchTestCustomer.Customers.Where(d => d.Id.Equals(key)).AsQueryable());
         }
 
-        public IActionResult CreateRefToOrders([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
+        public IActionResult CreateRef([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
         {
             var customer = BatchTestCustomer.Customers.FirstOrDefault(d => d.Id.Equals(key));
             if (customer == null)

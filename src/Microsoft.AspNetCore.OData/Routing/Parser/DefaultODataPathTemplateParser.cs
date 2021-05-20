@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// to segments
         /// </summary>
         /// <param name="model">the Edm model.</param>
-        /// <param name="odataPath">the setting.</param>
+        /// <param name="odataPath">the OData path.</param>
         /// <param name="requestProvider">The service provider.</param>
         /// <returns>Null or <see cref="ODataPathTemplate"/>.</returns>
         public virtual ODataPathTemplate Parse(IEdmModel model, string odataPath, IServiceProvider requestProvider)
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 EnableCaseInsensitive = true
             };
 
-            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in paraenthese and key as segment.
+            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parenthese and key as segment.
 
             ODataPath path = uriParser.ParsePath();
 

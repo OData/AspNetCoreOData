@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the generated path segments.
         /// </summary>
-        public ICollection<ODataPathSegment> Segments { get; } = new Collection<ODataPathSegment>();
+        public IList<ODataPathSegment> Segments { get; } = new List<ODataPathSegment>();
 
         /// <summary>
         /// Gets the parameter alias or the alias name itself.

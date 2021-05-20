@@ -13,45 +13,32 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match a $ref segment.
+    /// Represents a template that could match a $ref on a generic navigation segment.
     /// </summary>
-    public class NavigatioRefTemplateSegmentTemplate : ODataSegmentTemplate
+    public class NavigationLinkTemplateSegmentTemplate : ODataSegmentTemplate
     {
         private readonly string ParameterName = "navigationProperty";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RefSegmentTemplate" /> class.
+        /// Initializes a new instance of the <see cref="NavigationLinkTemplateSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="declaredType">The Edm navigation property.</param>
+        /// <param name="declaringType">The declaring type.</param>
         /// <param name="navigationSource">The Edm navigation source.</param>
-        public NavigatioRefTemplateSegmentTemplate(IEdmStructuredType declaredType, IEdmNavigationSource navigationSource)
-            : this(declaredType, navigationSource, null)
+        public NavigationLinkTemplateSegmentTemplate(IEdmStructuredType declaringType, IEdmNavigationSource navigationSource)
         {
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RefSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="declaredType">The Edm navigation property.</param>
-        /// <param name="navigationSource">The Edm navigation source.</param>
-        /// <param name="relatedKey">The related key mapping string.</param>
-        public NavigatioRefTemplateSegmentTemplate(IEdmStructuredType declaredType, IEdmNavigationSource navigationSource, string relatedKey)
-        {
-            StructuredType = declaredType ?? throw Error.ArgumentNull(nameof(declaredType));
+            DeclaringType = declaringType ?? throw Error.ArgumentNull(nameof(declaringType));
             NavigationSource = navigationSource ?? throw Error.ArgumentNull(nameof(navigationSource));
-            RelatedKey = relatedKey;
         }
 
         /// <summary>
         /// Gets the related key mapping.
         /// </summary>
-        public string RelatedKey { get; }
+        public string RelatedKey { get; set; }
 
         /// <summary>
-        /// Gets the declared type for this property template.
+        /// Gets the declaring type for this property template.
         /// </summary>
-        public IEdmStructuredType StructuredType { get; }
+        public IEdmStructuredType DeclaringType { get; }
 
         /// <summary>
         /// Gets the navigation source.
@@ -61,22 +48,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            options = options ?? ODataRouteOptions.Default;
-
             if (RelatedKey != null)
             {
+                options = options ?? ODataRouteOptions.Default;
+
                 if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
                 {
-                    yield return $"{{{ParameterName}}}({{{RelatedKey}}})/$ref";
-                    yield return $"{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
+                    yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
+                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
                 }
                 else if (options.EnableKeyInParenthesis)
                 {
-                    yield return $"{{{ParameterName}}}({{{RelatedKey}}})/$ref";
+                    yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
                 }
                 else if (options.EnableKeyAsSegment)
                 {
-                    yield return $"{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
+                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
                 }
                 else
                 {
@@ -100,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             RouteValueDictionary routeValues = context.RouteValues;
 
             // the request should have the navigation property
-            if (routeValues.TryGetValue(ParameterName, out object rawValue))
+            if (!routeValues.TryGetValue(ParameterName, out object rawValue))
             {
                 return false;
             }
@@ -112,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             // Find the navigation property
-            IEdmNavigationProperty edmNavProperty = StructuredType.ResolveProperty(navigationProperty) as IEdmNavigationProperty;
+            IEdmNavigationProperty edmNavProperty = DeclaringType.ResolveProperty(navigationProperty) as IEdmNavigationProperty;
             if (edmNavProperty == null)
             {
                 return false;
@@ -125,9 +112,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             if (RelatedKey != null)
             {
-                // TODO:  to process the related key
                 IEdmEntityType entityType = edmNavProperty.ToEntityType();
 
+                // only handle the single key
                 IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
                 Contract.Assert(entityType.Key().Count() == 1);
                 Contract.Assert(keyProperty != null);
@@ -138,10 +125,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 };
 
                 KeySegmentTemplate keySegment = new KeySegmentTemplate(keyValuePairs, entityType, targetNavigationSource);
-                if (keySegment.TryTranslate(context))
-                {
-                    return true;
-                }
+                return keySegment.TryTranslate(context);
             }
 
             return true;
