@@ -62,11 +62,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             }
             Contract.Assert(model != null);
 
-            ODataPathSegmentTemplateTranslator translator = new ODataPathSegmentTemplateTranslator(model);
+            ODataPathSegmentToTemplateHandler handler = new ODataPathSegmentToTemplateHandler(model);
 
-            var templates = path.WalkWith(translator);
+            path.WalkWith(handler);
 
-            return new ODataPathTemplate(templates);
+            return new ODataPathTemplate(handler.Templates);
         }
     }
 }

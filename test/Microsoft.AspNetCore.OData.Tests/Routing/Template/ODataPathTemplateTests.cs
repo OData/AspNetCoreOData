@@ -145,8 +145,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
                 KeySegmentTemplate.CreateKeySegment(customer, entitySet),
-                new NavigationLinkSegmentTemplate(navigation, entitySet),
-                new KeySegmentTemplate(keySegment));
+                new NavigationSegmentTemplate(navigation, entitySet),
+                new KeySegmentTemplate(keySegment),
+                new RefSegmentTemplate(navigation, entitySet));
 
             // Act
             IEnumerable<string> actual = template.GetTemplates();

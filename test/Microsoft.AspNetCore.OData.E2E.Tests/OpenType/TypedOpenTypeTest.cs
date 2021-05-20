@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
 
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
-            services.ConfigureControllers(typeof(AccountsController));
+            services.ConfigureControllers(typeof(AccountsController), typeof(ODataEndpointController));
 
             IEdmModel model1 = OpenComplexTypeEdmModel.GetTypedConventionModel();
 
@@ -776,6 +776,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
 
             var age = json.GetValue("Age");
             Assert.Equal(11, age);
+        }
+
+        [Fact]
+        public async Task TestRoutes()
+        {
+            // Arrange
+            string requestUri = "$odata";
+            HttpClient client = CreateClient();
+
+            // Act
+            var response = await client.GetAsync(requestUri);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            string payload = await response.Content.ReadAsStringAsync();
         }
 
         [Fact]

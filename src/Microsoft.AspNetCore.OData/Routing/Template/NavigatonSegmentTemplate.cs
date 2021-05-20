@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -28,31 +29,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationSegmentTemplate(NavigationPropertySegment segment)
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
-
-            IsSingle = !segment.NavigationProperty.Type.IsCollection();
         }
 
-        /// <inheritdoc />
-        public override string Literal => Navigation.Name;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Navigation.Type.Definition;
-
         /// <summary>
-        /// Gets the wrapped navigation property.
+        /// Gets the wrapped Edm navigation property.
         /// </summary>
-        public IEdmNavigationProperty Navigation => Segment.NavigationProperty;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Navigation;
-
-        /// <summary>
-        /// Gets the wrapped navigation property.
-        /// </summary>
-        public override IEdmNavigationSource NavigationSource => Segment.NavigationSource;
-
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
+        public IEdmNavigationProperty NavigationProperty => Segment.NavigationProperty;
 
         /// <summary>
         /// Gets the navigation property segment.
@@ -60,9 +42,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public NavigationPropertySegment Segment { get; }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{NavigationProperty.Name}";
+        }
+
+        /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

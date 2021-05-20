@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -20,21 +21,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void CommonProperties_ReturnsAsExpected()
+        public void Ctor_ThrowsArgumentNull_Segment()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ActionImportSegmentTemplate(segment: null), "segment");
+        }
+
+        [Fact]
+        public void GetTemplates_ReturnsTemplates()
         {
             // Assert
             EdmEntityContainer container = new EdmEntityContainer("NS", "default");
             EdmAction action = new EdmAction("NS", "action", null);
             EdmActionImport actionImport = new EdmActionImport(container, "actionImport", action);
 
-            ActionImportSegmentTemplate template = new ActionImportSegmentTemplate(actionImport, null);
+            ActionImportSegmentTemplate segment = new ActionImportSegmentTemplate(actionImport, null);
 
             // Act & Assert
-            Assert.Equal(ODataSegmentKind.ActionImport, template.Kind);
-            Assert.Equal("actionImport", template.Literal);
-            Assert.False(template.IsSingle);
-            Assert.Null(template.EdmType);
-            Assert.Null(template.NavigationSource);
+            IEnumerable<string> templates = segment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/actionImport", template);
         }
 
         [Fact]

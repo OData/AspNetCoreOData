@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
@@ -70,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the generated path segments.
         /// </summary>
-        public IList<ODataPathSegment> Segments { get; } = new List<ODataPathSegment>();
+        public ICollection<ODataPathSegment> Segments { get; } = new Collection<ODataPathSegment>();
 
         /// <summary>
         /// Gets the parameter alias or the alias name itself.

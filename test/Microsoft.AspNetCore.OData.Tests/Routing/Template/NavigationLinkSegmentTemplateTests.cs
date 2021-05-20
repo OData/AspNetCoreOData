@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void CommonNavigationTemplateProperties_ReturnsAsExpected()
+        public void GetTemplates_ReturnsTemplates()
         {
             // Assert
             EdmEntityType employee = new EdmEntityType("NS", "Employee");
@@ -41,11 +42,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(navigation, null);
 
             // Act & Assert
-            Assert.Equal("DirectReports", linkSegment.Literal);
-            Assert.Equal(ODataSegmentKind.NavigationLink, linkSegment.Kind);
-            Assert.False(linkSegment.IsSingle);
-            Assert.Equal("Collection(NS.Employee)", linkSegment.EdmType.FullTypeName());
-            Assert.Null(linkSegment.NavigationSource);
+            IEnumerable<string> templates = linkSegment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/DirectReports/$ref", template);
         }
 
         [Fact]

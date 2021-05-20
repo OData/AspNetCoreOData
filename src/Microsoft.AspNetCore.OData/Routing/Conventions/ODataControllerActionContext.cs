@@ -112,6 +112,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <summary>
         /// Gets/sets the OData Options.
         /// </summary>
-        public ODataOptions Options { get; set; }
+        public ODataOptions Options { get; set; } = new ODataOptions();
     }
 }

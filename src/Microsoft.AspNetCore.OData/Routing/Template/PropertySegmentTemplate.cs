@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -28,26 +29,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public PropertySegmentTemplate(PropertySegment segment)
         {
             Segment = segment ?? throw new ArgumentNullException(nameof(segment));
-
-            IsSingle = !segment.Property.Type.IsCollection();
         }
-
-        /// <inheritdoc />
-        public override string Literal => Property.Name;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Property.Type.Definition;
 
         /// <summary>
         /// Gets the wrapped Edm property.
         /// </summary>
         public IEdmStructuralProperty Property => Segment.Property;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Property;
-
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
 
         /// <summary>
         /// Gets the property segment.
@@ -55,9 +42,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public PropertySegment Segment { get; }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{Property.Name}";
+        }
+
+        /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

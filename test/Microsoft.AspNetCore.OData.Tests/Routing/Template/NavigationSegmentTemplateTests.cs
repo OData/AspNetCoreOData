@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -12,55 +13,58 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class NavigationSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Navigation()
+        public void CtorNavigationSegmentTemplate_ThrowsArgumentNull_Navigation()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => new NavigationSegmentTemplate(navigationProperty: null, navigationSource: null), "navigationProperty");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorNavigationSegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new NavigationSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void CommonNavigationTemplateProperties_ReturnsAsExpected()
+        public void CtorNavigationSegmentTemplate_SetsProperties()
         {
-            // Assert
-            EdmEntityType employee = new EdmEntityType("NS", "Employee");
-            IEdmNavigationProperty navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
-            {
-                Name = "DirectReports",
-                Target = employee,
-                TargetMultiplicity = EdmMultiplicity.Many
-            });
+            // Arrange & Act
+            NavigationSegmentTemplate navigationSegment = GetSegmentTemplate(out IEdmNavigationProperty navigation);
 
-            NavigationSegmentTemplate navigationSegment = new NavigationSegmentTemplate(navigation, null);
+            // Assert
+            Assert.NotNull(navigationSegment.Segment);
+            Assert.Same(navigation, navigationSegment.NavigationProperty);
+        }
+
+        [Fact]
+        public void GetTemplatesNavigationSegmentTemplate_ReturnsTemplates()
+        {
+            // Arrange
+            NavigationSegmentTemplate navigationSegment = GetSegmentTemplate(out _);
 
             // Act & Assert
-            Assert.Equal("DirectReports", navigationSegment.Literal);
-            Assert.Equal(ODataSegmentKind.Navigation, navigationSegment.Kind);
-            Assert.False(navigationSegment.IsSingle);
-            Assert.Equal("Collection(NS.Employee)", navigationSegment.EdmType.FullTypeName());
-            Assert.Null(navigationSegment.NavigationSource);
+            IEnumerable<string> templates = navigationSegment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/DirectReports", template);
+        }
+
+        [Fact]
+        public void TryTranslateSingletonSegmentTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange
+            NavigationSegmentTemplate navigationSegment = GetSegmentTemplate(out _);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => navigationSegment.TryTranslate(null), "context");
         }
 
         [Fact]
         public void TryTranslateNavigationSegmentTemplate_ReturnsODataNavigationSegment()
         {
             // Arrange
-            EdmEntityType employee = new EdmEntityType("NS", "Employee");
-            IEdmNavigationProperty navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
-            {
-                Name = "DirectReports",
-                Target = employee,
-                TargetMultiplicity = EdmMultiplicity.Many
-            });
-
-            NavigationSegmentTemplate navigationSegment = new NavigationSegmentTemplate(navigation, null);
+            NavigationSegmentTemplate navigationSegment = GetSegmentTemplate(out IEdmNavigationProperty navigation);
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
             // Act
@@ -72,6 +76,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             NavigationPropertySegment navSegment = Assert.IsType<NavigationPropertySegment>(actual);
             Assert.Same(navigation, navSegment.NavigationProperty);
             Assert.Null(navSegment.NavigationSource);
+        }
+
+        private static NavigationSegmentTemplate GetSegmentTemplate(out IEdmNavigationProperty navigation)
+        {
+            EdmEntityType employee = new EdmEntityType("NS", "Employee");
+            navigation = employee.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
+            {
+                Name = "DirectReports",
+                Target = employee,
+                TargetMultiplicity = EdmMultiplicity.Many
+            });
+
+            return new NavigationSegmentTemplate(navigation, null);
         }
     }
 }

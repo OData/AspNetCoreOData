@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -20,18 +21,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void CommonActionProperties_ReturnsAsExpected()
+        public void Ctor_ThrowsArgumentNull_Segment()
+        {
+            // Assert & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ActionSegmentTemplate(null), "segment");
+        }
+
+        [Fact]
+        public void GetTemplates_ReturnsTemplates()
         {
             // Assert
             EdmAction action = new EdmAction("NS", "action", null);
-            ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
+            ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
 
             // Act & Assert
-            Assert.Equal(ODataSegmentKind.Action, template.Kind);
-            Assert.Equal("NS.action", template.Literal);
-            Assert.False(template.IsSingle);
-            Assert.Null(template.EdmType);
-            Assert.Null(template.NavigationSource);
+            IEnumerable<string> templates = segment.GetTemplates();
+            Assert.Collection(templates,
+                e =>
+                {
+                    Assert.Equal("/NS.action", e);
+                },
+                e =>
+                {
+                    Assert.Equal("/action", e);
+                });
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -30,19 +31,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void CommonCastProperties_ReturnsAsExpected()
+        public void GetTemplates_ReturnsTemplates()
         {
             // Assert
             EdmEntityType baseType = new EdmEntityType("NS", "base");
             EdmEntityType subType = new EdmEntityType("NS", "sub", baseType);
-            CastSegmentTemplate template = new CastSegmentTemplate(subType, baseType, null);
+            CastSegmentTemplate segment = new CastSegmentTemplate(subType, baseType, null);
 
             // Act & Assert
-            Assert.Equal(ODataSegmentKind.Cast, template.Kind);
-            Assert.Equal("NS.sub", template.Literal);
-            Assert.True(template.IsSingle);
-            Assert.Same(subType, template.EdmType);
-            Assert.Null(template.NavigationSource);
+            IEnumerable<string> templates = segment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/NS.sub", template);
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -12,21 +13,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class SingletonSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Singleton()
+        public void CtorSingletonSegmentTemplate_ThrowsArgumentNull_Singleton()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new SingletonSegmentTemplate(singleton: null), "singleton");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorSingletonSegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new SingletonSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void CommonSingletonSegmentTemplateProperties_ReturnsAsExpected()
+        public void CtorSingletonSegmentTemplate_SetsProperties()
+        {
+            // Arrange & Act
+            EdmEntityType entityType = new EdmEntityType("NS", "entity");
+            IEdmEntityContainer container = new EdmEntityContainer("NS", "default");
+            IEdmSingleton singleton = new EdmSingleton(container, "singleton", entityType);
+            SingletonSegmentTemplate singletonSegment = new SingletonSegmentTemplate(singleton);
+
+            // Assert
+            Assert.NotNull(singletonSegment.Segment);
+            Assert.Same(singleton, singletonSegment.Singleton);
+        }
+
+        [Fact]
+        public void GetTemplatesSingletonSegmentTemplate_ReturnsTemplates()
         {
             // Assert
             EdmEntityType entityType = new EdmEntityType("NS", "entity");
@@ -35,11 +50,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             SingletonSegmentTemplate singletonSegment = new SingletonSegmentTemplate(singleton);
 
             // Act & Assert
-            Assert.Equal("singleton", singletonSegment.Literal);
-            Assert.Equal(ODataSegmentKind.Singleton, singletonSegment.Kind);
-            Assert.True(singletonSegment.IsSingle);
-            Assert.Same(entityType, singletonSegment.EdmType);
-            Assert.Same(singleton, singletonSegment.NavigationSource);
+            IEnumerable<string> templates = singletonSegment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/singleton", template);
+        }
+
+        [Fact]
+        public void TryTranslateSingletonSegmentTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange
+            EdmEntityType entityType = new EdmEntityType("NS", "entity");
+            IEdmEntityContainer container = new EdmEntityContainer("NS", "default");
+            IEdmSingleton singleton = new EdmSingleton(container, "singleton", entityType);
+            SingletonSegmentTemplate singletonSegment = new SingletonSegmentTemplate(singleton);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => singletonSegment.TryTranslate(null), "context");
         }
 
         [Fact]

@@ -26,10 +26,7 @@ abstract Microsoft.AspNetCore.OData.Results.PageResult.ToDictionary() -> System.
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.Order.get -> int
-abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.IsSingle.get -> bool
-abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.Literal.get -> string
+abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
 const Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.ParameterValuePrefix = "DF908045-6922-46A0-82F2-2F6E7F43D1B1_" -> string
 const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.Action = "action" -> string
@@ -1261,16 +1258,18 @@ Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.ODa
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImport.get -> Microsoft.OData.Edm.IEdmActionImport
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImportSegmentTemplate(Microsoft.OData.Edm.IEdmActionImport actionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
+Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImportSegmentTemplate(Microsoft.OData.UriParser.OperationImportSegment segment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.OperationImportSegment
 Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Action.get -> Microsoft.OData.Edm.IEdmAction
 Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.ActionSegmentTemplate(Microsoft.OData.Edm.IEdmAction action, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
-Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.ActionSegmentTemplate(Microsoft.OData.UriParser.OperationSegment operationSegment) -> void
+Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.ActionSegmentTemplate(Microsoft.OData.UriParser.OperationSegment segment) -> void
+Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.OperationSegment
 Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.CastSegmentTemplate(Microsoft.OData.Edm.IEdmType castType, Microsoft.OData.Edm.IEdmType expectedType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.CastSegmentTemplate(Microsoft.OData.UriParser.TypeSegment typeSegment) -> void
-Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.CastType.get -> Microsoft.OData.Edm.IEdmStructuredType
+Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.CastType.get -> Microsoft.OData.Edm.IEdmType
 Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.ExpectedType.get -> Microsoft.OData.Edm.IEdmType
 Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.TypeSegment.get -> Microsoft.OData.UriParser.TypeSegment
 Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate
@@ -1287,12 +1286,14 @@ Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Functi
 Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.FunctionImportSegmentTemplate(Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.FunctionImportSegmentTemplate(Microsoft.OData.UriParser.OperationImportSegment segment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.FunctionImportSegmentTemplate(System.Collections.Generic.IDictionary<string, string> parameters, Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
+Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.ParameterMappings.get -> System.Collections.Generic.IDictionary<string, string>
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Function.get -> Microsoft.OData.Edm.IEdmFunction
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.FunctionSegmentTemplate(Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.FunctionSegmentTemplate(Microsoft.OData.UriParser.OperationSegment operationSegment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.FunctionSegmentTemplate(System.Collections.Generic.IDictionary<string, string> parameters, Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
+Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.ParameterMappings.get -> System.Collections.Generic.IDictionary<string, string>
 Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator
 Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> Microsoft.OData.UriParser.ODataPath
@@ -1304,38 +1305,27 @@ Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeyProperties.get
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(Microsoft.OData.UriParser.KeySegment segment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(Microsoft.OData.UriParser.KeySegment segment, System.Collections.Generic.IDictionary<string, Microsoft.OData.Edm.IEdmProperty> keyProperties) -> void
 Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.KeySegmentTemplate(System.Collections.Generic.IDictionary<string, string> keys, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
+Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.NavigationLinkSegmentTemplate(Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.NavigationLinkSegmentTemplate(Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.NavigationPropertyLinkSegment
 Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate
-Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Navigation.get -> Microsoft.OData.Edm.IEdmNavigationProperty
+Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.NavigationProperty.get -> Microsoft.OData.Edm.IEdmNavigationProperty
 Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.NavigationSegmentTemplate(Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.NavigationSegmentTemplate(Microsoft.OData.UriParser.NavigationPropertySegment segment) -> void
 Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.NavigationPropertySegment
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.NavigatioRefTemplateSegmentTemplate(Microsoft.OData.Edm.IEdmStructuredType declaredType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.NavigatioRefTemplateSegmentTemplate(Microsoft.OData.Edm.IEdmStructuredType declaredType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, string relatedKey) -> void
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.RelatedKey.get -> string
+Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.StructuredType.get -> Microsoft.OData.Edm.IEdmStructuredType
 Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.ODataPathTemplate(params Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate[] segments) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.ODataPathTemplate(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate> segments) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.ODataPathTemplate(System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate> segments) -> void
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Action = 8 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.ActionImport = 10 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Cast = 4 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Count = 14 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Dynamic = 16 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.EntitySet = 1 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Function = 7 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.FunctionImport = 9 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Key = 3 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Metadata = 0 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Navigation = 6 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.NavigationLink = 13 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.PathTemplate = 15 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Property = 5 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Ref = 12 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Singleton = 2 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind.Value = 11 -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
 Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.ODataSegmentTemplate() -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext
@@ -1344,7 +1334,7 @@ Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.HttpCo
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.ODataTemplateTranslateContext(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.RouteValues.get -> Microsoft.AspNetCore.Routing.RouteValueDictionary
-Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Segments.get -> System.Collections.Generic.IList<Microsoft.OData.UriParser.ODataPathSegment>
+Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Segments.get -> System.Collections.Generic.ICollection<Microsoft.OData.UriParser.ODataPathSegment>
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.UpdatedValues.get -> Microsoft.AspNetCore.Routing.RouteValueDictionary
 Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.ParameterName.get -> string
@@ -1360,6 +1350,7 @@ Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.PropertySegm
 Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.Segment.get -> Microsoft.OData.UriParser.PropertySegment
 Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Navigation.get -> Microsoft.OData.Edm.IEdmNavigationProperty
+Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.RefSegmentTemplate(Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> void
 Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.SingletonSegment
@@ -1537,109 +1528,43 @@ override Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTrans
 override Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.SingletonSegment segment) -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate
 override Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.TypeSegment segment) -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate
 override Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator.Translate(Microsoft.OData.UriParser.ValueSegment segment) -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate
-override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.Literal.get -> string
+override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.Literal.get -> string
+override Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
+override Microsoft.AspNetCore.OData.Routing.Template.NavigatioRefTemplateSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
+override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.Literal.get -> string
+override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.Literal.get -> string
+override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.EdmType.get -> Microsoft.OData.Edm.IEdmType
-override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.IsSingle.get -> bool
-override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Kind.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind
-override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Literal.get -> string
-override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
 override sealed Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ReadInline(object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
 override sealed Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadInline(object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
@@ -1927,4 +1852,3 @@ virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConventio
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.Order.get -> int
 virtual Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider) -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> System.Collections.Generic.IEnumerable<string>
-virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource

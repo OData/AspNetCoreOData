@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -30,25 +31,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
-        /// <inheritdoc />
-        public override string Literal => Segment.Identifier;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Segment.EdmType;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.NavigationLink;
-
-        /// <inheritdoc />
-        public override bool IsSingle => false;
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource => Segment.NavigationSource;
-
         /// <summary>
         /// Gets or sets the navigation property link segment.
         /// </summary>
         public NavigationPropertyLinkSegment Segment { get; }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{Segment.NavigationProperty.Name}/$ref";
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)

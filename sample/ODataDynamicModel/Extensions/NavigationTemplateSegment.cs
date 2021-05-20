@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -10,13 +12,10 @@ namespace ODataDynamicModel.Extensions
 {
     public class NavigationTemplateSegment : ODataSegmentTemplate
     {
-        public override string Literal => "{navigation}";
-
-        public override ODataSegmentKind Kind => ODataSegmentKind.Navigation;
-
-        public override IEdmType EdmType => null;
-
-        public override bool IsSingle => false;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/{navigation}";
+        }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {

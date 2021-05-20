@@ -2,8 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.OData;
-using Microsoft.OData.Edm;
+using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -24,27 +23,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Segment = segment ?? throw new ArgumentNullException(nameof(segment));
         }
 
-        /// <inheritdoc />
-        public override string Literal => Segment.Identifier;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => null;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Dynamic;
-
-        /// <inheritdoc />
-        public override bool IsSingle => false;
-
         /// <summary>
         /// Gets or sets the open property segment.
         /// </summary>
         public DynamicPathSegment Segment { get; }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{Segment.Identifier}";
+        }
+
+        /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

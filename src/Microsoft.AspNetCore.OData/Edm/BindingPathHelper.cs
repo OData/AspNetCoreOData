@@ -27,12 +27,17 @@ namespace Microsoft.AspNetCore.OData.Edm
             {
                 ODataSegmentTemplate segment = parsedSegments[segmentIndex];
 
-                bool segmentIsNavigationPropertySegment = segment is NavigationSegmentTemplate;
-
+                PropertySegmentTemplate propertySegment = segment as PropertySegmentTemplate;
+                NavigationSegmentTemplate navigationSegment = segment as NavigationSegmentTemplate;
                 // Containment navigation property or complex property in binding path.
-                if (segment is PropertySegmentTemplate || (segmentIsNavigationPropertySegment && segment.NavigationSource is IEdmContainedEntitySet))
+                if (propertySegment != null ||
+                    (navigationSegment != null && navigationSegment.Segment.NavigationSource is IEdmContainedEntitySet))
                 {
-                    if (pathIndex < 0 || string.CompareOrdinal(paths[pathIndex], segment.Literal) != 0)
+                    string pathName = propertySegment != null ?
+                        propertySegment.Property.Name :
+                        navigationSegment.NavigationProperty.Name;
+
+                    if (pathIndex < 0 || string.CompareOrdinal(paths[pathIndex], pathName) != 0)
                     {
                         return false;
                     }
@@ -41,10 +46,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else if (segment is CastSegmentTemplate)
                 {
+                    CastSegmentTemplate cast = (CastSegmentTemplate)segment;
                     // May need match type if the binding path contains type cast.
                     if (pathIndex >= 0 && paths[pathIndex].Contains(".", System.StringComparison.Ordinal))
                     {
-                        if (string.CompareOrdinal(paths[pathIndex], segment.EdmType.AsElementType().FullTypeName()) != 0)
+                        if (string.CompareOrdinal(paths[pathIndex], cast.CastType.AsElementType().FullTypeName()) != 0)
                         {
                             return false;
                         }
@@ -54,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else if (segment is EntitySetSegmentTemplate
                         || segment is SingletonSegmentTemplate
-                        || segmentIsNavigationPropertySegment)
+                        || navigationSegment != null)
                 {
                     // Containment navigation property in first if statement for NavigationPropertySegment.
                     break;

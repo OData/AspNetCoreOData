@@ -19,6 +19,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// </summary>
     public class KeySegmentTemplate : ODataSegmentTemplate
     {
+        private string _keyLiteral;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
@@ -38,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(keys.Select(kvp => new KeyValuePair<string, object>(kvp.Key, kvp.Value)), entityType, KeyProperties);
 
-            Literal = KeyMappings.Count == 1 ?
+            _keyLiteral = KeyMappings.Count == 1 ?
                 $"{{{KeyMappings.First().Value}}}" :
                 string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
@@ -60,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(segment.Keys, EntityType, KeyProperties);
 
-            Literal = KeyMappings.Count == 1 ?
+            _keyLiteral = KeyMappings.Count == 1 ?
                 $"{{{KeyMappings.First().Value}}}" :
                 string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
@@ -90,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             KeyMappings = BuildKeyMappings(segment.Keys, EntityType, keyProperties);
 
-            Literal = string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            _keyLiteral = string.Join(",", KeyMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
         }
 
         /// <summary>
@@ -109,13 +111,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IDictionary<string, IEdmProperty> KeyProperties { get; }
 
         /// <inheritdoc />
-        public override string Literal { get; }
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => EntityType;
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource { get; }
+        public IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the entity type declaring this key.
@@ -128,10 +124,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public int Count => KeyMappings.Count;
 
         /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Key;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            options = options ?? ODataRouteOptions.Default;
 
-        /// <inheritdoc />
-        public override bool IsSingle => true;
+            if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
+            {
+                yield return $"({_keyLiteral})";
+                yield return $"/{_keyLiteral}";
+            }
+            else if (options.EnableKeyInParenthesis)
+            {
+                yield return $"({_keyLiteral})";
+            }
+            else if (options.EnableKeyAsSegment)
+            {
+                yield return $"/{_keyLiteral}";
+            }
+            else
+            {
+                throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
+            }
+        }
 
         /// <inheritdoc />
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]

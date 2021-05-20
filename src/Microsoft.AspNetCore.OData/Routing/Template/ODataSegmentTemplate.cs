@@ -1,47 +1,44 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using Microsoft.OData.Edm;
+using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents an OData segment template that could match an <see cref="ODataSegmentTemplate"/>.
+    /// Base class for OData segment template
     /// </summary>
     public abstract class ODataSegmentTemplate
     {
         /// <summary>
-        /// Gets the segment URL template literal.
+        /// Gets the templates. It's case-insensitive template.
+        /// It's used to build the routing template in conventional routing.
+        /// It's not used in attribute routing.
+        /// The template string should include the leading "/" if apply.
         /// </summary>
-        public abstract string Literal { get; }
+        /// <param name="options">The route options.</param>
+        /// <returns>The built segment templates.</returns>
+        public abstract IEnumerable<string> GetTemplates(ODataRouteOptions options);
 
         /// <summary>
-        /// Gets the segment kind.
+        /// Translate the template into a real OData path segment <see cref="ODataPathSegment"/>
         /// </summary>
-        public abstract ODataSegmentKind Kind { get; }
-
-        /// <summary>
-        /// Gets the Edm type of this segment.
-        /// </summary>
-        public abstract IEdmType EdmType { get; }
-
-        /// <summary>
-        /// Gets the target Navigation source of this segment.
-        /// </summary>
-        public virtual IEdmNavigationSource NavigationSource => throw new NotSupportedException();
-
-        /// <summary>
-        /// Gets a value indicating whether the output value is single value or collection value of this segment.
-        /// </summary>
-        public abstract bool IsSingle { get; }
-
-        /// <summary>
-        /// Translate the template into a real OData path segment, <see cref="ODataPathSegment"/>
-        /// </summary>
-        /// <param name="context">The translate context, the translated in context.</param>
-        /// <returns>True if translated. false if no.</returns>
+        /// <param name="context">The translate context.</param>
+        /// <returns>True if translated. False if no.</returns>
         public abstract bool TryTranslate(ODataTemplateTranslateContext context);
+
+        /// <summary>
+        /// Gets the templates by default. It's case-insensitive template.
+        /// It's used to build the routing template in conventional routing.
+        /// It's not used in attribute routing.
+        /// The template string should include the leading "/" if apply.
+        /// </summary>
+        /// <remarks>Used in Unit test.</remarks>
+        /// <returns>The built segment templates.</returns>
+        internal IEnumerable<string> GetTemplates()
+        {
+            return GetTemplates(ODataRouteOptions.Default);
+        }
     }
 }

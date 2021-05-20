@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -10,6 +12,148 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Parser
 {
+    internal class ODataPathSegmentToTemplateHandler : PathSegmentHandler
+    {
+        private IEdmModel _model;
+
+        private IList<ODataSegmentTemplate> _segmentTemplates;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataPathSegmentTemplateTranslator" /> class.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        public ODataPathSegmentToTemplateHandler(IEdmModel model)
+        {
+            _model = model;
+            _segmentTemplates = new List<ODataSegmentTemplate>();
+        }
+
+        public IList<ODataSegmentTemplate> Templates => _segmentTemplates;
+
+        public override void Handle(MetadataSegment segment)
+        {
+            _segmentTemplates.Add(MetadataSegmentTemplate.Instance);
+        }
+
+        public override void Handle(ValueSegment segment)
+        {
+            _segmentTemplates.Add(new ValueSegmentTemplate(segment));
+        }
+
+        public override void Handle(NavigationPropertyLinkSegment segment)
+        {
+            _segmentTemplates.Add(new NavigationSegmentTemplate(segment.NavigationProperty, segment.NavigationSource));
+            _segmentTemplates.Add(new RefSegmentTemplate(segment.NavigationProperty, segment.NavigationSource));
+        }
+
+        public override void Handle(CountSegment segment)
+        {
+            _segmentTemplates.Add(CountSegmentTemplate.Instance);
+        }
+
+        public override void Handle(DynamicPathSegment segment)
+        {
+            _segmentTemplates.Add(new DynamicSegmentTemplate(segment));
+        }
+        public override void Handle(OperationSegment segment)
+        {
+            IEdmOperation operation = segment.Operations.First();
+            if (operation.IsAction())
+            {
+                _segmentTemplates.Add(new ActionSegmentTemplate(segment));
+            }
+            else
+            {
+                _segmentTemplates.Add(new FunctionSegmentTemplate(segment));
+            }
+        }
+
+        public override void Handle(OperationImportSegment segment)
+        {
+            if (segment == null)
+            {
+                throw Error.ArgumentNull(nameof(segment));
+            }
+
+            if (segment.OperationImports.First().IsActionImport())
+            {
+                _segmentTemplates.Add(new ActionImportSegmentTemplate(segment));
+            }
+            else
+            {
+                _segmentTemplates.Add(new FunctionImportSegmentTemplate(segment));
+            }
+        }
+
+        public override void Handle(PropertySegment segment)
+        {
+            _segmentTemplates.Add(new PropertySegmentTemplate(segment));
+        }
+
+
+        public override void Handle(KeySegment segment)
+        {
+            Func<KeySegmentTemplate> BuildKeyTemplate = () =>
+            {
+                try
+                {
+                    return new KeySegmentTemplate(segment);
+                }
+                catch
+                {
+                    if (_model != null)
+                    {
+                        var alternateKeys = _model.ResolveAlternateKeyProperties(segment);
+                        if (alternateKeys != null)
+                        {
+                            return new KeySegmentTemplate(segment, alternateKeys);
+                        }
+                    }
+
+                    throw;
+                }
+            };
+
+            KeySegmentTemplate keyTemplate = BuildKeyTemplate();
+
+            ODataSegmentTemplate previous = _segmentTemplates.LastOrDefault();
+            RefSegmentTemplate preRef = previous as RefSegmentTemplate;
+            if (preRef != null)
+            {
+                int count = _segmentTemplates.Count;
+                _segmentTemplates.Insert(count - 1, keyTemplate);
+            }
+            else
+            {
+                _segmentTemplates.Add(keyTemplate);
+            }
+        }
+
+        public override void Handle(SingletonSegment segment)
+        {
+            _segmentTemplates.Add(new SingletonSegmentTemplate(segment));
+        }
+        public override void Handle(EntitySetSegment segment)
+        {
+            _segmentTemplates.Add(new EntitySetSegmentTemplate(segment));
+
+        }
+        public override void Handle(NavigationPropertySegment segment)
+        {
+            _segmentTemplates.Add(new NavigationSegmentTemplate(segment));
+        }
+
+        public override void Handle(TypeSegment segment)
+        {
+            _segmentTemplates.Add(new CastSegmentTemplate(segment));
+        }
+
+        public override void Handle(PathTemplateSegment segment)
+        {
+            _segmentTemplates.Add(new PathTemplateSegmentTemplate(segment));
+        }
+    }
+
     /// <summary>
     /// Translator an OData path to a path segment templates.
     /// </summary>

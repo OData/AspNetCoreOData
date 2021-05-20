@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -47,18 +48,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
         }
 
-        /// <inheritdoc />
-        public override string Literal => Segment.LiteralText;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => null;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.PathTemplate;
-
-        /// <inheritdoc />
-        public override bool IsSingle => false;
-
         /// <summary>
         /// Gets the segment name
         /// </summary>
@@ -68,6 +57,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// The parameter name of the dynamic property.
         /// </summary>
         public PathTemplateSegment Segment { get; }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{Segment.LiteralText}";
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.OData.Edm;
+using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -21,28 +21,23 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         private CountSegmentTemplate()
         {
-            EdmType = EdmCoreModel.Instance.GetInt32(false).Definition;
         }
 
         /// <inheritdoc />
-        public override string Literal => "$count";
-
-        /// <inheritdoc />
-        public override IEdmType EdmType { get; }
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Count;
-
-        /// <inheritdoc />
-        public override bool IsSingle => true;
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource => null;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/$count";
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(CountSegment.Instance);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(CountSegment.Instance);
             return true;
         }
     }

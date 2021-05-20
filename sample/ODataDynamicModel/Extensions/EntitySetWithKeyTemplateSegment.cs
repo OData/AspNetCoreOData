@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -14,13 +15,10 @@ namespace ODataDynamicModel.Extensions
 {
     public class EntitySetWithKeyTemplateSegment : ODataSegmentTemplate
     {
-        public override string Literal => "{key}";
-
-        public override ODataSegmentKind Kind => ODataSegmentKind.Key;
-
-        public override IEdmType EdmType => null;
-
-        public override bool IsSingle => false;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/{key}";
+        }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {

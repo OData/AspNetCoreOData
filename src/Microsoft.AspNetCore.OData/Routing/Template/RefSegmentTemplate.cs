@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -21,18 +22,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Navigation = navigation ?? throw Error.ArgumentNull(nameof(navigation));
 
             NavigationSource = navigationSource;
-
-            IsSingle = !navigation.Type.IsCollection();
         }
-
-        /// <inheritdoc />
-        public override string Literal => "$ref";
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Navigation.Type.Definition;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Ref;
 
         /// <summary>
         /// Gets the wrapped navigation property.
@@ -40,10 +30,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmNavigationProperty Navigation { get; }
 
         /// <inheritdoc />
-        public override bool IsSingle { get; }
+        public IEdmNavigationSource NavigationSource { get; }
 
         /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource { get; }
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/$ref";
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)

@@ -33,49 +33,48 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_FunctionImport()
+        public void CtorFunctionImportSegmentTemplate_ThrowsArgumentNull_FunctionImport()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(functionImport: null, null), "functionImport");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Parameters()
+        public void CtorFunctionImportSegmentTemplate_ThrowsArgumentNull_Parameters()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(parameters: null, null, null), "parameters");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_FunctionImport_InParametersCtor()
+        public void CtorFunctionImportSegmentTemplate_ThrowsArgumentNull_FunctionImport_InParametersCtor()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(new Dictionary<string, string>(), null, null), "functionImport");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorFunctionImportSegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new FunctionImportSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void CommonFunctionImportTemplateProperties_ReturnsAsExpected()
+        public void GetTemplatesFunctionImportSegmentTemplate_ReturnsTemplates()
         {
-            // Assert
+            // Arrange
             FunctionImportSegmentTemplate functionImportSegment = new FunctionImportSegmentTemplate(_functionImport, null);
 
             // Act & Assert
-            Assert.Equal("MyFunctionImport(name={name},title={title})", functionImportSegment.Literal);
-            Assert.Equal(ODataSegmentKind.FunctionImport, functionImportSegment.Kind);
-            Assert.True(functionImportSegment.IsSingle);
-            Assert.Same(IntPrimitive.Definition, functionImportSegment.EdmType);
+            IEnumerable<string> templates = functionImportSegment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/MyFunctionImport(name={name},title={title})", template);
             Assert.Null(functionImportSegment.NavigationSource);
         }
 
         [Fact]
-        public void TryTranslate_ReturnsODataFunctionImportSegment()
+        public void TryTranslateFunctionImportSegmentTemplate_ReturnsODataFunctionImportSegment()
         {
             // Arrange
             EdmFunction function = new EdmFunction("NS", "MyFunctionImport", IntPrimitive, false, null, false);
