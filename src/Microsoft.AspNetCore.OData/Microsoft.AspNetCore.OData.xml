@@ -6573,6 +6573,11 @@
               Looks up a localized string similar to Parameter alias &apos;{0}&apos; in segment &apos;{1}&apos; is empty..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.EmptyPathTemplate">
+            <summary>
+              Looks up a localized string similar to The route template in path template &apos;{0}&apos; is empty..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityReferenceMustHasKeySegment">
             <summary>
               Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
@@ -6680,7 +6685,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidAttributeRoutingTemplateSegment">
             <summary>
-              Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;..
+              Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;. The template string does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidBatchReaderState">
@@ -13162,16 +13167,25 @@
             <summary>
             Gets the current HttpContext.
             </summary>
+            <remarks>
+            The internal setter is provided for unit test purposes only.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.RouteValues">
             <summary>
             Gets the route values.
             </summary>
+            <remarks>
+            The internal setter is provided for unit test purposes only.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model">
             <summary>
             Gets the Edm model.
             </summary>
+            <remarks>
+            The internal setter is provided for unit test purposes only.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.UpdatedValues">
             <summary>
@@ -13298,11 +13312,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.IsMatchParameters(Microsoft.AspNetCore.Routing.RouteValueDictionary,System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
-            
+            Match the parameters
             </summary>
-            <param name="routeValues"></param>
-            <param name="parameterMappings"></param>
-            <returns></returns>
+            <param name="routeValues">The route values</param>
+            <param name="parameterMappings">The parameter mappings.</param>
+            <returns>True/False.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate">
             <summary>

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -13,6 +14,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class DefaultODataTemplateTranslatorTests
     {
+        [Fact]
+        public void TranslateODataPathTemplate_ThrowsArgumentNull_Path()
+        {
+            // Arrange
+            DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => translator.Translate(null, null), "path");
+        }
+
+        [Fact]
+        public void TranslateODataPathTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange
+            DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
+            ODataPathTemplate template = new ODataPathTemplate();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => translator.Translate(template, null), "context");
+        }
+
         [Fact]
         public void TranslateODataPathTemplate_ToODataPath()
         {

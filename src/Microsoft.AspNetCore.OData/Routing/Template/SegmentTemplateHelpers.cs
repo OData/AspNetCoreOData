@@ -99,11 +99,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <summary>
-        /// 
+        /// Match the parameters
         /// </summary>
-        /// <param name="routeValues"></param>
-        /// <param name="parameterMappings"></param>
-        /// <returns></returns>
+        /// <param name="routeValues">The route values</param>
+        /// <param name="parameterMappings">The parameter mappings.</param>
+        /// <returns>True/False.</returns>
         internal static bool IsMatchParameters(RouteValueDictionary routeValues, IDictionary<string, string> parameterMappings)
         {
             Contract.Assert(routeValues != null);
@@ -145,17 +145,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
+            string combinates = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
 
             // 2) Extract the key/value pairs
             //   p1=a    p2=b    p3=c
-            if (!KeyValuePairParser.TryParse(combintes, out IDictionary<string, string> parsedKeyValues))
+            if (!KeyValuePairParser.TryParse(combinates, out IDictionary<string, string> parsedKeyValues))
             {
                 return false;
             }
 
-            // 3) now the RequiredParameters (p1, p3) is not equal to actualParameters (p1, p2, p3)
-            return parameterMappings.Count == actualParameters.Keys.Count;
+            // 3) now the parsedKeyValues (p1, p3) is not equal to actualParameters (p1, p2, p3)
+            return parameterMappings.Count == parsedKeyValues.Count;
         }
     }
 }

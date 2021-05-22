@@ -622,7 +622,10 @@
     <value>'{0}' of kind '{1}' is not implemented.</value>
   </data>
   <data name="InvalidAttributeRoutingTemplateSegment" xml:space="preserve">
-    <value>The attribute routing template contains invalid segment '{0}'.</value>
+    <value>The attribute routing template contains invalid segment '{0}'. The template string does not start with '{{' or ends with '}}'.</value>
+  </data>
+  <data name="EmptyPathTemplate" xml:space="preserve">
+    <value>The route template in path template '{0}' is empty.</value>
   </data>
   <data name="EmptyParameterAlias" xml:space="preserve">
     <value>Parameter alias '{0}' in segment '{1}' is empty.</value>

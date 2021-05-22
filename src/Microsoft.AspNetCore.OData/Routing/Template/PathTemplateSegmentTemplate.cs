@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -35,8 +36,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             if (!IsRouteParameter(segment.LiteralText))
             {
-                throw new ODataException(
-                    Error.Format(SRResources.InvalidAttributeRoutingTemplateSegment, segment.LiteralText));
+                throw new ODataException(Error.Format(SRResources.InvalidAttributeRoutingTemplateSegment, segment.LiteralText));
             }
 
             // ParameterName = property or dynamicproperty
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             if (string.IsNullOrEmpty(ParameterName))
             {
-                Error.Format(SRResources.EmptyParameterAlias, ParameterName, segment.LiteralText);
+                throw new ODataException(Error.Format(SRResources.EmptyPathTemplate, segment.LiteralText));
             }
         }
 
@@ -117,13 +117,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmStructuralProperty edmProperty = previewEdmType.StructuralProperties().FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
-            if (edmProperty != null)
+            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
+            IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
+            if (structuralProperty != null)
             {
-                return new PropertySegment(edmProperty);
+                return new PropertySegment(structuralProperty);
             }
 
-            IEdmNavigationProperty navProperty = previewEdmType.NavigationProperties().FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+            IEdmNavigationProperty navProperty = edmProperty as IEdmNavigationProperty;
             if (navProperty != null)
             {
                 // TODO: shall we calculate the navigation source for navigation segment?
@@ -152,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmProperty edmProperty = previewEdmType.Properties().FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
             if (edmProperty != null)
             {
                 return null;

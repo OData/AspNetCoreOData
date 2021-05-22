@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
@@ -51,17 +50,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Gets the current HttpContext.
         /// </summary>
-        public HttpContext HttpContext { get; }
+        /// <remarks>
+        /// The internal setter is provided for unit test purposes only.
+        /// </remarks>
+        public HttpContext HttpContext { get; internal set; }
 
         /// <summary>
         /// Gets the route values.
         /// </summary>
-        public RouteValueDictionary RouteValues { get; }
+        /// <remarks>
+        /// The internal setter is provided for unit test purposes only.
+        /// </remarks>
+        public RouteValueDictionary RouteValues { get; internal set; }
 
         /// <summary>
         /// Gets the Edm model.
         /// </summary>
-        public IEdmModel Model { get; }
+        /// <remarks>
+        /// The internal setter is provided for unit test purposes only.
+        /// </remarks>
+        public IEdmModel Model { get; internal set; }
 
         /// <summary>
         /// Gets the updated route values. This will include the updated route values.
