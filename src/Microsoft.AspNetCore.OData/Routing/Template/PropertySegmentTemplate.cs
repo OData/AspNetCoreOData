@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -28,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="segment">The property segment.</param>
         public PropertySegmentTemplate(PropertySegment segment)
         {
-            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+            Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
         /// <summary>

@@ -12,62 +12,59 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class PropertySegmentTemplateTests
     {
-        private PropertySegmentTemplate _propertySegment;
+        private static PropertySegmentTemplate _propertySegment;
+        private static IEdmStructuralProperty _edmProperty;
 
-        public PropertySegmentTemplateTests()
+        static PropertySegmentTemplateTests()
         {
             EdmEntityType entityType = new EdmEntityType("NS", "Customer");
-            IEdmStructuralProperty property = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
-            _propertySegment = new PropertySegmentTemplate(property);
+            _edmProperty = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+            _propertySegment = new PropertySegmentTemplate(_edmProperty);
         }
 
         [Fact]
         public void CtorPropertySegmentTemplate_ThrowsArgumentNull_Property()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(property: null), "property");
         }
 
         [Fact]
         public void CtorPropertySegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
         public void CtorPropertySegmentTemplate_SetsProperties()
         {
-            // Arrange & Act
+            // Arrange & Act & Assert
             EdmEntityType entityType = new EdmEntityType("NS", "Customer");
             IEdmStructuralProperty property = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
             PropertySegmentTemplate propertySegment = new PropertySegmentTemplate(property);
-
-            // Assert
             Assert.NotNull(propertySegment.Segment);
             Assert.Same(property, propertySegment.Property);
+
+            // Arrange & Act & Assert
+            PropertySegmentTemplate propertySegment2 = new PropertySegmentTemplate(propertySegment.Segment);
+            Assert.Same(propertySegment.Segment, propertySegment2.Segment);
         }
 
         [Fact]
         public void GetTemplatesPropertySegmentTemplate_ReturnsTemplates()
         {
-            // Assert
-            PropertySegmentTemplate propertySegment = GetSegmentTemplate();
-
-            // Act & Assert
-            IEnumerable<string> templates = propertySegment.GetTemplates();
+            // Assert & Act & Assert
+            IEnumerable<string> templates = _propertySegment.GetTemplates();
             string template = Assert.Single(templates);
             Assert.Equal("/Name", template);
         }
 
         [Fact]
-        public void TryTranslateSingletonSegmentTemplate_ThrowsArgumentNull_Context()
+        public void TryTranslatePropertySegmentTemplate_ThrowsArgumentNull_Context()
         {
-            // Arrange
-            PropertySegmentTemplate propertySegment = GetSegmentTemplate();
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => propertySegment.TryTranslate(null), "context");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => _propertySegment.TryTranslate(null), "context");
         }
 
         [Fact]
@@ -75,23 +72,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
-            PropertySegmentTemplate propertySegment = GetSegmentTemplate();
 
             // Act
-            bool ok = propertySegment.TryTranslate(context);
+            bool ok = _propertySegment.TryTranslate(context);
 
             // Assert
             Assert.True(ok);
             ODataPathSegment segment = Assert.Single(context.Segments);
             PropertySegment odataPropertySegment = Assert.IsType<PropertySegment>(segment);
             Assert.Equal("Edm.String", odataPropertySegment.EdmType.FullTypeName());
-        }
-
-        private static PropertySegmentTemplate GetSegmentTemplate()
-        {
-            EdmEntityType entityType = new EdmEntityType("NS", "Customer");
-            IEdmStructuralProperty property = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
-            return new PropertySegmentTemplate(property);
         }
     }
 }

@@ -14,14 +14,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class CastSegmentTemplateTests
     {
         [Fact]
-        public void Ctor_ThrowsArgumentNull_CastType()
+        public void CtorCastSegmentTemplate_ThrowsArgumentNull_CastType()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new CastSegmentTemplate(null, null, null), "castType");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_ExpectedType()
+        public void CtorCastSegmentTemplate_ThrowsArgumentNull_ExpectedType()
         {
             // Assert
             Mock<IEdmType> edmType = new Mock<IEdmType>();
@@ -31,7 +31,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
-        public void GetTemplates_ReturnsTemplates()
+        public void CtorCastSegmentTemplate_ThrowsArgumentNull_TypeSegment()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new CastSegmentTemplate(null), "typeSegment");
+        }
+
+        [Fact]
+        public void CtorCastSegmentTemplate_SetsProperties()
+        {
+            // Arrange & Act
+            EdmEntityType baseType = new EdmEntityType("NS", "base");
+            EdmEntityType subType = new EdmEntityType("NS", "sub", baseType);
+            CastSegmentTemplate segment = new CastSegmentTemplate(subType, baseType, null);
+
+            // Assert
+            Assert.Same(subType, segment.CastType);
+            Assert.Same(baseType, segment.ExpectedType);
+            Assert.NotNull(segment.TypeSegment);
+
+            // Act & Assert
+            CastSegmentTemplate segment1 = new CastSegmentTemplate(segment.TypeSegment);
+            Assert.Same(segment.TypeSegment, segment1.TypeSegment);
+        }
+
+        [Fact]
+        public void GetTemplatesCastSegmentTemplate_ReturnsTemplates()
         {
             // Assert
             EdmEntityType baseType = new EdmEntityType("NS", "base");
@@ -42,6 +67,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             IEnumerable<string> templates = segment.GetTemplates();
             string template = Assert.Single(templates);
             Assert.Equal("/NS.sub", template);
+        }
+
+        [Fact]
+        public void TryTranslateCastSegmentTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange
+            EdmEntityType baseType = new EdmEntityType("NS", "base");
+            EdmEntityType subType = new EdmEntityType("NS", "sub", baseType);
+            CastSegmentTemplate segment = new CastSegmentTemplate(subType, baseType, null);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => segment.TryTranslate(null), "context");
         }
 
         [Fact]
