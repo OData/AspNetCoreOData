@@ -128,6 +128,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             options = options ?? ODataRouteOptions.Default;
 
+            Contract.Assert(options.EnableKeyInParenthesis || options.EnableKeyAsSegment);
+
             if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
             {
                 yield return $"({_keyLiteral})";
@@ -140,10 +142,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             else if (options.EnableKeyAsSegment)
             {
                 yield return $"/{_keyLiteral}";
-            }
-            else
-            {
-                throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
             }
         }
 

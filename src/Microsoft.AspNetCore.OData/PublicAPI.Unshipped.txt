@@ -1238,6 +1238,8 @@ Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.get -> b
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis.set -> void
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableNonParenthsisForEmptyParameterFunction.get -> bool
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableNonParenthsisForEmptyParameterFunction.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableQualifiedOperationCall.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableQualifiedOperationCall.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall.get -> bool

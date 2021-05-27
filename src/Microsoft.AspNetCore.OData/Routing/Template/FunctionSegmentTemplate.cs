@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
@@ -96,10 +97,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
             options = options ?? ODataRouteOptions.Default;
+            Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
 
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
-            string unqualifiedIdentifier = "/" + Function.Name + parameterStr;
-            string qualifiedIdentifier = "/" + Function.FullName() + parameterStr;
+            string unqualifiedIdentifier, qualifiedIdentifier;
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            {
+                unqualifiedIdentifier = "/" + Function.Name;
+                qualifiedIdentifier = "/" + Function.FullName();
+            }
+            else
+            {
+                string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+                unqualifiedIdentifier = "/" + Function.Name + parameterStr;
+                qualifiedIdentifier = "/" + Function.FullName() + parameterStr;
+            }
 
             if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
             {
@@ -114,14 +125,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // "/NS.Function(...)"
                 yield return qualifiedIdentifier;
             }
-            else if (options.EnableUnqualifiedOperationCall)
+            else
             {
                 // "/Function(...)"
                 yield return unqualifiedIdentifier;
-            }
-            else
-            {
-                throw new ODataException(Error.Format(SRResources.RouteOptionDisabledOperationSegment, "function"));
             }
         }
 

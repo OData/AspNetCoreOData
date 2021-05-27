@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -29,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="segment">The operation segment, it should be a function segment and the parameters are template.</param>
+        /// <param name="segment">The operation segment.</param>
         public ActionSegmentTemplate(OperationSegment segment)
         {
             if (segment == null)
@@ -53,7 +54,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         public IEdmAction Action { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the wrapped Edm navigation source.
+        /// </summary>
         public IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
@@ -65,6 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
             options = options ?? ODataRouteOptions.Default;
+            Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
 
             if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
             {
@@ -75,13 +79,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             {
                 yield return $"/{Action.FullName()}";
             }
-            else if (options.EnableUnqualifiedOperationCall)
-            {
-                yield return $"/{Action.Name}";
-            }
             else
             {
-                throw new ODataException(Error.Format(SRResources.RouteOptionDisabledOperationSegment, "action"));
+                yield return $"/{Action.Name}";
             }
         }
 

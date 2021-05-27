@@ -7105,12 +7105,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledKeySegment">
             <summary>
-              Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+              Looks up a localized string similar to The route option disables key in parenthesis and key as segment. At least one option should enable..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteOptionDisabledOperationSegment">
             <summary>
-              Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
+              Looks up a localized string similar to The route option disables qualified and unqualified operation call. At least one option should enable..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SegmentShouldBeKind">
@@ -12144,6 +12144,11 @@
             Represents the configurable options on a conventional routing template building.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis">
             <summary>
             Gets or sets a value indicating whether to generate odata path template as ~/entityset({key}).
@@ -12165,6 +12170,12 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall">
             <summary>
             Gets or sets a value indicating whether to generate odata path template as ~/MyFunction(parameters...)
+            Used in conventional routing.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableNonParenthsisForEmptyParameterFunction">
+            <summary>
+            Gets or sets a value indicating whther to generate non parenthsis for non-parameter function.
             Used in conventional routing.
             </summary>
         </member>
@@ -12603,7 +12614,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The operation segment, it should be a function segment and the parameters are template.</param>
+            <param name="segment">The operation segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Action">
             <summary>
@@ -12611,7 +12622,9 @@
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.NavigationSource">
-            <inheritdoc />
+            <summary>
+            Gets the wrapped Edm navigation source.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate.Segment">
             <summary>

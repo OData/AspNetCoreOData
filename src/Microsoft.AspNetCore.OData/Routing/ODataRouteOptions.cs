@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Routing
 {
     /// <summary>
@@ -11,28 +13,98 @@ namespace Microsoft.AspNetCore.OData.Routing
         // The default route options.
         internal static readonly ODataRouteOptions Default = new ODataRouteOptions();
 
+        private bool _enableKeyInParenthesis;
+        private bool _enableKeyAsSegment;
+        private bool _enableQualifiedOperationCall;
+        private bool _enableUnqualifiedOperationCall;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRouteOptions" /> class.
+        /// </summary>
+        public ODataRouteOptions()
+        {
+            _enableKeyInParenthesis = true;
+            _enableKeyAsSegment = true;
+            _enableQualifiedOperationCall = true;
+            _enableUnqualifiedOperationCall = true;
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset({key}).
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableKeyInParenthesis { get; set; } = true;
+        public bool EnableKeyInParenthesis
+        {
+            get => _enableKeyInParenthesis;
+            set
+            {
+                if (!value && !_enableKeyAsSegment)
+                {
+                    throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
+                }
+
+                _enableKeyInParenthesis = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset/{key}
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableKeyAsSegment { get; set; } = true;
+        public bool EnableKeyAsSegment
+        {
+            get => _enableKeyAsSegment;
+            set
+            {
+                if (!value && !_enableKeyInParenthesis)
+                {
+                    throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
+                }
+
+                _enableKeyAsSegment = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/Namespace.MyFunction(parameters...)
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableQualifiedOperationCall { get; set; } = true;
+        public bool EnableQualifiedOperationCall
+        {
+            get => _enableQualifiedOperationCall;
+            set
+            {
+                if (!value && !_enableUnqualifiedOperationCall)
+                {
+                    throw new ODataException(SRResources.RouteOptionDisabledOperationSegment);
+                }
+
+                _enableQualifiedOperationCall = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/MyFunction(parameters...)
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableUnqualifiedOperationCall { get; set; } = true;
+        public bool EnableUnqualifiedOperationCall
+        {
+            get => _enableUnqualifiedOperationCall;
+            set
+            {
+                if (!value && !_enableQualifiedOperationCall)
+                {
+                    throw new ODataException(SRResources.RouteOptionDisabledOperationSegment);
+                }
+
+                _enableUnqualifiedOperationCall = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whther to generate non parenthsis for non-parameter function.
+        /// Used in conventional routing.
+        /// </summary>
+        public bool EnableNonParenthsisForEmptyParameterFunction { get; set; } = false;
     }
 }

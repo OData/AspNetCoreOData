@@ -14,32 +14,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         [Fact]
         public void Ctor_ThrowsArgumentNull_Prefix()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ODataRoutingMetadata(prefix: null, null, null), "prefix");
         }
 
         [Fact]
         public void Ctor_ThrowsArgumentNull_Model()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ODataRoutingMetadata("prefix", null, null), "model");
         }
 
         [Fact]
         public void Ctor_ThrowsArgumentNull_template()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ODataRoutingMetadata("prefix", EdmCoreModel.Instance, null), "template");
         }
 
         [Fact]
         public void Ctor_SetPropertiesCorrectly()
         {
-            // Assert
+            // Arrange
             IEdmModel model = EdmCoreModel.Instance;
             ODataPathTemplate path = new ODataPathTemplate();
 
-            // & Act & Assert
+            // Act
             ODataRoutingMetadata metadata = new ODataRoutingMetadata("prefix", model, path);
 
             // Assert

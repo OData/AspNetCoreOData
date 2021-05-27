@@ -88,9 +88,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <inheritdoc />
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            string parameters = string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+            options = options ?? ODataRouteOptions.Default;
 
-            yield return $"/{FunctionImport.Name}({parameters})";
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            {
+                yield return $"/{FunctionImport.Name}";
+            }
+            else
+            {
+                string parameters = string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+                yield return $"/{FunctionImport.Name}({parameters})";
+            }
         }
 
         /// <inheritdoc />
