@@ -8,8 +8,6 @@ namespace ODataRoutingSample.Models
 {
     public static class EdmModelBuilder
     {
-   //     private static IEdmModel _edmModel;
-
         public static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
@@ -140,6 +138,16 @@ namespace ODataRoutingSample.Models
             function.Parameter<int>("order");
             function.Returns<int>();
 
+            return builder.GetEdmModel();
+        }
+
+        public static IEdmModel GetEdmModelV3()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<DriverTenant>("tenants");
+            builder.EntitySet<DriverDevice>("devices");
+            builder.EntitySet<DriverFolder>("folders");
+            builder.EntitySet<DriverPage>("pages");
             return builder.GetEdmModel();
         }
     }

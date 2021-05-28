@@ -60,6 +60,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         strValue = newStrValue;
                     }
 
+                    string originalStrValue = strValue;
+
                     // for resource or collection resource, this method will return "ODataResourceValue, ..." we should support it.
                     if (edmParameter.Type.IsResourceOrCollectionResource())
                     {
@@ -77,7 +79,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                             strValue = edmParameter.Type.FullName() + strValue;
                         }
 
-                        object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmParameter.Type);
+                        object newValue;
+                        try
+                        {
+                            newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmParameter.Type);
+                        }
+                        catch (ODataException ex)
+                        {
+                            string message = Error.Format(SRResources.InvalidParameterValueInUriFound, originalStrValue, edmParameter.Type.FullName());
+                            throw new ODataException(message, ex);
+                        }
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
                         updatedValues[parameterTemp] = newValue;

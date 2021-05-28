@@ -81,7 +81,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return true;
         }
 
-        private static (string, string) Split(string actionName)
+        // internal for unit test
+        internal static (string, string) Split(string actionName)
         {
             string typeName;
             string methodName;

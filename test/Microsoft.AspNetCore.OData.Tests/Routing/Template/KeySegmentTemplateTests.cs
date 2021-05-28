@@ -4,7 +4,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -114,12 +113,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 { "customerId", "{key}" }
             };
 
-            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { key = "42" });
-
             KeySegmentTemplate template = new KeySegmentTemplate(keys, _customerType, _customers);
-
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = new RouteValueDictionary(new { key = "42" }),
+                Model = model
+            };
 
             // Act
             bool ok = template.TryTranslate(context);
@@ -155,8 +154,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             KeySegmentTemplate template = new KeySegmentTemplate(keys, customerType, customers);
 
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValueDictionary,
+                Model = model
+            };
 
             // Act
             bool ok = template.TryTranslate(context);

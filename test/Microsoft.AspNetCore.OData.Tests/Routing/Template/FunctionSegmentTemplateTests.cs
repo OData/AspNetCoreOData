@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -153,7 +152,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             function.AddParameter("price", primitive);
 
             FunctionSegmentTemplate template = new FunctionSegmentTemplate(function, null);
-            HttpContext httpContext = new Mock<HttpContext>().Object;
             EdmModel edmModel = new EdmModel();
             edmModel.AddElement(function);
 
@@ -167,7 +165,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 routeValue = new RouteValueDictionary(); // Empty
             }
 
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValue, edmModel);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValue,
+                Model = edmModel
+            };
 
             // Act
             bool ok = template.TryTranslate(context);

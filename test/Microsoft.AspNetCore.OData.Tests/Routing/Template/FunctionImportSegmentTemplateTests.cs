@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -164,11 +163,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             EdmFunctionImport functionImport = new EdmFunctionImport(container, "MyFunctionImport", function);
 
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(functionImport, null);
-
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            Mock<IEdmModel> edmModel = new Mock<IEdmModel>();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext.Object,
-                new RouteValueDictionary(), edmModel.Object);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = new RouteValueDictionary()
+            };
 
             // Act
             bool ok = template.TryTranslate(context);
@@ -199,9 +197,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
 
             RouteValueDictionary routeValues = new RouteValueDictionary(new { nameTemp = "'pt'", titleTemp = "'abc'", minTemp = "42" });
-
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValues,
+                Model = model
+            };
 
             // Act
             bool ok = template.TryTranslate(context);
@@ -238,8 +238,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
 
             RouteValueDictionary routeValues = new RouteValueDictionary(new { name = "'pt'", title = "'abc'", min = "42,max=5" });
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValues,
+                Model = model
+            };
 
             // Act
             bool ok = template.TryTranslate(context);
@@ -265,8 +268,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             FunctionImportSegmentTemplate template = new FunctionImportSegmentTemplate(parameters, _functionImport, null);
 
             RouteValueDictionary routeValues = new RouteValueDictionary(new { name = "'pt'" });
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValues,
+                Model = model
+            };
 
             // Act
             bool ok = template.TryTranslate(context);

@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +51,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="httpContext">The context associated with the current request.</param>
         /// <param name="candidates">The CandidateSet.</param>
         /// <returns>The task.</returns>
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
         {
             if (httpContext == null)
@@ -88,31 +85,32 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                ODataTemplateTranslateContext translatorContext =
-                    new ODataTemplateTranslateContext(httpContext, candidate.Values, metadata.Model);
-
-                try
+                if (odataFeature.Path != null)
                 {
-                    ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
-                    if (odataPath != null)
-                    {
-                        odataFeature.PrefixName = metadata.Prefix;
-                        odataFeature.Model = metadata.Model;
-                        odataFeature.Path = odataPath;
-
-                        MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
-
-                        // Shall we break the remaining candidates?
-                        // So far the answer is no. Because we can use this matcher to obsolete the unmatched endpoint.
-                        // break;
-                    }
-                    else
-                    {
-                        candidates.SetValidity(i, false);
-                    }
+                    // If it's odata endpoint, and we have a path set, let other odata endpoints invalid.
+                    candidates.SetValidity(i, false);
+                    continue;
                 }
-                catch (Exception)
+
+                ODataTemplateTranslateContext translatorContext =
+                    new ODataTemplateTranslateContext(httpContext, candidate.Endpoint, candidate.Values, metadata.Model);
+
+                ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
+                if (odataPath != null)
                 {
+                    odataFeature.PrefixName = metadata.Prefix;
+                    odataFeature.Model = metadata.Model;
+                    odataFeature.Path = odataPath;
+
+                    MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
+
+                    // Shall we break the remaining candidates?
+                    // So far the answer is no. Because we can use this matcher to obsolete the unmatched endpoint.
+                    // break;
+                }
+                else
+                {
+                    candidates.SetValidity(i, false);
                 }
             }
 

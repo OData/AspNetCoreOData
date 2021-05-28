@@ -176,14 +176,28 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         strValue = newStrValue;
                     }
 
+                    // If it's key as segment and the key type is Edm.String, we support non-single quoted string.
+                    // Since we can't identify key as segment and key in parenthesis easy so far,
+                    // we use the key literal with "/" to test in the whole route template.
+                    // Why we can't create two key segment templates, one reason is that in attribute routing template,
+                    // we can't identify key as segment or key in parenthesis also.
+                    if (edmType.IsString() && context.IsPartOfRouteTemplate($"/{_keyLiteral}"))
+                    {
+                        if (!strValue.StartsWith('\'') && !strValue.EndsWith('\''))
+                        {
+                            strValue = $"'{strValue}'"; // prefix and suffix single quote
+                        }
+                    }
+
                     object newValue;
                     try
                     {
                         newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmType);
                     }
-                    catch
+                    catch (ODataException ex)
                     {
-                        return false;
+                        string message = Error.Format(SRResources.InvalidKeyInUriFound, strValue, edmType.FullName());
+                        throw new ODataException(message, ex);
                     }
 
                     // for non FromODataUri, so update it, for example, remove the single quote for string value.

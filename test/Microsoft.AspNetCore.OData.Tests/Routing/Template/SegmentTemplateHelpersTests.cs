@@ -133,7 +133,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             HttpContext httpContext = new DefaultHttpContext();
             httpContext.Request.QueryString = new QueryString("?@p='abc'");
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                HttpContext = httpContext,
+                RouteValues = routeValues,
+                Model = model
+            };
 
             IDictionary<string, string> parameterMappings = new Dictionary<string, string>
             {

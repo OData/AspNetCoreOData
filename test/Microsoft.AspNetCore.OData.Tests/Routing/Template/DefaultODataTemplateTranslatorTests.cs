@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
@@ -52,9 +51,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 KeySegmentTemplate.CreateKeySegment(customer, entitySet));
 
             DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
-            RouteValueDictionary routeValues = new RouteValueDictionary(new { key = "42" });
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = new RouteValueDictionary(new { key = "42" }),
+                Model = model
+            };
 
             // Act
             ODataPath path = translator.Translate(template, context);

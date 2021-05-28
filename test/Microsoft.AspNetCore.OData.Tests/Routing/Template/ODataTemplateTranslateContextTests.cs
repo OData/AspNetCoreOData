@@ -22,7 +22,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             IHttpRequestFeature requestFeature = request.HttpContext.Features.Get<IHttpRequestFeature>();
             requestFeature.QueryString = "?@p=[1, 2, null, 7, 8]";
 
-            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext(context);
+            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext
+            {
+                HttpContext = context
+            };
 
             // Act
             string alias = translateContext.GetParameterAliasOrSelf("@p");
@@ -40,7 +43,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             IHttpRequestFeature requestFeature = request.HttpContext.Features.Get<IHttpRequestFeature>();
             requestFeature.QueryString = "?@p=@age&@age=@para1&@para1='ab''c'";
 
-            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext(context);
+            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext
+            {
+                HttpContext = context
+            };
 
             // Act
             string alias = translateContext.GetParameterAliasOrSelf("@p");
@@ -58,7 +64,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             IHttpRequestFeature requestFeature = request.HttpContext.Features.Get<IHttpRequestFeature>();
             requestFeature.QueryString = "?@p=@age&@age=@p1&@p1=@p";
 
-            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext(context);
+            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext
+            {
+                HttpContext = context
+            };
 
             // Act
             Action test = () => translateContext.GetParameterAliasOrSelf("@p");
@@ -76,7 +85,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             IHttpRequestFeature requestFeature = request.HttpContext.Features.Get<IHttpRequestFeature>();
             requestFeature.QueryString = "?@p=@age&@para1='abc'";
 
-            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext(context);
+            ODataTemplateTranslateContext translateContext = new ODataTemplateTranslateContext
+            {
+                HttpContext = context
+            };
 
             // Act
             Action test = () => translateContext.GetParameterAliasOrSelf("@p");

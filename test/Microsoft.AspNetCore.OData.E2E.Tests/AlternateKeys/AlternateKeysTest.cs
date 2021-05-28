@@ -295,10 +295,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys
         [Fact]
         public async Task QueryFailedIfMissingAnyOfComposedAlternateKeys()
         {
+            // Since this request matched "odata/People({key})", and key value is not valid.
+            // It throws exception
             var requestUri = "odata/People(Country_Region='United States')";
             HttpClient client = CreateClient();
-            var response = await client.GetAsync(requestUri);
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+            try
+            {
+                var response = await client.GetAsync(requestUri);
+            }
+            catch (ODataException ex)
+            {
+                Assert.Equal("The key value (Country_Region='United States') from request is not valid. The key value should be format of type 'Edm.Int32'.", ex.Message);
+            }
         }
 
         /* ODL has the bug to parse the route template with complex property path expression.

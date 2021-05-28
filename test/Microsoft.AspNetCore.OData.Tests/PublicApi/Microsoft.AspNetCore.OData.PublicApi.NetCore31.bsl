@@ -3098,8 +3098,9 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate : Sys
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext {
-	public ODataTemplateTranslateContext (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model)
+	public ODataTemplateTranslateContext (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.Endpoint endpoint, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model)
 
+	Microsoft.AspNetCore.Http.Endpoint Endpoint  { public get; }
 	Microsoft.AspNetCore.Http.HttpContext HttpContext  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary RouteValues  { public get; }

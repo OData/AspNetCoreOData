@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
@@ -97,8 +96,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             NavigationLinkSegmentTemplate linkSegment = new NavigationLinkSegmentTemplate(_navigation, null);
             RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { id = "42" });
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValueDictionary,
+                Model = model
+            };
 
             // Without key segment
             // Act & Assert
@@ -112,7 +114,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 
             // With Key segment
             // Act & Assert
-            context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, model);
+            context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValueDictionary,
+                Model = model
+            };
+
             linkSegment.Key = KeySegmentTemplate.CreateKeySegment(_employee, null, "id");
             ok = linkSegment.TryTranslate(context);
 

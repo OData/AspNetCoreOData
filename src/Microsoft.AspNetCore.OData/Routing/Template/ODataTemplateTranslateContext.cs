@@ -26,29 +26,32 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
-        /// For Unit test only.
         /// </summary>
-        /// <param name="context">The HttpContext.</param>
-        internal ODataTemplateTranslateContext(HttpContext context)
+        /// <param name="context">The current HttpContext.</param>
+        /// <param name="endpoint">The current endpoint to match.</param>
+        /// <param name="routeValues">The current route values.</param>
+        /// <param name="model">The current Edm model.</param>
+        public ODataTemplateTranslateContext(HttpContext context, Endpoint endpoint, RouteValueDictionary routeValues, IEdmModel model)
         {
             HttpContext = context ?? throw Error.ArgumentNull(nameof(context));
-        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataTemplateTranslateContext" /> class.
-        /// </summary>
-        /// <param name="context">The HttpContext.</param>
-        /// <param name="routeValues">The route values.</param>
-        /// <param name="model">The Edm model.</param>
-        public ODataTemplateTranslateContext(HttpContext context, RouteValueDictionary routeValues, IEdmModel model)
-        {
-            HttpContext = context ?? throw Error.ArgumentNull(nameof(context));
+            Endpoint = endpoint ?? throw Error.ArgumentNull(nameof(endpoint));
+
             RouteValues = routeValues ?? throw Error.ArgumentNull(nameof(routeValues));
+
             Model = model ?? throw Error.ArgumentNull(nameof(model));
         }
 
         /// <summary>
-        /// Gets the current HttpContext.
+        /// Gets the current Endpoint <see cref="Endpoint"/>.
+        /// </summary>
+        /// <remarks>
+        /// The internal setter is provided for unit test purposes only.
+        /// </remarks>
+        public Endpoint Endpoint { get; internal set; }
+
+        /// <summary>
+        /// Gets the current HttpContext <see cref="HttpContext"/>.
         /// </summary>
         /// <remarks>
         /// The internal setter is provided for unit test purposes only.
@@ -56,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public HttpContext HttpContext { get; internal set; }
 
         /// <summary>
-        /// Gets the route values.
+        /// Gets the route values <see cref="RouteValueDictionary"/>.
         /// </summary>
         /// <remarks>
         /// The internal setter is provided for unit test purposes only.
@@ -64,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public RouteValueDictionary RouteValues { get; internal set; }
 
         /// <summary>
-        /// Gets the Edm model.
+        /// Gets the Edm model <see cref="IEdmModel"/>.
         /// </summary>
         /// <remarks>
         /// The internal setter is provided for unit test purposes only.
@@ -121,6 +124,23 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             // Go to next level of parameter alias "?@p1=@p2&@p2=abc"
             return GetParameterAliasOrSelf(alias, visited);
+        }
+
+        internal bool IsPartOfRouteTemplate(string part)
+        {
+            string template = null;
+            RouteEndpoint routeEndpoint = Endpoint as RouteEndpoint;
+            if (routeEndpoint != null)
+            {
+                template = routeEndpoint.RoutePattern.RawText;
+            }
+
+            if (template != null)
+            {
+                return template.Contains(part, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
     }
 }

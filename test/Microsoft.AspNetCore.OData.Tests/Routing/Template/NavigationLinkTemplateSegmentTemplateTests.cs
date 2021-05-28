@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
@@ -132,9 +131,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             NavigationLinkTemplateSegmentTemplate navigationSegment = new NavigationLinkTemplateSegmentTemplate(_employeeType, _entitySet);
 
             RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { navigationProperty = "DirectReports" });
-
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValueDictionary, _model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValueDictionary,
+                Model = _model
+            };
 
             // Act
             bool ok = navigationSegment.TryTranslate(context);

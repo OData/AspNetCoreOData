@@ -6698,6 +6698,11 @@
               Looks up a localized string similar to &apos;{0}&apos; should be less than or equal to &apos;{1}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidKeyInUriFound">
+            <summary>
+              Looks up a localized string similar to The key value ({0}) from request is not valid. The key value should be format of type &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidLastSegmentInSelectExpandPath">
             <summary>
               Looks up a localized string similar to The last segment &apos;{0}&apos; of the select or expand query option is not supported..
@@ -6711,6 +6716,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidODataUntypedValue">
             <summary>
               Looks up a localized string similar to The given untyped value &apos;{0}&apos; in payload is invalid. Consider using a OData type annotation explicitly..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidParameterValueInUriFound">
+            <summary>
+              Looks up a localized string similar to The parameter value ({0}) from request is not valid. The parameter value should be format of type &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidPropertyMapper">
@@ -13161,24 +13171,26 @@
             For Unit test only.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.Endpoint,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext" /> class.
-            For Unit test only.
             </summary>
-            <param name="context">The HttpContext.</param>
+            <param name="context">The current HttpContext.</param>
+            <param name="endpoint">The current endpoint to match.</param>
+            <param name="routeValues">The current route values.</param>
+            <param name="model">The current Edm model.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Routing.RouteValueDictionary,Microsoft.OData.Edm.IEdmModel)">
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Endpoint">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext" /> class.
+            Gets the current Endpoint <see cref="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Endpoint"/>.
             </summary>
-            <param name="context">The HttpContext.</param>
-            <param name="routeValues">The route values.</param>
-            <param name="model">The Edm model.</param>
+            <remarks>
+            The internal setter is provided for unit test purposes only.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.HttpContext">
             <summary>
-            Gets the current HttpContext.
+            Gets the current HttpContext <see cref="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.HttpContext"/>.
             </summary>
             <remarks>
             The internal setter is provided for unit test purposes only.
@@ -13186,7 +13198,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.RouteValues">
             <summary>
-            Gets the route values.
+            Gets the route values <see cref="T:Microsoft.AspNetCore.Routing.RouteValueDictionary"/>.
             </summary>
             <remarks>
             The internal setter is provided for unit test purposes only.
@@ -13194,7 +13206,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model">
             <summary>
-            Gets the Edm model.
+            Gets the Edm model <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
             </summary>
             <remarks>
             The internal setter is provided for unit test purposes only.

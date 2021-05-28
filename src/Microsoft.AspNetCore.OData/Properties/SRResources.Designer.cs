@@ -817,6 +817,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The key value ({0}) from request is not valid. The key value should be format of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidKeyInUriFound {
+            get {
+                return ResourceManager.GetString("InvalidKeyInUriFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The last segment &apos;{0}&apos; of the select or expand query option is not supported..
         /// </summary>
         internal static string InvalidLastSegmentInSelectExpandPath {
@@ -840,6 +849,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidODataUntypedValue {
             get {
                 return ResourceManager.GetString("InvalidODataUntypedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter value ({0}) from request is not valid. The parameter value should be format of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidParameterValueInUriFound {
+            get {
+                return ResourceManager.GetString("InvalidParameterValueInUriFound", resourceCulture);
             }
         }
         

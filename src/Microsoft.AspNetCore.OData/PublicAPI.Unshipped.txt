@@ -1333,10 +1333,11 @@ Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.ODataPathTemplate(
 Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.ODataSegmentTemplate() -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext
+Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Endpoint.get -> Microsoft.AspNetCore.Http.Endpoint
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.GetParameterAliasOrSelf(string alias) -> string
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.HttpContext.get -> Microsoft.AspNetCore.Http.HttpContext
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Model.get -> Microsoft.OData.Edm.IEdmModel
-Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.ODataTemplateTranslateContext(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model) -> void
+Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.ODataTemplateTranslateContext(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.Endpoint endpoint, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.RouteValues.get -> Microsoft.AspNetCore.Routing.RouteValueDictionary
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.Segments.get -> System.Collections.Generic.IList<Microsoft.OData.UriParser.ODataPathSegment>
 Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext.UpdatedValues.get -> Microsoft.AspNetCore.Routing.RouteValueDictionary
