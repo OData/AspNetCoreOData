@@ -96,6 +96,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return BindOrderByClause(binder, orderBy, elementType);
         }
 
+        internal static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
+        {
+            LambdaExpression filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
+            filter = Expression.Lambda(binder.ApplyNullPropagationForFilterBody(filter.Body), filter.Parameters);
+
+            Type expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
+            if (filter.Type != expectedFilterType)
+            {
+                throw Error.Argument("filterType", SRResources.CannotCastFilter, filter.Type.FullName, expectedFilterType.FullName);
+            }
+
+            return filter;
+        }
+
         #region For testing purposes only.
 
         private FilterBinder(
@@ -140,20 +154,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         #endregion
-
-        private static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
-        {
-            LambdaExpression filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
-            filter = Expression.Lambda(binder.ApplyNullPropagationForFilterBody(filter.Body), filter.Parameters);
-
-            Type expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
-            if (filter.Type != expectedFilterType)
-            {
-                throw Error.Argument("filterType", SRResources.CannotCastFilter, filter.Type.FullName, expectedFilterType.FullName);
-            }
-
-            return filter;
-        }
 
         private static LambdaExpression BindOrderByClause(FilterBinder binder, OrderByClause orderBy, Type elementType)
         {
