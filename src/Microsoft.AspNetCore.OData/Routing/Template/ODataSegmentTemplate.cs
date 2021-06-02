@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <returns>The built segment templates.</returns>
         internal IEnumerable<string> GetTemplates()
         {
-            return GetTemplates(ODataRouteOptions.Default);
+            return GetTemplates(null);
         }
     }
 }

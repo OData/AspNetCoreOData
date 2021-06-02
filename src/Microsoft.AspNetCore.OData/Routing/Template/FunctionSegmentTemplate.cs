@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // Only accept the bound function
             if (!function.IsBound)
             {
-                throw new ODataException(Error.Format(SRResources.FunctionIsNotBound, function.Name));
+                throw new ODataException(Error.Format(SRResources.OperationIsNotBound, function.Name, "function"));
             }
 
             // Parameters should include all required parameter, but maybe include the optional parameter.

@@ -31,11 +31,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
+        public void CtorActionSegmentTemplate_ThrowsArgument_NonboundAction()
+        {
+            // Arrange
+            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+            EdmAction action = new EdmAction("NS", "MyAction", primitive, false, null);
+
+            // Act & Assert
+            ExceptionAssert.Throws<ODataException>(() => new ActionSegmentTemplate(action, null),
+                "The input operation 'MyAction' is not a bound 'action'.");
+        }
+
+        [Fact]
         public void CtorActionSegmentTemplate_ThrowsODataException_NonAction()
         {
             // Arrange
-            IEdmPrimitiveTypeReference IntPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
-            EdmFunction function = new EdmFunction("NS", "MyFunction", IntPrimitive, false, null, false);
+            IEdmPrimitiveTypeReference intPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+            EdmFunction function = new EdmFunction("NS", "MyFunction", intPrimitive, false, null, false);
             OperationSegment operationSegment = new OperationSegment(function, null);
 
             // Act
@@ -49,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         public void CtorActionSegmentTemplate_SetsProperties()
         {
             // Arrange & Act
-            EdmAction action = new EdmAction("NS", "action", null);
+            EdmAction action = new EdmAction("NS", "action", null, true, null);
             ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
 
             // Assert
@@ -66,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         public void GetTemplatesActionSegmentTemplate_ReturnsTemplates()
         {
             // Assert
-            EdmAction action = new EdmAction("NS", "action", null);
+            EdmAction action = new EdmAction("NS", "action", null, true, null);
             ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
 
             // 1- Act & Assert
@@ -102,7 +114,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         public void TryTranslateActionSegmentTemplate_ThrowsArgumentNull_Context()
         {
             // Arrange
-            EdmAction action = new EdmAction("NS", "action", null);
+            EdmAction action = new EdmAction("NS", "action", null, true, null);
             ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
 
             // Act & Assert
@@ -113,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         public void TryTranslateActionSegmentTemplate_ReturnsODataActionImportSegment()
         {
             // Arrange
-            EdmAction action = new EdmAction("NS", "action", null);
+            EdmAction action = new EdmAction("NS", "action", null, true, null);
             ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 

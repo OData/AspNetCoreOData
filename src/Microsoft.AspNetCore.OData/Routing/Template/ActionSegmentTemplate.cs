@@ -23,6 +23,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public ActionSegmentTemplate(IEdmAction action, IEdmNavigationSource navigationSource)
         {
             Action = action ?? throw Error.ArgumentNull(nameof(action));
+
+            // Only accept the bound action
+            if (!action.IsBound)
+            {
+                throw new ODataException(Error.Format(SRResources.OperationIsNotBound, action.Name, "action"));
+            }
+
             NavigationSource = navigationSource;
             Segment = new OperationSegment(Action, NavigationSource as IEdmEntitySetBase);
         }

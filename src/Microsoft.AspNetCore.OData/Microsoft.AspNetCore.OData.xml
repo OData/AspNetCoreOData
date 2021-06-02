@@ -6638,11 +6638,6 @@
               Looks up a localized string similar to Reading type &apos;{0}&apos; is not supported by &apos;{1}&apos;..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.FunctionIsNotBound">
-            <summary>
-              Looks up a localized string similar to The input function &apos;{0}&apos; is not a bound function..
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.FunctionNotBoundToCollectionOfEntity">
             <summary>
               Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
@@ -6946,6 +6941,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OnlySingleValueNodeSupported">
             <summary>
               Looks up a localized string similar to Only SingleValueNode supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.OperationIsNotBound">
+            <summary>
+              Looks up a localized string similar to The input operation &apos;{0}&apos; is not a bound &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByClauseNotSupported">

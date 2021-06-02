@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // 1) We get all the parameters from the function and all parameter values from routeValue.
             // Combine them as a string. so, actualParameters = "p1=a,p2=b,p3=c"
 
-            IDictionary<string, string>  actualParameters = new Dictionary<string, string>();
+            IDictionary<string, string> actualParameters = new Dictionary<string, string>();
             foreach (var parameter in parameterMappings)
             {
                 // For a parameter mapping like: minSalary={min}

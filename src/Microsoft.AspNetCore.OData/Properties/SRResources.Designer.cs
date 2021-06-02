@@ -709,15 +709,6 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input function &apos;{0}&apos; is not a bound function..
-        /// </summary>
-        internal static string FunctionIsNotBound {
-            get {
-                return ResourceManager.GetString("FunctionIsNotBound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
         /// </summary>
         internal static string FunctionNotBoundToCollectionOfEntity {
@@ -1263,6 +1254,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string OnlySingleValueNodeSupported {
             get {
                 return ResourceManager.GetString("OnlySingleValueNodeSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The input operation &apos;{0}&apos; is not a bound &apos;{1}&apos;..
+        /// </summary>
+        internal static string OperationIsNotBound {
+            get {
+                return ResourceManager.GetString("OperationIsNotBound", resourceCulture);
             }
         }
         
