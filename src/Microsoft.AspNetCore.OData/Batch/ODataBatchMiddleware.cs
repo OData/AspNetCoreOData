@@ -57,10 +57,15 @@ namespace Microsoft.AspNetCore.OData.Batch
             {
                 throw Error.ArgumentNull(nameof(context));
             }
-
             string prefixName;
             ODataBatchHandler batchHandler;
-            if (_batchMapping != null && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
+
+            // The batch middleware should not handle the options requests for cors to properly function.
+            bool isPreFlight = HttpMethods.IsOptions(context.Request.Method);
+
+            if (!isPreFlight
+                && _batchMapping != null
+                && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
             {
                 Contract.Assert(batchHandler != null);
                 await batchHandler.ProcessBatchAsync(context, _next).ConfigureAwait(false);
