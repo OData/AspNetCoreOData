@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
@@ -109,6 +110,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Assert.Collection(templates,
                 e => Assert.Equal("/{navigationProperty}({relatedId})/$ref", e),
                 e => Assert.Equal("/{navigationProperty}/{relatedId}/$ref", e));
+        }
+
+        [Fact]
+        public void GetTemplatesNavigationRefSegmentTemplate_ReturnsTemplates_WithRouteOptions()
+        {
+            // Arrange
+            NavigationLinkTemplateSegmentTemplate navigationSegment = new NavigationLinkTemplateSegmentTemplate(_employeeType, _entitySet)
+            {
+                RelatedKey = "relatedId"
+            };
+
+            // Act & Assert
+            IEnumerable<string> templates = navigationSegment.GetTemplates(new ODataRouteOptions
+            {
+                EnableKeyInParenthesis = false
+            });
+            string template = Assert.Single(templates);
+            Assert.Equal("/{navigationProperty}/{relatedId}/$ref", template);
+
+            // Act & Assert
+            templates = navigationSegment.GetTemplates(new ODataRouteOptions
+            {
+                EnableKeyAsSegment = false
+            });
+            template = Assert.Single(templates);
+            Assert.Equal("/{navigationProperty}({relatedId})/$ref", template);
         }
 
         [Fact]

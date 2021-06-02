@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -18,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="declaredType">The declared type.</param>
         public PropertyCatchAllSegmentTemplate(IEdmStructuredType declaredType)
         {
-            StructuredType = declaredType;
+            StructuredType = declaredType ?? throw Error.ArgumentNull(nameof(declaredType));
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             if (context.RouteValues.TryGetValue("property", out object value))
             {
                 string rawValue = value as string;
-                IEdmProperty edmProperty = StructuredType.FindProperty(rawValue);
+                IEdmProperty edmProperty = StructuredType.ResolveProperty(rawValue);
                 if (edmProperty != null && edmProperty.PropertyKind == EdmPropertyKind.Structural)
                 {
                     context.Segments.Add(new PropertySegment((IEdmStructuralProperty)edmProperty));

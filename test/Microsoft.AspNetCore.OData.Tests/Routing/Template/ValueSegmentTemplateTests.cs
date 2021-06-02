@@ -15,14 +15,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         [Fact]
         public void CtorValueSegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert & Act & Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ValueSegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
         public void GetTemplatesValueSegmentTemplate_ReturnsTemplates()
         {
-            // Assert
+            // Arrange
             IEdmPrimitiveType primitive = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Int32);
             ValueSegmentTemplate valueSegment = new ValueSegmentTemplate(primitive);
 

@@ -51,6 +51,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             if (RelatedKey != null)
             {
                 options = options ?? ODataRouteOptions.Default;
+                Contract.Assert(options.EnableKeyInParenthesis || options.EnableKeyAsSegment);
 
                 if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
                 {
@@ -61,13 +62,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
                 }
-                else if (options.EnableKeyAsSegment)
-                {
-                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
-                }
                 else
                 {
-                    throw new ODataException(SRResources.RouteOptionDisabledKeySegment);
+                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
                 }
             }
             else

@@ -34,6 +34,10 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             IEdmEntityType entityType = (IEdmEntityType)keySegment.EdmType;
             var alternateKeys = model.GetAlternateKeys(entityType);
+            if (alternateKeys == null)
+            {
+                return null;
+            }
 
             // It should be case-sensitive, then we can support "Id" & "ID", they are different, but it's valid.
             HashSet<string> keyNames = keySegment.Keys.Select(k => k.Key).ToHashSet(/*StringComparer.OrdinalIgnoreCase*/);

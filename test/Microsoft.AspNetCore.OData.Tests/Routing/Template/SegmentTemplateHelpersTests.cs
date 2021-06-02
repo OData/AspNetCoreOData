@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -14,20 +16,51 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class SegmentTemplateHelpersTests
     {
+        private static IEdmPrimitiveTypeReference _IntType = EdmCoreModel.Instance.GetInt32(false);
+        private static IEdmPrimitiveTypeReference _StrType = EdmCoreModel.Instance.GetString(false);
+
+        [Fact]
+        public void MatchForFunction_ThrowsODataException_ForInvalidUriValue()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            EdmFunction function = new EdmFunction("NS", "MyFunction", _IntType, true, null, false);
+            function.AddParameter("data", _IntType);
+            model.AddElement(function);
+
+            RouteValueDictionary routeValues = new RouteValueDictionary()
+            {
+                { "dataValue", "ef12abc" }
+            };
+
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValues,
+                Model = model
+            };
+
+            IDictionary<string, string> parameterMappings = new Dictionary<string, string>
+            {
+                { "data", "dataValue" }
+            };
+
+            // Act
+            Action test = () => SegmentTemplateHelpers.Match(context, function, parameterMappings);
+            ExceptionAssert.Throws<ODataException>(test,
+                "The parameter value (ef12abc) from request is not valid. The parameter value should be format of type 'Edm.Int32'.");
+        }
+
         [Fact]
         public void MatchForFunction_ReturnsBuiltParameters()
         {
             // Arrange
-            var intType = EdmCoreModel.Instance.GetInt32(false);
-            var strType = EdmCoreModel.Instance.GetString(false);
-
             EdmComplexType complex = new EdmComplexType("NS", "Address");
-            complex.AddStructuralProperty("street", strType);
+            complex.AddStructuralProperty("street", _StrType);
 
             EdmModel model = new EdmModel();
-            EdmFunction function = new EdmFunction("NS", "MyFunction", intType, true, null, false);
-            function.AddParameter("name", strType);
-            function.AddParameter("title", intType);
+            EdmFunction function = new EdmFunction("NS", "MyFunction", _IntType, true, null, false);
+            function.AddParameter("name", _StrType);
+            function.AddParameter("title", _IntType);
             function.AddOptionalParameter("address", new EdmComplexTypeReference(complex, false));
             model.AddElement(function);
 
