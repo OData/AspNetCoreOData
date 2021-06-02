@@ -104,6 +104,42 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             Assert.True(processed);
         }
 
+        [Fact]
+        public async Task Invoke_CorsCallNextDelegateWithBatchHandler()
+        {
+            // Arrange
+            bool called = false;
+            RequestDelegate next = context =>
+            {
+                called = true;
+                return Task.CompletedTask;
+            };
+            Mock<ODataBatchHandler> batchHandlerMock = new Mock<ODataBatchHandler>();
+
+            bool processed = false;
+            batchHandlerMock.Setup(b => b.ProcessBatchAsync(It.IsAny<HttpContext>(), It.IsAny<RequestDelegate>()))
+                .Returns(() =>
+                {
+                    processed = true;
+                    return Task.CompletedTask;
+                });
+
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
+            ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
+            HttpContext context = new DefaultHttpContext();
+            context.Request.Path = new PathString("/odata/$batch");
+            context.Request.Method = "options";
+
+            // Act
+            Assert.False(called);
+            Assert.False(processed);
+            await middleware.Invoke(context);
+
+            // Assert
+            Assert.True(called);
+            Assert.False(processed);
+        }
+
         private static IServiceProvider BuildServiceProvider(Action<ODataOptions> setupAction)
         {
             IServiceCollection services = new ServiceCollection();
