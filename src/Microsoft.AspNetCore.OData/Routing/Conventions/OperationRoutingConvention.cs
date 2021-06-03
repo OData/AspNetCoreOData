@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Contract.Assert(entityType != null);
             Contract.Assert(navigationSource != null);
 
-            string actionName = context.Action.ActionMethod.Name;
+            string actionName = context.Action.ActionName;
 
             bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType);
             if (context.Singleton != null && hasKeyParameter)

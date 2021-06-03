@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Debug.Assert(context.Action != null);
 
             ActionModel action = context.Action;
-            string actionMethodName = action.ActionMethod.Name;
+            string actionMethodName = action.ActionName;
 
             // Need to refactor the following
             // for example:  CreateRef( with the navigation property parameter) should for all navigation properties

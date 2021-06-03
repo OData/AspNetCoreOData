@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 (IEdmNavigationSource)context.EntitySet;
 
             ActionModel action = context.Action;
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
 
             string method = SplitActionName(actionName, out string property, out string cast, out string declared);
             if (method == null || string.IsNullOrEmpty(property))

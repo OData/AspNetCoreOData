@@ -58,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
 
             // We care about the action in this pattern: {HttpMethod}{EntityTypeName}
             (string httpMethod, string castTypeName) = Split(actionName);

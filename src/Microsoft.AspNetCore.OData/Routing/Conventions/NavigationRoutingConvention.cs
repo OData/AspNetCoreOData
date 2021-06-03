@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // Filter by the action name.
             // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
             string method = SplitActionName(actionName, out string property, out string declared);
             if (method == null || string.IsNullOrEmpty(property))
             {

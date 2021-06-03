@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmModel model = context.Model;
 
             // By convention, we use the operation import name as the action name in the controller
-            string actionMethodName = action.ActionMethod.Name;
+            string actionMethodName = action.ActionName;
 
             var edmOperationImports = model.ResolveOperationImports(actionMethodName, enableCaseInsensitive: true);
             if (!edmOperationImports.Any())

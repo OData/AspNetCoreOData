@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Debug.Assert(context.Controller != null);
             Debug.Assert(context.Action != null);
             ActionModel action = context.Action;
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
 
             // for ~$metadata
             if (actionName == "GetMetadata")
