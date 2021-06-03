@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -15,6 +16,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     public class EntityRoutingConventionTests
     {
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToControllerAndActionOnEntityRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            EntityRoutingConvention convention = new EntityRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(CustomersController), true)]

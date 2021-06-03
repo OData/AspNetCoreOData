@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -19,6 +20,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     {
         private static OperationImportRoutingConvention ImportConvention = ConventionHelpers.CreateConvention<OperationImportRoutingConvention>();
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToControllerAndActionOnOperationImportRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            OperationImportRoutingConvention convention = new OperationImportRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(ODataOperationImportController), true)]

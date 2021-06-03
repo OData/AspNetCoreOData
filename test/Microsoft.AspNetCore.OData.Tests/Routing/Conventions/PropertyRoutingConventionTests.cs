@@ -19,6 +19,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         private static PropertyRoutingConvention PropertyConvention = ConventionHelpers.CreateConvention<PropertyRoutingConvention>();
         private static IEdmModel EdmModel = GetEdmModel();
 
+        [Fact]
+        public void AppliesToActionOnPropertyRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            PropertyRoutingConvention convention = new PropertyRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
+
         [Theory]
         [InlineData(typeof(CustomersController), true)]
         [InlineData(typeof(MeController), true)]

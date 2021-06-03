@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -18,6 +19,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     {
         private static IEdmModel _edmModel = GetModel();
         private static RefRoutingConvention _refConvention = ConventionHelpers.CreateConvention<RefRoutingConvention>();
+
+        [Fact]
+        public void AppliesToActionOnRefRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            RefRoutingConvention convention = new RefRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
 
         [Fact]
         public void SplitRefActionName_WorksAsExpected()

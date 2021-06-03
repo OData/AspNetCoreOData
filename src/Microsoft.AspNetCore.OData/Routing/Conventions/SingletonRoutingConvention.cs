@@ -25,12 +25,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            return context.Singleton != null;
+            return context?.Singleton != null;
         }
 
         /// <inheritdoc />
