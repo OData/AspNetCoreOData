@@ -1814,6 +1814,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator : Mic
 public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	public ODataRouteOptions ()
 
+	bool EnableControllerNameCaseInsensitive  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }
 	bool EnableNonParenthsisForEmptyParameterFunction  { public get; public set; }
@@ -2873,17 +2874,15 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingCon
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext {
 	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller)
-	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmEntitySet entitySet)
-	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmSingleton singleton)
 
-	Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel Action  { public get; }
+	Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel Action  { public get; public set; }
 	Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel Controller  { public get; }
 	Microsoft.OData.Edm.IEdmEntitySet EntitySet  { public get; }
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.ODataOptions Options  { public get; public set; }
 	string Prefix  { public get; }
-	System.IServiceProvider ServiceProvider  { public get; public set; }
 	Microsoft.OData.Edm.IEdmSingleton Singleton  { public get; }
 }
 

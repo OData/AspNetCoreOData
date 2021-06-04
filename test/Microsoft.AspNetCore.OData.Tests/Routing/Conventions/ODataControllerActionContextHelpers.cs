@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             IEdmSingleton singleton = model.EntityContainer?.FindSingleton(controllerName);
             if (singleton != null)
             {
-                context.NavigationSource = entitySet;
+                context.NavigationSource = singleton;
             }
 
             return context;
