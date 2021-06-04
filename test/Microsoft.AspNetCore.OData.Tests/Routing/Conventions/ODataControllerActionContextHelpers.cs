@@ -19,20 +19,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // We don't need to call te FindEntitySet or FindSingleton before every convention.
             // So, for a controller, we try to call "FindEntitySet" or "FindSingleton" once.
             string controllerName = controller.ControllerName;
+            ODataControllerActionContext context = new ODataControllerActionContext(modelPrefix, model, controller);
 
             IEdmEntitySet entitySet = model.EntityContainer?.FindEntitySet(controllerName);
             if (entitySet != null)
             {
-                return new ODataControllerActionContext(modelPrefix, model, controller, entitySet);
+                context.NavigationSource = entitySet;
             }
 
             IEdmSingleton singleton = model.EntityContainer?.FindSingleton(controllerName);
             if (singleton != null)
             {
-                return new ODataControllerActionContext(modelPrefix, model, controller, singleton);
+                context.NavigationSource = entitySet;
             }
 
-            return new ODataControllerActionContext(modelPrefix, model, controller);
+            return context;
         }
     }
 }

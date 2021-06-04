@@ -6318,6 +6318,11 @@
               Looks up a localized string similar to Aggregation &apos;{0}&apos; not supported for property &apos;{1}&apos; of type &apos;{2}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.AmbiguousNavigationSourceNameFound">
+            <summary>
+              Looks up a localized string similar to Ambiguous navigation source (entity set or singleton) name &apos;{0}&apos; found. Please use correct navigation source name case..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.AmbiguousPropertyNameFound">
             <summary>
               Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
@@ -11614,24 +11619,6 @@
             <param name="model">The Edm model.</param>
             <param name="controller">The controller model.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel,Microsoft.OData.Edm.IEdmEntitySet)">
-            <summary>
-             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
-            </summary>
-            <param name="prefix">The prefix.</param>
-            <param name="model">The Edm model.</param>
-            <param name="controller">The controller model.</param>
-            <param name="entitySet">The associated entity set for this controller.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.#ctor(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel,Microsoft.OData.Edm.IEdmSingleton)">
-            <summary>
-             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext" /> class.
-            </summary>
-            <param name="prefix">The prefix.</param>
-            <param name="model">The Edm model.</param>
-            <param name="controller">The controller model.</param>
-            <param name="singleton">The associated singleton for this controller.</param>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Prefix">
             <summary>
             Gets the associated model name for this model, it's also used as the routing prefix.
@@ -11640,6 +11627,21 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Model">
             <summary>
             Gets the Edm model.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Controller">
+            <summary>
+            Gets the related controller model in this context. This property should never be "null".
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.NavigationSource">
+            <summary>
+            Gets/sets the navigation source associated with controller.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Action">
+            <summary>
+            Gets/sets the related action model in this context.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.EntitySet">
@@ -11658,22 +11660,6 @@
             <summary>
             Gets the associated <see cref="T:Microsoft.OData.Edm.IEdmSingleton"/> for this controller.
             It might be null.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Controller">
-            <summary>
-            Gets the related controller model in this context. This property should never be "null".
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Action">
-            <summary>
-            Gets the related action model in this context
-            We guarentee that this property should never be "null" when calling "AppliesToAction"
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ServiceProvider">
-            <summary>
-            Gets/sets the odata service provider, used for the attribute routing parser or others.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Options">
@@ -12157,6 +12143,11 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive">
+            <summary>
+            Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis">

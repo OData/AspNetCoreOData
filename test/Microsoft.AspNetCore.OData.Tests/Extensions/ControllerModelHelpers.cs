@@ -263,10 +263,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             {
                 actionModel.ActionName = actionName.Name;
             }
-            //else
-            //{
-            //    actionModel.ActionName = CanonicalizeActionName(methodInfo.Name);
-            //}
+            else
+            {
+                actionModel.ActionName = CanonicalizeActionName(methodInfo.Name);
+            }
 
             var apiVisibility = attributes.OfType<IApiDescriptionVisibilityProvider>().FirstOrDefault();
             if (apiVisibility != null)
@@ -643,6 +643,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             };
 
             return parameterModel;
+        }
+
+        private static string CanonicalizeActionName(string actionName)
+        {
+            const string Suffix = "Async";
+
+            if (actionName.EndsWith(Suffix, StringComparison.Ordinal))
+            {
+                actionName = actionName.Substring(0, actionName.Length - Suffix.Length);
+            }
+
+            return actionName;
         }
 
         private static bool IsSilentRouteAttribute(IRouteTemplateProvider routeTemplateProvider)

@@ -133,6 +133,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambiguous navigation source (entity set or singleton) name &apos;{0}&apos; found. Please use correct navigation source name case..
+        /// </summary>
+        internal static string AmbiguousNavigationSourceNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousNavigationSourceNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
         /// </summary>
         internal static string AmbiguousPropertyNameFound {

@@ -1191,18 +1191,17 @@ Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention
 Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.NavigationRoutingConvention(Microsoft.Extensions.Logging.ILogger<Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention> logger) -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Action.get -> Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel
+Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Action.set -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Controller.get -> Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.EntitySet.get -> Microsoft.OData.Edm.IEdmEntitySet
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.EntityType.get -> Microsoft.OData.Edm.IEdmEntityType
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Model.get -> Microsoft.OData.Edm.IEdmModel
+Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
+Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.NavigationSource.set -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ODataControllerActionContext(string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> void
-Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ODataControllerActionContext(string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmEntitySet entitySet) -> void
-Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ODataControllerActionContext(string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmSingleton singleton) -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Options.get -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Options.set -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Prefix.get -> string
-Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ServiceProvider.get -> System.IServiceProvider
-Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.ServiceProvider.set -> void
 Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext.Singleton.get -> Microsoft.OData.Edm.IEdmSingleton
 Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention
 Microsoft.AspNetCore.OData.Routing.Conventions.OperationImportRoutingConvention.OperationImportRoutingConvention() -> void
@@ -1234,6 +1233,8 @@ Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathTemplate.get -> s
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator.ODataPathSegmentTranslator() -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.get -> bool
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis.get -> bool

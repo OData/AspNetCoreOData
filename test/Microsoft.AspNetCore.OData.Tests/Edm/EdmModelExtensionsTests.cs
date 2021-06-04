@@ -17,6 +17,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         private static IEdmModel _model = GetEdmModel();
 
         [Fact]
+        public void ResolveAlternateKeyProperties_ThrowsArugmentNull()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveAlternateKeyProperties(null), "model");
+
+            // Arrange & Act & Assert
+            model = EdmCoreModel.Instance;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveAlternateKeyProperties(null), "keySegment");
+        }
+
+        [Fact]
+        public void ResolveProperty_ThrowsArugmentNull()
+        {
+            // Arrange & Act & Assert
+            IEdmStructuredType structuredType = null;
+            ExceptionAssert.ThrowsArgumentNull(() => structuredType.ResolveProperty(null), "structuredType");
+        }
+
+        [Fact]
         public void ResolvePropertyTest_WorksForCaseSensitiveAndInsensitive()
         {
             // Arrange
@@ -115,6 +135,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Act & Assert
             Action test = () => _model.FindProperty(company, path);
             ExceptionAssert.Throws<ODataException>(test, "Cannot find the resource type 'NS.AnotherType' in the model.");
+        }
+
+        [Fact]
+        public void ResolveNavigationSource_ThrowsArugmentNull()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveNavigationSource(null), "model");
+        }
+
+        [Fact]
+        public void ResolveNavigationSource_ThrowsODataException_AmbiguousIdentifier()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            EdmEntityType entityType = new EdmEntityType("NS", "Entity");
+            EdmEntityContainer containter = new EdmEntityContainer("NS", "Default");
+            model.AddElement(entityType);
+            model.AddElement(containter);
+            containter.AddEntitySet("entities", entityType);
+            containter.AddEntitySet("enTIties", entityType);
+
+            // Act & Assert
+            Assert.NotNull(model.ResolveNavigationSource("enTIties"));
+            Assert.NotNull(model.ResolveNavigationSource("enTIties", true));
+
+            // Act & Assert
+            Assert.Null(model.ResolveNavigationSource("Entities"));
+
+            Action test = () => model.ResolveNavigationSource("Entities", true);
+            ExceptionAssert.Throws<ODataException>(test,
+                "Ambiguous navigation source (entity set or singleton) name 'Entities' found. Please use correct navigation source name case.");
         }
 
         private static IEdmModel GetEdmModel()

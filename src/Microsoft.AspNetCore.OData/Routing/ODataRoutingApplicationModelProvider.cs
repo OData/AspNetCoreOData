@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
@@ -73,11 +74,13 @@ namespace Microsoft.AspNetCore.OData.Routing
                         continue;
                     }
 
-                    ODataControllerActionContext odataContext = BuildContext(route.Key, model, controller);
-                    odataContext.ServiceProvider = route.Value.Item2;
+                    ODataControllerActionContext odataContext = new ODataControllerActionContext(route.Key, model, controller);
+
+                    odataContext.NavigationSource = model.ResolveNavigationSource(controller.ControllerName,
+                        _options.RouteOptions.EnableControllerNameCaseInsensitive);
+
                     odataContext.Options = _options;
 
-                    // consider to replace the Linq with others?
                     IODataControllerActionConvention[] conventions =
                         _controllerActionConventions.Where(c => c.AppliesToController(odataContext)).ToArray();
 
@@ -145,29 +148,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
-        private static ODataControllerActionContext BuildContext(string prefix, IEdmModel model, ControllerModel controller)
-        {
-            // The reason why to create a context is that:
-            // We don't need to call the FindEntitySet or FindSingleton before every convention.
-            // So, for a controller, we try to call "FindEntitySet" or "FindSingleton" once.
-            string controllerName = controller.ControllerName;
-
-            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(controllerName);
-            if (entitySet != null)
-            {
-                return new ODataControllerActionContext(prefix, model, controller, entitySet);
-            }
-
-            IEdmSingleton singleton = model.EntityContainer.FindSingleton(controllerName);
-            if (singleton != null)
-            {
-                return new ODataControllerActionContext(prefix, model, controller, singleton);
-            }
-
-            return new ODataControllerActionContext(prefix, model, controller);
-        }
-
-        private static bool CanApply(string prefix, Func<ODataModelAttribute> func)
+        internal static bool CanApply(string prefix, Func<ODataModelAttribute> func)
         {
             ODataModelAttribute odataModel = func?.Invoke();
             if (odataModel == null)

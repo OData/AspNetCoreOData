@@ -23,6 +23,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
             Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableControllerNameCaseInsensitive);
         }
 
         [Fact]
@@ -37,6 +38,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
             Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableControllerNameCaseInsensitive);
         }
 
         [Fact]
@@ -47,6 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Verify(opt => opt.EnableQualifiedOperationCall, (opt, b) => opt.EnableQualifiedOperationCall = b);
             Verify(opt => opt.EnableUnqualifiedOperationCall, (opt, b) => opt.EnableUnqualifiedOperationCall = b);
             Verify(opt => opt.EnableNonParenthsisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthsisForEmptyParameterFunction = b, false);
+            Verify(opt => opt.EnableControllerNameCaseInsensitive, (opt, b) => opt.EnableControllerNameCaseInsensitive = b, false);
         }
 
         private static void Verify(Func<ODataRouteOptions, bool> func, Action<ODataRouteOptions, bool> config, bool defValue = true)

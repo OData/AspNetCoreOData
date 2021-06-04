@@ -222,6 +222,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>Null or the found navigation source.</returns>
         public static IEdmNavigationSource ResolveNavigationSource(this IEdmModel model, string identifier, bool enableCaseInsensitive = false)
         {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
             IEdmNavigationSource navSource = model.FindDeclaredNavigationSource(identifier);
             if (navSource != null || !enableCaseInsensitive)
             {
@@ -239,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (result.Count > 1)
             {
-                throw new Exception($"More than one navigation sources match the name '{identifier}' found in model.");
+                throw new ODataException(Error.Format(SRResources.AmbiguousNavigationSourceNameFound, identifier));
             }
 
             return result.SingleOrDefault();

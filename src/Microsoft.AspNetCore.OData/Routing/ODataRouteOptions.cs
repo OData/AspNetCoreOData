@@ -30,6 +30,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
+        /// </summary>
+        public bool EnableControllerNameCaseInsensitive { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset({key}).
         /// Used in conventional routing.
         /// </summary>

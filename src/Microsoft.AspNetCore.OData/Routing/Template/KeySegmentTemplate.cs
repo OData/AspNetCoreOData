@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// </summary>
     public class KeySegmentTemplate : ODataSegmentTemplate
     {
-        private string _keyLiteral;
+        private readonly string _keyLiteral;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.

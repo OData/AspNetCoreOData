@@ -285,6 +285,9 @@
   <data name="AmbiguousTypeNameFound" xml:space="preserve">
     <value>Ambiguous type name '{0}' found. Please use correct type name case.</value>
   </data>
+  <data name="AmbiguousNavigationSourceNameFound" xml:space="preserve">
+    <value>Ambiguous navigation source (entity set or singleton) name '{0}' found. Please use correct navigation source name case.</value>
+  </data>
   <data name="ODataPathMissing" xml:space="preserve">
     <value>The operation cannot be completed because no ODataPath is available for the request.</value>
   </data>
