@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Results;
@@ -57,6 +58,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     { typeof(TimeSpan), EdmPrimitiveTypeKind.Duration },
                 };
             }
+        }
+
+        [Fact]
+        public void DefaultOdataSerializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
+        {
+            ExceptionAssert.ThrowsArgumentNull(
+                () => new DefaultODataSerializerProvider(serviceProvider: null),
+                "serviceProvider");
         }
 
         [Fact]
@@ -339,6 +348,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         [InlineData(typeof(Uri[]), typeof(ODataEntityReferenceLinksSerializer))]
         [InlineData(typeof(List<Uri>), typeof(ODataEntityReferenceLinksSerializer))]
         [InlineData(typeof(ODataEntityReferenceLinks), typeof(ODataEntityReferenceLinksSerializer))]
+        [InlineData(typeof(DeltaSet<Product>), typeof(ODataDeltaResourceSetSerializer))]
         public void GetODataSerializer_Returns_ExpectedSerializerType(Type payloadType, Type expectedSerializerType)
         {
             // Arrange
@@ -364,6 +374,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Same(firstCallSerializer, secondCallSerializer);
+        }
+
+        [Fact]
+        public void GetODataSerializer_ReturnsNull_IfTypeUnknown()
+        {
+            // Arrange
+            HttpRequest request = GetRequest(_edmModel);
+
+            // Act
+            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(UnknownEntityType), request);
+
+            // Assert
+            Assert.Null(serializer);
         }
 
         [Fact]
@@ -451,5 +474,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             FirstValue,
             SecondValue
         }
+
+        private class UnknownEntityType
+        { }
     }
 }
