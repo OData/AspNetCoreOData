@@ -36,6 +36,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         {
             IEdmModel model = GetModel();
             return model.GenerateServiceDocument();
+
 #if false
             ODataServiceDocument serviceDocument = new ODataServiceDocument();
             IEdmEntityContainer container = model.EntityContainer;
@@ -66,6 +67,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
 #endif
         }
 
+        /*
         private static ODataEntitySetInfo GetODataEntitySetInfo(string url, string name)
         {
             ODataEntitySetInfo info = new ODataEntitySetInfo
@@ -98,6 +100,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
 
             return info;
         }
+        */
 
         private IEdmModel GetModel()
         {

@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -41,35 +40,35 @@ namespace Microsoft.AspNetCore.OData.Results
 
             return null;
         }
+    }
 
-        private class PageResultConverter<TEntity> : JsonConverter<PageResult<TEntity>>
+    internal class PageResultConverter<TEntity> : JsonConverter<PageResult<TEntity>>
+    {
+        public override PageResult<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            public override PageResult<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            Contract.Assert(false, "PageResult{TEntity} should never be deserialized into");
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, PageResult<TEntity> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("items");
+            JsonSerializer.Serialize(writer, value.Items, options);
+
+            if (value.NextPageLink != null)
             {
-                Contract.Assert(false, "PageResult{TEntity} should never be deserialized into");
-                throw new NotImplementedException();
+                writer.WritePropertyName("nextpagelink");
+                writer.WriteStringValue(value.NextPageLink.OriginalString);
             }
 
-            public override void Write(Utf8JsonWriter writer, PageResult<TEntity> value, JsonSerializerOptions options)
+            if (value.Count != null)
             {
-                writer.WriteStartObject();
-                writer.WritePropertyName("items");
-                JsonSerializer.Serialize(writer, value.Items, options);
-
-                if (value.NextPageLink != null)
-                {
-                    writer.WritePropertyName("nextpagelink");
-                    writer.WriteStringValue(value.NextPageLink.OriginalString);
-                }
-
-                if (value.Count != null)
-                {
-                    writer.WritePropertyName("count");
-                    writer.WriteNumberValue(value.Count.Value);
-                }
-
-                writer.WriteEndObject();
+                writer.WritePropertyName("count");
+                writer.WriteNumberValue(value.Count.Value);
             }
+
+            writer.WriteEndObject();
         }
     }
 }

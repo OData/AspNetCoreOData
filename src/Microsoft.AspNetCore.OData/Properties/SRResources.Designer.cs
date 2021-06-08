@@ -1528,7 +1528,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request must have an associated EDM model. Consider using the extension method HttpConfiguration.MapODataServiceRoute to register a route that parses the OData URI and attaches the model information..
+        ///   Looks up a localized string similar to The request must have an associated EDM model. Consider registering Edm model calling AddOData()..
         /// </summary>
         internal static string RequestMustHaveModel {
             get {

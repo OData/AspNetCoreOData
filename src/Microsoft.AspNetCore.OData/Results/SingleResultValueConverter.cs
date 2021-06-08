@@ -42,24 +42,24 @@ namespace Microsoft.AspNetCore.OData.Results
 
             return null;
         }
+    }
 
-        private class SingleResultConverter<TEntity> : JsonConverter<SingleResult<TEntity>>
+    internal class SingleResultConverter<TEntity> : JsonConverter<SingleResult<TEntity>>
+    {
+        public override SingleResult<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            public override SingleResult<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                Contract.Assert(false, "SingleResult{TEntity} should never be deserialized into");
-                throw new NotImplementedException();
-            }
+            Contract.Assert(false, "SingleResult{TEntity} should never be deserialized into");
+            throw new NotImplementedException();
+        }
 
-            public override void Write(Utf8JsonWriter writer, SingleResult<TEntity> value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, SingleResult<TEntity> value, JsonSerializerOptions options)
+        {
+            if (value != null)
             {
-                if (value != null)
+                var singleObject = value.Queryable.FirstOrDefault();
+                if (singleObject != null)
                 {
-                    var singleObject = value.Queryable.FirstOrDefault();
-                    if (singleObject !=  null)
-                    {
-                        JsonSerializer.Serialize(writer, singleObject, options);
-                    }
+                    JsonSerializer.Serialize(writer, singleObject, options);
                 }
             }
         }

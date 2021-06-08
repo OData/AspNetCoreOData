@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Results
         public PageResult(IEnumerable<T> items, Uri nextPageLink, long? count)
             : base(nextPageLink, count)
         {
-            Items = items ?? throw new ArgumentNullException(nameof(items));
+            Items = items ?? throw Error.ArgumentNull(nameof(items));
         }
 
         /// <summary>

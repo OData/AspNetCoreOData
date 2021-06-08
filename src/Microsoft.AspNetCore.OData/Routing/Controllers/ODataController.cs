@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         {
             if (entity == null)
             {
-                throw Error.ArgumentNull("entity");
+                throw Error.ArgumentNull(nameof(entity));
             }
 
             return new CreatedODataResult<TEntity>(entity);
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         {
             if (entity == null)
             {
-                throw Error.ArgumentNull("entity");
+                throw Error.ArgumentNull(nameof(entity));
             }
 
             return new UpdatedODataResult<TEntity>(entity);

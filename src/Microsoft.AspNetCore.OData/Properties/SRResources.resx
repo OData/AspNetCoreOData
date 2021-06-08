@@ -130,7 +130,7 @@
     <value>Cannot find '{0}'. The OData services have not been configured. Are you missing a call to AddOData()?</value>
   </data>
   <data name="RequestMustHaveModel" xml:space="preserve">
-    <value>The request must have an associated EDM model. Consider using the extension method HttpConfiguration.MapODataServiceRoute to register a route that parses the OData URI and attaches the model information.</value>
+    <value>The request must have an associated EDM model. Consider registering Edm model calling AddOData().</value>
   </data>
   <data name="ArgumentMustBeGreaterThanOrEqualTo" xml:space="preserve">
     <value>Value must be greater than or equal to {0}.</value>

@@ -113,10 +113,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Create the HttpRequest with IEdmModel.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="model">The given Edm model.</param>
+        /// <returns>The created HttpRequest.</returns>
         public static HttpRequest Create(IEdmModel model)
         {
             HttpContext context = new DefaultHttpContext();
