@@ -77,7 +77,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             HttpRequest request = context.Request;
 
             IServiceCollection services = new ServiceCollection();
-            services.Configure(setupAction);
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
+
             context.RequestServices = services.BuildServiceProvider();
 
             request.Method = method;
