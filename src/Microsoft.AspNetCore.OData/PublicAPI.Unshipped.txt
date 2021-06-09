@@ -1229,7 +1229,6 @@ Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.ODataPathSegmentHandler() -> void
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathLiteral.get -> string
-Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathTemplate.get -> string
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator.ODataPathSegmentTranslator() -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
@@ -1506,7 +1505,6 @@ override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Micro
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.MetadataSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.NavigationPropertySegment segment) -> void
-override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.ODataPathSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.OperationImportSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.OperationSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.PathTemplateSegment segment) -> void

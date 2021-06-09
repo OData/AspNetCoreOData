@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Vocabularies;
@@ -16,6 +17,59 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
     public class EdmModelAnnotationExtensionsTests
     {
         private static IEdmModel _model = GetEdmModel();
+
+        [Fact]
+        public void GetAcceptableMediaTypes_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetAcceptableMediaTypes(null), "model");
+        }
+
+        [Fact]
+        public void GetAcceptableMediaTypes_ThrowsArgumentNull_Target()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => EdmCoreModel.Instance.GetAcceptableMediaTypes(null), "target");
+        }
+
+        [Fact]
+        public void GetAcceptableMediaTypes_Works_Target()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            EdmEntityType entity = new EdmEntityType("NS", "entity");
+            model.AddElement(entity);
+
+            // Act
+            IList<string> mediaTypes = model.GetAcceptableMediaTypes(entity);
+
+            // Assert
+            Assert.Null(mediaTypes);
+
+            // Act
+            EdmCollectionExpression collectionExp = new EdmCollectionExpression(
+                new EdmStringConstant("application/octet-stream"),
+                new EdmStringConstant("text/plain"));
+
+            var annotation = new EdmVocabularyAnnotation(entity, CoreVocabularyModel.AcceptableMediaTypesTerm, collectionExp);
+            annotation.SetSerializationLocation(model, EdmVocabularyAnnotationSerializationLocation.Inline);
+            model.SetVocabularyAnnotation(annotation);
+
+            // Act
+            mediaTypes = model.GetAcceptableMediaTypes(entity);
+
+            // Assert
+            Assert.Collection(mediaTypes,
+                e =>
+                {
+                    Assert.Equal("application/octet-stream", e);
+                },
+                e =>
+                {
+                    Assert.Equal("text/plain", e);
+                });
+        }
 
         [Fact]
         public void GetAlternateKeysTest_WorksForCoreAlternateKeys()

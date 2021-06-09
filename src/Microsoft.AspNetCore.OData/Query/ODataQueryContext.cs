@@ -40,19 +40,19 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (elementClrType == null)
             {
-                throw Error.ArgumentNull("elementClrType");
+                throw Error.ArgumentNull(nameof(elementClrType));
             }
 
             ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
 
             if (ElementType == null)
             {
-                throw Error.Argument("elementClrType", SRResources.ClrTypeNotInModel, elementClrType.FullName);
+                throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
             ElementClrType = elementClrType;
@@ -73,11 +73,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
+
             if (elementType == null)
             {
-                throw Error.ArgumentNull("elementType");
+                throw Error.ArgumentNull(nameof(elementType));
             }
 
             Model = model;

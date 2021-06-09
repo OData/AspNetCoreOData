@@ -69,12 +69,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             Contract.Assert(context.RequestContainer == null);
@@ -325,20 +325,16 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        [SuppressMessage(
-            "Microsoft.Maintainability",
-            "CA1502:AvoidExcessiveComplexity",
-            Justification = "These are simple conversion function and cannot be split up.")]
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
         {
             if (query == null)
             {
-                throw Error.ArgumentNull("query");
+                throw Error.ArgumentNull(nameof(query));
             }
 
             if (querySettings == null)
             {
-                throw Error.ArgumentNull("querySettings");
+                throw Error.ArgumentNull(nameof(querySettings));
             }
 
             IQueryable result = query;

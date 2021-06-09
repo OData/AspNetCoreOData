@@ -1785,7 +1785,6 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler : Micros
 
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	string PathLiteral  { public get; }
-	string PathTemplate  { public get; }
 
 	public virtual void Handle (Microsoft.OData.UriParser.BatchSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.CountSegment segment)
@@ -1795,7 +1794,6 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler : Micros
 	public virtual void Handle (Microsoft.OData.UriParser.MetadataSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.NavigationPropertySegment segment)
-	public virtual void Handle (Microsoft.OData.UriParser.ODataPathSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.OperationImportSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.OperationSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.PathTemplateSegment segment)

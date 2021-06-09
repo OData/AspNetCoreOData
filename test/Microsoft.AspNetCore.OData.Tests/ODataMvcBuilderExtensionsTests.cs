@@ -3,17 +3,64 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests
 {
     public class ODataMvcBuilderExtensionsTests
     {
+        [Fact]
+        public void AddOData_ThrowsArgumentNull_Builder()
+        {
+            // Arrange
+            IMvcBuilder builder = null;
+            Action<ODataOptions> setupAction = null;
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => builder.AddOData(setupAction), "builder");
+        }
+
+        [Fact]
+        public void AddOData_ThrowsArgumentNull_SetupAction()
+        {
+            // Arrange
+            IMvcBuilder builder = new Mock<IMvcBuilder>().Object;
+            Action<ODataOptions> setupAction = null;
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => builder.AddOData(setupAction), "setupAction");
+        }
+
+        [Fact]
+        public void AddOData_ForServiceProvider_ThrowsArgumentNull_Builder()
+        {
+            // Arrange
+            IMvcBuilder builder = null;
+            Action<ODataOptions, IServiceProvider> setupAction = null;
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => builder.AddOData(setupAction), "builder");
+        }
+
+        [Fact]
+        public void AddOData_ForServiceProvider_ThrowsArgumentNull_SetupAction()
+        {
+            // Arrange
+            IMvcBuilder builder = new Mock<IMvcBuilder>().Object;
+            Action<ODataOptions, IServiceProvider> setupAction = null;
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => builder.AddOData(setupAction), "setupAction");
+        }
+
         [Fact]
         public void AddOData_RegistersRequiredServicesIdempotently()
         {
@@ -133,5 +180,12 @@ namespace Microsoft.AspNetCore.OData.Tests
         public bool AppliesToAction(ODataControllerActionContext context) => true;
 
         public bool AppliesToController(ODataControllerActionContext context) => true;
+    }
+
+    public class MyMvcBuilder : IMvcBuilder
+    {
+        public ApplicationPartManager PartManager { get; set; }
+
+        public IServiceCollection Services { get; set; }
     }
 }

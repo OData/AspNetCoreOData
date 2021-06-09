@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <param name="uri">The http request uri.</param>
         /// <param name="setupAction">The OData configuration.</param>
         /// <returns>The HttpRequest.</returns>
-        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction)
+        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction = null)
         {
             HttpContext context = new DefaultHttpContext();
             HttpRequest request = context.Request;
@@ -107,9 +107,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Create the default HttpRequest.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The built default HttpRequest.</returns>
         public static HttpRequest Create()
         {
             HttpContext context = new DefaultHttpContext();

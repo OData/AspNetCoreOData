@@ -5030,20 +5030,6 @@
             <param name="property">The test property.</param>
             <returns>True/false</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions">
-            <summary>
-            Extensions.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.UrlHelperExtensions.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,System.String,Microsoft.OData.UriParser.ODataPathSegment[])">
-            <summary>
-            Creates the OData link
-            </summary>
-            <param name="request">The request.</param>
-            <param name="baseAddress">The base address.</param>
-            <param name="segments">The segments.</param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollection">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>s.
@@ -11997,14 +11983,9 @@
             Gets the path navigation source.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathTemplate">
-            <summary>
-            Gets the path template.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathLiteral">
             <summary>
-            Gets the path literal.
+            Gets the path Uri literal.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.EntitySetSegment)">
@@ -12094,12 +12075,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.MetadataSegment)">
             <summary>
             Handle a MetadataSegment
-            </summary>
-            <param name="segment">the segment to handle</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.ODataPathSegment)">
-            <summary>
-            Handle a general path segment
             </summary>
             <param name="segment">the segment to handle</param>
         </member>
