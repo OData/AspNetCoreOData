@@ -27,7 +27,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             services.AddSingleton<ODataActionPayloadDeserializer>();
 
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
-            services.AddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
             return services.BuildServiceProvider();
         }

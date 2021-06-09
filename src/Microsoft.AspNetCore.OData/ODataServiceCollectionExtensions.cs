@@ -53,8 +53,6 @@ namespace Microsoft.AspNetCore.OData
 
             services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
-            services.TryAddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
-
             //
             // Routing
             //

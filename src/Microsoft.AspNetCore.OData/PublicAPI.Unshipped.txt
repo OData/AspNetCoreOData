@@ -96,12 +96,6 @@ Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCount.get -> long?
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCount.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCountFunc.get -> System.Func<long>
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCountFunc.set -> void
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType) -> System.Type
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.GetClrType(Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType) -> System.Type
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.GetEdmPrimitiveType(System.Type clrType) -> Microsoft.OData.Edm.IEdmPrimitiveTypeReference
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.GetEdmType(Microsoft.OData.Edm.IEdmModel model, System.Type clrType) -> Microsoft.OData.Edm.IEdmTypeReference
-Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider.MapTo(System.Type clrType) -> System.Type
 Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute
 Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.NonValidatingParameterBindingAttribute() -> void
 Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.ShouldValidateEntry(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry entry, Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationEntry parentEntry) -> bool
@@ -144,8 +138,6 @@ Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCount.get -> long?
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCount.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCountFunc.get -> System.Func<long>
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCountFunc.set -> void
-Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider
-Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.ODataTypeMappingProvider(Microsoft.OData.ModelBuilder.IAssemblyResolver resolver) -> void
 Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem
 Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.ChangeSetRequestItem(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Http.HttpContext> contexts) -> void
 Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.Contexts.get -> System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Http.HttpContext>
@@ -1676,11 +1668,6 @@ static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.Mess
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.MessageLanguageKey -> string
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.ModelStateKey -> string
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.StackTraceKey -> string
-virtual Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType) -> System.Type
-virtual Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetClrType(Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType) -> System.Type
-virtual Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetEdmPrimitiveType(System.Type clrType) -> Microsoft.OData.Edm.IEdmPrimitiveTypeReference
-virtual Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.GetEdmType(Microsoft.OData.Edm.IEdmModel model, System.Type clrType) -> Microsoft.OData.Edm.IEdmTypeReference
-virtual Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider.MapTo(System.Type clrType) -> System.Type
 virtual Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ExecuteRequestMessagesAsync(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem> requests, Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>>
 virtual Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ParseBatchRequestsAsync(Microsoft.AspNetCore.Http.HttpContext context) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem>>
 virtual Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.CreateResponseMessageAsync(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem> responses, Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task
