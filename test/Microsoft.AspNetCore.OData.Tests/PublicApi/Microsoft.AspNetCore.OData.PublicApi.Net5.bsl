@@ -149,14 +149,6 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataFeature {
 	System.Func`1[[System.Int64]] TotalCountFunc  { public abstract get; public abstract set; }
 }
 
-public interface Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider {
-	System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType)
-	System.Type GetClrType (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType)
-	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
-	Microsoft.OData.Edm.IEdmTypeReference GetEdmType (Microsoft.OData.Edm.IEdmModel model, System.Type clrType)
-	System.Type MapTo (System.Type clrType)
-}
-
 [
 AttributeUsageAttribute(),
 ]
@@ -210,16 +202,6 @@ public class Microsoft.AspNetCore.OData.Abstracts.ODataFeature : IODataFeature {
 	System.IServiceProvider SubServiceProvider  { public virtual get; public virtual set; }
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; public virtual set; }
 	System.Func`1[[System.Int64]] TotalCountFunc  { public virtual get; public virtual set; }
-}
-
-public class Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider : IODataTypeMappingProvider {
-	public ODataTypeMappingProvider (Microsoft.OData.ModelBuilder.IAssemblyResolver resolver)
-
-	public virtual System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType)
-	public virtual System.Type GetClrType (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType)
-	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
-	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmType (Microsoft.OData.Edm.IEdmModel model, System.Type clrType)
-	public virtual System.Type MapTo (System.Type clrType)
 }
 
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchHandler {
