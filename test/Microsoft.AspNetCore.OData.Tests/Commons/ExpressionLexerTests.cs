@@ -10,6 +10,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
 {
     public class ExpressionLexerTests
     {
+        [Fact]
+        public void CtorExpressionLexer_ThrowsArgumentNull_Expression()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ExpressionLexer(null), "expression");
+        }
+
         [Theory]
         [InlineData("42")]
         [InlineData("123.001")]
@@ -116,6 +123,46 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             verifyAction("inOffice", "12345", true);
             verifyAction("name", "'abc,''efg'", true);
             verifyAction("瑞갂థ్క", "@p", false);
+        }
+
+        [Fact]
+        public void ExpressionLexerCanParseCurlyBraceExpression()
+        {
+            // Arrange
+            ExpressionLexer lexer = new ExpressionLexer(" { abc }");
+
+            // Act
+            Assert.Equal(ExpressionTokenKind.Literal, lexer.CurrentToken.Kind);
+            Assert.Equal("{ abc }", lexer.CurrentToken.Text);
+            Assert.Equal(1, lexer.CurrentToken.Position);
+
+            lexer.NextToken();
+            Assert.Equal(ExpressionTokenKind.TextEnd, lexer.CurrentToken.Kind);
+        }
+
+        [Fact]
+        public void ExpressionLexerCanParseBracketsExpression()
+        {
+            // Arrange
+            ExpressionLexer lexer = new ExpressionLexer("  [ abc ] ");
+
+            // Act
+            Assert.Equal(ExpressionTokenKind.Literal, lexer.CurrentToken.Kind);
+            Assert.Equal("[ abc ]", lexer.CurrentToken.Text);
+            Assert.Equal(2, lexer.CurrentToken.Position);
+
+            lexer.NextToken();
+            Assert.Equal(ExpressionTokenKind.TextEnd, lexer.CurrentToken.Kind);
+        }
+
+        [Fact]
+        public void ExpressionLexerThrowsUnbalancedBracketsExpression()
+        {
+            // Arrange & Act
+            Action test = () => new ExpressionLexer("  [ abc ) ");
+
+            // Assert
+            ExceptionAssert.Throws<ODataException>(test, "Found an unbalanced bracket '[' and ']' expression.");
         }
     }
 }

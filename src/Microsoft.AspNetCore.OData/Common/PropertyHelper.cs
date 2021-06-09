@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -20,7 +19,6 @@ namespace Microsoft.AspNetCore.OData.Common
         /// <summary>
         /// Initializes a fast property helper. This constructor does not cache the helper.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "This is intended the Name is auto set differently per type and the type is internal")]
         public PropertyHelper(PropertyInfo property)
         {
             Contract.Assert(property != null);

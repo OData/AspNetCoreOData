@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <param name="deltaItem">The delta item.</param>
         /// <param name="originalSet">The original set.</param>
         /// <returns></returns>
-        protected T GetOriginal(IDeltaSetItem deltaItem, IEnumerable originalSet)
+        protected virtual T GetOriginal(IDeltaSetItem deltaItem, IEnumerable originalSet)
         {
             if (deltaItem == null)
             {

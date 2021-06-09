@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (structuralType == null)
             {
-                throw Error.ArgumentNull("structuralType");
+                throw Error.ArgumentNull(nameof(structuralType));
             }
 
             if (!typeof(T).IsAssignableFrom(structuralType))

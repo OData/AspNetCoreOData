@@ -15,7 +15,8 @@ namespace Microsoft.AspNetCore.OData.Edm
     {
         private ConcurrentDictionary<Type, IEdmTypeReference> _clrToEdmTypeCache = new ConcurrentDictionary<Type, IEdmTypeReference>();
 
-        private ConcurrentDictionary<EdmTypeCacheItem, Type> _edmToClrTypeCache = new ConcurrentDictionary<EdmTypeCacheItem, Type>();
+        private ConcurrentDictionary<EdmTypeCacheItem, Type> _edmToClrTypeCache
+            = new ConcurrentDictionary<EdmTypeCacheItem, Type>(new EdmTypeCacheItemComparer());
 
         // for unit test only
         internal ConcurrentDictionary<Type, IEdmTypeReference> ClrToEdmTypeCache => _clrToEdmTypeCache;

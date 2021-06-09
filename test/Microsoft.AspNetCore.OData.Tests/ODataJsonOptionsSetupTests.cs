@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,16 @@ namespace Microsoft.AspNetCore.OData.Tests
 {
     public class ODataJsonOptionsSetupTests
     {
+        [Fact]
+        public void ConfigureODataJsonOptionsSetup_ThrowsArgumentNull_Options()
+        {
+            // Arrange
+            ODataJsonOptionsSetup setup = new ODataJsonOptionsSetup();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => setup.Configure(null), "options");
+        }
+
         [Fact]
         public void ODataJsonOptionsSetup_DoesNotSetup_ODataJsonConverters()
         {
