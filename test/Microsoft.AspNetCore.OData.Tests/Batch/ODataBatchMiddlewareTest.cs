@@ -97,6 +97,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
             HttpContext context = new DefaultHttpContext();
             context.Request.Path = new PathString("/odata/$batch");
+            context.Request.Method = "Post";
 
             // Act
             Assert.False(called);
@@ -128,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                     return Task.CompletedTask;
                 });
 
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
             HttpContext context = new DefaultHttpContext();
             context.Request.Path = new PathString("/odata/$batch");
