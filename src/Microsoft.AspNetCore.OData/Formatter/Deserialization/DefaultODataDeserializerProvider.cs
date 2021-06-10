@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="serviceProvider">The service provider.</param>
         public DefaultODataDeserializerProvider(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
         }
 
         /// <inheritdoc />

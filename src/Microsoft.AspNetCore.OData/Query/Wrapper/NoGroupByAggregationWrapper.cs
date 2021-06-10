@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -16,8 +15,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
     {
         public override NoGroupByAggregationWrapper Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Contract.Assert(false, "NoGroupByAggregationWrapper is internal and should never be deserialized into.");
-            throw new NotImplementedException();
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, nameof(NoGroupByAggregationWrapper)));
         }
 
         public override void Write(Utf8JsonWriter writer, NoGroupByAggregationWrapper value, JsonSerializerOptions options)

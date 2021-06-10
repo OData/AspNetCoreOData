@@ -898,6 +898,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is internal and should never be deserialized into..
+        /// </summary>
+        internal static string JsonConverterDoesnotSupportRead {
+            get {
+                return ResourceManager.GetString("JsonConverterDoesnotSupportRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
         /// </summary>
         internal static string KeyTemplateMustBeInCurlyBraces {

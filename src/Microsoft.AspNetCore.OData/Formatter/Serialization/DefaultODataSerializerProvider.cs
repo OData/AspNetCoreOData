@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="serviceProvider">The root container.</param>
         public DefaultODataSerializerProvider(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
         }
 
         /// <inheritdoc />

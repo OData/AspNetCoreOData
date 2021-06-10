@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Linq;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.OData.Query.Container;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.OData.Common;
-using System.Text.Json;
 using System;
-using System.Diagnostics.Contracts;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
@@ -87,8 +86,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
     {
         public override GroupByWrapper Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Contract.Assert(false, "EntitySetAggregationWrapper is internal and should never be deserialized into.");
-            throw new NotImplementedException();
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, nameof(GroupByWrapper)));
         }
 
         public override void Write(Utf8JsonWriter writer, GroupByWrapper value, JsonSerializerOptions options)

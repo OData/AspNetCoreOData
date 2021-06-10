@@ -6563,6 +6563,11 @@
               Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{&apos; and &apos;}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.JsonConverterDoesnotSupportRead">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; is internal and should never be deserialized into..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.KeyTemplateMustBeInCurlyBraces">
             <summary>
               Looks up a localized string similar to Key template value &apos;{0}&apos; for key segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..

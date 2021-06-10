@@ -24,6 +24,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
+        public void DefaultODataDeserializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new DefaultODataDeserializerProvider(null), "serviceProvider");
+        }
+
+        [Fact]
         public void GetODataDeserializer_Uri()
         {
             // Arrange
@@ -37,7 +44,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             var referenceLinkDeserializer = Assert.IsType<ODataEntityReferenceLinkDeserializer>(deserializer);
             Assert.Equal(ODataPayloadKind.EntityReferenceLink, referenceLinkDeserializer.ODataPayloadKind);
         }
-
 
         [Theory]
         [InlineData(typeof(Int16))]
@@ -173,7 +179,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void GetODataDeserializer_Throws_ArgumentNullForType()
+        public void GetODataDeserializer_ThrowsArgumentNull_ForType()
         {
             // Arrange
             HttpRequest request = GetRequest(model: null);
@@ -182,6 +188,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ExceptionAssert.ThrowsArgumentNull(
                 () => _deserializerProvider.GetODataDeserializer(type: null, request: request),
                 "type");
+        }
+
+        [Fact]
+        public void GetODataDeserializer_ThrowsArgumentNull_ForRequest()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => _deserializerProvider.GetODataDeserializer(typeof(int), request: null),
+                "request");
         }
 
         [Fact]

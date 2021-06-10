@@ -320,6 +320,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
                 IEdmTypeReference nullableDouble = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Double, isNullable: true);
                 IEdmTypeReference entity = new EdmEntityTypeReference(new EdmEntityType("NS", "Entity"), isNullable: true);
                 IEdmTypeReference complex = new EdmComplexTypeReference(new EdmComplexType("NS", "Complex"), isNullable: true);
+                IEdmTypeReference enumType = new EdmEnumTypeReference(new EdmEnumType("NS", "Enum"), isNullable: true);
 
                 return new TheoryDataSet<IEdmTypeReference, Type>
                 {
@@ -329,8 +330,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
                     { EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, isNullable: false), typeof(string) },
                     { entity, typeof(EdmEntityObject) },
                     { complex, typeof(EdmComplexObject) },
+                    { enumType, typeof(EdmEnumObject) },
                     { new EdmCollectionTypeReference(new EdmCollectionType(entity)), typeof(EdmEntityObjectCollection) },
                     { new EdmCollectionTypeReference(new EdmCollectionType(complex)), typeof(EdmComplexObjectCollection) },
+                    { new EdmCollectionTypeReference(new EdmCollectionType(enumType)), typeof(EdmEnumObjectCollection) },
                     { new EdmCollectionTypeReference(new EdmCollectionType(nullableDouble)), typeof(List<double?>) }
                 };
             }
@@ -340,7 +343,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
         [MemberData(nameof(GetClrTypeForUntypedDeltaTestData))]
         public void GetClrTypeForUntypedDelta(IEdmTypeReference edmType, Type expectedType)
         {
+            // Arrange & Act & Assert
             Assert.Equal(expectedType, EdmStructuredObject.GetClrTypeForUntypedDelta(edmType));
+        }
+
+        [Fact]
+        public void GetClrTypeForUntypedDelta_ThrowsInvalidOperation_ForUnsupportedTypeKind()
+        {
+            // Arrange & Act
+            IEdmPathTypeReference path = EdmCoreModel.Instance.GetPathType(EdmPathTypeKind.PropertyPath, true);
+            Action test = () => EdmStructuredObject.GetClrTypeForUntypedDelta(path);
+
+            // Assert
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => EdmStructuredObject.GetClrTypeForUntypedDelta(path),
+                "The EDM type '[Edm.PropertyPath Nullable=True]' of kind 'Path' is not supported.");
         }
 
         [Fact]
