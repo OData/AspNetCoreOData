@@ -93,6 +93,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
             HttpContext context = new DefaultHttpContext();
             context.Request.Path = new PathString("/odata/$batch");
+            context.Request.Method = "Post";
 
             // Act
             Assert.False(called);

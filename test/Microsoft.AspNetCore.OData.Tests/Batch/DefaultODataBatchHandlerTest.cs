@@ -189,6 +189,7 @@ bar
             httpContext.Request.Body = new MemoryStream(requestBytes);
             httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
             httpContext.Request.ContentLength = 827;
+            httpContext.Request.Method = "Post";
 
             IEdmModel model = new EdmModel();
             httpContext.ODataFeature().PrefixName = "odata";
