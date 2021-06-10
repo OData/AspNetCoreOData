@@ -84,6 +84,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectAllAndExpandConverter<>).MakeGenericType(new Type[] { entityType }));
             }
 
+            if (generaticType == typeof(SelectExpandWrapper<>))
+            {
+                return (JsonConverter)Activator.CreateInstance(typeof(SelectExpandWrapperConverter<>).MakeGenericType(new Type[] { entityType }));
+            }
+
             return null;
         }
     }

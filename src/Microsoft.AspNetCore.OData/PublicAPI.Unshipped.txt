@@ -675,7 +675,7 @@ Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(string prefix) -
 Microsoft.AspNetCore.OData.ODataOptions.Models.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel, System.IServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
+Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataOptions
@@ -791,29 +791,6 @@ Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.DefaultODataQueryRequestParser() -> void
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Count() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.DefaultQuerySettings() -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableCount.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableCount.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableExpand.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableExpand.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableFilter.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableFilter.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableOrderBy.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableOrderBy.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableSelect.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableSelect.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableSkipToken.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.EnableSkipToken.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Expand() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Filter() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.MaxTop.get -> int?
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.MaxTop.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.OrderBy() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.Select() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
-Microsoft.AspNetCore.OData.Query.DefaultQuerySettings.SkipToken() -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.DefaultSkipTokenHandler() -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute
@@ -867,12 +844,6 @@ Microsoft.AspNetCore.OData.Query.ETag.this[string key].set -> void
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable<TEntity> query) -> System.Linq.IQueryable<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ETag() -> void
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration.ExpandConfiguration() -> void
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration.ExpandType.get -> Microsoft.OData.ModelBuilder.SelectExpandType
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration.ExpandType.set -> void
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration.MaxDepth.get -> int
-Microsoft.AspNetCore.OData.Query.ExpandConfiguration.MaxDepth.set -> void
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindArguments(System.Collections.Generic.IEnumerable<Microsoft.OData.UriParser.QueryNode> nodes) -> System.Linq.Expressions.Expression[]
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.EnsureFlattenedPropertyContainer(System.Linq.Expressions.ParameterExpression source) -> void
@@ -898,29 +869,6 @@ Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.Countable.get -> bool?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.Countable.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableFilter.get -> bool?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableFilter.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableOrderBy.get -> bool?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultEnableOrderBy.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultExpandType.get -> Microsoft.OData.ModelBuilder.SelectExpandType?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultExpandType.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultMaxDepth.get -> int
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultMaxDepth.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultSelectType.get -> Microsoft.OData.ModelBuilder.SelectExpandType?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.DefaultSelectType.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.ExpandConfigurations.get -> System.Collections.Generic.Dictionary<string, Microsoft.AspNetCore.OData.Query.ExpandConfiguration>
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.FilterConfigurations.get -> System.Collections.Generic.Dictionary<string, bool>
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.MaxTop.get -> int?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.MaxTop.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.ModelBoundQuerySettings() -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.ModelBoundQuerySettings(Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings querySettings) -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.OrderByConfigurations.get -> System.Collections.Generic.Dictionary<string, bool>
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.PageSize.get -> int?
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.PageSize.set -> void
-Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings.SelectConfigurations.get -> System.Collections.Generic.Dictionary<string, Microsoft.OData.ModelBuilder.SelectExpandType>
 Microsoft.AspNetCore.OData.Query.ODataQueryableOptions
 Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Count() -> Microsoft.AspNetCore.OData.Query.ODataQueryableOptions
 Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableCount.get -> bool
@@ -945,7 +893,7 @@ Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Select() -> Microsoft.Asp
 Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.Query.ODataQueryableOptions
 Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SkipToken() -> Microsoft.AspNetCore.OData.Query.ODataQueryableOptions
 Microsoft.AspNetCore.OData.Query.ODataQueryContext
-Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings.get -> Microsoft.AspNetCore.OData.Query.DefaultQuerySettings
+Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.ElementType.get -> Microsoft.OData.Edm.IEdmType
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model.get -> Microsoft.OData.Edm.IEdmModel
@@ -1084,9 +1032,9 @@ Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.get -> Microsoft.AspNe
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Value.get -> int
 Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator
-Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.CountQueryValidator(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.CountQueryValidator(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator
-Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.FilterQueryValidator(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.FilterQueryValidator(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.ODataQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
@@ -1113,9 +1061,9 @@ Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxTop.get ->
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxTop.set -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.ODataValidationSettings() -> void
 Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
-Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.OrderByQueryValidator(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.OrderByQueryValidator(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator
-Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.SelectExpandQueryValidator(Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.SelectExpandQueryValidator(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.SkipQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator

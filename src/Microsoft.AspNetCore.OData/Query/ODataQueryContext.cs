@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query

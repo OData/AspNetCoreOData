@@ -24,6 +24,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(NoGroupByWrapper), true)]
         [InlineData(typeof(object), false)]
         [InlineData(typeof(SelectExpandWrapper), false)]
+        [InlineData(null, false)]
         public void CanConvertWorksForDynamicTypeWrapper(Type type, bool expected)
         {
             // Arrange
@@ -43,6 +44,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(NoGroupByWrapper), typeof(NoGroupByWrapperConverter))]
         [InlineData(typeof(object), null)]
         [InlineData(typeof(SelectExpandWrapper), null)]
+        [InlineData(null, null)]
         public void CreateConverterWorksForDynamicTypeWrapper(Type type, Type expected)
         {
             // Arrange
@@ -157,8 +159,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void ComputeWrapperOfTypeConverterCanSerializeGroupByWrapper()
+        public void ComputeWrapperOfTypeConverter_Works_ComputeWrapper()
         {
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterRead<ComputeWrapper<object>>();
+
             // Arrange
             GroupByWrapper wrapper = new GroupByWrapper();
             wrapper.GroupByContainer = new AggregationPropertyContainer()
@@ -183,8 +188,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void FlatteningWrapperOfTypeConverterCanSerializeGroupByWrapper()
+        public void FlatteningWrapperOfTypeConverter_Works_FlatteningWrapper()
         {
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterRead<FlatteningWrapper<object>>();
+
             // Arrange
             FlatteningWrapper<object> flatteningWrapper = new FlatteningWrapper<object>
             {

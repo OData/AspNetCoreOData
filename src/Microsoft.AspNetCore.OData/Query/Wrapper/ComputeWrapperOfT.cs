@@ -89,8 +89,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
     {
         public override ComputeWrapper<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Contract.Assert(false, "ComputeWrapper{T} is internal and should never be deserialized into.");
-            throw new NotImplementedException();
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(ComputeWrapper<>).Name));
         }
 
         public override void Write(Utf8JsonWriter writer, ComputeWrapper<T> value, JsonSerializerOptions options)

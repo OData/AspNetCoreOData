@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using Microsoft.OData;
+using Microsoft.OData.ModelBuilder.Config;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
@@ -19,12 +20,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (skipToken == null)
             {
-                throw Error.ArgumentNull("skipQueryOption");
+                throw Error.ArgumentNull(nameof(skipToken));
             }
 
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (skipToken.Context != null)

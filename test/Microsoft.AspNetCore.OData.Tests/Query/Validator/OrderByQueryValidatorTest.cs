@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 using Xunit;
 

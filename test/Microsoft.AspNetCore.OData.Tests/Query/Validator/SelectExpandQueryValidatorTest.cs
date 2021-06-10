@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -56,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             ExceptionAssert.DoesNotThrow(
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth + 1 }));
         }
-#if false
+
         [Theory]
         [InlineData("Orders($expand=Customer)", 1)]
         [InlineData("Orders,Orders($expand=Customer)", 1)]
@@ -88,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth + 1 }),
                 String.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth));
         }
-
+#if false
         [Theory]
         [InlineData("Parent($levels=5)", 4)]
         [InlineData("Parent($expand=Parent($levels=4))", 4)]
@@ -385,5 +386,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 String.Format(CultureInfo.InvariantCulture, "The property '{0}' cannot be used in the $expand query option.", propertyName));
         }
 #endif
+
+        [Fact]
+        public void GetSelectExpandQueryValidator_Returns_Validator()
+        {
+            // Arrange & Act & Assert
+            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(null));
+
+            // Arrange & Act & Assert
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(context));
+
+            // Arrange & Act & Assert
+            IServiceProvider services = new ServiceCollection()
+                .AddSingleton<SelectExpandQueryValidator>()
+                .AddSingleton<DefaultQuerySettings>().BuildServiceProvider();
+            context.RequestContainer = services;
+            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(context));
+        }
     }
 }

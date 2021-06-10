@@ -5,8 +5,10 @@ using System;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
@@ -109,6 +111,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Act & Assert
             ExceptionAssert.Throws<ODataException>(() => _validator.Validate(new TopQueryOption("11", context), settings),
                 "The limit of '10' for Top query has been exceeded. The value from the incoming request is '11'.");
+        }
+
+        [Fact]
+        public void GetTopQueryValidator_Returns_Validator()
+        {
+            // Arrange & Act & Assert
+            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(null));
+
+            // Arrange & Act & Assert
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(context));
+
+            // Arrange & Act & Assert
+            IServiceProvider services = new ServiceCollection()
+                .AddSingleton<TopQueryValidator>().BuildServiceProvider();
+            context.RequestContainer = services;
+            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(context));
         }
     }
 }

@@ -89,7 +89,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] Models  { public get; }
-	Microsoft.AspNetCore.OData.Query.DefaultQuerySettings QuerySettings  { public get; }
+	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
 	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
@@ -1224,26 +1224,6 @@ public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : I
 	public virtual System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
-public class Microsoft.AspNetCore.OData.Query.DefaultQuerySettings {
-	public DefaultQuerySettings ()
-
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Count ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Expand ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Filter ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings OrderBy ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Select ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings SkipToken ()
-}
-
 public class Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler : Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
 	public DefaultSkipTokenHandler ()
 
@@ -1309,13 +1289,6 @@ public class Microsoft.AspNetCore.OData.Query.ETag`1 : Microsoft.AspNetCore.ODat
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query)
 }
 
-public class Microsoft.AspNetCore.OData.Query.ExpandConfiguration {
-	public ExpandConfiguration ()
-
-	Microsoft.OData.ModelBuilder.SelectExpandType ExpandType  { public get; public set; }
-	int MaxDepth  { public get; public set; }
-}
-
 public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	public FilterQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
@@ -1326,24 +1299,6 @@ public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
-}
-
-public class Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings {
-	public ModelBoundQuerySettings ()
-	public ModelBoundQuerySettings (Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings querySettings)
-
-	System.Nullable`1[[System.Boolean]] Countable  { public get; public set; }
-	System.Nullable`1[[System.Boolean]] DefaultEnableFilter  { public get; public set; }
-	System.Nullable`1[[System.Boolean]] DefaultEnableOrderBy  { public get; public set; }
-	System.Nullable`1[[Microsoft.OData.ModelBuilder.SelectExpandType]] DefaultExpandType  { public get; public set; }
-	int DefaultMaxDepth  { public get; public set; }
-	System.Nullable`1[[Microsoft.OData.ModelBuilder.SelectExpandType]] DefaultSelectType  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[Microsoft.AspNetCore.OData.Query.ExpandConfiguration]] ExpandConfigurations  { public get; }
-	System.Collections.Generic.Dictionary`2[[System.String],[System.Boolean]] FilterConfigurations  { public get; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[System.Boolean]] OrderByConfigurations  { public get; }
-	System.Nullable`1[[System.Int32]] PageSize  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[Microsoft.OData.ModelBuilder.SelectExpandType]] SelectConfigurations  { public get; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.ODataQueryableOptions {
@@ -1370,7 +1325,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmType elementType, Microsoft.OData.UriParser.ODataPath path)
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, System.Type elementClrType, Microsoft.OData.UriParser.ODataPath path)
 
-	Microsoft.AspNetCore.OData.Query.DefaultQuerySettings DefaultQuerySettings  { public get; }
+	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings DefaultQuerySettings  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
@@ -2618,13 +2573,13 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {
-	public CountQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public CountQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator {
-	public FilterQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public FilterQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	public virtual void Validate (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
@@ -2673,13 +2628,13 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator {
-	public OrderByQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public OrderByQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator {
-	public SelectExpandQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public SelectExpandQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }

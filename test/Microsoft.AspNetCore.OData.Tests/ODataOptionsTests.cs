@@ -245,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.Null(options.QuerySettings.MaxTop); // Guard
+            Assert.Equal(0, options.QuerySettings.MaxTop); // Guard
 
             // Act
             options.SetMaxTop(2);

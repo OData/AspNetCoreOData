@@ -733,7 +733,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="limit">The query result limit.</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Not intended for public use, only public to enable invocation without security issues.")]
         public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, out bool resultsLimited)
         {
             return LimitResults<T>(queryable, limit, false, out resultsLimited);
@@ -748,7 +747,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Not intended for public use, only public to enable invocation without security issues.")]
         public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited)
         {
             TruncatedCollection<T> truncatedCollection = new TruncatedCollection<T>(queryable, limit, parameterize);

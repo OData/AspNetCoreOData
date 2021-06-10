@@ -50,6 +50,18 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Initialize a new instance of <see cref="SkipQueryOption"/> based on the raw $skiptoken value
+        /// This constructor is intended for unit testing only.
+        /// </summary>
+        /// <param name="rawValue">The raw value for $skiptoken query.</param>
+        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        internal SkipTokenQueryOption(string rawValue, ODataQueryContext context)
+        {
+            RawValue = rawValue;
+            Context = context;
+        }
+
+        /// <summary>
         /// Gets the raw $skiptoken value.
         /// </summary>
         public string RawValue { get; private set; }

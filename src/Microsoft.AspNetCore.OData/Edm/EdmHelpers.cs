@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm

@@ -5,7 +5,9 @@ using System;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
+using Microsoft.OData.Edm;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
@@ -73,6 +75,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 
             // Act & Assert
             ExceptionAssert.DoesNotThrow(() => _validator.Validate(new SkipQueryOption("9", _context), settings));
+        }
+
+        [Fact]
+        public void GetSkipQueryValidator_Returns_Validator()
+        {
+            // Arrange & Act & Assert
+            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(null));
+
+            // Arrange & Act & Assert
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(context));
+
+            // Arrange & Act & Assert
+            IServiceProvider services = new ServiceCollection()
+                .AddSingleton<SkipQueryValidator>().BuildServiceProvider();
+            context.RequestContainer = services;
+            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(context));
         }
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
@@ -26,6 +27,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(FlatteningWrapper<object>), false)]
         [InlineData(typeof(NoGroupByWrapper), false)]
         [InlineData(typeof(object), false)]
+        [InlineData(null, false)]
         public void CanConvertWorksForSelectExpandWrapper(Type type, bool expected)
         {
             // Arrange
@@ -38,13 +40,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [Theory]
         [InlineData(typeof(SelectAllAndExpand<object>), typeof(SelectAllAndExpandConverter<object>))]
         [InlineData(typeof(SelectAll<object>), typeof(SelectAllConverter<object>))]
-        [InlineData(typeof(SelectExpandWrapper<object>), null)]
         [InlineData(typeof(SelectSomeAndInheritance<object>), typeof(SelectSomeAndInheritanceConverter<object>))]
         [InlineData(typeof(SelectSome<object>), typeof(SelectSomeConverter<object>))]
+        [InlineData(typeof(SelectExpandWrapper<object>), typeof(SelectExpandWrapperConverter<object>))]
         [InlineData(typeof(SelectExpandWrapper), null)]
         [InlineData(typeof(FlatteningWrapper<object>), null)]
         [InlineData(typeof(NoGroupByWrapper), null)]
         [InlineData(typeof(object), null)]
+        [InlineData(null, null)]
         public void CreateConverterWorksForSelectExpandWrapper(Type type, Type expected)
         {
             // Arrange
@@ -66,34 +69,77 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void SelectSomeAndInheritanceWrapperConverterCanSerialize()
+        public void SelectExpandWrapperConverter_Works_SelectExpandWrapper()
         {
             // Arrange & Act & Assert
-            TestSelectExpandWrapperConverter<SelectSomeAndInheritance<SelectExpandWrapperEntity>>();
+            TestSelectExpandWrapperConverterRead<SelectExpandWrapper<SelectExpandWrapperEntity>>();
+
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterWrite<SelectExpandWrapper<SelectExpandWrapperEntity>>();
         }
 
         [Fact]
-        public void SelectAllWrapperConverterCanSerialize()
+        public void SelectSomeAndInheritanceWrapperConverter_Works_SelectSomeAndInheritance()
         {
             // Arrange & Act & Assert
-            TestSelectExpandWrapperConverter<SelectAll<SelectExpandWrapperEntity>>();
+            TestSelectExpandWrapperConverterRead<SelectSomeAndInheritance<SelectExpandWrapperEntity>>();
+
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterWrite<SelectSomeAndInheritance<SelectExpandWrapperEntity>>();
         }
 
         [Fact]
-        public void SelectAllAndExpandWrapperConverterCanSerialize()
+        public void SelectAllWrapperConverter_Works_SelectAll()
         {
             // Arrange & Act & Assert
-            TestSelectExpandWrapperConverter<SelectAllAndExpand<SelectExpandWrapperEntity>>();
+            TestSelectExpandWrapperConverterRead<SelectAll<SelectExpandWrapperEntity>>();
+
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterWrite<SelectAll<SelectExpandWrapperEntity>>();
         }
 
         [Fact]
-        public void SelectSomeWrapperConverterCanSerialize()
+        public void SelectAllAndExpandWrapperConverter_Works_SelectAllAndExpand()
         {
             // Arrange & Act & Assert
-            TestSelectExpandWrapperConverter<SelectSome<SelectExpandWrapperEntity>>();
+            TestSelectExpandWrapperConverterRead<SelectAllAndExpand<SelectExpandWrapperEntity>>();
+
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterWrite<SelectAllAndExpand<SelectExpandWrapperEntity>>();
         }
 
-        internal static void TestSelectExpandWrapperConverter<T>() where T : SelectExpandWrapper
+        [Fact]
+        public void SelectSomeWrapperConverter_Works_SelectSome()
+        {
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterRead<SelectSome<SelectExpandWrapperEntity>>();
+
+            // Arrange & Act & Assert
+            TestSelectExpandWrapperConverterWrite<SelectSome<SelectExpandWrapperEntity>>();
+        }
+
+        internal static void TestSelectExpandWrapperConverterRead<T>() where T : SelectExpandWrapper
+        {
+            // Arrange
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            SelectExpandWrapperConverter converter = new SelectExpandWrapperConverter();
+            JsonConverter<T> typeConverter = converter.CreateConverter(typeof(T), options) as JsonConverter<T>;
+
+            try
+            {
+                // Act
+                ReadOnlySpan<byte> jsonReadOnlySpan = Encoding.UTF8.GetBytes("any");
+                Utf8JsonReader reader = new Utf8JsonReader(jsonReadOnlySpan);
+                typeConverter.Read(ref reader, typeof(object), options);
+            }
+            catch (NotImplementedException ex)
+            {
+                // Assert
+                Assert.Equal($"'{typeof(T).Name}' is internal and should never be deserialized into.", ex.Message);
+            }
+        }
+
+        internal static void TestSelectExpandWrapperConverterWrite<T>() where T : SelectExpandWrapper
         {
             // Arrange
             T wrapper = (T)Activator.CreateInstance(typeof(T));
