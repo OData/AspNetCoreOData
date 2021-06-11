@@ -55,7 +55,7 @@ Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest.get -> Microso
 Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequest.set -> void
 Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope.HttpRequestScope() -> void
 Microsoft.AspNetCore.OData.Abstracts.IETagHandler
-Microsoft.AspNetCore.OData.Abstracts.IETagHandler.CreateETag(System.Collections.Generic.IDictionary<string, object> properties) -> Microsoft.Net.Http.Headers.EntityTagHeaderValue
+Microsoft.AspNetCore.OData.Abstracts.IETagHandler.CreateETag(System.Collections.Generic.IDictionary<string, object> properties, System.TimeZoneInfo timeZoneInfo = null) -> Microsoft.Net.Http.Headers.EntityTagHeaderValue
 Microsoft.AspNetCore.OData.Abstracts.IETagHandler.ParseETag(Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue) -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.BatchId.get -> System.Guid?
@@ -1514,7 +1514,7 @@ static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.IsNonODat
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.GetLinkGenerator(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.Routing.LinkGenerator
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataFeature
-static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary<string, object> properties) -> string
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary<string, object> properties, System.TimeZoneInfo timeZone = null) -> string
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateSubServiceProvider(this Microsoft.AspNetCore.Http.HttpRequest request, string prefixName) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(this Microsoft.AspNetCore.Http.HttpRequest request, bool dispose) -> void
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider

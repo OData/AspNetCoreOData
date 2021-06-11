@@ -145,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
             }
-            return handler.CreateETag(properties);
+            return handler.CreateETag(properties, resourceContext.TimeZone);
         }
 
         private static ResourceContext CreateInstanceContext(IEdmModel model, IEdmEntityTypeReference reference, object value)

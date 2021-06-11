@@ -116,7 +116,7 @@ public class Microsoft.AspNetCore.OData.ODataOptionsSetup : IConfigureOptions`1 
 }
 
 public interface Microsoft.AspNetCore.OData.Abstracts.IETagHandler {
-	Microsoft.Net.Http.Headers.EntityTagHeaderValue CreateETag (System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties)
+	Microsoft.Net.Http.Headers.EntityTagHeaderValue CreateETag (System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZoneInfo)
 	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ParseETag (Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue)
 }
 
@@ -791,7 +791,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static string CreateETag (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties)
+	public static string CreateETag (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZone)
 
 	[
 	ExtensionAttribute(),

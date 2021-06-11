@@ -52,20 +52,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return url;
         }
 
-        public static void AddLocationHeaderToMapping(
-            Uri location,
-            IDictionary<string, string> contentIdToLocationMapping,
-            string contentId)
-        {
-            Contract.Assert(contentIdToLocationMapping != null);
-            Contract.Assert(contentId != null);
-
-            if (location != null)
-            {
-                contentIdToLocationMapping.Add(contentId, location.AbsoluteUri);
-            }
-        }
-
         private static bool IsContentIdCharacter(char c)
         {
             // According to the OData ABNF grammar, Content-IDs follow the scheme.

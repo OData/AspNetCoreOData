@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (payloadKinds == null)
             {
-                throw new ArgumentNullException(nameof(payloadKinds));
+                throw Error.ArgumentNull(nameof(payloadKinds));
             }
 
             _payloadKinds = new HashSet<ODataPayloadKind>(payloadKinds);
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             // Ensure we have a valid request.
@@ -147,20 +147,20 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             Type type = context.ObjectType;
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
             type = TypeHelper.GetTaskInnerTypeOrSelf(type);
 
             HttpRequest request = context.HttpContext.Request;
             if (request == null)
             {
-                throw Error.InvalidOperation(SRResources.WriteToStreamAsyncMustHaveRequest);
+                throw Error.InvalidOperation(SRResources.WriteToResponseAsyncMustHaveRequest);
             }
 
             HttpResponse response = context.HttpContext.Response;
@@ -195,25 +195,24 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         /// <inheritdoc/>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             Type type = context.ObjectType;
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
             type = TypeHelper.GetTaskInnerTypeOrSelf(type);
 
             HttpRequest request = context.HttpContext.Request;
             if (request == null)
             {
-                throw Error.InvalidOperation(SRResources.WriteToStreamAsyncMustHaveRequest);
+                throw Error.InvalidOperation(SRResources.WriteToResponseAsyncMustHaveRequest);
             }
 
             HttpResponse response = context.HttpContext.Response;
@@ -252,7 +251,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             string baseAddress = request.CreateODataLink();
@@ -287,7 +286,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
 
             newMediaType = null;

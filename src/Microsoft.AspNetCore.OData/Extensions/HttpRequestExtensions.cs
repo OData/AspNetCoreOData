@@ -204,10 +204,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="request">The input property names and values.</param>
         /// <param name="properties">The input property names and values.</param>
+        /// <param name="timeZone">The Time zone info.</param>
         /// <returns>The generated ETag string.</returns>
-        public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties)
+        public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties, TimeZoneInfo timeZone = null)
         {
-            return request.GetETagHandler().CreateETag(properties)?.ToString();
+            return request.GetETagHandler().CreateETag(properties, timeZone)?.ToString();
         }
 
         /// <summary>

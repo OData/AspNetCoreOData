@@ -1519,7 +1519,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
+        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize..
         /// </summary>
         internal static string ReadFromStreamAsyncMustHaveRequest {
             get {
@@ -1843,11 +1843,11 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The OData formatter does not support writing client requests. This formatter instance must have an associated request..
+        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
         /// </summary>
-        internal static string WriteToStreamAsyncMustHaveRequest {
+        internal static string WriteToResponseAsyncMustHaveRequest {
             get {
-                return ResourceManager.GetString("WriteToStreamAsyncMustHaveRequest", resourceCulture);
+                return ResourceManager.GetString("WriteToResponseAsyncMustHaveRequest", resourceCulture);
             }
         }
     }

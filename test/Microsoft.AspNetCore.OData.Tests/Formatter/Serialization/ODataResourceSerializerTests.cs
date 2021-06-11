@@ -770,7 +770,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<IETagHandler> mockETagHandler = new Mock<IETagHandler>();
             string tag = "\"'anycity'\"";
             EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
-            mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>())).Returns(etagHeaderValue);
+            mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>(), It.IsAny<TimeZoneInfo>())).Returns(etagHeaderValue);
 
             var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
             {
