@@ -97,6 +97,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
+        [InlineData("Patch", "/Customers")]
+        [InlineData("PatchCustomers", "/Customers")]
+        public void AppliesToAction_Works_ForPatchActionWorksAsExpected(string actionName, string expected)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = controller.Actions.First();
+
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
+
+            // Act
+            bool returnValue = entitySetConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Equal(expected, selector.AttributeRouteModel.Template);
+        }
+
+        [Theory]
         [InlineData("Get")]
         [InlineData("PostTo")]
         public void AppliesToActionDoesNothingForNonConventionAction(string actionName)
@@ -150,6 +173,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             { }
 
             public void PostFromVipCustomer()
+            { }
+
+            public void Patch()
+            { }
+
+            public void PatchCustomers()
             { }
         }
 

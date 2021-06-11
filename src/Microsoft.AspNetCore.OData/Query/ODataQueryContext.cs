@@ -23,7 +23,6 @@ namespace Microsoft.AspNetCore.OData.Query
     public class ODataQueryContext
     {
         private DefaultQuerySettings _defaultQuerySettings;
-        private ODataQueryableOptions _queryableOptions;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -114,25 +113,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 return _defaultQuerySettings;
-            }
-        }
-
-        /// <summary>
-        /// Gets the given <see cref="ODataQueryableOptions"/>.
-        /// TODO: it seems this one is never been used??
-        /// </summary>
-        public ODataQueryableOptions QueryableOptions
-        {
-            get
-            {
-                if (_queryableOptions == null)
-                {
-                    _queryableOptions = RequestContainer == null
-                        ? new ODataQueryableOptions()
-                        : RequestContainer.GetRequiredService<IOptions<ODataQueryableOptions>>().Value;
-                }
-
-                return _queryableOptions;
             }
         }
 

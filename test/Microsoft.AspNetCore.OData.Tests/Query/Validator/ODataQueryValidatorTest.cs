@@ -255,7 +255,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             var message = RequestFactory.Create("Get", "http://localhost/?$expand=Contacts/Contacts", setupAction: null);
             ODataQueryOptions option = new ODataQueryOptions(_context, message);
 
-            Mock<SelectExpandQueryValidator> selectExpandValidator = new Mock<SelectExpandQueryValidator>(new DefaultQuerySettings());
+            Mock<SelectExpandQueryValidator> selectExpandValidator = new Mock<SelectExpandQueryValidator>();
             option.SelectExpand.Validator = selectExpandValidator.Object;
             ODataValidationSettings settings = new ODataValidationSettings();
 

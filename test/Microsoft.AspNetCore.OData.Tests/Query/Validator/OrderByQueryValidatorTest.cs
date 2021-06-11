@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public OrderByQueryValidatorTest()
         {
             _context = ValidationTestHelper.CreateCustomerContext();
-            _validator = new OrderByQueryValidator(_context.DefaultQuerySettings);
+            _validator = new OrderByQueryValidator();
         }
 
         [Fact]
@@ -233,14 +233,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmModel model = GetEdmModel();
             IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == edmTypeName);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
+            context.DefaultQuerySettings.EnableOrderBy = true;
             OrderByQueryOption option = new OrderByQueryOption(query, context);
             ODataValidationSettings settings = new ODataValidationSettings();
 
             // Act & Assert
-            OrderByQueryValidator validator = new OrderByQueryValidator(new DefaultQuerySettings
-            {
-                EnableOrderBy = true
-            });
+            OrderByQueryValidator validator = new OrderByQueryValidator();
             ExceptionAssert.Throws<ODataException>(() => validator.Validate(option, settings), message);
         }
 
@@ -284,8 +282,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             IEdmModel model = GetEdmModel();
             IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "LimitedEntity");
-            IEdmEntitySet entitySet = model.FindDeclaredEntitySet("Microsoft.AspNet.OData.Query.Validators.LimitedEntities");
+            IEdmEntitySet entitySet = model.FindDeclaredEntitySet("LimitedEntities");
+            Assert.NotNull(entitySet);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
+            context.DefaultQuerySettings.EnableOrderBy = true;
 
             OrderByQueryOption option = new OrderByQueryOption(
                 "@p,@q desc",

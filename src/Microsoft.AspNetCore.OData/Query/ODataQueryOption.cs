@@ -591,7 +591,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (Validator != null)

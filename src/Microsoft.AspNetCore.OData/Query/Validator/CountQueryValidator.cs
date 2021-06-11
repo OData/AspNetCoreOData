@@ -5,7 +5,6 @@ using System;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -16,18 +15,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// </summary>
     public class CountQueryValidator
     {
-        private readonly DefaultQuerySettings _defaultQuerySettings;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CountQueryValidator" /> class based on
-        /// the <see cref="DefaultQuerySettings" />.
-        /// </summary>
-        /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public CountQueryValidator(DefaultQuerySettings defaultQuerySettings)
-        {
-            _defaultQuerySettings = defaultQuerySettings;
-        }
-
         /// <summary>
         /// Validates a <see cref="CountQueryOption" />.
         /// </summary>
@@ -37,12 +24,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (countQueryOption == null)
             {
-                throw Error.ArgumentNull("countQueryOption");
+                throw Error.ArgumentNull(nameof(countQueryOption));
             }
 
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             ODataPath path = countQueryOption.Context.Path;
@@ -54,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 string name = countQueryOption.Context.TargetName;
                 if (EdmHelpers.IsNotCountable(property, structuredType,
                     countQueryOption.Context.Model,
-                    _defaultQuerySettings.EnableCount))
+                    countQueryOption.Context.DefaultQuerySettings.EnableCount))
                 {
                     if (property == null)
                     {
@@ -74,14 +61,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            if (context == null)
+            if (context == null || context.RequestContainer == null)
             {
-                return new CountQueryValidator(new DefaultQuerySettings());
+                return new CountQueryValidator();
             }
 
-            return context.RequestContainer == null
-                ? new CountQueryValidator(context.DefaultQuerySettings)
-                : context.RequestContainer.GetRequiredService<CountQueryValidator>();
+            return context.RequestContainer.GetRequiredService<CountQueryValidator>();
         }
     }
 }

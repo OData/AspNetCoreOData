@@ -1301,26 +1301,6 @@ public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
-public class Microsoft.AspNetCore.OData.Query.ODataQueryableOptions {
-	public ODataQueryableOptions ()
-
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Count ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Expand ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Filter ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions OrderBy ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Select ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions SkipToken ()
-}
-
 public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmType elementType, Microsoft.OData.UriParser.ODataPath path)
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, System.Type elementClrType, Microsoft.OData.UriParser.ODataPath path)
@@ -1331,7 +1311,6 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	Microsoft.OData.UriParser.ODataPath Path  { public get; }
-	Microsoft.AspNetCore.OData.Query.ODataQueryableOptions QueryableOptions  { public get; }
 	System.IServiceProvider RequestContainer  { public get; }
 }
 
@@ -2573,36 +2552,36 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {
-	public CountQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
+	public CountQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator {
-	public FilterQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
+	public FilterQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	public virtual void Validate (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
-	internal virtual void Validate (Microsoft.OData.Edm.IEdmProperty property, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
-	public virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateArithmeticOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateBinaryOperatorNode (Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionComplexNode (Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionPropertyAccessNode (Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateLogicalOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateRangeVariable (Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleComplexNode (Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleValueFunctionCallNode (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleValuePropertyAccessNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	internal virtual void Validate (Microsoft.OData.Edm.IEdmProperty property, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings querySettings)
+	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateArithmeticOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateBinaryOperatorNode (Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionComplexNode (Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionPropertyAccessNode (Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateLogicalOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateRangeVariable (Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleComplexNode (Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleValueFunctionCallNode (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleValuePropertyAccessNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator {
@@ -2628,13 +2607,13 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator {
-	public OrderByQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
+	public OrderByQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator {
-	public SelectExpandQueryValidator (Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings defaultQuerySettings)
+	public SelectExpandQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }

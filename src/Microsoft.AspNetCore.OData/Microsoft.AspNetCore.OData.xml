@@ -8669,93 +8669,6 @@
             Copy the $filter configuration of properties.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions">
-            <summary>
-            This class describes the settings to use during query composition.
-            TODO: it seems this class is never been used?? we need use it to replace "DefaultQuerySettings"??
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableExpand">
-            <summary>
-            Gets or sets a value indicating whether navigation property can be expanded.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableSelect">
-            <summary>
-            Gets or sets a value indicating whether property can be selected.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableCount">
-            <summary>
-            Gets or sets a value indicating whether entity set and property can apply $count.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableOrderBy">
-            <summary>
-            Gets or sets a value indicating whether property can apply $orderby.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableFilter">
-            <summary>
-            Gets or sets a value indicating whether property can apply $filter.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.EnableSkipToken">
-            <summary>
-            Gets or sets a value indicating whether the service will use skiptoken or not.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.MaxTop">
-            <summary>
-            Gets or sets the max value of $top that a client can request.
-            </summary>
-            <value>
-            The max value of $top that a client can request, or <c>null</c> if there is no limit.
-            </value>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Expand">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Select">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Filter">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.OrderBy">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.Count">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SkipToken">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions.SetMaxTop(System.Nullable{System.Int32})">
-            <summary>
-            
-            </summary>
-            <param name="maxTopValue"></param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext">
             <summary>
             This defines some context information used to perform query composition.
@@ -8787,12 +8700,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings">
             <summary>
             Gets the given <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.QueryableOptions">
-            <summary>
-            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryableOptions"/>.
-            TODO: it seems this one is never been used??
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model">
@@ -10193,13 +10100,6 @@
             based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.#ctor(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator" /> class based on
-            the <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.
-            </summary>
-            <param name="defaultQuerySettings">The <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
             Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" />.
@@ -10214,13 +10114,6 @@
             <remarks>
             Please note this class is not thread safe.
             </remarks>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.#ctor(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator" /> class based on
-            the <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.
-            </summary>
-            <param name="defaultQuerySettings">The <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10353,8 +10246,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="propertyAccessNode"></param>
-            <param name="settings"></param>
+            <param name="propertyAccessNode">The single value property access node.</param>
+            <param name="settings">The settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10572,13 +10465,6 @@
             Represents a validator used to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.#ctor(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator" /> class based on
-            the <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.
-            </summary>
-            <param name="defaultQuerySettings">The <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
             Validates an <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption" />.
@@ -10591,16 +10477,14 @@
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption" /> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.#ctor(Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator" /> class based on
-            the <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator" /> class
             </summary>
-            <param name="defaultQuerySettings">The <see cref="T:Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings" />.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption" />.
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption" />.
             </summary>
             <param name="selectExpandQueryOption">The $select and $expand query.</param>
             <param name="validationSettings">The validation settings.</param>

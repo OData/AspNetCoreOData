@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             OperationImportRoutingConvention convention = new OperationImportRoutingConvention();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
             ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
         }
 
