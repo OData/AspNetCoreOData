@@ -35,6 +35,30 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw Error.ArgumentNull(nameof(actionExecutedContext));
             }
 
+            if (actionExecutedContext.HttpContext == null)
+            {
+                throw Error.ArgumentNull("httpContext");
+            }
+
+            HttpRequest request = actionExecutedContext.HttpContext.Request;
+            ODataPath path = request.ODataFeature().Path;
+            if (path == null)
+            {
+                throw Error.ArgumentNull("path");
+            }
+
+            IEdmModel model = request.GetModel();
+            if (model == null)
+            {
+                throw Error.ArgumentNull("model");
+            }
+
+            IETagHandler etagHandler = request.GetETagHandler();
+            if (etagHandler == null)
+            {
+                throw Error.ArgumentNull("etagHandler");
+            }
+
             // Need a value to operate on.
             ObjectResult result = actionExecutedContext.Result as ObjectResult;
             if (result == null)
@@ -43,13 +67,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             }
 
             HttpResponse response = actionExecutedContext.HttpContext.Response;
-            HttpRequest request = actionExecutedContext.HttpContext.Request;
-
-            EntityTagHeaderValue etag = GetETag(response?.StatusCode,
-                request.ODataFeature().Path,
-                request.GetModel(),
-                result.Value,
-                request.GetETagHandler());
+            EntityTagHeaderValue etag = GetETag(response?.StatusCode, path, model, result.Value, etagHandler);
 
             if (etag != null)
             {
@@ -59,20 +77,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
         private static EntityTagHeaderValue GetETag(int? statusCode, ODataPath path, IEdmModel model, object value, IETagHandler etagHandler)
         {
-            if (path == null)
-            {
-                throw Error.ArgumentNull(nameof(path));
-            }
-
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (etagHandler == null)
-            {
-                throw Error.ArgumentNull(nameof(etagHandler));
-            }
+            Contract.Assert(path != null);
+            Contract.Assert(model != null);
+            Contract.Assert(etagHandler != null);
 
             // Do not interfere with null responses, we want to bubble it up to the top.
             // Do not handle 204 responses as the spec says a 204 response must not include an ETag header

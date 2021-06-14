@@ -223,7 +223,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
+            return request.GetSubServiceProvider().GetService<IETagHandler>();
         }
 
         /// <summary>
