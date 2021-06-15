@@ -37,6 +37,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
         }
 
         [Fact]
+        public void Getter_ThrowsArgumentNull_Instance()
+        {
+            // Arrange & Act & Assert
+            var mine = new MyProps();
+            var accessor = new FastPropertyAccessor<MyProps>(mine.GetType().GetProperty("StringProp"));
+            ExceptionAssert.ThrowsArgumentNull(() => accessor.GetValue(null), "instance");
+        }
+
+        [Fact]
         public void GetterWorksForReferenceType()
         {
             // Arrange
@@ -46,6 +55,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
 
             // Act & Assert
             Assert.Equal("*4", accessor.GetValue(mine));
+        }
+
+        [Fact]
+        public void Setter_ThrowsArgumentNull_Instance()
+        {
+            // Arrange & Act & Assert
+            var mine = new MyProps();
+            var accessor = new FastPropertyAccessor<MyProps>(mine.GetType().GetProperty("StringProp"));
+            ExceptionAssert.ThrowsArgumentNull(() => accessor.SetValue(null, 5), "instance");
         }
 
         [Fact]

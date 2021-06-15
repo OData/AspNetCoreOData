@@ -69,6 +69,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
 
             // Assert
             Assert.Null(pairs);
+
+            // Arrange & Act & Assert
+            Assert.False(KeyValuePairParser.TryParse(expression, out _));
         }
 
         [Theory]

@@ -134,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     elementType = TypeHelper.GetImplementedIEnumerableType(returnType);
                 }
-                else if (TypeHelper.IsGenericType(returnType) && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+                else if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
                     elementType = returnType.GetGenericArguments().First();
                 }

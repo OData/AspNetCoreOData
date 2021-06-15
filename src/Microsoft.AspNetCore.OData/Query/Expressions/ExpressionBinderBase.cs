@@ -1004,7 +1004,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal static bool IsNullable(Type t)
         {
-            if (!TypeHelper.IsValueType(t) || (TypeHelper.IsGenericType(t) && t.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            if (!t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)))
             {
                 return true;
             }
@@ -1121,7 +1121,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             var member = source as MemberExpression;
             return member != null
-                && this.Parameter.Type.IsGenericType()
+                && this.Parameter.Type.IsGenericType
                 && this.Parameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
                 && member.Expression == this.Parameter;
         }
@@ -1437,7 +1437,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Expression sourceValue;
 
-            if (TypeHelper.IsGenericType(source.Type) && source.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (source.Type.IsGenericType && source.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 if (TypeHelper.IsEnum(source.Type))
                 {

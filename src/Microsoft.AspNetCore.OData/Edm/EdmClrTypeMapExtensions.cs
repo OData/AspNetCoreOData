@@ -408,7 +408,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             Contract.Assert(type != null);
 
-            if (!TypeHelper.IsGenericType(type))
+            if (!type.IsGenericType)
             {
                 return type.Name;
             }
@@ -424,7 +424,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         private static Type ExtractGenericInterface(Type queryType, Type interfaceType)
         {
-            Func<Type, bool> matchesInterface = t => TypeHelper.IsGenericType(t) && t.GetGenericTypeDefinition() == interfaceType;
+            Func<Type, bool> matchesInterface = t => t.IsGenericType && t.GetGenericTypeDefinition() == interfaceType;
             return matchesInterface(queryType) ? queryType : queryType.GetInterfaces().FirstOrDefault(matchesInterface);
         }
 
@@ -442,7 +442,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return false;
             }
 
-            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == wrappedType)
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == wrappedType)
             {
                 entityType = type.GetGenericArguments()[0];
                 return true;

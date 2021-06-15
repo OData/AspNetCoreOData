@@ -891,75 +891,6 @@
             Helper extension methods for fast use of collections.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.AppendAndReallocate``1(``0[],``0)">
-            <summary>
-            Return a new array with the value added to the end. Slow and best suited to long lived arrays with few writes relative to reads.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.AsArray``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Return the enumerable as an Array, copying if required. Optimized for common case where it is an Array. 
-            Avoid mutating the return value.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.AsCollection``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Return the enumerable as a Collection of T, copying if required. Optimized for the common case where it is 
-            a Collection of T and avoiding a copy if it implements IList of T. Avoid mutating the return value.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.AsIList``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Return the enumerable as a IList of T, copying if required. Avoid mutating the return value.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.AsList``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Return the enumerable as a List of T, copying if required. Optimized for common case where it is an List of T 
-            or a ListWrapperCollection of T. Avoid mutating the return value.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.RemoveFrom``1(System.Collections.Generic.List{``0},System.Int32)">
-            <summary>
-            Remove values from the list starting at the index start.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.SingleDefaultOrError``2(System.Collections.Generic.IList{``0},System.Action{``1},``1)">
-            <summary>
-            Return the only value from list, the type's default value if empty, or call the errorAction for 2 or more.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.SingleOfTypeDefaultOrError``3(System.Collections.Generic.IList{``0},System.Action{``2},``2)">
-            <summary>
-            Returns a single value in list matching type TMatch if there is only one, null if there are none of type TMatch or calls the
-            errorAction with errorArg1 if there is more than one.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.ToArrayWithoutNulls``1(System.Collections.Generic.ICollection{``0})">
-            <summary>
-            Convert an ICollection to an array, removing null values. Fast path for case where there are no null values.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.ToDictionaryFast``2(``1[],System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
-            <summary>
-            Convert the array to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for array input.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.ToDictionaryFast``2(System.Collections.Generic.IList{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
-            <summary>
-            Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input with fast path for array.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.ToDictionaryFast``2(System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
-            <summary>
-            Convert the enumerable to a Dictionary using the keySelector to extract keys from values and the specified comparer. Fast paths for array and IList of T.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.CollectionExtensions.ToDictionaryFastNoCheck``2(System.Collections.Generic.IList{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
-            <summary>
-            Convert the list to a Dictionary using the keySelector to extract keys from values and the specified comparer. Optimized for IList of T input. No checking for other types.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.ExpressionTokenKind">
             <summary>
             Enumeration values for token kinds.
@@ -1165,24 +1096,6 @@
             <param name="literalText">The text to be evaluated</param>
             <returns>True if <paramref name="literalText"/> is valid for Uri template</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.TryExtractKeyValuePairs(System.String,System.Collections.Generic.IDictionary{System.String,System.String}@)">
-            <summary>
-            Extract key/value pairs, the value could have "=" or ', or "", etc.
-            </summary>
-            <param name="input">The input string</param>
-            <param name="pairs"></param>
-            <returns>true or false</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.ExtractKeyValuePairs(System.String)">
-            <summary>
-            Each key/value pair is separated using ",".
-            Each value could be a string using single quote, so it could have "," and escaped doulbe single quote.
-            "minSalary=2,maxSalary=3"
-            "minSalary='af''d,2,897abc' , maxSalary=3"
-            </summary>
-            <param name="input"></param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Common.TypeHelper">
             <summary>
             The type related helper methods.
@@ -1201,6 +1114,13 @@
             </summary>
             <param name="clrType">The type to convert.</param>
             <returns>The collection element type from a type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetUnderlyingTypeOrSelf(System.Type)">
+            <summary>
+            Return the undering type or itself.
+            </summary>
+            <param name="type">The input type.</param>
+            <returns>The underlying type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateTime(System.Type)">
             <summary>
@@ -1231,26 +1151,12 @@
             <param name="memberInfo">The member info to convert.</param>
             <returns>The reflected type from a member info.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsValueType(System.Type)">
-            <summary>
-            Determine if a type is a value type.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a value type; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsEnum(System.Type)">
             <summary>
             Determine if a type is an enumeration.
             </summary>
             <param name="clrType">The type to test.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsGenericType(System.Type)">
-            <summary>
-            Determine if a type is a generic type.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a generic type; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsNullable(System.Type)">
             <summary>
@@ -1280,13 +1186,6 @@
             <param name="clrType">The type to test.</param>
             <param name="elementType">out: the element type of the collection.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsInterface(System.Type)">
-            <summary>
-            Determine if a type is an interface.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is an interface; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>

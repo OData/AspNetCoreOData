@@ -2,8 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Common
 {
@@ -42,11 +40,12 @@ namespace Microsoft.AspNetCore.OData.Common
         /// <returns>True if <paramref name="literalText"/> is valid for Uri template</returns>
         internal static bool IsValidTemplateLiteral(this string literalText)
         {
-            return (!string.IsNullOrEmpty(literalText)
+            return !string.IsNullOrEmpty(literalText)
                 && literalText.StartsWith("{", StringComparison.Ordinal)
-                && literalText.EndsWith("}", StringComparison.Ordinal));
+                && literalText.EndsWith("}", StringComparison.Ordinal);
         }
 
+#if false // comment out the following codes for backup.
         /// <summary>
         /// Extract key/value pairs, the value could have "=" or ', or "", etc.
         /// </summary>
@@ -353,5 +352,6 @@ namespace Microsoft.AspNetCore.OData.Common
                 }
             }
         }
+#endif
     }
 }

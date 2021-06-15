@@ -37,8 +37,9 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (instance == null)
             {
-                throw Error.ArgumentNull("instance");
+                throw Error.ArgumentNull(nameof(instance));
             }
+
             return _getter(instance);
         }
 
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (instance == null)
             {
-                throw Error.ArgumentNull("instance");
+                throw Error.ArgumentNull(nameof(instance));
             }
 
             if (_isCollection)

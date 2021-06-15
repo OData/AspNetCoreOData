@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Common
             Contract.Assert(setMethod != null);
             Contract.Assert(!setMethod.IsStatic);
             Contract.Assert(setMethod.GetParameters().Length == 1);
-            Contract.Assert(!TypeHelper.IsValueType(TypeHelper.GetReflectedType(propertyInfo)));
+            Contract.Assert(!TypeHelper.GetReflectedType(propertyInfo).IsValueType);
 
             // Instance methods in the CLR can be turned into static methods where the first parameter
             // is open over "this". This parameter is always passed by reference, so we have a code
@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Common
             Type typeOutput = getMethod.ReturnType;
 
             Delegate callPropertyGetterDelegate;
-            if (TypeHelper.IsValueType(typeInput))
+            if (typeInput.IsValueType)
             {
                 // Create a delegate (ref TDeclaringType) -> TValue
                 Delegate propertyGetterAsFunc = getMethod.CreateDelegate(typeof(ByRefFunc<,>).MakeGenericType(typeInput, typeOutput));

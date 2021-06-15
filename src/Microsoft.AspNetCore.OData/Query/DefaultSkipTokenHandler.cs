@@ -413,7 +413,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     return null;
                 }
 
-                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).AsList();
+                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).ToList();
                 foreach (IEdmProperty subKey in key)
                 {
                     if (!orderByProps.Contains(subKey))

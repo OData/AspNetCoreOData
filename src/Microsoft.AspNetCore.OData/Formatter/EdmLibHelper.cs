@@ -59,13 +59,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <returns>True if the type was generic Delta; false otherwise.</returns>
         internal static bool TryGetInnerTypeForDelta(ref Type type)
         {
-            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(Delta<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Delta<>))
             {
                 type = type.GetGenericArguments()[0];
                 return true;
             }
 
-            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(DeltaSet<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>))
             {
                 type = type.GetGenericArguments()[0];
                 return true;
