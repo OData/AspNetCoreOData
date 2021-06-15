@@ -598,7 +598,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 dynamicPropertyDictionary.Where(x => selectExpandNode.SelectedDynamicProperties == null || selectExpandNode.SelectedDynamicProperties.Contains(x.Key));
             foreach (KeyValuePair<string, object> dynamicProperty in dynamicPropertiesToSelect)
             {
-                // TODO: test dynamic properties with null/empty keys not included
                 if (string.IsNullOrEmpty(dynamicProperty.Key))
                 {
                     continue;
