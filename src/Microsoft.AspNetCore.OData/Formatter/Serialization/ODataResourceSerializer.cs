@@ -565,12 +565,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return;
             }
 
-            bool nullDynamicPropertyEnabled = false;
-            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaResourceObject)
-            {
-                nullDynamicPropertyEnabled = true;
-            }
-
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;
             object value;
@@ -604,22 +598,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 dynamicPropertyDictionary.Where(x => selectExpandNode.SelectedDynamicProperties == null || selectExpandNode.SelectedDynamicProperties.Contains(x.Key));
             foreach (KeyValuePair<string, object> dynamicProperty in dynamicPropertiesToSelect)
             {
+                // TODO: test dynamic properties with null/empty keys not included
                 if (string.IsNullOrEmpty(dynamicProperty.Key))
                 {
-                    continue;
-                }
-
-                if (dynamicProperty.Value == null)
-                {
-                    if (nullDynamicPropertyEnabled)
-                    {
-                        dynamicProperties.Add(new ODataProperty
-                        {
-                            Name = dynamicProperty.Key,
-                            Value = new ODataNullValue()
-                        });
-                    }
-
                     continue;
                 }
 
@@ -627,6 +608,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     throw Error.InvalidOperation(SRResources.DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName,
                         dynamicProperty.Key, structuredType.FullTypeName());
+                }
+
+                if (dynamicProperty.Value == null)
+                {
+                    dynamicProperties.Add(new ODataProperty
+                    {
+                        Name = dynamicProperty.Key,
+                        Value = new ODataNullValue()
+                    });
+
+                    continue;
                 }
 
                 IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(dynamicProperty.Value,
