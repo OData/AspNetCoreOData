@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData.Edm;
@@ -12,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query
     /// <summary>
     /// This defines a translator to translate parameter alias nodes.
     /// </summary>
-    public class ParameterAliasNodeTranslator : QueryNodeVisitor<QueryNode>
+    internal class ParameterAliasNodeTranslator : QueryNodeVisitor<QueryNode>
     {
         private IDictionary<string, SingleValueNode> _parameterAliasNode;
 
@@ -37,10 +38,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(AllNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             AllNode allNode = new AllNode(nodeIn.RangeVariables, nodeIn.CurrentRangeVariable);
 
@@ -64,10 +62,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(AnyNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             AnyNode anyNode = new AnyNode(nodeIn.RangeVariables, nodeIn.CurrentRangeVariable);
 
@@ -91,10 +86,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(BinaryOperatorNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new BinaryOperatorNode(
                 nodeIn.OperatorKind,
@@ -109,10 +101,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(InNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new InNode(
                 (SingleValueNode)nodeIn.Left.Accept(this),
@@ -126,10 +115,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionFunctionCallNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionFunctionCallNode(
                 nodeIn.Name,
@@ -146,10 +132,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionNavigationNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return nodeIn.Source == null ?
                 nodeIn :
@@ -166,10 +149,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionOpenPropertyAccessNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionOpenPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
@@ -183,10 +163,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionComplexNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionComplexNode(
                 (SingleResourceNode)nodeIn.Source.Accept(this),
@@ -200,10 +177,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionPropertyAccessNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
@@ -237,10 +211,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(ConvertNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new ConvertNode((SingleValueNode)nodeIn.Source.Accept(this), nodeIn.TypeReference);
         }
@@ -252,10 +223,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionResourceCastNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionResourceCastNode(
                 (CollectionResourceNode)nodeIn.Source.Accept(this),
@@ -269,10 +237,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(CollectionResourceFunctionCallNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CollectionResourceFunctionCallNode(
                 nodeIn.Name,
@@ -300,10 +265,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(NamedFunctionParameterNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new NamedFunctionParameterNode(
                 nodeIn.Name,
@@ -356,10 +318,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleResourceCastNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return nodeIn.Source == null ?
                 nodeIn :
@@ -375,10 +334,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleResourceFunctionCallNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new SingleResourceFunctionCallNode(
                 nodeIn.Name,
@@ -396,10 +352,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleNavigationNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return nodeIn.Source == null ?
                 nodeIn :
@@ -416,10 +369,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValueFunctionCallNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new SingleValueFunctionCallNode(
                 nodeIn.Name,
@@ -436,10 +386,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValueOpenPropertyAccessNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new SingleValueOpenPropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
@@ -453,10 +400,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleValuePropertyAccessNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new SingleValuePropertyAccessNode(
                 (SingleValueNode)nodeIn.Source.Accept(this),
@@ -470,10 +414,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(SingleComplexNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new SingleComplexNode(
                 (SingleResourceNode)nodeIn.Source.Accept(this),
@@ -487,10 +428,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns>
         public override QueryNode Visit(UnaryOperatorNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new UnaryOperatorNode(nodeIn.OperatorKind, (SingleValueNode)nodeIn.Operand.Accept(this));
         }
@@ -502,10 +440,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The translated node.</returns> 
         public override QueryNode Visit(CountNode nodeIn)
         {
-            if (nodeIn == null)
-            {
-                throw Error.ArgumentNull(nameof(nodeIn));
-            }
+            Contract.Assert(nodeIn != null);
 
             return new CountNode((CollectionNode)nodeIn.Source.Accept(this));
         }

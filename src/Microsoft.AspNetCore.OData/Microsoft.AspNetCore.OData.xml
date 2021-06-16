@@ -6796,7 +6796,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.QueryNodeBindingNotSupported">
             <summary>
-              Looks up a localized string similar to Binding OData QueryNode of kind {0} is not supported by {1}..
+              Looks up a localized string similar to Binding OData QueryNode of kind &apos;{0}&apos; is not supported by &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.QueryNodeValidationNotSupported">
@@ -6881,7 +6881,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenParseError">
             <summary>
-              Looks up a localized string similar to Unable to parse the skiptoken value. Skiptoken value should always be server generated..
+              Looks up a localized string similar to Unable to parse the skiptoken value &apos;{0}&apos;. Skiptoken value should always be server generated..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTopLimitExceeded">
@@ -7529,82 +7529,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc/>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler">
-            <summary>
-            Default implementation of SkipTokenHandler for the service. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateNextPageLink(System.Uri,System.Int32,System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Returns the URI for NextPageLink
-            </summary>
-            <param name="baseUri">BaseUri for nextlink. It should be request URI for top level resource and navigation link for nested resource.</param>
-            <param name="pageSize">Maximum number of records in the set of partial results for a resource.</param>
-            <param name="instance">Instance based on which SkipToken value will be generated.</param>
-            <param name="context">Serializer context</param>
-            <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode})">
-            <summary>
-            Generates a string to be used as the skip token value within the next link.
-            </summary>
-            <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
-            <param name="model">The edm model.</param>
-            <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
-            <returns>Value for the skiptoken to be used in the next link.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption)">
-            <summary>
-            Apply the $skiptoken query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption)">
-            <summary>
-            Apply the $skiptoken query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyToCore(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},Microsoft.AspNetCore.OData.Query.ODataQueryContext,System.String)">
-            <summary>
-            Core logic for applying the query option to the IQueryable. 
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">Query setting used for validating the query option.</param>
-            <param name="orderByNodes">OrderBy information required to correctly apply the query option for default implementation.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.PopulatePropertyValuePairs(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
-            <summary>
-            Generates a dictionary with property name and property values specified in the skiptoken value.
-            </summary>
-            <param name="value">The skiptoken string value.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetPropertiesForSkipToken(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode})">
-            <summary>
-            Returns the list of properties that should be used for generating the skiptoken value. 
-            </summary>
-            <param name="lastMember">The last record that will be returned in the response.</param>
-            <param name="model">IEdmModel</param>
-            <param name="orderByNodes">OrderBy nodes in the original request.</param>
-            <returns>List of properties that should be used for generating the skiptoken value.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetTypeFromObject(System.Object,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Gets the EdmType from the Instance which may be a select expand wrapper.
-            </summary>
-            <param name="value">Instance for which the edmType needs to be computed.</param>
-            <param name="model">IEdmModel</param>
-            <returns>The EdmType of the underlying instance.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">
             <summary>
             This partial class defines the configuration on <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>.
@@ -8159,6 +8083,11 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/> class.
             </summary>
             <param name="requestContainer">The request container.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.#ctor(Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.OData.ModelBuilder.IAssemblyResolver,Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            For testing purposes only.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
@@ -9334,6 +9263,87 @@
             <param name="query">The query to compute the count for.</param>
             <returns>The the Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler">
+            <summary>
+            Default implementation of SkipTokenHandler for the service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateNextPageLink(System.Uri,System.Int32,System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Returns the URI for NextPageLink
+            </summary>
+            <param name="baseUri">BaseUri for nextlink. It should be request URI for top level resource and navigation link for nested resource.</param>
+            <param name="pageSize">Maximum number of records in the set of partial results for a resource.</param>
+            <param name="instance">Instance based on which SkipToken value will be generated.</param>
+            <param name="context">Serializer context</param>
+            <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},System.TimeZoneInfo)">
+            <summary>
+            Generates a string to be used as the skip token value within the next link.
+            </summary>
+            <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
+            <param name="model">The edm model.</param>
+            <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
+            <param name="timeZoneInfo">The timezone info.</param>
+            <returns>Value for the skiptoken to be used in the next link.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Apply the $skiptoken query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <param name="queryOptions">Information about the other query options.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to, could be null.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Apply the $skiptoken query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>, not null.</param>
+            <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option, not null.</param>
+            <param name="querySettings">The query settings to use while applying this query option, not null.</param>
+            <param name="queryOptions">Information about the other query options, could be null.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyToCore(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},Microsoft.AspNetCore.OData.Query.ODataQueryContext,System.String)">
+            <summary>
+            Core logic for applying the query option to the IQueryable. 
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">Query setting used for validating the query option.</param>
+            <param name="orderByNodes">OrderBy information required to correctly apply the query option for default implementation.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.PopulatePropertyValuePairs(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Generates a dictionary with property name and property values specified in the skiptoken value.
+            </summary>
+            <param name="value">The skiptoken string value.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <returns>Dictionary with property name and property value in the skiptoken value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetPropertiesForSkipToken(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode})">
+            <summary>
+            Returns the list of properties that should be used for generating the skiptoken value. 
+            </summary>
+            <param name="lastMember">The last record that will be returned in the response.</param>
+            <param name="model">IEdmModel</param>
+            <param name="orderByNodes">OrderBy nodes in the original request.</param>
+            <returns>List of properties that should be used for generating the skiptoken value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetTypeFromObject(System.Object,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Gets the EdmType from the Instance which may be a select expand wrapper.
+            </summary>
+            <param name="value">Instance for which the edmType needs to be computed.</param>
+            <param name="model">IEdmModel</param>
+            <returns>The EdmType of the underlying instance.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption">
             <summary>
             This defines a $filter OData query option for querying.
@@ -9760,20 +9770,24 @@
             Represents how NextLink for paging is generated.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
             <summary>
             Apply the $skiptoken query to the given IQueryable.
             </summary>
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="skipTokenQueryOption">The query option that contains all the relevant information for applying skiptoken.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <param name="queryOptions">Information about the other query options.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
             <summary>
             Apply the $skiptoken query to the given IQueryable.
             </summary>
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="skipTokenQueryOption">The query option that contains all the relevant information for applying skiptoken.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <param name="queryOptions">Information about the other query options.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.GenerateNextPageLink(System.Uri,System.Int32,System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -9791,27 +9805,13 @@
             This defines a $skiptoken OData query option for querying.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.skipTokenHandler">
-            <summary>
-            Generates the nextlink value and consumes the skiptoken value.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/> based on the raw $skiptoken value and
             an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
             </summary>
             <param name="rawValue">The raw value for $skiptoken query.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
-            <summary>
-            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/> based on the raw $skiptoken value
-            This constructor is intended for unit testing only.
-            </summary>
-            <param name="rawValue">The raw value for $skiptoken query.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.RawValue">
             <summary>
@@ -9820,22 +9820,17 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Context">
             <summary>
-            Gets and sets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator">
             <summary>
-            Gets or sets the SkipToken Query Validator.
+            Gets the SkipToken Query Validator.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.QuerySettings">
+        <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Handler">
             <summary>
-            Gets or sets the query setting 
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.QueryOptions">
-            <summary>
-            Gets or sets the QueryOptions
+            Gets the skip token handler.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">

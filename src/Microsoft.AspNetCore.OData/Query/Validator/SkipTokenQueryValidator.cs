@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder.Config;
 
@@ -36,6 +37,16 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
                 }
             }
+        }
+
+        internal static SkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
+        {
+            if (context == null || context.RequestContainer == null)
+            {
+                return new SkipTokenQueryValidator();
+            }
+
+            return context.RequestContainer.GetRequiredService<SkipTokenQueryValidator>();
         }
     }
 }

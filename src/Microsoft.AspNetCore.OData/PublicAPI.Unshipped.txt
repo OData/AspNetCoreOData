@@ -18,8 +18,8 @@ abstract Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvi
 abstract Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Bind(Microsoft.OData.UriParser.QueryNode node) -> System.Linq.Expressions.Expression
 abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Parameter.get -> System.Linq.Expressions.ParameterExpression
-abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption) -> System.Linq.IQueryable
-abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption) -> System.Linq.IQueryable<T>
+abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
+abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable<T>
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.GenerateNextPageLink(System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Uri
 abstract Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.Values.get -> System.Collections.Generic.Dictionary<string, object>
 abstract Microsoft.AspNetCore.OData.Results.PageResult.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
@@ -962,8 +962,6 @@ Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.set -> void
-Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator
-Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.ParameterAliasNodeTranslator(System.Collections.Generic.IDictionary<string, Microsoft.OData.UriParser.SingleValueNode> parameterAliasNodes) -> void
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> object
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> System.Linq.IQueryable
@@ -991,10 +989,9 @@ Microsoft.AspNetCore.OData.Query.SkipTokenHandler
 Microsoft.AspNetCore.OData.Query.SkipTokenHandler.SkipTokenHandler() -> void
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
-Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.QueryOptions.get -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
-Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
+Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Handler.get -> Microsoft.AspNetCore.OData.Query.SkipTokenHandler
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.RawValue.get -> string
-Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.SkipTokenQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
+Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.SkipTokenQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context) -> void
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator
 Microsoft.AspNetCore.OData.Query.TopQueryOption
@@ -1347,8 +1344,8 @@ override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind.get
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetPropertyType(string name, out System.Type type) -> bool
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetPropertyValue(string name, out object value) -> bool
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TrySetPropertyValue(string name, object value) -> bool
-override Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption) -> System.Linq.IQueryable
-override Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption) -> System.Linq.IQueryable<T>
+override Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
+override Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable<T>
 override Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateNextPageLink(System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Uri
 override Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext) -> void
 override Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext actionExecutingContext) -> void
@@ -1359,34 +1356,6 @@ override Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsof
 override Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Parameter.get -> System.Linq.Expressions.ParameterExpression
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.AllNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.AnyNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.BinaryOperatorNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionComplexNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionConstantNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionFunctionCallNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionNavigationNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionPropertyAccessNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionResourceCastNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CollectionResourceFunctionCallNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ConstantNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ConvertNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.CountNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.InNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.NamedFunctionParameterNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.NonResourceRangeVariableReferenceNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ParameterAliasNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ResourceRangeVariableReferenceNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SearchTermNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleComplexNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleNavigationNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleResourceCastNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleResourceFunctionCallNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValueFunctionCallNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValuePropertyAccessNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
-override Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.UnaryOperatorNode nodeIn) -> Microsoft.OData.UriParser.QueryNode
 override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.PageResult<T>.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 override Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task

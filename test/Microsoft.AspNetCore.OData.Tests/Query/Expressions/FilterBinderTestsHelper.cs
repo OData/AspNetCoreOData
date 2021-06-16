@@ -1,0 +1,49 @@
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+
+using System;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.UriParser;
+
+namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
+{
+    public static class FilterBinderTestsHelper
+    {
+        public static Expression TestBind(FilterClause filterClause, Type filterType, IEdmModel model,
+            IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
+        {
+            if (filterClause == null)
+            {
+                throw Error.ArgumentNull(nameof(filterClause));
+            }
+
+            if (filterType == null)
+            {
+                throw Error.ArgumentNull(nameof(filterType));
+            }
+
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (assembliesResolver == null)
+            {
+                throw Error.ArgumentNull(nameof(assembliesResolver));
+            }
+
+            FilterBinder binder = new FilterBinder(querySettings, assembliesResolver, model, filterType);
+
+            return FilterBinder.BindFilterClause(binder, filterClause, filterType);
+        }
+    }
+
+    public class MyNoneQueryNode : QueryNode
+    {
+        public override QueryNodeKind Kind => QueryNodeKind.None;
+    }
+}

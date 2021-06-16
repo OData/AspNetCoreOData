@@ -112,7 +112,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(model != null);
             Contract.Assert(querySettings != null);
-            Contract.Assert(querySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
             QuerySettings = querySettings;
             Model = model;

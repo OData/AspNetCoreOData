@@ -971,7 +971,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         break;
                     case "$skiptoken":
                         RawValues.SkipToken = kvp.Value;
-                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context, _queryOptionParser);
+                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
                         break;
                     case "$deltatoken":
                         RawValues.DeltaToken = kvp.Value;

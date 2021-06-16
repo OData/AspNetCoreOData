@@ -4,7 +4,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -37,16 +36,6 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return context.RequestContainer.GetRequiredService<SkipTokenHandler>();
-        }
-
-        public static SkipTokenQueryValidator GetSkipTokenQueryValidator(this ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SkipTokenQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenQueryValidator>();
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
-    /// Default implementation of SkipTokenHandler for the service. 
+    /// Default implementation of SkipTokenHandler for the service.
     /// </summary>
     public class DefaultSkipTokenHandler : SkipTokenHandler
     {
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     skipTokenGenerator = (obj) =>
                     {
-                        return GenerateSkipTokenValue(obj, model, orderByNodes);
+                        return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
                     };
 
                     return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 skipTokenGenerator = (obj) =>
                 {
-                    return GenerateSkipTokenValue(obj, model, orderByNodes);
+                    return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
                 };
             }
 
@@ -104,12 +104,13 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
         /// <param name="model">The edm model.</param>
         /// <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
+        /// <param name="timeZoneInfo">The timezone info.</param>
         /// <returns>Value for the skiptoken to be used in the next link.</returns>
-        private static string GenerateSkipTokenValue(Object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes)
+        internal static string GenerateSkipTokenValue(Object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes, TimeZoneInfo timeZoneInfo = null)
         {
             if (lastMember == null)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             IEnumerable<IEdmProperty> propertiesForSkipToken = GetPropertiesForSkipToken(lastMember, model, orderByNodes);
@@ -150,7 +151,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 else if (edmProperty.Type.IsDateTimeOffset() && value is DateTime)
                 {
                     var dateTime = (DateTime)value;
-                    var dateTimeOffsetValue = TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime);
+                    var dateTimeOffsetValue = TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime, timeZoneInfo);
                     uriLiteral = ODataUriUtils.ConvertToUriLiteral(dateTimeOffsetValue, ODataVersion.V401, model);
                 }
                 else
@@ -176,27 +177,53 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public override IQueryable<T> ApplyTo<T>(IQueryable<T> query, SkipTokenQueryOption skipTokenQueryOption)
+        /// <param name="querySettings">The query settings to use while applying this query option.</param>
+        /// <param name="queryOptions">Information about the other query options.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to, could be null.</returns>
+        public override IQueryable<T> ApplyTo<T>(IQueryable<T> query, SkipTokenQueryOption skipTokenQueryOption,
+            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
         {
-            return ApplyTo(query, skipTokenQueryOption);
+            return ApplyToImplementation(query, skipTokenQueryOption, querySettings, queryOptions) as IQueryable<T>;
         }
 
         /// <summary>
         /// Apply the $skiptoken query to the given IQueryable.
         /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option.</param>
+        /// <param name="query">The original <see cref="IQueryable"/>, not null.</param>
+        /// <param name="skipTokenQueryOption">The skiptoken query option which needs to be applied to this query option, not null.</param>
+        /// <param name="querySettings">The query settings to use while applying this query option, not null.</param>
+        /// <param name="queryOptions">Information about the other query options, could be null.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public override IQueryable ApplyTo(IQueryable query, SkipTokenQueryOption skipTokenQueryOption)
+        public override IQueryable ApplyTo(IQueryable query, SkipTokenQueryOption skipTokenQueryOption,
+            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
         {
-            if (skipTokenQueryOption == null)
+            return ApplyToImplementation(query, skipTokenQueryOption, querySettings, queryOptions);
+        }
+
+        private static IQueryable ApplyToImplementation(IQueryable query, SkipTokenQueryOption skipTokenQueryOption,
+            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+        {
+            if (query == null)
             {
-                throw Error.ArgumentNullOrEmpty("skipTokenQueryOption");
+                throw Error.ArgumentNull(nameof(query));
             }
 
-            ODataQuerySettings querySettings = skipTokenQueryOption.QuerySettings;
-            ODataQueryOptions queryOptions = skipTokenQueryOption.QueryOptions;
+            if (skipTokenQueryOption == null)
+            {
+                throw Error.ArgumentNull(nameof(skipTokenQueryOption));
+            }
+
+            if (querySettings == null)
+            {
+                throw Error.ArgumentNull(nameof(querySettings));
+            }
+
+            ODataQueryContext context = skipTokenQueryOption.Context;
+            if (context.ElementClrType == null)
+            {
+                throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
+            }
+
             IList<OrderByNode> orderByNodes = null;
 
             if (queryOptions != null)
@@ -222,15 +249,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns></returns>
         private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryContext context, string skipTokenRawValue)
         {
-            if (query == null)
-            {
-                throw Error.ArgumentNull(nameof(query));
-            }
-
-            if (context.ElementClrType == null)
-            {
-                throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
-            }
+            Contract.Assert(query != null);
+            Contract.Assert(context.ElementClrType != null);
 
             IDictionary<string, OrderByDirection> directionMap;
             if (orderByNodes != null)
@@ -311,7 +331,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="value">The skiptoken string value.</param>
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        private static IDictionary<string, object> PopulatePropertyValuePairs(string value, ODataQueryContext context)
+        internal static IDictionary<string, object> PopulatePropertyValuePairs(string value, ODataQueryContext context)
         {
             Contract.Assert(context != null);
 
@@ -340,11 +360,70 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
                 else
                 {
-                    throw Error.InvalidOperation(SRResources.SkipTokenParseError);
+                    throw new ODataException(Error.Format(SRResources.SkipTokenParseError, value));
                 }
             }
 
             return propertyValuePairs;
+        }
+
+        /// <summary>
+        /// Returns the list of properties that should be used for generating the skiptoken value. 
+        /// </summary>
+        /// <param name="lastMember">The last record that will be returned in the response.</param>
+        /// <param name="model">IEdmModel</param>
+        /// <param name="orderByNodes">OrderBy nodes in the original request.</param>
+        /// <returns>List of properties that should be used for generating the skiptoken value.</returns>
+        internal static IEnumerable<IEdmProperty> GetPropertiesForSkipToken(object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes)
+        {
+            IEdmType edmType = GetTypeFromObject(lastMember, model);
+            IEdmEntityType entity = edmType as IEdmEntityType;
+            if (entity == null)
+            {
+                return null;
+            }
+
+            IEnumerable<IEdmProperty> key = entity.Key();
+            if (orderByNodes != null)
+            {
+                if (orderByNodes.OfType<OrderByOpenPropertyNode>().Any())
+                {
+                    //SkipToken will not support ordering on dynamic properties
+                    return null;
+                }
+
+                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).ToList();
+                foreach (IEdmProperty subKey in key)
+                {
+                    if (!orderByProps.Contains(subKey))
+                    {
+                        orderByProps.Add(subKey);
+                    }
+                }
+
+                return orderByProps.AsEnumerable();
+            }
+
+            return key;
+        }
+
+        /// <summary>
+        /// Gets the EdmType from the Instance which may be a select expand wrapper.
+        /// </summary>
+        /// <param name="value">Instance for which the edmType needs to be computed.</param>
+        /// <param name="model">IEdmModel</param>
+        /// <returns>The EdmType of the underlying instance.</returns>
+        internal static IEdmType GetTypeFromObject(object value, IEdmModel model)
+        {
+            SelectExpandWrapper selectExpand = value as SelectExpandWrapper;
+            if (selectExpand != null)
+            {
+                IEdmTypeReference typeReference = selectExpand.GetEdmType();
+                return typeReference.Definition;
+            }
+
+            Type clrType = value.GetType();
+            return model.GetTypeMappingCache().GetEdmType(clrType, model)?.Definition;
         }
 
         private static IList<string> ParseValue(string value, char delim)
@@ -386,65 +465,6 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return results;
-        }
-
-        /// <summary>
-        /// Returns the list of properties that should be used for generating the skiptoken value. 
-        /// </summary>
-        /// <param name="lastMember">The last record that will be returned in the response.</param>
-        /// <param name="model">IEdmModel</param>
-        /// <param name="orderByNodes">OrderBy nodes in the original request.</param>
-        /// <returns>List of properties that should be used for generating the skiptoken value.</returns>
-        private static IEnumerable<IEdmProperty> GetPropertiesForSkipToken(object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes)
-        {
-            IEdmType edmType = GetTypeFromObject(lastMember, model);
-            IEdmEntityType entity = edmType as IEdmEntityType;
-            if (entity == null)
-            {
-                return null;
-            }
-
-            IEnumerable<IEdmProperty> key = entity.Key();
-            if (orderByNodes != null)
-            {
-                if (orderByNodes.OfType<OrderByOpenPropertyNode>().Any())
-                {
-                    //SkipToken will not support ordering on dynamic properties
-                    return null;
-                }
-
-                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).ToList();
-                foreach (IEdmProperty subKey in key)
-                {
-                    if (!orderByProps.Contains(subKey))
-                    {
-                        orderByProps.Add(subKey);
-                    }
-                }
-
-                return orderByProps.AsEnumerable();
-            }
-
-            return key;
-        }
-
-        /// <summary>
-        /// Gets the EdmType from the Instance which may be a select expand wrapper.
-        /// </summary>
-        /// <param name="value">Instance for which the edmType needs to be computed.</param>
-        /// <param name="model">IEdmModel</param>
-        /// <returns>The EdmType of the underlying instance.</returns>
-        private static IEdmType GetTypeFromObject(object value, IEdmModel model)
-        {
-            SelectExpandWrapper selectExpand = value as SelectExpandWrapper;
-            if (selectExpand != null)
-            {
-                IEdmTypeReference typeReference = selectExpand.GetEdmType();
-                return typeReference.Definition;
-            }
-
-            Type clrType = value.GetType();
-            return model.GetTypeMappingCache().GetEdmType(clrType, model)?.Definition;
         }
     }
 }

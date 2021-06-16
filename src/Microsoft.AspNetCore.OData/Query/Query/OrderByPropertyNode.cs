@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (orderByClause == null)
             {
-                throw Error.ArgumentNull("orderByClause");
+                throw Error.ArgumentNull(nameof(orderByClause));
             }
 
             OrderByClause = orderByClause;
@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (property == null)
             {
-                throw Error.ArgumentNull("property");
+                throw Error.ArgumentNull(nameof(property));
             }
 
             Property = property;

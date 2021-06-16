@@ -1492,7 +1492,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Binding OData QueryNode of kind {0} is not supported by {1}..
+        ///   Looks up a localized string similar to Binding OData QueryNode of kind &apos;{0}&apos; is not supported by &apos;{1}&apos;..
         /// </summary>
         internal static string QueryNodeBindingNotSupported {
             get {
@@ -1645,7 +1645,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to parse the skiptoken value. Skiptoken value should always be server generated..
+        ///   Looks up a localized string similar to Unable to parse the skiptoken value &apos;{0}&apos;. Skiptoken value should always be server generated..
         /// </summary>
         internal static string SkipTokenParseError {
             get {

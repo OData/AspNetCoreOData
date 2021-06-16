@@ -487,7 +487,7 @@
     <value>Property or path {0} isn't available in the current context. It was removed in earlier transformation.</value>
   </data>
   <data name="QueryNodeBindingNotSupported" xml:space="preserve">
-    <value>Binding OData QueryNode of kind {0} is not supported by {1}.</value>
+    <value>Binding OData QueryNode of kind '{0}' is not supported by '{1}'.</value>
   </data>
   <data name="BinaryOperatorNotSupported" xml:space="preserve">
     <value>A binary operator with incompatible types was detected. Found operand types '{0}' and '{1}' for operator kind '{2}'.</value>
@@ -550,7 +550,7 @@
     <value>$apply query options not supported for LINQ to SQL providers</value>
   </data>
   <data name="SkipTokenParseError" xml:space="preserve">
-    <value>Unable to parse the skiptoken value. Skiptoken value should always be server generated.</value>
+    <value>Unable to parse the skiptoken value '{0}'. Skiptoken value should always be server generated.</value>
   </data>
   <data name="ModelBinderUtil_ValueCannotBeEnum" xml:space="preserve">
     <value>The binding value '{0}' cannot be bound to the enum type '{1}'.</value>
