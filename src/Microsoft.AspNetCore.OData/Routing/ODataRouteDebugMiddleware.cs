@@ -177,9 +177,13 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 builder.Append($"N/A");
             }
-            else
+            else if (routeInfo.HttpMethods.Contains("GET"))
             {
                 builder.Append($"<td><a href=\"{routeInfo.Pattern}\">{routeInfo.Pattern}</a></td>");
+            }
+            else
+            {
+                builder.Append($"<td>{routeInfo.Pattern}</td>");
             }
             builder.AppendLine("</tr>");
         }
