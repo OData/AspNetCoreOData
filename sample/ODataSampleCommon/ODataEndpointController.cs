@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,8 +39,8 @@ namespace ODataSampleCommon
             CreateRouteTables(_dataSource.Endpoints, out var stdRouteTable, out var odataRouteTable);
 
             string output = ODataRouteMappingHtmlTemplate;
-            output = output.Replace("ODATACONTENT", odataRouteTable, StringComparison.OrdinalIgnoreCase);
-            output = output.Replace("NONENDPOINTCONTENT", stdRouteTable, StringComparison.OrdinalIgnoreCase);
+            output = output.Replace("ODATA_ROUTE_CONTENT", odataRouteTable, StringComparison.OrdinalIgnoreCase);
+            output = output.Replace("STD_ROUTE_CONTENT", stdRouteTable, StringComparison.OrdinalIgnoreCase);
 
             return base.Content(output, "text/html");
         }
@@ -129,9 +130,9 @@ namespace ODataSampleCommon
         <tr>
             <th> Controller & Action </th>
             <th> HttpMethods </th>
-            <th> Templates </th>
+            <th> Template </th>
         </tr>
-        ODATACONTENT
+        ODATA_ROUTE_CONTENT
     </table>
     <h1 id=""standard"">None OData Endpoint Mappings</h1>
     <p>
@@ -141,9 +142,9 @@ namespace ODataSampleCommon
         <tr>
             <th> Controller </th>
             <th> HttpMethods </th>
-            <th> Templates </th>
+            <th> Template </th>
         </tr>
-        NONENDPOINTCONTENT
+        STD_ROUTE_CONTENT
     </table>
 </body>
 </html>";

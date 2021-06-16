@@ -51,8 +51,10 @@ namespace Microsoft.AspNetCore.OData
         /// <returns></returns>
         public static IApplicationBuilder UseODataRouteDebug(this IApplicationBuilder app)
         {
-            return app.UseODataRouteDebug("$odata");
+            return app.UseODataRouteDebug(DefaultODataRouteDebugMiddlewareRoutePattern);
         }
+
+        private const string DefaultODataRouteDebugMiddlewareRoutePattern = "$odata";
 
         /// <summary>
         /// Use OData route debug middleware using the given route pattern.
