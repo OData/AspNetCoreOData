@@ -1322,7 +1322,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                     "" + String.Join(" add ", Enumerable.Range(1, maxCount/2)) + " eq 5050",
                     "" + String.Join("/", Enumerable.Range(1, maxCount/2).Select(_ => "Category/Product")) + "/ProductID eq 1",
                     "" + String.Join("/", Enumerable.Range(1, maxCount/2).Select(_ => "Category/Product")) + "/UnsignedReorderLevel eq 1",
-                    "" + Enumerable.Range(1,maxCount).Aggregate("'abc'", (prev,i) => String.Format("trim({0})", prev)) + " eq '123'",
+                    "" + Enumerable.Range(1, maxCount-1).Aggregate("'abc'", (prev,i) => String.Format("trim({0})", prev)) + " eq '123'",
                     " Category/Products/any(" + Enumerable.Range(1,maxCount/4).Aggregate("", (prev,i) => String.Format("p{1}: p{1}/Category/Products/any({0})", prev, i)) +")"
                 };
         }
