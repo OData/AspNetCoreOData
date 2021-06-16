@@ -270,37 +270,6 @@ namespace Microsoft.AspNetCore.OData.Edm
                 .Where(source => string.Equals(identifier, source.Name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static IEnumerable<IEdmOperation> ResolveOperations(this IEdmModel model, string identifier,
-            IEdmType bindingType, bool enableCaseInsensitive = false)
-        {
-            IEnumerable<IEdmOperation> results;
-            if (identifier.Contains(".", StringComparison.Ordinal))
-            {
-                results = FindAcrossModels<IEdmOperation>(model, identifier, true, enableCaseInsensitive);
-            }
-            else
-            {
-                results = FindAcrossModels<IEdmOperation>(model, identifier, false, enableCaseInsensitive);
-            }
-
-            var operations = results?.ToList();
-            if (operations != null && operations.Any())
-            {
-                IList<IEdmOperation> matchedOperation = new List<IEdmOperation>();
-                for (int i = 0; i < operations.Count; i++)
-                {
-                    if (operations[i].HasEquivalentBindingType(bindingType))
-                    {
-                        matchedOperation.Add(operations[i]);
-                    }
-                }
-
-                return matchedOperation;
-            }
-
-            return Enumerable.Empty<IEdmOperation>();
-        }
-
         internal static IEdmEntitySetBase GetTargetEntitySet(this IEdmOperation operation, IEdmNavigationSource source, IEdmModel model)
         {
             if (source == null)
@@ -360,61 +329,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return null;
         }
 
-        private static IEnumerable<T> FindAcrossModels<T>(IEdmModel model,
-            string identifier, bool fullName, bool caseInsensitive) where T : IEdmSchemaElement
-        {
-            Func<IEdmModel, IEnumerable<T>> finder = (refModel) =>
-                refModel.SchemaElements.OfType<T>()
-                .Where(e => string.Equals(identifier, fullName ? e.FullName() : e.Name,
-                caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
-
-            IEnumerable<T> results = finder(model);
-
-            foreach (IEdmModel reference in model.ReferencedModels)
-            {
-                results.Concat(finder(reference));
-            }
-
-            return results;
-        }
-
-        internal static bool IsStructuredCollectionType(this IEdmTypeReference typeReference)
-        {
-            return typeReference.Definition.IsStructuredCollectionType();
-        }
-
-        internal static bool IsStructuredCollectionType(this IEdmType type)
-        {
-            IEdmCollectionType collectionType = type as IEdmCollectionType;
-
-            if (collectionType == null
-                || (collectionType.ElementType != null
-                    && (collectionType.ElementType.TypeKind() != EdmTypeKind.Entity && collectionType.ElementType.TypeKind() != EdmTypeKind.Complex)))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Try to get the entity type <see cref="IEdmEntityType"/> from the input <see cref="IEdmType"/>
-        /// </summary>
-        /// <param name="edmType">The input Edm Type.</param>
-        /// <param name="entityType">The output Entity Type.</param>
-        /// <returns>True/false</returns>
-        public static bool TryGetEntityType(this IEdmType edmType, out IEdmEntityType entityType)
-        {
-            if (edmType == null || edmType.TypeKind != EdmTypeKind.Collection)
-            {
-                entityType = null;
-                return false;
-            }
-
-            entityType = ((IEdmCollectionType)edmType).ElementType.Definition as IEdmEntityType;
-            return entityType != null;
-        }
-
         public static bool IsEntityOrEntityCollectionType(this IEdmType edmType, out IEdmEntityType entityType)
         {
             if (edmType.TypeKind == EdmTypeKind.Entity)
@@ -448,7 +362,12 @@ namespace Microsoft.AspNetCore.OData.Edm
             return false;
         }
 
-        internal static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
+        /// <summary>
+        /// Tests type reference is enum or collection enum
+        /// </summary>
+        /// <param name="edmType"></param>
+        /// <returns></returns>
+        public static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
         {
             if (edmType.IsEnum())
             {
@@ -486,33 +405,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             //}
 
             return null;
-        }
-
-        public static IEnumerable<IEdmStructuredType> BaseTypes(this IEdmStructuredType structuralType)
-        {
-            IEdmStructuredType baseType = structuralType.BaseType;
-            while (baseType != null)
-            {
-                yield return baseType;
-
-                baseType = baseType.BaseType;
-            }
-        }
-
-        public static IEnumerable<IEdmStructuredType> ThisAndBaseTypes(this IEdmStructuredType structuralType)
-        {
-            IEdmStructuredType baseType = structuralType;
-            while (baseType != null)
-            {
-                yield return baseType;
-
-                baseType = baseType.BaseType;
-            }
-        }
-
-        public static IEnumerable<IEdmStructuredType> DerivedTypes(this IEdmStructuredType structuralType, IEdmModel model)
-        {
-            return model.FindAllDerivedTypes(structuralType);
         }
 
         /// <summary>

@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             NavigationSource = segment.EntitySet;
 
-            ParameterMappings = OperationHelper.BuildParameterMappings(segment.Parameters, operationImport.Name);
+            ParameterMappings = segment.Parameters.BuildParameterMappings(operationImport.Name);
         }
 
         /// <summary>

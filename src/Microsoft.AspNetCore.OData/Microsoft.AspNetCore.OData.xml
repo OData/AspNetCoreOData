@@ -1913,11 +1913,6 @@
             of the aggregation method to its MethodInfo.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation"/> class.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.AddMethod(System.String,System.Collections.Generic.IDictionary{System.Type,System.Reflection.MethodInfo})">
             <summary>
             Adds all implementations of a method that share the same methodToken.
@@ -2186,13 +2181,12 @@
             <param name="enableCaseInsensitive">Enable case insensitive</param>
             <returns>Null or the found navigation source.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.TryGetEntityType(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmEntityType@)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.IsEnumOrCollectionEnum(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
-            Try to get the entity type <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> from the input <see cref="T:Microsoft.OData.Edm.IEdmType"/>
+            Tests type reference is enum or collection enum
             </summary>
-            <param name="edmType">The input Edm Type.</param>
-            <param name="entityType">The output Entity Type.</param>
-            <returns>True/false</returns>
+            <param name="edmType"></param>
+            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String)">
             <summary>
@@ -2435,6 +2429,27 @@
             Constructs a NavigationLink for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" />, <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.OperationHelper">
+            <summary>
+            Helpers for Edm operation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.VerifyAndBuildParameterMappings(Microsoft.OData.Edm.IEdmFunction,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Verify and build the function parameters
+            </summary>
+            <param name="function">The Edm function.</param>
+            <param name="parameters">The input parameter template mapping.</param>
+            <returns>The build function parameter mapping.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.BuildParameterMappings(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.OperationSegmentParameter},System.String)">
+            <summary>
+            Build the function parameter mapping.
+            </summary>
+            <param name="parameters">The given function parameter</param>
+            <param name="segment">The segment string.</param>
+            <returns>The build function parameter mapping.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.GetFunctionParamterMappings(Microsoft.OData.Edm.IEdmFunction)">
             <summary>
             Gets the function parameter sets.
@@ -2444,17 +2459,17 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.GetFunctionParamterMappings(Microsoft.OData.Edm.IEdmFunctionImport)">
             <summary>
-            Gets the function parameter sets.
+            Gets the function import parameter sets.
             </summary>
             <param name="functionImport">The input function import.</param>
             <returns>The set of parameter name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.GetFunctionParamters(Microsoft.OData.Edm.IEdmFunction)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationHelper.SplitOperationImports(System.Collections.Generic.IEnumerable{Microsoft.OData.Edm.IEdmOperationImport})">
             <summary>
-            Gets the function parameter sets.
+            Split the operation into function and action.
             </summary>
-            <param name="function">The input function.</param>
-            <returns>The set of parameter name.</returns>
+            <param name="operationImports">The operation imports</param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder">
             <summary>

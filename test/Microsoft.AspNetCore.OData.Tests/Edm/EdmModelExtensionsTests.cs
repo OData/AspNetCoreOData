@@ -169,6 +169,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                 "Ambiguous navigation source (entity set or singleton) name 'Entities' found. Please use correct navigation source name case.");
         }
 
+        [Fact]
+        public void IsEnumOrCollectionEnum_Works_EdmType()
+        {
+            // Arrange & Act & Assert
+            IEdmTypeReference typeReference = EdmCoreModel.Instance.GetString(false);
+            Assert.False(typeReference.IsEnumOrCollectionEnum());
+
+            // Arrange & Act & Assert
+            EdmEnumType enumType = new EdmEnumType("NS", "Enum");
+            typeReference = new EdmEnumTypeReference(enumType, true);
+            Assert.True(typeReference.IsEnumOrCollectionEnum());
+
+            // Arrange & Act & Assert
+            typeReference = new EdmCollectionTypeReference(new EdmCollectionType(new EdmEnumTypeReference(enumType, true)));
+            Assert.True(typeReference.IsEnumOrCollectionEnum());
+        }
+
         private static IEdmModel GetEdmModel()
         {
             EdmModel model = new EdmModel();

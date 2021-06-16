@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return true;
             }
 
-            (var actionImports, var functionImports) = edmOperationImports.Split();
+            (var actionImports, var functionImports) = edmOperationImports.SplitOperationImports();
 
             // That's not allowed to have an action import and function import with the same name.
             if (actionImports.Count > 0 && functionImports.Count > 0)
