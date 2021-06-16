@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Routing.Template;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing
@@ -359,6 +362,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             // Assert
             Assert.Equal("Orders(42)/$ref", handler.PathLiteral);
             Assert.Same(orders, handler.NavigationSource);
+        }
+
+        [Fact]
+        public void ConvertKeysToString_ConvertKeysValues()
+        {
+            // Arrange
+            EdmEntityType entityType = new EdmEntityType("NS", "Entity");
+            IEdmStructuralProperty key1 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(false));
+            IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetString(false));
+
+            entityType.AddKeys(key1, key2);
+            IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
+            {
+                KeyValuePair.Create("Id", (object)4),
+                KeyValuePair.Create("Name", (object)"abc")
+            };
+
+            // Act
+            string actual = ODataPathSegmentHandler.ConvertKeysToString(keys, entityType);
+
+            // Assert
+            Assert.Equal("Id=4,Name='abc'", actual);
+        }
+
+        [Fact]
+        public void TranslateNode_TranslatesValue()
+        {
+            // Arrange & Act & Assert
+            UriTemplateExpression expression = KeySegmentTemplateTests.BuildExpression("{key}");
+            ConstantNode node = new ConstantNode(expression);
+            Assert.Equal("{key}", ODataPathSegmentHandler.TranslateNode(node));
+
+            // Arrange & Act & Assert
+            EdmEnumType enumType = new EdmEnumType("NS", "Color");
+            enumType.AddMember(new EdmEnumMember(enumType, "Red", new EdmEnumMemberValue(1)));
+            ODataEnumValue enumValue = new ODataEnumValue("Red", "NS.Color");
+            node = new ConstantNode(enumValue);
+            Assert.Equal("NS.Color'Red'", ODataPathSegmentHandler.TranslateNode(node));
         }
     }
 }

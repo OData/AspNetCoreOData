@@ -288,7 +288,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         // Convert the objects of keys in ODL path to string literals.
-        private static string ConvertKeysToString(IEnumerable<KeyValuePair<string, object>> keys, IEdmType edmType)
+        internal static string ConvertKeysToString(IEnumerable<KeyValuePair<string, object>> keys, IEdmType edmType)
         {
             Contract.Assert(keys != null);
 
@@ -312,7 +312,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     return string.Join(
                         ",",
                         keyValuePairs.Select(keyValuePair =>
-                            TranslateKeySegmentValue(keyValuePair.Value)).ToArray());
+                            TranslateNode(keyValuePair.Value)).ToArray());
                 }
             }
 
@@ -321,40 +321,11 @@ namespace Microsoft.AspNetCore.OData.Routing
                 keyValuePairs.Select(keyValuePair =>
                     (keyValuePair.Key +
                      "=" +
-                     TranslateKeySegmentValue(keyValuePair.Value))).ToArray());
+                     TranslateNode(keyValuePair.Value))).ToArray());
         }
 
-        // Translate the object of key in ODL path to string literal.
-        private static string TranslateKeySegmentValue(object value)
+        internal static string TranslateNode(object node)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            UriTemplateExpression uriTemplateExpression = value as UriTemplateExpression;
-            if (uriTemplateExpression != null)
-            {
-                return uriTemplateExpression.LiteralText;
-            }
-
-            ConstantNode constantNode = value as ConstantNode;
-            if (constantNode != null)
-            {
-                ODataEnumValue enumValue = constantNode.Value as ODataEnumValue;
-                if (enumValue != null)
-                {
-                    return ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V4);
-                }
-            }
-
-            return ODataUriUtils.ConvertToUriLiteral(value, ODataVersion.V4);
-        }
-
-        private static string TranslateNode(object node)
-        {
-            Contract.Assert(node != null);
-
             ConstantNode constantNode = node as ConstantNode;
             if (constantNode != null)
             {
@@ -386,8 +357,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return parameterAliasNode.Alias;
             }
 
-            //return node.ToString();
-            throw new NotSupportedException($"Cannot recongnize {node.GetType().FullName}");
+            return ODataUriUtils.ConvertToUriLiteral(node, ODataVersion.V4);
         }
     }
 }

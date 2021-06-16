@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
 using System.Text.Json;
@@ -18,6 +19,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// <summary>
     /// An OData route debug middleware
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ODataRouteDebugMiddleware
     {
         private readonly RequestDelegate _next;

@@ -636,7 +636,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Assert.Equal("yourId", actual.Value);
         }
 
-        private static UriTemplateExpression BuildExpression(string value, object expectType = null)
+        internal static UriTemplateExpression BuildExpression(string value, object expectType = null)
         {
             // The properties of UriTemplateExpression are internal set.
             // We use the reflect to set the value.

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// generic derived types that are used in the expressions that SelectExpandBinder generates.
     /// Also, Expression.Compile() could fail with stack overflow if expression is to deep and causes too many levels of recursion. To avoid that we are b-tree property container.
     /// </remarks>
+    [ExcludeFromCodeCoverage]
     internal abstract partial class PropertyContainer
     {
         /// <summary>
