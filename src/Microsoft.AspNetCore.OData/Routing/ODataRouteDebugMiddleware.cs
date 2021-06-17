@@ -175,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (routeInfo.Pattern == null)
             {
-                builder.Append($"N/A");
+                builder.Append($"<td>N/A</td>");
             }
             else if (routeInfo.HttpMethods.Contains("GET"))
             {
