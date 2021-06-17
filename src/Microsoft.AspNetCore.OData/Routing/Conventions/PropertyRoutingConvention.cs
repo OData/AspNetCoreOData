@@ -58,6 +58,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             IEdmNavigationSource navigationSource = context.NavigationSource;
+            if (navigationSource == null)
+            {
+                return false;
+            }
 
             ActionModel action = context.Action;
             string actionName = action.ActionName;
