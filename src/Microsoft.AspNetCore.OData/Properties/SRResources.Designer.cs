@@ -1042,6 +1042,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found multiple action imports with same &apos;{0}&apos; name within an entity container...
+        /// </summary>
+        internal static string MultipleActionImportFound {
+            get {
+                return ResourceManager.GetString("MultipleActionImportFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
         /// </summary>
         internal static string MultipleMatchingClrTypesForEdmType {
@@ -1281,6 +1290,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string OperationIsNotBound {
             get {
                 return ResourceManager.GetString("OperationIsNotBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Action import and function import &apos;{0}&apos; MUST be unique within an entity container..
+        /// </summary>
+        internal static string OperationMustBeUniqueInEntitySetContainer {
+            get {
+                return ResourceManager.GetString("OperationMustBeUniqueInEntitySetContainer", resourceCulture);
             }
         }
         

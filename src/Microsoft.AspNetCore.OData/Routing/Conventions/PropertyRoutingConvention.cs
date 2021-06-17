@@ -40,8 +40,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // structural property supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
+            return context.NavigationSource != null;
         }
 
         /// <inheritdoc />
@@ -52,14 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (context.EntitySet == null && context.Singleton == null)
-            {
-                return false;
-            }
-
-            IEdmNavigationSource navigationSource = context.EntitySet == null ?
-                (IEdmNavigationSource)context.Singleton :
-                (IEdmNavigationSource)context.EntitySet;
+            IEdmNavigationSource navigationSource = context.NavigationSource;
 
             ActionModel action = context.Action;
             string actionName = action.ActionName;

@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         public void AppliesToControllerAndActionOnMetadataRoutingConvention_Throws_Context()
         {
             // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => _metadataConvention.AppliesToAction(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => _metadataConvention.AppliesToController(null), "context");
             ExceptionAssert.ThrowsArgumentNull(() => _metadataConvention.AppliesToAction(null), "context");
         }
 

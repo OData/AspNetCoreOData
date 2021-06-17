@@ -6559,6 +6559,11 @@
               Looks up a localized string similar to The prefix &apos;{0}&apos; was already used for other Edm model..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleActionImportFound">
+            <summary>
+              Looks up a localized string similar to Found multiple action imports with same &apos;{0}&apos; name within an entity container...
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MultipleMatchingClrTypesForEdmType">
             <summary>
               Looks up a localized string similar to More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}..
@@ -6692,6 +6697,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OperationIsNotBound">
             <summary>
               Looks up a localized string similar to The input operation &apos;{0}&apos; is not a bound &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.OperationMustBeUniqueInEntitySetContainer">
+            <summary>
+              Looks up a localized string similar to Action import and function import &apos;{0}&apos; MUST be unique within an entity container..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByClauseNotSupported">

@@ -26,6 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             PropertyRoutingConvention convention = new PropertyRoutingConvention();
 
             // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
             ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
         }
 

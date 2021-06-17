@@ -21,12 +21,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         private static RefRoutingConvention _refConvention = ConventionHelpers.CreateConvention<RefRoutingConvention>();
 
         [Fact]
-        public void AppliesToActionOnRefRoutingConvention_Throws_Context()
+        public void AppliesToControllerAndActionOnRefRoutingConvention_Throws_Context()
         {
             // Arrange
             RefRoutingConvention convention = new RefRoutingConvention();
 
             // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
             ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
         }
 

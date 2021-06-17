@@ -714,4 +714,10 @@
   <data name="JsonConverterDoesnotSupportRead" xml:space="preserve">
     <value>'{0}' is internal and should never be deserialized into.</value>
   </data>
+  <data name="OperationMustBeUniqueInEntitySetContainer" xml:space="preserve">
+    <value>Action import and function import '{0}' MUST be unique within an entity container.</value>
+  </data>
+  <data name="MultipleActionImportFound" xml:space="preserve">
+    <value>Found multiple action imports with same '{0}' name within an entity container..</value>
+  </data>
 </root>

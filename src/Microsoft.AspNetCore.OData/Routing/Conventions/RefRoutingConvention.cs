@@ -24,8 +24,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // $ref supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
+            return context.NavigationSource != null;
         }
 
         /// <inheritdoc />
@@ -50,18 +55,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmNavigationSource navigationSource;
-            IEdmEntityType entityType;
-            if (context.EntitySet != null)
-            {
-                entityType = context.EntitySet.EntityType();
-                navigationSource = context.EntitySet;
-            }
-            else
-            {
-                entityType = context.Singleton.EntityType();
-                navigationSource = context.Singleton;
-            }
+            IEdmNavigationSource navigationSource = context.NavigationSource;
+            IEdmEntityType entityType = context.EntityType;
 
             // For entity set, we should have the key parameter
             // For Singleton, we should not have the key parameter
