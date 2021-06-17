@@ -31,22 +31,13 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <param name="next">The next middleware.</param>
         public ODataRouteDebugMiddleware(string routePattern, RequestDelegate next)
         {
-            _next = next ?? throw Error.ArgumentNull(nameof(next)); ;
-
             if (routePattern == null)
             {
                 throw Error.ArgumentNull(nameof(routePattern));
             }
-
             // ensure _routePattern starts with /
-            if (routePattern.StartsWith('/'))
-            {
-                _routePattern = routePattern;
-            }
-            else
-            {
-                _routePattern = $"/{routePattern}";
-            }
+            _routePattern = routePattern.StartsWith('/') ? routePattern : $"/{routePattern}";
+            _next = next ?? throw Error.ArgumentNull(nameof(next)); ;
         }
 
         /// <summary>
