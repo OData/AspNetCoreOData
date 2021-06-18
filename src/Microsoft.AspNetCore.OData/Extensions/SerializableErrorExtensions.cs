@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             if (serializableError == null)
             {
-                throw Error.ArgumentNull("serializableError");
+                throw Error.ArgumentNull(nameof(serializableError));
             }
 
             //Clone for removal of handled entries
@@ -115,7 +115,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 }
 
                 IEnumerable<string> errorMessages = modelStateError.Value as IEnumerable<string>;
-
                 if (errorMessages != null)
                 {
                     foreach (string errorMessage in errorMessages)

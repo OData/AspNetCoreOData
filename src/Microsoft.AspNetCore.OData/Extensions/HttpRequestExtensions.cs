@@ -361,7 +361,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <returns>The OData version.</returns>
         public static ODataVersion GetODataVersion(this HttpRequest request)
         {
-            Contract.Assert(request != null, $"{nameof(GetODataVersion)} called with a null request");
             return request.ODataMaxServiceVersion() ??
                 request.ODataMinServiceVersion() ??
                 request.ODataServiceVersion() ??
