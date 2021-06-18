@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -36,22 +37,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 throw Error.ArgumentNull(nameof(routePattern));
             }
-
-            if (next == null)
-            {
-                throw Error.ArgumentNull(nameof(next));
-            }
-
-            if (routePattern.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-            {
-                _routePattern = routePattern;
-            }
-            else
-            {
-                _routePattern = $"/{routePattern}";
-            }
-
-            _next = next;
+            // ensure _routePattern starts with /
+            _routePattern = routePattern.StartsWith('/') ? routePattern : $"/{routePattern}";
+            _next = next ?? throw Error.ArgumentNull(nameof(next)); ;
         }
 
         /// <summary>
@@ -70,13 +58,14 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (string.Equals(request.Path.Value, _routePattern, StringComparison.OrdinalIgnoreCase))
             {
-                if (IsJsonAccept(context))
+                var routeInfoList = GetRouteInfo(context);
+                if (AcceptsJson(request.Headers))
                 {
-                    await HandleJsonEndpointsAsync(context).ConfigureAwait(false);
+                    await WriteRoutesAsJson(context, routeInfoList).ConfigureAwait(false);
                 }
                 else
                 {
-                    await HandleEndpointsAsync(context).ConfigureAwait(false);
+                    await WriteRoutesAsHtml(context, routeInfoList).ConfigureAwait(false);
                 }
             }
             else
@@ -85,15 +74,15 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
-        internal static async Task HandleJsonEndpointsAsync(HttpContext context)
+        internal static IList<EndpointRouteInfo> GetRouteInfo(HttpContext context)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            List<EndpointRouteInfo> infos = new List<EndpointRouteInfo>();
-            EndpointDataSource dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
+            var routInfoList = new List<EndpointRouteInfo>();
+            var dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
             foreach (var endpoint in dataSource.Endpoints)
             {
                 ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
@@ -102,179 +91,143 @@ namespace Microsoft.AspNetCore.OData.Routing
                     continue;
                 }
 
-                EndpointRouteInfo info = new EndpointRouteInfo
+                var routeEndpoint = endpoint as RouteEndpoint;
+                var metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
+
+                var info = new EndpointRouteInfo
                 {
                     DisplayName = endpoint.DisplayName,
-                    HttpMethods = string.Join(",", GetHttpMethods(endpoint)),
+                    HttpMethods = endpoint.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods ?? EmptyHeaders,
+                    Pattern = routeEndpoint?.RoutePattern?.RawText ?? "N/A",
+                    IsODataRoute = metadata != null,
                 };
 
-                // template name
-                RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
-                if (routeEndpoint != null)
-                {
-                    info.Template = routeEndpoint.RoutePattern.RawText;
-                }
-                else
-                {
-                    info.Template = "N/A";
-                }
-
-                IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
-                if (metadata == null)
-                {
-                    info.IsODataRoute = false;
-                }
-                else
-                {
-                    info.IsODataRoute = true;
-                }
-
-                infos.Add(info);
+                routInfoList.Add(info);
             }
 
-            JsonSerializerOptions options = new JsonSerializerOptions()
+            return routInfoList;
+        }
+
+        private static IReadOnlyList<string> EmptyHeaders = Array.Empty<string>();
+
+        internal static async Task WriteRoutesAsJson(HttpContext context, IList<EndpointRouteInfo> routeInfoList)
+        {
+            var options = new JsonSerializerOptions()
             {
                 WriteIndented = true
             };
-            string output = JsonSerializer.Serialize(infos, options);
+            string output = JsonSerializer.Serialize(routeInfoList, options);
             context.Response.Headers["Content_Type"] = "application/json";
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
-        internal static async Task HandleEndpointsAsync(HttpContext context)
+        internal static async Task WriteRoutesAsHtml(HttpContext context, IList<EndpointRouteInfo> routeInfoList)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            StringBuilder nonSb = new StringBuilder();
-            StringBuilder sb = new StringBuilder();
-            EndpointDataSource dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
-            foreach (var endpoint in dataSource.Endpoints)
+            var stdRouteTable = new StringBuilder();
+            var odataRouteTable = new StringBuilder();
+            foreach (var routeInfo in routeInfoList)
             {
-                ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-                if (controllerActionDescriptor == null)
+                if (routeInfo.IsODataRoute)
                 {
-                    continue;
-                }
-
-                IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
-                if (metadata == null)
-                {
-                    AppendRoute(nonSb, endpoint);
+                    AppendRoute(odataRouteTable, routeInfo);
                 }
                 else
                 {
-                    AppendRoute(sb, endpoint);
+                    AppendRoute(stdRouteTable, routeInfo);
                 }
             }
 
-            string output = ODataRouteMappingHtmlTemplate.Replace("ODATACONTENT", sb.ToString(), StringComparison.Ordinal);
-            output = output.Replace("NONENDPOINTCONTENT", nonSb.ToString(), StringComparison.Ordinal);
+            string output = ODataRouteMappingHtmlTemplate;
+            output = output.Replace("ODATA_ROUTE_CONTENT", odataRouteTable.ToString(), StringComparison.Ordinal);
+            output = output.Replace("STD_ROUTE_CONTENT", stdRouteTable.ToString(), StringComparison.Ordinal);
 
-            context.Response.Headers["Content_Type"] = "text/html";
+            context.Response.Headers["Content-Type"] = "text/html";
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
-        internal static bool IsJsonAccept(HttpContext context)
+
+        internal static bool AcceptsJson(IHeaderDictionary headers)
         {
-            Contract.Assert(context != null);
+            var acceptHeaders = MediaTypeHeaderValue.ParseList(headers[HeaderNames.Accept]);
 
-            HttpRequest request = context.Request;
-            IList<string> accepts = request.Headers[HeaderNames.Accept];
-            if (accepts == null || accepts.Count == 0)
-            {
-                return false;
-            }
-
-            // Simply compare "application/json"
-            string accept = accepts[0];
-            return string.Equals(accept, "application/json", StringComparison.OrdinalIgnoreCase);
+            var result = acceptHeaders.Any(h =>
+                h.IsSubsetOf(new MediaTypeHeaderValue("application/json")));
+            return result;
         }
 
-        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        private static void AppendRoute(StringBuilder builder, EndpointRouteInfo routeInfo)
         {
-            Contract.Assert(endpoint != null);
+            builder.Append("<tr>");
+            builder.Append($"<td>{routeInfo.DisplayName}</td>");
+            builder.Append($"<td>{string.Join(",", routeInfo.HttpMethods)}</td>");
 
-            HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
-            if (metadata != null)
+            if (routeInfo.Pattern == null)
             {
-                return metadata.HttpMethods;
+                builder.Append($"<td>N/A</td>");
             }
-
-            return new[] { "N/A" };
-        }
-
-        private static void AppendRoute(StringBuilder sb, Endpoint endpoint)
-        {
-            sb.Append("<tr>");
-            sb.Append($"<td>{endpoint.DisplayName}</td>");
-            sb.Append($"<td>{string.Join(",", GetHttpMethods(endpoint))}</td>");
-
-            RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
-            if (routeEndpoint != null)
+            else if (routeInfo.HttpMethods.Contains("GET"))
             {
-                if (routeEndpoint.RoutePattern.RawText.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-                {
-                    sb.Append("<td>~").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
-                }
-                else if (routeEndpoint.RoutePattern.RawText.StartsWith("~/", StringComparison.OrdinalIgnoreCase))
-                {
-                    sb.Append("<td>").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
-                }
-                else
-                {
-                    sb.Append("<td>~/").Append(routeEndpoint.RoutePattern.RawText).Append("</td>");
-                }
+                builder.Append($"<td><a href=\"{routeInfo.Pattern}\">{routeInfo.Pattern}</a></td>");
             }
             else
             {
-                sb.Append("<td>N/A</td></tr>");
+                builder.Append($"<td>{routeInfo.Pattern}</td>");
             }
-
-            sb.Append("</tr>");
+            builder.AppendLine("</tr>");
         }
 
+
         private static string ODataRouteMappingHtmlTemplate = @"<html>
-  <head>
+<head>
     <title>OData Endpoint Routing Debugger</title>
     <style>
-    table {
-      font-family: arial, sans-serif;
-      border-collapse: collapse;
-      width: 100%;
-    }
-    td, th {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;
-    }
-    tr:nth-child(even) {
-      background-color: #dddddd;
-    }
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
     </style>
-  </head>
-  <body>
-    <h1 id=""odataendpoint"">OData Endpoint Mapping <a href=""#nonodataendpoint""> >>> Go to non-odata endpoint mapping</a></h1>
+</head>
+<body>
+    <h1 id=""odata"">OData Endpoint Mappings</h1>
+    <p>
+        <a href=""#standard"">Got to none OData endpoint mappings</a>
+    </p>
     <table>
-     <tr>
-       <th> Controller & Action </th>
-       <th> HttpMethods </th>
-       <th> Templates </th>
-    </tr>
-    ODATACONTENT
+        <tr>
+            <th> Controller & Action </th>
+            <th> HttpMethods </th>
+            <th> Template </th>
+        </tr>
+        ODATA_ROUTE_CONTENT
     </table>
-    <h1 id=""nonodataendpoint"">Non-OData Endpoint Mapping <a href=""#odataendpoint""> >>> Back to odata endpoint mapping</a></h1>
+    <h1 id=""standard"">None OData Endpoint Mappings</h1>
+    <p>
+        <a href=""#odata"">Go to OData endpoint mappings</a>
+    </p>
     <table>
-     <tr>
-       <th> Controller </th>
-       <th> HttpMethods </th>
-       <th> Templates </th>
-    </tr>
-    NONENDPOINTCONTENT
+        <tr>
+            <th> Controller </th>
+            <th> HttpMethods </th>
+            <th> Template </th>
+        </tr>
+        STD_ROUTE_CONTENT
     </table>
-   </body>
+</body>
 </html>";
     }
 
@@ -282,9 +235,9 @@ namespace Microsoft.AspNetCore.OData.Routing
     {
         public string DisplayName { get; set; }
 
-        public string HttpMethods { get; set; }
+        public IReadOnlyList<string> HttpMethods { get; set; }
 
-        public string Template { get; set; }
+        public string Pattern { get; set; }
 
         public bool IsODataRoute { get; set; }
     }
