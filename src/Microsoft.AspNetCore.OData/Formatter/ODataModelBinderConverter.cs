@@ -216,7 +216,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
-        private static object ConvertResourceOrResourceSet(object oDataValue, IEdmTypeReference edmTypeReference,
+        internal static object ConvertResourceOrResourceSet(object oDataValue, IEdmTypeReference edmTypeReference,
             ODataDeserializerContext readContext)
         {
             string valueString = oDataValue as string;
@@ -279,15 +279,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEnumerable enumerable = result as IEnumerable;
             if (enumerable != null)
             {
-                IEnumerable newEnumerable = enumerable;
-                if (collectionType.ElementType().IsEntity())
-                {
-                    newEnumerable = CovertResourceSetIds(enumerable, resourceSet, collectionType, readContext);
-                }
-
                 if (readContext.IsNoClrType)
                 {
-                    return newEnumerable.ConvertToEdmObject(collectionType);
+                    return enumerable.ConvertToEdmObject(collectionType);
                 }
                 else
                 {
@@ -296,7 +290,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     Type elementClrType = readContext.Model.GetClrType(elementTypeReference);
                     IEnumerable castedResult =
                         CastMethodInfo.MakeGenericMethod(elementClrType)
-                            .Invoke(null, new object[] { newEnumerable }) as IEnumerable;
+                            .Invoke(null, new object[] { enumerable }) as IEnumerable;
                     return castedResult;
                 }
             }
@@ -328,89 +322,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             ODataResourceDeserializer entityDeserializer =
                 (ODataResourceDeserializer)deserializerProvider.GetEdmTypeDeserializer(edmTypeReference);
-            object value = entityDeserializer.ReadInline(topLevelResource, edmTypeReference, readContext);
-
-            if (edmTypeReference.IsEntity())
-            {
-                IEdmEntityTypeReference entityType = edmTypeReference.AsEntity();
-                return CovertResourceId(value, topLevelResource.Resource, entityType, readContext);
-            }
-
-            return value;
-        }
-
-        private static IEnumerable CovertResourceSetIds(IEnumerable sources, ODataResourceSetWrapper resourceSet,
-            IEdmCollectionTypeReference collectionType, ODataDeserializerContext readContext)
-        {
-            IEdmEntityTypeReference entityTypeReference = collectionType.ElementType().AsEntity();
-            int i = 0;
-            foreach (object item in sources)
-            {
-                object newItem = CovertResourceId(item, resourceSet.Resources[i].Resource, entityTypeReference,
-                    readContext);
-                i++;
-                yield return newItem;
-            }
-        }
-
-        private static object CovertResourceId(object source, ODataResourceBase resource,
-            IEdmEntityTypeReference entityTypeReference, ODataDeserializerContext readContext)
-        {
-            Contract.Assert(resource != null);
-            Contract.Assert(source != null);
-
-            if (resource.Id == null || resource.Properties.Any())
-            {
-                return source;
-            }
-
-            HttpRequest request = readContext.Request;
-            string serviceRoot = request.CreateODataLink();
-
-            IEnumerable<KeyValuePair<string, object>> keyValues = GetKeys(request, serviceRoot, resource.Id, request.GetSubServiceProvider());
-
-            IList<IEdmStructuralProperty> keys = entityTypeReference.Key().ToList();
-
-            if (keys.Count == 1 && keyValues.Count() == 1)
-            {
-                // TODO: make sure the enum key works
-                object propertyValue = keyValues.First().Value;
-                DeserializationHelpers.SetDeclaredProperty(source, EdmTypeKind.Primitive, keys[0].Name, propertyValue,
-                    keys[0], readContext);
-                return source;
-            }
-
-            IDictionary<string, object> keyValuesDic = keyValues.ToDictionary(e => e.Key, e => e.Value);
-            foreach (IEdmStructuralProperty key in keys)
-            {
-                object value;
-                if (keyValuesDic.TryGetValue(key.Name, out value))
-                {
-                    // TODO: make sure the enum key works
-                    DeserializationHelpers.SetDeclaredProperty(source, EdmTypeKind.Primitive, key.Name, value, key,
-                        readContext);
-                }
-            }
-
-            return source;
-        }
-
-        private static IEnumerable<KeyValuePair<string, object>> GetKeys(HttpRequest request, string serviceRoot,
-            Uri uri, IServiceProvider requestContainer)
-        {
-            IEdmModel model = request.GetModel();
-
-            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri, requestContainer);
-
-            //ODataPath odataPath = pathHandler.Parse(serviceRoot, uri.ToString(), requestContainer);
-            ODataPath odataPath = uriParser.ParsePath();
-            KeySegment segment = odataPath.OfType<KeySegment>().Last();
-            if (segment == null)
-            {
-                throw Error.InvalidOperation(SRResources.EntityReferenceMustHasKeySegment, uri);
-            }
-
-            return segment.Keys;
+            return entityDeserializer.ReadInline(topLevelResource, edmTypeReference, readContext);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 Model = _edmModel,
                 ResourceType = typeof(Color)
             };
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
             // Act
             object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 Model = _edmModel,
                 ResourceType = typeof(IEdmEnumObject)
             };
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
             // Act
             object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(Level)
             };
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/OData/TestUri", _edmModel);
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
             // Act
             object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),

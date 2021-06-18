@@ -2,9 +2,17 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
@@ -49,6 +57,184 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Assert.NotNull(result);
             Assert.IsType(clrType, result);
             Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public void ConvertTo_Converts_InputValue()
+        {
+            // Arrange & Act & Assert
+            Assert.Null(ODataModelBinderConverter.ConvertTo(null, null, null));
+
+            // Arrange & Act & Assert
+            Assert.Null(ODataModelBinderConverter.ConvertTo("null", typeof(int?), null));
+
+            // Arrange & Act & Assert
+            Assert.Equal(Color.Red, ODataModelBinderConverter.ConvertTo("NS.Color'Red'", typeof(Color), null));
+
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => ODataModelBinderConverter.ConvertTo("NS.Color'Unknown'", typeof(Color), null),
+                "The binding value 'Unknown' cannot be bound to the enum type 'Color'.");
+
+            Assert.Equal(Color.Red, ODataModelBinderConverter.ConvertTo("NS.Color'Red'", typeof(Color), null));
+
+            // Arrange & Act & Assert
+            Assert.Equal(new Date(2021, 6, 17), ODataModelBinderConverter.ConvertTo("2021-06-17", typeof(Date?), null));
+
+            // Arrange & Act & Assert
+            Assert.Equal(42, ODataModelBinderConverter.ConvertTo("42", typeof(int), null));
+        }
+
+        [Fact]
+        public void ConvertResourceOrResourceSetCanConvert_SingleResource()
+        {
+            // Arrange
+            string odataValue = "{\"Id\": 9, \"Name\": \"Sam\"}";
+            IEdmModel model = GetEdmModel();
+            IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
+            IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request,
+                ResourceType = typeof(Customer),
+                ResourceEdmType = edmTypeReference,
+            };
+
+            // Act
+            object value = ODataModelBinderConverter.ConvertResourceOrResourceSet(odataValue, edmTypeReference, context);
+
+            // Assert
+            Assert.NotNull(value);
+
+            Customer customer = Assert.IsType<Customer>(value);
+            Assert.Equal(9, customer.Id);
+            Assert.Equal("Sam", customer.Name);
+        }
+
+        [Fact]
+        public void ConvertResourceOrResourceSetCanConvert_ResourceSet()
+        {
+            // Arrange
+            string odataValue = "[{\"Id\": 9, \"Name\": \"Sam\"}, {\"Id\": 18, \"Name\": \"Peter\"}]";
+            IEdmModel model = GetEdmModel();
+            IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
+            IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request,
+                ResourceType = typeof(Customer),
+                ResourceEdmType = edmTypeReference,
+            };
+
+            IEdmTypeReference setType = new EdmCollectionTypeReference(new EdmCollectionType(edmTypeReference));
+
+            // Act
+            object value = ODataModelBinderConverter.ConvertResourceOrResourceSet(odataValue, setType, context);
+
+            // Assert
+            Assert.NotNull(value);
+
+            IEnumerable<Customer> customers = Assert.IsAssignableFrom<IEnumerable<Customer>>(value);
+            Assert.Collection(customers,
+                e =>
+                {
+                    Assert.Equal(9, e.Id);
+                    Assert.Equal("Sam", e.Name);
+                },
+                e =>
+                {
+                    Assert.Equal(18, e.Id);
+                    Assert.Equal("Peter", e.Name);
+                });
+        }
+
+        [Fact]
+        public void ConvertResourceOrResourceSetCanConvert_ResourceId()
+        {
+            // Arrange
+            string odataValue = "{\"@odata.id\":\"http://localhost/odata/Customers(81)\"}";
+            IEdmModel model = GetEdmModel();
+            IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
+            IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request,
+                ResourceType = typeof(Customer),
+                ResourceEdmType = edmTypeReference,
+            };
+
+            // Act
+            object value = ODataModelBinderConverter.ConvertResourceOrResourceSet(odataValue, edmTypeReference, context);
+
+            // Assert
+            Assert.NotNull(value);
+
+            Customer customer = Assert.IsType<Customer>(value);
+            Assert.Equal(81, customer.Id);
+        }
+
+        [Fact]
+        public void ConvertResourceOrResourceSetCanConvert_ResourceWithMulitipleKeys()
+        {
+            // Arrange
+            string odataValue = "{\"@odata.id\":\"http://localhost/odata/CustomerWithKeys(First='abc',Last='efg')\"}";
+            IEdmModel model = GetEdmModel();
+            IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "CustomerWithKeys");
+            IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
+            request.ODataFeature().PrefixName = "odata";
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request,
+                ResourceType = typeof(CustomerWithKeys),
+                ResourceEdmType = edmTypeReference,
+            };
+
+            // Act
+            object value = ODataModelBinderConverter.ConvertResourceOrResourceSet(odataValue, edmTypeReference, context);
+
+            // Assert
+            Assert.NotNull(value);
+
+            CustomerWithKeys customer = Assert.IsType<CustomerWithKeys>(value);
+            Assert.Equal("abc", customer.First);
+            Assert.Equal("efg", customer.Last);
+        }
+
+        private static IEdmModel GetEdmModel()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Customer>("Customers");
+            builder.EntitySet<CustomerWithKeys>("CustomerWithKeys");
+            builder.EntityType<CustomerWithKeys>().HasKey(c => new { c.First, c.Last });
+            return builder.GetEdmModel();
+        }
+
+        private class Customer
+        {
+            public int Id { get; set; }
+
+            public string Name { get; set; }
+        }
+
+        private class CustomerWithKeys
+        {
+            public string First { get; set; }
+            public string Last { get; set; }
+        }
+
+        private enum Color
+        {
+            Red
         }
     }
 }
