@@ -565,12 +565,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return;
             }
 
-            bool nullDynamicPropertyEnabled = false;
-            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaResourceObject)
-            {
-                nullDynamicPropertyEnabled = true;
-            }
-
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;
             object value;
@@ -609,24 +603,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     continue;
                 }
 
-                if (dynamicProperty.Value == null)
-                {
-                    if (nullDynamicPropertyEnabled)
-                    {
-                        dynamicProperties.Add(new ODataProperty
-                        {
-                            Name = dynamicProperty.Key,
-                            Value = new ODataNullValue()
-                        });
-                    }
-
-                    continue;
-                }
-
                 if (declaredPropertyNameSet.Contains(dynamicProperty.Key))
                 {
                     throw Error.InvalidOperation(SRResources.DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName,
                         dynamicProperty.Key, structuredType.FullTypeName());
+                }
+
+                if (dynamicProperty.Value == null)
+                {
+                    dynamicProperties.Add(new ODataProperty
+                    {
+                        Name = dynamicProperty.Key,
+                        Value = new ODataNullValue()
+                    });
+
+                    continue;
                 }
 
                 IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(dynamicProperty.Value,

@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             Assert.Equal(new JArray(new[] { 200, 100, 300, 0, 400 }), result["ListProp"]);
             Assert.Equal("0001-01-01", result["DateList"][0]);
             Assert.Equal("9999-12-31", result["DateList"][1]);
-            Assert.Null(result["Receipt"]);
+            Assert.Equal(JTokenType.Null, result["Receipt"].Type);
         }
 
         [Theory]
