@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -34,6 +35,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         {
             // Arrange & Act & Assert
             Assert.Throws<ArgumentNullException>("payloadKinds", () => new ODataInputFormatter(payloadKinds: null));
+        }
+
+        [Fact]
+        public void GetSupportedContentTypesODataInputFormatter_WorksForContentType()
+        {
+            // Arrange
+            ODataInputFormatter formatter = ODataInputFormatterFactory.Create().First();
+            Assert.NotNull(formatter); // guard
+
+            // Act & Assert
+            IReadOnlyList<string> contentTypes = formatter.GetSupportedContentTypes("application/json", typeof(string));
+            Assert.Equal(12, contentTypes.Count);
+
+            // Act & Assert
+            formatter.SupportedMediaTypes.Clear();
+            ExceptionAssert.DoesNotThrow(() => formatter.GetSupportedContentTypes("application/json", typeof(string)));
         }
 
         [Fact]

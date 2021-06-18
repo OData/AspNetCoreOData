@@ -10,7 +10,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
@@ -52,6 +51,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// Gets or sets a method that allows consumers to provide an alternate base address for OData Uri.
         /// </summary>
         public Func<HttpRequest, Uri> BaseAddressFactory { get; set; }
+
+        /// <inheritdoc />
+        public override IReadOnlyList<string> GetSupportedContentTypes(string contentType, Type objectType)
+        {
+            if (SupportedMediaTypes.Count == 0)
+            {
+                // note: this is parity with the base implementation when there are no matches
+                return default;
+            }
+
+            return base.GetSupportedContentTypes(contentType, objectType);
+        }
 
         /// <inheritdoc/>
         public override bool CanRead(InputFormatterContext context)

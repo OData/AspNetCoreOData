@@ -1313,8 +1313,10 @@ override Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMa
 override Microsoft.AspNetCore.OData.Formatter.MediaType.ODataStreamMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest request) -> double
 override Microsoft.AspNetCore.OData.Formatter.MediaType.QueryStringMediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest request) -> double
 override Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.CanRead(Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext context) -> bool
+override Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetSupportedContentTypes(string contentType, System.Type objectType) -> System.Collections.Generic.IReadOnlyList<string>
 override Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.ReadRequestBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext context, System.Text.Encoding encoding) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.Formatters.InputFormatterResult>
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.CanWriteResult(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterCanWriteContext context) -> bool
+override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetSupportedContentTypes(string contentType, System.Type objectType) -> System.Collections.Generic.IReadOnlyList<string>
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context, System.Text.Encoding selectedEncoding) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseHeaders(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context) -> void
 override Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer

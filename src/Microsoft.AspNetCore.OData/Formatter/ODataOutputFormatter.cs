@@ -60,6 +60,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         public ICollection<MediaTypeMapping> MediaTypeMappings { get; } = new List<MediaTypeMapping>();
 
+        /// <inheritdoc />
+        public override IReadOnlyList<string> GetSupportedContentTypes(string contentType, Type objectType)
+        {
+            if (SupportedMediaTypes.Count == 0)
+            {
+                // note: this is parity with the base implementation when there are no matches
+                return default;
+            }
+
+            return base.GetSupportedContentTypes(contentType, objectType);
+        }
+
         /// <inheritdoc/>
         public override bool CanWriteResult(OutputFormatterCanWriteContext context)
         {

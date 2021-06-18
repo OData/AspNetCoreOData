@@ -26,6 +26,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public class FilterBinder : ExpressionBinderBase
     {
         private const string ODataItParameterName = "$it";
+        private const string ODataThisParameterName = "$this";
 
         private Stack<Dictionary<string, ParameterExpression>> _parametersStack = new Stack<Dictionary<string, ParameterExpression>>();
         private Dictionary<string, ParameterExpression> _lambdaParameters;
@@ -571,7 +572,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(rangeVariable));
             }
 
-            ParameterExpression parameter = _lambdaParameters[rangeVariable.Name];
+            ParameterExpression parameter;
+            // When we have a $this RangeVariable, we still create a $it parameter.
+            // i.e $it => $it instead of $this => $this
+            if (rangeVariable.Name == ODataThisParameterName)
+            {
+                parameter = _lambdaParameters[ODataItParameterName];
+            }
+            else
+            {
+                parameter = _lambdaParameters[rangeVariable.Name];
+            }
+
             return ConvertNonStandardPrimitives(parameter);
         }
 

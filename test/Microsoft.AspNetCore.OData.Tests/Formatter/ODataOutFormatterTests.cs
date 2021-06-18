@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -28,6 +28,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         {
             // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new ODataOutputFormatter(payloadKinds: null), "payloadKinds");
+        }
+
+        [Fact]
+        public void GetSupportedContentTypesODataOutputFormatter_WorksForContentType()
+        {
+            // Arrange
+            ODataOutputFormatter formatter = ODataOutputFormatterFactory.Create().First();
+            Assert.NotNull(formatter); // guard
+
+            // Act & Assert
+            IReadOnlyList<string> contentTypes = formatter.GetSupportedContentTypes("application/json", typeof(string));
+            Assert.Equal(12, contentTypes.Count);
+
+            // Act & Assert
+            formatter.SupportedMediaTypes.Clear();
+            ExceptionAssert.DoesNotThrow(() => formatter.GetSupportedContentTypes("application/json", typeof(string)));
         }
 
         [Fact]

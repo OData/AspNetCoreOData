@@ -3630,6 +3630,9 @@
             Gets or sets a method that allows consumers to provide an alternate base address for OData Uri.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetSupportedContentTypes(System.String,System.Type)">
+            <inheritdoc />
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.CanRead(Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext)">
             <inheritdoc/>
         </member>
@@ -3755,6 +3758,9 @@
             <summary>
             Gets a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping"/> objects.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetSupportedContentTypes(System.String,System.Type)">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.CanWriteResult(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterCanWriteContext)">
             <inheritdoc/>
