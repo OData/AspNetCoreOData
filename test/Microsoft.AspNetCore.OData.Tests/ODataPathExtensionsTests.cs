@@ -35,9 +35,9 @@ namespace Microsoft.AspNetCore.OData.Tests
             // Act & Assert
             IEdmTypeReference typeRef = EdmCoreModel.Instance.GetStream(false);
             Mock<IEdmStructuralProperty> mock = new Mock<IEdmStructuralProperty>();
-            PropertySegment segment = new PropertySegment(mock.Object);
             mock.Setup(s => s.Name).Returns("any");
             mock.Setup(s => s.Type).Returns(typeRef);
+            PropertySegment segment = new PropertySegment(mock.Object);
 
             path = new ODataPath(segment);
             Assert.True(path.IsStreamPropertyPath());
