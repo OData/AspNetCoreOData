@@ -1611,11 +1611,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataPathExtensions {
 	ExtensionAttribute(),
 	]
 	public static bool IsStreamPropertyPath (Microsoft.OData.UriParser.ODataPath path)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static string TranslatePathTemplateSegment (Microsoft.OData.UriParser.PathTemplateSegment pathTemplatesegment, out System.String& value)
 }
 
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds {

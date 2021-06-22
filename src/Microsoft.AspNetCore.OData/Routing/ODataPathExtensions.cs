@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -33,10 +31,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             IEdmTypeReference propertyType = propertySegment.Property.Type;
-            if (propertyType == null)
-            {
-                return false;
-            }
 
             // Edm.Stream, or a type definition whose underlying type is Edm.Stream,
             // cannot be used in collections or for non-binding parameters to functions or actions.
@@ -124,6 +118,8 @@ namespace Microsoft.AspNetCore.OData.Routing
             return handler.PathLiteral;
         }
 
+        #region BACKUP
+#if false
         /// <summary>
         /// 
         /// </summary>
@@ -161,5 +157,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             value = string.Empty;
             return string.Empty;
         }
+#endif
+        #endregion
     }
 }

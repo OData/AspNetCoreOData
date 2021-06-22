@@ -11308,14 +11308,6 @@
             <param name="segments">The path segments.</param>
             <returns>The string representation of the Context Url path.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.TranslatePathTemplateSegment(Microsoft.OData.UriParser.PathTemplateSegment,System.String@)">
-            <summary>
-            
-            </summary>
-            <param name="pathTemplatesegment"></param>
-            <param name="value"></param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler">
             <summary>
             A handler used to calculate some values based on the odata path.

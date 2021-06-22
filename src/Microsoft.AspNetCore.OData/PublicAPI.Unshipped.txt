@@ -1547,7 +1547,6 @@ static Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetNavigationSourc
 static Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPathString(this Microsoft.OData.UriParser.ODataPath path) -> string
 static Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPathString(this System.Collections.Generic.IList<Microsoft.OData.UriParser.ODataPathSegment> segments) -> string
 static Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.IsStreamPropertyPath(this Microsoft.OData.UriParser.ODataPath path) -> bool
-static Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.TranslatePathTemplateSegment(this Microsoft.OData.UriParser.PathTemplateSegment pathTemplatesegment, out string value) -> string
 static Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator.TranslateParameterAlias(Microsoft.OData.UriParser.SingleValueNode node, System.Collections.Generic.IDictionary<string, Microsoft.OData.UriParser.SingleValueNode> parameterAliasNodes) -> Microsoft.OData.UriParser.SingleValueNode
 static Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate.Instance.get -> Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate
 static Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Instance.get -> Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate

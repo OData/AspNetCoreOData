@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -229,16 +228,16 @@ namespace Microsoft.AspNetCore.OData.Routing
     </table>
 </body>
 </html>";
-    }
 
-    internal class EndpointRouteInfo
-    {
-        public string DisplayName { get; set; }
+        internal class EndpointRouteInfo
+        {
+            public string DisplayName { get; set; }
 
-        public IReadOnlyList<string> HttpMethods { get; set; }
+            public IReadOnlyList<string> HttpMethods { get; set; }
 
-        public string Pattern { get; set; }
+            public string Pattern { get; set; }
 
-        public bool IsODataRoute { get; set; }
+            public bool IsODataRoute { get; set; }
+        }
     }
 }
