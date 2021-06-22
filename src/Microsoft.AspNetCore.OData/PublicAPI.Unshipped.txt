@@ -494,7 +494,6 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedFunc
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedNavigationProperties.get -> System.Collections.Generic.ISet<Microsoft.OData.Edm.IEdmNavigationProperty>
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedStructuralProperties.get -> System.Collections.Generic.ISet<Microsoft.OData.Edm.IEdmStructuralProperty>
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectExpandNode() -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectExpandNode(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNodeToCopy) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectExpandNode(Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectExpandNode(Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.Edm.IEdmModel model) -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollection
@@ -1516,7 +1515,6 @@ static Microsoft.AspNetCore.OData.Formatter.ODataInputFormatterFactory.Create() 
 static Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Uri
 static Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatterFactory.Create() -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter>
 static Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(Microsoft.OData.ODataCollectionValue value, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> void
-static Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.GetStructuralProperties(Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.HashSet<Microsoft.OData.Edm.IEdmStructuralProperty> structuralProperties, System.Collections.Generic.HashSet<Microsoft.OData.Edm.IEdmStructuralProperty> nestedStructuralProperties) -> void
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResource(this Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResourceSet(this Microsoft.OData.Edm.IEdmType type) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSet(this Microsoft.OData.ODataReader reader) -> Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper

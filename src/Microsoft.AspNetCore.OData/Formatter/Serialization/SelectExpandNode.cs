@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -25,42 +24,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <remarks>The default constructor is for unit testing only.</remarks>
         public SelectExpandNode()
         {
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="SelectExpandNode"/> class by copying the state of another instance. This is
-        /// intended for scenarios that wish to modify state without updating the values cached within ODataResourceSerializer.
-        /// </summary>
-        /// <param name="selectExpandNodeToCopy">The instance from which the state for the new instance will be copied.</param>
-        public SelectExpandNode(SelectExpandNode selectExpandNodeToCopy)
-        {
-            if (selectExpandNodeToCopy == null)
-            {
-                throw Error.ArgumentNull(nameof(selectExpandNodeToCopy));
-            }
-
-            SelectedStructuralProperties = selectExpandNodeToCopy.SelectedStructuralProperties == null ?
-                null : new HashSet<IEdmStructuralProperty>(selectExpandNodeToCopy.SelectedStructuralProperties);
-
-            SelectedNavigationProperties = selectExpandNodeToCopy.SelectedNavigationProperties == null ?
-                null : new HashSet<IEdmNavigationProperty>(selectExpandNodeToCopy.SelectedNavigationProperties);
-
-            ExpandedProperties = selectExpandNodeToCopy.ExpandedProperties == null ?
-                null : new Dictionary<IEdmNavigationProperty, ExpandedNavigationSelectItem>(selectExpandNodeToCopy.ExpandedProperties);
-
-            ReferencedProperties = selectExpandNodeToCopy.ReferencedProperties == null ?
-                null : new Dictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem>();
-
-            SelectAllDynamicProperties = selectExpandNodeToCopy.SelectAllDynamicProperties;
-
-            SelectedDynamicProperties = selectExpandNodeToCopy.SelectedDynamicProperties == null ?
-                null : new HashSet<string>(selectExpandNodeToCopy.SelectedDynamicProperties);
-
-            SelectedActions = selectExpandNodeToCopy.SelectedActions == null ?
-                null : new HashSet<IEdmAction>(selectExpandNodeToCopy.SelectedActions);
-
-            SelectedFunctions = selectExpandNodeToCopy.SelectedFunctions == null ?
-                null : new HashSet<IEdmFunction>(selectExpandNodeToCopy.SelectedFunctions);
         }
 
         /// <summary>
@@ -643,60 +606,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Separate the structural properties into two parts:
-        /// 1. Complex and collection of complex are nested structural properties.
-        /// 2. Others are non-nested structural properties.
-        /// </summary>
-        /// <param name="structuredType">The structural type of the resource.</param>
-        /// <param name="structuralProperties">The non-nested structural properties of the structural type.</param>
-        /// <param name="nestedStructuralProperties">The nested structural properties of the structural type.</param>
-        [Obsolete("This public method is not used anymore. It will be removed later.")]
-        public static void GetStructuralProperties(IEdmStructuredType structuredType, HashSet<IEdmStructuralProperty> structuralProperties,
-            HashSet<IEdmStructuralProperty> nestedStructuralProperties)
-        {
-            // Be noted: this method is not used anymore. Keeping it unremoved is only for non-breaking changes.
-            // If any new requirement for such method, it's better to move to "EdmLibHelpers" class.
-
-            if (structuredType == null)
-            {
-                throw Error.ArgumentNull("structuredType");
-            }
-
-            if (structuralProperties == null)
-            {
-                throw Error.ArgumentNull("structuralProperties");
-            }
-
-            if (nestedStructuralProperties == null)
-            {
-                throw Error.ArgumentNull("nestedStructuralProperties");
-            }
-
-            foreach (var edmStructuralProperty in structuredType.StructuralProperties())
-            {
-                if (edmStructuralProperty.Type.IsComplex())
-                {
-                    nestedStructuralProperties.Add(edmStructuralProperty);
-                }
-                else if (edmStructuralProperty.Type.IsCollection())
-                {
-                    if (edmStructuralProperty.Type.AsCollection().ElementType().IsComplex())
-                    {
-                        nestedStructuralProperties.Add(edmStructuralProperty);
-                    }
-                    else
-                    {
-                        structuralProperties.Add(edmStructuralProperty);
-                    }
-                }
-                else
-                {
-                    structuralProperties.Add(edmStructuralProperty);
-                }
-            }
         }
 
         /// <summary>

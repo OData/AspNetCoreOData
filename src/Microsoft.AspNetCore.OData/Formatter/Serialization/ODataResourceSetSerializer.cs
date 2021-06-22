@@ -291,7 +291,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="resourceSetContext">The context for the resourceSet instance being written.</param>
         /// <param name="writeContext">The serializer context.</param>
         /// <returns>The created operation or null if the operation should not be written.</returns>
-        [SuppressMessage("Microsoft.Usage", "CA2234: Pass System.Uri objects instead of strings", Justification = "This overload is equally good")]
         public virtual ODataOperation CreateODataOperation(IEdmOperation operation, ResourceSetContext resourceSetContext, ODataSerializerContext writeContext)
         {
             if (operation == null)

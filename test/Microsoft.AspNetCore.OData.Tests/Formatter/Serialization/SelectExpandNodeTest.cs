@@ -20,6 +20,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         private CustomersModelWithInheritance _model = new CustomersModelWithInheritance();
 
         [Fact]
+        public void Ctor_ThrowsArgumentNull_WriteContext()
+        {
+            // Arrange & Act & Assert
+            IEdmStructuredType structuredType = new Mock<IEdmStructuredType>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => new SelectExpandNode(structuredType, null), "writeContext");
+        }
+
+        [Fact]
         public void Ctor_ThrowsArgumentNull_StructuredType()
         {
             // Arrange & Act & Assert

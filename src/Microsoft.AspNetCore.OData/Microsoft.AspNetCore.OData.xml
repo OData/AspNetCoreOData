@@ -4615,13 +4615,6 @@
             </summary>
             <remarks>The default constructor is for unit testing only.</remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode)">
-            <summary>
-            Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> class by copying the state of another instance. This is
-            intended for scenarios that wish to modify state without updating the values cached within ODataResourceSerializer.
-            </summary>
-            <param name="selectExpandNodeToCopy">The instance from which the state for the new instance will be copied.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.#ctor(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> class describing the set of structural properties,
@@ -4728,16 +4721,6 @@
             </summary>
             <param name="structuralProperty">The test structural property.</param>
             <returns>True/false.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.GetStructuralProperties(Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.HashSet{Microsoft.OData.Edm.IEdmStructuralProperty},System.Collections.Generic.HashSet{Microsoft.OData.Edm.IEdmStructuralProperty})">
-            <summary>
-            Separate the structural properties into two parts:
-            1. Complex and collection of complex are nested structural properties.
-            2. Others are non-nested structural properties.
-            </summary>
-            <param name="structuredType">The structural type of the resource.</param>
-            <param name="structuralProperties">The non-nested structural properties of the structural type.</param>
-            <param name="nestedStructuralProperties">The nested structural properties of the structural type.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo">
             <summary>
