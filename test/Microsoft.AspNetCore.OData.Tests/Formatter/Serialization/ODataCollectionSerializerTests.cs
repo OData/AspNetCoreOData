@@ -100,13 +100,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void CreateODataCollectionValue_ThrowsArgumentNull_WriteContext()
+        public async Task WriteCollectionAsync_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
             ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer: null, graph: null, collectionType: null, writeContext: null),
+                "writer");
+
+            // Arrange & Act & Assert
+            ODataCollectionWriter writer = new Mock<ODataCollectionWriter>().Object;
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer, graph: null, collectionType: null, writeContext: null),
+                "writeContext");
+        }
+
+        [Fact]
+        public void CreateODataCollectionValue_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange
+            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), null, writeContext: null),
+                "elementType");
+
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), this._edmIntType, writeContext: null),
                 "writeContext");
@@ -324,6 +345,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Equal(expectedResult, actualResult);
+        }
+
+        [Fact]
+        public void GetElementType_ThrowsSerializationException_NonCollectionType()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmCoreModel.Instance.GetString(false);
+
+            // Act & Assert
+            ExceptionAssert.Throws<SerializationException>(
+                () => ODataCollectionSerializer.GetElementType(edmType),
+                "ODataCollectionSerializer cannot write an object of type 'Edm.String'.");
         }
     }
 }

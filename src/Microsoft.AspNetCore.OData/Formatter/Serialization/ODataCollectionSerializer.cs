@@ -285,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private static IEdmTypeReference GetElementType(IEdmTypeReference feedType)
+        internal static IEdmTypeReference GetElementType(IEdmTypeReference feedType)
         {
             if (feedType.IsCollection())
             {

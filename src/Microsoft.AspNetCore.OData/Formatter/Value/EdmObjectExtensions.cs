@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         {
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
 
             return (type.GetType() == typeof(EdmDeltaCollectionType));
@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         {
             if (resource == null)
             {
-                throw Error.ArgumentNull("resource");
+                throw Error.ArgumentNull(nameof(resource));
             }
 
             TypedEdmEntityObject obj = resource as TypedEdmEntityObject;

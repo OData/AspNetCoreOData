@@ -316,7 +316,7 @@
     <value>The type name of the dynamic resource set '{0}' is required and cannot be empty. Consider using a OData type annotation explicitly.</value>
   </data>
   <data name="TypeMustBeResourceSet" xml:space="preserve">
-    <value>{0} is not a resource set type. Only resource set are supported.</value>
+    <value>'{0}' is not a resource set type. Only resource set are supported.</value>
   </data>
   <data name="RequestNotActionInvocation" xml:space="preserve">
     <value>The last segment of the request URI '{0}' was not recognized as an OData action.</value>
@@ -547,7 +547,7 @@
     <value>A model is required for querying. Consider implementing the EnableQueryAttribute.GetModel method never to return a null value.</value>
   </data>
   <data name="ApplyQueryOptionNotSupportedForLinq2SQL" xml:space="preserve">
-    <value>$apply query options not supported for LINQ to SQL providers</value>
+    <value>$apply query options not supported for LINQ to SQL providers.</value>
   </data>
   <data name="SkipTokenParseError" xml:space="preserve">
     <value>Unable to parse the skiptoken value '{0}'. Skiptoken value should always be server generated.</value>

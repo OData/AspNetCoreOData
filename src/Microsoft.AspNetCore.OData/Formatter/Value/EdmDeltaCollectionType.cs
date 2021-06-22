@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <param name="typeReference">The element type reference.</param>
         internal EdmDeltaCollectionType(IEdmTypeReference typeReference)
         {
-            ElementType = typeReference ?? throw Error.ArgumentNull("typeReference");
+            ElementType = typeReference ?? throw Error.ArgumentNull(nameof(typeReference));
         }
 
         /// <inheritdoc />

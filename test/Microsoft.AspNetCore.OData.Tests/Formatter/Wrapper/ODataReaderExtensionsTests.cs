@@ -70,6 +70,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         [Fact]
+        public void ReadResourceOrResourceSet_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act & Assert
+            ODataReader reader = null;
+            ExceptionAssert.ThrowsArgumentNull(() => reader.ReadResourceOrResourceSet(), "reader");
+        }
+
+        [Fact]
+        public async Task ReadResourceOrResourceSetAsync_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act & Assert
+            ODataReader reader = null;
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => reader.ReadResourceOrResourceSetAsync(), "reader");
+        }
+
+        [Fact]
         public async Task ReadResourceWorksAsExpected()
         {
             // Arrange

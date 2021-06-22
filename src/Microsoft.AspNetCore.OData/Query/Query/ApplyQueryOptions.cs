@@ -32,27 +32,34 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
         public ApplyQueryOption(string rawValue, ODataQueryContext context, ODataQueryOptionParser queryOptionParser)
         {
-            if (context == null)
+            if (string.IsNullOrEmpty(rawValue))
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNullOrEmpty(nameof(rawValue));
             }
 
-            if (String.IsNullOrEmpty(rawValue))
+            if (context == null)
             {
-                throw Error.ArgumentNullOrEmpty("rawValue");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (queryOptionParser == null)
             {
-                throw Error.ArgumentNull("queryOptionParser");
+                throw Error.ArgumentNull(nameof(queryOptionParser));
             }
 
-            Context = context;
             RawValue = rawValue;
+            Context = context;
             // TODO: Implement and add validator
             //Validator = new FilterQueryValidator();
             _queryOptionParser = queryOptionParser;
             ResultClrType = Context.ElementClrType;
+        }
+
+        // for unit test only
+        internal ApplyQueryOption(string rawValue, ODataQueryContext context)
+        {
+            RawValue = rawValue;
+            Context = context;
         }
 
         /// <summary>
@@ -100,12 +107,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (query == null)
             {
-                throw Error.ArgumentNull("query");
+                throw Error.ArgumentNull(nameof(query));
             }
 
             if (querySettings == null)
             {
-                throw Error.ArgumentNull("querySettings");
+                throw Error.ArgumentNull(nameof(querySettings));
             }
 
             if (Context.ElementClrType == null)

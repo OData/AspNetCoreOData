@@ -2,12 +2,15 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -18,6 +21,91 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
     public class ODataDeltaResourceSetDeserializerTests
     {
+        [Fact]
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(null, null, null), "messageReader");
+        }
+
+        [Fact]
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+            ODataMessageReader reader = new ODataMessageReader((IODataResponseMessage)new InMemoryMessage(), new ODataMessageReaderSettings());
+
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(reader, typeof(DeltaSet<>), null), "readContext");
+        }
+
+        [Fact]
+        public void ReadInline_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+
+            // Arrange & Act & Assert
+            Assert.Null(deserializer.ReadInline(null, null, null));
+
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(5, null, null), "edmType");
+
+            // Arrange & Act & Assert
+            IEdmTypeReference typeReference = new Mock<IEdmTypeReference>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(5, typeReference, null), "readContext");
+
+            // Arrange & Act & Assert
+            ODataDeserializerContext context = new ODataDeserializerContext();
+            IEdmPrimitiveTypeReference intType = EdmCoreModel.Instance.GetString(false);
+            IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(intType));
+            ExceptionAssert.ThrowsArgument(() => deserializer.ReadInline(4, collectionType, context),
+                "edmType",
+                "'Collection(Edm.String)' is not a resource set type. Only resource set are supported.");
+
+            // Arrange & Act & Assert
+            EdmEntityType entityType = new EdmEntityType("NS", "Customer");
+            collectionType = new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(entityType, false)));
+            ExceptionAssert.ThrowsArgument(() => deserializer.ReadInline(4, collectionType, context),
+                "item",
+                "The argument must be of type 'ODataDeltaResourceSetWrapper'.");
+        }
+
+        [Fact]
+        public void ReadInline_Calls_ReadDeltaResourceSet()
+        {
+            // Arrange
+            EdmEntityType entityType = new EdmEntityType("NS", "Customer");
+            IEdmEntityTypeReference entityTypeRef = new EdmEntityTypeReference(entityType, false);
+            IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(entityTypeRef));
+
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<ODataDeltaResourceSetDeserializer> deserializer = new Mock<ODataDeltaResourceSetDeserializer>(deserializerProvider.Object);
+
+            ODataDeltaResourceSetWrapper wrapper = new ODataDeltaResourceSetWrapper(new ODataDeltaResourceSet());
+            ODataDeserializerContext readContext = new ODataDeserializerContext();
+
+            deserializer.CallBase = true;
+            deserializer.Setup(d => d.ReadDeltaResourceSet(wrapper, It.IsAny<IEdmStructuredTypeReference>(), readContext)).Returns((IEnumerable)null).Verifiable();
+
+            // Act
+            var result = deserializer.Object.ReadInline(wrapper, collectionType, readContext);
+
+            // Assert
+            deserializer.Verify();
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void ReadInline_Calls_ReadInlineForEachDeltaItem()
+        {
+            ODataDeserializerProvider provider = ODataFormatterHelpers.GetDeserializerProvider();
+        }
+
         [Fact]
         public void ReadDeltaResourceSet_Calls_ReadInlineForEachDeltaItem()
         {
@@ -53,6 +141,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Assert
             Assert.Equal(new[] { "entry1", "entry2" }, result.OfType<String>());
             resourceDeserializer.Verify();
+        }
+
+        [Fact]
+        public void ReadDeltaResource_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaResource(null, null, null), "resource");
+
+            // Arrange & Act & Assert
+            ODataResourceWrapper wrapper = new ODataResourceWrapper(new ODataResource());
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaResource(wrapper, null, null), "readContext");
         }
 
         [Theory]
@@ -123,6 +224,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             }
         }
 
+        [Fact]
+        public void ReadDeltaDeletedLink_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaDeletedLink(null, null, null), "deletedLink");
+
+            // Arrange & Act & Assert
+            ODataDeltaDeletedLinkWrapper wrapper = new ODataDeltaDeletedLinkWrapper(
+                new ODataDeltaDeletedLink(new Uri("http://localhost"), new Uri("http://localhost"), "delete"));
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaDeletedLink(wrapper, null, null), "readContext");
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -174,6 +289,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 Assert.Equal(target, deltaDeletedLink.Target);
                 Assert.Equal("Orders", deltaDeletedLink.Relationship);
             }
+        }
+
+        [Fact]
+        public void ReadDeltaLink_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaLink(null, null, null), "link");
+
+            // Arrange & Act & Assert
+            ODataDeltaLinkWrapper wrapper = new ODataDeltaLinkWrapper(
+                new ODataDeltaLink(new Uri("http://localhost"), new Uri("http://localhost"), "delete"));
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaLink(wrapper, null, null), "readContext");
         }
 
         [Theory]

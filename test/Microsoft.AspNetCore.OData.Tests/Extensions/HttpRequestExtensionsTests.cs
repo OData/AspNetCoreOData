@@ -4,6 +4,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Moq;
+using System;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
@@ -91,6 +93,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         [Fact]
+        public void GetNextPageLink_Returns_Uri()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = RequestFactory.Create("get", "http://localhost");
+
+            // Act
+            Uri uri = request.GetNextPageLink(4, 4, null);
+
+            // Assert
+            Assert.Equal(new Uri("http://localhost/?$skip=4"), uri);
+        }
+
+        [Fact]
         public void CreateETag_ThrowsArgumentNull_Request()
         {
             // Arrange & Act & Assert
@@ -128,6 +143,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Arrange & Act & Assert
             HttpRequest request = null;
             ExceptionAssert.ThrowsArgumentNull(() => request.CreateSubServiceProvider(""), "request");
+        }
+
+        [Fact]
+        public void CreateSubServiceProvider_ThrowsInvalidOperation_SubServiceProvider()
+        {
+            // Arrange
+            HttpRequest request = RequestFactory.Create();
+            request.ODataFeature().SubServiceProvider = new Mock<IServiceProvider>().Object;
+
+            // Act
+            Action test = () => request.CreateSubServiceProvider("odata");
+
+            // Assert
+            ExceptionAssert.Throws<InvalidOperationException>(test, "A request container already exists on the request.");
         }
 
         [Fact]

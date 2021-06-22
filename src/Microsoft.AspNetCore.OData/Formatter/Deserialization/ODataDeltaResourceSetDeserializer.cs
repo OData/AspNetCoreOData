@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (!edmType.IsCollection() || !edmType.AsCollection().ElementType().IsStructured())
             {
-                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.FullName());
             }
 
             ODataDeltaResourceSetWrapper resourceSet = item as ODataDeltaResourceSetWrapper;

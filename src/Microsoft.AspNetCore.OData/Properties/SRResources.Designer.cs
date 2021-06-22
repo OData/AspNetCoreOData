@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
+        ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers..
         /// </summary>
         internal static string ApplyQueryOptionNotSupportedForLinq2SQL {
             get {
@@ -1744,7 +1744,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
         /// </summary>
         internal static string TypeMustBeResourceSet {
             get {

@@ -4,19 +4,67 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
     public class ApplyQueryOptionTest
     {
+        private static IEdmModel _model = GetEdmModel();
+
+        [Fact]
+        public void CtorApplyQueryOption_ThrowsArgumentNull_ForInputParameter()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNullOrEmpty(() => new ApplyQueryOption(null, null, null), "rawValue");
+            ExceptionAssert.ThrowsArgumentNullOrEmpty(() => new ApplyQueryOption(string.Empty, null, null), "rawValue");
+
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ApplyQueryOption("groupby", null, null), "context");
+
+            // Arrange & Act & Assert
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            ExceptionAssert.ThrowsArgumentNull(() => new ApplyQueryOption("groupby", context, null), "queryOptionParser");
+        }
+
+        [Fact]
+        public void ApplyToApplyQueryOption_ThrowsArgumentNull_ForInputParameter()
+        {
+            // Arrange
+            IEdmType type = EdmCoreModel.Instance.GetString(false).Definition;
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, type);
+            ApplyQueryOption apply = new ApplyQueryOption("groupby", context);
+
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => apply.ApplyTo(null, null), "query");
+
+            // Arrange & Act & Assert
+            Mock<IQueryable> queryable = new Mock<IQueryable>();
+            ExceptionAssert.ThrowsArgumentNull(() => apply.ApplyTo(queryable.Object, null), "querySettings");
+
+            // Arrange & Act & Assert
+            ExceptionAssert.Throws<NotSupportedException>(() => apply.ApplyTo(queryable.Object, new ODataQuerySettings()),
+                "The query option is not bound to any CLR type. 'ApplyTo' is only supported with a query option bound to a CLR type.");
+
+            // Arrange & Act & Assert
+            context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            apply = new ApplyQueryOption("groupby", context);
+            queryable.Setup(q => q.Provider).Returns(new System.Data.Linq.MyQueryProvider());
+            ExceptionAssert.Throws<NotSupportedException>(() => apply.ApplyTo(queryable.Object, new ODataQuerySettings()),
+                "$apply query options not supported for LINQ to SQL providers.");
+        }
+
         // Legal apply queries usable against CustomerApplyTestData.
         // Tuple is: apply, expected number
         public static TheoryDataSet<string, List<Dictionary<string, object>>> CustomerTestApplies
@@ -1495,6 +1543,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.False(true, "Property " + path + " not found");
             return null;
         }
+
+        private static IEdmModel GetEdmModel()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<ApplyCustomer>("Customers");
+            return builder.GetEdmModel();
+        }
+
+        private class ApplyCustomer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string City { get; set; }
+        }
     }
 
     public class CustomersController : ODataController
@@ -1510,6 +1572,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public IQueryable<Customer> Get()
         {
             return _customers.AsQueryable();
+        }
+    }
+}
+
+namespace System.Data.Linq
+{
+    public class MyQueryProvider : IQueryProvider
+    {
+        public IQueryable CreateQuery(Expression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Execute(Expression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TResult Execute<TResult>(Expression expression)
+        {
+            throw new NotImplementedException();
         }
     }
 }

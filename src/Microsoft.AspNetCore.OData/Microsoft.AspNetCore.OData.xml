@@ -6077,7 +6077,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ApplyQueryOptionNotSupportedForLinq2SQL">
             <summary>
-              Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
+              Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ApplyToOnUntypedQueryOption">
@@ -6957,7 +6957,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeResourceSet">
             <summary>
-              Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
+              Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeOfDynamicPropertyNotSupported">
