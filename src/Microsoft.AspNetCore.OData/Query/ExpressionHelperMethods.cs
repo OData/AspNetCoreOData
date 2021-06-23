@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Query
         private static MethodInfo _createQueryGenericMethod = GetCreateQueryGenericMethod();
 
         //Unlike the Sum method, the return types are not unique and do not match the input type of the expression.
-        //Inspecting the 2nd parameters expression's function's 2nd argument is too specific for the GetQueryableAggregationMethods        
+        //Inspecting the 2nd parameters expression's function's 2nd argument is too specific for the GetQueryableAggregationMethods
         private static Dictionary<Type, MethodInfo> _enumerableAverageMethods = new Dictionary<Type, MethodInfo>()
         {
             { typeof(int), GenericMethodOf(_ => Enumerable.Average<string>(default(IEnumerable<string>), default(Func<string, int>))) },
@@ -111,259 +111,109 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private static MethodInfo _safeConvertToDecimalMethod = typeof(ExpressionHelperMethods).GetMethod("SafeConvertToDecimal");
 
-        public static MethodInfo EnumerableWhereGeneric
-        {
-            get { return _enumerableWhereMethod; }
-        }
+        public static MethodInfo EnumerableWhereGeneric => _enumerableWhereMethod;
 
-        public static MethodInfo QueryableToList
-        {
-            get { return _queryableToListMethod; }
-        }
+        public static MethodInfo QueryableToList => _queryableToListMethod;
 
-        public static MethodInfo QueryableOrderByGeneric
-        {
-            get { return _orderByMethod; }
-        }
+        public static MethodInfo QueryableOrderByGeneric => _orderByMethod;
 
-        public static MethodInfo EnumerableOrderByGeneric
-        {
-            get { return _enumerableOrderByMethod; }
-        }
+        public static MethodInfo EnumerableOrderByGeneric => _enumerableOrderByMethod;
 
-        public static MethodInfo QueryableOrderByDescendingGeneric
-        {
-            get { return _orderByDescendingMethod; }
-        }
+        public static MethodInfo QueryableOrderByDescendingGeneric => _orderByDescendingMethod;
 
-        public static MethodInfo EnumerableOrderByDescendingGeneric
-        {
-            get { return _enumerableOrderByDescendingMethod; }
-        }
+        public static MethodInfo EnumerableOrderByDescendingGeneric => _enumerableOrderByDescendingMethod;
 
-        public static MethodInfo QueryableThenByGeneric
-        {
-            get { return _thenByMethod; }
-        }
+        public static MethodInfo QueryableThenByGeneric => _thenByMethod;
 
-        public static MethodInfo EnumerableThenByGeneric
-        {
-            get { return _enumerableThenByMethod; }
-        }
+        public static MethodInfo EnumerableThenByGeneric => _enumerableThenByMethod;
 
-        public static MethodInfo QueryableThenByDescendingGeneric
-        {
-            get { return _thenByDescendingMethod; }
-        }
+        public static MethodInfo QueryableThenByDescendingGeneric => _thenByDescendingMethod;
 
-        public static MethodInfo EnumerableThenByDescendingGeneric
-        {
-            get { return _enumerableThenByDescendingMethod; }
-        }
+        public static MethodInfo EnumerableThenByDescendingGeneric => _enumerableThenByDescendingMethod;
 
-        public static MethodInfo QueryableCountGeneric
-        {
-            get { return _countMethod; }
-        }
+        public static MethodInfo QueryableCountGeneric => _countMethod;
 
-        public static Dictionary<Type, MethodInfo> QueryableSumGenerics
-        {
-            get { return _queryableSumMethods; }
-        }
+        public static Dictionary<Type, MethodInfo> QueryableSumGenerics => _queryableSumMethods;
 
-        public static Dictionary<Type, MethodInfo> EnumerableSumGenerics
-        {
-            get { return _enumerableSumMethods; }
-        }
+        public static Dictionary<Type, MethodInfo> EnumerableSumGenerics => _enumerableSumMethods;
 
-        public static MethodInfo QueryableMin
-        {
-            get { return _queryableMinMethod; }
-        }
+        public static MethodInfo QueryableMin => _queryableMinMethod; 
 
-        public static MethodInfo EnumerableMin
-        {
-            get { return _enumerableMinMethod; }
-        }
+        public static MethodInfo EnumerableMin => _enumerableMinMethod;
 
-        public static MethodInfo QueryableMax
-        {
-            get { return _queryableMaxMethod; }
-        }
+        public static MethodInfo QueryableMax => _queryableMaxMethod;
 
-        public static MethodInfo EnumerableMax
-        {
-            get { return _enumerableMaxMethod; }
-        }
+        public static MethodInfo EnumerableMax => _enumerableMaxMethod;
 
-        public static Dictionary<Type, MethodInfo> QueryableAverageGenerics
-        {
-            get { return _queryableAverageMethods; }
-        }
+        public static Dictionary<Type, MethodInfo> QueryableAverageGenerics => _queryableAverageMethods; 
 
-        public static Dictionary<Type, MethodInfo> EnumerableAverageGenerics
-        {
-            get { return _enumerableAverageMethods; }
-        }
+        public static Dictionary<Type, MethodInfo> EnumerableAverageGenerics => _enumerableAverageMethods;
 
-        public static MethodInfo QueryableDistinct
-        {
-            get { return _queryableDistinctMethod; }
-        }
+        public static MethodInfo QueryableDistinct => _queryableDistinctMethod;
 
-        public static MethodInfo EnumerableDistinct
-        {
-            get { return _enumerableDistinctMethod; }
-        }
+        public static MethodInfo EnumerableDistinct => _enumerableDistinctMethod;
 
-        public static MethodInfo QueryableGroupByGeneric
-        {
-            get { return _groupByMethod; }
-        }
+        public static MethodInfo QueryableGroupByGeneric => _groupByMethod;
 
-        public static MethodInfo EnumerableGroupByGeneric
-        {
-            get { return _enumerableGroupByMethod; }
-        }
+        public static MethodInfo EnumerableGroupByGeneric => _enumerableGroupByMethod;
 
-        public static MethodInfo QueryableAggregateGeneric
-        {
-            get { return _aggregateMethod; }
-        }
+        public static MethodInfo QueryableAggregateGeneric => _aggregateMethod; 
 
-        public static MethodInfo QueryableTakeGeneric
-        {
-            get { return _queryableTakeMethod; }
-        }
+        public static MethodInfo QueryableTakeGeneric => _queryableTakeMethod;
 
-        public static MethodInfo EnumerableTakeGeneric
-        {
-            get { return _enumerableTakeMethod; }
-        }
+        public static MethodInfo EnumerableTakeGeneric => _enumerableTakeMethod;
 
-        public static MethodInfo QueryableSkipGeneric
-        {
-            get { return _skipMethod; }
-        }
+        public static MethodInfo QueryableSkipGeneric => _skipMethod;
 
-        public static MethodInfo EnumerableSkipGeneric
-        {
-            get { return _enumerableSkipMethod; }
-        }
+        public static MethodInfo EnumerableSkipGeneric => _enumerableSkipMethod;
 
-        public static MethodInfo QueryableWhereGeneric
-        {
-            get { return _whereMethod; }
-        }
+        public static MethodInfo QueryableWhereGeneric => _whereMethod;
 
-        public static MethodInfo QueryableCastGeneric
-        {
-            get { return _queryableCastMethod; }
-        }
+        public static MethodInfo QueryableCastGeneric => _queryableCastMethod;
 
-        public static MethodInfo EnumerableCastGeneric
-        {
-            get { return _enumerableCastMethod; }
-        }
+        public static MethodInfo EnumerableCastGeneric => _enumerableCastMethod;
 
-        public static MethodInfo QueryableContainsGeneric
-        {
-            get { return _queryableContainsMethod; }
-        }
+        public static MethodInfo QueryableContainsGeneric => _queryableContainsMethod;
 
-        public static MethodInfo EnumerableContainsGeneric
-        {
-            get { return _enumerableContainsMethod; }
-        }
+        public static MethodInfo EnumerableContainsGeneric => _enumerableContainsMethod;
 
-        public static MethodInfo QueryableSelectGeneric
-        {
-            get { return _queryableSelectMethod; }
-        }
+        public static MethodInfo QueryableSelectGeneric => _queryableSelectMethod;
 
-        public static MethodInfo EnumerableSelectGeneric
-        {
-            get { return _enumerableSelectMethod; }
-        }
+        public static MethodInfo EnumerableSelectGeneric => _enumerableSelectMethod;
 
-        public static MethodInfo QueryableSelectManyGeneric
-        {
-            get { return _queryableSelectManyMethod; }
-        }
+        public static MethodInfo QueryableSelectManyGeneric => _queryableSelectManyMethod;
 
-        public static MethodInfo EnumerableSelectManyGeneric
-        {
-            get { return _enumerableSelectManyMethod; }
-        }
+        public static MethodInfo EnumerableSelectManyGeneric => _enumerableSelectManyMethod;
 
-        public static MethodInfo QueryableEmptyAnyGeneric
-        {
-            get { return _queryableEmptyAnyMethod; }
-        }
+        public static MethodInfo QueryableEmptyAnyGeneric => _queryableEmptyAnyMethod;
 
-        public static MethodInfo QueryableNonEmptyAnyGeneric
-        {
-            get { return _queryableNonEmptyAnyMethod; }
-        }
+        public static MethodInfo QueryableNonEmptyAnyGeneric => _queryableNonEmptyAnyMethod;
 
-        public static MethodInfo QueryableAllGeneric
-        {
-            get { return _queryableAllMethod; }
-        }
+        public static MethodInfo QueryableAllGeneric => _queryableAllMethod;
 
-        public static MethodInfo EnumerableEmptyAnyGeneric
-        {
-            get { return _enumerableEmptyAnyMethod; }
-        }
+        public static MethodInfo EnumerableEmptyAnyGeneric => _enumerableEmptyAnyMethod;
 
-        public static MethodInfo EnumerableNonEmptyAnyGeneric
-        {
-            get { return _enumerableNonEmptyAnyMethod; }
-        }
+        public static MethodInfo EnumerableNonEmptyAnyGeneric => _enumerableNonEmptyAnyMethod;
 
-        public static MethodInfo EnumerableAllGeneric
-        {
-            get { return _enumerableAllMethod; }
-        }
+        public static MethodInfo EnumerableAllGeneric => _enumerableAllMethod;
 
-        public static MethodInfo EnumerableOfType
-        {
-            get { return _enumerableOfTypeMethod; }
-        }
+        public static MethodInfo EnumerableOfType => _enumerableOfTypeMethod;
 
-        public static MethodInfo QueryableOfType
-        {
-            get { return _queryableOfTypeMethod; }
-        }
+        public static MethodInfo QueryableOfType => _queryableOfTypeMethod;
 
-        public static MethodInfo QueryableAsQueryable
-        {
-            get { return _queryableAsQueryableMethod; }
-        }
+        public static MethodInfo QueryableAsQueryable => _queryableAsQueryableMethod;
 
-        public static MethodInfo EntityAsQueryable
-        {
-            get { return _toQueryableMethod; }
-        }
+        public static MethodInfo EntityAsQueryable => _toQueryableMethod;
+
+        public static MethodInfo EnumerableCountGeneric => _enumerableCountMethod;
+
+        public static MethodInfo ConvertToDecimal => _safeConvertToDecimalMethod;
+
+        public static MethodInfo CreateQueryGeneric => _createQueryGenericMethod;
 
         public static IQueryable ToQueryable<T>(T value)
         {
             return (new List<T> { value }).AsQueryable();
-        }
-
-        public static MethodInfo EnumerableCountGeneric
-        {
-            get { return _enumerableCountMethod; }
-        }
-
-        public static MethodInfo ConvertToDecimal
-        {
-            get { return _safeConvertToDecimalMethod; }
-        }
-
-        public static MethodInfo CreateQueryGeneric
-        {
-            get { return _createQueryGenericMethod; }
         }
 
         public static decimal? SafeConvertToDecimal(object value)

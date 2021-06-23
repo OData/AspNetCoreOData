@@ -67,6 +67,29 @@ namespace Microsoft.AspNetCore.OData.Tests
                 Services = services
             };
 
+            // Act
+            builder.AddOData();
+            IServiceProvider provider = services.BuildServiceProvider();
+
+            // Assert
+            IOptions<ODataOptions> options = provider.GetService<IOptions<ODataOptions>>();
+            Assert.NotNull(options);
+
+            ODataOptions odataOptions = options.Value;
+            Assert.Empty(odataOptions.Models);
+        }
+
+        [Fact]
+        public void AddODataWithSetup_OnMvcCoreBuilder_RegistersODataOptions()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            services.AddLogging();
+            IMvcCoreBuilder builder = new MyMvcCoreBuilder
+            {
+                Services = services
+            };
+
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
@@ -85,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
-        public void AddOData_RegistersODataOptionsWithServiceProvider()
+        public void AddODataWithSetup_RegistersODataOptionsWithServiceProvider()
         {
             // Arrange
             var services = new ServiceCollection();

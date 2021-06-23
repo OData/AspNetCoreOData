@@ -81,6 +81,25 @@ namespace Microsoft.AspNetCore.OData.Tests
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
+
+            // Act
+            services.AddControllers().AddOData();
+            IServiceProvider provider = services.BuildServiceProvider();
+
+            // Assert
+            IOptions<ODataOptions> options = provider.GetService<IOptions<ODataOptions>>();
+            Assert.NotNull(options);
+
+            ODataOptions odataOptions = options.Value;
+            Assert.Empty(odataOptions.Models);
+        }
+
+        [Fact]
+        public void AddODataWithSetup_RegistersODataOptions()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            services.AddLogging();
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
@@ -99,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
-        public void AddOData_RegistersODataOptionsWithServiceProvider()
+        public void AddODataWithSetup_RegistersODataOptionsWithServiceProvider()
         {
             // Arrange
             var services = new ServiceCollection();

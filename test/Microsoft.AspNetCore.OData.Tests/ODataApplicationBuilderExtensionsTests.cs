@@ -100,9 +100,22 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Theory]
+        [InlineData("/$odata2", true)]
+        [InlineData("/$odata", false)]
+        public async Task UseODataRouteDebug_Calls_ODataRouteDebugMiddleware(string requestPath, bool lastCalledExpected)
+        {
+            await VerifyRouteDebug(requestPath, lastCalledExpected, app => app.UseODataRouteDebug());
+        }
+
+        [Theory]
         [InlineData("/$odata2", false)]
         [InlineData("/$odata", true)]
-        public async Task UseODataRouteDebug_Calls_ODataRouteDebugMiddleware(string requestPath, bool lastCalledExpected)
+        public async Task UseODataRouteDebug_UsingPattern_Calls_ODataRouteDebugMiddleware(string requestPath, bool lastCalledExpected)
+        {
+            await VerifyRouteDebug(requestPath, lastCalledExpected, app => app.UseODataRouteDebug("$odata2"));
+        }
+
+        private static async Task VerifyRouteDebug(string requestPath, bool lastCalledExpected, Action<ApplicationBuilder> config)
         {
             // Arrange
             IServiceCollection services = new ServiceCollection();
@@ -118,7 +131,8 @@ namespace Microsoft.AspNetCore.OData.Tests
             bool lastCalled = false;
 
             // Act
-            builder.UseODataRouteDebug("$odata2"); // first - middleware
+            config(builder);// first - middleware
+
             builder.Run(context =>  // second - middleware
             {
                 lastCalled = true;

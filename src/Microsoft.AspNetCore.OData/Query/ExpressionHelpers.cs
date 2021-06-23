@@ -224,9 +224,11 @@ namespace Microsoft.AspNetCore.OData.Query
             return selectMethod.Invoke(null, new object[] { query, expression }) as IQueryable;
         }
 
+#if false
         public static IQueryable SelectMany(IQueryable query, LambdaExpression expression, Type type)
         {
-            MethodInfo selectManyMethod = ExpressionHelperMethods.QueryableSelectManyGeneric.MakeGenericMethod(type, expression.Body.Type);
+            Type elementType = TypeHelper.GetInnerElementType(expression.Body.Type);
+            MethodInfo selectManyMethod = ExpressionHelperMethods.QueryableSelectManyGeneric.MakeGenericMethod(type, elementType);
             return selectManyMethod.Invoke(null, new object[] { query, expression }) as IQueryable;
         }
 
@@ -240,6 +242,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             return converterMethod.Invoke(null, new object[] { agg }) as IQueryable;
         }
+#endif
 
         public static IQueryable Where(IQueryable query, Expression where, Type type)
         {

@@ -13,6 +13,8 @@ namespace Microsoft.AspNetCore.OData
     /// </summary>
     public static class ODataApplicationBuilderExtensions
     {
+        private const string DefaultODataRouteDebugMiddlewareRoutePattern = "$odata";
+
         /// <summary>
         /// Use OData batching middleware.
         /// </summary>
@@ -53,8 +55,6 @@ namespace Microsoft.AspNetCore.OData
         {
             return app.UseODataRouteDebug(DefaultODataRouteDebugMiddlewareRoutePattern);
         }
-
-        private const string DefaultODataRouteDebugMiddlewareRoutePattern = "$odata";
 
         /// <summary>
         /// Use OData route debug middleware using the given route pattern.

@@ -4,6 +4,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,16 @@ namespace Microsoft.AspNetCore.OData.Tests
 {
     public class ODataMvcOptionsSetupTests
     {
+        [Fact]
+        public void Configure_ThrowsArgumentNull_Options()
+        {
+            // Arrange
+            ODataMvcOptionsSetup setup = new ODataMvcOptionsSetup();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => setup.Configure(null), "options");
+        }
+
         [Fact]
         public void ODataMvcOptionsSetup_DoesNotSetup_ODataFormatters()
         {
