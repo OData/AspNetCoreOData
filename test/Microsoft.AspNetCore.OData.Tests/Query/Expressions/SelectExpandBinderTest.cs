@@ -909,6 +909,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Taxes")]
         [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddress")]
         [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddresses")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/HomeAddress")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Addresses")]
         public void GetSelectExpandProperties_ForDirectProperty_OutputCorrectProperties(string select)
         {
             // Arrange
@@ -1159,6 +1161,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Addresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCities")]
         [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCities")]
         [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/VipAddresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/HomeAddress/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCnAddress/CnCities")]
+        [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryVipCustomer/Addresses/Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryUsAddress/UsCities")]
         public void GetSelectExpandProperties_ForNonDirectNavigationProperty_ReturnsCorrectExpandedProperties(string expand)
         {
             // Arrange
@@ -1896,6 +1900,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public QueryAddress VipAddress { get; set; }
 
         public QueryAddress[] VipAddresses { get; set; }
+        
+        public new QueryUsAddress HomeAddress { get; set; }
+
+        public new QueryCnAddress[] Addresses { get; set; }
 
         public QueryVipOrder SpecialOrder { get; set; }
 

@@ -170,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // Expression:  source.Property
             string propertyName = _model.GetClrPropertyName(property);
-            PropertyInfo propertyInfo = source.Type.GetProperty(propertyName);
+            PropertyInfo propertyInfo = source.Type.GetProperties().First(p => p.Name == propertyName);
             Expression propertyValue = Expression.Property(source, propertyInfo);
             Type nullablePropertyType = TypeHelper.ToNullable(propertyValue.Type);
             Expression nullablePropertyValue = ExpressionHelpers.ToNullable(propertyValue);
