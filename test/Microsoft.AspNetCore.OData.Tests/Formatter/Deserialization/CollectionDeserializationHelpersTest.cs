@@ -6,11 +6,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -53,6 +55,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             source.AddToCollection(newCollection, typeof(SimpleEnum), typeof(CollectionDeserializationHelpersTest), "PropertyName", newCollection.GetType());
 
             Assert.Equal(new[] { SimpleEnum.First, SimpleEnum.Second, SimpleEnum.Third }, newCollection as IEnumerable<SimpleEnum>);
+        }
+
+        [Fact]
+        public void AddToCollection_ThrowsSerializationException_IsAnArray()
+        {
+            // Arrange
+            IList source = new List<SimpleEnum> { SimpleEnum.First, SimpleEnum.Second, SimpleEnum.Third };
+            IEnumerable newCollection = new string[] { };
+
+            // Act
+            Action test = () => source.AddToCollection(newCollection, typeof(SimpleEnum), typeof(CollectionDeserializationHelpersTest), "PropertyName", newCollection.GetType());
+
+            // Assert
+            ExceptionAssert.Throws<SerializationException>(test,
+                "The value of the property 'PropertyName' on type 'Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.CollectionDeserializationHelpersTest' is an array." +
+                " Consider adding a setter for the property.");
         }
 
         [Fact]

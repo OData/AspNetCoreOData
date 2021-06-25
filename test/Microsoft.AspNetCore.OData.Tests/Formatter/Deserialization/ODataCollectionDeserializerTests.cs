@@ -96,6 +96,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void ReadInline_ThrowsArgumentNull_ReadContext()
+        {
+            // Arrange
+            var deserializer = new ODataCollectionDeserializer(DeserializerProvider);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(42, IntCollectionType, null), "readContext");
+        }
+
+        [Fact]
+        public void ReadInline_ThrowsSerializationException_IfNonCollectionType()
+        {
+            // Arrange
+            var deserializer = new ODataCollectionDeserializer(DeserializerProvider);
+            IEdmTypeReference intType = EdmCoreModel.Instance.GetInt32(false);
+
+            // Act & Assert
+            ExceptionAssert.Throws<SerializationException>(() => deserializer.ReadInline(42, intType, new ODataDeserializerContext()),
+                "'[Edm.Int32 Nullable=False]' cannot be deserialized using the OData input formatter.");
+        }
+
+        [Fact]
         public void ReadInline_ReturnsNull_IfItemIsNull()
         {
             // Arrange
@@ -121,6 +143,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Assert
             deserializer.Verify();
+        }
+
+        [Fact]
+        public void ReadInline_ReturnsNull_ReadCollectionValueReturnsNull()
+        {
+            // Arrange
+            Mock<ODataCollectionDeserializer> deserializer = new Mock<ODataCollectionDeserializer>(DeserializerProvider);
+            ODataCollectionValue collectionValue = new ODataCollectionValue();
+            ODataDeserializerContext readContext = new ODataDeserializerContext();
+
+            deserializer.CallBase = true;
+            deserializer.Setup(s => s.ReadCollectionValue(collectionValue, IntCollectionType.ElementType(), readContext)).Returns((IEnumerable)null);
+
+            // Act
+            object actual = deserializer.Object.ReadInline(collectionValue, IntCollectionType, readContext);
+
+            // Assert
+            Assert.Null(actual);
         }
 
         [Fact]

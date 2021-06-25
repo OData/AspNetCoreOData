@@ -2629,7 +2629,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 #endregion
 
         [Fact]
-        public void BindOnFilterBinder_ThrowsArgumentNull_Node()
+        public void BindForNodeOnFilterBinder_ThrowsArgumentNull_Node()
         {
             // Arrange
             ODataQuerySettings settings = new ODataQuerySettings();
@@ -2639,6 +2639,48 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindDynamicPropertyAccessQueryNode(null), "openNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleResourceFunctionCallNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleResourceCastNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionResourceCastNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindBinaryOperatorNode(null), "binaryOperatorNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindInNode(null), "inNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindRangeVariable(null), "rangeVariable");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionPropertyAccessNode(null), "propertyAccessNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionComplexNode(null), "collectionComplexNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindPropertyAccessQueryNode(null), "propertyAccessNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleComplexNode(null), "singleComplexNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindUnaryOperatorNode(null), "unaryOperatorNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindAllNode(null), "allNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindAnyNode(null), "anyNode");
         }
 
         [Fact]

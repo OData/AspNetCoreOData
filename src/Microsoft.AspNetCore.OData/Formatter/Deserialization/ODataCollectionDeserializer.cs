@@ -109,6 +109,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return castedResult;
                 }
             }
+
             return null;
         }
 

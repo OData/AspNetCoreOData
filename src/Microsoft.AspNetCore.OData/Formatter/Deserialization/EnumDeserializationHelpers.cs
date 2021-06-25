@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData;
 
@@ -15,11 +14,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (value == null)
             {
-                throw Error.ArgumentNull("value");
+                throw Error.ArgumentNull(nameof(value));
             }
+
             if (type == null)
             {
-                throw Error.ArgumentNull("type");
+                throw Error.ArgumentNull(nameof(type));
             }
 
             Type enumType = TypeHelper.GetUnderlyingTypeOrSelf(type);

@@ -9,6 +9,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
     public class FastPropertyAccessorTest
     {
         [Fact]
+        public void Ctor_ThrowsArgumentNull_Property()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new FastPropertyAccessor<MyProps>(null), "property");
+        }
+
+        [Fact]
+        public void Ctor_ThrowsArgument_Property()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgument(
+                () => new FastPropertyAccessor<MyProps>(typeof(MyProps).GetProperty("DoubleProp")),
+                "property", "The PropertyInfo provided must have public 'get' and 'set' accessor methods.");
+        }
+
+        [Fact]
         public void GetterWorksForValueType()
         {
             // Arrange
@@ -82,10 +98,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             Assert.Equal("#3", mine.StringProp);
         }
 
+        [Fact]
+        public void Copy_ThrowsArgumentNull_FromAndTo()
+        {
+            // Arrange
+            var accessor = new FastPropertyAccessor<MyProps>(typeof(MyProps).GetProperty("StringProp"));
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => accessor.Copy(null, null), "from");
+
+            // Act & Assert
+            MyProps mine = new MyProps();
+            ExceptionAssert.ThrowsArgumentNull(() => accessor.Copy(mine, null), "to");
+        }
+
         public class MyProps
         {
             public int IntProp { get; set; }
             public string StringProp { get; set; }
+
+            public double DoubleProp { get; }
         }
     }
 }

@@ -927,8 +927,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
             Justification = "Need lower case string here.")]
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
-            Justification = "These are simple and flat processing functions based on parameter key value and cannot be split up.")]
         private void BuildQueryOptions(IDictionary<string, string> queryParameters)
         {
             foreach (KeyValuePair<string, string> kvp in queryParameters)

@@ -556,7 +556,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an {1} cannot be null..
+        ///   Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an &apos;{1}&apos; cannot be null..
         /// </summary>
         internal static string EdmTypeCannotBeNull {
             get {

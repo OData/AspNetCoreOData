@@ -86,6 +86,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
             return Failed;
         }
+
         internal static string GetRequestPreferHeader(IHeaderDictionary headers)
         {
             StringValues values;

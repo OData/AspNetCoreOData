@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             HttpRequest request = context.HttpContext.Request;
             if (request == null)
             {
-                throw Error.InvalidOperation(SRResources.ReadFromStreamAsyncMustHaveRequest);
+                throw Error.InvalidOperation(SRResources.WriteToResponseAsyncMustHaveRequest);
             }
 
             // Ignore non-OData requests.

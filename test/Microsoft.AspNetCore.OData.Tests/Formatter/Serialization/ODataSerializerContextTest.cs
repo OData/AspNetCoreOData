@@ -133,7 +133,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() => context.GetEdmType(edmObject, null),
                 exceptionMessage: "The EDM type of the object of type 'Microsoft.AspNetCore.OData.Tests.Formatter.Serialization.ODataSerializerContextTest+NullEdmType'" +
-                " is null. The EDM type of an IEdmObject cannot be null.");
+                " is null. The EDM type of an 'IEdmObject' cannot be null.");
         }
 
         private static IEdmModel GetEdmModel()

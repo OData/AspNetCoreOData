@@ -22,7 +22,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// Translates an OData $filter parse tree represented by <see cref="FilterClause"/> to
     /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
     /// </summary>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     public class FilterBinder : ExpressionBinderBase
     {
         private const string ODataItParameterName = "$it";
@@ -682,14 +681,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 default:
                     throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, unaryOperatorNode.Kind, typeof(FilterBinder).Name);
-            }
-        }
-
-        private static void ValidateAllStringArguments(string functionName, Expression[] arguments)
-        {
-            if (arguments.Any(arg => arg.Type != typeof(string)))
-            {
-                throw new ODataException(Error.Format(SRResources.FunctionNotSupportedOnEnum, functionName));
             }
         }
 

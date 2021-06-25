@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.UriParser;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -51,6 +52,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => new ODataQueryOptions(new ODataQueryContext(EdmCoreModel.Instance, typeof(bool)), null), "request");
+        }
+
+        [Fact]
+        public void ValidateODataQueryOption_ThrowsArgumentNull_ValidationSettingst()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://any");
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+
+            ExceptionAssert.ThrowsArgumentNull(() => queryOptions.Validate(null), "validationSettings");
         }
 
         [Theory]
@@ -691,6 +703,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange & Act & Assert
             Assert.True(ODataQueryOptions.IsSystemQueryOption(queryName));
+
+            string newQueryName = queryName.Substring(1); // remove "$"
+            Assert.False(ODataQueryOptions.IsSystemQueryOption(newQueryName, false));
+            Assert.True(ODataQueryOptions.IsSystemQueryOption(newQueryName, true));
         }
 
         [Fact]
@@ -698,6 +714,63 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange & Act & Assert
             Assert.False(ODataQueryOptions.IsSystemQueryOption("$invalidqueryname"));
+        }
+
+        [Fact]
+        public void IsSystemQueryOption_ThrowsArgumentNull_QueryOptionName()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNullOrEmpty(() => ODataQueryOptions.IsSystemQueryOption(null), "queryOptionName");
+            ExceptionAssert.ThrowsArgumentNullOrEmpty(() => ODataQueryOptions.IsSystemQueryOption(string.Empty), "queryOptionName");
+        }
+
+        [Fact]
+        public void GenerateStableOrder_Works_WithGroupbyApplyClause()
+        {
+            // Arrange
+            IEdmModel model = GetEdmModel(c => c.CustomerId);
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers?$apply=groupby((CustomerId, Name))&$orderby=Name");
+
+            ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
+            ODataQueryOptions option = new ODataQueryOptions(context, request);
+
+            // Act
+            OrderByQueryOption orderByQuery = option.GenerateStableOrder();
+
+            // Assert
+            Assert.NotNull(orderByQuery);
+            Assert.Equal(2, orderByQuery.OrderByNodes.Count);
+            Assert.Collection(orderByQuery.OrderByNodes,
+                e =>
+                {
+                    OrderByPropertyNode node = Assert.IsType<OrderByPropertyNode>(e);
+                    Assert.Equal("Name", node.Property.Name);
+                },
+                e =>
+                {
+                    OrderByPropertyNode node = Assert.IsType<OrderByPropertyNode>(e);
+                    Assert.Equal("CustomerId", node.Property.Name);
+                });
+        }
+
+        [Fact]
+        public void GenerateStableOrder_Works_WithAggregateApplyClause()
+        {
+            // Arrange
+            IEdmModel model = GetEdmModel(c => c.CustomerId);
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers?$apply=aggregate(CustomerId with sum as Total)&$orderby=Total");
+
+            ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
+            ODataQueryOptions option = new ODataQueryOptions(context, request);
+
+            // Act
+            OrderByQueryOption orderByQuery = option.GenerateStableOrder();
+
+            // Assert
+            Assert.NotNull(orderByQuery);
+            OrderByNode orderbyNode = Assert.Single(orderByQuery.OrderByNodes);
+            OrderByOpenPropertyNode node = Assert.IsType<OrderByOpenPropertyNode>(orderbyNode);
+            Assert.Equal("Total", node.PropertyName);
         }
 
         [Theory]

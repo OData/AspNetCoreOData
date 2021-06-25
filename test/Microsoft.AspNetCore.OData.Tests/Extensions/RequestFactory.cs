@@ -122,11 +122,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <param name="model">The given Edm model.</param>
         /// <returns>The created HttpRequest.</returns>
         public static HttpRequest Create(IEdmModel model) => Create("Get", "http://localhost/", model);
-        //{
-        //    HttpContext context = new DefaultHttpContext();
-        //    context.ODataFeature().Model = model;
-        //    return context.Request;
-        //}
+
+        /// <summary>
+        /// Create the HttpRequest with IEdmModel.
+        /// </summary>
+        /// <param name="model">The given Edm model.</param>
+        /// <param name="setupAction">The OData configuration.</param>
+        /// <returns>The created HttpRequest.</returns>
+        public static HttpRequest Create(IEdmModel model, Action<ODataOptions> setupAction)
+        {
+            HttpRequest request = Create("Get", "http://localhost/", setupAction);
+            IODataFeature feature = request.ODataFeature();
+            feature.PrefixName = "";
+            feature.Model = model;
+            return request;
+        }
 
         /// <summary>
         /// 

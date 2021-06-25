@@ -229,7 +229,7 @@ public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem {
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem {
 	protected ODataBatchResponseItem ()
 
-	internal virtual bool IsResponseSuccessful ()
+	internal abstract bool IsResponseSuccessful ()
 	[
 	AsyncStateMachineAttribute(),
 	]
@@ -768,11 +768,6 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensi
 ExtensionAttribute(),
 ]
 public sealed class Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions {
-	[
-	ExtensionAttribute(),
-	]
-	public static Microsoft.AspNetCore.Routing.LinkGenerator GetLinkGenerator (Microsoft.AspNetCore.Http.HttpContext httpContext)
-
 	[
 	ExtensionAttribute(),
 	]

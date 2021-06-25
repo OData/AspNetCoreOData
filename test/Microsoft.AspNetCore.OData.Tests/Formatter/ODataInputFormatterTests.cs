@@ -64,6 +64,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Fact]
+        public void CanReadResultODataOutputFormatter_Throws_IfRequestIsNull()
+        {
+            // Arrange & Act
+            ODataInputFormatter formatter = new ODataInputFormatter(new[] { ODataPayloadKind.Resource });
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext.Setup(c => c.Request).Returns((HttpRequest)null);
+            InputFormatterContext context = new InputFormatterContext(httpContext.Object,
+                "any",
+                new ModelStateDictionary(),
+                new EmptyModelMetadataProvider().GetMetadataForType(typeof(int)),
+                 (stream, encoding) => null);
+
+            // Assert
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => formatter.CanRead(context),
+                "The OData formatter requires an attached request in order to deserialize.");
+        }
+
+        [Fact]
         public void CanReadReturnsFalseIfNoODataPathSet()
         {
             // Arrange & Act
@@ -127,6 +146,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                         Assert.Equal(TaskStatus.RanToCompletion, readTask.Status);
                         mockStream.Verify(s => s.Close(), Times.Never());
                     });
+        }
+
+        [Fact]
+        public async Task ReadRequestBodyAsync_ThrowsArgumentNull_ForInputParameter()
+        {
+            // Arrange
+            ODataInputFormatter formatter = GetInputFormatter();
+            InputFormatterContext formatterContext = null;
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8), "context");
+
+            //Mock<ModelMetadata> mock = new Mock<ModelMetadata>();
+            //mock.Setup(s => s.ModelType).Returns((Type)null);
+            //formatterContext = new InputFormatterContext(new DefaultHttpContext(),
+            //    modelName: string.Empty,
+            //    modelState: new ModelStateDictionary(),
+            //    metadata: mock.Object,
+            //    readerFactory: (stream, encoding) => new StreamReader(stream, encoding));
+
+            //await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8), "type");
+        }
+
+        [Fact]
+        public void GetDefaultBaseAddress_ThrowsArgumentNull_Request()
+        {
+            ExceptionAssert.ThrowsArgumentNull(() => ODataInputFormatter.GetDefaultBaseAddress(null), "request");
         }
 
         [Theory]

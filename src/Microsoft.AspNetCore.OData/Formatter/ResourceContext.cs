@@ -114,18 +114,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             set => SerializerContext.Request = value;
         }
 
-        ///// <summary>
-        ///// Gets or sets a <see cref="IWebApiUrlHelper"/> that may be used to generate links while serializing this resource
-        ///// instance.
-        ///// </summary>
-        //internal IWebApiUrlHelper InternalUrlHelper
-        //{
-        //    get
-        //    {
-        //        return SerializerContext.InternalUrlHelper;
-        //    }
-        //}
-
         /// <summary>
         /// Gets or sets the <see cref="TimeZoneInfo"/>.
         /// </summary>

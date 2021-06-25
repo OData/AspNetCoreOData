@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Assert
             ExceptionAssert.Throws<InvalidOperationException>(
                 () => formatter.CanWriteResult(context),
-                "The OData formatter requires an attached request in order to deserialize.");
+                "The OData formatter requires an attached request in order to serialize.");
         }
 
         [Fact]

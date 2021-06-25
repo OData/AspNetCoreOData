@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             Type type = context.ModelType;

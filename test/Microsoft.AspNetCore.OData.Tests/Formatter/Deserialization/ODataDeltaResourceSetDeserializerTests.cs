@@ -4,9 +4,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
 
@@ -21,6 +25,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
     public class ODataDeltaResourceSetDeserializerTests
     {
+        private static IEdmModel _model = GetEdmModel();
+
         [Fact]
         public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
@@ -40,6 +46,52 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageReader reader = new ODataMessageReader((IODataResponseMessage)new InMemoryMessage(), new ODataMessageReaderSettings());
 
             await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(reader, typeof(DeltaSet<>), null), "readContext");
+        }
+
+        [Fact]
+        public async Task ReadAsync_Calls_ReadInline()
+        {
+            // Arrange
+            string body = "{\"@context\":\"http://example.com/$metadata#Customers/$delta\"," +
+                "\"value\":[" +
+                  "{" +
+                    "\"@removed\":{\"reason\":\"changed\"}," +
+                    "\"ID\":1" +
+                  "}" +
+                "]" +
+              "}";
+
+            ODataMessageWrapper message = new ODataMessageWrapper(await GetStringAsStreamAsync(body));
+            message.SetHeader("Content-Type", "application/json");
+            ODataMessageReader reader = new ODataMessageReader(message as IODataRequestMessage, new ODataMessageReaderSettings(), _model);
+            IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("Customers");
+            ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
+            ODataDeserializerContext readerContext = new ODataDeserializerContext() { Path = path, Model = _model };
+
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<ODataDeltaResourceSetDeserializer> deserializer = new Mock<ODataDeltaResourceSetDeserializer>(deserializerProvider.Object);
+
+            // Arrange & Act & Assert
+            deserializer.CallBase = true;
+            deserializer
+                .Setup(s => s.ReadInline(It.IsAny<object>(), It.IsAny<IEdmTypeReference>(), readerContext))
+                .Returns((object)null)
+                .Verifiable();
+
+            object actual = await deserializer.Object.ReadAsync(reader, typeof(DeltaSet<>), readerContext);
+
+            // Arrange & Act & Assert
+            deserializer.Verify();
+        }
+
+        private static async Task<Stream> GetStringAsStreamAsync(string body)
+        {
+            Stream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            await writer.WriteAsync(body);
+            await writer.FlushAsync();
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
         }
 
         [Fact]
@@ -154,6 +206,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Arrange & Act & Assert
             ODataResourceWrapper wrapper = new ODataResourceWrapper(new ODataResource());
             ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaResource(wrapper, null, null), "readContext");
+        }
+
+        [Fact]
+        public void ReadDeltaResource_ThrowsSerializationException_NullDeserializer()
+        {
+            // Arrange & Act & Assert
+            IEdmComplexType complex = new EdmComplexType("NS", "Complex");
+            IEdmStructuredTypeReference typeRef = new EdmComplexTypeReference(complex, false);
+            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            deserializerProvider.Setup(s => s.GetEdmTypeDeserializer(typeRef, false)).Returns((ODataEdmTypeDeserializer)null);
+
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+
+            // Arrange & Act & Assert
+            ODataResourceWrapper wrapper = new ODataResourceWrapper(new ODataResource());
+            ODataDeserializerContext readContext = new ODataDeserializerContext();
+
+            ExceptionAssert.Throws<SerializationException>(
+                () => deserializer.ReadDeltaResource(wrapper, typeRef, readContext),
+                "'NS.Complex' cannot be deserialized using the OData input formatter.");
         }
 
         [Theory]

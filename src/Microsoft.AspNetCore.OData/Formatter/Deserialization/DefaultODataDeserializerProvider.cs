@@ -93,6 +93,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
             }
 
+            if (IsDelta(type))
+            {
+                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+            }
 
             IEdmModel model = request.GetModel();
             //IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
@@ -107,8 +111,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                bool isDelta = IsDelta(type);
-                return GetEdmTypeDeserializer(edmType, isDelta);
+                return GetEdmTypeDeserializer(edmType);
             }
         }
 

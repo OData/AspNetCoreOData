@@ -25,15 +25,15 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             if (writer == null)
             {
-                throw new ArgumentNullException(nameof(writer));
+                throw Error.ArgumentNull(nameof(writer));
             }
 
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            string contentId = (context.Request != null) ? context.Request.GetODataContentId() : String.Empty;
+            string contentId = (context.Request != null) ? context.Request.GetODataContentId() : string.Empty;
 
             ODataBatchOperationResponseMessage batchResponse = await writer.CreateOperationResponseMessageAsync(contentId).ConfigureAwait(false);
 
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             foreach (KeyValuePair<string, StringValues> header in context.Response.Headers)
             {
-                batchResponse.SetHeader(header.Key, String.Join(",", header.Value.ToArray()));
+                batchResponse.SetHeader(header.Key, string.Join(",", header.Value.ToArray()));
             }
 
             if (context.Response.Body != null && context.Response.Body.Length != 0)
@@ -71,9 +71,6 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <summary>
         /// Gets a value that indicates if the responses in this item are successful.
         /// </summary>
-        internal virtual bool IsResponseSuccessful()
-        {
-            return false;
-        }
+        internal abstract bool IsResponseSuccessful();
     }
 }

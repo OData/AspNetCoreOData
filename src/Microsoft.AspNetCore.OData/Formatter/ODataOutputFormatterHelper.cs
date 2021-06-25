@@ -148,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        private static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
+        internal static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
             ODataSerializerProvider serializerProvider)
         {
             ODataSerializer serializer;
@@ -248,6 +248,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     // Any $metadata request will throw "Synchronous operations are disallowed. Call WriteAsync or set AllowSynchronousIO to true."
     // So, we have to use "StreamWrapper" to override "Write(byte[] buffer, int offset, int count)"
     // Once we enable async for metadata writer, we should remove this class.
+    [ExcludeFromCodeCoverage]
     internal class StreamWrapper : Stream
     {
         private Stream stream;

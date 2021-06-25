@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadInline_Calls_ReadFeed()
+        public void ReadInline_Calls_ReadResourceSet()
         {
             // Arrange
             ODataDeserializerProvider deserializerProvider = _deserializerProvider;
