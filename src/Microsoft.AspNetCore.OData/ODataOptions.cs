@@ -15,14 +15,12 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
 {
-
     /// <summary>
     /// Contains the details of a given OData request. These properties should all be mutable.
     /// </summary>
     /// <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
     public class ODataOptions
     {
-
         #region Settings
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace Microsoft.AspNetCore.OData
 
         #endregion
 
-        #region Models
+        #region RouteComponents
 
         /// <summary>
         /// Contains the OData <see cref="IEdmModel"/> instances and Dependency Injection containers for specific routes.
@@ -171,7 +169,7 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
-        public ODataOptions EnableAllFeatures(int? maxTopValue)
+        public ODataOptions EnableODataQuery(int? maxTopValue)
         {
             QuerySettings.EnableExpand = true;
             QuerySettings.EnableSelect = true;
@@ -319,7 +317,5 @@ namespace Microsoft.AspNetCore.OData
 
             return odataContainerBuilder.BuildContainer();
         }
-
     }
-
 }

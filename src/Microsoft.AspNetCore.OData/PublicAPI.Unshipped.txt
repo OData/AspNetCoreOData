@@ -675,13 +675,13 @@ Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.get -> System.Func<Micros
 Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.Conventions.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention>
 Microsoft.AspNetCore.OData.ODataOptions.Count() -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.EnableAllFeatures(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
+Microsoft.AspNetCore.OData.ODataOptions.EnableODataQuery(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Expand() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(string prefix) -> System.IServiceProvider
