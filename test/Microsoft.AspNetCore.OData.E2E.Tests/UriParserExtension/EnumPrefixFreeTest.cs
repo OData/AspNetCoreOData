@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
@@ -25,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
             services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController), typeof(MetadataController));
 
             IEdmModel model = UriParserExtenstionEdmModel.GetEdmModel();
-            services.AddOData(opt => opt.AddModel("odata", model,
+            services.AddControllers().AddOData(opt => opt.AddModel("odata", model,
                 builder =>
                 {
                     builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(ODataUriResolver), sp => new StringAsEnumResolver() { EnableCaseInsensitive = true });
@@ -47,31 +48,61 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
             }
         }
 
-        [Theory]
-        [MemberData(nameof(EnumPrefixFreeCases))]
-        public async Task EnableEnumPrefixFreeTest(string prefix, string prefixFree, int statusCode)
+        [Fact]
+        public async Task EnableEnumPrefixFreeTest()
         {
             // Enum with prefix
             HttpClient client = CreateClient();
 
-            var prefixUri = $"odata/Customers/Default.GetCustomerByGender({prefix})";
+            var prefixUri = $"odata/Customers/Default.GetCustomerByGender(gEnDeR=Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'mAlE')";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, prefixUri);
             HttpResponseMessage response = await client.SendAsync(request);
 
-            Assert.Equal(statusCode, (int)response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             string prefixResponse = await response.Content.ReadAsStringAsync();
 
             // Enum prefix free
-            var prefixFreeUri = $"odata/Customers/Default.GetCustomerByGender({prefixFree})";
+            var prefixFreeUri = $"odata/Customers/Default.GetCustomerByGender(GeNdEr='MaLe')";
             request = new HttpRequestMessage(HttpMethod.Get, prefixFreeUri);
             response = await client.SendAsync(request);
 
-            Assert.Equal(statusCode, (int)response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             string prefixFreeResponse = await response.Content.ReadAsStringAsync();
 
-            if (statusCode == (int)HttpStatusCode.OK)
+            Assert.Equal(prefixResponse, prefixFreeResponse);
+        }
+
+        [Fact]
+        public async Task EnableEnumPrefixFreeTestThrows()
+        {
+            // Enum with prefix
+            HttpClient client = CreateClient();
+
+            var prefixUri = $"odata/Customers/Default.GetCustomerByGender(GeNdEr=Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'UnknownValue')";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, prefixUri);
+
+            try
             {
-                Assert.Equal(prefixResponse, prefixFreeResponse);
+                await client.SendAsync(request);
+            }
+            catch(ODataException ex)
+            {
+                Assert.Equal("The parameter value (Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'UnknownValue') from request is not valid. " +
+                    "The parameter value should be format of type 'Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'.", ex.Message);
+            }
+
+            // Enum prefix free
+            var prefixFreeUri = $"odata/Customers/Default.GetCustomerByGender(gEnDeR='UnknownValue')";
+            request = new HttpRequestMessage(HttpMethod.Get, prefixFreeUri);
+
+            try
+            {
+                await client.SendAsync(request);
+            }
+            catch(ODataException ex)
+            {
+                Assert.Equal("The parameter value ('UnknownValue') from request is not valid. " +
+                    "The parameter value should be format of type 'Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension.Gender'.", ex.Message);
             }
         }
     }

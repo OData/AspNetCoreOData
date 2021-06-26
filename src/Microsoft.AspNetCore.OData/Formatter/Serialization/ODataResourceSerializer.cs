@@ -232,7 +232,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmProperty.Type.IsCollection())
                 {
                     ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                    await serializer.WriteDeltaResourceSetInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
+                    await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
                         .ConfigureAwait(false);
                 }
                 else
@@ -513,7 +513,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (!(resourceContext.NavigationSource is IEdmContainedEntitySet))
                 {
                     IEdmModel model = resourceContext.SerializerContext.Model;
-                    NavigationSourceLinkBuilderAnnotation linkBuilder = Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(model, resourceContext.NavigationSource);
+                    NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, resourceContext.NavigationSource);
                     EntitySelfLinks selfLinks = linkBuilder.BuildEntitySelfLinks(resourceContext, resourceContext.SerializerContext.MetadataLevel);
 
                     if (selfLinks.IdLink != null)
@@ -565,12 +565,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return;
             }
 
-            bool nullDynamicPropertyEnabled = false;
-            if (resourceContext.EdmObject is EdmDeltaComplexObject || resourceContext.EdmObject is EdmDeltaResourceObject)
-            {
-                nullDynamicPropertyEnabled = true;
-            }
-
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;
             object value;
@@ -609,24 +603,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     continue;
                 }
 
-                if (dynamicProperty.Value == null)
-                {
-                    if (nullDynamicPropertyEnabled)
-                    {
-                        dynamicProperties.Add(new ODataProperty
-                        {
-                            Name = dynamicProperty.Key,
-                            Value = new ODataNullValue()
-                        });
-                    }
-
-                    continue;
-                }
-
                 if (declaredPropertyNameSet.Contains(dynamicProperty.Key))
                 {
                     throw Error.InvalidOperation(SRResources.DynamicPropertyNameAlreadyUsedAsDeclaredPropertyName,
                         dynamicProperty.Key, structuredType.FullTypeName());
+                }
+
+                if (dynamicProperty.Value == null)
+                {
+                    dynamicProperties.Add(new ODataProperty
+                    {
+                        Name = dynamicProperty.Key,
+                        Value = new ODataNullValue()
+                    });
+
+                    continue;
                 }
 
                 IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(dynamicProperty.Value,
@@ -700,7 +691,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
                 }
 
-                return resourceContext.Request.CreateETag(properties);
+                return resourceContext.Request.CreateETag(properties, resourceContext.TimeZone);
             }
 
             return null;
@@ -991,7 +982,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 IEdmTypeReference propertyType = navigationProperty.Type;
                 IEdmModel model = writeContext.Model;
-                NavigationSourceLinkBuilderAnnotation linkBuilder = Edm.EdmModelExtensions.GetNavigationSourceLinkBuilder(model, navigationSource);
+                NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, navigationSource);
                 Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
 
                 navigationLink = new ODataNestedResourceInfo

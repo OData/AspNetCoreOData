@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // By convention, we look for the controller name as "ODataOperationImportController"
             // Each operation import will be handled by the same action name in this controller.
-            return context.Controller?.ControllerName == "ODataOperationImport";
+            return context.Controller.ControllerName == "ODataOperationImport";
         }
 
         /// <inheritdoc />
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmModel model = context.Model;
 
             // By convention, we use the operation import name as the action name in the controller
-            string actionMethodName = action.ActionMethod.Name;
+            string actionMethodName = action.ActionName;
 
             var edmOperationImports = model.ResolveOperationImports(actionMethodName, enableCaseInsensitive: true);
             if (!edmOperationImports.Any())
@@ -57,18 +57,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return true;
             }
 
-            (var actionImports, var functionImports) = edmOperationImports.Split();
+            (var actionImports, var functionImports) = edmOperationImports.SplitOperationImports();
 
             // That's not allowed to have an action import and function import with the same name.
             if (actionImports.Count > 0 && functionImports.Count > 0)
             {
-                throw new ODataException($"Action import and function import '{actionMethodName}' MUST be unique within an entity container");
+                throw new ODataException(Error.Format(SRResources.OperationMustBeUniqueInEntitySetContainer, actionMethodName));
             }
             else if (actionImports.Count > 0 && context.Action.Attributes.Any(a => a is HttpPostAttribute))
             {
                 if (actionImports.Count != 1)
                 {
-                    throw new ODataException($"Found multiple action imports with same '{actionMethodName}' name within an entity container.");
+                    throw new ODataException(Error.Format(SRResources.MultipleActionImportFound, actionMethodName));
                 }
 
                 IEdmActionImport actionImport = actionImports[0];

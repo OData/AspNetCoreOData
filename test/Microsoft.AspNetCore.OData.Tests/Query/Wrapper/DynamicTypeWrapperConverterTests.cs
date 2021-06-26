@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -23,6 +24,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(NoGroupByWrapper), true)]
         [InlineData(typeof(object), false)]
         [InlineData(typeof(SelectExpandWrapper), false)]
+        [InlineData(null, false)]
         public void CanConvertWorksForDynamicTypeWrapper(Type type, bool expected)
         {
             // Arrange
@@ -42,6 +44,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(NoGroupByWrapper), typeof(NoGroupByWrapperConverter))]
         [InlineData(typeof(object), null)]
         [InlineData(typeof(SelectExpandWrapper), null)]
+        [InlineData(null, null)]
         public void CreateConverterWorksForDynamicTypeWrapper(Type type, Type expected)
         {
             // Arrange
@@ -63,41 +66,77 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void AggregationWrapperConverterCanSerializeAggregationWrapper()
+        public void AggregationWrapperConverter_Works_AggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverter<AggregationWrapper>();
+            TestDynamicTypeWrapperConverterRead<AggregationWrapper>();
+
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterWrite<AggregationWrapper>();
         }
 
         [Fact]
-        public void EntitySetAggregationWrapperConverterCanSerializeEntitySetAggregationWrapper()
+        public void EntitySetAggregationWrapperConverter_Works_EntitySetAggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverter<EntitySetAggregationWrapper>();
+            TestDynamicTypeWrapperConverterRead<EntitySetAggregationWrapper>();
+
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterWrite<EntitySetAggregationWrapper>();
         }
 
         [Fact]
-        public void GroupByWrapperWrapperConverterCanSerializeGroupByWrapper()
+        public void GroupByWrapperWrapperConverter_Works_GroupByWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverter<GroupByWrapper>();
+            TestDynamicTypeWrapperConverterRead<GroupByWrapper>();
+
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterWrite<GroupByWrapper>();
         }
 
         [Fact]
-        public void NoGroupByAggregationWrapperConverterCanSerializeNoGroupByAggregationWrapper()
+        public void NoGroupByAggregationWrapperConverter_Works_NoGroupByAggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverter<NoGroupByWrapper>();
+            TestDynamicTypeWrapperConverterRead<NoGroupByAggregationWrapper>();
+
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterWrite<NoGroupByAggregationWrapper>();
         }
 
         [Fact]
-        public void NoGroupByWrapperWrapperConverterCanSerializeNoGroupByWrapper()
+        public void NoGroupByWrapperWrapperConverter_Works_NoGroupByWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverter<NoGroupByWrapper>();
+            TestDynamicTypeWrapperConverterRead<NoGroupByWrapper>();
+
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterWrite<NoGroupByWrapper>();
         }
 
-        internal static void TestDynamicTypeWrapperConverter<T>() where T : GroupByWrapper
+        internal static void TestDynamicTypeWrapperConverterRead<T>() where T : GroupByWrapper
+        {
+            // Arrange
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            DynamicTypeWrapperConverter converter = new DynamicTypeWrapperConverter();
+            JsonConverter<T> typeConverter = converter.CreateConverter(typeof(T), options) as JsonConverter<T>;
+
+            try
+            {
+                // Act
+                ReadOnlySpan<byte> jsonReadOnlySpan = Encoding.UTF8.GetBytes("any");
+                Utf8JsonReader reader = new Utf8JsonReader(jsonReadOnlySpan);
+                typeConverter.Read(ref reader, typeof(AggregationWrapper), options);
+            }
+            catch (NotImplementedException ex)
+            {
+                // Assert
+                Assert.Equal($"'{typeof(T).Name}' is internal and should never be deserialized into.", ex.Message);
+            }
+        }
+
+        internal static void TestDynamicTypeWrapperConverterWrite<T>() where T : GroupByWrapper
         {
             // Arrange
             T wrapper = (T)Activator.CreateInstance(typeof(T));
@@ -120,8 +159,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void ComputeWrapperOfTypeConverterCanSerializeGroupByWrapper()
+        public void ComputeWrapperOfTypeConverter_Works_ComputeWrapper()
         {
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterRead<ComputeWrapper<object>>();
+
             // Arrange
             GroupByWrapper wrapper = new GroupByWrapper();
             wrapper.GroupByContainer = new AggregationPropertyContainer()
@@ -146,8 +188,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void FlatteningWrapperOfTypeConverterCanSerializeGroupByWrapper()
+        public void FlatteningWrapperOfTypeConverter_Works_FlatteningWrapper()
         {
+            // Arrange & Act & Assert
+            TestDynamicTypeWrapperConverterRead<FlatteningWrapper<object>>();
+
             // Arrange
             FlatteningWrapper<object> flatteningWrapper = new FlatteningWrapper<object>
             {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -20,12 +21,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         private static RefRoutingConvention _refConvention = ConventionHelpers.CreateConvention<RefRoutingConvention>();
 
         [Fact]
+        public void AppliesToControllerAndActionOnRefRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            RefRoutingConvention convention = new RefRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
+
+        [Fact]
         public void SplitRefActionName_WorksAsExpected()
         {
             // Arranges & Act & Assert
             string actionMethodName = "CreateRef";
             string method = RefRoutingConvention.SplitRefActionName(actionMethodName, out string httpMethod, out string prop, out string declaring);
-            Assert.Equal("Post,Patch", httpMethod);
+            Assert.Equal("Post,Put", httpMethod);
             Assert.Equal("CreateRef", method);
             Assert.Null(prop);
             Assert.Null(declaring);

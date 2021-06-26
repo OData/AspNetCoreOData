@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -17,67 +19,52 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
         /// <param name="action">The Edm action.</param>
-        /// <param name="navigationSource">Unqualified function/action call boolean value.</param>
+        /// <param name="navigationSource">The Edm navigation source.</param>
         public ActionSegmentTemplate(IEdmAction action, IEdmNavigationSource navigationSource)
         {
             Action = action ?? throw Error.ArgumentNull(nameof(action));
-            NavigationSource = navigationSource;
 
-            if (action.ReturnType != null)
+            // Only accept the bound action
+            if (!action.IsBound)
             {
-                IsSingle = action.ReturnType.TypeKind() != EdmTypeKind.Collection;
-                EdmType = action.ReturnType.Definition;
+                throw new ODataException(Error.Format(SRResources.OperationIsNotBound, action.Name, "action"));
             }
 
+            NavigationSource = navigationSource;
             Segment = new OperationSegment(Action, NavigationSource as IEdmEntitySetBase);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionSegmentTemplate" /> class.
+        /// Initializes a new instance of the <see cref="ActionSegmentTemplate" /> class.
         /// </summary>
-        /// <param name="operationSegment">The operation segment, it should be a function segment and the parameters are template.</param>
-        public ActionSegmentTemplate(OperationSegment operationSegment)
+        /// <param name="segment">The operation segment.</param>
+        public ActionSegmentTemplate(OperationSegment segment)
         {
-            if (operationSegment == null)
+            if (segment == null)
             {
-                throw Error.ArgumentNull(nameof(operationSegment));
+                throw Error.ArgumentNull(nameof(segment));
             }
 
-            IEdmOperation operation = operationSegment.Operations.FirstOrDefault();
+            IEdmOperation operation = segment.Operations.FirstOrDefault();
             if (!operation.IsAction())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "Action", "ActionSegmentTemplate"));
             }
 
             Action = (IEdmAction)operation;
-            if (Action.ReturnType != null)
-            {
-                IsSingle = Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
-                EdmType = Action.ReturnType.Definition;
-            }
-
-            Segment = operationSegment;
+            NavigationSource = segment.EntitySet;
+            Segment = segment;
         }
-
-        /// <inheritdoc />
-        public override string Literal => Action.FullName();
-
-        /// <inheritdoc />
-        public override IEdmType EdmType { get; }
 
         /// <summary>
         /// Gets the wrapped Edm action.
         /// </summary>
         public IEdmAction Action { get; }
 
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource { get; }
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Action;
-
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
+        /// <summary>
+        /// Gets the wrapped Edm navigation source.
+        /// </summary>
+        public IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the action segment.
@@ -85,9 +72,35 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public OperationSegment Segment { get; }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            options = options ?? ODataRouteOptions.Default;
+            Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
+
+            if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
+            {
+                yield return $"/{Action.FullName()}";
+                yield return $"/{Action.Name}";
+            }
+            else if (options.EnableQualifiedOperationCall)
+            {
+                yield return $"/{Action.FullName()}";
+            }
+            else
+            {
+                yield return $"/{Action.Name}";
+            }
+        }
+
+        /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

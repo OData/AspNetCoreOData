@@ -28,10 +28,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            IEdmNavigationSource navigationSource = context.EntitySet == null ?
-                (IEdmNavigationSource)context.Singleton :
-                (IEdmNavigationSource)context.EntitySet;
-
+            IEdmNavigationSource navigationSource = context.NavigationSource;
             IEdmEntityType entityType = navigationSource.EntityType();
 
             // function should have the [HttpGet]

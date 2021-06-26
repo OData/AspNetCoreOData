@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -27,20 +27,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="segment">The entity set segment.</param>
         public EntitySetSegmentTemplate(EntitySetSegment segment)
         {
-            Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+            Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
-        /// <inheritdoc />
-        public override string Literal => Segment.EntitySet.Name;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Segment.EdmType;
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource => Segment.EntitySet;
-
         /// <summary>
-        /// Gets the wrapped entity set.
+        /// Gets the wrapped Edm entityset.
         /// </summary>
         public IEdmEntitySet EntitySet => Segment.EntitySet;
 
@@ -50,15 +41,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public EntitySetSegment Segment { get; }
 
         /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
-
-        /// <inheritdoc />
-        public override bool IsSingle => false;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return $"/{Segment.EntitySet.Name}";
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -22,21 +22,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     {
         private int _currentAnyAllExpressionDepth;
         private int _currentNodeCount;
-        private readonly DefaultQuerySettings _defaultQuerySettings;
+        private DefaultQuerySettings _defaultQuerySettings;
         private IEdmProperty _property;
         private IEdmStructuredType _structuredType;
 
         private IEdmModel _model;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FilterQueryValidator" /> class based on
-        /// the <see cref="DefaultQuerySettings" />.
-        /// </summary>
-        /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public FilterQueryValidator(DefaultQuerySettings defaultQuerySettings)
-        {
-             _defaultQuerySettings = defaultQuerySettings;
-        }
 
         /// <summary>
         /// Validates a <see cref="FilterQueryOption" />.
@@ -64,7 +54,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 _structuredType = filterQueryOption.Context.TargetStructuredType;
             }
 
+            _defaultQuerySettings = filterQueryOption.Context.DefaultQuerySettings;
+
             Validate(filterQueryOption.FilterClause, settings, filterQueryOption.Context.Model);
+        }
+
+        internal virtual void Validate(IEdmProperty property, IEdmStructuredType structuredType,
+            FilterClause filterClause, ODataValidationSettings settings, IEdmModel model, DefaultQuerySettings querySettings)
+        {
+            _property = property;
+            _structuredType = structuredType;
+            _defaultQuerySettings = querySettings;
+            Validate(filterClause, settings, model);
         }
 
         /// <summary>
@@ -90,14 +91,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             ValidateQueryNode(filterClause.Expression, settings);
         }
 
-        internal virtual void Validate(IEdmProperty property, IEdmStructuredType structuredType,
-            FilterClause filterClause, ODataValidationSettings settings, IEdmModel model)
-        {
-            _property = property;
-            _structuredType = structuredType;
-            Validate(filterClause, settings, model);
-        }
-
         /// <summary>
         /// Override this method to restrict the 'all' query inside the filter query.
         /// </summary>
@@ -107,17 +100,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="allNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateAllNode(AllNode allNode, ODataValidationSettings settings)
+        protected virtual void ValidateAllNode(AllNode allNode, ODataValidationSettings settings)
         {
-            if (allNode == null)
-            {
-                throw Error.ArgumentNull(nameof(allNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(allNode != null);
 
             ValidateFunction("all", settings);
             EnterLambda(settings);
@@ -143,17 +128,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="anyNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateAnyNode(AnyNode anyNode, ODataValidationSettings settings)
+        protected virtual void ValidateAnyNode(AnyNode anyNode, ODataValidationSettings settings)
         {
-            if (anyNode == null)
-            {
-                throw Error.ArgumentNull(nameof(anyNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(anyNode != null);
 
             ValidateFunction("any", settings);
             EnterLambda(settings);
@@ -182,17 +159,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="binaryOperatorNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings settings)
+        protected virtual void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings settings)
         {
-            if (binaryOperatorNode == null)
-            {
-                throw Error.ArgumentNull(nameof(binaryOperatorNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(binaryOperatorNode != null);
 
             // base case goes
             switch (binaryOperatorNode.OperatorKind)
@@ -227,17 +196,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="binaryNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateLogicalOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+        protected virtual void ValidateLogicalOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
         {
-            if (binaryNode == null)
-            {
-                throw Error.ArgumentNull(nameof(binaryNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(binaryNode != null);
+            Contract.Assert(settings != null);
 
             AllowedLogicalOperators logicalOperator = ToLogicalOperator(binaryNode);
 
@@ -261,17 +223,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="binaryNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+        protected virtual void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
         {
-            if (binaryNode == null)
-            {
-                throw Error.ArgumentNull(nameof(binaryNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(binaryNode != null);
+            Contract.Assert(settings != null);
 
             AllowedArithmeticOperators arithmeticOperator = ToArithmeticOperator(binaryNode);
 
@@ -295,18 +250,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="constantNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateConstantNode(ConstantNode constantNode, ODataValidationSettings settings)
+        protected virtual void ValidateConstantNode(ConstantNode constantNode, ODataValidationSettings settings)
         {
-            if (constantNode == null)
-            {
-                throw Error.ArgumentNull(nameof(constantNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
-
             // No default validation logic here.
         }
 
@@ -319,17 +264,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="convertNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateConvertNode(ConvertNode convertNode, ODataValidationSettings settings)
+        protected virtual void ValidateConvertNode(ConvertNode convertNode, ODataValidationSettings settings)
         {
-            if (convertNode == null)
-            {
-                throw Error.ArgumentNull(nameof(convertNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(convertNode != null);
 
             // Validate child nodes but not the ConvertNode itself.
             ValidateQueryNode(convertNode.Source, settings);
@@ -345,17 +282,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="sourceNode"></param>
         /// <param name="navigationProperty"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
+        protected virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
         {
-            if (navigationProperty == null)
-            {
-                throw Error.ArgumentNull(nameof(navigationProperty));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(navigationProperty != null);
 
             // Check whether the property is not filterable
             if (EdmHelpers.IsNotFilterable(navigationProperty, _property, _structuredType, _model,
@@ -381,18 +310,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="rangeVariable"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateRangeVariable(RangeVariable rangeVariable, ODataValidationSettings settings)
+        protected virtual void ValidateRangeVariable(RangeVariable rangeVariable, ODataValidationSettings settings)
         {
-            if (rangeVariable == null)
-            {
-                throw Error.ArgumentNull(nameof(rangeVariable));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
-
             // No default validation logic here.
         }
 
@@ -403,19 +322,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="propertyAccessNode"></param>
-        /// <param name="settings"></param>
-        public virtual void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+        /// <param name="propertyAccessNode">The single value property access node.</param>
+        /// <param name="settings">The settings.</param>
+        protected virtual void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
         {
-            if (propertyAccessNode == null)
-            {
-                throw Error.ArgumentNull(nameof(propertyAccessNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(propertyAccessNode != null);
+            Contract.Assert(settings != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
@@ -459,17 +371,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="singleComplexNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, ODataValidationSettings settings)
+        protected virtual void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, ODataValidationSettings settings)
         {
-            if (singleComplexNode == null)
-            {
-                throw Error.ArgumentNull("singleComplexNode");
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull("settings");
-            }
+            Contract.Assert(singleComplexNode != null);
+            Contract.Assert(settings != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = singleComplexNode.Property;
@@ -491,17 +396,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="propertyAccessNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+        protected virtual void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
         {
-            if (propertyAccessNode == null)
-            {
-                throw Error.ArgumentNull("propertyAccessNode");
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull("settings");
-            }
+            Contract.Assert(propertyAccessNode != null);
+            Contract.Assert(settings != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
@@ -523,17 +421,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="collectionComplexNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, ODataValidationSettings settings)
+        protected virtual void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, ODataValidationSettings settings)
         {
-            if (collectionComplexNode == null)
-            {
-                throw Error.ArgumentNull("collectionComplexNode");
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull("settings");
-            }
+            Contract.Assert(collectionComplexNode != null);
+            Contract.Assert(settings != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = collectionComplexNode.Property;
@@ -555,17 +446,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="node"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, ODataValidationSettings settings)
+        protected virtual void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, ODataValidationSettings settings)
         {
-            if (node == null)
-            {
-                throw Error.ArgumentNull("node");
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull("settings");
-            }
+            Contract.Assert(node != null);
+            Contract.Assert(settings != null);
 
             ValidateFunction(node.Name, settings);
 
@@ -585,17 +469,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// testing scenarios and is not intended to be called from user code. Call the Validate method to validate a
         /// <see cref="FilterQueryOption" /> instance.
         /// </remarks>
-        public virtual void ValidateSingleResourceFunctionCallNode(SingleResourceFunctionCallNode node, ODataValidationSettings settings)
+        protected virtual void ValidateSingleResourceFunctionCallNode(SingleResourceFunctionCallNode node, ODataValidationSettings settings)
         {
-            if (node == null)
-            {
-                throw Error.ArgumentNull(nameof(node));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(node != null);
+            Contract.Assert(settings != null);
 
             ValidateFunction(node.Name, settings);
             foreach (QueryNode argumentNode in node.Parameters)
@@ -613,17 +490,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="unaryOperatorNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings settings)
+        protected virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings settings)
         {
-            if (unaryOperatorNode == null)
-            {
-                throw Error.ArgumentNull(nameof(unaryOperatorNode));
-            }
-
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(unaryOperatorNode != null);
+            Contract.Assert(settings != null);
 
             ValidateQueryNode(unaryOperatorNode.Operand, settings);
 
@@ -651,12 +521,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="node"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateQueryNode(QueryNode node, ODataValidationSettings settings)
+        protected virtual void ValidateQueryNode(QueryNode node, ODataValidationSettings settings)
         {
-            if (settings == null)
-            {
-                throw Error.ArgumentNull(nameof(settings));
-            }
+            Contract.Assert(settings != null);
 
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
@@ -685,12 +552,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="collectionResourceCastNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateCollectionResourceCastNode(CollectionResourceCastNode collectionResourceCastNode, ODataValidationSettings settings)
+        protected virtual void ValidateCollectionResourceCastNode(CollectionResourceCastNode collectionResourceCastNode, ODataValidationSettings settings)
         {
-            if (collectionResourceCastNode == null)
-            {
-                throw Error.ArgumentNull(nameof(collectionResourceCastNode));
-            }
+            Contract.Assert(collectionResourceCastNode != null);
+            Contract.Assert(settings != null);
 
             ValidateQueryNode(collectionResourceCastNode.Source, settings);
         }
@@ -704,30 +569,28 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="singleResourceCastNode"></param>
         /// <param name="settings"></param>
-        public virtual void ValidateSingleResourceCastNode(SingleResourceCastNode singleResourceCastNode, ODataValidationSettings settings)
+        protected virtual void ValidateSingleResourceCastNode(SingleResourceCastNode singleResourceCastNode, ODataValidationSettings settings)
         {
-            if (singleResourceCastNode == null)
-            {
-                throw Error.ArgumentNull(nameof(singleResourceCastNode));
-            }
+            Contract.Assert(singleResourceCastNode != null);
+            Contract.Assert(settings != null);
 
             ValidateQueryNode(singleResourceCastNode.Source, settings);
         }
 
         internal static FilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
         {
-            if (context == null)
+            if (context == null || context.RequestContainer == null)
             {
-                return new FilterQueryValidator(new DefaultQuerySettings());
+                return new FilterQueryValidator();
             }
 
-            return context.RequestContainer == null
-                ? new FilterQueryValidator(context.DefaultQuerySettings)
-                : context.RequestContainer.GetRequiredService<FilterQueryValidator>();
+            return context.RequestContainer.GetRequiredService<FilterQueryValidator>();
         }
 
         private void EnterLambda(ODataValidationSettings validationSettings)
         {
+            Contract.Assert(validationSettings != null);
+
             if (_currentAnyAllExpressionDepth >= validationSettings.MaxAnyAllExpressionDepth)
             {
                 throw new ODataException(Error.Format(SRResources.MaxAnyAllExpressionLimitExceeded, validationSettings.MaxAnyAllExpressionDepth, "MaxAnyAllExpressionDepth"));
@@ -858,6 +721,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     // No setting validations
                     break;
 
+                case QueryNodeKind.Count:
+                    // No setting validations
+                    break;
+
                 case QueryNodeKind.NamedFunctionParameter:
                 case QueryNodeKind.ParameterAlias:
                 case QueryNodeKind.EntitySet:
@@ -871,6 +738,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         private static void ValidateFunction(string functionName, ODataValidationSettings settings)
         {
+            Contract.Assert(settings != null);
+
             AllowedFunctions convertedFunction = ToODataFunction(functionName);
             if ((settings.AllowedFunctions & convertedFunction) != convertedFunction)
             {
@@ -879,7 +748,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
         private static AllowedFunctions ToODataFunction(string functionName)
         {
             AllowedFunctions result = AllowedFunctions.None;

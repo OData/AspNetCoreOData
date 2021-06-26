@@ -86,50 +86,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             else
             {
                 IEnumerable<string> keyValues =
-                    keys.Select(key => String.Format(
+                    keys.Select(key => string.Format(
                         CultureInfo.InvariantCulture, "{0}={1}", key.Name, GetUriRepresentationForKeyValue(key, resourceContext)));
-                return String.Join(",", keyValues);
+                return string.Join(",", keyValues);
             }
-        }
-
-        public static bool IsValidStructuralProperty(this PropertyInfo propertyInfo)
-        {
-            if (propertyInfo == null)
-            {
-                throw Error.ArgumentNull("propertyInfo");
-            }
-
-            // ignore any indexer properties.
-            if (propertyInfo.GetIndexParameters().Any())
-            {
-                return false;
-            }
-
-            if (propertyInfo.CanRead)
-            {
-                // non-public getters are not valid properties
-                MethodInfo publicGetter = propertyInfo.GetGetMethod();
-                if (publicGetter != null && propertyInfo.PropertyType.IsValidStructuralPropertyType())
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static bool IsValidStructuralPropertyType(this Type type)
-        {
-            if (type == null)
-            {
-                throw Error.ArgumentNull("type");
-            }
-
-            Type elementType;
-
-            return !(type.IsGenericTypeDefinition
-                     || type.IsPointer
-                     || type == typeof(object)
-                     || (TypeHelper.IsCollection(type, out elementType) && elementType == typeof(object)));
         }
 
         // gets the primitive odata uri representation.
@@ -191,4 +151,3 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
     }
 }
-

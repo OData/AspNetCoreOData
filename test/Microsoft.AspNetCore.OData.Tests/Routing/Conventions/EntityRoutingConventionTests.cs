@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -15,6 +16,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     public class EntityRoutingConventionTests
     {
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToControllerAndActionOnEntityRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            EntityRoutingConvention convention = new EntityRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(CustomersController), true)]
@@ -163,6 +175,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             SelectorModel selector = Assert.Single(action.Selectors);
             Assert.Null(selector.AttributeRouteModel);
         }
+
+        #region Split Tests
+        [Theory]
+        [InlineData("Post", null, null)]
+        [InlineData("Get", "Get", null)]
+        [InlineData("GetVipCustomer", "Get", "VipCustomer")]
+        [InlineData("Put", "Put", null)]
+        [InlineData("PutVipCustomer", "Put", "VipCustomer")]
+        [InlineData("Patch", "Patch", null)]
+        [InlineData("PatchVipCustomer", "Patch", "VipCustomer")]
+        [InlineData("Delete", "Delete", null)]
+        [InlineData("DeleteVipCustomer", "Delete", "VipCustomer")]
+        public void SplitActionNameForEntity_Works(string actionName, string expectMethod, string expectCast)
+        {
+            // Arrange
+            (string httpMethod, string castTypeName) = EntityRoutingConvention.Split(actionName);
+
+            // Act & Assert
+            Assert.Equal(expectMethod, httpMethod);
+            Assert.Equal(expectCast, castTypeName);
+        }
+        #endregion
 
         private static IEdmModel GetEdmModel()
         {

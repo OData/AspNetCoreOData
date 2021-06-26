@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         {
             Type testType = typeof(TTest);
 
-            MethodInfo method  = testType.GetMethod("UpdateServices",
+            MethodInfo method  = testType.GetMethod("UpdateConfigureServices",
                 BindingFlags.NonPublic | BindingFlags.Static,
                 null,
                 new Type[] { typeof(IServiceCollection) },
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
                    webBuilder
                         .UseKestrel(options =>
                         {
-                             options.Listen(IPAddress.Loopback, _port);
+                            options.Listen(IPAddress.Loopback, _port);
                         })
                         //.UseStartup<TTest>()
                        .ConfigureServices(services =>

@@ -8,7 +8,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -30,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceContext));
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             IList<ODataPathSegment> idLinkPathSegments = resourceContext.GenerateBaseODataPathSegments();
@@ -63,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceContext));
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
 
             IList<ODataPathSegment> navigationPathSegments = resourceContext.GenerateBaseODataPathSegments();
@@ -95,12 +94,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceSetContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceSetContext));
+                throw Error.ArgumentNull(nameof(resourceSetContext));
             }
 
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             IEdmOperationParameter bindingParameter = action.Parameters.FirstOrDefault();
@@ -112,33 +111,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return GenerateActionLink(resourceSetContext, bindingParameter.Type, action);
-        }
-
-        internal static Uri GenerateActionLink(this ResourceSetContext feedContext, string bindingParameterType,
-            string actionName)
-        {
-            Contract.Assert(feedContext != null);
-
-            if (feedContext.EntitySetBase is IEdmContainedEntitySet)
-            {
-                return null;
-            }
-
-            if (feedContext.EdmModel == null)
-            {
-                return null;
-            }
-
-            IEdmModel model = feedContext.EdmModel;
-            string elementType = DeserializationHelpers.GetCollectionElementTypeName(bindingParameterType,
-                isNested: false);
-            Contract.Assert(elementType != null);
-
-            IEdmTypeReference typeReference = model.FindDeclaredType(elementType).ToEdmTypeReference(true);
-            IEdmTypeReference collection = new EdmCollectionTypeReference(new EdmCollectionType(typeReference));
-
-            IEdmOperation operation = model.FindDeclaredOperations(actionName).First();
-            return feedContext.GenerateActionLink(collection, operation);
         }
 
         internal static Uri GenerateActionLink(this ResourceSetContext resourceSetContext, IEdmTypeReference bindingParameterType,
@@ -178,12 +150,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceSetContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceSetContext));
+                throw Error.ArgumentNull(nameof(resourceSetContext));
             }
 
             if (function == null)
             {
-                throw new ArgumentNullException(nameof(function));
+                throw Error.ArgumentNull(nameof(function));
             }
 
             IEdmOperationParameter bindingParameter = function.Parameters.FirstOrDefault();
@@ -232,33 +204,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return functionLink == null ? null : new Uri(functionLink);
         }
 
-        internal static Uri GenerateFunctionLink(this ResourceSetContext feedContext, string bindingParameterType,
-            string functionName, IEnumerable<string> parameterNames)
-        {
-            Contract.Assert(feedContext != null);
-
-            if (feedContext.EntitySetBase is IEdmContainedEntitySet)
-            {
-                return null;
-            }
-
-            if (feedContext.EdmModel == null)
-            {
-                return null;
-            }
-
-            IEdmModel model = feedContext.EdmModel;
-
-            string elementType = DeserializationHelpers.GetCollectionElementTypeName(bindingParameterType,
-                isNested: false);
-            Contract.Assert(elementType != null);
-
-            IEdmTypeReference typeReference = model.FindDeclaredType(elementType).ToEdmTypeReference(true);
-            IEdmTypeReference collection = new EdmCollectionTypeReference(new EdmCollectionType(typeReference));
-            IEdmOperation operation = model.FindDeclaredOperations(functionName).First();
-            return feedContext.GenerateFunctionLink(collection, operation, parameterNames);
-        }
-
         /// <summary>
         /// Generates an action link following the OData URL conventions for the action <paramref name="action"/> and bound to the entity
         /// represented by <paramref name="resourceContext"/>.
@@ -270,11 +215,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceContext));
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
             if (action == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw Error.ArgumentNull(nameof(action));
             }
 
             IEdmOperationParameter bindingParameter = action.Parameters.FirstOrDefault();
@@ -311,26 +256,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return actionLink == null ? null : new Uri(actionLink);
         }
 
-        internal static Uri GenerateActionLink(this ResourceContext resourceContext, string bindingParameterType,
-            string actionName)
-        {
-            Contract.Assert(resourceContext != null);
-            if (resourceContext.NavigationSource is IEdmContainedEntitySet)
-            {
-                return null;
-            }
-
-            if (resourceContext.EdmModel == null)
-            {
-                return null;
-            }
-
-            IEdmModel model = resourceContext.EdmModel;
-            IEdmTypeReference typeReference = model.FindDeclaredType(bindingParameterType).ToEdmTypeReference(true);
-            IEdmOperation operation = model.FindDeclaredOperations(actionName).First();
-            return resourceContext.GenerateActionLink(typeReference, operation);
-        }
-
         /// <summary>
         /// Generates an function link following the OData URL conventions for the function <paramref name="function"/> and bound to the entity
         /// represented by <paramref name="resourceContext"/>.
@@ -342,11 +267,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (resourceContext == null)
             {
-                throw new ArgumentNullException(nameof(resourceContext));
+                throw Error.ArgumentNull(nameof(resourceContext));
             }
             if (function == null)
             {
-                throw new ArgumentNullException(nameof(function));
+                throw Error.ArgumentNull(nameof(function));
             }
 
             IEdmOperationParameter bindingParameter = function.Parameters.FirstOrDefault();

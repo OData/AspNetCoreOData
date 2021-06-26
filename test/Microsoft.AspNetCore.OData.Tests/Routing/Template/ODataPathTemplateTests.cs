@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -14,6 +16,42 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
     public class ODataPathTemplateTests
     {
         private static IEdmTypeReference IntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
+
+        [Fact]
+        public void CtorODataPathTemplate_SetsSegments_UsingEnumerable()
+        {
+            // Arrange
+            ODataSegmentTemplate template = new Mock<ODataSegmentTemplate>().Object;
+            IEnumerable<ODataSegmentTemplate> templates = new ODataSegmentTemplate[]
+            {
+                template
+            };
+
+            // Act
+            ODataPathTemplate path = new ODataPathTemplate(templates);
+
+            // Assert
+            ODataSegmentTemplate actual = Assert.Single(path);
+            Assert.Same(template, actual);
+        }
+
+        [Fact]
+        public void CtorODataPathTemplate_SetsSegments_UsingList()
+        {
+            // Arrange
+            ODataSegmentTemplate template = new Mock<ODataSegmentTemplate>().Object;
+            IList<ODataSegmentTemplate> templates = new List<ODataSegmentTemplate>
+            {
+                template
+            };
+
+            // Act
+            ODataPathTemplate path = new ODataPathTemplate(templates);
+
+            // Assert
+            ODataSegmentTemplate actual = Assert.Single(path);
+            Assert.Same(template, actual);
+        }
 
         [Fact]
         public void GetTemplatesReturnsCorrectWithEmptySegments()
@@ -145,8 +183,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataPathTemplate template = new ODataPathTemplate(
                 new EntitySetSegmentTemplate(entitySet),
                 KeySegmentTemplate.CreateKeySegment(customer, entitySet),
-                new NavigationLinkSegmentTemplate(navigation, entitySet),
-                new KeySegmentTemplate(keySegment));
+                new NavigationLinkSegmentTemplate(navigation, entitySet)
+                {
+                    Key = new KeySegmentTemplate(keySegment)
+                });
 
             // Act
             IEnumerable<string> actual = template.GetTemplates();

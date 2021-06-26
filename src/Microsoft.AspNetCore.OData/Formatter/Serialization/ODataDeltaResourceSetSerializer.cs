@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Results;
@@ -63,18 +64,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataWriter writer = await messageWriter.CreateODataDeltaResourceSetWriterAsync(entitySet, entityType.EntityDefinition())
                 .ConfigureAwait(false);
 
-            await WriteDeltaResourceSetInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
+            await WriteObjectInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Writes the given object specified by the parameter graph as a part of an existing OData message using the given
-        /// messageWriter and the writeContext.
-        /// </summary>
-        /// <param name="graph">The object to be written.</param>
-        /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-        /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
-        /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaResourceSetInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
+        /// <inheritdoc />
+        public override async Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             if (writer == null)
@@ -104,10 +98,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            await WriteFeedAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
+            await WriteDeltaResourceSetAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
         }
 
-        private async Task WriteFeedAsync(IEnumerable enumerable, IEdmTypeReference feedType, ODataWriter writer,
+        private async Task WriteDeltaResourceSetAsync(IEnumerable enumerable, IEdmTypeReference feedType, ODataWriter writer,
             ODataSerializerContext writeContext)
         {
             Contract.Assert(writer != null);
@@ -156,33 +150,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 object lastResource = null;
                 //Iterate over all the entries present and select the appropriate write method.
                 //Write method creates ODataDeltaDeletedEntry / ODataDeltaDeletedLink / ODataDeltaLink or ODataEntry.
-                foreach (object entry in enumerable)
+                foreach (object item in enumerable)
                 {
-                    if (entry == null)
+                    if (item == null)
                     {
                         throw new SerializationException(SRResources.NullElementInCollection);
                     }
 
-                    lastResource = entry;
-                    IEdmChangedObject edmChangedObject = entry as IEdmChangedObject;
-                    if (edmChangedObject == null)
+                    lastResource = item;
+                    DeltaItemKind kind = GetDelteItemKind(item);
+                    switch (kind)
                     {
-                        throw new SerializationException(Error.Format(
-                            SRResources.CannotWriteType, GetType().Name, enumerable.GetType().FullName));
-                    }
-
-                    switch (edmChangedObject.DeltaKind)
-                    {
-                        case EdmDeltaKind.DeletedResource:
-                            await WriteDeletedResourceAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeletedResource:
+                            await WriteDeltaDeletedResourceAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.DeltaDeletedLink:
-                            await WriteDeltaDeletedLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeltaDeletedLink:
+                            await WriteDeltaDeletedLinkAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.DeltaLink:
-                            await WriteDeltaLinkAsync(entry, writer, writeContext).ConfigureAwait(false);
+                        case DeltaItemKind.DeltaLink:
+                            await WriteDeltaLinkAsync(item, writer, writeContext).ConfigureAwait(false);
                             break;
-                        case EdmDeltaKind.Resource:
+                        case DeltaItemKind.Resource:
                             {
                                 ODataResourceSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataResourceSerializer;
                                 if (entrySerializer == null)
@@ -190,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                                     throw new SerializationException(
                                         Error.Format(SRResources.TypeCannotBeSerialized, elementType.FullName()));
                                 }
-                                await entrySerializer.WriteDeltaObjectInlineAsync(entry, elementType, writer, writeContext)
+                                await entrySerializer.WriteDeltaObjectInlineAsync(item, elementType, writer, writeContext)
                                     .ConfigureAwait(false);
                                 break;
                             }
@@ -271,37 +259,43 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
         /// messageWriter and the writeContext.
         /// </summary>
-        /// <param name="graph">The object to be written.</param>
+        /// <param name="value">The object to be written.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeletedResourceAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
+        public virtual async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
         {
             if (writer == null)
             {
                 throw Error.ArgumentNull(nameof(writer));
             }
 
-            EdmDeltaDeletedResourceObject edmDeltaDeletedEntity = graph as EdmDeltaDeletedResourceObject;
-            if (edmDeltaDeletedEntity == null)
-            {
-                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));
-            }
+            ODataDeletedResource odataDeletedResource;
 
-            Uri id = StringToUri(edmDeltaDeletedEntity.Id);
-            ODataDeletedResource deletedResource = new ODataDeletedResource(id, edmDeltaDeletedEntity.Reason);
-
-            if (edmDeltaDeletedEntity.NavigationSource != null)
+            if (value is EdmDeltaDeletedResourceObject edmDeltaDeletedEntity)
             {
-                ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo
+                odataDeletedResource = new ODataDeletedResource(edmDeltaDeletedEntity.Id, edmDeltaDeletedEntity.Reason ?? DeltaDeletedEntryReason.Deleted);
+
+                if (edmDeltaDeletedEntity.NavigationSource != null)
                 {
-                    NavigationSourceName = edmDeltaDeletedEntity.NavigationSource.Name
-                };
-                deletedResource.SetSerializationInfo(serializationInfo);
+                    ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo
+                    {
+                        NavigationSourceName = edmDeltaDeletedEntity.NavigationSource.Name
+                    };
+                    odataDeletedResource.SetSerializationInfo(serializationInfo);
+                }
+            }
+            else if (value is IDeltaDeletedResource deltaDeletedResource)
+            {
+                odataDeletedResource = new ODataDeletedResource(deltaDeletedResource.Id, deltaDeletedResource.Reason ?? DeltaDeletedEntryReason.Deleted);
+            }
+            else
+            {
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, value?.GetType().FullName));
             }
 
-            if (deletedResource != null)
+            if (odataDeletedResource != null)
             {
-                await writer.WriteStartAsync(deletedResource).ConfigureAwait(false);
+                await writer.WriteStartAsync(odataDeletedResource).ConfigureAwait(false);
                 await writer.WriteEndAsync().ConfigureAwait(false);
             }
         }
@@ -310,31 +304,38 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Writes the given deltaDeletedLink specified by the parameter graph as a part of an existing OData message using the given
         /// messageWriter and the writeContext.
         /// </summary>
-        /// <param name="graph">The object to be written.</param>
+        /// <param name="value">The object to be written.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaDeletedLinkAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
+        public virtual async Task WriteDeltaDeletedLinkAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
         {
+            if (value == null)
+            {
+                throw Error.ArgumentNull(nameof(value));
+            }
+
             if (writer == null)
             {
                 throw Error.ArgumentNull(nameof(writer));
             }
 
-            EdmDeltaDeletedLink edmDeltaDeletedLink = graph as EdmDeltaDeletedLink;
-            if (edmDeltaDeletedLink == null)
+            ODataDeltaDeletedLink odataDeltaDeletedLink;
+            if (value is EdmDeltaDeletedLink edmDeltaDeletedLink)
             {
-                throw new SerializationException(
-                    Error.Format(SRResources.CannotWriteType, GetType().Name, graph?.GetType().FullName));
+                odataDeltaDeletedLink = new ODataDeltaDeletedLink(edmDeltaDeletedLink.Source, edmDeltaDeletedLink.Target, edmDeltaDeletedLink.Relationship);
+            }
+            else if (value is IDeltaDeletedLink deltaDeletedLink)
+            {
+                odataDeltaDeletedLink = new ODataDeltaDeletedLink(deltaDeletedLink.Source, deltaDeletedLink.Target, deltaDeletedLink.Relationship);
+            }
+            else
+            {
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, value.GetType().FullName));
             }
 
-            ODataDeltaDeletedLink deltaDeletedLink = new ODataDeltaDeletedLink(
-                edmDeltaDeletedLink.Source,
-                edmDeltaDeletedLink.Target,
-                edmDeltaDeletedLink.Relationship);
-
-            if (deltaDeletedLink != null)
+            if (odataDeltaDeletedLink != null)
             {
-                await writer.WriteDeltaDeletedLinkAsync(deltaDeletedLink).ConfigureAwait(false);
+                await writer.WriteDeltaDeletedLinkAsync(odataDeltaDeletedLink).ConfigureAwait(false);
             }
         }
 
@@ -342,14 +343,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Writes the given deltaLink specified by the parameter graph as a part of an existing OData message using the given
         /// messageWriter and the writeContext.
         /// </summary>
-        /// <param name="graph">The object to be written.</param>
+        /// <param name="value">The object to be written.</param>
         /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        public virtual async Task WriteDeltaLinkAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
+        public virtual async Task WriteDeltaLinkAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
         {
-            if (graph == null)
+            if (value == null)
             {
-                throw Error.ArgumentNull(nameof(graph));
+                throw Error.ArgumentNull(nameof(value));
             }
 
             if (writer == null)
@@ -357,22 +358,42 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull(nameof(writer));
             }
 
-            EdmDeltaLink edmDeltaLink = graph as EdmDeltaLink;
-            if (edmDeltaLink == null)
+            ODataDeltaLink odataDeltaLink;
+            if (value is EdmDeltaLink edmDeltaLink) // typeless
             {
-                throw new SerializationException(
-                    Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
+                odataDeltaLink = new ODataDeltaLink(edmDeltaLink.Source, edmDeltaLink.Target, edmDeltaLink.Relationship);
+            }
+            else if (value is IDeltaLink deltaLink) // typed
+            {
+                odataDeltaLink = new ODataDeltaLink(deltaLink.Source, deltaLink.Target, deltaLink.Relationship);
+            }
+            else
+            {
+                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, value.GetType().FullName));
             }
 
-            ODataDeltaLink deltaLink = new ODataDeltaLink(
-                edmDeltaLink.Source,
-                edmDeltaLink.Target,
-                edmDeltaLink.Relationship);
-
-            if (deltaLink != null)
+            if (odataDeltaLink != null)
             {
-                await writer.WriteDeltaLinkAsync(deltaLink).ConfigureAwait(false);
+                await writer.WriteDeltaLinkAsync(odataDeltaLink).ConfigureAwait(false);
             }
+        }
+
+        internal DeltaItemKind GetDelteItemKind(object item)
+        {
+            IEdmChangedObject edmChangedObject = item as IEdmChangedObject;
+            if (edmChangedObject != null)
+            {
+                return edmChangedObject.Kind;
+            }
+
+            IDeltaSetItem deltaSetItem = item as IDeltaSetItem;
+            if (deltaSetItem != null)
+            {
+                return deltaSetItem.Kind;
+            }
+
+            throw new SerializationException(Error.Format(
+                SRResources.CannotWriteType, GetType().Name, item.GetType().FullName));
         }
 
         private static IEdmStructuredTypeReference GetResourceType(IEdmTypeReference feedType)
@@ -386,29 +407,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataResourceSetSerializer).Name, feedType.FullName());
+            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataDeltaResourceSetSerializer).Name, feedType.FullName());
             throw new SerializationException(message);
-        }
-
-        /// <summary>
-        /// Safely returns the specified string as a relative or absolute Uri.
-        /// </summary>
-        /// <param name="uriString">The string to convert to a Uri.</param>
-        /// <returns>The string as a Uri.</returns>
-        internal static Uri StringToUri(string uriString)
-        {
-            Uri uri;
-            try
-            {
-                uri = new Uri(uriString, UriKind.RelativeOrAbsolute);
-            }
-            catch (FormatException)
-            {
-                // The Uri constructor throws a format exception if it can't figure out the type of Uri
-                uri = new Uri(uriString, UriKind.Relative);
-            }
-
-            return uri;
         }
     }
 }

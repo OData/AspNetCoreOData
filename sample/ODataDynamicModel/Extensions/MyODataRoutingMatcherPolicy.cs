@@ -95,7 +95,8 @@ namespace ODataDynamicModel.Extensions
                     continue;
                 }
 
-                ODataTemplateTranslateContext translatorContext = new ODataTemplateTranslateContext(httpContext, candidate.Values, model);
+                ODataTemplateTranslateContext translatorContext
+                    = new ODataTemplateTranslateContext(httpContext, candidate.Endpoint, candidate.Values, model);
 
                 try
                 {

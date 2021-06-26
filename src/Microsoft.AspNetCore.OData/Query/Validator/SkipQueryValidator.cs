@@ -20,12 +20,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (skipQueryOption == null)
             {
-                throw Error.ArgumentNull("skipQueryOption");
+                throw Error.ArgumentNull(nameof(skipQueryOption));
             }
 
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (skipQueryOption.Value > validationSettings.MaxSkip)

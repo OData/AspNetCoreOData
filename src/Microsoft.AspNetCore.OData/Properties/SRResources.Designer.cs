@@ -133,7 +133,34 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers.
+        ///   Looks up a localized string similar to Ambiguous navigation source (entity set or singleton) name &apos;{0}&apos; found. Please use correct navigation source name case..
+        /// </summary>
+        internal static string AmbiguousNavigationSourceNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousNavigationSourceNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous property name &apos;{0}&apos; found. Please use correct property name case..
+        /// </summary>
+        internal static string AmbiguousPropertyNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousPropertyNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous type name &apos;{0}&apos; found. Please use correct type name case..
+        /// </summary>
+        internal static string AmbiguousTypeNameFound {
+            get {
+                return ResourceManager.GetString("AmbiguousTypeNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to $apply query options not supported for LINQ to SQL providers..
         /// </summary>
         internal static string ApplyQueryOptionNotSupportedForLinq2SQL {
             get {
@@ -309,6 +336,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string CannotInstantiateAbstractResourceType {
             get {
                 return ResourceManager.GetString("CannotInstantiateAbstractResourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to parse query request payload..
+        /// </summary>
+        internal static string CannotParseQueryRequestPayload {
+            get {
+                return ResourceManager.GetString("CannotParseQueryRequestPayload", resourceCulture);
             }
         }
         
@@ -520,7 +556,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an {1} cannot be null..
+        ///   Looks up a localized string similar to The EDM type of the object of type &apos;{0}&apos; is null. The EDM type of an &apos;{1}&apos; cannot be null..
         /// </summary>
         internal static string EdmTypeCannotBeNull {
             get {
@@ -561,6 +597,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string EmptyParameterAlias {
             get {
                 return ResourceManager.GetString("EmptyParameterAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The route template in path template &apos;{0}&apos; is empty..
+        /// </summary>
+        internal static string EmptyPathTemplate {
+            get {
+                return ResourceManager.GetString("EmptyPathTemplate", resourceCulture);
             }
         }
         
@@ -673,15 +718,6 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input function &apos;{0}&apos; is not a bound function..
-        /// </summary>
-        internal static string FunctionIsNotBound {
-            get {
-                return ResourceManager.GetString("FunctionIsNotBound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The function &apos;{0}&apos; is not bound to the collection of entity. Only functions that are bound to entities can have function links..
         /// </summary>
         internal static string FunctionNotBoundToCollectionOfEntity {
@@ -745,7 +781,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number of the entity type key &apos;{1}&apos;..
+        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
         /// </summary>
         internal static string InputKeyNotMatchEntityTypeKey {
             get {
@@ -754,7 +790,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;..
+        ///   Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;. The template string does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
         /// </summary>
         internal static string InvalidAttributeRoutingTemplateSegment {
             get {
@@ -777,6 +813,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidExpansionDepthValue {
             get {
                 return ResourceManager.GetString("InvalidExpansionDepthValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The key value ({0}) from request is not valid. The key value should be format of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidKeyInUriFound {
+            get {
+                return ResourceManager.GetString("InvalidKeyInUriFound", resourceCulture);
             }
         }
         
@@ -804,6 +849,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidODataUntypedValue {
             get {
                 return ResourceManager.GetString("InvalidODataUntypedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter value ({0}) from request is not valid. The parameter value should be format of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidParameterValueInUriFound {
+            get {
+                return ResourceManager.GetString("InvalidParameterValueInUriFound", resourceCulture);
             }
         }
         
@@ -840,6 +894,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string InvalidTemplateLiteral {
             get {
                 return ResourceManager.GetString("InvalidTemplateLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is internal and should never be deserialized into..
+        /// </summary>
+        internal static string JsonConverterDoesnotSupportRead {
+            get {
+                return ResourceManager.GetString("JsonConverterDoesnotSupportRead", resourceCulture);
             }
         }
         
@@ -975,6 +1038,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ModelPrefixAlreadyUsed {
             get {
                 return ResourceManager.GetString("ModelPrefixAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found multiple action imports with same &apos;{0}&apos; name within an entity container...
+        /// </summary>
+        internal static string MultipleActionImportFound {
+            get {
+                return ResourceManager.GetString("MultipleActionImportFound", resourceCulture);
             }
         }
         
@@ -1213,6 +1285,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The input operation &apos;{0}&apos; is not a bound &apos;{1}&apos;..
+        /// </summary>
+        internal static string OperationIsNotBound {
+            get {
+                return ResourceManager.GetString("OperationIsNotBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Action import and function import &apos;{0}&apos; MUST be unique within an entity container..
+        /// </summary>
+        internal static string OperationMustBeUniqueInEntitySetContainer {
+            get {
+                return ResourceManager.GetString("OperationMustBeUniqueInEntitySetContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
         /// </summary>
         internal static string OrderByClauseNotSupported {
@@ -1263,6 +1353,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ParameterTypeIsNotCollection {
             get {
                 return ResourceManager.GetString("ParameterTypeIsNotCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value cannot be converted to type {0}..
+        /// </summary>
+        internal static string PropertyCannotBeConverted {
+            get {
+                return ResourceManager.GetString("PropertyCannotBeConverted", resourceCulture);
             }
         }
         
@@ -1357,11 +1456,38 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can not resolve the property using property path &apos;{0}&apos; from type &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyNotFoundOnPathExpression {
+            get {
+                return ResourceManager.GetString("PropertyNotFoundOnPathExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
         /// </summary>
         internal static string PropertyOrPathWasRemovedFromContext {
             get {
                 return ResourceManager.GetString("PropertyOrPathWasRemovedFromContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value has a value that is out of range of type {0}..
+        /// </summary>
+        internal static string PropertyTypeOverflow {
+            get {
+                return ResourceManager.GetString("PropertyTypeOverflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value has a format that is not recognized by type {0}..
+        /// </summary>
+        internal static string PropertyUnrecognizedFormat {
+            get {
+                return ResourceManager.GetString("PropertyUnrecognizedFormat", resourceCulture);
             }
         }
         
@@ -1384,7 +1510,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Binding OData QueryNode of kind {0} is not supported by {1}..
+        ///   Looks up a localized string similar to Binding OData QueryNode of kind &apos;{0}&apos; is not supported by &apos;{1}&apos;..
         /// </summary>
         internal static string QueryNodeBindingNotSupported {
             get {
@@ -1411,7 +1537,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize. Controller classes must derive from ODataController or be marked with ODataFormattingAttribute. Custom parameter bindings must call GetPerRequestFormatterInstance on each formatter and use these per-request instances..
+        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to deserialize..
         /// </summary>
         internal static string ReadFromStreamAsyncMustHaveRequest {
             get {
@@ -1429,7 +1555,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request must have an associated EDM model. Consider using the extension method HttpConfiguration.MapODataServiceRoute to register a route that parses the OData URI and attaches the model information..
+        ///   Looks up a localized string similar to The request must have an associated EDM model. Consider registering Edm model calling AddOData()..
         /// </summary>
         internal static string RequestMustHaveModel {
             get {
@@ -1474,7 +1600,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Found a key segment in a OData path. The route option disables key in parenthesis and key as segment..
+        ///   Looks up a localized string similar to The route option disables key in parenthesis and key as segment. At least one option should enable..
         /// </summary>
         internal static string RouteOptionDisabledKeySegment {
             get {
@@ -1483,7 +1609,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Found a &apos;{0}&apos; segment in a OData path. The route option disables qualified and unqualified operation call..
+        ///   Looks up a localized string similar to The route option disables qualified and unqualified operation call. At least one option should enable..
         /// </summary>
         internal static string RouteOptionDisabledOperationSegment {
             get {
@@ -1537,7 +1663,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to parse the skiptoken value. Skiptoken value should always be server generated..
+        ///   Looks up a localized string similar to Unable to parse the skiptoken value &apos;{0}&apos;. Skiptoken value should always be server generated..
         /// </summary>
         internal static string SkipTokenParseError {
             get {
@@ -1618,7 +1744,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is not a resource set type. Only resource set are supported..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
         /// </summary>
         internal static string TypeMustBeResourceSet {
             get {
@@ -1735,11 +1861,11 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The OData formatter does not support writing client requests. This formatter instance must have an associated request..
+        ///   Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
         /// </summary>
-        internal static string WriteToStreamAsyncMustHaveRequest {
+        internal static string WriteToResponseAsyncMustHaveRequest {
             get {
-                return ResourceManager.GetString("WriteToStreamAsyncMustHaveRequest", resourceCulture);
+                return ResourceManager.GetString("WriteToResponseAsyncMustHaveRequest", resourceCulture);
             }
         }
     }

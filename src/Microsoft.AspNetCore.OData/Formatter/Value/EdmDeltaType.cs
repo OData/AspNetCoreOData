@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
@@ -10,23 +11,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// </summary>
     internal class EdmDeltaType : IEdmType
     {
-        private IEdmEntityType _entityType;
-        private EdmDeltaKind _deltaKind;
-
-        internal EdmDeltaType(IEdmEntityType entityType, EdmDeltaKind deltaKind)
+        internal EdmDeltaType(IEdmEntityType entityType, DeltaItemKind deltaKind)
         {
-            _entityType = entityType ?? throw Error.ArgumentNull("entityType");
-            _deltaKind = deltaKind;
+            EntityType = entityType ?? throw Error.ArgumentNull(nameof(entityType));
+            DeltaKind = deltaKind;
         }
 
         /// <inheritdoc />
         public EdmTypeKind TypeKind => EdmTypeKind.Entity;
 
-        public IEdmEntityType EntityType => _entityType;
+        public IEdmEntityType EntityType { get; }
 
         /// <summary>
         /// Returning DeltaKind of the object within DeltaResourceSet payload
         /// </summary>
-        public EdmDeltaKind DeltaKind => _deltaKind;
+        public DeltaItemKind DeltaKind { get; }
     }
 }

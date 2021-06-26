@@ -11,11 +11,44 @@ using ODataRoutingSample.Models;
 namespace ODataRoutingSample.Controllers.v1
 {
     [ODataModel("v1")]
+    [ODataRouting]
     public class OrganizationsController : Controller
     {
+        [EnableQuery]
+        public IActionResult Post([FromBody] Organization org)
+        {
+            /*
+             * You can send a Post request with the request body as follows (v4.0):
+            {
+              "@odata.context":"http://localhost:5000/v1/$metadata#Organizations/$entity",
+              "Name": "Peter",
+              "Departs@odata.bind":[ "Departments(4)", "Departments(5)"]
+            }
+
+            or 4.01 request body as follows:
+
+            {
+              "@odata.context":"http://localhost:5000/v1/$metadata#Organizations/$entity",
+              "Name": "Peter",
+              "Departs": [{
+                 "@odata.id": "Departments(4)"
+              },
+              {
+                  "@odata.id": "Departments(5)"
+                  "Alias": "No2"
+              }
+              ]
+            }
+
+            */
+
+            org.OrganizationId = 99; // 99 is just for testing
+            return Ok(org);
+        }
+
         [HttpPatch]
         [EnableQuery]
-       // public IActionResult Patch(EdmChangedObjectCollection changes)
+        // public IActionResult Patch(EdmChangedObjectCollection changes)
         public IActionResult Patch(DeltaSet<Organization> changes)
         {
             /*
@@ -56,8 +89,19 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok();
         }
 
+        public IActionResult GetName(int key)
+        {
+            Organization org = new Organization
+            {
+                OrganizationId = 9,
+                Name = "MyName"
+            };
+
+            return Ok(org.Name);
+        }
+
         [HttpGet]
-        public IActionResult GetPrice([FromODataUri]string organizationId, [FromODataUri] string partId)
+        public IActionResult GetPrice([FromODataUri] string organizationId, [FromODataUri] string partId)
         {
             return Ok($"Caculated the price using {organizationId} and {partId}");
         }
@@ -72,6 +116,70 @@ namespace ODataRoutingSample.Controllers.v1
         public IActionResult GetMorePrice2(string orgId, string parId, string orgId2, string parId2)
         {
             return Ok($"Caculated the price using {orgId} and {parId} | using {orgId2} and {parId2}");
+        }
+
+        [HttpPost("v1/Organizations/GetByAccount(accountId={aId})/MarkAsFavourite")]
+        public IActionResult MarkAsFavouriteAfterGetByAccount(string aId)
+        {
+            /*
+             * It works for the following request;
+             * POST http://localhost:5000/v1/Organizations/GetByAccount(accountId=99)/MarkAsFavourite
+             * */
+            return Ok($"MarkAsFavouriteAfterGetByAccount after {aId}");
+        }
+
+        [HttpPost("v1/Organizations/GetByAccount2(accountId={aId})/{key}/MarkAsFavourite")]
+        // [HttpPost("v1/Organizations/GetByAccount2(accountId={aId})({key})/MarkAsFavourite")] this syntax has ODL problem.
+        public IActionResult MarkAsFavouriteAfterGetByAccount2(int key, string aId)
+        {
+            /*
+             * It works for the following request;
+             * POST http://localhost:5000/v1/Organizations/GetByAccount2(accountId=99)/4/MarkAsFavourite
+             * */
+            return Ok($"MarkAsFavourite2AfterGetByAccount2 after {aId} with key={key}");
+        }
+
+        /* Conventional routing builds the following two routing templates:
+GET ~/v1/Organizations({key})/{navigationProperty}/$ref
+GET ~/v1/Organizations/{key}/{navigationProperty}/$ref
+         */
+        [HttpGet]
+        public IActionResult GetRef(int key, string navigationProperty)
+        {
+            return Ok($"GetRef - {key}: {navigationProperty}");
+        }
+
+        /* Conventional routing builds the following two routing templates:
+POST,PUT ~/v1/Organizations({ key})/{navigationProperty }/$ref
+POST,PUT ~/v1/Organizations/{key }/{navigationProperty}/$ref
+        */
+        [HttpPost]
+        [HttpPut]
+        public IActionResult CreateRef(int key, string navigationProperty)
+        {
+            return Ok($"CreateRef - {key}: {navigationProperty}");
+        }
+
+        /* Conventional routing builds the following two routing templates:
+DELETE ~/v1/Organizations({key})/{navigationProperty}/$ref
+DELETE ~/v1/Organizations/{key}/{navigationProperty}/$ref
+        */
+        [HttpDelete]
+        public IActionResult DeleteRef(int key, string navigationProperty)
+        {
+            return Ok($"DeleteRef - {key}: {navigationProperty}");
+        }
+
+        /* Conventional routing builds the following two routing templates:
+DELETE ~/v1/Organizations({key})/{navigationProperty}({relatedKey})/$ref
+DELETE ~/v1/Organizations({key})/{navigationProperty}/{relatedKey}/$ref
+DELETE ~/v1/Organizations/{key}/{navigationProperty}({relatedKey})/$ref
+DELETE ~/v1/Organizations/{key}/{navigationProperty}/{relatedKey}/$ref
+        */
+        [HttpDelete]
+        public IActionResult DeleteRef(int key, int relatedKey, string navigationProperty)
+        {
+            return Ok($"DeleteRef - {key} - {relatedKey}: {navigationProperty}");
         }
     }
 }

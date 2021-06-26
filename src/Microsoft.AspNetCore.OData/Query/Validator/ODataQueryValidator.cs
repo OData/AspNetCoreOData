@@ -117,7 +117,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
 
             return context.RequestContainer.GetRequiredService<ODataQueryValidator>();
-            //return context.Request.HttpContext.RequestServices.GetRequiredService<ODataQueryValidator>();
         }
 
         private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)

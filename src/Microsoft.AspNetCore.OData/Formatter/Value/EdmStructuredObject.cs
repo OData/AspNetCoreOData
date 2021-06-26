@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// Represents an <see cref="IEdmStructuredObject"/> with no backing CLR <see cref="Type"/>.
     /// </summary>
     [NonValidatingParameterBinding]
-    public abstract class EdmStructuredObject : Delta, IEdmStructuredObject
+    public abstract class EdmStructuredObject : Delta, IEdmStructuredObject, IEdmChangedObject
     {
         private Dictionary<string, object> _container = new Dictionary<string, object>();
         private HashSet<string> _setProperties = new HashSet<string>();
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <inheritdoc/>
-        public override DeltaKind Kind => DeltaKind.DeltaResource;
+        public override DeltaItemKind Kind => DeltaItemKind.Resource;
 
         /// <summary>
         /// Gets or sets the expected <see cref="IEdmStructuredType"/> of the entity or complex type of this object.

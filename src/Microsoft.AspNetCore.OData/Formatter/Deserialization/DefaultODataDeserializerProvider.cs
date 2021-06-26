@@ -26,11 +26,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="serviceProvider">The service provider.</param>
         public DefaultODataDeserializerProvider(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
         }
 
         /// <inheritdoc />
-        public override ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType)
+        public override ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
         {
             if (edmType == null)
             {
@@ -50,6 +50,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
 
                 case EdmTypeKind.Collection:
+                    if (isDelta)
+                    {
+                        return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+                    }
+
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
                     if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
                     {
@@ -88,8 +93,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
             }
 
-            if (type == typeof(EdmChangedObjectCollection) || 
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+            if (IsDelta(type))
             {
                 return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
             }
@@ -109,6 +113,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 return GetEdmTypeDeserializer(edmType);
             }
+        }
+
+        private static bool IsDelta(Type type)
+        {
+            if (type == typeof(EdmChangedObjectCollection) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

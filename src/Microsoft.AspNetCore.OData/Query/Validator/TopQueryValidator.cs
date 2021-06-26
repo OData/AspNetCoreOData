@@ -22,12 +22,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (topQueryOption == null)
             {
-                throw Error.ArgumentNull("topQueryOption");
+                throw Error.ArgumentNull(nameof(topQueryOption));
             }
 
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (topQueryOption.Value > validationSettings.MaxTop)

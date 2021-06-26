@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Microsoft.AspNetCore.OData.Edm
@@ -18,13 +17,6 @@ namespace Microsoft.AspNetCore.OData.Edm
     {
         private readonly Dictionary<string, IDictionary<Type, MethodInfo>> _tokenToMethodMap
             = new Dictionary<string, IDictionary<Type, MethodInfo>>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CustomAggregateMethodAnnotation"/> class.
-        /// </summary>
-        public CustomAggregateMethodAnnotation()
-        {
-        }
 
         /// <summary>
         /// Adds all implementations of a method that share the same methodToken.
@@ -46,7 +38,6 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="returnType">The given return type.</param>
         /// <param name="methodInfo">The output of method info.</param>
         /// <returns>True if the method info was found, false otherwise.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Out param is appropriate here")]
         public bool GetMethodInfo(string methodToken, Type returnType, out MethodInfo methodInfo)
         {
             IDictionary<Type, MethodInfo> methodWrapper;

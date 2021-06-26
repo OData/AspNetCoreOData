@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="IDelta" /> allows and tracks changes to delta link.
     /// </summary>
-    public interface IDeltaLinkBase : IDeltaItem
+    public interface IDeltaLinkBase : IDeltaSetItem
     {
         /// <summary>
         /// The Uri of the entity from which the relationship is defined, which may be absolute or relative.

@@ -6,31 +6,61 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataQueryRequest (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataRouteDebug (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataRouteDebug (Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern)
 }
 
 [
 ExtensionAttribute(),
 ]
-public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions {
+public sealed class Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions {
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddConvention (Microsoft.AspNetCore.OData.Abstracts.IODataBuilder builder)
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+	public static Microsoft.Extensions.DependencyInjection.IMvcBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
+}
+
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.OData.Abstracts.IODataBuilder AddOData (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`1[[Microsoft.AspNetCore.OData.ODataOptions]] setupAction)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
 }
 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
@@ -38,21 +68,28 @@ public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 }
 
+public class Microsoft.AspNetCore.OData.ODataJsonOptionsSetup : IConfigureOptions`1 {
+	public ODataJsonOptionsSetup ()
+
+	public virtual void Configure (Microsoft.AspNetCore.Mvc.JsonOptions options)
+}
+
+public class Microsoft.AspNetCore.OData.ODataMvcOptionsSetup : IConfigureOptions`1 {
+	public ODataMvcOptionsSetup ()
+
+	public virtual void Configure (Microsoft.AspNetCore.Mvc.MvcOptions options)
+}
+
 public class Microsoft.AspNetCore.OData.ODataOptions {
 	public ODataOptions ()
 
 	System.Func`1[[Microsoft.OData.IContainerBuilder]] BuilderFactory  { public get; public set; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention]] Conventions  { public get; }
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] Models  { public get; }
+	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
 	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
@@ -62,24 +99,24 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model)
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
 	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, System.Action`1[[Microsoft.OData.IContainerBuilder]] configureAction)
-	public Microsoft.AspNetCore.OData.ODataOptions ConfigureRoute (System.Action`1[[Microsoft.AspNetCore.OData.Routing.ODataRouteOptions]] configureAction)
 	public Microsoft.AspNetCore.OData.ODataOptions Count ()
 	public Microsoft.AspNetCore.OData.ODataOptions Expand ()
 	public Microsoft.AspNetCore.OData.ODataOptions Filter ()
 	public System.IServiceProvider GetODataServiceProvider (string prefix)
 	public Microsoft.AspNetCore.OData.ODataOptions OrderBy ()
 	public Microsoft.AspNetCore.OData.ODataOptions Select ()
-	public Microsoft.AspNetCore.OData.ODataOptions SetAttributeRouting (bool enabled)
-	public Microsoft.AspNetCore.OData.ODataOptions SetBuilderFactory (System.Func`1[[Microsoft.OData.IContainerBuilder]] factory)
-	public Microsoft.AspNetCore.OData.ODataOptions SetContinueOnErrorHeader (bool enableContinueOnError)
 	public Microsoft.AspNetCore.OData.ODataOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.ODataOptions SetTimeZoneInfo (System.TimeZoneInfo timeZoneInfo)
-	public Microsoft.AspNetCore.OData.ODataOptions SetUrlKeyDelimiter (Microsoft.OData.ODataUrlKeyDelimiter keyDelimiter)
 	public Microsoft.AspNetCore.OData.ODataOptions SkipToken ()
 }
 
+public class Microsoft.AspNetCore.OData.ODataOptionsSetup : IConfigureOptions`1 {
+	public ODataOptionsSetup (Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser parser)
+
+	public virtual void Configure (Microsoft.AspNetCore.OData.ODataOptions options)
+}
+
 public interface Microsoft.AspNetCore.OData.Abstracts.IETagHandler {
-	Microsoft.Net.Http.Headers.EntityTagHeaderValue CreateETag (System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties)
+	Microsoft.Net.Http.Headers.EntityTagHeaderValue CreateETag (System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZoneInfo)
 	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ParseETag (Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue)
 }
 
@@ -112,12 +149,13 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataFeature {
 	System.Func`1[[System.Int64]] TotalCountFunc  { public abstract get; public abstract set; }
 }
 
-public interface Microsoft.AspNetCore.OData.Abstracts.IODataTypeMappingProvider {
-	System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType)
-	System.Type GetClrType (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType)
-	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
-	Microsoft.OData.Edm.IEdmTypeReference GetEdmType (Microsoft.OData.Edm.IEdmModel model, System.Type clrType)
-	System.Type MapTo (System.Type clrType)
+[
+AttributeUsageAttribute(),
+]
+public class Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute : Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute, IActionFilter, IAsyncActionFilter, IAsyncResultFilter, IFilterMetadata, IOrderedFilter, IResultFilter {
+	public ETagActionFilterAttribute ()
+
+	public virtual void OnActionExecuted (Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext)
 }
 
 public class Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope {
@@ -166,16 +204,6 @@ public class Microsoft.AspNetCore.OData.Abstracts.ODataFeature : IODataFeature {
 	System.Func`1[[System.Int64]] TotalCountFunc  { public virtual get; public virtual set; }
 }
 
-public class Microsoft.AspNetCore.OData.Abstracts.ODataTypeMappingProvider : IODataTypeMappingProvider {
-	public ODataTypeMappingProvider (Microsoft.OData.ModelBuilder.IAssemblyResolver resolver)
-
-	public virtual System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveTypeReference edmPrimitiveType)
-	public virtual System.Type GetClrType (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmTypeReference edmType)
-	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
-	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmType (Microsoft.OData.Edm.IEdmModel model, System.Type clrType)
-	public virtual System.Type MapTo (System.Type clrType)
-}
-
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchHandler {
 	protected ODataBatchHandler ()
 
@@ -201,7 +229,7 @@ public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem {
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem {
 	protected ODataBatchResponseItem ()
 
-	internal virtual bool IsResponseSuccessful ()
+	internal abstract bool IsResponseSuccessful ()
 	[
 	AsyncStateMachineAttribute(),
 	]
@@ -404,15 +432,15 @@ public class Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler : Micr
 	public virtual System.Threading.Tasks.Task ProcessBatchAsync (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.RequestDelegate nextHandler)
 }
 
-public enum Microsoft.AspNetCore.OData.Deltas.DeltaKind : int {
-	DeltaDeletedLink = 3
-	DeltaDeletedResource = 2
-	DeltaLink = 4
-	DeltaResource = 1
-	Unknown = 0
+public enum Microsoft.AspNetCore.OData.Deltas.DeltaItemKind : int {
+	DeletedResource = 1
+	DeltaDeletedLink = 2
+	DeltaLink = 3
+	Resource = 0
+	Unknown = 4
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaItem {
+public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaSetItem {
 	void Clear ()
 	System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
 	System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
@@ -421,25 +449,28 @@ public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaItem {
 	bool TrySetPropertyValue (string name, object value)
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink : IDeltaItem, IDeltaLinkBase {
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink : IDeltaLinkBase, IDeltaSetItem {
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource : IDelta, IDeltaItem {
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource : IDelta, IDeltaSetItem {
 	System.Uri Id  { public abstract get; public abstract set; }
 	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public abstract get; public abstract set; }
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaItem {
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLink : IDeltaLinkBase, IDeltaSetItem {
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLink : IDeltaItem, IDeltaLinkBase {
-}
-
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase : IDeltaItem {
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase : IDeltaSetItem {
 	string Relationship  { public abstract get; public abstract set; }
 	System.Uri Source  { public abstract get; public abstract set; }
 	System.Uri Target  { public abstract get; public abstract set; }
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaSet : IEnumerable, ICollection`1, IEnumerable`1 {
+}
+
+public interface Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem {
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Deltas.ITypedDelta {
@@ -447,10 +478,10 @@ public interface Microsoft.AspNetCore.OData.Deltas.ITypedDelta {
 	System.Type StructuredType  { public abstract get; }
 }
 
-public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.DynamicObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem {
+public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.DynamicObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem {
 	protected Delta ()
 
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
 
 	public abstract void Clear ()
 	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
@@ -462,33 +493,29 @@ public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.D
 	public abstract bool TrySetPropertyValue (string name, object value)
 }
 
-public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1 : IDeltaItem, IDeltaLinkBase, ITypedDelta {
+public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1 : IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
 	protected DeltaLinkBase`1 ()
 	protected DeltaLinkBase`1 (System.Type structuralType)
 
 	System.Type ExpectedClrType  { public virtual get; }
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public abstract get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
 	string Relationship  { public virtual get; public virtual set; }
 	System.Uri Source  { public virtual get; public virtual set; }
 	System.Type StructuredType  { public virtual get; }
 	System.Uri Target  { public virtual get; public virtual set; }
 }
 
-public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaSet : System.Collections.ObjectModel.Collection`1[[Microsoft.AspNetCore.OData.Deltas.IDeltaItem]], ICollection, IEnumerable, IList, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
-	protected DeltaSet ()
-}
-
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaItem, ITypedDelta {
+public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, ITypedDelta {
 	public Delta`1 ()
 	public Delta`1 (System.Type structuralType)
 	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
 	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
 
 	System.Type ExpectedClrType  { public virtual get; }
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
 
 	public virtual void Clear ()
@@ -504,46 +531,52 @@ public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OD
 	public virtual bool TrySetPropertyValue (string name, object value)
 }
 
-public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1 : DeltaLinkBase`1, IDeltaDeletedLink, IDeltaItem, IDeltaLinkBase, ITypedDelta {
-	public DeltaDeletedLink`1 ()
-	public DeltaDeletedLink`1 (System.Type structuralType)
-
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
-}
-
-public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1 : Delta`1, IDynamicMetaObjectProvider, IDelta, IDeltaDeletedResource, IDeltaItem, ITypedDelta {
+public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1 : Delta`1, IDynamicMetaObjectProvider, IDelta, IDeltaDeletedResource, IDeltaSetItem, ITypedDelta {
 	public DeltaDeletedResource`1 ()
 	public DeltaDeletedResource`1 (System.Type structuralType)
+	public DeltaDeletedResource`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
+	public DeltaDeletedResource`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
 
 	System.Uri Id  { public virtual get; public virtual set; }
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public virtual get; public virtual set; }
-}
-
-public class Microsoft.AspNetCore.OData.Deltas.DeltaLink`1 : DeltaLinkBase`1, IDeltaItem, IDeltaLink, IDeltaLinkBase, ITypedDelta {
-	public DeltaLink`1 ()
-	public DeltaLink`1 (System.Type structuralType)
-
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
 }
 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : Microsoft.AspNetCore.OData.Deltas.DeltaSet, ICollection, IEnumerable, IList, ITypedDelta, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
+public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.ObjectModel.Collection`1[[Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem]], ICollection, IEnumerable, IList, IDeltaSet, ITypedDelta, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1 {
 	public DeltaSet`1 ()
 
 	System.Type ExpectedClrType  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
 
-	protected virtual T GetOriginal (Microsoft.AspNetCore.OData.Deltas.IDeltaItem deltaItem, IEnumerable`1 originalSet)
-	public virtual void Patch (IEnumerable`1 originalSet)
+	protected virtual T GetOriginal (Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem deltaItem, System.Collections.IEnumerable originalSet)
+}
+
+public sealed class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1 : DeltaLinkBase`1, IDeltaDeletedLink, IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
+	public DeltaDeletedLink`1 ()
+	public DeltaDeletedLink`1 (System.Type structuralType)
+
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
+}
+
+public sealed class Microsoft.AspNetCore.OData.Deltas.DeltaLink`1 : DeltaLinkBase`1, IDeltaLink, IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
+	public DeltaLink`1 ()
+	public DeltaLink`1 (System.Type structuralType)
+
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 }
 
 [
 ExtensionAttribute(),
 ]
 public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Collections.Generic.IEnumerable`1[[System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmPathExpression]]]] GetAlternateKeys (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmEntityType entityType)
+
 	[
 	ExtensionAttribute(),
 	]
@@ -573,6 +606,51 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	ExtensionAttribute(),
 	]
 	public static string SetModelName (Microsoft.OData.Edm.IEdmModel model)
+}
+
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation GetNavigationSourceLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder GetOperationLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void HasEditLink (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] editLinkBuilder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void HasIdLink (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] idLinkBuilder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void HasNavigationPropertyLink (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder linkBuilder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void HasReadLink (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] readLinkBuilder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void SetNavigationSourceLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation navigationSourceLinkBuilder)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void SetOperationLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder operationLinkBuilder)
 }
 
 public class Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation {
@@ -606,7 +684,10 @@ public class Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder {
 public class Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation {
 	public NavigationSourceLinkBuilderAnnotation ()
 	public NavigationSourceLinkBuilderAnnotation (Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmModel model)
-	public NavigationSourceLinkBuilderAnnotation (Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] idLinkBuilder, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] editLinkBuilder, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] readLinkBuilder)
+
+	Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] EditLinkBuilder  { public get; public set; }
+	Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] IdLinkBuilder  { public get; public set; }
+	Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1[[System.Uri]] ReadLinkBuilder  { public get; public set; }
 
 	public void AddNavigationPropertyLinkBuilder (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder linkBuilder)
 	public virtual System.Uri BuildEditLink (Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel, System.Uri idLink)
@@ -690,11 +771,6 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.AspNetCore.Routing.LinkGenerator GetLinkGenerator (Microsoft.AspNetCore.Http.HttpContext httpContext)
-
-	[
-	ExtensionAttribute(),
-	]
 	public static Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature ODataBatchFeature (Microsoft.AspNetCore.Http.HttpContext httpContext)
 
 	[
@@ -710,7 +786,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static string CreateETag (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties)
+	public static string CreateETag (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZone)
 
 	[
 	ExtensionAttribute(),
@@ -745,7 +821,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.OData.ODataVersion GetODataResponseVersion (Microsoft.AspNetCore.Http.HttpRequest request)
+	public static Microsoft.OData.ODataVersion GetODataVersion (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
 	ExtensionAttribute(),
@@ -903,6 +979,7 @@ public class Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter : Microsof
 
 	public virtual bool CanRead (Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext context)
 	public static System.Uri GetDefaultBaseAddress (Microsoft.AspNetCore.Http.HttpRequest request)
+	public virtual System.Collections.Generic.IReadOnlyList`1[[System.String]] GetSupportedContentTypes (string contentType, System.Type objectType)
 	[
 	AsyncStateMachineAttribute(),
 	]
@@ -917,6 +994,7 @@ public class Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter : Microso
 
 	public virtual bool CanWriteResult (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterCanWriteContext context)
 	public static System.Uri GetDefaultBaseAddress (Microsoft.AspNetCore.Http.HttpRequest request)
+	public virtual System.Collections.Generic.IReadOnlyList`1[[System.String]] GetSupportedContentTypes (string contentType, System.Type objectType)
 	public virtual System.Threading.Tasks.Task WriteResponseBodyAsync (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context, System.Text.Encoding selectedEncoding)
 	public virtual void WriteResponseHeaders (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context)
 }
@@ -1073,6 +1151,11 @@ public enum Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption : int {
 	True = 1
 }
 
+public interface Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser {
+	bool CanParse (Microsoft.AspNetCore.Http.HttpRequest request)
+	System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
+}
+
 public abstract class Microsoft.AspNetCore.OData.Query.OrderByNode {
 	protected OrderByNode (Microsoft.OData.UriParser.OrderByClause orderByClause)
 	protected OrderByNode (Microsoft.OData.UriParser.OrderByDirection direction)
@@ -1085,8 +1168,8 @@ public abstract class Microsoft.AspNetCore.OData.Query.OrderByNode {
 public abstract class Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
 	protected SkipTokenHandler ()
 
-	public abstract IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption)
-	public abstract System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption)
+	public abstract IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
+	public abstract System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
 	public abstract System.Uri GenerateNextPageLink (System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context)
 }
 
@@ -1128,31 +1211,21 @@ public class Microsoft.AspNetCore.OData.Query.CountQueryOption {
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
-public class Microsoft.AspNetCore.OData.Query.DefaultQuerySettings {
-	public DefaultQuerySettings ()
+public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : IODataQueryRequestParser {
+	public DefaultODataQueryRequestParser ()
 
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Count ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Expand ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Filter ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings OrderBy ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings Select ()
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.Query.DefaultQuerySettings SkipToken ()
+	public virtual bool CanParse (Microsoft.AspNetCore.Http.HttpRequest request)
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
 public class Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler : Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
 	public DefaultSkipTokenHandler ()
 
-	public virtual IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption)
-	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption)
+	public virtual IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
+	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
 	public virtual System.Uri GenerateNextPageLink (System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context)
 }
 
@@ -1213,13 +1286,6 @@ public class Microsoft.AspNetCore.OData.Query.ETag`1 : Microsoft.AspNetCore.ODat
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query)
 }
 
-public class Microsoft.AspNetCore.OData.Query.ExpandConfiguration {
-	public ExpandConfiguration ()
-
-	Microsoft.OData.ModelBuilder.SelectExpandType ExpandType  { public get; public set; }
-	int MaxDepth  { public get; public set; }
-}
-
 public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	public FilterQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
@@ -1232,55 +1298,16 @@ public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
-public class Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings {
-	public ModelBoundQuerySettings ()
-	public ModelBoundQuerySettings (Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettings querySettings)
-
-	System.Nullable`1[[System.Boolean]] Countable  { public get; public set; }
-	System.Nullable`1[[System.Boolean]] DefaultEnableFilter  { public get; public set; }
-	System.Nullable`1[[System.Boolean]] DefaultEnableOrderBy  { public get; public set; }
-	System.Nullable`1[[Microsoft.OData.ModelBuilder.SelectExpandType]] DefaultExpandType  { public get; public set; }
-	int DefaultMaxDepth  { public get; public set; }
-	System.Nullable`1[[Microsoft.OData.ModelBuilder.SelectExpandType]] DefaultSelectType  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[Microsoft.AspNetCore.OData.Query.ExpandConfiguration]] ExpandConfigurations  { public get; }
-	System.Collections.Generic.Dictionary`2[[System.String],[System.Boolean]] FilterConfigurations  { public get; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[System.Boolean]] OrderByConfigurations  { public get; }
-	System.Nullable`1[[System.Int32]] PageSize  { public get; public set; }
-	System.Collections.Generic.Dictionary`2[[System.String],[Microsoft.OData.ModelBuilder.SelectExpandType]] SelectConfigurations  { public get; }
-}
-
-public class Microsoft.AspNetCore.OData.Query.ODataQueryableOptions {
-	public ODataQueryableOptions ()
-
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
-
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Count ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Expand ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Filter ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions OrderBy ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions Select ()
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
-	public Microsoft.AspNetCore.OData.Query.ODataQueryableOptions SkipToken ()
-}
-
 public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmType elementType, Microsoft.OData.UriParser.ODataPath path)
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, System.Type elementClrType, Microsoft.OData.UriParser.ODataPath path)
 
-	Microsoft.AspNetCore.OData.Query.DefaultQuerySettings DefaultQuerySettings  { public get; }
+	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings DefaultQuerySettings  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	Microsoft.OData.UriParser.ODataPath Path  { public get; }
-	Microsoft.AspNetCore.OData.Query.ODataQueryableOptions QueryableOptions  { public get; }
 	System.IServiceProvider RequestContainer  { public get; }
 }
 
@@ -1334,6 +1361,15 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1 : Microsoft.As
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query)
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	internal virtual Microsoft.AspNetCore.OData.Query.ETag GetETag (Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue)
+}
+
+public class Microsoft.AspNetCore.OData.Query.ODataQueryRequestMiddleware {
+	public ODataQueryRequestMiddleware (System.Collections.Generic.IEnumerable`1[[Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser]] queryRequestParsers, Microsoft.AspNetCore.Http.RequestDelegate next)
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public System.Threading.Tasks.Task Invoke (Microsoft.AspNetCore.Http.HttpContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.ODataQuerySettings {
@@ -1404,39 +1440,6 @@ public class Microsoft.AspNetCore.OData.Query.OrderByQueryOption {
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
-public class Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator : Microsoft.OData.UriParser.QueryNodeVisitor`1[[Microsoft.OData.UriParser.QueryNode]] {
-	public ParameterAliasNodeTranslator (System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.UriParser.SingleValueNode]] parameterAliasNodes)
-
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.AllNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.AnyNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.BinaryOperatorNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionComplexNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionConstantNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionFunctionCallNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionNavigationNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionPropertyAccessNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionResourceCastNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CollectionResourceFunctionCallNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.ConstantNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.ConvertNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.CountNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.InNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.NamedFunctionParameterNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.NonResourceRangeVariableReferenceNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.ParameterAliasNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.ResourceRangeVariableReferenceNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SearchTermNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleComplexNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleNavigationNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleResourceCastNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleResourceFunctionCallNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleValueFunctionCallNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.SingleValuePropertyAccessNode nodeIn)
-	public virtual Microsoft.OData.UriParser.QueryNode Visit (Microsoft.OData.UriParser.UnaryOperatorNode nodeIn)
-}
-
 public class Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption {
 	public SelectExpandQueryOption (string select, string expand, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
@@ -1466,11 +1469,10 @@ public class Microsoft.AspNetCore.OData.Query.SkipQueryOption {
 }
 
 public class Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption {
-	public SkipTokenQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
+	public SkipTokenQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context)
 
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
-	Microsoft.AspNetCore.OData.Query.ODataQueryOptions QueryOptions  { public get; }
-	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; }
+	Microsoft.AspNetCore.OData.Query.SkipTokenHandler Handler  { public get; }
 	string RawValue  { public get; }
 	Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator Validator  { public get; }
 
@@ -1514,6 +1516,8 @@ public abstract class Microsoft.AspNetCore.OData.Results.PageResult {
 	DataMemberAttribute(),
 	]
 	System.Uri NextPageLink  { public get; }
+
+	public abstract System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
 }
 
 public abstract class Microsoft.AspNetCore.OData.Results.SingleResult {
@@ -1548,6 +1552,7 @@ public class Microsoft.AspNetCore.OData.Results.PageResult`1 : Microsoft.AspNetC
 
 	public virtual IEnumerator`1 GetEnumerator ()
 	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
 }
 
 public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
@@ -1601,11 +1606,6 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataPathExtensions {
 	ExtensionAttribute(),
 	]
 	public static bool IsStreamPropertyPath (Microsoft.OData.UriParser.ODataPath path)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static string TranslatePathTemplateSegment (Microsoft.OData.UriParser.PathTemplateSegment pathTemplatesegment, out System.String& value)
 }
 
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds {
@@ -1659,7 +1659,6 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler : Micros
 
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	string PathLiteral  { public get; }
-	string PathTemplate  { public get; }
 
 	public virtual void Handle (Microsoft.OData.UriParser.BatchSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.CountSegment segment)
@@ -1669,7 +1668,6 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler : Micros
 	public virtual void Handle (Microsoft.OData.UriParser.MetadataSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.NavigationPropertySegment segment)
-	public virtual void Handle (Microsoft.OData.UriParser.ODataPathSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.OperationImportSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.OperationSegment segment)
 	public virtual void Handle (Microsoft.OData.UriParser.PathTemplateSegment segment)
@@ -1688,8 +1686,10 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator : Mic
 public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	public ODataRouteOptions ()
 
+	bool EnableControllerNameCaseInsensitive  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }
+	bool EnableNonParenthsisForEmptyParameterFunction  { public get; public set; }
 	bool EnableQualifiedOperationCall  { public get; public set; }
 	bool EnableUnqualifiedOperationCall  { public get; public set; }
 }
@@ -1713,7 +1713,7 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Deserialization.OData
 public abstract class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider {
 	protected ODataDeserializerProvider ()
 
-	public abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer GetEdmTypeDeserializer (Microsoft.OData.Edm.IEdmTypeReference edmType)
+	public abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer GetEdmTypeDeserializer (Microsoft.OData.Edm.IEdmTypeReference edmType, params bool isDelta)
 	public abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer GetODataDeserializer (System.Type type, Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
@@ -1729,7 +1729,7 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Deserialization.OData
 public class Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider : Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider {
 	public DefaultODataDeserializerProvider (System.IServiceProvider serviceProvider)
 
-	public virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer GetEdmTypeDeserializer (Microsoft.OData.Edm.IEdmTypeReference edmType)
+	public virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer GetEdmTypeDeserializer (Microsoft.OData.Edm.IEdmTypeReference edmType, params bool isDelta)
 	public virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer GetODataDeserializer (System.Type type, Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
@@ -1766,6 +1766,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaReso
 
 	public virtual object ReadDeltaDeletedLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper deletedLink, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object ReadDeltaLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper link, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual object ReadDeltaResource (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resource, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual System.Collections.IEnumerable ReadDeltaResourceSet (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper deltaResourceSet, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object ReadInline (object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 }
@@ -1816,6 +1817,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitive
 public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer : Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer {
 	public ODataResourceDeserializer (Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider)
 
+	public virtual void ApplyDeletedResource (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperty (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper resourceInfoWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyStructuralProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
@@ -1958,27 +1960,27 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResour
 	[
 	AsyncStateMachineAttribute(),
 	]
-	public virtual System.Threading.Tasks.Task WriteDeletedResourceAsync (object graph, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+	public virtual System.Threading.Tasks.Task WriteDeltaDeletedLinkAsync (object value, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 
 	[
 	AsyncStateMachineAttribute(),
 	]
-	public virtual System.Threading.Tasks.Task WriteDeltaDeletedLinkAsync (object graph, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+	public virtual System.Threading.Tasks.Task WriteDeltaDeletedResourceAsync (object value, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 
 	[
 	AsyncStateMachineAttribute(),
 	]
-	public virtual System.Threading.Tasks.Task WriteDeltaLinkAsync (object graph, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
-
-	[
-	AsyncStateMachineAttribute(),
-	]
-	public virtual System.Threading.Tasks.Task WriteDeltaResourceSetInlineAsync (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+	public virtual System.Threading.Tasks.Task WriteDeltaLinkAsync (object value, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 
 	[
 	AsyncStateMachineAttribute(),
 	]
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task WriteObjectInlineAsync (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer {
@@ -2124,7 +2126,6 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocu
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode {
 	public SelectExpandNode ()
-	public SelectExpandNode (Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNodeToCopy)
 	public SelectExpandNode (Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 	public SelectExpandNode (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.Edm.IEdmModel model)
 
@@ -2137,40 +2138,27 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmFunction]] SelectedFunctions  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmNavigationProperty]] SelectedNavigationProperties  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] SelectedStructuralProperties  { public get; }
-
-	[
-	ObsoleteAttribute(),
-	]
-	public static void GetStructuralProperties (Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.HashSet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] structuralProperties, System.Collections.Generic.HashSet`1[[Microsoft.OData.Edm.IEdmStructuralProperty]] nestedStructuralProperties)
 }
 
-public enum Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind : int {
-	DeletedResource = 1
-	DeltaDeletedLink = 2
-	DeltaLink = 3
-	Resource = 0
-	Unknown = 4
-}
-
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject : IEdmObject, IEdmStructuredObject {
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public abstract get; }
+public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject : IEdmObject {
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject : IEdmObject, IEdmStructuredObject {
 }
 
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink : IEdmChangedObject, IEdmDeltaLinkBase, IEdmObject, IEdmStructuredObject {
+public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedLink : IEdmChangedObject, IEdmDeltaLinkBase, IEdmObject {
 }
 
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject : IEdmChangedObject, IEdmObject, IEdmStructuredObject {
-	string Id  { public abstract get; public abstract set; }
-	Microsoft.OData.DeltaDeletedEntryReason Reason  { public abstract get; public abstract set; }
+public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject : IEdmChangedObject, IEdmObject {
+	System.Uri Id  { public abstract get; public abstract set; }
+	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public abstract get; public abstract set; }
 }
 
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink : IEdmChangedObject, IEdmDeltaLinkBase, IEdmObject, IEdmStructuredObject {
+public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink : IEdmChangedObject, IEdmDeltaLinkBase, IEdmObject {
 }
 
-public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLinkBase : IEdmChangedObject, IEdmObject, IEdmStructuredObject {
+public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLinkBase : IEdmChangedObject, IEdmObject {
 	string Relationship  { public abstract get; public abstract set; }
 	System.Uri Source  { public abstract get; public abstract set; }
 	System.Uri Target  { public abstract get; public abstract set; }
@@ -2190,10 +2178,24 @@ public interface Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject
 	bool TryGetPropertyValue (string propertyName, out System.Object& value)
 }
 
+public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase : IEdmChangedObject, IEdmDeltaLinkBase, IEdmObject {
+	protected EdmDeltaLinkBase (Microsoft.OData.Edm.IEdmEntityTypeReference typeReference)
+	protected EdmDeltaLinkBase (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
+
+	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
+	bool IsNullable  { public get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
+	string Relationship  { public virtual get; public virtual set; }
+	System.Uri Source  { public virtual get; public virtual set; }
+	System.Uri Target  { public virtual get; public virtual set; }
+
+	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmType ()
+}
+
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmObject, IEdmStructuredObject {
+public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject : Microsoft.AspNetCore.OData.Deltas.Delta, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmObject, IEdmStructuredObject {
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredType edmType)
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredTypeReference edmType)
 	protected EdmStructuredObject (Microsoft.OData.Edm.IEdmStructuredType edmType, bool isNullable)
@@ -2201,7 +2203,7 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredOb
 	Microsoft.OData.Edm.IEdmStructuredType ActualEdmType  { public get; public set; }
 	Microsoft.OData.Edm.IEdmStructuredType ExpectedEdmType  { public get; public set; }
 	bool IsNullable  { public get; public set; }
-	Microsoft.AspNetCore.OData.Deltas.DeltaKind Kind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 
 	public virtual void Clear ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
@@ -2241,7 +2243,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmChangedObjectCollecti
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType)
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexTypeReference edmType)
 	public EdmComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType, bool isNullable)
@@ -2260,7 +2262,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollecti
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType)
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexTypeReference edmType)
 	public EdmDeltaComplexObject (Microsoft.OData.Edm.IEdmComplexType edmType, bool isNullable)
@@ -2269,61 +2271,55 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaDeletedLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase, IEdmChangedObject, IEdmDeltaDeletedLink, IEdmDeltaLinkBase, IEdmObject {
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
-	string Relationship  { public virtual get; public virtual set; }
-	System.Uri Source  { public virtual get; public virtual set; }
-	System.Uri Target  { public virtual get; public virtual set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 }
 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaDeletedResourceObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmDeltaDeletedResourceObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaDeletedResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
-	string Id  { public virtual get; public virtual set; }
+	System.Uri Id  { public virtual get; public virtual set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
-	Microsoft.OData.DeltaDeletedEntryReason Reason  { public virtual get; public virtual set; }
+	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public virtual get; public virtual set; }
 }
 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmDeltaLink, IEdmDeltaLinkBase, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase, IEdmChangedObject, IEdmDeltaLink, IEdmDeltaLinkBase, IEdmObject {
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaLink (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
-	string Relationship  { public virtual get; public virtual set; }
-	System.Uri Source  { public virtual get; public virtual set; }
-	System.Uri Target  { public virtual get; public virtual set; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 }
 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType)
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityTypeReference entityTypeReference)
 	public EdmDeltaResourceObject (Microsoft.OData.Edm.IEdmEntityType entityType, bool isNullable)
 
-	Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaKind DeltaKind  { public virtual get; }
+	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind DeltaKind  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 }
 
 [
 NonValidatingParameterBindingAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaItem, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
+public class Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityType edmType)
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityTypeReference edmType)
 	public EdmEntityObject (Microsoft.OData.Edm.IEdmEntityType edmType, bool isNullable)
@@ -2378,12 +2374,6 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrap
 	protected ODataItemWrapper ()
 }
 
-public abstract class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
-	protected ODataResourceBaseWrapper ()
-
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }
-}
-
 public abstract class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	protected ODataResourceSetBaseWrapper ()
 }
@@ -2410,12 +2400,6 @@ public class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLi
 	Microsoft.OData.ODataEntityReferenceLink EntityReferenceLink  { public get; }
 }
 
-public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeletedResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper {
-	public ODataDeletedResourceWrapper (Microsoft.OData.ODataDeletedResource deletedResource)
-
-	Microsoft.OData.ODataDeletedResource DeletedResource  { public get; }
-}
-
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkBaseWrapper {
 	public ODataDeltaDeletedLinkWrapper (Microsoft.OData.ODataDeltaDeletedLink deltaDeletedLink)
 
@@ -2438,10 +2422,8 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResou
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataNestedResourceInfoWrapper (Microsoft.OData.ODataNestedResourceInfo nestedInfo)
 
-	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper]] NestedLinks  { public get; }
-	Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper NestedResource  { public get; public set; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper]] NestedItems  { public get; }
 	Microsoft.OData.ODataNestedResourceInfo NestedResourceInfo  { public get; }
-	Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper NestedResourceSet  { public get; public set; }
 }
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper {
@@ -2451,10 +2433,12 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSe
 	Microsoft.OData.ODataResourceSet ResourceSet  { public get; }
 }
 
-public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceBaseWrapper {
-	public ODataResourceWrapper (Microsoft.OData.ODataResource resource)
+public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
+	public ODataResourceWrapper (Microsoft.OData.ODataResourceBase resource)
 
-	Microsoft.OData.ODataResource Resource  { public get; }
+	bool IsDeletedResource  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }
+	Microsoft.OData.ODataResourceBase Resource  { public get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper {
@@ -2520,36 +2504,36 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {
-	public CountQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public CountQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator {
-	public FilterQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public FilterQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	public virtual void Validate (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
-	internal virtual void Validate (Microsoft.OData.Edm.IEdmProperty property, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
-	public virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateArithmeticOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateBinaryOperatorNode (Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionComplexNode (Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionPropertyAccessNode (Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateLogicalOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateRangeVariable (Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleComplexNode (Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleValueFunctionCallNode (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateSingleValuePropertyAccessNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
-	public virtual void ValidateUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	internal virtual void Validate (Microsoft.OData.Edm.IEdmProperty property, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings querySettings)
+	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateArithmeticOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateBinaryOperatorNode (Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionComplexNode (Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionPropertyAccessNode (Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateLogicalOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateRangeVariable (Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleComplexNode (Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleValueFunctionCallNode (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateSingleValuePropertyAccessNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	protected virtual void ValidateUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator {
@@ -2575,13 +2559,13 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator {
-	public OrderByQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public OrderByQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator {
-	public SelectExpandQueryValidator (Microsoft.AspNetCore.OData.Query.DefaultQuerySettings defaultQuerySettings)
+	public SelectExpandQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
@@ -2756,17 +2740,15 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingCon
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext {
 	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller)
-	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmEntitySet entitySet)
-	public ODataControllerActionContext (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller, Microsoft.OData.Edm.IEdmSingleton singleton)
 
-	Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel Action  { public get; }
+	Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel Action  { public get; public set; }
 	Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel Controller  { public get; }
 	Microsoft.OData.Edm.IEdmEntitySet EntitySet  { public get; }
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.ODataOptions Options  { public get; public set; }
 	string Prefix  { public get; }
-	System.IServiceProvider ServiceProvider  { public get; public set; }
 	Microsoft.OData.Edm.IEdmSingleton Singleton  { public get; }
 }
 
@@ -2816,47 +2798,6 @@ public class Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateP
 	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Parse (Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider)
 }
 
-public class Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentTemplateTranslator : Microsoft.OData.UriParser.PathSegmentTranslator`1[[Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate]] {
-	public ODataPathSegmentTemplateTranslator ()
-
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchReferenceSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.BatchSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.CountSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.DynamicPathSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.EntitySetSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.KeySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.MetadataSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.NavigationPropertySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.OperationImportSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.OperationSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.PathTemplateSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.PropertySegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.SingletonSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.TypeSegment segment)
-	public virtual Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate Translate (Microsoft.OData.UriParser.ValueSegment segment)
-}
-
-public enum Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind : int {
-	Action = 8
-	ActionImport = 10
-	Cast = 4
-	Count = 14
-	Dynamic = 16
-	EntitySet = 1
-	Function = 7
-	FunctionImport = 9
-	Key = 3
-	Metadata = 0
-	Navigation = 6
-	NavigationLink = 13
-	PathTemplate = 15
-	Property = 5
-	Ref = 12
-	Singleton = 2
-	Value = 11
-}
-
 public interface Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator {
 	Microsoft.OData.UriParser.ODataPath Translate (Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
@@ -2864,41 +2805,30 @@ public interface Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTrans
 public abstract class Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	protected ODataSegmentTemplate ()
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public abstract get; }
-	bool IsSingle  { public abstract get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public abstract get; }
-	string Literal  { public abstract get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
-
+	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public abstract bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public ActionImportSegmentTemplate (Microsoft.OData.UriParser.OperationImportSegment segment)
 	public ActionImportSegmentTemplate (Microsoft.OData.Edm.IEdmActionImport actionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmActionImport ActionImport  { public get; }
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.OperationImportSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ActionSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public ActionSegmentTemplate (Microsoft.OData.UriParser.OperationSegment operationSegment)
+	public ActionSegmentTemplate (Microsoft.OData.UriParser.OperationSegment segment)
 	public ActionSegmentTemplate (Microsoft.OData.Edm.IEdmAction action, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	Microsoft.OData.Edm.IEdmAction Action  { public get; }
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	Microsoft.OData.UriParser.OperationSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -2906,38 +2836,27 @@ public class Microsoft.AspNetCore.OData.Routing.Template.CastSegmentTemplate : M
 	public CastSegmentTemplate (Microsoft.OData.UriParser.TypeSegment typeSegment)
 	public CastSegmentTemplate (Microsoft.OData.Edm.IEdmType castType, Microsoft.OData.Edm.IEdmType expectedType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
-	Microsoft.OData.Edm.IEdmStructuredType CastType  { public get; }
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
+	Microsoft.OData.Edm.IEdmType CastType  { public get; }
 	Microsoft.OData.Edm.IEdmType ExpectedType  { public get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.TypeSegment TypeSegment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.CountSegmentTemplate Instance  { public static get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.DynamicSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public DynamicSegmentTemplate (Microsoft.OData.UriParser.DynamicPathSegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
 	Microsoft.OData.UriParser.DynamicPathSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -2945,14 +2864,10 @@ public class Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplat
 	public EntitySetSegmentTemplate (Microsoft.OData.Edm.IEdmEntitySet entitySet)
 	public EntitySetSegmentTemplate (Microsoft.OData.UriParser.EntitySetSegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmEntitySet EntitySet  { public get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.EntitySetSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -2961,14 +2876,11 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTe
 	public FunctionImportSegmentTemplate (Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 	public FunctionImportSegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] parameters, Microsoft.OData.Edm.IEdmFunctionImport functionImport, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmFunctionImport FunctionImport  { public get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -2977,41 +2889,33 @@ public class Microsoft.AspNetCore.OData.Routing.Template.FunctionSegmentTemplate
 	public FunctionSegmentTemplate (Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 	public FunctionSegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] parameters, Microsoft.OData.Edm.IEdmFunction function, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmFunction Function  { public get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ParameterMappings  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public KeySegmentTemplate (Microsoft.OData.UriParser.KeySegment segment)
+	public KeySegmentTemplate (Microsoft.OData.UriParser.KeySegment segment, System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmProperty]] keyProperties)
 	public KeySegmentTemplate (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] keys, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
 	int Count  { public get; }
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.OData.Edm.IEdmEntityType EntityType  { public get; }
-	bool IsSingle  { public virtual get; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] KeyMappings  { public get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.Edm.IEdmProperty]] KeyProperties  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate Instance  { public static get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3019,13 +2923,23 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTe
 	public NavigationLinkSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertyLinkSegment segment)
 	public NavigationLinkSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate Key  { public get; public set; }
+	Microsoft.OData.Edm.IEdmNavigationProperty NavigationProperty  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
 	Microsoft.OData.UriParser.NavigationPropertyLinkSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
+	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkTemplateSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
+	public NavigationLinkTemplateSegmentTemplate (Microsoft.OData.Edm.IEdmStructuredType declaringType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
+
+	Microsoft.OData.Edm.IEdmStructuredType DeclaringType  { public get; }
+	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; }
+	string RelatedKey  { public get; public set; }
+
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3033,14 +2947,10 @@ public class Microsoft.AspNetCore.OData.Routing.Template.NavigationSegmentTempla
 	public NavigationSegmentTemplate (Microsoft.OData.UriParser.NavigationPropertySegment segment)
 	public NavigationSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
+	Microsoft.OData.Edm.IEdmNavigationProperty NavigationProperty  { public get; }
 	Microsoft.OData.UriParser.NavigationPropertySegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3053,8 +2963,9 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate : Sys
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext {
-	public ODataTemplateTranslateContext (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model)
+	public ODataTemplateTranslateContext (Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.Endpoint endpoint, Microsoft.AspNetCore.Routing.RouteValueDictionary routeValues, Microsoft.OData.Edm.IEdmModel model)
 
+	Microsoft.AspNetCore.Http.Endpoint Endpoint  { public get; }
 	Microsoft.AspNetCore.Http.HttpContext HttpContext  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.AspNetCore.Routing.RouteValueDictionary RouteValues  { public get; }
@@ -3067,26 +2978,19 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateC
 public class Microsoft.AspNetCore.OData.Routing.Template.PathTemplateSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public PathTemplateSegmentTemplate (Microsoft.OData.UriParser.PathTemplateSegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	string PropertyName  { public get; }
+	string ParameterName  { public get; }
 	Microsoft.OData.UriParser.PathTemplateSegment Segment  { public get; }
-	string SegmentName  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Template.PropertyCatchAllSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
 	public PropertyCatchAllSegmentTemplate (Microsoft.OData.Edm.IEdmStructuredType declaredType)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmStructuredType StructuredType  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3094,26 +2998,10 @@ public class Microsoft.AspNetCore.OData.Routing.Template.PropertySegmentTemplate
 	public PropertySegmentTemplate (Microsoft.OData.Edm.IEdmStructuralProperty property)
 	public PropertySegmentTemplate (Microsoft.OData.UriParser.PropertySegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
 	Microsoft.OData.Edm.IEdmStructuralProperty Property  { public get; }
 	Microsoft.OData.UriParser.PropertySegment Segment  { public get; }
 
-	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
-}
-
-public class Microsoft.AspNetCore.OData.Routing.Template.RefSegmentTemplate : Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate {
-	public RefSegmentTemplate (Microsoft.OData.Edm.IEdmNavigationProperty navigation, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
-
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationProperty Navigation  { public get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
-
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3121,14 +3009,10 @@ public class Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplat
 	public SingletonSegmentTemplate (Microsoft.OData.Edm.IEdmSingleton singleton)
 	public SingletonSegmentTemplate (Microsoft.OData.UriParser.SingletonSegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.SingletonSegment Segment  { public get; }
 	Microsoft.OData.Edm.IEdmSingleton Singleton  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 
@@ -3136,13 +3020,9 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate : 
 	public ValueSegmentTemplate (Microsoft.OData.Edm.IEdmType previousType)
 	public ValueSegmentTemplate (Microsoft.OData.UriParser.ValueSegment segment)
 
-	Microsoft.OData.Edm.IEdmType EdmType  { public virtual get; }
-	bool IsSingle  { public virtual get; }
-	Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind Kind  { public virtual get; }
-	string Literal  { public virtual get; }
-	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public virtual get; }
 	Microsoft.OData.UriParser.ValueSegment Segment  { public get; }
 
+	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
 

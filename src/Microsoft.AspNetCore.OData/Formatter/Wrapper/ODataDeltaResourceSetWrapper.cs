@@ -31,8 +31,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         public ODataDeltaResourceSet DeltaResourceSet { get; }
 
         /// <summary>
-        /// Gets the nested delta items (resource, or delted resource, or deleted link, or added link).
-        /// The order of the delta items matters.
+        /// Gets the nested delta items (resource, or deleted resource, or deleted link, or added link).
+        /// Be noted: the order of the delta items matters.
         /// </summary>
         public IList<ODataItemWrapper> DeltaItems { get; }
     }

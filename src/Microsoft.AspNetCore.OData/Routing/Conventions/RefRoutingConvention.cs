@@ -24,8 +24,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // $ref supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
+            return context.NavigationSource != null;
         }
 
         /// <inheritdoc />
@@ -39,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Debug.Assert(context.Action != null);
 
             ActionModel action = context.Action;
-            string actionMethodName = action.ActionMethod.Name;
+            string actionMethodName = action.ActionName;
 
             // Need to refactor the following
             // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
@@ -50,24 +55,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            // Action parameter should have a (string navigationProperty) parameter
-            if (!action.HasParameter<string>("navigationProperty"))
-            {
-                return false;
-            }
-
-            IEdmNavigationSource navigationSource;
-            IEdmEntityType entityType;
-            if (context.EntitySet != null)
-            {
-                entityType = context.EntitySet.EntityType();
-                navigationSource = context.EntitySet;
-            }
-            else
-            {
-                entityType = context.Singleton.EntityType();
-                navigationSource = context.Singleton;
-            }
+            IEdmNavigationSource navigationSource = context.NavigationSource;
+            IEdmEntityType entityType = context.EntityType;
 
             // For entity set, we should have the key parameter
             // For Singleton, we should not have the key parameter
@@ -87,6 +76,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     return false;
                 }
+            }
+
+            // Process the generic scenario
+            if (property == null)
+            {
+                return ProcessNonNavigationProperty(httpMethod, context, action, navigationSource, entityType, declaringType);
             }
 
             // Find the navigation property if have
@@ -118,32 +113,85 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
-
-            if (navigationProperty != null)
-            {
-                segments.Add(new NavigationSegmentTemplate(navigationProperty, targetNavigationSource));
-            }
-            else
-            {
-                //TODO: Add the navigation template segment template,
-                // Or add the template for all navigation properties? 
-                return false;
-            }
+            NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
 
             IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
             bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
-                segments.Add(KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey"));
+                linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
+            }
+            else
+            {
+                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedId");
+                if (hasNavigationPropertyKeyParameter)
+                {
+                    linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");
+                }
             }
 
-            segments.Add(new RefSegmentTemplate(navigationProperty, targetNavigationSource));
+            segments.Add(linkTemplate);
 
-            // TODO: support key as segment?
             ODataPathTemplate template = new ODataPathTemplate(segments);
             action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
             // processed
+            return true;
+        }
+
+        internal static bool ProcessNonNavigationProperty(string httpMethod, ODataControllerActionContext context,
+            ActionModel action,
+            IEdmNavigationSource navigationSource,
+            IEdmEntityType entityType, IEdmStructuredType castType)
+        {
+            // Action parameter should have a (string navigationProperty) parameter
+            if (!action.HasParameter<string>("navigationProperty"))
+            {
+                return false;
+            }
+
+            // Let's only handle single-key convention, for composite key, use attribute routing or non-generic navigation.
+            bool hasRelatedKey = action.Parameters.Any(p => p.Name == "relatedKey"); // case sensitive?
+            bool hasRelatedId = action.Parameters.Any(p => p.Name == "relatedId");
+
+            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+            if (context.EntitySet != null)
+            {
+                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
+            }
+            else
+            {
+                segments.Add(new SingletonSegmentTemplate(context.Singleton));
+            }
+
+            if (entityType != castType)
+            {
+                segments.Add(new CastSegmentTemplate(castType, entityType, navigationSource));
+            }
+
+            if (hasRelatedKey)
+            {
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
+                {
+                    RelatedKey = "relatedKey"
+                });
+            }
+            else if (hasRelatedId)
+            {
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
+                {
+                    RelatedKey = "relatedId"
+                });
+            }
+            else
+            {
+                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource));
+            }
+
+            ODataPathTemplate template = new ODataPathTemplate(segments);
+            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
+
             return true;
         }
 
@@ -159,7 +207,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
             {
                 method = "CreateRef";
-                httpMethod = "Post,Patch";
+                httpMethod = "Post,Put";
                 remaining = actionName.Substring(9);
             }
             else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
@@ -19,12 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <param name="edmType">The EDM type of this object.</param>
         public NullEdmComplexObject(IEdmComplexTypeReference edmType)
         {
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull("edmType");
-            }
-
-            _edmType = edmType;
+            _edmType = edmType ?? throw Error.ArgumentNull(nameof(edmType));
         }
 
         /// <inheritdoc/>

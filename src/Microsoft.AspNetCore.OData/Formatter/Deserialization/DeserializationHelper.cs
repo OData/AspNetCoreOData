@@ -22,7 +22,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         internal static void ApplyProperty(ODataProperty property, IEdmStructuredTypeReference resourceType, object resource,
             ODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
-            IEdmProperty edmProperty = resourceType.FindProperty(property.Name);
+            IEdmStructuredType structuredType = resourceType.StructuredDefinition();
+            IEdmProperty edmProperty = structuredType == null ? null : structuredType.ResolveProperty(property.Name);
 
             bool isDynamicProperty = false;
             string propertyName = property.Name;
@@ -32,7 +33,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                IEdmStructuredType structuredType = resourceType.StructuredDefinition();
                 isDynamicProperty = structuredType != null && structuredType.IsOpen;
             }
 
@@ -361,27 +361,23 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
         private static object ConvertPrimitiveValue(string value)
         {
-            double doubleValue;
-            int intValue;
-            decimal decimalValue;
-
             if (String.CompareOrdinal(value, "null") == 0)
             {
                 return null;
             }
 
-            if (Int32.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out intValue))
+            if (Int32.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out int intValue))
             {
                 return intValue;
             }
 
             // todo: if it is Ieee754Compatible, parse decimal after double
-            if (Decimal.TryParse(value, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out decimalValue))
+            if (Decimal.TryParse(value, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out decimal decimalValue))
             {
                 return decimalValue;
             }
 
-            if (Double.TryParse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out doubleValue))
+            if (Double.TryParse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out double doubleValue))
             {
                 return doubleValue;
             }

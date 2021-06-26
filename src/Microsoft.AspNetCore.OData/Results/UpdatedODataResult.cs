@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Results
             HttpRequest request = context.HttpContext.Request;
             IActionResult result = GetInnerActionResult(request);
             await result.ExecuteResultAsync(context).ConfigureAwait(false);
-            ResultHelpers.AddServiceVersion(response, () => ODataUtils.ODataVersionToString(ResultHelpers.GetODataResponseVersion(request)));
+            ResultHelpers.AddServiceVersion(response, () => ODataUtils.ODataVersionToString(request.GetODataVersion()));
         }
 
         internal IActionResult GetInnerActionResult(HttpRequest request)

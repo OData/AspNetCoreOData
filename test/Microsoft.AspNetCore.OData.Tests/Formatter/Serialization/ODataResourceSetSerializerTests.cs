@@ -721,6 +721,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Null(resourceSet.Count);
         }
 
+        [Fact]
+        public void CreateODataOperation_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => serializer.CreateODataOperation(null, null, null), "operation");
+
+            // Act & Assert
+            IEdmOperation operation = new Mock<IEdmOperation>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => serializer.CreateODataOperation(operation, null, null), "resourceSetContext");
+
+            // Act & Assert
+            ResourceSetContext context = new ResourceSetContext();
+            ExceptionAssert.ThrowsArgumentNull(() => serializer.CreateODataOperation(operation, context, null), "writeContext");
+        }
+
         [Theory]
         [InlineData(ODataMetadataLevel.Minimal)]
         [InlineData(ODataMetadataLevel.None)]

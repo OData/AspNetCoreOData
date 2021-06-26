@@ -4,9 +4,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -40,16 +38,6 @@ namespace Microsoft.AspNetCore.OData.Query
             return context.RequestContainer.GetRequiredService<SkipTokenHandler>();
         }
 
-        public static SkipTokenQueryValidator GetSkipTokenQueryValidator(this ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SkipTokenQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenQueryValidator>();
-        }
-
         /// <summary>
         /// Gets the <see cref="FilterBinder"/>.
         /// </summary>
@@ -71,8 +59,8 @@ namespace Microsoft.AspNetCore.OData.Query
             FilterBinder binder = null;
             if (context.RequestContainer != null)
             {
-                binder = context.RequestContainer.GetRequiredService<FilterBinder>();
-                if (binder != null && binder.Model != context.Model && binder.Model == EdmCoreModel.Instance)
+                binder = context.RequestContainer.GetService<FilterBinder>();
+                if (binder != null && binder.Model != context.Model)
                 {
                     // TODO: Wtf, Need refactor these codes?
                     binder.Model = context.Model;

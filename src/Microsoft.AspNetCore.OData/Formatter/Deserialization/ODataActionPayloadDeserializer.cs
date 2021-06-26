@@ -17,6 +17,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Routing;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -195,7 +196,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (action == null)
             {
-                string message = Error.Format(SRResources.RequestNotActionInvocation, path.ToString());
+                string message = Error.Format(SRResources.RequestNotActionInvocation, path.GetPathString());
                 throw new SerializationException(message);
             }
 

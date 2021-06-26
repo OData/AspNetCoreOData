@@ -35,13 +35,17 @@ namespace Microsoft.AspNetCore.OData.Common
         /// <returns>The collection element type from a type.</returns>
         public static Type GetInnerElementType(Type clrType)
         {
-            Type elementType;
-            TypeHelper.IsCollection(clrType, out elementType);
+            IsCollection(clrType, out Type elementType);
             Contract.Assert(elementType != null);
 
             return elementType;
         }
 
+        /// <summary>
+        /// Return the undering type or itself.
+        /// </summary>
+        /// <param name="type">The input type.</param>
+        /// <returns>The underlying type.</returns>
         public static Type GetUnderlyingTypeOrSelf(Type type)
         {
             return Nullable.GetUnderlyingType(type) ?? type;
@@ -91,16 +95,6 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Determine if a type is a value type.
-        /// </summary>
-        /// <param name="clrType">The type to test.</param>
-        /// <returns>True if the type is a value type; false otherwise.</returns>
-        public static bool IsValueType(Type clrType)
-        {
-            return clrType.IsValueType;
-        }
-
-        /// <summary>
         /// Determine if a type is an enumeration.
         /// </summary>
         /// <param name="clrType">The type to test.</param>
@@ -109,16 +103,6 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
             return underlyingTypeOrSelf.IsEnum;
-        }
-
-        /// <summary>
-        /// Determine if a type is a generic type.
-        /// </summary>
-        /// <param name="clrType">The type to test.</param>
-        /// <returns>True if the type is a generic type; false otherwise.</returns>
-        public static bool IsGenericType(this Type clrType)
-        {
-            return clrType.IsGenericType;
         }
 
         /// <summary>
@@ -133,10 +117,10 @@ namespace Microsoft.AspNetCore.OData.Common
                 return false;
             }
 
-            if (TypeHelper.IsValueType(clrType))
+            if (clrType.IsValueType)
             {
                 // value types are only nullable if they are Nullable<T>
-                return TypeHelper.IsGenericType(clrType) && clrType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                return clrType.IsGenericType && clrType.GetGenericTypeDefinition() == typeof(Nullable<>);
             }
             else
             {
@@ -152,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Common
         /// <returns>The type from a nullable type.</returns>
         public static Type ToNullable(Type clrType)
         {
-            if (TypeHelper.IsNullable(clrType))
+            if (IsNullable(clrType))
             {
                 return clrType;
             }
@@ -167,11 +151,7 @@ namespace Microsoft.AspNetCore.OData.Common
         /// </summary>
         /// <param name="clrType">The type to test.</param>
         /// <returns>True if the type is an enumeration; false otherwise.</returns>
-        public static bool IsCollection(Type clrType)
-        {
-            Type elementType;
-            return TypeHelper.IsCollection(clrType, out elementType);
-        }
+        public static bool IsCollection(Type clrType) => IsCollection(clrType, out _);
 
         /// <summary>
         /// Determine if a type is a collection.
@@ -183,7 +163,7 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (clrType == null)
             {
-                throw Error.ArgumentNull("clrType");
+                throw Error.ArgumentNull(nameof(clrType));
             }
 
             elementType = clrType;
@@ -198,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Common
                 = clrType.GetInterfaces()
                     .Union(new[] { clrType })
                     .FirstOrDefault(
-                        t => TypeHelper.IsGenericType(t)
+                        t => t.IsGenericType
                              && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
             if (collectionInterface != null)
@@ -211,16 +191,6 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Determine if a type is an interface.
-        /// </summary>
-        /// <param name="clrType">The type to test.</param>
-        /// <returns>True if the type is an interface; false otherwise.</returns>
-        public static bool IsInterface(Type clrType)
-        {
-            return clrType.IsInterface;
-        }
-
-        /// <summary>
         /// Returns type of T if the type implements IEnumerable of T, otherwise, return null.
         /// </summary>
         /// <param name="type"></param>
@@ -228,12 +198,12 @@ namespace Microsoft.AspNetCore.OData.Common
         internal static Type GetImplementedIEnumerableType(Type type)
         {
             // get inner type from Task<T>
-            if (TypeHelper.IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(Task<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>))
             {
                 type = type.GetGenericArguments().First();
             }
 
-            if (TypeHelper.IsGenericType(type) && TypeHelper.IsInterface(type) &&
+            if (type.IsGenericType && type.IsInterface &&
                 (type.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
                  type.GetGenericTypeDefinition() == typeof(IQueryable<>)))
             {
@@ -246,7 +216,7 @@ namespace Microsoft.AspNetCore.OData.Common
                 Type[] interfaces = type.GetInterfaces();
                 foreach (Type interfaceType in interfaces)
                 {
-                    if (TypeHelper.IsGenericType(interfaceType) &&
+                    if (interfaceType.IsGenericType &&
                         (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
                          interfaceType.GetGenericTypeDefinition() == typeof(IQueryable<>)))
                     {
@@ -305,7 +275,7 @@ namespace Microsoft.AspNetCore.OData.Common
 
         internal static Type GetTaskInnerTypeOrSelf(Type type)
         {
-            if (IsGenericType(type) && type.GetGenericTypeDefinition() == typeof(Task<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>))
             {
                 return type.GetGenericArguments().First();
             }

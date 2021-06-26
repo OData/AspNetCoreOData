@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 instance = new EdmEnumObjectCollection(edmCollectionType);
                 return true;
             }
-            else if (TypeHelper.IsGenericType(collectionType))
+            else if (collectionType.IsGenericType)
             {
                 Type genericDefinition = collectionType.GetGenericTypeDefinition();
                 if (genericDefinition == typeof(IEnumerable<>) ||

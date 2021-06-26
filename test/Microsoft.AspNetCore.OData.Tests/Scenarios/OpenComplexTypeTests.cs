@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             Assert.Equal("My Dynamic Place", result["Place"]);
             Assert.Equal("2c1f450a-a2a7-4fe1-a25d-4d9332fc0694", result["Token"]);
             Assert.Equal("2015-03-02", result["Birthday"]);
-            Assert.Null(result["Region"]);
+            Assert.Equal(JTokenType.Null, result["Region"].Type);
         }
 
         [Fact]

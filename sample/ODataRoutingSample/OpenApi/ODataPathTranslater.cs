@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.OData.Edm;
-using ODataSegmentKind = Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentKind;
 
 namespace ODataRoutingSample.OpenApi
 {
@@ -23,94 +22,78 @@ namespace ODataRoutingSample.OpenApi
             IList<ODataSegment> newSegments = new List<ODataSegment>();
             foreach (var segment in pathTemplate)
             {
-                switch (segment.Kind)
+                switch (segment)
                 {
-                    case ODataSegmentKind.Metadata:
+                    case MetadataSegmentTemplate:
                         newSegments.Add(new ODataMetadataSegment());
                         break;
 
-                    case ODataSegmentKind.EntitySet:
-                        EntitySetSegmentTemplate entitySet = (EntitySetSegmentTemplate)segment;
+                    case EntitySetSegmentTemplate entitySet:
                         newSegments.Add(entitySet.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Singleton:
-                        SingletonSegmentTemplate singleton = (SingletonSegmentTemplate)segment;
+                    case SingletonSegmentTemplate singleton:
                         newSegments.Add(singleton.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Key:
-                        KeySegmentTemplate key = (KeySegmentTemplate)segment;
+                    case KeySegmentTemplate key:
                         newSegments.Add(key.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Cast:
-                        CastSegmentTemplate cast = (CastSegmentTemplate)segment;
+                    case CastSegmentTemplate cast:
                         newSegments.Add(cast.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Property:
+                    case PropertySegmentTemplate property:
                         // TODO: 
                         return null;
                         //PropertySegmentTemplate property = (PropertySegmentTemplate)segment;
                         //newSegments.Add(property.ConvertTo());
                         //break;
 
-                    case ODataSegmentKind.Navigation:
-                        NavigationSegmentTemplate navigation = (NavigationSegmentTemplate)segment;
+                    case NavigationSegmentTemplate navigation:
                         newSegments.Add(navigation.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Function:
-                        FunctionSegmentTemplate function = (FunctionSegmentTemplate)segment;
+                    case FunctionSegmentTemplate function:
                         newSegments.Add(function.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Action:
-                        ActionSegmentTemplate action = (ActionSegmentTemplate)segment;
+                    case ActionSegmentTemplate action:
                         newSegments.Add(action.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.FunctionImport:
-                        FunctionImportSegmentTemplate functionImport = (FunctionImportSegmentTemplate)segment;
+                    case FunctionImportSegmentTemplate functionImport:
                         newSegments.Add(functionImport.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.ActionImport:
-                        ActionImportSegmentTemplate actionImport = (ActionImportSegmentTemplate)segment;
+                    case ActionImportSegmentTemplate actionImport:
                         newSegments.Add(actionImport.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.Value:
+                    case ValueSegmentTemplate value:
                         return null;
                         //ValueSegmentTemplate value = (ValueSegmentTemplate)segment;
                         //newSegments.Add(value.ConvertTo());
                         //break;
 
-                    case ODataSegmentKind.Ref:
-                        return null;
-                        //KeySegmentTemplate key = (KeySegmentTemplate)segment;
-                        //newSegments.Add(key.ConvertTo());
-                        //break;
-
-                    case ODataSegmentKind.NavigationLink:
+                    case NavigationLinkSegmentTemplate navigationLink:
                         return null;
                         //NavigationLinkSegmentTemplate navigationLink = (NavigationLinkSegmentTemplate)segment;
                         //newSegments.Add(navigationLink.ConvertTo());
                         //break;
 
-                    case ODataSegmentKind.Count:
-                        CountSegmentTemplate count = (CountSegmentTemplate)segment;
+                    case CountSegmentTemplate count:
                         newSegments.Add(count.ConvertTo());
                         break;
 
-                    case ODataSegmentKind.PathTemplate:
+                    case PathTemplateSegmentTemplate:
                         return null;
                         //KeySegmentTemplate key = (KeySegmentTemplate)segment;
                         //newSegments.Add(key.ConvertTo());
                         //break;
 
-                    case ODataSegmentKind.Dynamic:
+                    case DynamicSegmentTemplate:
                         return null;
                         //KeySegmentTemplate key = (KeySegmentTemplate)segment;
                         //newSegments.Add(key.ConvertTo());
@@ -126,7 +109,7 @@ namespace ODataRoutingSample.OpenApi
 
         public static ODataNavigationSourceSegment ConvertTo(this EntitySetSegmentTemplate entitySet)
         {
-            return new ODataNavigationSourceSegment(entitySet.EntitySet);
+            return new ODataNavigationSourceSegment(entitySet.Segment.EntitySet);
         }
 
         public static ODataNavigationSourceSegment ConvertTo(this SingletonSegmentTemplate singleton)
@@ -153,7 +136,7 @@ namespace ODataRoutingSample.OpenApi
 
         public static ODataNavigationPropertySegment ConvertTo(this NavigationSegmentTemplate navigation)
         {
-            return new ODataNavigationPropertySegment(navigation.Navigation);
+            return new ODataNavigationPropertySegment(navigation.Segment.NavigationProperty);
         }
 
         public static ODataOperationSegment ConvertTo(this FunctionSegmentTemplate function)

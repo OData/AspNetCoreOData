@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -22,7 +23,6 @@ namespace Microsoft.AspNetCore.OData.Query
     public class ODataQueryContext
     {
         private DefaultQuerySettings _defaultQuerySettings;
-        private ODataQueryableOptions _queryableOptions;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -40,19 +40,19 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (elementClrType == null)
             {
-                throw Error.ArgumentNull("elementClrType");
+                throw Error.ArgumentNull(nameof(elementClrType));
             }
 
             ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
 
             if (ElementType == null)
             {
-                throw Error.Argument("elementClrType", SRResources.ClrTypeNotInModel, elementClrType.FullName);
+                throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
             ElementClrType = elementClrType;
@@ -73,11 +73,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
+
             if (elementType == null)
             {
-                throw Error.ArgumentNull("elementType");
+                throw Error.ArgumentNull(nameof(elementType));
             }
 
             Model = model;
@@ -107,30 +108,11 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (_defaultQuerySettings == null)
                 {
                     _defaultQuerySettings = RequestContainer == null
-                        ? new DefaultQuerySettings()
+                        ? GetDefaultQuerySettings()
                         : RequestContainer.GetRequiredService<DefaultQuerySettings>();
                 }
 
                 return _defaultQuerySettings;
-            }
-        }
-
-        /// <summary>
-        /// Gets the given <see cref="ODataQueryableOptions"/>.
-        /// TODO: it seems this one is never been used??
-        /// </summary>
-        public ODataQueryableOptions QueryableOptions
-        {
-            get
-            {
-                if (_queryableOptions == null)
-                {
-                    _queryableOptions = RequestContainer == null
-                        ? new ODataQueryableOptions()
-                        : RequestContainer.GetRequiredService<IOptions<ODataQueryableOptions>>().Value;
-                }
-
-                return _queryableOptions;
             }
         }
 
@@ -220,6 +202,22 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 TargetStructuredType = ElementType as IEdmStructuredType;
             }
+        }
+
+        private DefaultQuerySettings GetDefaultQuerySettings()
+        {
+            if (Request is null)
+            {
+                return new DefaultQuerySettings();
+            }
+
+            IOptions<ODataOptions> odataOptions = Request.HttpContext?.RequestServices?.GetService<IOptions<ODataOptions>>();
+            if (odataOptions is  null || odataOptions.Value is null)
+            {
+                return new DefaultQuerySettings();
+            }
+
+            return odataOptions.Value.QuerySettings;
         }
     }
 }

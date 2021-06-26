@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -22,12 +21,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <param name="builder">The container builder.</param>
         /// <returns>The calling itself.</returns>
-        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "DI services")]
         public static IContainerBuilder AddDefaultWebApiServices(this IContainerBuilder builder)
         {
             if (builder == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw Error.ArgumentNull(nameof(builder));
             }
 
             builder.AddService<IETagHandler, DefaultODataETagHandler>(ServiceLifetime.Singleton);
@@ -50,7 +48,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // QueryValidators.
             builder.AddService<CountQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<FilterQueryValidator>(ServiceLifetime.Singleton);
+
+            // FilterQueryValidator should be scoped, otherwise some instance field (for example:_currentNodeCount) should be a problem.
+            builder.AddService<FilterQueryValidator>(ServiceLifetime.Scoped);
+
             builder.AddService<ODataQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<OrderByQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<SelectExpandQueryValidator>(ServiceLifetime.Singleton);

@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.OData.NewtonsoftJson</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter">
+            <summary>
+            Represents a custom <see cref="T:Newtonsoft.Json.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> instances to JSON.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            Determines whether this instance can convert the specified <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> type.
+            </summary>
+            <param name="objectType">Type of the object.</param>
+            <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Reads the JSON representation of the object.
+            </summary>
+            <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+            <param name="objectType">Type of the object.</param>
+            <param name="existingValue">The existing value of object being read.</param>
+            <param name="serializer">The calling serializer.</param>
+            <returns>The object value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JDynamicTypeWrapperConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Writes the JSON representation of the object.
+            </summary>
+            <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+            <param name="value">The value.</param>
+            <param name="serializer">The calling serializer.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter">
+            <summary>
+            Represents a custom <see cref="T:Newtonsoft.Json.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Results.PageResult"/> instances to JSON.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.CanConvert(System.Type)">
+            <summary>
+            Determines whether this instance can convert the specified <see cref="T:Microsoft.AspNetCore.OData.Results.PageResult"/> type.
+            </summary>
+            <param name="objectType">Type of the object.</param>
+            <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Reads the JSON representation of the object.
+            </summary>
+            <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+            <param name="objectType">Type of the object.</param>
+            <param name="existingValue">The existing value of object being read.</param>
+            <param name="serializer">The calling serializer.</param>
+            <returns>The object value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JPageResultValueConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Writes the JSON representation of the object.
+            </summary>
+            <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+            <param name="value">The value.</param>
+            <param name="serializer">The calling serializer.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter">
+            <summary>
+            Represents a custom <see cref="T:Newtonsoft.Json.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> instances to JSON.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.#ctor(System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter"/> class.
+            </summary>
+            <param name="mapperProvider">The mapper provider.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.CanConvert(System.Type)">
+            <summary>
+            Determines whether this instance can convert the specified <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper"/> type.
+            </summary>
+            <param name="objectType">Type of the object.</param>
+            <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Reads the JSON representation of the object.
+            </summary>
+            <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+            <param name="objectType">Type of the object.</param>
+            <param name="existingValue">The existing value of object being read.</param>
+            <param name="serializer">The calling serializer.</param>
+            <returns>The object value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSelectExpandWrapperConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Writes the JSON representation of the object.
+            </summary>
+            <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+            <param name="value">The value.</param>
+            <param name="serializer">The calling serializer.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter">
+            <summary>
+            Represents a custom <see cref="T:Newtonsoft.Json.JsonConverter"/> to serialize <see cref="T:Microsoft.AspNetCore.OData.Results.SingleResult"/> instances to JSON.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.CanConvert(System.Type)">
+            <summary>
+            Determines whether this instance can convert the specified <see cref="T:Microsoft.AspNetCore.OData.Results.SingleResult"/> type.
+            </summary>
+            <param name="objectType">Type of the object.</param>
+            <returns>true if this instance can convert the specified object type; otherwise, false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Reads the JSON representation of the object.
+            </summary>
+            <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+            <param name="objectType">Type of the object.</param>
+            <param name="existingValue">The existing value of object being read.</param>
+            <param name="serializer">The calling serializer.</param>
+            <returns>The object value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JSingleResultValueConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Writes the JSON representation of the object.
+            </summary>
+            <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+            <param name="value">The value.</param>
+            <param name="serializer">The calling serializer.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper">
+            <summary>
+            Edm Property name mapper.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper"/> class.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="type">The Edm structured type.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.JsonPropertyNameMapper.MapProperty(System.String)">
+            <summary>
+            Map the given property name.
+            </summary>
+            <param name="propertyName">The given property name.</param>
+            <returns>The mapped property name.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions">
+            <summary>
+            Extension methods for adding OData Json converter to Newtonsoft.Json to <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/> and <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(Microsoft.Extensions.DependencyInjection.IMvcBuilder)">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The Mvc builder.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper})">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The Mvc builder.</param>
+            <param name="mapperProvider">The mapper provider.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder)">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The Mvc core builder.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NewtonsoftJson.ODataNewtonsoftJsonMvcBuilderExtensions.AddODataNewtonsoftJson(Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder,System.Func{Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper})">
+            <summary>
+            Configures Newtonsoft.Json using OData Json converter.
+            </summary>
+            <param name="builder">The Mvc core builder.</param>
+            <param name="mapperProvider">The mapper provider.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.ReadDynamicTypeWrapperNotImplemented">
+            <summary>
+              Looks up a localized string similar to DynamicTypeWrapper is only valid in write scenario..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.ReadPageResultNotImplemented">
+            <summary>
+              Looks up a localized string similar to PageResult is only valid in write scenario..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.ReadSelectExpandWrapperNotImplemented">
+            <summary>
+              Looks up a localized string similar to SelectExpandWrapper is only valid in write scenario..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NewtonsoftJson.SRResources.ReadSingleResultNotImplemented">
+            <summary>
+              Looks up a localized string similar to SingleResult is only valid in write scenario..
+            </summary>
+        </member>
+    </members>
+</doc>

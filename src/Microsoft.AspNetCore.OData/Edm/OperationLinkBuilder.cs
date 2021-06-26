@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (linkFactory == null)
             {
-                throw new ArgumentNullException(nameof(linkFactory));
+                throw Error.ArgumentNull(nameof(linkFactory));
             }
 
             LinkFactory = linkFactory;
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (linkFactory == null)
             {
-                throw new ArgumentNullException(nameof(linkFactory));
+                throw Error.ArgumentNull(nameof(linkFactory));
             }
 
             FeedLinkFactory = linkFactory;

@@ -6,13 +6,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -22,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// The convention for an odata template string.
     /// It looks for the <see cref="RouteAttribute"/> on controller
-    /// and <see cref="RouteAttribute"/> or other Http attribute for example <see cref="HttpGetAttribute"/> on action.
+    /// and <see cref="RouteAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -85,45 +83,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // In order to avoiding pollute the action selectors, we use a Dictionary to save the intermediate results.
             IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors = new Dictionary<SelectorModel, IList<SelectorModel>>();
-            foreach (var controllerSelector in controllerSelectors)
+            foreach (var actionSelector in actionModel.Selectors)
             {
-                foreach (var actionSelector in actionModel.Selectors)
+                if (actionSelector.AttributeRouteModel != null && actionSelector.AttributeRouteModel.IsAbsoluteTemplate)
                 {
-                    // If non attribute routing on action, let's skip it.
-                    // So, at least [HttpGet("")]
-                    if (actionSelector.AttributeRouteModel == null)
+                    ProcessAttributeModel(actionSelector.AttributeRouteModel, prefixes, context, actionSelector, actionModel, controllerModel, updatedSelectors);
+                }
+                else
+                {
+                    foreach (var controllerSelector in controllerSelectors)
                     {
-                        continue;
-                    }
-
-                    var combinedRouteModel = AttributeRouteModel.CombineAttributeRouteModel(controllerSelector?.AttributeRouteModel, actionSelector.AttributeRouteModel);
-                    if (combinedRouteModel == null)
-                    {
-                        // no an attribute routing, skip it.
-                        continue;
-                    }
-
-                    string prefix = FindRelatedODataPrefix(combinedRouteModel.Template, prefixes, out string newRouteTemplate);
-                    if (prefix == null)
-                    {
-                        continue;
-                    }
-
-                    IEdmModel model = context.Options.Models[prefix].Item1;
-                    IServiceProvider sp = context.Options.Models[prefix].Item2;
-
-                    SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
-                                combinedRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);
-                    if (newSelectorModel != null)
-                    {
-                        IList<SelectorModel> selectors;
-                        if (!updatedSelectors.TryGetValue(actionSelector, out selectors))
-                        {
-                            selectors = new List<SelectorModel>();
-                            updatedSelectors[actionSelector] = selectors;
-                        }
-
-                        selectors.Add(newSelectorModel);
+                        var combinedRouteModel = AttributeRouteModel.CombineAttributeRouteModel(controllerSelector?.AttributeRouteModel, actionSelector.AttributeRouteModel);
+                        ProcessAttributeModel(combinedRouteModel, prefixes, context, actionSelector, actionModel, controllerModel, updatedSelectors);
                     }
                 }
             }
@@ -145,6 +116,40 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // let's just return false to let this action go to other conventions.
             return false;
+        }
+
+        private void ProcessAttributeModel(AttributeRouteModel attributeRouteModel, IEnumerable<string> prefixes,
+            ODataControllerActionContext context, SelectorModel actionSelector, ActionModel actionModel, ControllerModel controllerModel,
+            IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors)
+        {
+            if (attributeRouteModel == null)
+            {
+                // not an attribute routing, skip it.
+                return;
+            }
+
+            string prefix = FindRelatedODataPrefix(attributeRouteModel.Template, prefixes, out string newRouteTemplate);
+            if (prefix == null)
+            {
+                return;
+            }
+
+            IEdmModel model = context.Options.Models[prefix].Item1;
+            IServiceProvider sp = context.Options.Models[prefix].Item2;
+
+            SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
+                        attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);
+            if (newSelectorModel != null)
+            {
+                IList<SelectorModel> selectors;
+                if (!updatedSelectors.TryGetValue(actionSelector, out selectors))
+                {
+                    selectors = new List<SelectorModel>();
+                    updatedSelectors[actionSelector] = selectors;
+                }
+
+                selectors.Add(newSelectorModel);
+            }
         }
 
         private SelectorModel CreateActionSelectorModel(string prefix, IEdmModel model, IServiceProvider sp,
@@ -228,6 +233,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
         private static string FindRelatedODataPrefix(string routeTemplate, IEnumerable<string> prefixes, out string newRouteTemplate)
         {
+            if (routeTemplate.StartsWith('/'))
+            {
+                routeTemplate = routeTemplate.Substring(1);
+            }
+            else if (routeTemplate.StartsWith("~/", StringComparison.Ordinal))
+            {
+                routeTemplate = routeTemplate.Substring(2);
+            }
+
             // the input route template could be:
             // #1) odata/Customers/{key}
             // #2) orders({key})

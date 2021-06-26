@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -37,6 +38,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Fact]
+        public void GetSupportedContentTypesODataInputFormatter_WorksForContentType()
+        {
+            // Arrange
+            ODataInputFormatter formatter = ODataInputFormatterFactory.Create().First();
+            Assert.NotNull(formatter); // guard
+
+            // Act & Assert
+            IReadOnlyList<string> contentTypes = formatter.GetSupportedContentTypes("application/json", typeof(string));
+            Assert.Equal(12, contentTypes.Count);
+
+            // Act & Assert
+            formatter.SupportedMediaTypes.Clear();
+            ExceptionAssert.DoesNotThrow(() => formatter.GetSupportedContentTypes("application/json", typeof(string)));
+        }
+
+        [Fact]
         public void CanReadThrowsIfContextIsNull()
         {
             // Arrange & Act
@@ -44,6 +61,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Assert
             Assert.Throws<ArgumentNullException>("context", () => formatter.CanRead(context: null));
+        }
+
+        [Fact]
+        public void CanReadResultODataOutputFormatter_Throws_IfRequestIsNull()
+        {
+            // Arrange & Act
+            ODataInputFormatter formatter = new ODataInputFormatter(new[] { ODataPayloadKind.Resource });
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext.Setup(c => c.Request).Returns((HttpRequest)null);
+            InputFormatterContext context = new InputFormatterContext(httpContext.Object,
+                "any",
+                new ModelStateDictionary(),
+                new EmptyModelMetadataProvider().GetMetadataForType(typeof(int)),
+                 (stream, encoding) => null);
+
+            // Assert
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => formatter.CanRead(context),
+                "The OData formatter requires an attached request in order to deserialize.");
         }
 
         [Fact]
@@ -112,34 +148,51 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                     });
         }
 
+        [Fact]
+        public async Task ReadRequestBodyAsync_ThrowsArgumentNull_ForInputParameter()
+        {
+            // Arrange
+            ODataInputFormatter formatter = GetInputFormatter();
+            InputFormatterContext formatterContext = null;
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8), "context");
+
+            //Mock<ModelMetadata> mock = new Mock<ModelMetadata>();
+            //mock.Setup(s => s.ModelType).Returns((Type)null);
+            //formatterContext = new InputFormatterContext(new DefaultHttpContext(),
+            //    modelName: string.Empty,
+            //    modelState: new ModelStateDictionary(),
+            //    metadata: mock.Object,
+            //    readerFactory: (stream, encoding) => new StreamReader(stream, encoding));
+
+            //await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8), "type");
+        }
+
+        [Fact]
+        public void GetDefaultBaseAddress_ThrowsArgumentNull_Request()
+        {
+            ExceptionAssert.ThrowsArgumentNull(() => ODataInputFormatter.GetDefaultBaseAddress(null), "request");
+        }
+
         [Theory]
-        [InlineData(false)]
-        [InlineData(0)]
-        [InlineData("")]
-        public async Task ReadRequestBodyAsyncReturnsDefaultTypeValueWhenContentLengthIsZero<T>(T value)
+        [InlineData(typeof(bool))]
+        [InlineData(typeof(int))]
+        [InlineData(typeof(string))]
+        public async Task ReadRequestBodyAsyncFailsWhenContentLengthIsZero(Type type)
         {
             // Arrange
             ODataInputFormatter formatter = GetInputFormatter();
             byte[] contentBytes = Encoding.UTF8.GetBytes("");
             HttpContext httpContext = GetHttpContext(contentBytes);
 
-            InputFormatterContext formatterContext = CreateInputFormatterContext(typeof(T), httpContext);
+            InputFormatterContext formatterContext = CreateInputFormatterContext(type, httpContext);
 
             // Act
             InputFormatterResult result = await formatter.ReadRequestBodyAsync(formatterContext, Encoding.UTF8);
 
             // Assert
-            Assert.False(result.HasError);
-            Type valueType = value.GetType();
-            if (valueType.IsValueType)
-            {
-                T actualResult = Assert.IsType<T>(result.Model);
-                Assert.Equal(default(T), actualResult);
-            }
-            else
-            {
-                Assert.Null(result.Model);
-            }
+            Assert.True(result.HasError);
         }
 
         [Fact]
@@ -175,7 +228,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Fact]
-        public Task ReadRequestBodyAsyncReadsDataButDoesNotCloseStreamWhenContentLengthl()
+        public Task ReadRequestBodyAsyncReadsDataButDoesNotCloseStreamWhenContentLength()
         {
             // Arrange
             byte[] expectedSampleTypeByte = Encoding.UTF8.GetBytes(
@@ -192,7 +245,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             HttpContext httpContext = GetHttpContext(expectedSampleTypeByte, opt => opt.AddModel("odata", _edmModel));
             httpContext.Request.ContentType = "application/json;odata.metadata=minimal";
-            httpContext.Request.ContentLength = expectedSampleTypeByte.Length;
             httpContext.ODataFeature().Model = _edmModel;
             httpContext.ODataFeature().PrefixName = "odata";
             httpContext.ODataFeature().Path = new ODataPath(singletonSeg);

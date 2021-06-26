@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Represents a template that could match a $value segment.
+    /// Represents a template that could match a "/$value" segment.
     /// </summary>
     public class ValueSegmentTemplate : ODataSegmentTemplate
     {
@@ -29,30 +30,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
         }
 
-        /// <inheritdoc />
-        public override string Literal => "$value";
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Segment.EdmType;
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Value;
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource => null;
-
-        /// <inheritdoc />
-        public override bool IsSingle => true;
-
         /// <summary>
         /// Gets the value segment.
         /// </summary>
         public ValueSegment Segment { get; }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/$value";
+        }
+
+        /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            context?.Segments.Add(Segment);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            context.Segments.Add(Segment);
             return true;
         }
     }

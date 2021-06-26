@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Attributes
         /// <param name="model">The specified model name.</param>
         public ODataModelAttribute(string model)
         {
-            Model = model ?? throw new ArgumentNullException(nameof(model));
+            Model = model ?? throw Error.ArgumentNull(nameof(model));
         }
 
         /// <summary>

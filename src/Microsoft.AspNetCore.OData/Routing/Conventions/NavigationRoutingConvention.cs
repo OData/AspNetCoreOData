@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // structural property supports for entity set and singleton
-            return context.EntitySet != null || context.Singleton != null;
+            return context.NavigationSource != null;
         }
 
         /// <inheritdoc />
@@ -55,25 +55,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (context.EntitySet == null && context.Singleton == null)
-            {
-                return false;
-            }
-
             ActionModel action = context.Action;
 
             // Filter by the action name.
             // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
             string method = SplitActionName(actionName, out string property, out string declared);
             if (method == null || string.IsNullOrEmpty(property))
             {
                 return false;
             }
 
-            IEdmNavigationSource navigationSource = context.EntitySet == null ?
-                (IEdmNavigationSource)context.Singleton :
-                (IEdmNavigationSource)context.EntitySet;
+            IEdmNavigationSource navigationSource = context.NavigationSource;
 
             // filter by action parameter
             IEdmEntityType entityType = navigationSource.EntityType();

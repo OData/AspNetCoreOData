@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -19,6 +20,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     {
         private static ActionRoutingConvention ActionConvention = ConventionHelpers.CreateConvention<ActionRoutingConvention>();
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToActionOnActionRoutingConvention_Throws_Context()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => ActionConvention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => ActionConvention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(CustomersController), true)]

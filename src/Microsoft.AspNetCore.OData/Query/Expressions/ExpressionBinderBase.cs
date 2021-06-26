@@ -39,8 +39,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal static readonly Expression TrueConstant = Expression.Constant(true);
         internal static readonly Expression ZeroConstant = Expression.Constant(0);
 
-        internal static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
-                        .Single(m => m.Name == "TryParse" && m.GetParameters().Length == 2);
+        // .NET 6 adds a new overload: TryParse<TEnum>(ReadOnlySpan<Char>, TEnum)
+        // Now, with `TryParse<TEnum>(String, TEnum)`, there will have two versions with two parameters
+        // So, the previous Single() will throw exception.
+        internal static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethod("TryParse",
+            new[]
+            {
+                typeof(string),
+                Type.MakeGenericMethodParameter(0).MakeByRefType()
+            });
 
         internal static readonly Dictionary<BinaryOperatorKind, ExpressionType> BinaryOperatorMapping = new Dictionary<BinaryOperatorKind, ExpressionType>
         {
@@ -105,7 +112,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(model != null);
             Contract.Assert(querySettings != null);
-            Contract.Assert(querySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
             QuerySettings = querySettings;
             Model = model;
@@ -997,7 +1003,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal static bool IsNullable(Type t)
         {
-            if (!TypeHelper.IsValueType(t) || (TypeHelper.IsGenericType(t) && t.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            if (!t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)))
             {
                 return true;
             }
@@ -1114,7 +1120,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             var member = source as MemberExpression;
             return member != null
-                && this.Parameter.Type.IsGenericType()
+                && this.Parameter.Type.IsGenericType
                 && this.Parameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
                 && member.Expression == this.Parameter;
         }
@@ -1430,7 +1436,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Expression sourceValue;
 
-            if (TypeHelper.IsGenericType(source.Type) && source.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (source.Type.IsGenericType && source.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 if (TypeHelper.IsEnum(source.Type))
                 {

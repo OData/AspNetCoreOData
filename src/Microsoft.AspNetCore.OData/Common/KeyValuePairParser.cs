@@ -26,16 +26,6 @@ namespace Microsoft.AspNetCore.OData.Common
             ExpressionLexer lexer = new ExpressionLexer(expression);
 
             IDictionary<string, string> pairs = new Dictionary<string, string>();
-            if (lexer.CurrentToken.Kind == ExpressionTokenKind.TextEnd)
-            {
-                // It's empty expression, let's output empty dictionary.
-                return pairs;
-            }
-
-            //if (currentToken.Kind != ExpressionTokenKind.Literal)
-            //{
-            //    return null;
-            //}
 
             while (lexer.CurrentToken.Kind != ExpressionTokenKind.TextEnd)
             {

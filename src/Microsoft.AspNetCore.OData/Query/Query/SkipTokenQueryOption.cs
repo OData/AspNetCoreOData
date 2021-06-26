@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -15,64 +13,48 @@ namespace Microsoft.AspNetCore.OData.Query
     public class SkipTokenQueryOption
     {
         /// <summary>
-        /// Generates the nextlink value and consumes the skiptoken value.
-        /// </summary>
-        private SkipTokenHandler skipTokenHandler;
-
-        /// <summary>
         /// Initialize a new instance of <see cref="SkipQueryOption"/> based on the raw $skiptoken value and
         /// an EdmModel from <see cref="ODataQueryContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $skiptoken query.</param>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
-        /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public SkipTokenQueryOption(string rawValue, ODataQueryContext context, ODataQueryOptionParser queryOptionParser)
+        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        public SkipTokenQueryOption(string rawValue, ODataQueryContext context)
         {
+            if (string.IsNullOrEmpty(rawValue))
+            {
+                throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+            }
+
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
-            }
-
-            if (String.IsNullOrEmpty(rawValue))
-            {
-                throw Error.ArgumentNullOrEmpty("rawValue");
-            }
-
-            if (queryOptionParser == null)
-            {
-                throw Error.ArgumentNull("queryOptionParser");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             RawValue = rawValue;
-            Validator = context.GetSkipTokenQueryValidator();
-            skipTokenHandler = context.GetSkipTokenHandler();
+            Validator = SkipTokenQueryValidator.GetSkipTokenQueryValidator(context);
+            Handler = context.GetSkipTokenHandler();
             Context = context;
         }
 
         /// <summary>
         /// Gets the raw $skiptoken value.
         /// </summary>
-        public string RawValue { get; private set; }
+        public string RawValue { get; }
 
         /// <summary>
-        /// Gets and sets the given <see cref="ODataQueryContext"/>.
+        /// Gets the given <see cref="ODataQueryContext"/>.
         /// </summary>
-        public ODataQueryContext Context { get; private set; }
+        public ODataQueryContext Context { get; }
 
         /// <summary>
-        /// Gets or sets the SkipToken Query Validator.
+        /// Gets the SkipToken Query Validator.
         /// </summary>
         public SkipTokenQueryValidator Validator { get; }
 
         /// <summary>
-        /// Gets or sets the query setting 
+        /// Gets the skip token handler.
         /// </summary>
-        public ODataQuerySettings QuerySettings { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the QueryOptions
-        /// </summary>
-        public ODataQueryOptions QueryOptions { get; private set; }
+        public SkipTokenHandler Handler { get; }
 
         /// <summary>
         /// Apply the $skiptoken query to the given IQueryable.
@@ -83,9 +65,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
         public virtual IQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
         {
-            QuerySettings = querySettings;
-            QueryOptions = queryOptions;
-            return skipTokenHandler.ApplyTo<T>(query, this) as IOrderedQueryable<T>;
+            return Handler.ApplyTo(query, this, querySettings, queryOptions) as IOrderedQueryable<T>;
         }
 
         /// <summary>
@@ -97,9 +77,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
         {
-            QuerySettings = querySettings;
-            QueryOptions = queryOptions;
-            return skipTokenHandler.ApplyTo(query, this);
+            return Handler.ApplyTo(query, this, querySettings, queryOptions);
         }
 
         /// <summary>
@@ -110,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (Validator != null)

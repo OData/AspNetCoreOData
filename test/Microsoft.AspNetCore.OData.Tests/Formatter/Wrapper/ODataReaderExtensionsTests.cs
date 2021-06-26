@@ -70,6 +70,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         [Fact]
+        public void ReadResourceOrResourceSet_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act & Assert
+            ODataReader reader = null;
+            ExceptionAssert.ThrowsArgumentNull(() => reader.ReadResourceOrResourceSet(), "reader");
+        }
+
+        [Fact]
+        public async Task ReadResourceOrResourceSetAsync_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act & Assert
+            ODataReader reader = null;
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => reader.ReadResourceOrResourceSetAsync(), "reader");
+        }
+
+        [Fact]
         public async Task ReadResourceWorksAsExpected()
         {
             // Arrange
@@ -161,11 +177,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal(new[] { "Location", "Order", "Orders" }, resource.NestedResourceInfos.Select(n => n.NestedResourceInfo.Name));
 
             ODataNestedResourceInfoWrapper orders = resource.NestedResourceInfos.First(n => n.NestedResourceInfo.Name == "Orders");
-            Assert.Null(orders.NestedResource); // not a child resource
-            Assert.Null(orders.NestedLinks); // not a child reference link(s)
-            Assert.NotNull(orders.NestedResourceSet);
+            ODataItemWrapper nestedItem = Assert.Single(orders.NestedItems);
 
-            ODataResourceSetWrapper ordersSet = Assert.IsType<ODataResourceSetWrapper>(orders.NestedResourceSet);
+            ODataResourceSetWrapper ordersSet = Assert.IsType<ODataResourceSetWrapper>(nestedItem);
             Assert.Equal(2, ordersSet.Resources.Count);
             Assert.Collection(ordersSet.Resources,
                 r =>
@@ -222,17 +236,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             //                     |--- Normal Resource
             ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
             ODataItemWrapper deltaItem = Assert.Single(deltaResourceSet.DeltaItems);
-            ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(deltaItem);
-            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.DeletedResource.Reason);
+            ODataResourceWrapper deletedResourceWrapper = Assert.IsType<ODataResourceWrapper>(deltaItem);
+            ODataDeletedResource deletedResource = Assert.IsType<ODataDeletedResource>(deletedResourceWrapper.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.Reason);
 
-            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResource.NestedResourceInfos);
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResourceWrapper.NestedResourceInfos);
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            ODataItemWrapper nestedItem = Assert.Single(nestedResourceInfo.NestedItems);
+            ODataDeltaResourceSetWrapper ordersDeltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(nestedItem);
             Assert.Equal(2, ordersDeltaResourceSet.DeltaItems.Count);
-            ODataDeletedResourceWrapper deletedResource1 = Assert.IsType<ODataDeletedResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
-            Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.DeletedResource.Reason);
+            ODataResourceWrapper resource1 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(0));
+            ODataDeletedResource deletedResource1 = Assert.IsType<ODataDeletedResource>(resource1.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource1.Reason);
 
             ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(1));
             Assert.Equal("NS.VipOrder", resource2.Resource.TypeName);
@@ -342,10 +359,64 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 e =>
                 {
                     // 5) Deleted resource
-                    ODataDeletedResourceWrapper deletedResource = Assert.IsType<ODataDeletedResourceWrapper>(e);
-                    Assert.Equal("Customers(21)", deletedResource.DeletedResource.Id.OriginalString);
-                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.DeletedResource.Reason);
+                    ODataResourceWrapper deletedResourceWrapper = Assert.IsType<ODataResourceWrapper>(e);
+                    ODataDeletedResource deletedResource = Assert.IsType<ODataDeletedResource>(deletedResourceWrapper.Resource);
+                    Assert.Equal("Customers(21)", deletedResource.Id.OriginalString);
+                    Assert.Equal(DeltaDeletedEntryReason.Deleted, deletedResource.Reason);
                 });
+        }
+
+        [Fact]
+        public async Task ReadDeletedLinkInDeltaResourceSetWorksAsExpected2()
+        {
+            // Arrange
+            string payload = "{\"@context\":\"http://example.com/$metadata#Customers/$delta\"," +
+                "\"value\":[" +
+                  "{" +
+                    "\"@removed\":{\"reason\":\"changed\"}," +
+                    "\"CustomerID\":1," +
+                    "\"Order@delta\":{" +
+                        "\"@context\":\"#Orders/$deletedEntity\"," +
+                        "\"@removed\":{\"reason\":\"deleted\"}," +
+                        "\"OrderId\":10" +
+                      "}" +
+                  "}" +
+                "]" +
+              "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
+
+            // Assert
+            Assert.NotNull(item);
+
+            // --- DeltaResourceSet
+            //      |--- DeleteResource (Changed)
+            //         |--- NestedResourceInfo
+            //            |--- DeleteResource (Deleted)
+            ODataDeltaResourceSetWrapper deltaResourceSet = Assert.IsType<ODataDeltaResourceSetWrapper>(item);
+            ODataItemWrapper deltaItem = Assert.Single(deltaResourceSet.DeltaItems);
+            ODataResourceWrapper deletedResourceWrapper = Assert.IsType<ODataResourceWrapper>(deltaItem);
+            ODataDeletedResource deletedResource = Assert.IsType<ODataDeletedResource>(deletedResourceWrapper.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Changed, deletedResource.Reason);
+
+            ODataNestedResourceInfoWrapper nestedResourceInfo = Assert.Single(deletedResourceWrapper.NestedResourceInfos);
+            Assert.Equal("Order", nestedResourceInfo.NestedResourceInfo.Name);
+            Assert.False(nestedResourceInfo.NestedResourceInfo.IsCollection);
+
+            ODataItemWrapper nestedItem = Assert.Single(nestedResourceInfo.NestedItems);
+            ODataResourceWrapper orderResource = Assert.IsType<ODataResourceWrapper>(nestedItem);
+            Assert.True(orderResource.IsDeletedResource);
+            ODataDeletedResource innerDeletedResource = Assert.IsType<ODataDeletedResource>(orderResource.Resource);
+            Assert.Equal(DeltaDeletedEntryReason.Deleted, innerDeletedResource.Reason);
+
+            ODataProperty property = Assert.Single(innerDeletedResource.Properties);
+            Assert.Equal("OrderId", property.Name);
+            Assert.Equal(10, property.Value);
         }
 
         [Theory]
@@ -377,7 +448,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 // --- Resource
                 //     |--- NestedResourceInfo (Order)
                 //          |--- Resource
-                ODataResourceWrapper order = Assert.IsType<ODataResourceWrapper>(nestedResourceInfo.NestedResource);
+                ODataResourceWrapper order = Assert.IsType<ODataResourceWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
                 Assert.Equal("http://svc/Orders(8)", order.Resource.Id.OriginalString);
                 Assert.Empty(order.Resource.Properties);
             }
@@ -386,7 +457,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 // --- Resource
                 //     |--- NestedResourceInfo (Order)
                 //          |--- EntityReferenceLink
-                ODataEntityReferenceLinkWrapper orderLink = Assert.IsType<ODataEntityReferenceLinkWrapper>(Assert.Single(nestedResourceInfo.NestedLinks));
+                ODataEntityReferenceLinkWrapper orderLink = Assert.IsType<ODataEntityReferenceLinkWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
                 Assert.Equal("http://svc/Orders(7)", orderLink.EntityReferenceLink.Url.OriginalString);
             }
         }
@@ -426,9 +497,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            Assert.NotNull(nestedResourceInfo.NestedLinks);
-            Assert.Equal(3, nestedResourceInfo.NestedLinks.Count);
-            Assert.Collection(nestedResourceInfo.NestedLinks,
+            Assert.NotNull(nestedResourceInfo.NestedItems);
+            Assert.Equal(3, nestedResourceInfo.NestedItems.Count);
+            ODataEntityReferenceLinkWrapper[] links = nestedResourceInfo.NestedItems.OfType<ODataEntityReferenceLinkWrapper>().ToArray();
+            Assert.Equal(3, links.Length);
+            Assert.Collection(links,
                 r =>
                 {
                     Assert.Equal("http://svc/Orders(2)", r.EntityReferenceLink.Url.OriginalString);
@@ -479,7 +552,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.Equal("Orders", nestedResourceInfo.NestedResourceInfo.Name);
             Assert.True(nestedResourceInfo.NestedResourceInfo.IsCollection);
 
-            ODataResourceSetWrapper ordersResourceSet = Assert.IsType<ODataResourceSetWrapper>(nestedResourceInfo.NestedResourceSet);
+            ODataResourceSetWrapper ordersResourceSet = Assert.IsType<ODataResourceSetWrapper>(Assert.Single(nestedResourceInfo.NestedItems));
             Assert.Equal(3, ordersResourceSet.Resources.Count);
             Assert.Collection(ordersResourceSet.Resources,
                 r =>

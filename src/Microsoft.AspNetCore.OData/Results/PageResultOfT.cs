@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Results
         public PageResult(IEnumerable<T> items, Uri nextPageLink, long? count)
             : base(nextPageLink, count)
         {
-            Items = items ?? throw new ArgumentNullException(nameof(items));
+            Items = items ?? throw Error.ArgumentNull(nameof(items));
         }
 
         /// <summary>
@@ -55,6 +55,28 @@ namespace Microsoft.AspNetCore.OData.Results
         IEnumerator IEnumerable.GetEnumerator()
         {
             return Items.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Projects the result to a <see cref="IDictionary{TKey,TValue}" />.
+        /// </summary>
+        /// <returns>An <see cref="IDictionary{TKey,TValue}"/> representing the page result.</returns>
+        public override IDictionary<string, object> ToDictionary()
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary["items"] = Items;
+
+            if (NextPageLink != null)
+            {
+                dictionary["nextpagelink"] = NextPageLink.OriginalString;
+            }
+
+            if (Count != null)
+            {
+                dictionary["count"]= Count.Value;
+            }
+
+            return dictionary;
         }
     }
 }

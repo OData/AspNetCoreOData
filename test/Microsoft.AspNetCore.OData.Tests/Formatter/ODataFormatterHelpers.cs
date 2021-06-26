@@ -137,8 +137,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
-            services.AddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
-
             // Deserializers.
             services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
 

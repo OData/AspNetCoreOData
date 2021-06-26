@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -46,24 +47,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.DeletedResource);
+            _edmType = new EdmDeltaType(entityType, DeltaItemKind.DeletedResource);
         }
 
         /// <inheritdoc />
-        public string Id { get; set; }
+        public Uri Id { get; set; }
 
         /// <inheritdoc />
-        public DeltaDeletedEntryReason Reason { get; set; }
+        public DeltaDeletedEntryReason? Reason { get; set; }
 
         /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
-        {
-            get
-            {
-                Contract.Assert(_edmType != null);
-                return _edmType.DeltaKind;
-            }
-        }
+        public override DeltaItemKind Kind => DeltaItemKind.DeletedResource;
 
         /// <summary>
         /// The navigation source of the deleted entity. If null, then the deleted entity is from the current feed.

@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Container
@@ -26,6 +27,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
         {
             ExceptionAssert.ThrowsArgumentGreaterThanOrEqualTo(
                 () => new TruncatedCollection<int>(source: new int[0], pageSize: 0), "pageSize", "1", "0");
+        }
+
+        [Fact]
+        public void CtorTruncatedCollection_SetsProperties()
+        {
+            // Arrange & Act
+            IEnumerable<int> source = new[] { 1, 2, 3, 5, 7 };
+            TruncatedCollection<int> collection = new TruncatedCollection<int>(source, 3, 5);
+
+            // Arrange
+            Assert.Equal(3, collection.PageSize);
+            Assert.Equal(5, collection.TotalCount);
+            Assert.True(collection.IsTruncated);
+            Assert.Equal(3, collection.Count);
+            Assert.Equal(new[] { 1, 2, 3 }, collection);
         }
 
         [Theory]

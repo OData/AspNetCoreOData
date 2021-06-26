@@ -583,7 +583,7 @@ Host: example.com
                     builder.EntitySet<BatchTestCustomer>("BatchTestCustomers");
                     builder.EntitySet<BatchTestOrder>("BatchTestOrders");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
@@ -781,7 +781,7 @@ Accept-Charset: UTF-8
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestHeadersCustomer>("BatchTestHeadersCustomers");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
@@ -877,7 +877,7 @@ Accept-Charset: UTF-8
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestOrder>("BatchTestOrders");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddOData(opt => opt.AddModel(model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddModel(model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
@@ -1026,7 +1026,7 @@ Prefer: return=representation
             return SingleResult.Create(BatchTestCustomer.Customers.Where(d => d.Id.Equals(key)).AsQueryable());
         }
 
-        public IActionResult CreateRefToOrders([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
+        public IActionResult CreateRef([FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link)
         {
             var customer = BatchTestCustomer.Customers.FirstOrDefault(d => d.Id.Equals(key));
             if (customer == null)

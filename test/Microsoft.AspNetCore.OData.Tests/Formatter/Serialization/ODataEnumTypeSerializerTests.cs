@@ -4,8 +4,10 @@
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -65,7 +67,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.NotNull(annotation);
             Assert.Null(annotation.TypeName);
         }
- 
+
+        [Fact]
+        public async Task WriteObjectAsync_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange
+            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteObjectAsync(graph: null, type: null, messageWriter: null, writeContext: null),
+                "messageWriter");
+
+            // Arrange & Act & Assert
+            ODataMessageWriter messageWriter = ODataTestUtil.GetMockODataMessageWriter();
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteObjectAsync(graph: null, type: null, messageWriter, null),
+                "writeContext");
+
+            // Arrange & Act & Assert
+            ODataSerializerContext context = new ODataSerializerContext();
+            context.RootElementName = null;
+            await ExceptionAssert.ThrowsAsync<ArgumentException>(() => serializer.WriteObjectAsync(graph: null, type: null, messageWriter, context),
+                "The 'RootElementName' property is required on 'ODataSerializerContext'. (Parameter 'writeContext')");
+        }
+
         [Fact]
         public void CreateODataEnumValue_ReturnsCorrectEnumMember()
         {
@@ -90,6 +115,56 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Assert
             Assert.NotNull(value);
             Assert.Equal("news", value.Value);
+        }
+
+        [Fact]
+        public void CreateODataValue_ThrowsInvalidOperation_NonEnumType()
+        {
+            // Arrange
+            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
+            IEdmTypeReference expectedType = EdmCoreModel.Instance.GetString(false);
+
+            // Act & Assert
+            ExceptionAssert.Throws<InvalidOperationException>(() => serializer.CreateODataValue(graph: null, expectedType: expectedType, writeContext: null),
+                "ODataEnumSerializer cannot write an object of type 'Edm.String'.");
+        }
+
+        [Fact]
+        public void CreateODataValue_RetrunsNull_IfGraphNull()
+        {
+            // Arrange
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
+            IEdmEnumType enumType = new EdmEnumType("NS", "Enum");
+            IEdmTypeReference expectedType = new EdmEnumTypeReference(enumType, false);
+
+            // Act
+            ODataValue actual = serializer.CreateODataValue(graph: null, expectedType: expectedType, writeContext);
+
+            // Assert
+            Assert.IsType<ODataNullValue>(actual);
+        }
+
+        [Fact]
+        public void CreateODataValue_Retruns_CorrectODataValue()
+        {
+            // Arrange
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            Mock<ODataEnumSerializer> serializer = new Mock<ODataEnumSerializer>(provider);
+            ODataEnumValue enumValue = new ODataEnumValue("Cartoon");
+            serializer.Setup(s => s.CreateODataEnumValue(null, It.IsAny<IEdmEnumTypeReference>(), writeContext)).Returns(enumValue);
+
+            IEdmEnumType enumType = new EdmEnumType("NS", "Enum");
+            IEdmTypeReference expectedType = new EdmEnumTypeReference(enumType, false);
+
+            // Act
+            ODataValue actual = serializer.Object.CreateODataValue(graph: null, expectedType: expectedType, writeContext);
+
+            // Assert
+            Assert.Same(enumValue, actual);
         }
     }
 

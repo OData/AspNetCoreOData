@@ -28,8 +28,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // bound operation supports for entity set and singleton
-            return context?.EntitySet != null || context?.Singleton != null;
+            return context.NavigationSource != null;
         }
 
         /// <inheritdoc />
@@ -47,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Contract.Assert(entityType != null);
             Contract.Assert(navigationSource != null);
 
-            string actionName = context.Action.ActionMethod.Name;
+            string actionName = context.Action.ActionName;
 
             bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType);
             if (context.Singleton != null && hasKeyParameter)

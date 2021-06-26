@@ -770,7 +770,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<IETagHandler> mockETagHandler = new Mock<IETagHandler>();
             string tag = "\"'anycity'\"";
             EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
-            mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>())).Returns(etagHeaderValue);
+            mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>(), It.IsAny<TimeZoneInfo>())).Returns(etagHeaderValue);
 
             var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
             {
@@ -985,7 +985,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Equal("Default.Customer", resource.TypeName);
-            Assert.Equal(3, resource.Properties.Count());
+            Assert.Equal(4, resource.Properties.Count());
 
             // Verify the declared properties
             ODataProperty street = Assert.Single(resource.Properties.Where(p => p.Name == "CustomerId"));
@@ -1001,8 +1001,205 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataProperty guidProperty = Assert.Single(resource.Properties.Where(p => p.Name == "GuidProperty"));
             Assert.Equal(new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"), guidProperty.Value);
 
-            ODataProperty nullProperty = resource.Properties.SingleOrDefault(p => p.Name == "NullProperty");
-            Assert.Null(nullProperty);
+            ODataProperty nullProperty = resource.Properties.Single(p => p.Name == "NullProperty");
+            Assert.Null(nullProperty.Value);
+        }
+
+        [Fact]
+        public void CreateResource_Works_ToIgnoreDynamicPropertiesWithEmptyNames_ForOpenEntityType()
+        {
+            // Arrange
+            IEdmModel model = SerializationTestsHelpers.SimpleOpenTypeModel();
+
+            IEdmEntitySet customers = model.EntityContainer.FindEntitySet("Customers");
+
+            IEdmEntityType customerType = model.FindDeclaredType("Default.Customer") as IEdmEntityType;
+            Type simpleOpenCustomer = typeof(SimpleOpenCustomer);
+            model.SetAnnotationValue(customerType, new ClrTypeAnnotation(simpleOpenCustomer));
+
+            IEdmComplexType addressType = model.FindDeclaredType("Default.Address") as IEdmComplexType;
+            Type simpleOpenAddress = typeof(SimpleOpenAddress);
+            model.SetAnnotationValue(addressType, new ClrTypeAnnotation(simpleOpenAddress));
+
+            IEdmEnumType enumType = model.FindDeclaredType("Default.SimpleEnum") as IEdmEnumType;
+            Type simpleEnumType = typeof(SimpleEnum);
+            model.SetAnnotationValue(enumType, new ClrTypeAnnotation(simpleEnumType));
+
+            model.SetAnnotationValue(customerType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenCustomer.GetProperty("CustomerProperties")));
+
+            model.SetAnnotationValue(addressType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenAddress.GetProperty("Properties")));
+
+            ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
+
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
+            request.ODataFeature().PrefixName = "route";
+            SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
+            ODataSerializerContext writeContext = new ODataSerializerContext
+            {
+                Model = model,
+                Path = new ODataPath(new EntitySetSegment(customers)),
+                Request = request
+            };
+
+            SimpleOpenCustomer customer = new SimpleOpenCustomer()
+            {
+                CustomerId = 991,
+                Name = "Name #991",
+                Address = new SimpleOpenAddress
+                {
+                    City = "a city",
+                    Street = "a street",
+                    Properties = new Dictionary<string, object> { { "ArrayProperty", new[] { "15", "14", "13" } } }
+                },
+                CustomerProperties = new Dictionary<string, object>()
+            };
+
+            customer.CustomerProperties.Add("GuidProperty", new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"));
+            customer.CustomerProperties.Add("", "EmptyProperty");
+
+            ResourceContext entityContext = new ResourceContext(writeContext,
+                customerType.ToEdmTypeReference(false) as IEdmEntityTypeReference, customer);
+
+            // Act
+            ODataResource resource = serializer.CreateResource(selectExpandNode, entityContext);
+
+            // Assert
+            Assert.Equal("Default.Customer", resource.TypeName);
+            Assert.Equal(3, resource.Properties.Count());
+
+            // Verify properties with empty names are ignored
+            ODataProperty emptyProperty = resource.Properties.SingleOrDefault(p => p.Name == "");
+            Assert.Null(emptyProperty);
+        }
+
+        [Fact]
+        public void CreateResource_Throws_IfDynamicPropertyUsesExistingName_ForOpenType()
+        {
+            // Arrange
+            IEdmModel model = SerializationTestsHelpers.SimpleOpenTypeModel();
+
+            IEdmEntitySet customers = model.EntityContainer.FindEntitySet("Customers");
+
+            IEdmEntityType customerType = model.FindDeclaredType("Default.Customer") as IEdmEntityType;
+            Type simpleOpenCustomer = typeof(SimpleOpenCustomer);
+            model.SetAnnotationValue(customerType, new ClrTypeAnnotation(simpleOpenCustomer));
+
+            IEdmComplexType addressType = model.FindDeclaredType("Default.Address") as IEdmComplexType;
+            Type simpleOpenAddress = typeof(SimpleOpenAddress);
+            model.SetAnnotationValue(addressType, new ClrTypeAnnotation(simpleOpenAddress));
+
+            IEdmEnumType enumType = model.FindDeclaredType("Default.SimpleEnum") as IEdmEnumType;
+            Type simpleEnumType = typeof(SimpleEnum);
+            model.SetAnnotationValue(enumType, new ClrTypeAnnotation(simpleEnumType));
+
+            model.SetAnnotationValue(customerType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenCustomer.GetProperty("CustomerProperties")));
+
+            model.SetAnnotationValue(addressType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenAddress.GetProperty("Properties")));
+
+            ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
+
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
+            request.ODataFeature().PrefixName = "route";
+            SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
+            ODataSerializerContext writeContext = new ODataSerializerContext
+            {
+                Model = model,
+                Path = new ODataPath(new EntitySetSegment(customers)),
+                Request = request
+            };
+
+            SimpleOpenCustomer customer = new SimpleOpenCustomer()
+            {
+                CustomerId = 991,
+                Name = "Name #991",
+                Address = new SimpleOpenAddress
+                {
+                    City = "a city",
+                    Street = "a street",
+                    Properties = new Dictionary<string, object> { { "ArrayProperty", new[] { "15", "14", "13" } } }
+                },
+                CustomerProperties = new Dictionary<string, object>()
+            };
+
+            customer.CustomerProperties.Add("GuidProperty", new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"));
+            customer.CustomerProperties.Add("Name", "DynamicName");
+
+            ResourceContext entityContext = new ResourceContext(writeContext,
+                customerType.ToEdmTypeReference(false) as IEdmEntityTypeReference, customer);
+
+            // Act & Assert
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => serializer.CreateResource(selectExpandNode, entityContext),
+                "Name",
+                partialMatch: true);
+        }
+
+        [Fact]
+        public void CreateResource_Throws_IfNullDynamicPropertyUsesExistingName_ForOpenType()
+        {
+            // Arrange
+            IEdmModel model = SerializationTestsHelpers.SimpleOpenTypeModel();
+
+            IEdmEntitySet customers = model.EntityContainer.FindEntitySet("Customers");
+
+            IEdmEntityType customerType = model.FindDeclaredType("Default.Customer") as IEdmEntityType;
+            Type simpleOpenCustomer = typeof(SimpleOpenCustomer);
+            model.SetAnnotationValue(customerType, new ClrTypeAnnotation(simpleOpenCustomer));
+
+            IEdmComplexType addressType = model.FindDeclaredType("Default.Address") as IEdmComplexType;
+            Type simpleOpenAddress = typeof(SimpleOpenAddress);
+            model.SetAnnotationValue(addressType, new ClrTypeAnnotation(simpleOpenAddress));
+
+            IEdmEnumType enumType = model.FindDeclaredType("Default.SimpleEnum") as IEdmEnumType;
+            Type simpleEnumType = typeof(SimpleEnum);
+            model.SetAnnotationValue(enumType, new ClrTypeAnnotation(simpleEnumType));
+
+            model.SetAnnotationValue(customerType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenCustomer.GetProperty("CustomerProperties")));
+
+            model.SetAnnotationValue(addressType, new DynamicPropertyDictionaryAnnotation(
+                simpleOpenAddress.GetProperty("Properties")));
+
+            ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
+
+            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
+            request.ODataFeature().PrefixName = "route";
+            SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
+            ODataSerializerContext writeContext = new ODataSerializerContext
+            {
+                Model = model,
+                Path = new ODataPath(new EntitySetSegment(customers)),
+                Request = request
+            };
+
+            SimpleOpenCustomer customer = new SimpleOpenCustomer()
+            {
+                CustomerId = 991,
+                Name = "Name #991",
+                Address = new SimpleOpenAddress
+                {
+                    City = "a city",
+                    Street = "a street",
+                    Properties = new Dictionary<string, object> { { "ArrayProperty", new[] { "15", "14", "13" } } }
+                },
+                CustomerProperties = new Dictionary<string, object>()
+            };
+
+            customer.CustomerProperties.Add("GuidProperty", new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"));
+            customer.CustomerProperties.Add("Name", null);
+
+            ResourceContext entityContext = new ResourceContext(writeContext,
+                customerType.ToEdmTypeReference(false) as IEdmEntityTypeReference, customer);
+
+            // Act & Assert
+            ExceptionAssert.Throws<InvalidOperationException>(
+                () => serializer.CreateResource(selectExpandNode, entityContext),
+                "Name",
+                partialMatch: true);
         }
 
         [Fact]

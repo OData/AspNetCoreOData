@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
-                services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
+                services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
                     .AddModel("aggregation", edmModel));
             }
         }

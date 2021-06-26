@@ -10,12 +10,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 {
     internal class MockNavigationSourceLinkBuilderAnnotation : NavigationSourceLinkBuilderAnnotation
     {
-        public SelfLinkBuilder<Uri> IdLinkBuilder { get; set; }
-
-        public SelfLinkBuilder<Uri> EditLinkBuilder { get; set; }
-
-        public SelfLinkBuilder<Uri> ReadLinkBuilder { get; set; }
-
         public Func<ResourceContext, IEdmNavigationProperty, ODataMetadataLevel, Uri> NavigationLinkBuilder { get; set; }
 
         public override Uri BuildEditLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel, Uri idLink)

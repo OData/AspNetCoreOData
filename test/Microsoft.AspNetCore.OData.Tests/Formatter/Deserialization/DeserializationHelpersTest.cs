@@ -283,6 +283,84 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         //    resource.Verify();
         //}
 
+        [Theory]
+        [InlineData("null", null)]
+        [InlineData("42", 42)]
+        [InlineData("\"abc\"", "abc")]
+        public void ConvertValue_Works_WithODataUntypedValue(string rawValue, object expected)
+        {
+            // Arrange
+            object oDataValue = new ODataUntypedValue
+            {
+                RawValue = rawValue
+            };
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            object value = DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, null, null, out EdmTypeKind typeKind);
+
+            // Assert
+            Assert.Equal(EdmTypeKind.Primitive, typeKind);
+            Assert.Equal(expected, value);
+        }
+
+        [Fact]
+        public void ConvertValue_Works_WithODataUntypedValue_Decimal()
+        {
+            // Arrange
+            object oDataValue = new ODataUntypedValue
+            {
+                RawValue = "42.6"
+            };
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            object value = DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, null, null, out EdmTypeKind typeKind);
+
+            // Assert
+            Assert.Equal(EdmTypeKind.Primitive, typeKind);
+            Assert.Equal((decimal)42.6, value);
+        }
+
+        [Fact]
+        public void ConvertValue_Works_WithODataUntypedValue_Double()
+        {
+            // Arrange
+            object oDataValue = new ODataUntypedValue
+            {
+                RawValue = "-1.643e6"
+            };
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            object value = DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, null, null, out EdmTypeKind typeKind);
+
+            // Assert
+            Assert.Equal(EdmTypeKind.Primitive, typeKind);
+            Assert.Equal((double)-1643000, value);
+        }
+
+        [Theory]
+        [InlineData("[abc1.643e6]")]
+        [InlineData("{abc1.643e6}")]
+        [InlineData("abc1.643e6")]
+        public void ConvertValue_ThrowsODataException_WithInvalidValue(string rawValue)
+        {
+            // Arrange
+            object oDataValue = new ODataUntypedValue
+            {
+                RawValue = rawValue
+            };
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            Action test = () => DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, null, null, out EdmTypeKind typeKind);
+
+            // Assert
+            ExceptionAssert.Throws<ODataException>(test,
+                $"The given untyped value '{rawValue}' in payload is invalid. Consider using a OData type annotation explicitly.");
+        }
+
         [Fact]
         public void ApplyProperty_FailsWithUsefulErrorMessageOnUnknownProperty()
         {
@@ -308,6 +386,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Assert
             Assert.Equal(HelpfulErrorMessage, exception.Message);
+        }
+
+        [Fact]
+        public void GetCollectionElementTypeName_ThrowsODataException_NestedCollection()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.Throws<ODataException>(
+                () => DeserializationHelpers.GetCollectionElementTypeName("Collection(Edm.Int32)", true),
+                "The type 'Collection(Edm.Int32)' is a nested collection type. Nested collection types are not allowed.");
         }
 
         private static IEdmProperty GetMockEdmProperty(string name, EdmPrimitiveTypeKind elementType)

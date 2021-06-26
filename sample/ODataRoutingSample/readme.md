@@ -11,14 +11,14 @@ If you run the sample and send the following request in a Web brower:
 
 `~/$odata`, you will get the following (similar) routing table:
 
-![image](https://user-images.githubusercontent.com/9426627/104256721-992da180-5430-11eb-846b-19b02756c084.png)
+![image](https://user-images.githubusercontent.com/9426627/113971652-08c3ea80-97ee-11eb-8893-6084062a995b.png)
 
 
 ## OpenAPI/Swagger
 
 If you run the sample and send the following request in a Web brower:
 
-`/swagger`, you will get the following (simiar) swagger page:
+`/swagger`, you will get the following (similar) swagger page:
 
 ![image](../../images/sample_swagger.png)
 
@@ -52,14 +52,15 @@ you can get:
 
 Known issue: It seems there are some issues related to the complex property selection.
 
-`http://localhost:5000/api/accounts?$select=HomeAddress`
-`http://localhost:5000/api/accounts?$select=HomeAddress($select=City)`
+* `http://localhost:5000/api/accounts?$select=HomeAddress`
+
+* `http://localhost:5000/api/accounts?$select=HomeAddress($select=City)`
 
 ## Raw OpenAPI/Swagger
 
 If you run the sample and send the following request in a Web brower:
 
-`/v1/$openapi`, you will get the following (simiar) swagger page:
+`/v1/$openapi`, you will get the following (similar) swagger page:
 
 ```json
 {
@@ -93,4 +94,4 @@ If you run the sample and send the following request in a Web brower:
           
 ```
 
-You can use `$format=application/{yaml|json};version={2.0|3.0}` to get different openApi in format and version.
+You can use `$format=application/{yaml|json};version={2.0|3.0}` to get openApi in different format and version.

@@ -17,7 +17,6 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     public class ODataPathSegmentHandler : PathSegmentHandler
     {
-        private readonly IList<string> _pathTemplate;
         private readonly IList<string> _pathUriLiteral;
         private IEdmNavigationSource _navigationSource; // used to record the navigation source in the last segment.
 
@@ -27,33 +26,18 @@ namespace Microsoft.AspNetCore.OData.Routing
         public ODataPathSegmentHandler()
         {
             _navigationSource = null;
-            _pathTemplate = new List<string> { ODataSegmentKinds.ServiceBase }; // ~
             _pathUriLiteral = new List<string>();
         }
 
         /// <summary>
         /// Gets the path navigation source.
         /// </summary>
-        public IEdmNavigationSource NavigationSource
-        {
-            get { return _navigationSource; }
-        }
+        public IEdmNavigationSource NavigationSource => _navigationSource;
 
         /// <summary>
-        /// Gets the path template.
+        /// Gets the path Uri literal.
         /// </summary>
-        public string PathTemplate
-        {
-            get { return String.Join("/", _pathTemplate); }
-        }
-
-        /// <summary>
-        /// Gets the path literal.
-        /// </summary>
-        public string PathLiteral
-        {
-            get { return String.Join("/", _pathUriLiteral); }
-        }
+        public string PathLiteral => string.Join("/", _pathUriLiteral);
 
         /// <summary>
         /// Handle a EntitySetSegment
@@ -62,10 +46,8 @@ namespace Microsoft.AspNetCore.OData.Routing
         public override void Handle(EntitySetSegment segment)
         {
             Contract.Assert(segment != null);
+
             _navigationSource = segment.EntitySet;
-
-            _pathTemplate.Add(ODataSegmentKinds.EntitySet); // entityset
-
             _pathUriLiteral.Add(segment.EntitySet.Name);
         }
 
@@ -78,15 +60,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             _navigationSource = segment.NavigationSource;
-
-            if (_pathTemplate.Last() == ODataSegmentKinds.Ref)
-            {
-                _pathTemplate.Insert(_pathTemplate.Count - 1, ODataSegmentKinds.Key);
-            }
-            else
-            {
-                _pathTemplate.Add(ODataSegmentKinds.Key);
-            }
 
             string value = ConvertKeysToString(segment.Keys, segment.EdmType);
 
@@ -118,10 +91,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
 
-            // TODO: do we really need to add $ref?
-            _pathTemplate.Add(ODataSegmentKinds.Navigation); // navigation
-            _pathTemplate.Add(ODataSegmentKinds.Ref); // $ref
-
             _pathUriLiteral.Add(segment.NavigationProperty.Name);
             _pathUriLiteral.Add(ODataSegmentKinds.Ref);
         }
@@ -135,8 +104,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
 
-            _pathTemplate.Add(ODataSegmentKinds.Navigation); // navigation
-
             _pathUriLiteral.Add(segment.NavigationProperty.Name);
         }
 
@@ -148,8 +115,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             Contract.Assert(segment != null);
             _navigationSource = null;
-
-            _pathTemplate.Add(ODataSegmentKinds.DynamicProperty); // dynamic property
 
             _pathUriLiteral.Add(segment.Identifier);
         }
@@ -168,13 +133,10 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (actionImport != null)
             {
-                _pathTemplate.Add(ODataSegmentKinds.UnboundAction); // unbound action
                 _pathUriLiteral.Add(actionImport.Name);
             }
             else
             {
-                _pathTemplate.Add(ODataSegmentKinds.UnboundFunction); // unbound function
-
                 // Translate the nodes in ODL path to string literals as parameter of UnboundFunctionPathSegment.
                 Dictionary<string, string> parameterValues = segment.Parameters.ToDictionary(
                     parameterValue => parameterValue.Name,
@@ -183,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 IEdmFunctionImport function = (IEdmFunctionImport)segment.OperationImports.Single();
 
                 IEnumerable<string> parameters = parameterValues.Select(v => String.Format(CultureInfo.InvariantCulture, "{0}={1}", v.Key, v.Value));
-                string literal = String.Format(CultureInfo.InvariantCulture, "{0}({1})", function.Name, String.Join(",", parameters));
+                string literal = string.Format(CultureInfo.InvariantCulture, "{0}({1})", function.Name, String.Join(",", parameters));
 
                 _pathUriLiteral.Add(literal);
             }
@@ -202,13 +164,10 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (action != null)
             {
-                _pathTemplate.Add(ODataSegmentKinds.Action); // action
                 _pathUriLiteral.Add(action.FullName());
             }
             else
             {
-                _pathTemplate.Add(ODataSegmentKinds.Function); // function
-
                 // Translate the nodes in ODL path to string literals as parameter of BoundFunctionPathSegment.
                 Dictionary<string, string> parameterValues = segment.Parameters.ToDictionary(
                     parameterValue => parameterValue.Name,
@@ -233,8 +192,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = null;
 
-            _pathTemplate.Add(ODataSegmentKinds.Property); // path template
-
             _pathUriLiteral.Add(segment.LiteralText);
         }
 
@@ -246,8 +203,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             Contract.Assert(segment != null);
             // Not setting navigation source to null as the relevant navigation source for the path will be the previous navigation source.
-
-            _pathTemplate.Add(ODataSegmentKinds.Property); // property
 
             _pathUriLiteral.Add(segment.Property.Name);
         }
@@ -261,8 +216,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = segment.Singleton;
 
-            _pathTemplate.Add(ODataSegmentKinds.Singleton); // singleton
-
             _pathUriLiteral.Add(segment.Singleton.Name);
         }
 
@@ -274,8 +227,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             Contract.Assert(segment != null);
             _navigationSource = segment.NavigationSource;
-
-            _pathTemplate.Add(ODataSegmentKinds.Cast); // cast
 
             // Uri literal does not use the collection type.
             IEdmType elementType = segment.EdmType;
@@ -297,7 +248,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             // It means to use the previous the navigation source
             Contract.Assert(segment != null);
 
-            _pathTemplate.Add(ODataSegmentKinds.Value); // $value
             _pathUriLiteral.Add(ODataSegmentKinds.Value);
         }
 
@@ -310,7 +260,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = null;
 
-            _pathTemplate.Add(ODataSegmentKinds.Count); // $count
             _pathUriLiteral.Add(ODataSegmentKinds.Count);
         }
 
@@ -323,7 +272,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = null;
 
-            _pathTemplate.Add(ODataSegmentKinds.Batch);
             _pathUriLiteral.Add(ODataSegmentKinds.Batch);
         }
 
@@ -336,26 +284,11 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
             _navigationSource = null;
 
-            _pathTemplate.Add(ODataSegmentKinds.Metadata); // $metadata
             _pathUriLiteral.Add(ODataSegmentKinds.Metadata);
         }
 
-        /// <summary>
-        /// Handle a general path segment
-        /// </summary>
-        /// <param name="segment">the segment to handle</param>
-        public override void Handle(ODataPathSegment segment)
-        {
-            // ODL doesn't provide the handle function for general path segment
-            Contract.Assert(segment != null);
-            _navigationSource = null;
-
-            _pathTemplate.Add(segment.ToString());
-            _pathUriLiteral.Add(segment.ToString());
-        }
-
         // Convert the objects of keys in ODL path to string literals.
-        private static string ConvertKeysToString(IEnumerable<KeyValuePair<string, object>> keys, IEdmType edmType)
+        internal static string ConvertKeysToString(IEnumerable<KeyValuePair<string, object>> keys, IEdmType edmType)
         {
             Contract.Assert(keys != null);
 
@@ -365,7 +298,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             IList<KeyValuePair<string, object>> keyValuePairs = keys as IList<KeyValuePair<string, object>> ?? keys.ToList();
             if (keyValuePairs.Count < 1)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             if (keyValuePairs.Count < 2)
@@ -376,52 +309,23 @@ namespace Microsoft.AspNetCore.OData.Routing
                 // To support the alternate key
                 if (isDeclaredKey)
                 {
-                    return String.Join(
+                    return string.Join(
                         ",",
                         keyValuePairs.Select(keyValuePair =>
-                            TranslateKeySegmentValue(keyValuePair.Value)).ToArray());
+                            TranslateNode(keyValuePair.Value)).ToArray());
                 }
             }
 
-            return String.Join(
+            return string.Join(
                 ",",
                 keyValuePairs.Select(keyValuePair =>
                     (keyValuePair.Key +
                      "=" +
-                     TranslateKeySegmentValue(keyValuePair.Value))).ToArray());
+                     TranslateNode(keyValuePair.Value))).ToArray());
         }
 
-        // Translate the object of key in ODL path to string literal.
-        private static string TranslateKeySegmentValue(object value)
+        internal static string TranslateNode(object node)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            UriTemplateExpression uriTemplateExpression = value as UriTemplateExpression;
-            if (uriTemplateExpression != null)
-            {
-                return uriTemplateExpression.LiteralText;
-            }
-
-            ConstantNode constantNode = value as ConstantNode;
-            if (constantNode != null)
-            {
-                ODataEnumValue enumValue = constantNode.Value as ODataEnumValue;
-                if (enumValue != null)
-                {
-                    return ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V4);
-                }
-            }
-
-            return ODataUriUtils.ConvertToUriLiteral(value, ODataVersion.V4);
-        }
-
-        private static string TranslateNode(object node)
-        {
-            Contract.Assert(node != null);
-
             ConstantNode constantNode = node as ConstantNode;
             if (constantNode != null)
             {
@@ -453,8 +357,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return parameterAliasNode.Alias;
             }
 
-            //return node.ToString();
-            throw new NotSupportedException($"Cannot recongnize {node.GetType().FullName}");
+            return ODataUriUtils.ConvertToUriLiteral(node, ODataVersion.V4);
         }
     }
 }

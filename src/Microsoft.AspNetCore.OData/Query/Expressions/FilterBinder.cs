@@ -9,10 +9,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -24,10 +22,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// Translates an OData $filter parse tree represented by <see cref="FilterClause"/> to
     /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
     /// </summary>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     public class FilterBinder : ExpressionBinderBase
     {
         private const string ODataItParameterName = "$it";
+        private const string ODataThisParameterName = "$this";
 
         private Stack<Dictionary<string, ParameterExpression>> _parametersStack = new Stack<Dictionary<string, ParameterExpression>>();
         private Dictionary<string, ParameterExpression> _lambdaParameters;
@@ -47,27 +45,22 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
         }
 
-        internal static Expression Bind(
-            IQueryable baseQuery,
-            FilterClause filterClause,
-            Type filterType,
-            ODataQueryContext context,
-            ODataQuerySettings querySettings)
+        /// <summary>
+        /// For testing purposes only.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        internal FilterBinder(ODataQuerySettings querySettings, IAssemblyResolver assembliesResolver, IEdmModel model, Type filterType)
+            : base(model, assembliesResolver, querySettings)
         {
-            if (filterClause == null)
-            {
-                throw Error.ArgumentNull(nameof(filterClause));
-            }
+            _filterType = filterType;
+        }
 
-            if (filterType == null)
-            {
-                throw Error.ArgumentNull(nameof(filterType));
-            }
-
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
+        internal static Expression Bind(IQueryable baseQuery, FilterClause filterClause, Type filterType,
+            ODataQueryContext context, ODataQuerySettings querySettings)
+        {
+            Contract.Assert(filterClause != null);
+            Contract.Assert(filterType != null);
+            Contract.Assert(context != null);
 
             FilterBinder binder = context.GetFilterBinder(querySettings);
 
@@ -77,71 +70,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return BindFilterClause(binder, filterClause, filterType);
         }
 
-        internal static LambdaExpression Bind(
-            IQueryable baseQuery,
-            OrderByClause orderBy,
-            Type elementType,
-            ODataQueryContext context,
-            ODataQuerySettings querySettings)
-        {
-            Contract.Assert(orderBy != null);
-            Contract.Assert(elementType != null);
-            Contract.Assert(context != null);
-
-            FilterBinder binder = context.GetFilterBinder(querySettings);
-
-            binder._filterType = elementType;
-            binder.BaseQuery = baseQuery;
-
-            return BindOrderByClause(binder, orderBy, elementType);
-        }
-
-        #region For testing purposes only.
-
-        private FilterBinder(
-            IEdmModel model,
-            IAssemblyResolver assembliesResolver,
-            ODataQuerySettings querySettings,
-            Type filterType)
-            : base(model, assembliesResolver, querySettings)
-        {
-            _filterType = filterType;
-        }
-
-        internal static Expression<Func<TEntityType, bool>> Bind<TEntityType>(FilterClause filterClause, IEdmModel model,
-            IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
-        {
-            return Bind(filterClause, typeof(TEntityType), model, assembliesResolver, querySettings) as Expression<Func<TEntityType, bool>>;
-        }
-
-        internal static Expression Bind(FilterClause filterClause, Type filterType, IEdmModel model,
-            IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
-        {
-            if (filterClause == null)
-            {
-                throw Error.ArgumentNull("filterClause");
-            }
-            if (filterType == null)
-            {
-                throw Error.ArgumentNull("filterType");
-            }
-            if (model == null)
-            {
-                throw Error.ArgumentNull("model");
-            }
-            if (assembliesResolver == null)
-            {
-                throw Error.ArgumentNull("assembliesResolver");
-            }
-
-            FilterBinder binder = new FilterBinder(model, assembliesResolver, querySettings, filterType);
-
-            return BindFilterClause(binder, filterClause, filterType);
-        }
-
-        #endregion
-
-        private static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
+        internal static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
         {
             LambdaExpression filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
             filter = Expression.Lambda(binder.ApplyNullPropagationForFilterBody(filter.Body), filter.Parameters);
@@ -155,7 +84,22 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return filter;
         }
 
-        private static LambdaExpression BindOrderByClause(FilterBinder binder, OrderByClause orderBy, Type elementType)
+        internal static LambdaExpression Bind(IQueryable baseQuery, OrderByClause orderBy, Type elementType,
+            ODataQueryContext context, ODataQuerySettings querySettings)
+        {
+            Contract.Assert(orderBy != null);
+            Contract.Assert(elementType != null);
+            Contract.Assert(context != null);
+
+            FilterBinder binder = context.GetFilterBinder(querySettings);
+
+            binder._filterType = elementType;
+            binder.BaseQuery = baseQuery;
+
+            return BindOrderByClause(binder, orderBy, elementType);
+        }
+
+        internal static LambdaExpression BindOrderByClause(FilterBinder binder, OrderByClause orderBy, Type elementType)
         {
             LambdaExpression orderByLambda = binder.BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
             return orderByLambda;
@@ -627,7 +571,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(rangeVariable));
             }
 
-            ParameterExpression parameter = _lambdaParameters[rangeVariable.Name];
+            ParameterExpression parameter;
+            // When we have a $this RangeVariable, we still create a $it parameter.
+            // i.e $it => $it instead of $this => $this
+            if (rangeVariable.Name == ODataThisParameterName)
+            {
+                parameter = _lambdaParameters[ODataItParameterName];
+            }
+            else
+            {
+                parameter = _lambdaParameters[rangeVariable.Name];
+            }
+
             return ConvertNonStandardPrimitives(parameter);
         }
 
@@ -726,14 +681,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 default:
                     throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, unaryOperatorNode.Kind, typeof(FilterBinder).Name);
-            }
-        }
-
-        private static void ValidateAllStringArguments(string functionName, Expression[] arguments)
-        {
-            if (arguments.Any(arg => arg.Type != typeof(string)))
-            {
-                throw new ODataException(Error.Format(SRResources.FunctionNotSupportedOnEnum, functionName));
             }
         }
 

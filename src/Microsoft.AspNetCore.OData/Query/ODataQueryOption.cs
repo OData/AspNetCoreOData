@@ -69,12 +69,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (context == null)
             {
-                throw Error.ArgumentNull("context");
+                throw Error.ArgumentNull(nameof(context));
             }
 
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             Contract.Assert(context.RequestContainer == null);
@@ -325,20 +325,16 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        [SuppressMessage(
-            "Microsoft.Maintainability",
-            "CA1502:AvoidExcessiveComplexity",
-            Justification = "These are simple conversion function and cannot be split up.")]
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
         {
             if (query == null)
             {
-                throw Error.ArgumentNull("query");
+                throw Error.ArgumentNull(nameof(query));
             }
 
             if (querySettings == null)
             {
-                throw Error.ArgumentNull("querySettings");
+                throw Error.ArgumentNull(nameof(querySettings));
             }
 
             IQueryable result = query;
@@ -595,7 +591,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
             if (Validator != null)
@@ -737,7 +733,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="limit">The query result limit.</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Not intended for public use, only public to enable invocation without security issues.")]
         public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, out bool resultsLimited)
         {
             return LimitResults<T>(queryable, limit, false, out resultsLimited);
@@ -752,7 +747,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Not intended for public use, only public to enable invocation without security issues.")]
         public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited)
         {
             TruncatedCollection<T> truncatedCollection = new TruncatedCollection<T>(queryable, limit, parameterize);
@@ -933,8 +927,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
             Justification = "Need lower case string here.")]
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
-            Justification = "These are simple and flat processing functions based on parameter key value and cannot be split up.")]
         private void BuildQueryOptions(IDictionary<string, string> queryParameters)
         {
             foreach (KeyValuePair<string, string> kvp in queryParameters)
@@ -977,7 +969,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         break;
                     case "$skiptoken":
                         RawValues.SkipToken = kvp.Value;
-                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context, _queryOptionParser);
+                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
                         break;
                     case "$deltatoken":
                         RawValues.DeltaToken = kvp.Value;

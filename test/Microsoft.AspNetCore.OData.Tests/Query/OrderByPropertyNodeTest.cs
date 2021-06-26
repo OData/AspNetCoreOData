@@ -44,8 +44,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Fact]
         public void Ctor_TakingOrderByClause_ThrowsArgumentNull_OrderByClause()
         {
-            ExceptionAssert.ThrowsArgumentNull(() => new OrderByPropertyNode(orderByClause: null),
-                "orderByClause");
+            ExceptionAssert.ThrowsArgumentNull(() => new OrderByPropertyNode(orderByClause: null), "orderByClause");
         }
 
         [Fact]

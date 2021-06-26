@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -19,15 +20,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <param name="actionImport">The wrapper action import.</param>
         /// <param name="navigationSource">The target navigation source. it could be null.</param>
         public ActionImportSegmentTemplate(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
-            : this(BuildSegment(actionImport, navigationSource as IEdmEntitySetBase))
         {
+            ActionImport = actionImport ?? throw Error.ArgumentNull(nameof(actionImport));
+            Segment = new OperationImportSegment(actionImport, navigationSource as IEdmEntitySetBase);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionImportSegmentTemplate" /> class.
         /// </summary>
         /// <param name="segment">The operation import segment.</param>
-        internal ActionImportSegmentTemplate(OperationImportSegment segment)
+        public ActionImportSegmentTemplate(OperationImportSegment segment)
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
@@ -38,36 +40,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             ActionImport = (IEdmActionImport)operationImport;
-
-            if (ActionImport.Action.ReturnType != null)
-            {
-                IsSingle = ActionImport.Action.ReturnType.TypeKind() != EdmTypeKind.Collection;
-
-                EdmType = ActionImport.Action.ReturnType.Definition;
-            }
-
-            NavigationSource = segment.EntitySet;
         }
-
-        /// <inheritdoc />
-        public override string Literal => ActionImport.Name;
-
-        /// <inheritdoc />
-        public override IEdmType EdmType { get; }
-
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the wrapped action import.
         /// </summary>
         public IEdmActionImport ActionImport { get; }
-
-        /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.ActionImport;
-
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
 
         /// <summary>
         /// Gets the action import segment.
@@ -75,20 +53,21 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public OperationImportSegment Segment { get; }
 
         /// <inheritdoc />
-        public override bool TryTranslate(ODataTemplateTranslateContext context)
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            context?.Segments.Add(Segment);
-            return true;
+            yield return $"/{ActionImport.Name}";
         }
 
-        private static OperationImportSegment BuildSegment(IEdmActionImport actionImport, IEdmNavigationSource navigationSource)
+        /// <inheritdoc />
+        public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (actionImport == null)
+            if (context == null)
             {
-                throw Error.ArgumentNull(nameof(actionImport));
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            return new OperationImportSegment(actionImport, navigationSource as IEdmEntitySetBase);
+            context.Segments.Add(Segment);
+            return true;
         }
     }
 }

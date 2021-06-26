@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Runtime.ExceptionServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
@@ -52,6 +52,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// </summary>
         public Func<HttpRequest, Uri> BaseAddressFactory { get; set; }
 
+        /// <inheritdoc />
+        public override IReadOnlyList<string> GetSupportedContentTypes(string contentType, Type objectType)
+        {
+            if (SupportedMediaTypes.Count == 0)
+            {
+                // note: this is parity with the base implementation when there are no matches
+                return default;
+            }
+
+            return base.GetSupportedContentTypes(contentType, objectType);
+        }
+
         /// <inheritdoc/>
         public override bool CanRead(InputFormatterContext context)
         {
@@ -93,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw Error.ArgumentNull(nameof(context));
             }
 
             Type type = context.ModelType;
@@ -108,14 +120,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.ReadFromStreamAsyncMustHaveRequest);
             }
 
-            // If content length is 0 then return default value for this type
-            RequestHeaders contentHeaders = request.GetTypedHeaders();
             object defaultValue = GetDefaultValueForType(type);
-            if (contentHeaders == null || contentHeaders.ContentLength == null)
-            {
-                return InputFormatterResult.Success(defaultValue);
-            }
-
             try
             {
 
@@ -123,7 +128,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 Uri baseAddress = GetBaseAddressInternal(request);
 
-                object result = await ReadFromStreamAsync(type, defaultValue, baseAddress, request, toDispose).ConfigureAwait(false);
+                object result = await ReadFromStreamAsync(
+                    type,
+                    defaultValue,
+                    baseAddress,
+                    request.GetODataVersion(),
+                    request,
+                    toDispose).ConfigureAwait(false);
 
                 foreach (IDisposable obj in toDispose)
                 {
@@ -164,7 +175,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is sent to the logger, which may throw it.")]
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "oDataMessageReader mis registered for disposal.")]
-        internal static async Task<object> ReadFromStreamAsync(Type type, object defaultValue, Uri baseAddress, HttpRequest request, IList<IDisposable> disposes)
+        internal static async Task<object> ReadFromStreamAsync(
+            Type type,
+            object defaultValue,
+            Uri baseAddress,
+            ODataVersion version,
+            HttpRequest request,
+            IList<IDisposable> disposes)
         {
             object result;
             IEdmModel model = request.GetModel();
@@ -180,6 +197,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 ODataMessageReaderSettings oDataReaderSettings = request.GetReaderSettings();
                 oDataReaderSettings.BaseUri = baseAddress;
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
+                oDataReaderSettings.Version = version;
 
                 // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
                 // In ODL 8.x, ReadUntypedAsString option will be deleted.
@@ -228,10 +246,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ILogger logger = context.RequestServices.GetService<ILogger>();
             if (logger == null)
             {
-                throw ex;
+                ExceptionDispatchInfo.Capture(ex).Throw();
             }
 
-            logger.LogError(ex, String.Empty);
+            logger.LogError(ex, string.Empty);
         }
 
         /// <summary>

@@ -9,32 +9,36 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.UriParser;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 {
     public class CountQueryValidatorTests
     {
-        private readonly CountQueryValidator _validator = CountQueryValidator.GetCountQueryValidator(null);
+        private readonly CountQueryValidator _validator;
 
-        [Fact]
-        public void Validate_Throws_NullOption()
+        public CountQueryValidatorTests()
         {
-            // Arrange & Act & Assert
-            ExceptionAssert.Throws<ArgumentNullException>(() =>
-                _validator.Validate(null, new ODataValidationSettings()));
+            _validator = new CountQueryValidator();
         }
 
-        /*
         [Fact]
-        public void Validate_Throws_NullSettings()
+        public void ValidateCountQueryValidator_Throws_NullOption()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(null, new ODataValidationSettings()), "countQueryOption");
+        }
+
+        [Fact]
+        public void ValidateCountQueryValidator_Throws_NullSettings()
         {
             // Arrange
-            ODataQueryContext context = ValidationTestHelper.CreateCustomerContext();
-            var option = new CountQueryOption("Name eq 'abc'", context);
+            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            CountQueryOption option = new CountQueryOption("true", context);
 
             // Act & Assert
-            ExceptionAssert.Throws<ArgumentNullException>(() => _validator.Validate(option, null));
+            ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(option, null), "validationSettings");
         }
 
         [Theory]
@@ -54,19 +58,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         {
             // Arrange
             IEdmModel model = GetEdmModel();
-            var pathHandler = new DefaultODataPathHandler();
             string serviceRoot = "http://localhost/";
-            ODataPath path = pathHandler.Parse(model, serviceRoot, uri);
-            var context = new ODataQueryContext(
-                model,
-                EdmCoreModel.Instance.GetInt32(false).Definition,
-                path);
-            var option = new CountQueryOption("true", context);
-            var settings = new ODataValidationSettings();
+            ODataUriParser pathHandler = new ODataUriParser(model, new Uri(serviceRoot), new Uri(uri, UriKind.RelativeOrAbsolute));
+            ODataPath path = pathHandler.ParsePath();
+            ODataQueryContext context = new ODataQueryContext(model, EdmCoreModel.Instance.GetInt32(false).Definition, path);
+            CountQueryOption option = new CountQueryOption("true", context);
+            ODataValidationSettings settings = new ODataValidationSettings();
 
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() => _validator.Validate(option, settings), message);
-        }*/
+        }
 
         private static IEdmModel GetEdmModel()
         {

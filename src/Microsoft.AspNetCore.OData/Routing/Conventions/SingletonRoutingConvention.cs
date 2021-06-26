@@ -25,12 +25,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <inheritdoc />
         public virtual bool AppliesToController(ODataControllerActionContext context)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            return context.Singleton != null;
+            return context?.Singleton != null;
         }
 
         /// <inheritdoc />
@@ -47,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             ActionModel action = context.Action;
             string singletonName = context.Singleton.Name;
 
-            string actionMethodName = action.ActionMethod.Name;
+            string actionMethodName = action.ActionName;
             if (IsSupportedActionName(actionMethodName, singletonName, out string httpMethod))
             {
                 // ~/Me

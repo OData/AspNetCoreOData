@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -30,6 +31,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             _options = new ODataOptions();
             _options.AddModel(_edmModel);
             _attributeConvention = CreateConvention();
+        }
+
+        [Fact]
+        public void AppliesToControllerOnAttributeRoutingConvention_ReturnsTrue()
+        {
+            // Arrange & Act & Assert
+            Assert.True(_attributeConvention.AppliesToController(null));
+        }
+
+        [Fact]
+        public void AppliesToActionOnAttributeRoutingConvention_Throws_Context()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => _attributeConvention.AppliesToAction(null), "context");
         }
 
         [Fact]

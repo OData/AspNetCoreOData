@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadInline_Calls_ReadFeed()
+        public void ReadInline_Calls_ReadResourceSet()
         {
             // Arrange
             ODataDeserializerProvider deserializerProvider = _deserializerProvider;
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceSetWrapper feedWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             ODataDeserializerContext readContext = new ODataDeserializerContext();
 
-            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(_customerType)).Returns<ODataEdmTypeDeserializer>(null);
+            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(_customerType, false)).Returns<ODataEdmTypeDeserializer>(null);
 
             ExceptionAssert.Throws<SerializationException>(
                 () => deserializer.ReadResourceSet(feedWrapper, _customerType, readContext).GetEnumerator().MoveNext(),
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             resourceSetWrapper.Resources.Add(new ODataResourceWrapper(new ODataResource { Id = new Uri("http://a2/") }));
             ODataDeserializerContext readContext = new ODataDeserializerContext();
 
-            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(_customerType)).Returns(entityDeserializer.Object);
+            deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(_customerType, false)).Returns(entityDeserializer.Object);
             entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[0], _customerType, readContext)).Returns("entry1").Verifiable();
             entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[1], _customerType, readContext)).Returns("entry2").Verifiable();
 

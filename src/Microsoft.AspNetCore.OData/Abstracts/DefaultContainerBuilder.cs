@@ -27,12 +27,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         {
             if (serviceType == null)
             {
-                throw new ArgumentNullException(nameof(serviceType));
+                throw Error.ArgumentNull(nameof(serviceType));
             }
 
             if (implementationType == null)
             {
-                throw new ArgumentNullException(nameof(implementationType));
+                throw Error.ArgumentNull(nameof(implementationType));
             }
 
             services.Add(new ServiceDescriptor(
@@ -54,12 +54,12 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         {
             if (serviceType == null)
             {
-                throw new ArgumentNullException(nameof(serviceType));
+                throw Error.ArgumentNull(nameof(serviceType));
             }
 
             if (implementationFactory == null)
             {
-                throw new ArgumentNullException(nameof(implementationFactory));
+                throw Error.ArgumentNull(nameof(implementationFactory));
             }
 
             services.Add(new ServiceDescriptor(

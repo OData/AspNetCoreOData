@@ -29,9 +29,7 @@ namespace ODataDynamicModel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
-            services.AddOData();
+            services.AddControllers().AddOData();
 
             services.TryAddSingleton<IDataSourceProvider, DataSourceProvider>();
 
@@ -48,6 +46,9 @@ namespace ODataDynamicModel
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // Use odata route debug, /$odata
+            app.UseODataRouteDebug();
 
             app.UseRouting();
 

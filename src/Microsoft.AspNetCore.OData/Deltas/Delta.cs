@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         /// DeltaKind for the objects part of the DeltaResourceSet Payload.
         /// </summary>
-        public abstract DeltaKind Kind { get; }
+        public abstract DeltaItemKind Kind { get; }
 
         /// <summary>
         /// Clears the Delta and resets the underlying Entity.

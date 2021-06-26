@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     public class ODataDeserializerContext
     {
         private bool? _isDeltaOfT;
+        private bool? _isDeltaDeleted;
         private bool? _isNoClrType;
 
         /// <summary>
@@ -55,12 +56,33 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 if (!_isDeltaOfT.HasValue)
                 {
-                    _isDeltaOfT = ResourceType != null && TypeHelper.IsGenericType(ResourceType) &&
-                        (ResourceType.GetGenericTypeDefinition() == typeof(Delta<>) ||
-                        ResourceType.GetGenericTypeDefinition() == typeof(DeltaSet<>));
+                    _isDeltaOfT = ResourceType != null && ResourceType.IsGenericType &&
+                        ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
                 }
 
                 return _isDeltaOfT.Value;
+            }
+        }
+
+        internal bool IsDeltaDeleted
+        {
+            get
+            {
+                if (_isDeltaDeleted == null)
+                {
+                    if (typeof(IEdmDeltaDeletedResourceObject).IsAssignableFrom(ResourceType))
+                    {
+                        _isDeltaDeleted = true;
+                    }
+                    else
+                    {
+                        _isDeltaDeleted = ResourceType != null &&
+                            ResourceType.IsGenericType &&
+                            ResourceType.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>);
+                    }
+                }
+
+                return _isDeltaDeleted.Value;
             }
         }
 
@@ -86,6 +108,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             return EdmLibHelper.GetExpectedPayloadType(type, Path, Model);
+        }
+
+        internal ODataDeserializerContext CloneWithoutType()
+        {
+            return new ODataDeserializerContext
+            {
+                Path = this.Path,
+                Model = this.Model,
+                Request = this.Request,
+                TimeZone = this.TimeZone
+            };
         }
     }
 }

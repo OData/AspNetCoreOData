@@ -58,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
 
             // We care about the action in this pattern: {HttpMethod}{EntityTypeName}
             (string httpMethod, string castTypeName) = Split(actionName);
@@ -81,7 +81,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return true;
         }
 
-        private static (string, string) Split(string actionName)
+        // internal for unit test
+        internal static (string, string) Split(string actionName)
         {
             string typeName;
             string methodName;

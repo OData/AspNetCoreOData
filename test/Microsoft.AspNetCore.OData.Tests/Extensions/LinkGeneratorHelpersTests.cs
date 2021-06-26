@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
     public class LinkGeneratorHelpersTests
     {
+        [Fact]
+        public void CreateODataLink_ThrowsArgumentNull_Request()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = null;
+            ExceptionAssert.ThrowsArgumentNull(() => request.CreateODataLink(), "request");
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData("odata")]

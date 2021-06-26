@@ -204,10 +204,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="request">The input property names and values.</param>
         /// <param name="properties">The input property names and values.</param>
+        /// <param name="timeZone">The Time zone info.</param>
         /// <returns>The generated ETag string.</returns>
-        public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties)
+        public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties, TimeZoneInfo timeZone = null)
         {
-            return request.GetETagHandler().CreateETag(properties)?.ToString();
+            return request.GetETagHandler().CreateETag(properties, timeZone)?.ToString();
         }
 
         /// <summary>
@@ -222,7 +223,29 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
+            return request.GetSubServiceProvider().GetService<IETagHandler>();
+        }
+
+        /// <summary>
+        /// Checks whether the request is a POST targeted at a resource path ending in /$query.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>true if the request path has $query segment.</returns>
+        internal static bool IsODataQueryRequest(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            // Requests to paths ending in /$query MUST use the POST verb.
+            if (!string.Equals(request.Method, HttpMethods.Post, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            string path = request.Path.Value.TrimEnd('/');
+            return path.EndsWith("/$query", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -332,13 +355,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Gets thes OData version for the response.
+        /// Gets the OData version from the request context.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>The OData version.</returns>
-        public static ODataVersion GetODataResponseVersion(this HttpRequest request)
+        public static ODataVersion GetODataVersion(this HttpRequest request)
         {
-            Contract.Assert(request != null, "GetODataResponseVersion called with a null request");
             return request.ODataMaxServiceVersion() ??
                 request.ODataMinServiceVersion() ??
                 request.ODataServiceVersion() ??

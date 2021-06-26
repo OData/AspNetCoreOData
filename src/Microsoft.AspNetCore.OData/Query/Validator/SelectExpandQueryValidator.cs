@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -19,24 +20,21 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// </summary>
     public class SelectExpandQueryValidator
     {
-        private readonly DefaultQuerySettings _defaultQuerySettings;
         private readonly FilterQueryValidator _filterQueryValidator;
         private OrderByModelLimitationsValidator _orderByQueryValidator;
         private SelectExpandQueryOption _selectExpandQueryOption;
+        private DefaultQuerySettings _defaultQuerySettings;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelectExpandQueryValidator" /> class based on
-        /// the <see cref="DefaultQuerySettings" />.
+        /// Initializes a new instance of the <see cref="SelectExpandQueryValidator" /> class
         /// </summary>
-        /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public SelectExpandQueryValidator(DefaultQuerySettings defaultQuerySettings)
+        public SelectExpandQueryValidator()
         {
-            _defaultQuerySettings = defaultQuerySettings;
-            _filterQueryValidator = new FilterQueryValidator(_defaultQuerySettings);
+            _filterQueryValidator = new FilterQueryValidator();
         }
 
         /// <summary>
-        /// Validates a <see cref="TopQueryOption" />.
+        /// Validates a <see cref="SelectExpandQueryOption" />.
         /// </summary>
         /// <param name="selectExpandQueryOption">The $select and $expand query.</param>
         /// <param name="validationSettings">The validation settings.</param>
@@ -44,16 +42,17 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (selectExpandQueryOption == null)
             {
-                throw Error.ArgumentNull("selectExpandQueryOption");
+                throw Error.ArgumentNull(nameof(selectExpandQueryOption));
             }
 
             if (validationSettings == null)
             {
-                throw Error.ArgumentNull("validationSettings");
+                throw Error.ArgumentNull(nameof(validationSettings));
             }
 
-            _orderByQueryValidator = new OrderByModelLimitationsValidator(selectExpandQueryOption.Context,
-                _defaultQuerySettings.EnableOrderBy);
+            _defaultQuerySettings = selectExpandQueryOption.Context.DefaultQuerySettings;
+
+            _orderByQueryValidator = new OrderByModelLimitationsValidator(selectExpandQueryOption.Context, _defaultQuerySettings.EnableOrderBy);
             _selectExpandQueryOption = selectExpandQueryOption;
             ValidateRestrictions(null, 0, selectExpandQueryOption.SelectExpandClause, null, validationSettings);
 
@@ -77,14 +76,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static SelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
         {
-            if (context == null)
+            if (context == null || context.RequestContainer == null)
             {
-                return new SelectExpandQueryValidator(new DefaultQuerySettings());
+                return new SelectExpandQueryValidator();
             }
 
-            return context.RequestContainer == null
-                ? new SelectExpandQueryValidator(context.DefaultQuerySettings)
-                : context.RequestContainer.GetRequiredService<SelectExpandQueryValidator>();
+            return context.RequestContainer.GetRequiredService<SelectExpandQueryValidator>();
         }
 
         private static void ValidateDepth(SelectExpandClause selectExpand, int maxDepth)
@@ -163,9 +160,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     edmModel,
                     _defaultQuerySettings.EnableCount))
                 {
-                    throw new InvalidOperationException(Error.Format(
-                        SRResources.NotCountablePropertyUsedForCount,
-                        property.Name));
+                    throw new ODataException(Error.Format(SRResources.NotCountablePropertyUsedForCount, property.Name));
                 }
             }
         }
@@ -184,7 +179,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (filterClause != null)
             {
-                _filterQueryValidator.Validate(property, structuredType, filterClause, validationSettings, edmModel);
+                _filterQueryValidator.Validate(property, structuredType, filterClause, validationSettings, edmModel, _defaultQuerySettings);
             }
         }
 

@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public async Task WriteObjectAsync_Calls_WriteDeltaResourceSetInline()
+        public async Task WriteObjectAsync_Calls_WriteObjectInlineAsync()
         {
             // Arrange
             object graph = new object();
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(provider.Object);
             serializer.CallBase = true;
             serializer
-                .Setup(s => s.WriteDeltaResourceSetInlineAsync(graph, It.Is<IEdmTypeReference>(e => _customersType.IsEquivalentTo(e)),
+                .Setup(s => s.WriteObjectInlineAsync(graph, It.Is<IEdmTypeReference>(e => _customersType.IsEquivalentTo(e)),
                     It.IsAny<ODataWriter>(), _writeContext))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_ThrowsArgumentNull_Writer()
+        public async Task WriteObjectInlineAsync_ThrowsArgumentNull_Writer()
         {
             // Arrange
             Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
@@ -157,12 +157,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => serializer.WriteDeltaResourceSetInlineAsync(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
+                () => serializer.WriteObjectInlineAsync(graph: null, expectedType: null, writer: null, writeContext: new ODataSerializerContext()),
                 "writer");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_ThrowsArgumentNull_WriteContext()
+        public async Task WriteObjectInlineAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange
             Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
@@ -170,12 +170,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => serializer.WriteDeltaResourceSetInlineAsync(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
+                () => serializer.WriteObjectInlineAsync(graph: null, expectedType: null, writer: new Mock<ODataWriter>().Object, writeContext: null),
                 "writeContext");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_ThrowsSerializationException_CannotSerializerNull()
+        public async Task WriteObjectInlineAsync_ThrowsSerializationException_CannotSerializerNull()
         {
             // Arrange
             Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
@@ -183,13 +183,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act & Assert
             await ExceptionAssert.ThrowsAsync<SerializationException>(
-                () => serializer.WriteDeltaResourceSetInlineAsync(graph: null, expectedType: _customersType,
+                () => serializer.WriteObjectInlineAsync(graph: null, expectedType: _customersType,
                     writer: new Mock<ODataWriter>().Object, writeContext: _writeContext),
                 "Cannot serialize a null 'DeltaResourceSet'.");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_ThrowsSerializationException_IfGraphIsNotEnumerable()
+        public async Task WriteObjectInlineAsync_ThrowsSerializationException_IfGraphIsNotEnumerable()
         {
             // Arrange
             Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
@@ -197,13 +197,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act & Assert
             await ExceptionAssert.ThrowsAsync<SerializationException>(
-                () => serializer.WriteDeltaResourceSetInlineAsync(graph: 42, expectedType: _customersType,
+                () => serializer.WriteObjectInlineAsync(graph: 42, expectedType: _customersType,
                     writer: new Mock<ODataWriter>().Object, writeContext: _writeContext),
                 "ODataDeltaResourceSetSerializer cannot write an object of type 'System.Int32'.");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Throws_NullElementInCollection_IfFeedContainsNullElement()
+        public async Task WriteObjectInlineAsync_Throws_NullElementInCollection_IfFeedContainsNullElement()
         {
             // Arrange
             IEnumerable instance = new object[] { null };
@@ -212,12 +212,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act
             await ExceptionAssert.ThrowsAsync<SerializationException>(
-                () => serializer.WriteDeltaResourceSetInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
+                () => serializer.WriteObjectInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
                 "Collections cannot contain null elements.");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Throws_TypeCannotBeSerialized_IfFeedContainsEntityThatCannotBeSerialized()
+        public async Task WriteObjectInlineAsync_Throws_TypeCannotBeSerialized_IfFeedContainsEntityThatCannotBeSerialized()
         {
             // Arrange
             Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
@@ -228,12 +228,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act
             await ExceptionAssert.ThrowsAsync<SerializationException>(
-                () => serializer.WriteDeltaResourceSetInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
-                "ODataDeltaResourceSetSerializer cannot write an object of type 'System.Object[]'.");
+                () => serializer.WriteObjectInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext),
+                "ODataDeltaResourceSetSerializer cannot write an object of type 'System.Int32'.");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Calls_CreateODataDeltaResourceSet()
+        public async Task WriteObjectInlineAsync_Calls_CreateODataDeltaResourceSet()
         {
             // Arrange
             IEnumerable instance = new object[0];
@@ -243,14 +243,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns(new ODataDeltaResourceSet()).Verifiable();
 
             // Act
-            await serializer.Object.WriteDeltaResourceSetInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(instance, _customersType, new Mock<ODataWriter>().Object, _writeContext);
 
             // Assert
             serializer.Verify();
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Throws_CannotSerializerNull_IfCreateODataDeltaResourceSetReturnsNull()
+        public async Task WriteObjectInlineAsync_Throws_CannotSerializerNull_IfCreateODataDeltaResourceSetReturnsNull()
         {
             // Arrange
             IEnumerable instance = new object[0];
@@ -262,12 +262,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Act & Assert
             await ExceptionAssert.ThrowsAsync<SerializationException>(
-                () => serializer.Object.WriteDeltaResourceSetInlineAsync(instance, _customersType, writer, _writeContext),
+                () => serializer.Object.WriteObjectInlineAsync(instance, _customersType, writer, _writeContext),
                 "Cannot serialize a null 'DeltaResourceSet'.");
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Writes_CreateODataFeedOutput()
+        public async Task WriteObjectInlineAsync_Writes_CreateODataFeedOutput()
         {
             // Arrange
             IEnumerable instance = new object[0];
@@ -280,14 +280,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             writer.Setup(s => s.WriteStartAsync(deltaResourceSet)).Verifiable();
 
             // Act
-            await serializer.Object.WriteDeltaResourceSetInlineAsync(instance, _customersType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(instance, _customersType, writer.Object, _writeContext);
 
             // Assert
             writer.Verify();
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Can_WriteCollectionOfIEdmChangedObjects()
+        public async Task WriteObjectInlineAsync_Can_WriteCollectionOfIEdmChangedObjects()
         {
             // Arrange
             IEdmTypeReference edmType = new EdmEntityTypeReference(new EdmEntityType("NS", "Name"), isNullable: false);
@@ -307,14 +307,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(serializerProvider.Object);
 
             // Act
-            await serializer.WriteDeltaResourceSetInlineAsync(new[] { edmObject.Object }, feedType, mockWriter.Object, _writeContext);
+            await serializer.WriteObjectInlineAsync(new[] { edmObject.Object }, feedType, mockWriter.Object, _writeContext);
 
             // Assert
             customerSerializer.Verify();
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_WritesEachEntityInstance()
+        public async Task WriteObjectInlineAsync_WritesEachEntityInstance()
         {
             // Arrange
             Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
@@ -325,14 +325,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _serializer = new ODataDeltaResourceSetSerializer(provider);
 
             // Act
-            await _serializer.WriteDeltaResourceSetInlineAsync(_deltaResourceSetCustomers, _customersType, mockWriter.Object, _writeContext);
+            await _serializer.WriteObjectInlineAsync(_deltaResourceSetCustomers, _customersType, mockWriter.Object, _writeContext);
 
             // Assert
             customerSerializer.Verify();
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Sets_NextPageLink_OnWriteEndAsync()
+        public async Task WriteObjectInlineAsync_Sets_NextPageLink_OnWriteEndAsync()
         {
             // Arrange
             IEnumerable instance = new object[0];
@@ -354,14 +354,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Verifiable();
 
             // Act
-            await serializer.Object.WriteDeltaResourceSetInlineAsync(instance, _customersType, mockWriter.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(instance, _customersType, mockWriter.Object, _writeContext);
 
             // Assert
             mockWriter.Verify();
         }
 
         [Fact]
-        public async Task WriteDeltaResourceSetInlineAsync_Sets_DeltaLink()
+        public async Task WriteObjectInlineAsync_Sets_DeltaLink()
         {
             // Arrange
             IEnumerable instance = new object[0];
@@ -383,7 +383,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Verifiable();
 
             // Act
-            await serializer.Object.WriteDeltaResourceSetInlineAsync(instance, _customersType, mockWriter.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(instance, _customersType, mockWriter.Object, _writeContext);
 
             // Assert
             mockWriter.Verify();

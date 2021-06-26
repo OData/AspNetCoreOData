@@ -3,197 +3,214 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Validation;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class EdmModelExtensions
     {
         /// <summary>
-        /// Gets the <see cref="NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
-        /// links for the given navigation source.
+        /// Resolve the alternate key properties.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel"/> containing the navigation source.</param>
-        /// <param name="navigationSource">The navigation source.</param>
-        /// <returns>The <see cref="NavigationSourceLinkBuilderAnnotation"/> if set for the given the singleton; otherwise,
-        /// a new <see cref="NavigationSourceLinkBuilderAnnotation"/> that generates URLs that follow OData URL conventions.
-        /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
-            Justification = "IEdmNavigationSource is more relevant here.")]
-        public static NavigationSourceLinkBuilderAnnotation GetNavigationSourceLinkBuilder(this IEdmModel model,
-            IEdmNavigationSource navigationSource)
+        /// <param name="model">The Edm model.</param>
+        /// <param name="keySegment">The key segment.</param>
+        /// <returns>The resolved Edm properties.</returns>
+        public static IDictionary<string, IEdmProperty> ResolveAlternateKeyProperties(this IEdmModel model, KeySegment keySegment)
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
 
-            NavigationSourceLinkBuilderAnnotation annotation = model
-                .GetAnnotationValue<NavigationSourceLinkBuilderAnnotation>(navigationSource);
-            if (annotation == null)
+            if (keySegment == null)
             {
-                // construct and set a navigation source link builder that follows OData URL conventions.
-                annotation = new NavigationSourceLinkBuilderAnnotation(navigationSource, model);
-                model.SetNavigationSourceLinkBuilder(navigationSource, annotation);
+                throw Error.ArgumentNull(nameof(keySegment));
             }
 
-            return annotation;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="NavigationSourceLinkBuilderAnnotation"/> to be used while generating self and navigation
-        /// links for the given navigation source.
-        /// </summary>
-        /// <param name="model">The <see cref="IEdmModel"/> containing the navigation source.</param>
-        /// <param name="navigationSource">The navigation source.</param>
-        /// <param name="navigationSourceLinkBuilder">The <see cref="NavigationSourceLinkBuilderAnnotation"/> to set.</param>
-        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
-            Justification = "IEdmNavigationSource is more relevant here.")]
-        public static void SetNavigationSourceLinkBuilder(this IEdmModel model, IEdmNavigationSource navigationSource,
-            NavigationSourceLinkBuilderAnnotation navigationSourceLinkBuilder)
-        {
-            if (model == null)
+            IEdmEntityType entityType = (IEdmEntityType)keySegment.EdmType;
+            var alternateKeys = model.GetAlternateKeys(entityType);
+            if (alternateKeys == null)
             {
-                throw Error.ArgumentNull("model");
+                return null;
             }
 
-            model.SetAnnotationValue(navigationSource, navigationSourceLinkBuilder);
-        }
+            // It should be case-sensitive, then we can support "Id" & "ID", they are different, but it's valid.
+            HashSet<string> keyNames = keySegment.Keys.Select(k => k.Key).ToHashSet(/*StringComparer.OrdinalIgnoreCase*/);
 
-        /// <summary>
-        /// Gets the <see cref="OperationLinkBuilder"/> to be used while generating operation links for the given action.
-        /// </summary>
-        /// <param name="model">The <see cref="IEdmModel"/> containing the operation.</param>
-        /// <param name="operation">The operation for which the link builder is needed.</param>
-        /// <returns>The <see cref="OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
-        /// <see cref="OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
-            Justification = "IEdmActionImport is more relevant here.")]
-        public static OperationLinkBuilder GetOperationLinkBuilder(this IEdmModel model, IEdmOperation operation)
-        {
-            if (model == null)
+            // Let's find the alternate key in alternate keys
+            // The count should match
+            // The keys should match the alias
+            int count = keySegment.Keys.Count();
+            IDictionary<string, IEdmPathExpression> foundAlternateKey = alternateKeys.FirstOrDefault(a => a.Count == count && keyNames.SetEquals(a.Keys));
+
+            if (foundAlternateKey == null)
             {
-                throw Error.ArgumentNull("model");
-            }
-            if (operation == null)
-            {
-                throw Error.ArgumentNull("operation");
+                return null;
             }
 
-            OperationLinkBuilder linkBuilder = model.GetAnnotationValue<OperationLinkBuilder>(operation);
-            if (linkBuilder == null)
+            IDictionary<string, IEdmProperty> properties = null;
+            foreach (var alternateKey in foundAlternateKey)
             {
-                linkBuilder = GetDefaultOperationLinkBuilder(operation);
-                model.SetOperationLinkBuilder(operation, linkBuilder);
-            }
-
-            return linkBuilder;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="OperationLinkBuilder"/> to be used for generating the OData operation link for the given operation.
-        /// </summary>
-        /// <param name="model">The <see cref="IEdmModel"/> containing the entity set.</param>
-        /// <param name="operation">The operation for which the operation link is to be generated.</param>
-        /// <param name="operationLinkBuilder">The <see cref="OperationLinkBuilder"/> to set.</param>
-        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",
-            Justification = "IEdmActionImport is more relevant here.")]
-        public static void SetOperationLinkBuilder(this IEdmModel model, IEdmOperation operation, OperationLinkBuilder operationLinkBuilder)
-        {
-            if (model == null)
-            {
-                throw Error.ArgumentNull("model");
-            }
-
-            model.SetAnnotationValue(operation, operationLinkBuilder);
-        }
-
-        private static OperationLinkBuilder GetDefaultOperationLinkBuilder(IEdmOperation operation)
-        {
-            OperationLinkBuilder linkBuilder = null;
-            if (operation.Parameters != null)
-            {
-                if (operation.Parameters.First().Type.IsEntity())
+                IEdmProperty edmProperty = model.FindProperty(entityType, alternateKey.Value);
+                if (edmProperty == null)
                 {
-                    if (operation is IEdmAction)
+                    throw new ODataException(Error.Format(SRResources.PropertyNotFoundOnPathExpression, alternateKey.Value.Path, entityType.FullName()));
+                }
+
+                if (properties == null)
+                {
+                    properties = new Dictionary<string, IEdmProperty>();
+                }
+
+                properties[alternateKey.Key] = edmProperty;
+            }
+
+            return properties;
+        }
+
+        /// <summary>
+        /// Resolve the <see cref="IEdmProperty"/> using the property name. This method supports the property name case insensitive.
+        /// However, ODL only support case-sensitive.
+        /// </summary>
+        /// <param name="structuredType">The given structural type </param>
+        /// <param name="propertyName">The given property name.</param>
+        /// <returns>The resolved <see cref="IEdmProperty"/>.</returns>
+        public static IEdmProperty ResolveProperty(this IEdmStructuredType structuredType, string propertyName)
+        {
+            if (structuredType == null)
+            {
+                throw Error.ArgumentNull(nameof(structuredType));
+            }
+
+            bool ambiguous = false;
+            IEdmProperty edmProperty = null;
+            foreach (var property in structuredType.Properties())
+            {
+                string name = property.Name;
+                if (name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (name.Equals(propertyName, StringComparison.Ordinal))
                     {
-                        linkBuilder = new OperationLinkBuilder(
-                            (ResourceContext resourceContext) =>
-                                resourceContext.GenerateActionLink(operation), followsConventions: true);
+                        return property;
+                    }
+                    else if (edmProperty != null)
+                    {
+                        ambiguous = true;
                     }
                     else
                     {
-                        linkBuilder = new OperationLinkBuilder(
-                            (ResourceContext resourceContext) =>
-                                resourceContext.GenerateFunctionLink(operation), followsConventions: true);
-                    }
-                }
-                else if (operation.Parameters.First().Type.IsCollection())
-                {
-                    if (operation is IEdmAction)
-                    {
-                        linkBuilder =
-                            new OperationLinkBuilder(
-                                (ResourceSetContext reseourceSetContext) =>
-                                    reseourceSetContext.GenerateActionLink(operation), followsConventions: true);
-                    }
-                    else
-                    {
-                        linkBuilder =
-                            new OperationLinkBuilder(
-                                (ResourceSetContext reseourceSetContext) =>
-                                    reseourceSetContext.GenerateFunctionLink(operation), followsConventions: true);
+                        edmProperty = property;
                     }
                 }
             }
-            return linkBuilder;
-        }
 
-        public static IEdmProperty ResolveProperty(this IEdmStructuredType type, string propertyName, bool enableCaseInsensitive = false)
-        {
-            IEdmProperty property = type.FindProperty(propertyName);
-            if (property != null || !enableCaseInsensitive)
+            if (ambiguous)
             {
-                return property;
+                throw new ODataException(Error.Format(SRResources.AmbiguousPropertyNameFound, propertyName));
             }
 
-            var result = type.Properties()
-            .Where(_ => string.Equals(propertyName, _.Name, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-            return result.SingleOrDefault();
+            return edmProperty;
         }
 
-        public static IEdmSchemaType ResolveType(this IEdmModel model, string typeName, bool enableCaseInsensitive = false)
+        /// <summary>
+        /// Resolve the <see cref="IEdmSchemaType"/> using the type name. This method supports the type name case insensitive.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The Edm schema type.</returns>
+        public static IEdmSchemaType ResolveType(this IEdmModel model, string typeName)
         {
             IEdmSchemaType type = model.FindType(typeName);
-            if (type != null || !enableCaseInsensitive)
+            if (type != null)
             {
                 return type;
             }
 
             var types = model.SchemaElements.OfType<IEdmSchemaType>()
-                .Where(e => string.Equals(typeName, e.FullName(), enableCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                .Where(e => string.Equals(typeName, e.FullName(), StringComparison.OrdinalIgnoreCase));
 
             foreach (var refModels in model.ReferencedModels)
             {
                 var refedTypes = refModels.SchemaElements.OfType<IEdmSchemaType>()
-                    .Where(e => string.Equals(typeName, e.FullName(), enableCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                    .Where(e => string.Equals(typeName, e.FullName(), StringComparison.OrdinalIgnoreCase));
 
                 types = types.Concat(refedTypes);
             }
 
             if (types.Count() > 1)
             {
-                throw new Exception($"Multiple type found from the model for '{typeName}'.");
+                throw new ODataException(Error.Format(SRResources.AmbiguousTypeNameFound, typeName));
             }
 
             return types.SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Find the property using the given <see cref="IEdmPathExpression"/> starting from the given <see cref="IEdmStructuredType"/>.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="structuredType">The structured type.</param>
+        /// <param name="path">The property path.</param>
+        /// <returns>Null or the found edm property.</returns>
+        public static IEdmProperty FindProperty(this IEdmModel model, IEdmStructuredType structuredType, IEdmPathExpression path)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (structuredType == null)
+            {
+                throw Error.ArgumentNull(nameof(structuredType));
+            }
+
+            if (path == null)
+            {
+                throw Error.ArgumentNull(nameof(path));
+            }
+
+            IEdmProperty property = null;
+            IEdmStructuredType startingType = structuredType;
+            foreach (var segment in path.PathSegments)
+            {
+                if (string.IsNullOrEmpty(segment))
+                {
+                    // Let's simply ignore the empty segment
+                    continue;
+                }
+
+                // So far, we only support "property and type cast in the path"
+                if (segment.Contains('.', StringComparison.Ordinal))
+                {
+                    startingType = model.ResolveType(segment) as IEdmStructuredType;
+                    if (startingType == null)
+                    {
+                        throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, segment));
+                    }
+                }
+                else
+                {
+                    if (startingType == null)
+                    {
+                        return null;
+                    }
+
+                    property = startingType.ResolveProperty(segment);
+                    if (property == null)
+                    {
+                        throw new ODataException(Error.Format(SRResources.PropertyNotFoundOnPathExpression, path.Path, structuredType.FullTypeName()));
+                    }
+
+                    startingType = property.Type.GetElementTypeOrSelf().Definition as IEdmStructuredType;
+                }
+            }
+
+            return property;
         }
 
         /// <summary>
@@ -205,6 +222,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>Null or the found navigation source.</returns>
         public static IEdmNavigationSource ResolveNavigationSource(this IEdmModel model, string identifier, bool enableCaseInsensitive = false)
         {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
             IEdmNavigationSource navSource = model.FindDeclaredNavigationSource(identifier);
             if (navSource != null || !enableCaseInsensitive)
             {
@@ -222,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (result.Count > 1)
             {
-                throw new Exception($"More than one navigation sources match the name '{identifier}' found in model.");
+                throw new ODataException(Error.Format(SRResources.AmbiguousNavigationSourceNameFound, identifier));
             }
 
             return result.SingleOrDefault();
@@ -246,37 +268,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             return container.Elements.OfType<IEdmOperationImport>()
                 .Where(source => string.Equals(identifier, source.Name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static IEnumerable<IEdmOperation> ResolveOperations(this IEdmModel model, string identifier,
-            IEdmType bindingType, bool enableCaseInsensitive = false)
-        {
-            IEnumerable<IEdmOperation> results;
-            if (identifier.Contains(".", StringComparison.Ordinal))
-            {
-                results = FindAcrossModels<IEdmOperation>(model, identifier, true, enableCaseInsensitive);
-            }
-            else
-            {
-                results = FindAcrossModels<IEdmOperation>(model, identifier, false, enableCaseInsensitive);
-            }
-
-            var operations = results?.ToList();
-            if (operations != null && operations.Any())
-            {
-                IList<IEdmOperation> matchedOperation = new List<IEdmOperation>();
-                for (int i = 0; i < operations.Count; i++)
-                {
-                    if (operations[i].HasEquivalentBindingType(bindingType))
-                    {
-                        matchedOperation.Add(operations[i]);
-                    }
-                }
-
-                return matchedOperation;
-            }
-
-            return Enumerable.Empty<IEdmOperation>();
         }
 
         internal static IEdmEntitySetBase GetTargetEntitySet(this IEdmOperation operation, IEdmNavigationSource source, IEdmModel model)
@@ -308,7 +299,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return null;
         }
 
-
         public static IEdmNavigationSource FindNavigationTarget(this IEdmNavigationSource navigationSource,
             IEdmNavigationProperty navigationProperty,
             IList<ODataSegmentTemplate> parsedSegments,
@@ -337,61 +327,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return null;
-        }
-
-        private static IEnumerable<T> FindAcrossModels<T>(IEdmModel model,
-            string identifier, bool fullName, bool caseInsensitive) where T : IEdmSchemaElement
-        {
-            Func<IEdmModel, IEnumerable<T>> finder = (refModel) =>
-                refModel.SchemaElements.OfType<T>()
-                .Where(e => string.Equals(identifier, fullName ? e.FullName() : e.Name,
-                caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
-
-            IEnumerable<T> results = finder(model);
-
-            foreach (IEdmModel reference in model.ReferencedModels)
-            {
-                results.Concat(finder(reference));
-            }
-
-            return results;
-        }
-
-        internal static bool IsStructuredCollectionType(this IEdmTypeReference typeReference)
-        {
-            return typeReference.Definition.IsStructuredCollectionType();
-        }
-
-        internal static bool IsStructuredCollectionType(this IEdmType type)
-        {
-            IEdmCollectionType collectionType = type as IEdmCollectionType;
-
-            if (collectionType == null
-                || (collectionType.ElementType != null
-                    && (collectionType.ElementType.TypeKind() != EdmTypeKind.Entity && collectionType.ElementType.TypeKind() != EdmTypeKind.Complex)))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Try to get the entity type <see cref="IEdmEntityType"/> from the input <see cref="IEdmType"/>
-        /// </summary>
-        /// <param name="edmType">The input Edm Type.</param>
-        /// <param name="entityType">The output Entity Type.</param>
-        /// <returns>True/false</returns>
-        public static bool TryGetEntityType(this IEdmType edmType, out IEdmEntityType entityType)
-        {
-            if (edmType == null || edmType.TypeKind != EdmTypeKind.Collection)
-            {
-                entityType = null;
-                return false;
-            }
-
-            entityType = ((IEdmCollectionType)edmType).ElementType.Definition as IEdmEntityType;
-            return entityType != null;
         }
 
         public static bool IsEntityOrEntityCollectionType(this IEdmType edmType, out IEdmEntityType entityType)
@@ -427,7 +362,12 @@ namespace Microsoft.AspNetCore.OData.Edm
             return false;
         }
 
-        internal static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
+        /// <summary>
+        /// Tests type reference is enum or collection enum
+        /// </summary>
+        /// <param name="edmType"></param>
+        /// <returns></returns>
+        public static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
         {
             if (edmType.IsEnum())
             {
@@ -465,35 +405,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             //}
 
             return null;
-        }
-
-        public static IEnumerable<IEdmStructuredType> BaseTypes(
-            this IEdmStructuredType structuralType)
-        {
-            IEdmStructuredType baseType = structuralType.BaseType;
-            while (baseType != null)
-            {
-                yield return baseType;
-
-                baseType = baseType.BaseType;
-            }
-        }
-
-        public static IEnumerable<IEdmStructuredType> ThisAndBaseTypes(
-            this IEdmStructuredType structuralType)
-        {
-            IEdmStructuredType baseType = structuralType;
-            while (baseType != null)
-            {
-                yield return baseType;
-
-                baseType = baseType.BaseType;
-            }
-        }
-
-        public static IEnumerable<IEdmStructuredType> DerivedTypes(this IEdmStructuredType structuralType, IEdmModel model)
-        {
-            return model.FindAllDerivedTypes(structuralType);
         }
 
         /// <summary>

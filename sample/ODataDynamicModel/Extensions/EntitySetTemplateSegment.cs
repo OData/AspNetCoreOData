@@ -2,7 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -11,13 +13,10 @@ namespace ODataDynamicModel.Extensions
 {
     public class EntitySetTemplateSegment : ODataSegmentTemplate
     {
-        public override string Literal => "{entityset}";
-
-        public override ODataSegmentKind Kind => ODataSegmentKind.EntitySet;
-
-        public override IEdmType EdmType => null;
-
-        public override bool IsSingle => true;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            yield return "/{entityset}";
+        }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {

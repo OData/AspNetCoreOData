@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (structuralType == null)
             {
-                throw Error.ArgumentNull("structuralType");
+                throw Error.ArgumentNull(nameof(structuralType));
             }
 
             if (!typeof(T).IsAssignableFrom(structuralType))
@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         }
 
         /// <inheritdoc />
-        public abstract DeltaKind Kind { get; }
+        public abstract DeltaItemKind Kind { get; }
 
         /// <summary>
         ///  Gets the actual type of the structural object for which the changes are tracked.

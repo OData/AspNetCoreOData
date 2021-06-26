@@ -22,7 +22,7 @@
         <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
         <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
       </group>
-        <group targetFramework=".net5.0">
+      <group targetFramework=".net5.0">
         <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
         <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
         <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />

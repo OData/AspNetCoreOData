@@ -60,6 +60,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         strValue = newStrValue;
                     }
 
+                    string originalStrValue = strValue;
+
                     // for resource or collection resource, this method will return "ODataResourceValue, ..." we should support it.
                     if (edmParameter.Type.IsResourceOrCollectionResource())
                     {
@@ -77,7 +79,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                             strValue = edmParameter.Type.FullName() + strValue;
                         }
 
-                        object newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmParameter.Type);
+                        object newValue;
+                        try
+                        {
+                            newValue = ODataUriUtils.ConvertFromUriLiteral(strValue, ODataVersion.V4, context.Model, edmParameter.Type);
+                        }
+                        catch (ODataException ex)
+                        {
+                            string message = Error.Format(SRResources.InvalidParameterValueInUriFound, originalStrValue, edmParameter.Type.FullName());
+                            throw new ODataException(message, ex);
+                        }
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
                         updatedValues[parameterTemp] = newValue;
@@ -99,11 +110,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         }
 
         /// <summary>
-        /// 
+        /// Match the parameters
         /// </summary>
-        /// <param name="routeValues"></param>
-        /// <param name="parameterMappings"></param>
-        /// <returns></returns>
+        /// <param name="routeValues">The route values</param>
+        /// <param name="parameterMappings">The parameter mappings.</param>
+        /// <returns>True/False.</returns>
         internal static bool IsMatchParameters(RouteValueDictionary routeValues, IDictionary<string, string> parameterMappings)
         {
             Contract.Assert(routeValues != null);
@@ -120,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // 1) We get all the parameters from the function and all parameter values from routeValue.
             // Combine them as a string. so, actualParameters = "p1=a,p2=b,p3=c"
 
-            IDictionary<string, string>  actualParameters = new Dictionary<string, string>();
+            IDictionary<string, string> actualParameters = new Dictionary<string, string>();
             foreach (var parameter in parameterMappings)
             {
                 // For a parameter mapping like: minSalary={min}
@@ -145,17 +156,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 }
             }
 
-            string combintes = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
+            string combinates = string.Join(",", actualParameters.Select(kvp => kvp.Key + "=" + kvp.Value));
 
             // 2) Extract the key/value pairs
             //   p1=a    p2=b    p3=c
-            if (!KeyValuePairParser.TryParse(combintes, out IDictionary<string, string> parsedKeyValues))
+            if (!KeyValuePairParser.TryParse(combinates, out IDictionary<string, string> parsedKeyValues))
             {
                 return false;
             }
 
-            // 3) now the RequiredParameters (p1, p3) is not equal to actualParameters (p1, p2, p3)
-            return parameterMappings.Count == actualParameters.Keys.Count;
+            // 3) now the parsedKeyValues (p1, p3) is not equal to actualParameters (p1, p2, p3)
+            return parameterMappings.Count == parsedKeyValues.Count;
         }
     }
 }

@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
@@ -29,32 +30,10 @@ namespace Microsoft.AspNetCore.OData
         public ODataUrlKeyDelimiter UrlKeyDelimiter { get; set; } = ODataUrlKeyDelimiter.Slash;
 
         /// <summary>
-        /// Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically whether to recognize keys as segments or not.
-        /// </summary>
-        /// <param name="keyDelimiter">The key demimiter.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetUrlKeyDelimiter(ODataUrlKeyDelimiter keyDelimiter)
-        {
-            UrlKeyDelimiter = keyDelimiter;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or Sets a value indicating if batch requests should continue on error.
         /// By default, it's false.
         /// </summary>
         public bool EnableContinueOnErrorHeader { get; set; }
-
-        /// <summary>
-        /// Sets a value indicating if batch requests should continue on error.
-        /// </summary>
-        /// <param name="enableContinueOnError">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetContinueOnErrorHeader(bool enableContinueOnError)
-        {
-            EnableContinueOnErrorHeader = enableContinueOnError;
-            return this;
-        }
 
         /// <summary>
         /// Gets or Sets a value indicating if attribute routing is enabled or not.
@@ -63,32 +42,10 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableAttributeRouting { get; set; } = true;
 
         /// <summary>
-        /// Sets a value indicating if attribute routing is enabled or not.
-        /// </summary>
-        /// <param name="enabled">The boolean value.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetAttributeRouting(bool enabled)
-        {
-            EnableAttributeRouting = enabled;
-            return this;
-        }
-
-        /// <summary>
         /// Gets or sets a function to build an <see cref="IContainerBuilder"/>.
         /// Please call it before the "AddModel".
         /// </summary>
         public Func<IContainerBuilder> BuilderFactory { get; set; }
-
-        /// <summary>
-        /// Sets the builder factory. Please call it before the "AddModel".
-        /// </summary>
-        /// <param name="factory">The builder factory.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetBuilderFactory(Func<IContainerBuilder> factory)
-        {
-            BuilderFactory = factory;
-            return this;
-        }
 
         /// <summary>
         /// Gets or sets a TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
@@ -96,41 +53,14 @@ namespace Microsoft.AspNetCore.OData
         public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.Local;
 
         /// <summary>
-        /// Sets the <see cref="TimeZoneInfo"/> in route builder.
+        /// Gets the routing conventions.
         /// </summary>
-        /// <param name="timeZoneInfo">The <see cref="TimeZoneInfo"/></param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions SetTimeZoneInfo(TimeZoneInfo timeZoneInfo)
-        {
-            if (timeZoneInfo == null)
-            {
-                throw Error.ArgumentNull(nameof(timeZoneInfo));
-            }
-
-            TimeZone = timeZoneInfo;
-            return this;
-        }
+        public IList<IODataControllerActionConvention> Conventions { get; } = new List<IODataControllerActionConvention>();
 
         /// <summary>
         /// Configure the route options.
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
-
-        /// <summary>
-        /// Configure the route options.
-        /// </summary>
-        /// <param name="configureAction">The action to config route options.</param>
-        /// <returns>The calling itself.</returns>
-        public ODataOptions ConfigureRoute(Action<ODataRouteOptions> configureAction)
-        {
-            if (configureAction == null)
-            {
-                throw Error.ArgumentNull(nameof(configureAction));
-            }
-
-            configureAction(RouteOptions);
-            return this;
-        }
         #endregion
 
         #region Models
@@ -195,7 +125,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (Models.ContainsKey(prefix))
@@ -226,66 +156,13 @@ namespace Microsoft.AspNetCore.OData
         #endregion
 
         #region Globle Query settings
-
-        private int? _maxTop = 0;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether navigation property can be expanded.
-        /// </summary>
-        public bool EnableExpand { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can be selected.
-        /// </summary>
-        public bool EnableSelect { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether entity set and property can apply $count.
-        /// </summary>
-        public bool EnableCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can apply $orderby.
-        /// </summary>
-        public bool EnableOrderBy { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether property can apply $filter.
-        /// </summary>
-        public bool EnableFilter { get; set; }
-
-        /// <summary>
-        /// Gets or sets the max value of $top that a client can request.
-        /// </summary>
-        /// <value>
-        /// The max value of $top that a client can request, or <c>null</c> if there is no limit.
-        /// </value>
-        public int? MaxTop
-        {
-            get => _maxTop;
-            set
-            {
-                if (value.HasValue && value < 0)
-                {
-                    throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, 0);
-                }
-
-                _maxTop = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the service will use skiptoken or not.
-        /// </summary>
-        public bool EnableSkipToken { get; set; }
-
         /// <summary>
         /// Enable $expand query options.
         /// </summary>
         /// <returns>The calling itself.</returns>
         public ODataOptions Expand()
         {
-            EnableExpand = true;
+            QuerySettings.EnableExpand = true;
             return this;
         }
 
@@ -295,7 +172,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Select()
         {
-            EnableSelect = true;
+            QuerySettings.EnableSelect = true;
             return this;
         }
 
@@ -305,7 +182,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Filter()
         {
-            EnableFilter = true;
+            QuerySettings.EnableFilter = true;
             return this;
         }
 
@@ -315,7 +192,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions OrderBy()
         {
-            EnableOrderBy = true;
+            QuerySettings.EnableOrderBy = true;
             return this;
         }
 
@@ -325,7 +202,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions Count()
         {
-            EnableCount = true;
+            QuerySettings.EnableCount = true;
             return this;
         }
 
@@ -335,7 +212,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The calling itself.</returns>
         public ODataOptions SkipToken()
         {
-            EnableSkipToken = true;
+            QuerySettings.EnableSkipToken = true;
             return this;
         }
 
@@ -351,7 +228,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxTopValue), maxTopValue, 0);
             }
 
-            MaxTop = maxTopValue;
+            QuerySettings.MaxTop = maxTopValue;
             return this;
         }
 
@@ -361,23 +238,10 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableNoDollarQueryOptions { get; set; } = true;
 
         /// <summary>
-        /// Build the default QueryOption settings
+        /// Gets the query setting.
         /// </summary>
-        /// <returns>The default query options settings.</returns>
-        internal DefaultQuerySettings BuildDefaultQuerySettings()
-        {
-            DefaultQuerySettings settings = new DefaultQuerySettings();
+        public DefaultQuerySettings QuerySettings { get; } = new DefaultQuerySettings();
 
-            settings.EnableCount = EnableCount;
-            settings.EnableExpand = EnableExpand;
-            settings.EnableFilter = EnableFilter;
-            settings.EnableOrderBy = EnableOrderBy;
-            settings.EnableSelect = EnableSelect;
-            settings.EnableSkipToken = EnableSkipToken;
-            settings.MaxTop = MaxTop;
-
-            return settings;
-        }
         #endregion
 
         /// <summary>
@@ -408,7 +272,7 @@ namespace Microsoft.AspNetCore.OData
             odataContainerBuilder.AddDefaultODataServices();
 
             // Inject the default query setting from this options.
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => BuildDefaultQuerySettings());
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => this.QuerySettings);
 
             // Inject the default Web API OData services.
             odataContainerBuilder.AddDefaultWebApiServices();

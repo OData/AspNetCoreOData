@@ -1,18 +1,52 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class DefaultODataTemplateTranslatorTests
     {
+        [Fact]
+        public void TranslateODataPathTemplate_ThrowsArgumentNull_Path()
+        {
+            // Arrange
+            DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => translator.Translate(null, null), "path");
+        }
+
+        [Fact]
+        public void TranslateODataPathTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange
+            DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
+            ODataPathTemplate template = new ODataPathTemplate();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => translator.Translate(template, null), "context");
+        }
+
+        [Fact]
+        public void TranslateODataPathTemplate_ReturnsNull()
+        {
+            // Arrange
+            DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
+            ODataPathTemplate path = new ODataPathTemplate(new MySegmentTemplate());
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
+
+            // Act & Assert
+            Assert.Null(translator.Translate(path, context));
+        }
+
         [Fact]
         public void TranslateODataPathTemplate_ToODataPath()
         {
@@ -30,9 +64,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                 KeySegmentTemplate.CreateKeySegment(customer, entitySet));
 
             DefaultODataTemplateTranslator translator = new DefaultODataTemplateTranslator();
-            RouteValueDictionary routeValues = new RouteValueDictionary(new { key = "42" });
-            HttpContext httpContext = new DefaultHttpContext();
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext(httpContext, routeValues, model);
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = new RouteValueDictionary(new { key = "42" }),
+                Model = model
+            };
 
             // Act
             ODataPath path = translator.Translate(template, context);
@@ -47,6 +83,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             KeyValuePair<string, object> key = Assert.Single(keySegment.Keys);
             Assert.Equal("CustomerId", key.Key);
             Assert.Equal(42, key.Value);
+        }
+
+        private class MySegmentTemplate : ODataSegmentTemplate
+        {
+            public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+            {
+                return null;
+            }
+
+            public override bool TryTranslate(ODataTemplateTranslateContext context)
+            {
+                return false;
+            }
         }
     }
 }

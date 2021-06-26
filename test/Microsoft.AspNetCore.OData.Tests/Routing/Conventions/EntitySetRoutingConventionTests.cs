@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -14,6 +15,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     public class EntitySetRoutingConventionTests
     {
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToControllerAndActionOnEntitySetRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            EntitySetRoutingConvention convention = new EntitySetRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(CustomersController), true)]
@@ -65,6 +77,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [InlineData("Post", "/Customers")]
         [InlineData("PostFromVipCustomer", "/Customers/NS.VipCustomer")]
         public void AppliesToActionForPostActionWorksAsExpected(string actionName, string expected)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = controller.Actions.First();
+
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
+
+            // Act
+            bool returnValue = entitySetConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Equal(expected, selector.AttributeRouteModel.Template);
+        }
+
+        [Theory]
+        [InlineData("Patch", "/Customers")]
+        [InlineData("PatchCustomers", "/Customers")]
+        public void AppliesToAction_Works_ForPatchActionWorksAsExpected(string actionName, string expected)
         {
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
@@ -138,6 +173,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             { }
 
             public void PostFromVipCustomer()
+            { }
+
+            public void Patch()
+            { }
+
+            public void PatchCustomers()
             { }
         }
 

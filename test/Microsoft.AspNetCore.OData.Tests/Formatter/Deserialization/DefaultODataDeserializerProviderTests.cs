@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -24,6 +26,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
+        public void DefaultODataDeserializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new DefaultODataDeserializerProvider(null), "serviceProvider");
+        }
+
+        [Fact]
         public void GetODataDeserializer_Uri()
         {
             // Arrange
@@ -37,7 +46,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             var referenceLinkDeserializer = Assert.IsType<ODataEntityReferenceLinkDeserializer>(deserializer);
             Assert.Equal(ODataPayloadKind.EntityReferenceLink, referenceLinkDeserializer.ODataPayloadKind);
         }
-
 
         [Theory]
         [InlineData(typeof(Int16))]
@@ -80,7 +88,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.Equal(ODataPayloadKind.Resource, deserializer.ODataPayloadKind);
             Assert.Equal(entityDeserializer.DeserializerProvider, _deserializerProvider);
         }
-
 
         [Fact]
         public void GetODataDeserializer_Resource_ForComplex()
@@ -142,6 +149,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.Equal(resourceSetDeserializer.DeserializerProvider, _deserializerProvider);
         }
 
+        [Theory]
+        [InlineData(typeof(DeltaSet<>))]
+        [InlineData(typeof(EdmChangedObjectCollection))]
+        public void GetODataDeserializer_DeltaResourceSet_ForDeltaSet(Type deltaType)
+        {
+            // Arrange
+            HttpRequest request = GetRequest(_edmModel);
+
+            // Act
+            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(deltaType, request);
+
+            // Assert
+            Assert.NotNull(deserializer);
+            ODataDeltaResourceSetDeserializer setDeserializer = Assert.IsType<ODataDeltaResourceSetDeserializer>(deserializer);
+            Assert.Equal(ODataPayloadKind.Delta, setDeserializer.ODataPayloadKind);
+            Assert.Equal(setDeserializer.DeserializerProvider, _deserializerProvider);
+        }
+
         [Fact]
         public void GetODataDeserializer_ReturnsSameDeserializer_ForSameType()
         {
@@ -173,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void GetODataDeserializer_Throws_ArgumentNullForType()
+        public void GetODataDeserializer_ThrowsArgumentNull_ForType()
         {
             // Arrange
             HttpRequest request = GetRequest(model: null);
@@ -182,6 +207,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ExceptionAssert.ThrowsArgumentNull(
                 () => _deserializerProvider.GetODataDeserializer(type: null, request: request),
                 "type");
+        }
+
+        [Fact]
+        public void GetODataDeserializer_ThrowsArgumentNull_ForRequest()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => _deserializerProvider.GetODataDeserializer(typeof(int), request: null),
+                "request");
         }
 
         [Fact]
@@ -215,6 +249,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Deserializers.
             services.AddSingleton<ODataResourceDeserializer>();
+            services.AddSingleton<ODataDeltaResourceSetDeserializer>();
             services.AddSingleton<ODataEnumDeserializer>();
             services.AddSingleton<ODataPrimitiveDeserializer>();
             services.AddSingleton<ODataResourceSetDeserializer>();
@@ -223,7 +258,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             services.AddSingleton<ODataActionPayloadDeserializer>();
 
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
-            services.AddSingleton<IODataTypeMappingProvider, ODataTypeMappingProvider>();
 
             return services.BuildServiceProvider();
         }

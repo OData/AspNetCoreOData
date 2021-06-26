@@ -37,12 +37,12 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             if (from == null)
             {
-                throw new ArgumentNullException(nameof(from));
+                throw Error.ArgumentNull(nameof(from));
             }
 
             if (to == null)
             {
-                throw new ArgumentNullException(nameof(to));
+                throw Error.ArgumentNull(nameof(to));
             }
 
             SetValue(to, GetValue(from));

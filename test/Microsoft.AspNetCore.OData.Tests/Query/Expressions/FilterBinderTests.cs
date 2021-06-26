@@ -17,6 +17,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
@@ -2627,7 +2628,78 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
 #endregion
 
-#region parameter alias for filter query option
+        [Fact]
+        public void BindForNodeOnFilterBinder_ThrowsArgumentNull_Node()
+        {
+            // Arrange
+            ODataQuerySettings settings = new ODataQuerySettings();
+            IEdmModel model = EdmCoreModel.Instance;
+            IAssemblyResolver resolver = new Mock<IAssemblyResolver>().Object;
+            FilterBinder binder = new FilterBinder(settings, resolver, model);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindDynamicPropertyAccessQueryNode(null), "openNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleResourceFunctionCallNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleResourceCastNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionResourceCastNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindBinaryOperatorNode(null), "binaryOperatorNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindInNode(null), "inNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindRangeVariable(null), "rangeVariable");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionPropertyAccessNode(null), "propertyAccessNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCollectionComplexNode(null), "collectionComplexNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindPropertyAccessQueryNode(null), "propertyAccessNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleComplexNode(null), "singleComplexNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindUnaryOperatorNode(null), "unaryOperatorNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindAllNode(null), "allNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindAnyNode(null), "anyNode");
+        }
+
+        [Fact]
+        public void BindOnFilterBinder_ThrowsNotSupported_InvalidNode()
+        {
+            // Arrange
+            ODataQuerySettings settings = new ODataQuerySettings();
+            IEdmModel model = EdmCoreModel.Instance;
+            IAssemblyResolver resolver = new Mock<IAssemblyResolver>().Object;
+            FilterBinder binder = new FilterBinder(settings, resolver, model);
+
+            MyNoneQueryNode node = new MyNoneQueryNode();
+
+            // Act & Assert
+            ExceptionAssert.Throws<NotSupportedException>(() => binder.Bind(node),
+                "Binding OData QueryNode of kind 'None' is not supported by 'FilterBinder'.");
+        }
+
+        #region parameter alias for filter query option
 
         [Theory]
         // Parameter alias value is not null.
@@ -2681,7 +2753,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             FilterClause filterClause = new FilterQueryOption(filter, context, parser).FilterClause;
 
             // Act
-            Expression actualExpression = FilterBinder.Bind(
+            Expression actualExpression = FilterBinderTestsHelper.TestBind(
                 filterClause,
                 typeof(DataTypes),
                 model,
@@ -2713,7 +2785,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             FilterClause filterClause = new FilterQueryOption(filter, context, parser).FilterClause;
 
             // Act
-            Expression actualExpression = FilterBinder.Bind(
+            Expression actualExpression = FilterBinderTestsHelper.TestBind(
                 filterClause,
                 typeof(DataTypes),
                 model,
@@ -2743,7 +2815,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             FilterClause filterClause = new FilterQueryOption("IntProp eq @p1", context, parser).FilterClause;
 
             // Act
-            Expression actualExpression = FilterBinder.Bind(
+            Expression actualExpression = FilterBinderTestsHelper.TestBind(
                 filterClause,
                 typeof(DataTypes),
                 model,
@@ -2990,9 +3062,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             return Bind<T>(filterNode, model, AssemblyResolverHelper.Default, querySettings);
         }
 
-        private static Expression<Func<TEntityType, bool>> Bind<TEntityType>(FilterClause filterNode, IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
+        private static Expression<Func<TEntityType, bool>> Bind<TEntityType>(FilterClause filterClause, IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
         {
-            return FilterBinder.Bind<TEntityType>(filterNode, model, assembliesResolver, querySettings);
+            Type filterType = typeof(TEntityType);
+            FilterBinder binder = new FilterBinder(querySettings, assembliesResolver, model, filterType);
+            return FilterBinder.BindFilterClause(binder, filterClause, filterType) as Expression<Func<TEntityType, bool>>;
         }
 
         private FilterClause CreateFilterNode(string filter, IEdmModel model, Type entityType)

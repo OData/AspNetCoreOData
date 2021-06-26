@@ -30,16 +30,16 @@ namespace ODataCustomizedSample
             IEdmModel model3 = EnumsEdmModel.GetConventionModel();
             IEdmModel model4 = EnumsEdmModel.GetExplicitModel();
 
-            services.AddControllers();
-
-            services.AddOData(opt =>
+            services.AddControllers().AddOData(opt =>
                 opt
                     .AddModel(model1)
                     .AddModel("odata", model2)
                     .AddModel("v{version}", model1)
                     .AddModel("convention", model3)
-                    .AddModel("explicit", model4))
-                .AddConvention<MyEntitySetRoutingConvention>();
+                    .AddModel("explicit", model4)
+                    .Conventions.Add(new MyEntitySetRoutingConvention()));
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +50,17 @@ namespace ODataCustomizedSample
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+            });
+
             app.UseRouting();
+
+            // for route debug page. be noted: you can put the middleware after UseRouting.
+            // and you can use different route pattern name.
+            app.UseODataRouteDebug("$odata2");
 
             app.UseAuthorization();
 

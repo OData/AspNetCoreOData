@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -22,6 +23,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         {
             // Arrange & Act & Assert
             Assert.Equal(200, SingletonConvention.Order);
+        }
+
+        [Fact]
+        public void AppliesToActionOnSingletonRoutingConvention_Throws_Context()
+        {
+            // Arrange
+            SingletonRoutingConvention convention = new SingletonRoutingConvention();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => convention.AppliesToAction(null), "context");
         }
 
         [Theory]

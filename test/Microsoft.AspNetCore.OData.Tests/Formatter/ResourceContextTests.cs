@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() => context.GetPropertyValue("SomeProperty"),
-                "The EDM type of an IEdmObject cannot be null.", partialMatch: true);
+                "The EDM type of an 'IEdmObject' cannot be null.", partialMatch: true);
             mock.Verify();
         }
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -43,8 +42,7 @@ property selection combination possible. */
     {
         public override SelectExpandWrapper<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Contract.Assert(false, "SelectExpandWrapper{TEntity} is internal and should never be deserialized into.");
-            throw new NotImplementedException();
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(SelectExpandWrapper<>).Name));
         }
 
         public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)

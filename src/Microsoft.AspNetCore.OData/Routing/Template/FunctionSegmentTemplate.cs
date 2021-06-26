@@ -2,6 +2,7 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
@@ -45,21 +46,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             // Only accept the bound function
             if (!function.IsBound)
             {
-                throw new ODataException(Error.Format(SRResources.FunctionIsNotBound, function.Name));
+                throw new ODataException(Error.Format(SRResources.OperationIsNotBound, function.Name, "function"));
             }
 
             // Parameters should include all required parameter, but maybe include the optional parameter.
             ParameterMappings = function.VerifyAndBuildParameterMappings(parameters);
-
-            // Join the parameters as p1={p1}
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
-
-            UnqualifiedIdentifier = function.Name + parameterStr;
-
-            Literal = function.FullName() + parameterStr;
-
-            // Function will always have the return type
-            IsSingle = function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <summary>
@@ -83,17 +74,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             NavigationSource = operationSegment.EntitySet;
 
-            ParameterMappings = OperationHelper.BuildParameterMappings(operationSegment.Parameters, operation.FullName());
-
-            // join the parameters as p1={p1}
-            string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
-
-            UnqualifiedIdentifier = Function.Name + parameterStr;
-
-            Literal = Function.FullName() + parameterStr;
-
-            // Function will always have the return type
-            IsSingle = Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
+            ParameterMappings = operationSegment.Parameters.BuildParameterMappings(operation.FullName());
         }
 
         /// <summary>
@@ -102,30 +83,54 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         public IDictionary<string, string> ParameterMappings { get; private set; }
 
-        /// <inheritdoc />
-        public override string Literal { get; }
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => Function.ReturnType.Definition;
-
         /// <summary>
         /// Gets the wrapped Edm function.
         /// </summary>
         public IEdmFunction Function { get; }
 
-        /// <inheritdoc />
-        public override IEdmNavigationSource NavigationSource { get; }
-
         /// <summary>
-        /// Key=value, Key=value
+        /// Gets the wrapped navigation source.
         /// </summary>
-        internal string UnqualifiedIdentifier { get; }
+        public IEdmNavigationSource NavigationSource { get; }
 
         /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.Function;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            options = options ?? ODataRouteOptions.Default;
+            Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
 
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
+            string unqualifiedIdentifier, qualifiedIdentifier;
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            {
+                unqualifiedIdentifier = "/" + Function.Name;
+                qualifiedIdentifier = "/" + Function.FullName();
+            }
+            else
+            {
+                string parameterStr = "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
+                unqualifiedIdentifier = "/" + Function.Name + parameterStr;
+                qualifiedIdentifier = "/" + Function.FullName() + parameterStr;
+            }
+
+            if (options.EnableQualifiedOperationCall && options.EnableUnqualifiedOperationCall)
+            {
+                // "/NS.Function(...)"
+                yield return qualifiedIdentifier;
+
+                // "/Function(...)"
+                yield return unqualifiedIdentifier;
+            }
+            else if (options.EnableQualifiedOperationCall)
+            {
+                // "/NS.Function(...)"
+                yield return qualifiedIdentifier;
+            }
+            else
+            {
+                // "/Function(...)"
+                yield return unqualifiedIdentifier;
+            }
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
@@ -147,10 +152,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
                 // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // In this request, the comming route data has:
+                // Because, In this request, the comming route data has the following:
                 // min = 1
                 // max = 2,ave=3
-                // so, let's combine the route data together and separate them using "," again.
+                // Therefore, we need to combine the route data together and separate them using "," again.
                 if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
                 {
                     return false;

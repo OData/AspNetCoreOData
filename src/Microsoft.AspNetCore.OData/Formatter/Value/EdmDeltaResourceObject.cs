@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -16,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     [NonValidatingParameterBinding]
     public class EdmDeltaResourceObject : EdmEntityObject, IEdmChangedObject
     {
+        // TODO: this class should remove, use the EdmEntityObject.
         private EdmDeltaType _edmType;
 
         /// <summary>
@@ -45,11 +47,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaResourceObject(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.Resource);
+            _edmType = new EdmDeltaType(entityType, DeltaItemKind.Resource);
         }
 
         /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
+        public DeltaItemKind DeltaKind
         {
             get
             {

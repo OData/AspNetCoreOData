@@ -33,12 +33,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (bindingContext == null)
             {
-                throw Error.ArgumentNull("bindingContext");
+                throw Error.ArgumentNull(nameof(bindingContext));
             }
 
             if (bindingContext.ModelMetadata == null)
             {
-                throw Error.Argument("bindingContext", SRResources.ModelBinderUtil_ModelMetadataCannotBeNull);
+                throw Error.Argument(nameof(bindingContext), SRResources.ModelBinderUtil_ModelMetadataCannotBeNull);
             }
 
             ValueProviderResult valueProviderResult = ValueProviderResult.None;

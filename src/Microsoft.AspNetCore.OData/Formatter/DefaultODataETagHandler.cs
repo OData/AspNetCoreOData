@@ -18,11 +18,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private const char Separator = ',';
 
-        public EntityTagHeaderValue CreateETag(IDictionary<string, object> properties)
+        public EntityTagHeaderValue CreateETag(IDictionary<string, object> properties, TimeZoneInfo timeZoneInfo = null)
         {
             if (properties == null)
             {
-                throw new ArgumentNullException(nameof(properties));
+                throw Error.ArgumentNull(nameof(properties));
             }
 
             if (properties.Count == 0)
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 string str = propertyValue == null
                     ? NullLiteralInETag
-                    : ConventionsHelpers.GetUriRepresentationForValue(propertyValue);
+                    : ConventionsHelpers.GetUriRepresentationForValue(propertyValue, timeZoneInfo);
 
                 // base64 encode
                 byte[] bytes = Encoding.UTF8.GetBytes(str);
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (etagHeaderValue == null)
             {
-                throw new ArgumentNullException(nameof(etagHeaderValue));
+                throw Error.ArgumentNull(nameof(etagHeaderValue));
             }
 
             string tag = etagHeaderValue.Tag.ToString().Trim('\"');

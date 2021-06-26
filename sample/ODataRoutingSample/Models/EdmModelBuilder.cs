@@ -8,8 +8,6 @@ namespace ODataRoutingSample.Models
 {
     public static class EdmModelBuilder
     {
-   //     private static IEdmModel _edmModel;
-
         public static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
@@ -86,6 +84,26 @@ namespace ODataRoutingSample.Models
             productPrice.Parameter<string>("partId").Required();
             productPrice.IsComposable = true;
 
+            // Add a composable function
+            var getOrgByAccount =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount")
+                .ReturnsFromEntitySet<Organization>("Organizations");
+            getOrgByAccount.Parameter<int>("accountId").Required();
+            getOrgByAccount.IsComposable = true;
+
+            builder.EntityType<Organization>().Action("MarkAsFavourite");
+
+            // Add another composable function
+            var getOrgByAccount2 =
+                builder.EntityType<Organization>()
+                .Collection
+                .Function("GetByAccount2")
+                .ReturnsCollectionFromEntitySet<Organization>("Organizations"); // be noted, it returns collection.
+            getOrgByAccount2.Parameter<int>("accountId").Required();
+            getOrgByAccount2.IsComposable = true;
+
             return builder.GetEdmModel();
         }
 
@@ -120,6 +138,16 @@ namespace ODataRoutingSample.Models
             function.Parameter<int>("order");
             function.Returns<int>();
 
+            return builder.GetEdmModel();
+        }
+
+        public static IEdmModel GetEdmModelV3()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<DriverTenant>("tenants");
+            builder.EntitySet<DriverDevice>("devices");
+            builder.EntitySet<DriverFolder>("folders");
+            builder.EntitySet<DriverPage>("pages");
             return builder.GetEdmModel();
         }
     }

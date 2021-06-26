@@ -12,18 +12,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// </summary>
     public class OrderByQueryValidator
     {
-        private readonly DefaultQuerySettings _defaultQuerySettings;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByQueryValidator" /> class based on
-        /// the <see cref="DefaultQuerySettings" />.
-        /// </summary>
-        /// <param name="defaultQuerySettings">The <see cref="DefaultQuerySettings" />.</param>
-        public OrderByQueryValidator(DefaultQuerySettings defaultQuerySettings)
-        {
-            _defaultQuerySettings = defaultQuerySettings;
-        }
-
         /// <summary>
         /// Validates an <see cref="OrderByQueryOption" />.
         /// </summary>
@@ -52,7 +40,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 }
             }
 
-            OrderByModelLimitationsValidator validator = new OrderByModelLimitationsValidator(orderByOption.Context, _defaultQuerySettings.EnableOrderBy);
+            bool enableOrderBy = orderByOption.Context.DefaultQuerySettings.EnableOrderBy;
+            OrderByModelLimitationsValidator validator = new OrderByModelLimitationsValidator(orderByOption.Context, enableOrderBy);
             bool explicitAllowedProperties = validationSettings.AllowedOrderByProperties.Count > 0;
 
             foreach (OrderByNode node in orderByOption.OrderByNodes)
@@ -98,14 +87,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static OrderByQueryValidator GetOrderByQueryValidator(ODataQueryContext context)
         {
-            if (context == null)
+            if (context == null || context.RequestContainer == null)
             {
-                return new OrderByQueryValidator(new DefaultQuerySettings());
+                return new OrderByQueryValidator();
             }
 
-            return context.RequestContainer == null
-                ? new OrderByQueryValidator(context.DefaultQuerySettings)
-                : context.RequestContainer.GetRequiredService<OrderByQueryValidator>();
+            return context.RequestContainer.GetRequiredService<OrderByQueryValidator>();
         }
 
         private static bool IsAllowed(ODataValidationSettings validationSettings, string propertyName)

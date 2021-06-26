@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
 using ODataRoutingSample.Models;
-using ODataRoutingSample.OpenApi;
 
 namespace ODataRoutingSample
 {
@@ -30,17 +29,11 @@ namespace ODataRoutingSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MyDataContext>(opt => opt.UseLazyLoadingProxies().UseInMemoryDatabase("MyDataContextList"));
-
-            IEdmModel model0 = EdmModelBuilder.GetEdmModel();
-            IEdmModel model1 = EdmModelBuilder.GetEdmModelV1();
-            IEdmModel model2 = EdmModelBuilder.GetEdmModelV2();
-
-            services.AddControllers(options => {
+            //services.AddControllers(options => {
             //{
             //    options.Conventions.Add(new MetadataApplicationModelConventionAttribute());
             //    options.Conventions.Add(new MetadataActionModelConvention());
-            });
+            //});
 
             /*services.AddConvention<MyConvention>();
             
@@ -54,11 +47,20 @@ namespace ODataRoutingSample
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
             */
 
-            services.AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                .AddModel(model0)
-                .AddModel("v1", model1)
-                .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
-                //.ConfigureRoute(route => route.EnableQualifiedOperationCall = false) // use this to configure the built route template
+            services.AddDbContext<MyDataContext>(opt => opt.UseLazyLoadingProxies().UseInMemoryDatabase("MyDataContextList"));
+
+            IEdmModel model0 = EdmModelBuilder.GetEdmModel();
+            IEdmModel model1 = EdmModelBuilder.GetEdmModelV1();
+            IEdmModel model2 = EdmModelBuilder.GetEdmModelV2();
+            IEdmModel model3 = EdmModelBuilder.GetEdmModelV3();
+
+            services.AddControllers()
+                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                    .AddModel(model0)
+                    .AddModel("v1", model1)
+                    .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
+                    .AddModel("v3", model3)
+                    .Conventions.Add(new MyConvention())
                 );
 
             services.AddSwaggerGen();
@@ -72,8 +74,14 @@ namespace ODataRoutingSample
                 app.UseDeveloperExceptionPage();
             }
 
-            // If you want to use middle, enable the middleware.
+            // Use odata route debug, /$odata
+            app.UseODataRouteDebug();
+
+            // If you want to use /$openapi, enable the middleware.
             //app.UseODataOpenApi();
+
+            // Add OData /$query middleware
+            app.UseODataQueryRequest();
 
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();

@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            string actionName = action.ActionMethod.Name;
+            string actionName = action.ActionName;
 
             // 1. Without type case
             if (ProcessEntitySetAction(actionName, entitySet, null, context, action))

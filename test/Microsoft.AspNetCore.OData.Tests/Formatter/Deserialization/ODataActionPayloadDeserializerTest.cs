@@ -644,6 +644,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.Equal("Robot", customer.Name);
         }
 
+        [Fact]
+        public void GetAction_ThrowsSerializationException_ForNonAction()
+        {
+            // Arrange
+            ODataPath path = new ODataPath(MetadataSegment.Instance);
+            ODataDeserializerContext context = new ODataDeserializerContext() { Path = path };
+
+            // Act & Assert
+            ExceptionAssert.Throws<SerializationException>(() => ODataActionPayloadDeserializer.GetAction(context),
+                "The last segment of the request URI '$metadata' was not recognized as an OData action.");
+        }
+
         [Theory]
         [MemberData(nameof(DeserializeWithPrimitiveParametersTest))]
         public void ThrowsAsync_ODataException_When_Parameter_Notfound(string actionName, IEdmAction expectedAction, ODataPath path)

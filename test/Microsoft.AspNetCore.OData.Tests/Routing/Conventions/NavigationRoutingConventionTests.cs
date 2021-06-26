@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -17,6 +18,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
     {
         private static NavigationRoutingConvention NavigationConvention = ConventionHelpers.CreateConvention<NavigationRoutingConvention>();
         private static IEdmModel EdmModel = GetEdmModel();
+
+        [Fact]
+        public void AppliesToControllerAndActionOnNavigationRoutingConvention_Throws_Context()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => NavigationConvention.AppliesToController(null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => NavigationConvention.AppliesToAction(null), "context");
+        }
 
         [Theory]
         [InlineData(typeof(CustomersController), true)]

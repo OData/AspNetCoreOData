@@ -12,6 +12,7 @@ namespace Microsoft.AspNetCore.OData
     /// <summary>
     /// Utility class for creating and unwrapping <see cref="Exception"/> instances.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal static class Error
     {
         /// <summary>

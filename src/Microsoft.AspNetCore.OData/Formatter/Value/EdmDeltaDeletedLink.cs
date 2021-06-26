@@ -2,10 +2,9 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -14,10 +13,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// Used to hold the Deleted Link object in the Delta ResourceSet Payload.
     /// </summary>
     [NonValidatingParameterBinding]
-    public class EdmDeltaDeletedLink : EdmEntityObject, IEdmDeltaDeletedLink
+    public class EdmDeltaDeletedLink : EdmDeltaLinkBase, IEdmDeltaDeletedLink
     {
-        private EdmDeltaType _edmType;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="EdmDeltaDeletedLink"/> class.
         /// </summary>
@@ -31,9 +28,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// Initializes a new instance of the <see cref="EdmDeltaDeletedLink"/> class.
         /// </summary>
         /// <param name="entityTypeReference">The <see cref="IEdmEntityTypeReference"/> of this DeltaDeletedLink.</param>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "EntityDefinition checks the nullable.")]
         public EdmDeltaDeletedLink(IEdmEntityTypeReference entityTypeReference)
-            : this(entityTypeReference.EntityDefinition(), entityTypeReference.IsNullable)
+            : base(entityTypeReference)
         {
         }
 
@@ -45,26 +41,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         public EdmDeltaDeletedLink(IEdmEntityType entityType, bool isNullable)
             : base(entityType, isNullable)
         {
-            _edmType = new EdmDeltaType(entityType, EdmDeltaKind.DeltaDeletedLink);
         }
 
         /// <inheritdoc />
-        public Uri Source { get; set; }
-
-        /// <inheritdoc />
-        public Uri Target { get; set; }
-
-        /// <inheritdoc />
-        public string Relationship { get; set; }
-
-        /// <inheritdoc />
-        public EdmDeltaKind DeltaKind
-        {
-            get
-            {
-                Contract.Assert(_edmType != null);
-                return _edmType.DeltaKind;
-            }
-        }
+        public override DeltaItemKind Kind => DeltaItemKind.DeltaDeletedLink;
     }
 }

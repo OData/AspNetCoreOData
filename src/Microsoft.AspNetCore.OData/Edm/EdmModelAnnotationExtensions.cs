@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
+using Microsoft.OData.Edm.Vocabularies.Community.V1;
 using Microsoft.OData.Edm.Vocabularies.V1;
 using Microsoft.OData.ModelBuilder;
 
@@ -248,6 +249,114 @@ namespace Microsoft.AspNetCore.OData.Edm
             string name = Guid.NewGuid().ToString();
             model.SetAnnotationValue(model, new ModelNameAnnotation(name));
             return name;
+        }
+
+        /// <summary>
+        /// Gets the declared alternate keys of the most defined entity with a declared key present.
+        /// Each entity type could define a set of alternate keys.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="entityType">The Edm entity type.</param>
+        /// <returns>Alternate Keys of this type.</returns>
+        public static IEnumerable<IDictionary<string, IEdmPathExpression>> GetAlternateKeys(this IEdmModel model, IEdmEntityType entityType)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (entityType == null)
+            {
+                throw Error.ArgumentNull(nameof(entityType));
+            }
+
+            IEnumerable<IDictionary<string, IEdmPathExpression>> alternateCoreKeys = null;
+            // Let's search the core.alternate key term first
+            IEdmTerm coreAlternateTerm = CoreVocabularyModel.Instance.FindDeclaredTerm("Org.OData.Core.V1.AlternateKeys");
+            if (coreAlternateTerm != null)
+            {
+                model.TryGetAlternateKeys(entityType, coreAlternateTerm, out alternateCoreKeys);
+            }
+
+            // for back compability, let's support the community.alternatekey
+            IEnumerable<IDictionary<string, IEdmPathExpression>> alternateKeys = null;
+            IEdmTerm communityAlternateTerm = AlternateKeysVocabularyModel.Instance.FindDeclaredTerm("OData.Community.Keys.V1.AlternateKeys");
+            if (communityAlternateTerm != null)
+            {
+                model.TryGetAlternateKeys(entityType, communityAlternateTerm, out alternateKeys);
+            }
+
+            if (alternateCoreKeys == null)
+            {
+                return alternateKeys;
+            }
+            else if (alternateKeys == null)
+            {
+                return alternateCoreKeys;
+            }
+            else
+            {
+                return alternateCoreKeys.Concat(alternateKeys);
+            }
+        }
+
+        private static bool TryGetAlternateKeys(this IEdmModel model, IEdmEntityType entityType, IEdmTerm term,
+            out IEnumerable<IDictionary<string, IEdmPathExpression>> alternateKeys)
+        {
+            IEdmEntityType checkingType = entityType;
+            while (checkingType != null)
+            {
+                IEnumerable<IDictionary<string, IEdmPathExpression>> declaredAlternateKeys = GetDeclaredAlternateKeysForType(model, checkingType, term);
+                if (declaredAlternateKeys != null)
+                {
+                    alternateKeys = declaredAlternateKeys;
+                    return true;
+                }
+
+                checkingType = checkingType.BaseEntityType();
+            }
+
+            alternateKeys = null;
+            return false;
+        }
+
+        private static IEnumerable<IDictionary<string, IEdmPathExpression>> GetDeclaredAlternateKeysForType(IEdmModel model, IEdmEntityType type, IEdmTerm term)
+        {
+            IEdmVocabularyAnnotation annotationValue = model.FindVocabularyAnnotations<IEdmVocabularyAnnotation>(type, term).FirstOrDefault();
+            if (annotationValue != null)
+            {
+                List<IDictionary<string, IEdmPathExpression>> declaredAlternateKeys = new List<IDictionary<string, IEdmPathExpression>>();
+
+                IEdmCollectionExpression keys = annotationValue.Value as IEdmCollectionExpression;
+
+                foreach (IEdmRecordExpression key in keys.Elements.OfType<IEdmRecordExpression>())
+                {
+                    var edmPropertyConstructor = key.Properties.FirstOrDefault(e => e.Name == "Key");
+                    if (edmPropertyConstructor != null)
+                    {
+                        IEdmCollectionExpression collectionExpression = edmPropertyConstructor.Value as IEdmCollectionExpression;
+
+                        IDictionary<string, IEdmPathExpression> alternateKey = new Dictionary<string, IEdmPathExpression>();
+                        foreach (IEdmRecordExpression propertyRef in collectionExpression.Elements.OfType<IEdmRecordExpression>())
+                        {
+                            var aliasProp = propertyRef.Properties.FirstOrDefault(e => e.Name == "Alias");
+                            string alias = ((IEdmStringConstantExpression)aliasProp.Value).Value;
+
+                            var nameProp = propertyRef.Properties.FirstOrDefault(e => e.Name == "Name");
+                            alternateKey[alias] = (IEdmPathExpression)nameProp.Value;
+                        }
+
+                        if (alternateKey.Any())
+                        {
+                            declaredAlternateKeys.Add(alternateKey);
+                        }
+                    }
+                }
+
+                return declaredAlternateKeys;
+            }
+
+            return null;
         }
     }
 }

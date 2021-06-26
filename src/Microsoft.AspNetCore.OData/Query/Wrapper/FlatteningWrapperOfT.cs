@@ -18,8 +18,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
     {
         public override FlatteningWrapper<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Contract.Assert(false, "FlatteningWrapper{T} is internal and should never be deserialized into.");
-            throw new NotImplementedException();
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(FlatteningWrapper<>).Name));
         }
 
         public override void Write(Utf8JsonWriter writer, FlatteningWrapper<T> value, JsonSerializerOptions options)

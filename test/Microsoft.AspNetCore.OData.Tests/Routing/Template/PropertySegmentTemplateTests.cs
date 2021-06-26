@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -11,33 +12,59 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
 {
     public class PropertySegmentTemplateTests
     {
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_Property()
+        private static PropertySegmentTemplate _propertySegment;
+        private static IEdmStructuralProperty _edmProperty;
+
+        static PropertySegmentTemplateTests()
         {
-            // Assert
+            EdmEntityType entityType = new EdmEntityType("NS", "Customer");
+            _edmProperty = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+            _propertySegment = new PropertySegmentTemplate(_edmProperty);
+        }
+
+        [Fact]
+        public void CtorPropertySegmentTemplate_ThrowsArgumentNull_Property()
+        {
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(property: null), "property");
         }
 
         [Fact]
-        public void Ctor_ThrowsArgumentNull_Segment()
+        public void CtorPropertySegmentTemplate_ThrowsArgumentNull_Segment()
         {
-            // Assert
+            // Arrange & Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => new PropertySegmentTemplate(segment: null), "segment");
         }
 
         [Fact]
-        public void CommonPropertySegmentTemplateProperties_ReturnsAsExpected()
+        public void CtorPropertySegmentTemplate_SetsProperties()
         {
-            // Assert
+            // Arrange & Act & Assert
             EdmEntityType entityType = new EdmEntityType("NS", "Customer");
             IEdmStructuralProperty property = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
             PropertySegmentTemplate propertySegment = new PropertySegmentTemplate(property);
+            Assert.NotNull(propertySegment.Segment);
+            Assert.Same(property, propertySegment.Property);
 
-            // Act & Assert
-            Assert.Equal("Name", propertySegment.Literal);
-            Assert.Equal(ODataSegmentKind.Property, propertySegment.Kind);
-            Assert.True(propertySegment.IsSingle);
-            Assert.Equal("Edm.String", propertySegment.EdmType.FullTypeName());
+            // Arrange & Act & Assert
+            PropertySegmentTemplate propertySegment2 = new PropertySegmentTemplate(propertySegment.Segment);
+            Assert.Same(propertySegment.Segment, propertySegment2.Segment);
+        }
+
+        [Fact]
+        public void GetTemplatesPropertySegmentTemplate_ReturnsTemplates()
+        {
+            // Assert & Act & Assert
+            IEnumerable<string> templates = _propertySegment.GetTemplates();
+            string template = Assert.Single(templates);
+            Assert.Equal("/Name", template);
+        }
+
+        [Fact]
+        public void TryTranslatePropertySegmentTemplate_ThrowsArgumentNull_Context()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => _propertySegment.TryTranslate(null), "context");
         }
 
         [Fact]
@@ -45,12 +72,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         {
             // Arrange
             ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
-            EdmEntityType entityType = new EdmEntityType("NS", "Customer");
-            IEdmStructuralProperty property = entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
-            PropertySegmentTemplate propertySegment = new PropertySegmentTemplate(property);
 
             // Act
-            bool ok = propertySegment.TryTranslate(context);
+            bool ok = _propertySegment.TryTranslate(context);
 
             // Assert
             Assert.True(ok);

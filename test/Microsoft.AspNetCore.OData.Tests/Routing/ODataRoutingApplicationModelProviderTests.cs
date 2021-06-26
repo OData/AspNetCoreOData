@@ -183,8 +183,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         private static ODataRoutingApplicationModelProvider CreateProvider(ODataOptions options,
             IEnumerable<IODataControllerActionConvention> conventions)
         {
+            foreach (var c in conventions)
+            {
+                options.Conventions.Add(c);
+            }
             IOptions<ODataOptions> odataOptions = Options.Create(options);
-            return new ODataRoutingApplicationModelProvider(conventions, odataOptions);
+            return new ODataRoutingApplicationModelProvider(/*conventions, */odataOptions);
         }
 
         private static ApplicationModelProviderContext CreateProviderContext(Type controllerType)

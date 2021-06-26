@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Xunit;
@@ -12,6 +13,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
 {
     public class DefaultContainerBuilderTests
     {
+        [Fact]
+        public void AddServiceWithImplementationType_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            ExceptionAssert.ThrowsArgumentNull(
+                () => builder.AddService(ServiceLifetime.Singleton, serviceType: null, implementationType: null), "serviceType");
+
+            ExceptionAssert.ThrowsArgumentNull(
+                () => builder.AddService(ServiceLifetime.Singleton, serviceType: typeof(int), implementationType: null), "implementationType");
+        }
+
+        [Fact]
+        public void AddServiceWithImplementationFactory_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            ExceptionAssert.ThrowsArgumentNull(
+                () => builder.AddService(ServiceLifetime.Singleton, serviceType: null, implementationFactory: null), "serviceType");
+
+            ExceptionAssert.ThrowsArgumentNull(
+                () => builder.AddService(ServiceLifetime.Singleton, serviceType: typeof(int), implementationFactory: null), "implementationFactory");
+        }
+
         [Fact]
         public void AddService_WithImplementationType()
         {

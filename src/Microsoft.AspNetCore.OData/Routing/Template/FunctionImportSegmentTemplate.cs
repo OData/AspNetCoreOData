@@ -41,12 +41,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             FunctionImport = functionImport ?? throw Error.ArgumentNull(nameof(functionImport));
             NavigationSource = navigationSource;
 
-            // parameters should include all required parameter, but maybe include the optional parameter.
+            // parameters should include all required parameters, but maybe include the optional parameters.
             ParameterMappings = functionImport.Function.VerifyAndBuildParameterMappings(parameters);
-
-            Literal = functionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
-
-            IsSingle = functionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
         }
 
         /// <summary>
@@ -70,12 +66,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             NavigationSource = segment.EntitySet;
 
-            ParameterMappings = OperationHelper.BuildParameterMappings(segment.Parameters, operationImport.Name);
-
-            // join the parameters as p1={p1}
-            Literal = FunctionImport.Name + "(" + string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}")) + ")";
-
-            IsSingle = FunctionImport.Function.ReturnType.TypeKind() != EdmTypeKind.Collection;
+            ParameterMappings = segment.Parameters.BuildParameterMappings(operationImport.Name);
         }
 
         /// <summary>
@@ -84,16 +75,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// </summary>
         public IDictionary<string, string> ParameterMappings { get; }
 
-        /// <inheritdoc />
-        public override string Literal { get; }
-
-        /// <inheritdoc />
-        public override IEdmType EdmType => FunctionImport.Function.ReturnType.Definition;
-
         /// <summary>
         /// Gets the target Navigation source of this segment.
         /// </summary>
-        public override IEdmNavigationSource NavigationSource { get; }
+        public IEdmNavigationSource NavigationSource { get; }
 
         /// <summary>
         /// Gets the wrapped Edm function import.
@@ -101,10 +86,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         public IEdmFunctionImport FunctionImport { get; }
 
         /// <inheritdoc />
-        public override ODataSegmentKind Kind => ODataSegmentKind.FunctionImport;
+        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+        {
+            options = options ?? ODataRouteOptions.Default;
 
-        /// <inheritdoc />
-        public override bool IsSingle { get; }
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            {
+                yield return $"/{FunctionImport.Name}";
+            }
+            else
+            {
+                string parameters = string.Join(",", ParameterMappings.Select(a => $"{a.Key}={{{a.Value}}}"));
+                yield return $"/{FunctionImport.Name}({parameters})";
+            }
+        }
 
         /// <inheritdoc />
         public override bool TryTranslate(ODataTemplateTranslateContext context)
@@ -126,10 +121,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
                 // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // In this request, the comming route data has:
+                // Because, In this request, the comming route data has the following:
                 // min = 1
                 // max = 2,ave=3
-                // so, let's combine the route data together and separate them using "," again.
+                // Therefore, we need to combine the route data together and separate them using "," again.
                 if (!SegmentTemplateHelpers.IsMatchParameters(context.RouteValues, ParameterMappings))
                 {
                     return false;
@@ -148,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         private bool HasOptionalMissing()
         {
-            return ParameterMappings.Count != FunctionImport.Function.Parameters.Count() - 1;
+            return ParameterMappings.Count != FunctionImport.Function.Parameters.Count();
         }
     }
 }

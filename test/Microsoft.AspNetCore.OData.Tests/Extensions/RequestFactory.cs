@@ -71,13 +71,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <param name="uri">The http request uri.</param>
         /// <param name="setupAction">The OData configuration.</param>
         /// <returns>The HttpRequest.</returns>
-        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction)
+        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction = null)
         {
             HttpContext context = new DefaultHttpContext();
             HttpRequest request = context.Request;
 
             IServiceCollection services = new ServiceCollection();
-            services.Configure(setupAction);
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
+
             context.RequestServices = services.BuildServiceProvider();
 
             request.Method = method;
@@ -103,9 +107,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Create the default HttpRequest.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The built default HttpRequest.</returns>
         public static HttpRequest Create()
         {
             HttpContext context = new DefaultHttpContext();
@@ -113,15 +117,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Create the HttpRequest with IEdmModel.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        public static HttpRequest Create(IEdmModel model)
+        /// <param name="model">The given Edm model.</param>
+        /// <returns>The created HttpRequest.</returns>
+        public static HttpRequest Create(IEdmModel model) => Create("Get", "http://localhost/", model);
+
+        /// <summary>
+        /// Create the HttpRequest with IEdmModel.
+        /// </summary>
+        /// <param name="model">The given Edm model.</param>
+        /// <param name="setupAction">The OData configuration.</param>
+        /// <returns>The created HttpRequest.</returns>
+        public static HttpRequest Create(IEdmModel model, Action<ODataOptions> setupAction)
         {
-            HttpContext context = new DefaultHttpContext();
-            context.ODataFeature().Model = model;
-            return context.Request;
+            HttpRequest request = Create("Get", "http://localhost/", setupAction);
+            IODataFeature feature = request.ODataFeature();
+            feature.PrefixName = "";
+            feature.Model = model;
+            return request;
         }
 
         /// <summary>
@@ -153,9 +167,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
 
         public static HttpRequest Create(string method, string uri, IEdmModel model)
         {
-            HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
+          //  HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
+            HttpRequest request = Create(method, uri, setupAction: null);
             IODataFeature feature = request.ODataFeature();
-            feature.PrefixName = "odata";
+            feature.PrefixName = "";
             feature.Model = model;
             return request;
         }
