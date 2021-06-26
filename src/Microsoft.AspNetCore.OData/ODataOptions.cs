@@ -15,13 +15,16 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
 {
+
     /// <summary>
     /// Contains the details of a given OData request. These properties should all be mutable.
-    /// None of these properties should ever be set to null.
     /// </summary>
+    /// <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
     public class ODataOptions
     {
+
         #region Settings
+
         /// <summary>
         /// Gets or Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
         /// whether to recognize keys as segments or not.
@@ -61,54 +64,57 @@ namespace Microsoft.AspNetCore.OData
         /// Configure the route options.
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
+
         #endregion
 
         #region Models
 
         /// <summary>
-        /// Gets the configured Edm models.
+        /// Contains the OData <see cref="IEdmModel"/> instances and Dependency Injection containers for specific routes.
         /// </summary>
-        public IDictionary<string, (IEdmModel, IServiceProvider)> Models { get; } = new Dictionary<string, (IEdmModel, IServiceProvider)>();
+        /// <remarks>Do not modify this collection yourself. Instead, use the .AddModel() methods for registering model instances."/></remarks>
+        public IDictionary<string, (IEdmModel EdmModel, IServiceProvider ServiceProvider)> RouteComponents { get; } = new Dictionary<string, (IEdmModel, IServiceProvider)>();
 
         /// <summary>
-        /// Add an Edm model without prefix.
+        /// Adds an <see cref="IEdmModel"/> to the default route.
         /// </summary>
-        /// <param name="model">The Edm model.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="model">The <see cref="IEdmModel"/> to add to the default route.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(IEdmModel model)
         {
             return AddModel(string.Empty, model, configureAction: null);
         }
 
         /// <summary>
-        /// Add a model without prefix using given batch handler.
+        /// Adds an <see cref="IEdmModel"/>, as well as the given <see cref="ODataBatchHandler"/>, to the default route.
         /// </summary>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="batchHandler">The batch handler <see cref="ODataBatchHandler"/>.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="model">The <see cref="IEdmModel"/> to add to the default route.</param>
+        /// <param name="batchHandler">The <see cref="ODataBatchHandler"/> instance to add to the default route.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(IEdmModel model, ODataBatchHandler batchHandler)
         {
             return AddModel(string.Empty, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
         }
 
         /// <summary>
-        /// Add a model with prefix.
+        /// Adds an <see cref="IEdmModel"/> to the specified route.
         /// </summary>
         /// <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="model">The <see cref="IEdmModel"/> to add to the specified route.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        /// <remarks></remarks>
         public ODataOptions AddModel(string prefix, IEdmModel model)
         {
             return AddModel(prefix, model, configureAction: null);
         }
 
         /// <summary>
-        /// Add a model with prefix using given batch handler.
+        /// Adds an <see cref="IEdmModel"/>, as well as the given <see cref="ODataBatchHandler"/>, to the specified route.
         /// </summary>
         /// <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="batchHandler">The $batch handler <see cref="ODataBatchHandler"/>.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="model">The <see cref="IEdmModel"/> to add to the specified route.</param>
+        /// <param name="batchHandler">The <see cref="ODataBatchHandler"/> instance to add to the specified route.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(string prefix, IEdmModel model, ODataBatchHandler batchHandler)
         {
             return AddModel(prefix, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
@@ -118,9 +124,11 @@ namespace Microsoft.AspNetCore.OData
         /// Adds OData model using the service configuration.
         /// </summary>
         /// <param name="prefix">The model related prefix.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="configureAction">The sub service configuration action.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="model">The <see cref="IEdmModel"/> to add to the specified route.</param>
+        /// <param name="configureAction">
+        /// A <see cref="Action{IContainerBuilder}"/> lambda method that allows you to add services directly to the DI container just prior to finalization.
+        /// </param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(string prefix, IEdmModel model, Action<IContainerBuilder> configureAction)
         {
             if (model == null)
@@ -128,14 +136,14 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            if (Models.ContainsKey(prefix))
+            if (RouteComponents.ContainsKey(prefix))
             {
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, prefix);
             }
 
             // Consider to use Lazy<IServiceProvider> ?
-            IServiceProvider serviceProvider = BuildContainBuilder(model, configureAction);
-            Models[prefix] = (model, serviceProvider);
+            IServiceProvider serviceProvider = BuildRouteContainer(model, configureAction);
+            RouteComponents[prefix] = (model, serviceProvider);
             return this;
         }
 
@@ -146,20 +154,39 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The root service provider for the route (prefix) name.</returns>
         public IServiceProvider GetODataServiceProvider(string prefix)
         {
-            if (prefix != null && Models.ContainsKey(prefix))
+            if (prefix != null && RouteComponents.ContainsKey(prefix))
             {
-                return Models[prefix].Item2;
+                return RouteComponents[prefix].ServiceProvider;
             }
 
             return null;
         }
+
         #endregion
 
-        #region Globle Query settings
+        #region Global Query settings
+
+        /// <summary>
+        /// Enables all OData query features in one command.
+        /// </summary>
+        /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions EnableAllFeatures(int? maxTopValue)
+        {
+            QuerySettings.EnableExpand = true;
+            QuerySettings.EnableSelect = true;
+            QuerySettings.EnableFilter = true;
+            QuerySettings.EnableOrderBy = true;
+            QuerySettings.EnableCount = true;
+            QuerySettings.EnableSkipToken = true;
+            SetMaxTop(maxTopValue);
+            return this;
+        }
+
         /// <summary>
         /// Enable $expand query options.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Expand()
         {
             QuerySettings.EnableExpand = true;
@@ -169,7 +196,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Enable $select query options.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Select()
         {
             QuerySettings.EnableSelect = true;
@@ -179,7 +206,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Enable $filter query options.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Filter()
         {
             QuerySettings.EnableFilter = true;
@@ -189,7 +216,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Enable $orderby query options.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions OrderBy()
         {
             QuerySettings.EnableOrderBy = true;
@@ -199,7 +226,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Enable $count query options.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Count()
         {
             QuerySettings.EnableCount = true;
@@ -209,7 +236,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Enable $skiptop query option.
         /// </summary>
-        /// <returns>The calling itself.</returns>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions SkipToken()
         {
             QuerySettings.EnableSkipToken = true;
@@ -217,10 +244,10 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// Setup the max top value.
+        /// Sets the maximum value of $top that a client can request.
         /// </summary>
-        /// <param name="maxTopValue">The max top value.</param>
-        /// <returns>The calling itself.</returns>
+        /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions SetMaxTop(int? maxTopValue)
         {
             if (maxTopValue.HasValue && maxTopValue.Value < 0)
@@ -233,7 +260,7 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// Gets and sets the optional-$-sign-prefix for OData system query option.
+        /// Gets or sets whether or not the OData system query options should be prefixed with '$'.
         /// </summary>
         public bool EnableNoDollarQueryOptions { get; set; } = true;
 
@@ -250,7 +277,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="model">The Edm model.</param>
         /// <param name="setupAction">The setup config.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildContainBuilder(IEdmModel model, Action<IContainerBuilder> setupAction)
+        private IServiceProvider BuildRouteContainer(IEdmModel model, Action<IContainerBuilder> setupAction)
         {
             Contract.Assert(model != null);
 
@@ -292,5 +319,7 @@ namespace Microsoft.AspNetCore.OData
 
             return odataContainerBuilder.BuildContainer();
         }
+
     }
+
 }

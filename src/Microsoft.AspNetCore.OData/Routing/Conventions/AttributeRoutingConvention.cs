@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // TODO: Which one is better? input from context or inject from constructor?
-            IEnumerable<string> prefixes = context.Options.Models.Keys;
+            IEnumerable<string> prefixes = context.Options.RouteComponents.Keys;
 
             // Loop through all attribute routes defined on the controller.
             var controllerSelectors = controllerModel.Selectors.Where(sm => sm.AttributeRouteModel != null).ToList();
@@ -134,8 +134,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return;
             }
 
-            IEdmModel model = context.Options.Models[prefix].Item1;
-            IServiceProvider sp = context.Options.Models[prefix].Item2;
+            IEdmModel model = context.Options.RouteComponents[prefix].EdmModel;
+            IServiceProvider sp = context.Options.RouteComponents[prefix].ServiceProvider;
 
             SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
                         attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);

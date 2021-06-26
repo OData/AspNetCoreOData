@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.False(options.RouteOptions.EnableKeyAsSegment);
             Assert.False(options.EnableNoDollarQueryOptions);
 
-            Assert.Empty(options.Models);
+            Assert.Empty(options.RouteComponents);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             }
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
 
             Assert.Equal(prefix ?? String.Empty, model.Key);
 
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             options.AddModel(edmModel, handler);
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
             Assert.Equal(String.Empty, model.Key);
 
             Assert.Same(edmModel, model.Value.Item1);
@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             options.AddModel("odata", edmModel, builder => builder.AddService<IODataFeature, ODataFeature>(Microsoft.OData.ServiceLifetime.Singleton));
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
             Assert.Equal("odata", model.Key);
 
             Assert.Same(edmModel, model.Value.Item1);
@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             options.AddModel("odata", edmModel);
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
             Assert.Equal("odata", model.Key);
 
             Assert.Same(edmModel, model.Value.Item1);

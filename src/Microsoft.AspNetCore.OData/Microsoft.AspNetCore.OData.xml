@@ -5776,8 +5776,8 @@
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
             <summary>
             Contains the details of a given OData request. These properties should all be mutable.
-            None of these properties should ever be set to null.
             </summary>
+            <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter">
             <summary>
@@ -5819,17 +5819,18 @@
             Configure the route options.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.Models">
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteComponents">
             <summary>
-            Gets the configured Edm models.
+            Contains the OData <see cref="T:Microsoft.OData.Edm.IEdmModel"/> instances and Dependency Injection containers for specific routes.
             </summary>
+            <remarks>You should not modify this collection yourself. Instead, use the .AddModel() methods for registering model "/></remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            Add an Edm model without prefix.
+            Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to the default route.
             </summary>
-            <param name="model">The Edm model.</param>
-            <returns>The calling itself.</returns>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add to the default route.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
             <summary>
@@ -5837,7 +5838,7 @@
             </summary>
             <param name="model">The Edm model.</param>
             <param name="batchHandler">The batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>.</param>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -5845,7 +5846,8 @@
             </summary>
             <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
             <param name="model">The Edm model.</param>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
+            <remarks></remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
             <summary>
@@ -5854,7 +5856,7 @@
             <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
             <param name="model">The Edm model.</param>
             <param name="batchHandler">The $batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>.</param>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>
@@ -5863,7 +5865,7 @@
             <param name="prefix">The model related prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="configureAction">The sub service configuration action.</param>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(System.String)">
             <summary>
@@ -5872,52 +5874,59 @@
             <param name="prefix">The route name (the route prefix name).</param>
             <returns>The root service provider for the route (prefix) name.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.EnableAllFeatures(System.Nullable{System.Int32})">
+            <summary>
+            Enables all OData query features in one command.
+            </summary>
+            <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Expand">
             <summary>
             Enable $expand query options.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Select">
             <summary>
             Enable $select query options.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Filter">
             <summary>
             Enable $filter query options.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.OrderBy">
             <summary>
             Enable $orderby query options.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Count">
             <summary>
             Enable $count query options.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SkipToken">
             <summary>
             Enable $skiptop query option.
             </summary>
-            <returns>The calling itself.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(System.Nullable{System.Int32})">
             <summary>
-            Setup the max top value.
+            Sets the maximum value of $top that a client can request.
             </summary>
-            <param name="maxTopValue">The max top value.</param>
-            <returns>The calling itself.</returns>
+            <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> to enable fluent configuration.</returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>
-            Gets and sets the optional-$-sign-prefix for OData system query option.
+            Gets or sets whether or not the OData system query options should be prefixed with '$'.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
@@ -5925,7 +5934,7 @@
             Gets the query setting.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainBuilder(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
             <summary>
             Build the container.
             </summary>
