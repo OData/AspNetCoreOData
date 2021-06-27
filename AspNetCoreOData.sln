@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataDynamicModel", "sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataSampleCommon", "sample\ODataSampleCommon\ODataSampleCommon.csproj", "{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataRoutingSample.Tests", "sample\ODataRoutingSample.Tests\ODataRoutingSample.Tests.csproj", "{CD0608D8-36D0-4E45-9355-A2040960ADC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataRoutingSample.Tests", "sample\ODataRoutingSample.Tests\ODataRoutingSample.Tests.csproj", "{2084B1F8-5122-41A1-8735-06F36E7C9903}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +65,10 @@ Global
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD0608D8-36D0-4E45-9355-A2040960ADC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD0608D8-36D0-4E45-9355-A2040960ADC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD0608D8-36D0-4E45-9355-A2040960ADC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD0608D8-36D0-4E45-9355-A2040960ADC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2084B1F8-5122-41A1-8735-06F36E7C9903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2084B1F8-5122-41A1-8735-06F36E7C9903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2084B1F8-5122-41A1-8735-06F36E7C9903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2084B1F8-5122-41A1-8735-06F36E7C9903}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,7 +82,7 @@ Global
 		{BDC5474B-9511-4CDF-83FE-376C7130F7F0} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 		{CE04E38B-547F-46C0-ABE4-F981E3A1874F} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA} = {B1F86961-6958-4617-ACA4-C231F95AE099}
-		{CD0608D8-36D0-4E45-9355-A2040960ADC8} = {B1F86961-6958-4617-ACA4-C231F95AE099}
+		{2084B1F8-5122-41A1-8735-06F36E7C9903} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {540C9752-AAC0-49EA-BA60-78490C90FF86}
