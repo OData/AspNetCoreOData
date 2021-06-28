@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 .Returns((object)null)
                 .Verifiable();
 
-            object actual = await deserializer.Object.ReadAsync(reader, typeof(DeltaSet<>), readerContext);
+            object actual = await deserializer.Object.ReadAsync(reader, typeof(DeltaSet<Customer>), readerContext);
 
             // Arrange & Act & Assert
             deserializer.Verify();

@@ -29,6 +29,7 @@ namespace ODataRoutingSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Codes for backup and use to compare with preview design/implementation
             //services.AddControllers(options => {
             //{
             //    options.Conventions.Add(new MetadataApplicationModelConventionAttribute());
@@ -46,6 +47,7 @@ namespace ODataRoutingSample
             services.AddODataFormatter();
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
             */
+            #endregion
 
             services.AddDbContext<MyDataContext>(opt => opt.UseLazyLoadingProxies().UseInMemoryDatabase("MyDataContextList"));
 
