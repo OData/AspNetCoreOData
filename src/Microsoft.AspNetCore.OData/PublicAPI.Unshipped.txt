@@ -1442,7 +1442,6 @@ override sealed Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollecti
 override sealed Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.CreateODataValue(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataValue
 override sealed Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.CreateODataValue(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataValue
 static Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.CopyAbsoluteUrl(this Microsoft.AspNetCore.Http.HttpRequest request, System.Uri uri) -> void
-static Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.CopyBatchRequestProperties(this Microsoft.AspNetCore.Http.HttpRequest subRequest, Microsoft.AspNetCore.Http.HttpRequest batchRequest) -> void
 static Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.GetODataMessageReader(this Microsoft.AspNetCore.Http.HttpRequest request, System.IServiceProvider requestContainer) -> Microsoft.OData.ODataMessageReader
 static Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataBatchId(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.Guid?
 static Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.GetODataChangeSetId(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.Guid?
