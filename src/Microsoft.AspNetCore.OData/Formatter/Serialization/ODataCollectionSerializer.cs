@@ -204,6 +204,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return value;
         }
 
+        /// <inheritdoc />
         public override ODataProperty CreateProperty(object graph, IEdmTypeReference expectedType, string elementName,
             ODataSerializerContext writeContext)
         {

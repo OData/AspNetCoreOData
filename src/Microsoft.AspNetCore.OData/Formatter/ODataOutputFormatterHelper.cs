@@ -148,10 +148,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        internal static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
+        internal static IODataSerializer GetSerializer(Type type, object value, HttpRequest request,
             IODataSerializerProvider serializerProvider)
         {
-            ODataSerializer serializer;
+            IODataSerializer serializer;
 
             IEdmObject edmObject = value as IEdmObject;
             if (edmObject != null)
