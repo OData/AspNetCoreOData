@@ -5,13 +5,13 @@
     <RootNamespace>Microsoft.AspNetCore.OData</RootNamespace>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-    
     <!-- Let's generate our own assembly info -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <Import Project="..\..\tool\build.props" />
@@ -66,5 +66,15 @@
       <LastGenOutput>PropertyContainer.generated.cs</LastGenOutput>
     </Content>
   </ItemGroup>
+
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>ProductRoot=$(productBinPath);VersionNuGetSemantic=$(VersionNuGetSemantic)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ODataModelBuilderPackageDependency=$(ODataModelBuilderPackageDependency)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ODataLibPackageDependency=$(ODataLibPackageDependency)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);NightlyBuildVersion=$(NightlyBuildVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);SourcesRoot=$(SourcesRoot)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 
 </Project>
