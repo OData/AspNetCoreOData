@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
             }
 
-            ODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
+            IODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
 
             ODataPath path = request.ODataFeature().Path;
             IEdmNavigationSource targetNavigationSource = GetTargetNavigationSource(path, model);
