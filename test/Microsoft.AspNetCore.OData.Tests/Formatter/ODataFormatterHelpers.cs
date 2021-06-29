@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<ODataActionPayloadDeserializer>();
 
             // Serializers.
-            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, DefaultODataSerializerProvider>();
 
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();
