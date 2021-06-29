@@ -56,6 +56,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             }
         }
 
+        [Fact]
+        public void TryGetPropertyValue_ThrowsArgumentNull_original()
+        {
+            // Arrange & Act
+            var delta = new Delta<Base>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetPropertyValue(null, out _), "name");
+        }
+
+        [Fact]
+        public void TryGetPropertyType_ThrowsArgumentNull_original()
+        {
+            // Arrange & Act
+            var delta = new Delta<Base>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetPropertyType(null, out _), "name");
+        }
+
         [Theory]
         [MemberData(nameof(DeltaModelPropertyNamesData))]
         public void RoundTrip_Properties(string propertyName, object value)
@@ -70,6 +86,47 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             object retrievedValue;
             delta.TryGetPropertyValue(propertyName, out retrievedValue);
             Assert.Equal(value, retrievedValue);
+        }
+
+        [Fact]
+        public void RoundTrip_Properties_InDynamicContainer()
+        {
+            // Arrange
+            Type dynamicType = typeof(AddressWithDynamicContainer);
+            PropertyInfo dynamicDictionaryPropertyinfo = dynamicType.GetProperty("Dynamics");
+            Delta<AddressWithDynamicContainer> delta = new Delta<AddressWithDynamicContainer>(
+                dynamicType, null, dynamicDictionaryPropertyinfo);
+
+            // Act & Assert
+            Type propertyType;
+            string propertyName = "DynamicPropertyName";
+            Assert.False(delta.TryGetPropertyType(propertyName, out propertyType));
+
+            // Act & Assert
+            object value = 42;
+            Assert.True(delta.TrySetPropertyValue(propertyName, value));
+
+            // Act & Assert
+            object retrievedValue;
+            delta.TryGetPropertyValue(propertyName, out retrievedValue);
+            Assert.Equal(value, retrievedValue);
+        }
+
+        [Fact]
+        public void TrySetPropertyValue_ThrowsInvalidOperation_IfDynamicContainerWithoutSetter()
+        {
+            // Arrange
+            Type dynamicType = typeof(AddressWithDynamicContainer);
+            PropertyInfo dynamicDictionaryPropertyinfo = dynamicType.GetProperty("NonSetDynamics");
+            Delta<AddressWithDynamicContainer> delta = new Delta<AddressWithDynamicContainer>(
+                dynamicType, null, dynamicDictionaryPropertyinfo);
+
+            // Act
+            Action test = () => delta.TrySetPropertyValue("AnyDynamicName", 42);
+
+            // Assert
+            ExceptionAssert.Throws<InvalidOperationException>(test,
+                "The dynamic dictionary property 'NonSetDynamics' of type 'Microsoft.AspNetCore.OData.Tests.Deltas.DeltaTest+AddressWithDynamicContainer' cannot be set. The dynamic property dictionary must have a setter.");
         }
 
         [Fact]
@@ -189,6 +246,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             Assert.Null(address.Street);
             Assert.Equal(1, address.Properties["IntProp"]);
             Assert.False(address.Properties.ContainsKey("ListProp"));
+        }
+
+        [Fact]
+        public void CopyUnchangedValues_ThrowsArgumentNull_original()
+        {
+            // Arrange & Act
+            var delta = new Delta<Base>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.CopyUnchangedValues(null), "original");
+        }
+
+        [Fact]
+        public void CopyChangedValues_ThrowsArgumentNull_original()
+        {
+            // Arrange & Act
+            var delta = new Delta<Base>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.CopyChangedValues(null), "original");
         }
 
         [Fact]
@@ -664,6 +737,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             public string State { get; set; }
 
             public int ZipCode { get; set; }
+        }
+
+        public class AddressWithDynamicContainer
+        {
+            public int ID { get; set; }
+
+            public string City { get; set; }
+
+            public IDictionary<string, object> Dynamics { get; set; }
+
+            public IDictionary<string, object> NonSetDynamics { get; }
         }
     }
 }

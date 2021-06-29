@@ -29,14 +29,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             Assert.Equal(typeof(DeltaSetOfTTests), set.ExpectedClrType);
         }
 
-        [Fact]
-        public void PatchOnDeltaSet_ThrowsArgumentNull_OriginalSet()
-        {
-            // Arrange
-            DeltaSet<DeltaSetOfTTests> set = new DeltaSet<DeltaSetOfTTests>();
+        //[Fact]
+        //public void PatchOnDeltaSet_ThrowsArgumentNull_OriginalSet()
+        //{
+        //    // Arrange
+        //    DeltaSet<DeltaSetOfTTests> set = new DeltaSet<DeltaSetOfTTests>();
 
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => set.Patch(null), "originalSet");
-        }
+        //    // Act & Assert
+        //    ExceptionAssert.ThrowsArgumentNull(() => set.Patch(null), "originalSet");
+        //}
     }
 }

@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -151,7 +151,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (name == null)
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -202,7 +202,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (name == null)
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -277,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (original == null)
             {
-                throw Error.ArgumentNull("original");
+                throw Error.ArgumentNull(nameof(original));
             }
 
             // Delta parameter type cannot be derived type of original
@@ -342,7 +342,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (original == null)
             {
-                throw Error.ArgumentNull("original");
+                throw Error.ArgumentNull(nameof(original));
             }
 
             if (!_structuredType.IsInstanceOfType(original))
@@ -415,15 +415,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         private static IDictionary<string, object> GetDynamicPropertyDictionary(PropertyInfo propertyInfo,
             T entity, bool create)
         {
-            if (propertyInfo == null)
-            {
-                throw Error.ArgumentNull("propertyInfo");
-            }
-
-            if (entity == null)
-            {
-                throw Error.ArgumentNull("entity");
-            }
+            Contract.Assert(propertyInfo != null);
+            Contract.Assert(entity != null);
 
             object propertyValue = propertyInfo.GetValue(entity);
             if (propertyValue != null)

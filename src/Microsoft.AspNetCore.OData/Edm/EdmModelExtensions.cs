@@ -382,31 +382,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return false;
         }
 
-        internal static string GetNavigationSourceUrl(this IEdmModel model, IEdmNavigationSource navigationSource)
-        {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
-
-            if (navigationSource == null)
-            {
-                throw new ArgumentNullException(nameof(navigationSource));
-            }
-
-            //NavigationSourceUrlAnnotation annotation = model.GetAnnotationValue<NavigationSourceUrlAnnotation>(navigationSource);
-            //if (annotation == null)
-            //{
-            //    return navigationSource.Name;
-            //}
-            //else
-            //{
-            //    return annotation.Url;
-            //}
-
-            return null;
-        }
-
         /// <summary>
         /// Find the given type in a structured type inheritance, include itself.
         /// </summary>

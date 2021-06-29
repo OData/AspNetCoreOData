@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             return new EdmCollectionType(edmType.ToEdmTypeReference(isNullable));
@@ -573,17 +573,6 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             Contract.Assert(model != null);
             return model.GetAnnotationValue<OperationTitleAnnotation>(operation);
-        }
-
-        /// <summary>
-        /// Check whether the two are properly related types
-        /// </summary>
-        /// <param name="first">the first type</param>
-        /// <param name="second">the second type</param>
-        /// <returns>Whether the two types are related.</returns>
-        public static bool IsRelatedTo(IEdmType first, IEdmType second)
-        {
-            return second.IsOrInheritsFrom(first) || first.IsOrInheritsFrom(second);
         }
     }
 }

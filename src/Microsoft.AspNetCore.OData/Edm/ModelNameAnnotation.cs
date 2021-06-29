@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="name">The model name.</param>
         public ModelNameAnnotation(string name)
         {
-            ModelName = name ?? throw new ArgumentNullException(nameof(name));
+            ModelName = name ?? throw Error.ArgumentNull(nameof(name));
         }
 
         /// <summary>

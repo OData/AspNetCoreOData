@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
@@ -88,6 +89,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Act & Assert - Negative case
             Action test = () => structuredType.ResolveProperty("title");
             ExceptionAssert.Throws<ODataException>(test, "Ambiguous property name 'title' found. Please use correct property name case.");
+        }
+
+        [Fact]
+        public void FindProperty_ThrowsArugmentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.FindProperty(null, null), "model");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.FindProperty(null, null), "structuredType");
+
+            IEdmStructuredType structuredType = new Mock<IEdmStructuredType>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.FindProperty(structuredType, null), "path");
         }
 
         [Theory]

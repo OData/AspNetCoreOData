@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="followsConventions">Represents whether this factory follows OData conventions or not.</param>
         public NavigationLinkBuilder(Func<ResourceContext, IEdmNavigationProperty, Uri> navigationLinkFactory, bool followsConventions)
         {
-            Factory = navigationLinkFactory ?? throw new ArgumentNullException(nameof(navigationLinkFactory));
+            Factory = navigationLinkFactory ?? throw Error.ArgumentNull(nameof(navigationLinkFactory));
             FollowsConventions = followsConventions;
         }
 

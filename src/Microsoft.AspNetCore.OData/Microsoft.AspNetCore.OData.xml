@@ -1739,24 +1739,6 @@
             Gets the expected type of the entity for which the changes are tracked.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.Patch(System.Collections.IEnumerable)">
-            <summary>
-             Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
-            </summary>
-            <remarks>
-            TODO: this functionality hasn't finished yet. We'd like to get more feedback about how to
-            patch the deltaset to the original data source.
-            </remarks>
-            <param name="originalSet">The original set.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem,System.Collections.IEnumerable)">
-            <summary>
-            Find the related instance.
-            </summary>
-            <param name="deltaItem">The delta item.</param>
-            <param name="originalSet">The original set.</param>
-            <returns></returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
             <summary>
             <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to an object.
@@ -2021,13 +2003,6 @@
             <param name="assembliesResolver">The assembly resolver.</param>
             <returns>Null or the CLR type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetTypeMappingCache(Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable(System.Type)">
             <summary>
             Check the input type is nullable type or not.
@@ -2062,14 +2037,6 @@
             <param name="edmType">The Edm type.</param>
             <param name="isNullable">Nullable value.</param>
             <returns>The Edm type reference.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsRelatedTo(Microsoft.OData.Edm.IEdmType,Microsoft.OData.Edm.IEdmType)">
-            <summary>
-            Check whether the two are properly related types
-            </summary>
-            <param name="first">the first type</param>
-            <param name="second">the second type</param>
-            <returns>Whether the two types are related.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions">
             <summary>
@@ -2123,11 +2090,12 @@
             <param name="model">The Edm model.</param>
             <returns>The Edm model name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetModelName(Microsoft.OData.Edm.IEdmModel,System.String)">
             <summary>
             Sets the Edm model name.
             </summary>
             <param name="model">The Edm model.</param>
+            <param name="name">The Edm model name.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAlternateKeys(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>

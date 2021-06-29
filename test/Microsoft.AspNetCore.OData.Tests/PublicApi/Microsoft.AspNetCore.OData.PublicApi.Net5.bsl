@@ -550,8 +550,6 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 
 	System.Type ExpectedClrType  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
-
-	protected virtual T GetOriginal (Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem deltaItem, System.Collections.IEnumerable originalSet)
 }
 
 public sealed class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1 : DeltaLinkBase`1, IDeltaDeletedLink, IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
@@ -605,7 +603,7 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static string SetModelName (Microsoft.OData.Edm.IEdmModel model)
+	public static void SetModelName (Microsoft.OData.Edm.IEdmModel model, string name)
 }
 
 [

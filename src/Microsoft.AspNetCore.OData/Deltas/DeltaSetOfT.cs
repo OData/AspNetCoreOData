@@ -2,7 +2,6 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -26,6 +25,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public Type ExpectedClrType => typeof(T);
 
+        #region Exclude unfinished APIs
+#if false
         /// <summary>
         ///  Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
         /// </summary>
@@ -94,5 +95,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             return null;
         }
+#endif
+#endregion
     }
 }

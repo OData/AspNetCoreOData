@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.Spatial;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
@@ -153,6 +154,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         #endregion
 
         #region GetClrType
+        [Fact]
+        public void GetClrType_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act
+            IAssemblyResolver resolver = new Mock<IAssemblyResolver>().Object;
+            IEdmModel model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrType((IEdmTypeReference)null, resolver), "edmTypeReference");
+
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrType((IEdmType)null, resolver), "edmType");
+        }
+
         [Theory]
         [InlineData(EdmPrimitiveTypeKind.String, typeof(string))]
         [InlineData(EdmPrimitiveTypeKind.Boolean, typeof(bool))]
@@ -267,6 +279,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         #endregion
 
         #region GetEdmType
+
+        [Fact]
+        public void GetEdmType_ThrowsArgumentNull_ModelAndClrType()
+        {
+            // Arrange & Act
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetEdmType(typeof(int)), "edmModel");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetEdmType(null), "clrType");
+        }
 
         [Fact]
         public void GetEdmTypeReferenceReturnsNullForUnknownType()

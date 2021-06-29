@@ -4,7 +4,9 @@
 using System;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
@@ -23,6 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                 IEdmTypeDefinition typeDefinition = new EdmTypeDefinition("NS", "TypeDef", primitive);
                 IEdmCollectionType collection = new EdmCollectionType(new EdmEntityTypeReference(entity, isNullable: false));
                 IEdmCollectionType collectionNullable = new EdmCollectionType(new EdmEntityTypeReference(entity, isNullable: true));
+                IEdmEntityReferenceType entityReferenenceType = new EdmEntityReferenceType(entity);
 
                 return new TheoryDataSet<IEdmType, bool, Type>
                 {
@@ -39,7 +42,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                     { path, true, typeof(IEdmPathTypeReference) },
                     { path, false, typeof(IEdmPathTypeReference) },
                     { typeDefinition, true, typeof(IEdmTypeDefinitionReference) },
-                    { typeDefinition, false, typeof(IEdmTypeDefinitionReference) }
+                    { typeDefinition, false, typeof(IEdmTypeDefinitionReference) },
+                    { entityReferenenceType, true, typeof(IEdmEntityReferenceTypeReference) },
+                    { entityReferenenceType, true, typeof(IEdmEntityReferenceTypeReference) },
                 };
             }
         }
@@ -64,6 +69,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             Assert.Equal(edmType, result.Definition);
             Assert.IsAssignableFrom(expectedType, result);
+        }
+
+        [Fact]
+        public void ToEdmTypeReference_ThrowsNotSupportedException_UnknownTypeKind()
+        {
+            // Arrange & Act
+            Mock<IEdmType> mock = new Mock<IEdmType>();
+            mock.Setup(s => s.TypeKind).Returns(EdmTypeKind.None);
+            ExceptionAssert.Throws<NotSupportedException>(() => mock.Object.ToEdmTypeReference(false),
+                "UnknownType is not a supported EDM type.");
+        }
+
+        [Fact]
+        public void ToCollection_ThrowsArgumentNull_EdmType()
+        {
+            // Arrange & Act
+            IEdmType edmType = null;
+            ExceptionAssert.ThrowsArgumentNull(() => edmType.ToCollection(false), "edmType");
         }
     }
 }

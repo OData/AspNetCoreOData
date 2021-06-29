@@ -180,12 +180,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (clrType == null)
             {
-                throw new ArgumentNullException(nameof(clrType));
+                throw Error.ArgumentNull(nameof(clrType));
             }
 
             return GetEdmType(edmModel, clrType, testCollections: true);
@@ -292,7 +292,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmTypeReference == null)
             {
-                throw new ArgumentNullException(nameof(edmTypeReference));
+                throw Error.ArgumentNull(nameof(edmTypeReference));
             }
 
             if (edmTypeReference.IsPrimitive())
@@ -333,7 +333,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             IEdmSchemaType edmSchemaType = edmType as IEdmSchemaType;
@@ -366,11 +366,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         internal static ClrTypeCache GetTypeMappingCache(this IEdmModel model)
         {
             Contract.Assert(model != null);

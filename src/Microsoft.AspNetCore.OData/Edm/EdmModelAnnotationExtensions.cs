@@ -136,12 +136,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (enumType == null)
             {
-                throw new ArgumentNullException(nameof(enumType));
+                throw Error.ArgumentNull(nameof(enumType));
             }
 
             ClrEnumMemberAnnotation annotation = edmModel.GetAnnotationValue<ClrEnumMemberAnnotation>(enumType);
@@ -163,12 +163,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (edmProperty == null)
             {
-                throw new ArgumentNullException(nameof(edmProperty));
+                throw Error.ArgumentNull(nameof(edmProperty));
             }
 
             string propertyName = edmProperty.Name;
@@ -195,12 +195,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             DynamicPropertyDictionaryAnnotation annotation =
@@ -222,7 +222,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             ModelNameAnnotation annotation =
@@ -232,23 +232,29 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return annotation.ModelName;
             }
 
-            return SetModelName(model);
+            string name = Guid.NewGuid().ToString();
+            SetModelName(model, name);
+            return name;
         }
 
         /// <summary>
         /// Sets the Edm model name.
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        public static string SetModelName(this IEdmModel model)
+        /// <param name="name">The Edm model name.</param>
+        public static void SetModelName(this IEdmModel model, string name)
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
-            string name = Guid.NewGuid().ToString();
+            if (name == null)
+            {
+                throw Error.ArgumentNull(nameof(name));
+            }
+
             model.SetAnnotationValue(model, new ModelNameAnnotation(name));
-            return name;
         }
 
         /// <summary>
