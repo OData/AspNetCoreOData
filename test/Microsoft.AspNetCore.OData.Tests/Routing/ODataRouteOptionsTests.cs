@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableKeyAsSegment);
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
-            Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
             Assert.False(options.EnableControllerNameCaseInsensitive);
         }
 
@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableKeyAsSegment);
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
-            Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
             Assert.False(options.EnableControllerNameCaseInsensitive);
         }
 
@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Verify(opt => opt.EnableKeyAsSegment, (opt, b) => opt.EnableKeyAsSegment = b);
             Verify(opt => opt.EnableQualifiedOperationCall, (opt, b) => opt.EnableQualifiedOperationCall = b);
             Verify(opt => opt.EnableUnqualifiedOperationCall, (opt, b) => opt.EnableUnqualifiedOperationCall = b);
-            Verify(opt => opt.EnableNonParenthsisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthsisForEmptyParameterFunction = b, false);
+            Verify(opt => opt.EnableNonParenthesisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthesisForEmptyParameterFunction = b, false);
             Verify(opt => opt.EnableControllerNameCaseInsensitive, (opt, b) => opt.EnableControllerNameCaseInsensitive = b, false);
         }
 

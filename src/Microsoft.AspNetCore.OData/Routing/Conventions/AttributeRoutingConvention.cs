@@ -18,9 +18,9 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// The convention for an odata template string.
-    /// It looks for the <see cref="RouteAttribute"/> on controller
-    /// and <see cref="RouteAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
+    /// The convention for an OData template string.
+    /// It looks for the <see cref="ODataRoutingAttribute"/> on controller
+    /// and <see cref="ODataRoutingAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 controllerSelectors.Add(null);
             }
 
-            // In order to avoiding pollute the action selectors, we use a Dictionary to save the intermediate results.
+            // In order to avoiding polluting the action selectors, we use a Dictionary to save the intermediate results.
             IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors = new Dictionary<SelectorModel, IList<SelectorModel>>();
             foreach (var actionSelector in actionModel.Selectors)
             {
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             try
             {
-                // Do the uri parser, it will throw exception if the route template is not a OData path.
+                // Due the uri parser, it will throw exception if the route template is not a OData path.
                 ODataPathTemplate pathTemplate = _templateParser.Parse(model, routeTemplate, sp);
                 if (pathTemplate != null)
                 {

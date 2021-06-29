@@ -60,7 +60,7 @@ namespace ODataRoutingSample.Controllers.v2
             return _context.Orders;
         }
 
-        [HttpGet] // ~/Oders({key})
+        [HttpGet] // ~/Orders({key})
         [EnableQuery]
         public Order Get(int key)
         {
@@ -80,13 +80,13 @@ namespace ODataRoutingSample.Controllers.v2
             return Created(order);
         }
 
-        [HttpDelete] // ~/Oders({key})
+        [HttpDelete] // ~/Orders({key})
         public string Delete(int key)
         {
             return $"Delete Order at {key}";
         }
 
-       // [Http] // ~/Oders({key})
+       // [Http] // ~/Orders({key})
         [HttpPatch]
         public string Patch(int key)
         {

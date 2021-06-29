@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
 
             string unqualifiedIdentifier, qualifiedIdentifier;
-            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthesisForEmptyParameterFunction)
             {
                 unqualifiedIdentifier = "/" + Function.Name;
                 qualifiedIdentifier = "/" + Function.FullName();

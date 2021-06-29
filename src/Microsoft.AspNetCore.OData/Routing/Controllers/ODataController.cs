@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <typeparam name="TEntity">The created entity type.</typeparam>
         /// <param name="entity">The created entity.</param>
         /// <returns>A <see cref="CreatedODataResult{TEntity}"/> with the specified values.</returns>
-        /// <remarks>These function uses types that are AspNetCore-specific.</remarks>
+        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         protected virtual CreatedODataResult<TEntity> Created<TEntity>(TEntity entity)
         {
             if (entity == null)
@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <typeparam name="TEntity">The updated entity type.</typeparam>
         /// <param name="entity">The updated entity.</param>
         /// <returns>An <see cref="UpdatedODataResult{TEntity}"/> with the specified values.</returns>
-        /// <remarks>These function uses types that are AspNetCore-specific.</remarks>
+        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         protected virtual UpdatedODataResult<TEntity> Updated<TEntity>(TEntity entity)
         {
             if (entity == null)

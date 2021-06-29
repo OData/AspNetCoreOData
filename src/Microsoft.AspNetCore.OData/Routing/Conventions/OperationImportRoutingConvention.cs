@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             (var actionImports, var functionImports) = edmOperationImports.SplitOperationImports();
 
-            // That's not allowed to have an action import and function import with the same name.
+            // It's not allowed to have an action import and function import with the same name.
             if (actionImports.Count > 0 && functionImports.Count > 0)
             {
                 throw new ODataException(Error.Format(SRResources.OperationMustBeUniqueInEntitySetContainer, actionMethodName));

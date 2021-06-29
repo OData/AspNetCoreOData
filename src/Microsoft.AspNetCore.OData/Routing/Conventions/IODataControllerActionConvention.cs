@@ -33,14 +33,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// </summary>
         /// <param name="context">The controller action context.</param>
         /// <returns>
-        /// True: yes, applied the convention, please stop to execute the remaining conventions.
+        /// True: yes, apply the convention, please stop executing the remaining conventions.
         /// False: no, please continue to execute the remaining conventions.
         /// </returns>
         /// <remarks>
         /// The OData action convention should not put limitation on the action parameters.
         /// That's, if an action has extra parameter that's not required for a certain convention,
-        /// We consider this action is valid for this convention.
-        /// For example, Entity convention requires the key(s) parameters, doesn't care about other parameters.
+        /// we consider this action is valid for this convention.
+        /// For example, entity convention requires the key(s) parameters, doesn't care about other parameters.
         /// </remarks>
         bool AppliesToAction(ODataControllerActionContext context);
     }

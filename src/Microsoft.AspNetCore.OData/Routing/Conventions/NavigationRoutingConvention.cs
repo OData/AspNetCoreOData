@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// Conventions for <see cref="IEdmNavigationProperty"/>.
-    /// Action name convention should follow up: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
+    /// Action name convention should follow this: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
     /// </summary>
     public class NavigationRoutingConvention : IODataControllerActionConvention
     {
@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Find the declaring type of the property if we have the declaring type name in the action name.
-            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            // Otherwise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmNavigationSource navigationSource, string declared, IEdmEntityType declaringEntityType,
             IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
         {
-            IEdmEntitySet entitySet = navigationSource as IEdmEntitySet;
+            IEdmEntitySet entitySet = context.EntitySet;
             IEdmEntityType entityType = navigationSource.EntityType();
 
             // Starts the routing template

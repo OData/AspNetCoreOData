@@ -134,6 +134,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     propertyType = propertyType.AsCollection().ElementType();
                 }
+
                 if (!propertyType.IsComplex())
                 {
                     return false;
@@ -276,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            //Allow post only to collection properties
+            // Allow post only to collection properties
             if (!isCollection && method == "PostTo")
             {
                 return false;

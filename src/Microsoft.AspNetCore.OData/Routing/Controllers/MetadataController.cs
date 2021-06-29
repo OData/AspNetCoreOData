@@ -11,7 +11,7 @@ using Microsoft.OData.Edm.Csdl;
 namespace Microsoft.AspNetCore.OData.Routing.Controllers
 {
     /// <summary>
-    /// Represents a controller for generating OData servicedoc and metadata document ($metadata).
+    /// Represents a controller for generating OData service and metadata ($metadata) documents.
     /// </summary>
     public class MetadataController : ControllerBase
     {

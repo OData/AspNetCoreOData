@@ -112,8 +112,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 IEdmEntityType entityType = edmNavProperty.ToEntityType();
 
                 // only handle the single key
-                IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
                 Contract.Assert(entityType.Key().Count() == 1);
+                IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
                 Contract.Assert(keyProperty != null);
 
                 IDictionary<string, string> keyValuePairs = new Dictionary<string, string>
