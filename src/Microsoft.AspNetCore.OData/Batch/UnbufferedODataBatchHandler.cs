@@ -110,7 +110,6 @@ namespace Microsoft.AspNetCore.OData.Batch
             cancellationToken.ThrowIfCancellationRequested();
             HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, cancellationToken).ConfigureAwait(false);
 
-            operationContext.Request.CopyBatchRequestProperties(originalRequest);
             operationContext.Request.DeleteSubRequestProvider(false);
             OperationRequestItem operation = new OperationRequestItem(operationContext);
 
@@ -153,8 +152,6 @@ namespace Microsoft.AspNetCore.OData.Batch
                 {
                     CancellationToken cancellationToken = originalRequest.HttpContext.RequestAborted;
                     HttpContext changeSetOperationContext = await batchReader.ReadChangeSetOperationRequestAsync(originalRequest.HttpContext, batchId, changeSetId, cancellationToken).ConfigureAwait(false);
-                    changeSetOperationContext.Request.CopyBatchRequestProperties(originalRequest);
-                    //changeSetOperationContext.Request.DeleteRequestContainer(false);
 
                     await ODataBatchRequestItem.SendRequestAsync(handler, changeSetOperationContext, contentIdToLocationMapping).ConfigureAwait(false);
                     if (changeSetOperationContext.Response.IsSuccessStatusCode())

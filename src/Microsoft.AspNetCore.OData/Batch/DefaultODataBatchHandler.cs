@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -113,7 +112,6 @@ namespace Microsoft.AspNetCore.OData.Batch
                         IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
                         foreach (HttpContext changeSetContext in changeSetContexts)
                         {
-                            changeSetContext.Request.CopyBatchRequestProperties(request);
                             changeSetContext.Request.DeleteSubRequestProvider(false);
                         }
                         requests.Add(new ChangeSetRequestItem(changeSetContexts));
@@ -121,7 +119,6 @@ namespace Microsoft.AspNetCore.OData.Batch
                     else if (batchReader.State == ODataBatchReaderState.Operation)
                     {
                         HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
-                        operationContext.Request.CopyBatchRequestProperties(request);
                         operationContext.Request.DeleteSubRequestProvider(false);
                         requests.Add(new OperationRequestItem(operationContext));
                     }

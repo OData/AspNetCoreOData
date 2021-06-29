@@ -251,11 +251,6 @@ public sealed class Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions {
 	[
 	ExtensionAttribute(),
 	]
-	public static void CopyBatchRequestProperties (Microsoft.AspNetCore.Http.HttpRequest subRequest, Microsoft.AspNetCore.Http.HttpRequest batchRequest)
-
-	[
-	ExtensionAttribute(),
-	]
 	public static Microsoft.OData.ODataMessageReader GetODataMessageReader (Microsoft.AspNetCore.Http.HttpRequest request, System.IServiceProvider requestContainer)
 }
 

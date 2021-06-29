@@ -453,17 +453,6 @@
             <param name="request">The request.</param>
             <param name="uri">The absolute uri to copy.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.HttpRequestExtensions.CopyBatchRequestProperties(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Copies the properties from another <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
-            </summary>
-            <param name="subRequest">The sub-request.</param>
-            <param name="batchRequest">The batch request that contains the properties to copy.</param>
-            <remarks>
-            Currently, this method is unused but is retained to keep a similar API surface area
-            between the AspNet and AspNetCore versions of OData WebApi.
-            </remarks>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchContent">
             <summary>
             Encapsulates a collection of OData batch responses.
