@@ -22,7 +22,7 @@ using Microsoft.AspNetCore.OData.Routing;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> for reading OData action parameters.
+    /// Represents an <see cref="IODataDeserializer"/> for reading OData action parameters.
     /// </summary>
     public class ODataActionPayloadDeserializer : ODataDeserializer
     {
@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataActionPayloadDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataActionPayloadDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataActionPayloadDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Parameter)
         {
             DeserializerProvider = deserializerProvider ?? throw new ArgumentNullException(nameof(deserializerProvider));
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <summary>
         /// Gets the deserializer provider to use to read inner objects.
         /// </summary>
-        public ODataDeserializerProvider DeserializerProvider { get; private set; }
+        public IODataDeserializerProvider DeserializerProvider { get; private set; }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",

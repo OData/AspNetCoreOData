@@ -287,7 +287,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = odataFeature.Model;
             expectedPayloadType = null;
 
-            ODataDeserializerProvider deserializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            IODataDeserializerProvider deserializerProvider = request.GetSubServiceProvider().GetRequiredService<IODataDeserializerProvider>();
 
             // Get the deserializer using the CLR type first from the deserializer provider.
             ODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);

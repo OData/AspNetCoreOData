@@ -111,12 +111,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         /// <summary>
-        /// Gets an <see cref="ODataDeserializerProvider"/>.
+        /// Gets an <see cref="IODataDeserializerProvider"/>.
         /// </summary>
         /// <returns>An ODataDeserializerProvider.</returns>
-        public static ODataDeserializerProvider GetDeserializerProvider()
+        public static IODataDeserializerProvider GetDeserializerProvider()
         {
-            return _serviceProvider.GetRequiredService<ODataDeserializerProvider>();
+            return _serviceProvider.GetRequiredService<IODataDeserializerProvider>();
         }
 
         public static ODataMessageWriter GetMockODataMessageWriter()
@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
             // Deserializers.
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, DefaultODataDeserializerProvider>();
 
             services.AddSingleton<ODataResourceDeserializer>();
             services.AddSingleton<ODataEnumDeserializer>();

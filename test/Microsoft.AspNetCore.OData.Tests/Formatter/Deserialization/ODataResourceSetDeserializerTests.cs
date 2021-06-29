@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private readonly IEdmCollectionTypeReference _customersType;
         private readonly IEdmEntityTypeReference _customerType;
         private readonly ODataSerializerProvider _serializerProvider;
-        private readonly ODataDeserializerProvider _deserializerProvider;
+        private readonly IODataDeserializerProvider _deserializerProvider;
 
         public ODataResourceSetDeserializerTests()
         {
@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadInline_Calls_ReadResourceSet()
         {
             // Arrange
-            ODataDeserializerProvider deserializerProvider = _deserializerProvider;
+            IODataDeserializerProvider deserializerProvider = _deserializerProvider;
             Mock<ODataResourceSetDeserializer> deserializer = new Mock<ODataResourceSetDeserializer>(deserializerProvider);
             ODataResourceSetWrapper feedWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             ODataDeserializerContext readContext = new ODataDeserializerContext();
@@ -169,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void ReadResourceSet_Throws_TypeCannotBeDeserialized()
         {
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataResourceSetDeserializer deserializer = new ODataResourceSetDeserializer(deserializerProvider.Object);
             ODataResourceSetWrapper feedWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             ODataDeserializerContext readContext = new ODataDeserializerContext();
@@ -185,7 +185,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadResourceSet_Calls_ReadInlineForEachEntry()
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             Mock<ODataEdmTypeDeserializer> entityDeserializer = new Mock<ODataEdmTypeDeserializer>(ODataPayloadKind.Resource);
             ODataResourceSetDeserializer deserializer = new ODataResourceSetDeserializer(deserializerProvider.Object);
             ODataResourceSetWrapper resourceSetWrapper = new ODataResourceSetWrapper(new ODataResourceSet());

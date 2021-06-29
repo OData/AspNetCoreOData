@@ -8,9 +8,10 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents a factory that creates an <see cref="ODataDeserializer"/>.
+    /// Represents a factory that creates an <see cref="IODataDeserializer"/>.
     /// </summary>
-    public abstract class ODataDeserializerProvider
+    public interface IODataDeserializerProvider
+
     {
         /// <summary>
         /// Gets an <see cref="ODataDeserializer"/> for the given type.
@@ -18,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="type">The CLR type.</param>
         /// <param name="request">The request being deserialized.</param>
         /// <returns>An <see cref="ODataDeserializer"/> that can deserialize the given type.</returns>
-        public abstract ODataDeserializer GetODataDeserializer(Type type, HttpRequest request);
+        public IODataDeserializer GetODataDeserializer(Type type, HttpRequest request);
 
         /// <summary>
         /// Gets the <see cref="ODataEdmTypeDeserializer"/> for the given EDM type.
@@ -26,6 +27,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="edmType">The EDM type.</param>
         /// <param name="isDelta">Is delta</param>
         /// <returns>An <see cref="ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
-        public abstract ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false);
+        public IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false);
     }
 }

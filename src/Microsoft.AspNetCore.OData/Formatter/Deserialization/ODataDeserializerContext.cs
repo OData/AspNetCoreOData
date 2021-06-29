@@ -12,7 +12,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// This class encapsulates the state and settings that get passed to <see cref="ODataDeserializer"/>.
+    /// This class encapsulates the state and settings that get passed to <see cref="IODataDeserializer"/>.
     /// </summary>
     public class ODataDeserializerContext
     {

@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
     public class DefaultODataDeserializerProviderTests
     {
-        private static ODataDeserializerProvider _deserializerProvider = GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+        private static IODataDeserializerProvider _deserializerProvider = GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
@@ -245,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, DefaultODataDeserializerProvider>();
 
             // Deserializers.
             services.AddSingleton<ODataResourceDeserializer>();

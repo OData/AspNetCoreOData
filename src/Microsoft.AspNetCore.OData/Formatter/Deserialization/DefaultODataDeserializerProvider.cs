@@ -14,9 +14,9 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// The default <see cref="ODataDeserializerProvider"/>.
+    /// The default <see cref="IODataDeserializerProvider"/>.
     /// </summary>
-    public class DefaultODataDeserializerProvider : ODataDeserializerProvider
+    public class DefaultODataDeserializerProvider : IODataDeserializerProvider
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
+        public IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
         {
             if (edmType == null)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public override ODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
+        public IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
         {
             if (type == null)
             {

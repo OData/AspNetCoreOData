@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static readonly ODataSerializerProvider SerializerProvider = ODataFormatterHelpers.GetSerializerProvider(); // TODO:
 
         // private static readonly ODataDeserializerProvider DeserializerProvider = ODataDeserializerProviderFactory.Create();
-        private static readonly ODataDeserializerProvider DeserializerProvider = ODataFormatterHelpers.GetDeserializerProvider(); // TODO:
+        private static readonly IODataDeserializerProvider DeserializerProvider = ODataFormatterHelpers.GetDeserializerProvider(); // TODO:
 
         private static readonly IEdmEnumTypeReference ColorType =
             new EdmEnumTypeReference(Model.SchemaElements.OfType<IEdmEnumType>().First(c => c.Name == "Color"),
@@ -192,7 +192,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadCollectionValue_Throws_IfElementTypeCannotBeDeserialized()
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(ColorType, false)).Returns<ODataResourceDeserializer>(null);
             var deserializer = new ODataCollectionDeserializer(deserializerProvider.Object);
 

@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, DefaultODataDeserializerProvider>();
 
             // Deserializers.
             services.AddSingleton<ODataResourceDeserializer>();

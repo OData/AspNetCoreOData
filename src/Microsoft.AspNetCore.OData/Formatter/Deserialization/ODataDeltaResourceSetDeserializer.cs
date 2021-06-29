@@ -18,7 +18,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> that can read OData delta resource sets.
+    /// Represents an <see cref="IODataDeserializer"/> that can read OData delta resource sets.
     /// </summary>
     public class ODataDeltaResourceSetDeserializer : ODataEdmTypeDeserializer
     {
@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataDeltaResourceSetDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataDeltaResourceSetDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataDeltaResourceSetDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Delta, deserializerProvider)
         {
         }

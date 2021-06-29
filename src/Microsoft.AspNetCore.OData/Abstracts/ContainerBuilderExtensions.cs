@@ -63,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // SerializerProvider and DeserializerProvider.
             builder.AddService<ODataSerializerProvider, DefaultODataSerializerProvider>(ServiceLifetime.Singleton);
-            builder.AddService<ODataDeserializerProvider, DefaultODataDeserializerProvider>(ServiceLifetime.Singleton);
+            builder.AddService<IODataDeserializerProvider, DefaultODataDeserializerProvider>(ServiceLifetime.Singleton);
 
             // Deserializers.
             builder.AddService<ODataResourceDeserializer>(ServiceLifetime.Singleton);

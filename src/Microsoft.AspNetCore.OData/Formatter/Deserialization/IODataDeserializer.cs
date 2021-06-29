@@ -1,35 +1,26 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.OData;
 using System;
 using System.Threading.Tasks;
-using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// An <see cref="ODataDeserializer"/> is used to read an ODataMessage into a CLR object.
+    /// An <see cref="IODataDeserializer"/> is used to read an ODataMessage into a CLR object.
     /// </summary>
     /// <remarks>
-    /// Each supported CLR type has a corresponding <see cref="ODataDeserializer" />. A CLR type is supported if it is one of
+    /// Each supported CLR type has a corresponding <see cref="IODataDeserializer" />. A CLR type is supported if it is one of
     /// the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
     /// Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
     /// </remarks>
-    public abstract class ODataDeserializer : IODataDeserializer
+    public interface IODataDeserializer
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataDeserializer"/> class.
-        /// </summary>
-        /// <param name="payloadKind">The kind of payload this deserializer handles.</param>
-        protected ODataDeserializer(ODataPayloadKind payloadKind)
-        {
-            ODataPayloadKind = payloadKind;
-        }
-
         /// <summary>
         /// The kind of ODataPayload this deserializer handles.
         /// </summary>
-        public ODataPayloadKind ODataPayloadKind { get; private set; }
+        ODataPayloadKind ODataPayloadKind { get; }
 
         /// <summary>
         /// Reads an <see cref="IODataRequestMessage"/> using messageReader.
@@ -38,9 +29,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="type">The type of the object to read into.</param>
         /// <param name="readContext">The read context.</param>
         /// <returns>The deserialized object.</returns>
-        public virtual Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
-        {
-            throw Error.NotSupported(SRResources.DeserializerDoesNotSupportRead, GetType().Name);
-        }
+        Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext);
     }
 }

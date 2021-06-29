@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private readonly IEdmEntityTypeReference _productEdmType;
         private readonly IEdmEntityTypeReference _supplierEdmType;
         private readonly IEdmComplexTypeReference _addressEdmType;
-        private readonly ODataDeserializerProvider _deserializerProvider;
+        private readonly IODataDeserializerProvider _deserializerProvider;
         private readonly string _supplyRequestResource;
 
         public ODataResourceDeserializerTests()
@@ -322,7 +322,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadResource_ThrowsSerializationException_TypeCannotBeDeserialized()
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             deserializerProvider.Setup(d => d.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>(), false)).Returns<ODataEdmTypeDeserializer>(null);
             var deserializer = new ODataResourceDeserializer(deserializerProvider.Object);
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { TypeName = _supplierEdmType.FullName() });
@@ -338,7 +338,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             // Arrange
             Mock<ODataEdmTypeDeserializer> supplierDeserializer = new Mock<ODataEdmTypeDeserializer>(ODataPayloadKind.Resource);
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             var deserializer = new ODataResourceDeserializer(deserializerProvider.Object);
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { TypeName = _supplierEdmType.FullName() });
 
