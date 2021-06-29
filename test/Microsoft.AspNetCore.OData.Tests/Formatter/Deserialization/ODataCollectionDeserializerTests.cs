@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static readonly IEdmModel Model = GetEdmModel();
 
         // private static readonly ODataSerializerProvider SerializerProvider = ODataSerializerProviderFactory.Create();
-        private static readonly ODataSerializerProvider SerializerProvider = ODataFormatterHelpers.GetSerializerProvider(); // TODO:
+        private static readonly IODataSerializerProvider SerializerProvider = ODataFormatterHelpers.GetSerializerProvider(); // TODO:
 
         // private static readonly ODataDeserializerProvider DeserializerProvider = ODataDeserializerProviderFactory.Create();
         private static readonly IODataDeserializerProvider DeserializerProvider = ODataFormatterHelpers.GetDeserializerProvider(); // TODO:

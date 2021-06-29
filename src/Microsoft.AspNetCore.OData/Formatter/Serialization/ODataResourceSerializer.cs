@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         private const string Resource = "Resource";
 
         /// <inheritdoc />
-        public ODataResourceSerializer(ODataSerializerProvider serializerProvider)
+        public ODataResourceSerializer(IODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Resource, serializerProvider)
         {
         }
@@ -640,7 +640,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else
                 {
-                    ODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+                    IODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
                     if (propertySerializer == null)
                     {
                         throw Error.NotSupported(SRResources.DynamicPropertyCannotBeSerialized, dynamicProperty.Key,
@@ -771,7 +771,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, null, null);
 
             // Write object.
-            ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmType);
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmType);
             if (serializer == null)
             {
                 throw new SerializationException(
@@ -929,7 +929,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, null /*resourceContext.SerializerContext.QueryContext*/, selectItem);
 
                 // write object.
-                ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
+                IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
                 if (serializer == null)
                 {
                     throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmProperty.Type.ToTraceString()));
@@ -1092,7 +1092,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
 
-            ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
             if (serializer == null)
             {
                 throw new SerializationException(

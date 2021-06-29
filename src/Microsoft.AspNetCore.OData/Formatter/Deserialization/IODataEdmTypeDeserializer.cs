@@ -5,7 +5,7 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
-    public interface IODataEdmTypeDeserializer
+    public interface IODataEdmTypeDeserializer: IODataDeserializer
     {
         /// <summary>
         /// Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.

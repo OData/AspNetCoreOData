@@ -41,13 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// </summary>
         public IODataDeserializerProvider DeserializerProvider { get; private set; }
 
-        /// <summary>
-        /// Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
-        /// </summary>
-        /// <param name="item">The item to deserialize.</param>
-        /// <param name="edmType">The EDM type of the object to read into.</param>
-        /// <param name="readContext">The <see cref="ODataDeserializerContext"/>.</param>
-        /// <returns>The deserialized object.</returns>
+        /// <inheritdoc/>
         public virtual object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
         {
             throw Error.NotSupported(SRResources.DoesNotSupportReadInLine, GetType().Name);

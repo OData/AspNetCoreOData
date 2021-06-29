@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
 
             // Act & Assert
@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ThrowsInvalidOperation_NonEnumType()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             IEdmTypeReference expectedType = EdmCoreModel.Instance.GetString(false);
 
@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             IEdmEnumType enumType = new EdmEnumType("NS", "Enum");
             IEdmTypeReference expectedType = new EdmEnumTypeReference(enumType, false);
@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             Mock<ODataEnumSerializer> serializer = new Mock<ODataEnumSerializer>(provider);
             ODataEnumValue enumValue = new ODataEnumValue("Cartoon");
             serializer.Setup(s => s.CreateODataEnumValue(null, It.IsAny<IEdmEnumTypeReference>(), writeContext)).Returns(enumValue);

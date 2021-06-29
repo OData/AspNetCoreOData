@@ -16,15 +16,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     /// <summary>
     /// The default <see cref="IODataDeserializerProvider"/>.
     /// </summary>
-    public class DefaultODataDeserializerProvider : IODataDeserializerProvider
+    public class ODataDeserializerProvider: IODataDeserializerProvider
     {
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultODataDeserializerProvider"/> class.
+        /// Initializes a new instance of the <see cref="ODataDeserializerProvider"/> class.
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
-        public DefaultODataDeserializerProvider(IServiceProvider serviceProvider)
+        public ODataDeserializerProvider(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
         }

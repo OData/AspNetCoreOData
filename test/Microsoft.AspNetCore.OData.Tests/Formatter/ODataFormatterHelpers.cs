@@ -23,7 +23,7 @@ using Microsoft.OData.ModelBuilder;
 namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     /// <summary>
-    /// A factory for creating <see cref="ODataSerializerProvider"/>.
+    /// A factory for creating <see cref="IODataSerializerProvider"/>.
     /// </summary>
     public static class ODataFormatterHelpers
     {
@@ -102,12 +102,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         /// <summary>
-        /// Gets an <see cref="ODataSerializerProvider"/>.
+        /// Gets an <see cref="IODataSerializerProvider"/>.
         /// </summary>
         /// <returns>An ODataSerializerProvider.</returns>
-        public static ODataSerializerProvider GetSerializerProvider()
+        public static IODataSerializerProvider GetSerializerProvider()
         {
-            return _serviceProvider.GetRequiredService<ODataSerializerProvider>();
+            return _serviceProvider.GetRequiredService<IODataSerializerProvider>();
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
             // Deserializers.
-            services.AddSingleton<IODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, ODataDeserializerProvider>();
 
             services.AddSingleton<ODataResourceDeserializer>();
             services.AddSingleton<ODataEnumDeserializer>();
@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<ODataActionPayloadDeserializer>();
 
             // Serializers.
-            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, DefaultODataSerializerProvider>();
 
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();

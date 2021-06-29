@@ -161,14 +161,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// get the deserializer provider associated with the request.
         /// </summary>
         /// <returns></returns>
-        public static IODataDeserializerProvider GetDeserializerProvider(this HttpRequest request)
+        public static ODataDeserializerProvider GetDeserializerProvider(this HttpRequest request)
         {
             if (request == null)
             {
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<IODataDeserializerProvider>();
+            return request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
         }
 
         /// <summary>

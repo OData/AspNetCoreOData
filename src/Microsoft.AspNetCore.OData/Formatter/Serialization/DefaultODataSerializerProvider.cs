@@ -19,9 +19,9 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
     /// <summary>
-    /// The default implementation of <see cref="ODataSerializerProvider"/>.
+    /// The default implementation of <see cref="IODataSerializerProvider"/>.
     /// </summary>
-    public class DefaultODataSerializerProvider : ODataSerializerProvider
+    public class DefaultODataSerializerProvider : IODataSerializerProvider
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public override ODataEdmTypeSerializer GetEdmTypeSerializer(IEdmTypeReference edmType)
+        public IODataEdmTypeSerializer GetEdmTypeSerializer(IEdmTypeReference edmType)
         {
             if (edmType == null)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public override ODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
+        public IODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
         {
             if (type == null)
             {

@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private readonly IEdmModel _model;
         private readonly IEdmCollectionTypeReference _customersType;
         private readonly IEdmEntityTypeReference _customerType;
-        private readonly ODataSerializerProvider _serializerProvider;
+        private readonly IODataSerializerProvider _serializerProvider;
         private readonly IODataDeserializerProvider _deserializerProvider;
 
         public ODataResourceSetDeserializerTests()

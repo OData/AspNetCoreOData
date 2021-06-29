@@ -27,8 +27,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Initializes a new instance of <see cref="ODataDeltaResourceSetSerializer"/>.
         /// </summary>
-        /// <param name="serializerProvider">The <see cref="ODataSerializerProvider"/> to use to write nested entries.</param>
-        public ODataDeltaResourceSetSerializer(ODataSerializerProvider serializerProvider)
+        /// <param name="serializerProvider">The <see cref="IODataSerializerProvider"/> to use to write nested entries.</param>
+        public ODataDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Delta, serializerProvider)
         {
         }

@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         }
                         else
                         {
-                            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(parameter.Type);
+                            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(parameter.Type);
                             payload[parameterName] = deserializer.ReadInline(reader.Value, parameter.Type, readContext);
                         }
                         break;

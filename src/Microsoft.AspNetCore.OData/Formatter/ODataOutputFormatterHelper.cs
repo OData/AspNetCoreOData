@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             MediaTypeHeaderValue contentType,
             HttpRequest request,
             IHeaderDictionary requestHeaders,
-            ODataSerializerProvider serializerProvider)
+            IODataSerializerProvider serializerProvider)
         {
             if (model == null)
             {
@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         internal static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
-            ODataSerializerProvider serializerProvider)
+            IODataSerializerProvider serializerProvider)
         {
             ODataSerializer serializer;
 

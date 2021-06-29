@@ -355,7 +355,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Contract.Assert(collectionType != null, "The type for collection must be a IEdmCollectionType.");
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
+            IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
             return deserializer.ReadInline(collection, collectionType, readContext);
         }
 
@@ -410,7 +410,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 edmEnumType = propertyType.AsEnum();
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
+            IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
             return deserializer.ReadInline(enumValue, propertyType, readContext);
         }
 

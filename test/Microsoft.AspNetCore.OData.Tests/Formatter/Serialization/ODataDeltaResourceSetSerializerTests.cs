@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             object graph = new object();
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -125,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             object graph = new object();
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(provider.Object);
             serializer.CallBase = true;
             serializer
@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsArgumentNull_Writer()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -165,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -178,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsSerializationException_CannotSerializerNull()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -192,7 +192,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsSerializationException_IfGraphIsNotEnumerable()
         {
             // Arrange
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act & Assert
@@ -207,7 +207,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[] { null };
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
             // Act
@@ -220,7 +220,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_Throws_TypeCannotBeSerialized_IfFeedContainsEntityThatCannotBeSerialized()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             var request = RequestFactory.Create();
             serializerProvider.Setup(s => s.GetODataPayloadSerializer(typeof(int), request)).Returns<ODataSerializer>(null);
             IEnumerable instance = new object[] { 42 };
@@ -237,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[0];
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(provider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns(new ODataDeltaResourceSet()).Verifiable();
@@ -254,7 +254,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable instance = new object[0];
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(provider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns<ODataDeltaResourceSet>(null);
@@ -272,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataDeltaResourceSet deltaResourceSet = new ODataDeltaResourceSet();
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(provider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns(deltaResourceSet);
@@ -297,11 +297,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             var mockWriter = new Mock<ODataWriter>();
 
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
             Mock<ODataResourceSerializer> customerSerializer = new Mock<ODataResourceSerializer>(provider.Object);
             customerSerializer.Setup(s => s.WriteDeltaObjectInlineAsync(edmObject.Object, edmType, mockWriter.Object, _writeContext)).Verifiable();
 
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(edmType)).Returns(customerSerializer.Object);
 
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(serializerProvider.Object);
@@ -317,9 +317,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_WritesEachEntityInstance()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializeProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataResourceSerializer> customerSerializer = new Mock<ODataResourceSerializer>(serializeProvider.Object);
-            ODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
+            IODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
             var mockWriter = new Mock<ODataWriter>();
             customerSerializer.Setup(s => s.WriteDeltaObjectInlineAsync(_deltaResourceSetCustomers[0], _customersType.ElementType(), mockWriter.Object, _writeContext)).Verifiable();
             _serializer = new ODataDeltaResourceSetSerializer(provider);
@@ -337,7 +337,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataDeltaResourceSet deltaResourceSet = new ODataDeltaResourceSet { NextPageLink = new Uri("http://nextlink.com/") };
-            Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializeProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(serializeProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns(deltaResourceSet);
@@ -366,7 +366,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable instance = new object[0];
             ODataDeltaResourceSet deltaResourceSet = new ODataDeltaResourceSet { DeltaLink = new Uri("http://deltalink.com/") };
-            Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializeProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataDeltaResourceSetSerializer> serializer = new Mock<ODataDeltaResourceSetSerializer>(serializeProvider.Object);
             serializer.CallBase = true;
             serializer.Setup(s => s.CreateODataDeltaResourceSet(instance, _customersType, _writeContext)).Returns(deltaResourceSet);
@@ -393,7 +393,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataDeltaResourceSet_Sets_CountValueForPageResult()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializeProvider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(serializeProvider.Object);
             Uri expectedNextLink = new Uri("http://nextlink.com");
             const long ExpectedCountValue = 1000;
@@ -411,7 +411,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataDeltaResourceSet_Sets_NextPageLinkForPageResult()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializeProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializeProvider = new Mock<IODataSerializerProvider>();
             ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(serializeProvider.Object);
             Uri expectedNextLink = new Uri("http://nextlink.com");
             const long ExpectedCountValue = 1000;
