@@ -848,7 +848,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<IODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
 
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();
