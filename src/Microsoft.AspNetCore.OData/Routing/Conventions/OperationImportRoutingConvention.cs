@@ -73,13 +73,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                 IEdmActionImport actionImport = actionImports[0];
 
-                IEdmEntitySetBase targetSet;
-                actionImport.TryGetStaticEntitySet(model, out targetSet);
+                IEdmEntitySetBase targetEntitySet;
+                actionImport.TryGetStaticEntitySet(model, out targetEntitySet);
 
                 // TODO:
                 // 1. shall we check the [HttpPost] attribute, or does the ASP.NET Core have the default?
                 // 2) shall we check the action has "ODataActionParameters" parameter type?
-                ODataPathTemplate template = new ODataPathTemplate(new ActionImportSegmentTemplate(actionImport, targetSet));
+                ODataPathTemplate template = new ODataPathTemplate(new ActionImportSegmentTemplate(actionImport, targetEntitySet));
                 action.AddSelector("Post", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }

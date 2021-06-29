@@ -73,10 +73,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string castTypeName = actionName.Substring(index + 4); // + 4 means to skip the "From"
-            if (string.IsNullOrEmpty(castTypeName))
-            {
-                return false;
-            }
 
             IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
             if (castType == null)
