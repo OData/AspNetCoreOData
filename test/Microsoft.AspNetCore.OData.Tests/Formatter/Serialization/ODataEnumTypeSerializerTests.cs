@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEnumType enumType = model.SchemaElements.OfType<IEdmEnumType>().Single();
 
             IServiceProvider serviceProvder = new Mock<IServiceProvider>().Object;
-            var provider = new DefaultODataSerializerProvider(serviceProvder);
+            var provider = new ODataSerializerProvider(serviceProvder);
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {

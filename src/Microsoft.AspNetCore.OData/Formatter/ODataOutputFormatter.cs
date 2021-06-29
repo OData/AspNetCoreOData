@@ -341,7 +341,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 type = type.GetGenericArguments()[0];
             }
 
-            ODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
+            IODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
             return serializer == null ? null : (ODataPayloadKind?)serializer.ODataPayloadKind;
         }
 

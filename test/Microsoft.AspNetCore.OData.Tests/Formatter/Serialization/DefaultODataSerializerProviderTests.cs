@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void DefaultOdataSerializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
         {
             ExceptionAssert.ThrowsArgumentNull(
-                () => new DefaultODataSerializerProvider(serviceProvider: null),
+                () => new ODataSerializerProvider(serviceProvider: null),
                 "serviceProvider");
         }
 
@@ -416,7 +416,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<IODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
 
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();

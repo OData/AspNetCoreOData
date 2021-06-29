@@ -21,15 +21,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     /// <summary>
     /// The default implementation of <see cref="IODataSerializerProvider"/>.
     /// </summary>
-    public class DefaultODataSerializerProvider : IODataSerializerProvider
+    public class ODataSerializerProvider: IODataSerializerProvider
     {
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultODataSerializerProvider"/> class.
+        /// Initializes a new instance of the <see cref="ODataSerializerProvider"/> class.
         /// </summary>
         /// <param name="serviceProvider">The root container.</param>
-        public DefaultODataSerializerProvider(IServiceProvider serviceProvider)
+        public ODataSerializerProvider(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
         }
