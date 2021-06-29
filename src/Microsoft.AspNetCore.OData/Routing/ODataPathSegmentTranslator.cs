@@ -23,12 +23,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (node == null)
             {
-                throw Error.ArgumentNull("node");
+                throw Error.ArgumentNull(nameof(node));
             }
 
             if (parameterAliasNodes == null)
             {
-                throw Error.ArgumentNull("parameterAliasNodes");
+                throw Error.ArgumentNull(nameof(parameterAliasNodes));
             }
 
             ParameterAliasNode parameterAliasNode = node as ParameterAliasNode;

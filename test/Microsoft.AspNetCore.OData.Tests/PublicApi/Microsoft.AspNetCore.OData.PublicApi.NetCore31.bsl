@@ -1687,7 +1687,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	bool EnableControllerNameCaseInsensitive  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }
-	bool EnableNonParenthsisForEmptyParameterFunction  { public get; public set; }
+	bool EnableNonParenthesisForEmptyParameterFunction  { public get; public set; }
 	bool EnableQualifiedOperationCall  { public get; public set; }
 	bool EnableUnqualifiedOperationCall  { public get; public set; }
 }

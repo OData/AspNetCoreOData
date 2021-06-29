@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// GET ~/entityset/cast/$count
     /// POST ~/entityset
     /// POST ~/entityset/cast
-    /// PATCH ~/entityset   ==> Delta resource set patch
+    /// PATCH ~/entityset ==> Delta resource set patch
     /// </summary>
     public class EntitySetRoutingConvention : IODataControllerActionConvention
     {
@@ -73,6 +73,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string castTypeName = actionName.Substring(index + 4); // + 4 means to skip the "From"
+
             IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
             if (castType == null)
             {
@@ -101,10 +102,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
+
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
@@ -113,10 +116,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
+
                 segments.Add(CountSegmentTemplate.Instance);
 
                 template = new ODataPathTemplate(segments);
@@ -130,6 +135,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     IEdmCollectionType castCollectionType = castType.ToCollection(true);

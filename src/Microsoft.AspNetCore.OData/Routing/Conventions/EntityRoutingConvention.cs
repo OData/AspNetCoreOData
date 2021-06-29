@@ -85,26 +85,27 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         internal static (string, string) Split(string actionName)
         {
             string typeName;
-            string methodName;
+            string methodName = null;
             if (actionName.StartsWith("Get", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(3);
                 methodName = "Get";
             }
             else if (actionName.StartsWith("Put", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(3);
                 methodName = "Put";
             }
             else if (actionName.StartsWith("Patch", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(5);
                 methodName = "Patch";
             }
             else if (actionName.StartsWith("Delete", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(6);
                 methodName = "Delete";
+            }
+
+            if (methodName != null)
+            {
+                typeName = actionName.Substring(methodName.Length);
             }
             else
             {

@@ -15,10 +15,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
-    /// Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
-    /// Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
-    /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
-    /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
+    /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
+    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+    /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
+    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
     /// </summary>
     public abstract class OperationRoutingConvention : IODataControllerActionConvention
     {
@@ -198,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Verify the parameter of the edm operation meets the parameter defined in action.
+        /// Verify the parameter of the Edm operation meets the parameter defined in action.
         /// </summary>
         /// <param name="operation">The Edm operation.</param>
         /// <param name="action">The action model.</param>
@@ -254,22 +254,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            IEdmNavigationSource targetset = null;
+            IEdmNavigationSource targetEntitySet = null;
             if (edmOperation.ReturnType != null)
             {
-                targetset = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
+                targetEntitySet = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
             }
 
             string httpMethod;
             if (edmOperation.IsAction())
             {
-                segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetset));
+                segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetEntitySet));
                 httpMethod = "Post";
             }
             else
             {
                 IDictionary<string, string> required = GetRequiredFunctionParamters(edmOperation, context.Action);
-                segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetset));
+                segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetEntitySet));
                 httpMethod = "Get";
             }
 

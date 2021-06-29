@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +12,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for <see cref="IEdmAction"/>.
-    /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
-    /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
+    /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
+    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
     /// </summary>
     public class ActionRoutingConvention : OperationRoutingConvention
     {
@@ -59,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // So far, we use the "ODataActionParameters" and "ODataUntypedActionParameters" to hold the action parameter values.
-            // TODO: consider to use [FromODataBody] to seperate the parameters to each corresponding 
+            // TODO: consider using [FromODataBody] to separate the parameters to each corresponding 
             if (operation.Parameters.Count() > 1)
             {
                 if (!action.Parameters.Any(p => p.ParameterType == typeof(ODataActionParameters) || p.ParameterType == typeof(ODataUntypedActionParameters)))

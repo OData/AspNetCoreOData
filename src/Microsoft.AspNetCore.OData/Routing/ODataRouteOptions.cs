@@ -110,6 +110,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets or sets a value indicating whther to generate non parenthsis for non-parameter function.
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableNonParenthsisForEmptyParameterFunction { get; set; } = false;
+        public bool EnableNonParenthesisForEmptyParameterFunction { get; set; } = false;
     }
 }

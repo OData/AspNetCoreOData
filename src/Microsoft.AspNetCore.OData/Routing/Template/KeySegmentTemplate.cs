@@ -104,8 +104,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <summary>
         /// Gets the keys.
-        /// The key of dict is the key name or alias name.
-        /// The value of dict is the key property, it could be property on entity type or sub property on complex property.
+        /// The key of dictionary is the key name or alias.
+        /// The value of dictionary is the key property, it could be property on entity type or sub property on complex property.
         /// </summary>
         public IDictionary<string, IEdmProperty> KeyProperties { get; }
 

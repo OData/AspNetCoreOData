@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -116,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 WriteIndented = true
             };
             string output = JsonSerializer.Serialize(routeInfoList, options);
-            context.Response.Headers["Content_Type"] = "application/json";
+            context.Response.ContentType = MediaTypeNames.Application.Json;
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
@@ -145,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             output = output.Replace("ODATA_ROUTE_CONTENT", odataRouteTable.ToString(), StringComparison.Ordinal);
             output = output.Replace("STD_ROUTE_CONTENT", stdRouteTable.ToString(), StringComparison.Ordinal);
 
-            context.Response.Headers["Content-Type"] = "text/html";
+            context.Response.ContentType = "text/html";
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
@@ -155,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             var acceptHeaders = MediaTypeHeaderValue.ParseList(headers[HeaderNames.Accept]);
 
             var result = acceptHeaders.Any(h =>
-                h.IsSubsetOf(new MediaTypeHeaderValue("application/json")));
+                h.IsSubsetOf(new MediaTypeHeaderValue(MediaTypeNames.Application.Json)));
             return result;
         }
 

@@ -105,8 +105,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return null;
             }
 
-            IEdmStructuredType previewEdmType = previous.EdmType as IEdmStructuredType;
-            if (previewEdmType == null)
+            IEdmStructuredType previousEdmType = previous.EdmType as IEdmStructuredType;
+            if (previousEdmType == null)
             {
                 return null;
             }
@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
+            IEdmProperty edmProperty = previousEdmType.ResolveProperty(propertyName);
             IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
             if (structuralProperty != null)
             {
@@ -141,8 +141,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return null;
             }
 
-            IEdmStructuredType previewEdmType = previous.EdmType as IEdmStructuredType;
-            if (previewEdmType == null || !previewEdmType.IsOpen)
+            IEdmStructuredType previousEdmType = previous.EdmType as IEdmStructuredType;
+            if (previousEdmType == null || !previousEdmType.IsOpen)
             {
                 return null;
             }
@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
+            IEdmProperty edmProperty = previousEdmType.ResolveProperty(propertyName);
             if (edmProperty != null)
             {
                 return null;

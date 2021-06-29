@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             // Act & Assert
             templates = functionImportSegment.GetTemplates(new ODataRouteOptions
             {
-                EnableNonParenthsisForEmptyParameterFunction = true
+                EnableNonParenthesisForEmptyParameterFunction = true
             });
             template = Assert.Single(templates);
             Assert.Equal("/MyFunctionImport", template);
