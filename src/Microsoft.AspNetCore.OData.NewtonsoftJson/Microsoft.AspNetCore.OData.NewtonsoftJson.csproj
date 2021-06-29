@@ -54,4 +54,12 @@
       <CustomToolNamespace>Microsoft.AspNetCore.OData.NewtonsoftJson</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
+
+   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>ProductRoot=$(productBinPath);VersionNuGetSemantic=$(VersionNuGetSemantic)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);NightlyBuildVersion=$(NightlyBuildVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);SourcesRoot=$(SourcesRoot)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 </Project>
