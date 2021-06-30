@@ -3,7 +3,6 @@
 
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
