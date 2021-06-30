@@ -1577,7 +1577,6 @@ virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.ExpectedClrType.get -> System
 virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.StructuredType.get -> System.Type
 virtual Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.ExpectedClrType.get -> System.Type
 virtual Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.StructuredType.get -> System.Type
-virtual Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.GetOriginal(Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem deltaItem, System.Collections.IEnumerable originalSet) -> T
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEditLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel, System.Uri idLink) -> System.Uri
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEntitySelfLinks(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> Microsoft.AspNetCore.OData.Edm.EntitySelfLinks
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildIdLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> System.Uri
