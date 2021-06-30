@@ -163,7 +163,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             // Arrange & Act & Assert
             var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
-            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadResourceSet(null, null, null), "resourceSet");
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadResourceSet(null, null, null).GetEnumerator().MoveNext(), "resourceSet");
         }
 
         [Fact]

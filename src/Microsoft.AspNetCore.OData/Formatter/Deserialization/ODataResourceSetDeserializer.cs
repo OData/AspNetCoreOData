@@ -132,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceSet == null)
             {
-                throw new ArgumentNullException(nameof(resourceSet));
+                throw Error.ArgumentNull(nameof(resourceSet));
             }
 
             ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
