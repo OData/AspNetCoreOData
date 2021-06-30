@@ -30,17 +30,5 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="writer">The <see cref="ODataWriter" /> to be used for writing.</param>
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
         Task WriteObjectInlineAsync(object graph, IEdmTypeReference expectedType, ODataWriter writer, ODataSerializerContext writeContext);
-
-        /// <summary>
-        /// Creates an <see cref="ODataProperty"/> with name <paramref name="elementName"/> and value
-        /// based on the object represented by <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">The object to base the value of the property on.</param>
-        /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-        /// <param name="elementName">The name of the property.</param>
-        /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
-        /// <returns>The <see cref="ODataProperty"/> created.</returns>
-        ODataProperty CreateProperty(object graph, IEdmTypeReference expectedType, string elementName,
-            ODataSerializerContext writeContext);
     }
 }

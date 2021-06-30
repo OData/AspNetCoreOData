@@ -50,17 +50,5 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             throw Error.NotSupported(SRResources.CreateODataValueNotSupported, GetType().Name);
         }
-
-        /// <inheritdoc/>
-        public virtual ODataProperty CreateProperty(object graph, IEdmTypeReference expectedType, string elementName,
-            ODataSerializerContext writeContext)
-        {
-            Contract.Assert(elementName != null);
-            return new ODataProperty
-            {
-                Name = elementName,
-                Value = CreateODataValue(graph, expectedType, writeContext)
-            };
-        }
     }
 }

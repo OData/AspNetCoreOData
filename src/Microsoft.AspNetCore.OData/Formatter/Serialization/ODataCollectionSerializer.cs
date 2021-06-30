@@ -204,26 +204,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return value;
         }
 
-        /// <inheritdoc />
-        public override ODataProperty CreateProperty(object graph, IEdmTypeReference expectedType, string elementName,
-            ODataSerializerContext writeContext)
-        {
-            Contract.Assert(elementName != null);
-            var property = CreateODataValue(graph, expectedType, writeContext);
-            if (property != null)
-            {
-                return new ODataProperty
-                {
-                    Name = elementName,
-                    Value = property
-                };
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         /// <summary>
         /// Adds the type name annotations required for proper json light serialization.
         /// </summary>

@@ -3967,17 +3967,6 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.CreateProperty(System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Creates an <see cref="T:Microsoft.OData.ODataProperty"/> with name <paramref name="elementName"/> and value
-            based on the object represented by <paramref name="graph"/>.
-            </summary>
-            <param name="graph">The object to base the value of the property on.</param>
-            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-            <param name="elementName">The name of the property.</param>
-            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
-            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> created.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer">
             <summary>
             An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> is used to write a CLR object to an ODataMessage.
@@ -4058,9 +4047,6 @@
             <param name="elementType">The element EDM type of the collection.</param>
             <param name="writeContext">The serializer context to be used while creating the collection.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataCollectionValue"/>.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.CreateProperty(System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(Microsoft.OData.ODataCollectionValue,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
             <summary>
@@ -4160,9 +4146,6 @@
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.CreateProperty(System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer">
@@ -4586,6 +4569,17 @@
             <summary>
             Gets or sets the navigation property being expanded.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerPropertyHelper.CreateProperty(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer,System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataProperty"/> with name <paramref name="elementName"/> and value
+            based on the object represented by <paramref name="graph"/>.
+            </summary>
+            <param name="graph">The object to base the value of the property on.</param>
+            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
+            <param name="elementName">The name of the property.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> created.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider">
             <summary>

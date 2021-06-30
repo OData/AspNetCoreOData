@@ -52,8 +52,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Arrange
             Type intType = typeof(int);
             HttpRequest request = new DefaultHttpContext().Request;
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
-            provider.Setup(s => s.GetODataPayloadSerializer(intType, request)).Returns((ODataSerializer)null);
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
+            provider.Setup(s => s.GetODataPayloadSerializer(intType, request)).Returns((IODataSerializer)null);
 
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
@@ -69,8 +69,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Mock<IEdmObject> mock = new Mock<IEdmObject>();
             mock.Setup(s => s.GetEdmType()).Returns(intType);
 
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
-            provider.Setup(s => s.GetEdmTypeSerializer(intType)).Returns((ODataEdmTypeSerializer)null);
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
+            provider.Setup(s => s.GetEdmTypeSerializer(intType)).Returns((IODataEdmTypeSerializer)null);
 
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(

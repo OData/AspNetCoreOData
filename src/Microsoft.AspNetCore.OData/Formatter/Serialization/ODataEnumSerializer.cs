@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            await messageWriter.WritePropertyAsync(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
+            await messageWriter.WritePropertyAsync(this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
