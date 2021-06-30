@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData;
@@ -774,6 +775,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void ApplyDeletedResource_ThrowsArgumentNull_ResourceWrapper()
+        {
+            // Arrange & Act & Assert
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ApplyDeletedResource(null, null, null), "resourceWrapper");
+        }
+
+        [Fact]
+        public void ApplyDeletedResource_ThrowsArgumentNull_ReadContext()
+        {
+            // Arrange & Act & Assert
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+            ODataResourceWrapper wrapper = new ODataResourceWrapper(new ODataResource());
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ApplyDeletedResource(null, wrapper, null), "readContext");
+        }
+
+        [Fact]
         public void ApplyNestedProperties_ThrowsArgumentNull_EntryWrapper()
         {
             // Arrange
@@ -845,39 +863,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 "Cannot find nested property 'SomeProperty' on the resource type 'ODataDemo.Product'.");
         }
 
-        /* Never valid test cases
-        [Fact]
-        public void ApplyNestedProperty_ThrowsODataException_WhenPatchingNavigationProperty()
-        {
-            // Arrange
-            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
-            ODataNestedResourceInfoWrapper resourceInfoWrapper = new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Supplier" });
-            resourceInfoWrapper.NestedItems.Add(new ODataResourceWrapper(new ODataResource()));
-            _readContext.ResourceType = typeof(Delta<Supplier>);
-
-            // Act & Assert
-            ExceptionAssert.Throws<ODataException>(
-                () => deserializer.ApplyNestedProperty(42, resourceInfoWrapper, _productEdmType, _readContext),
-                "Cannot apply PATCH to navigation property 'Supplier' on entity type 'ODataDemo.Product'.");
-        }
-
-        [Fact]
-        public void ApplyNestedProperty_ThrowsODataException_WhenPatchingCollectionNavigationProperty()
-        {
-            // Arrange
-            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
-            ODataNestedResourceInfoWrapper resourceInfoWrapper = new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Products" });
-            resourceInfoWrapper.NestedItems.Add(new ODataResourceSetWrapper(new ODataResourceSet()));
-            _readContext.ResourceType = typeof(Delta<Supplier>);
-
-            // Act & Assert
-            ExceptionAssert.Throws<ODataException>(
-                () => deserializer.ApplyNestedProperty(42, resourceInfoWrapper, _supplierEdmType, _readContext),
-                "Cannot apply PATCH to navigation property 'Products' on entity type 'ODataDemo.Supplier'.");
-        }
-        */
-
-        /*
         [Fact]
         public void ApplyNestedProperty_UsesThePropertyAlias_ForResourceSet()
         {
@@ -934,7 +919,104 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Assert
             Assert.Equal(42, order.AliasedCustomer.ID);
         }
-        */
+
+        [Fact]
+        public void ApplyNestedProperty_Works_ForEntityReferenceLinkWrapper()
+        {
+            // Arrange
+            Product product = new Product();
+            ODataNestedResourceInfoWrapper resourceInfoWrapper =
+                new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Supplier" });
+            resourceInfoWrapper.NestedItems.Add(
+                new ODataEntityReferenceLinkWrapper(
+                    new ODataEntityReferenceLink
+                    {
+                        Url = new Uri("http://localhost/Suppliers(42)", UriKind.RelativeOrAbsolute)
+                    })
+                );
+
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost");
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = _edmModel,
+                Request = request
+            };
+
+            // Act
+            new ODataResourceDeserializer(_deserializerProvider)
+                .ApplyNestedProperty(product, resourceInfoWrapper, _productEdmType, context);
+
+            // Assert
+            Assert.Equal(42, product.Supplier.ID);
+        }
+
+        [Fact]
+        public void ApplyNestedProperty_Works_ForEntityReferenceLinksWrapper()
+        {
+            // Arrange
+            Supplier supplier = new Supplier();
+            ODataNestedResourceInfoWrapper resourceInfoWrapper =
+                new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Products" });
+            resourceInfoWrapper.NestedItems.Add(
+                new ODataEntityReferenceLinkWrapper(
+                    new ODataEntityReferenceLink
+                    {
+                        Url = new Uri("http://localhost/Products(5)", UriKind.RelativeOrAbsolute)
+                    })
+                );
+            resourceInfoWrapper.NestedItems.Add(
+                new ODataEntityReferenceLinkWrapper(
+                    new ODataEntityReferenceLink
+                    {
+                        Url = new Uri("http://localhost/Products(6)", UriKind.RelativeOrAbsolute)
+                    })
+                );
+
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost");
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = _edmModel,
+                Request = request
+            };
+
+            // Act
+            new ODataResourceDeserializer(_deserializerProvider)
+                .ApplyNestedProperty(supplier, resourceInfoWrapper, _supplierEdmType, context);
+
+            // Assert
+            Assert.Equal(2, supplier.Products.Count);
+            Assert.Collection(supplier.Products,
+                e => Assert.Equal(5, e.ID),
+                e => Assert.Equal(6, e.ID));
+        }
+
+        [Fact(Skip = "This test need to refactor and the ODataResourceDeserializer has the problem for nested resource set.")]
+        public void ApplyNestedProperty_Works_ForDeltaResourceSetWrapper()
+        {
+            // Arrange
+            Delta<Supplier> supplier = new Delta<Supplier>();
+            ODataNestedResourceInfoWrapper resourceInfoWrapper =
+                new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = "Products" });
+
+            ODataDeltaResourceSetWrapper wrapper = new ODataDeltaResourceSetWrapper(new ODataDeltaResourceSet());
+            ODataResource resource = new ODataResource { Properties = new[] { new ODataProperty { Name = "ID", Value = 42 } } };
+            wrapper.DeltaItems.Add(new ODataResourceWrapper(resource));
+
+            resourceInfoWrapper.NestedItems.Add(wrapper);
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost");
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = _edmModel,
+                Request = request
+            };
+
+            // Act
+            new ODataResourceDeserializer(_deserializerProvider)
+                .ApplyNestedProperty(supplier, resourceInfoWrapper, _supplierEdmType, context);
+
+            // Assert
+            Assert.True(supplier.TryGetPropertyValue("Products", out _));
+        }
 
         [Fact]
         public void ApplyStructuralProperties_ThrowsArgumentNull_resourceWrapper()
@@ -1269,7 +1351,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             public string Name { get; set; }
 
-            public virtual ICollection<Product> Products { get; set; }
+            public virtual IList<Product> Products { get; set; }
         }
 
         public class Supplier
@@ -1284,7 +1366,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             public SupplierRating SupplierRating { get; set; }
 
-            public virtual ICollection<Product> Products { get; set; }
+            public virtual IList<Product> Products { get; set; }
         }
 
         public class Address
