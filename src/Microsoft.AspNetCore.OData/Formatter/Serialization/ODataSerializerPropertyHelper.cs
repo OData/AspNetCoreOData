@@ -14,6 +14,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Creates an <see cref="ODataProperty"/> with name <paramref name="elementName"/> and value
         /// based on the object represented by <paramref name="graph"/>.
         /// </summary>
+        /// <param name="serializer">The <see cref="IODataEdmTypeSerializer"/> writing the property value.</param>
         /// <param name="graph">The object to base the value of the property on.</param>
         /// <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
         /// <param name="elementName">The name of the property.</param>

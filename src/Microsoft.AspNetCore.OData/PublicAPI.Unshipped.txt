@@ -9,12 +9,8 @@ abstract Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyType(string name,
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyValue(string name, out object value) -> bool
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TrySetPropertyValue(string name, object value) -> bool
 abstract Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
-abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer
-abstract Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer
 abstract Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping.TryMatchMediaType(Microsoft.AspNetCore.Http.HttpRequest request) -> double
 abstract Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.IsMatch(Microsoft.OData.UriParser.PropertySegment propertySegment) -> bool
-abstract Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer
-abstract Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer
 abstract Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Bind(Microsoft.OData.UriParser.QueryNode node) -> System.Linq.Expressions.Expression
 abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Parameter.get -> System.Linq.Expressions.ParameterExpression
@@ -295,15 +291,21 @@ Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions
 Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers
 Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions
 Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys
-Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider
-Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.DefaultODataDeserializerProvider(System.IServiceProvider serviceProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer.ODataPayloadKind.get -> Microsoft.OData.ODataPayloadKind
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Threading.Tasks.Task<object>
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer.ReadInline(object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.DeserializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.ODataActionPayloadDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.DeserializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.ODataActionPayloadDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ODataCollectionDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ODataCollectionDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ODataDeltaResourceSetDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ODataDeltaResourceSetDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.ODataDeserializer(Microsoft.OData.ODataPayloadKind payloadKind) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.ODataPayloadKind.get -> Microsoft.OData.ODataPayloadKind
@@ -322,11 +324,13 @@ Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.Re
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.TimeZone.get -> System.TimeZoneInfo
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.TimeZone.set -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.ODataDeserializerProvider() -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.ODataDeserializerProvider(System.IServiceProvider serviceProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.DeserializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.DeserializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.ODataEdmTypeDeserializer(Microsoft.OData.ODataPayloadKind payloadKind) -> void
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.ODataEdmTypeDeserializer(Microsoft.OData.ODataPayloadKind payloadKind, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.ODataEdmTypeDeserializer(Microsoft.OData.ODataPayloadKind payloadKind, Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer.ODataEntityReferenceLinkDeserializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer
@@ -334,9 +338,9 @@ Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.OData
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer.ODataPrimitiveDeserializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ODataResourceDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ODataResourceDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer
-Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ODataResourceSetDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider deserializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ODataResourceSetDeserializer(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider deserializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.FromODataBodyAttribute
 Microsoft.AspNetCore.OData.Formatter.FromODataBodyAttribute.FromODataBodyAttribute() -> void
 Microsoft.AspNetCore.OData.Formatter.FromODataUriAttribute
@@ -418,22 +422,29 @@ Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.Request.set -> void
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetContext() -> void
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetInstance.get -> object
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetInstance.set -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider
-Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.DefaultODataSerializerProvider(System.IServiceProvider serviceProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.CreateODataValue(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataValue
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.WriteObjectInlineAsync(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.ODataPayloadKind.get -> Microsoft.OData.ODataPayloadKind
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.WriteObjectAsync(object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.ODataCollectionSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.ODataCollectionSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.ODataDeltaResourceSetSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.ODataDeltaResourceSetSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.ODataEdmTypeSerializer(Microsoft.OData.ODataPayloadKind payloadKind) -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.ODataEdmTypeSerializer(Microsoft.OData.ODataPayloadKind payloadKind, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.SerializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.ODataEdmTypeSerializer(Microsoft.OData.ODataPayloadKind payloadKind, Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.SerializerProvider.get -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer.ODataEntityReferenceLinkSerializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinksSerializer.ODataEntityReferenceLinksSerializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.ODataEnumSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.ODataEnumSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer.ODataErrorSerializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSerializer
@@ -443,9 +454,9 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.ODat
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataRawValueSerializer.ODataRawValueSerializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.ODataResourceSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.ODataResourceSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.ODataResourceSetSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider serializerProvider) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.ODataResourceSetSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind.get -> Microsoft.OData.ODataPayloadKind
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataSerializer(Microsoft.OData.ODataPayloadKind payloadKind) -> void
@@ -480,7 +491,9 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SkipEx
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.TimeZone.get -> System.TimeZoneInfo
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.TimeZone.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.ODataSerializerProvider() -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.ODataSerializerProvider(System.IServiceProvider serviceProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.ODataServiceDocumentSerializer() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode
@@ -1293,8 +1306,6 @@ override Microsoft.AspNetCore.OData.Deltas.Delta<T>.TrySetPropertyValue(string n
 override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Deltas.DeltaLink<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
-override Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference edmType, bool isDelta = false) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer
-override Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Threading.Tasks.Task<object>
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Threading.Tasks.Task<object>
 override Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Threading.Tasks.Task<object>
@@ -1319,8 +1330,6 @@ override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.CanWriteResul
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetSupportedContentTypes(string contentType, System.Type objectType) -> System.Collections.Generic.IReadOnlyList<string>
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context, System.Text.Encoding selectedEncoding) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseHeaders(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context) -> void
-override Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer
-override Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer
 override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteObjectAsync(object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectInlineAsync(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
@@ -1485,7 +1494,7 @@ static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary<string, object> properties, System.TimeZoneInfo timeZone = null) -> string
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateSubServiceProvider(this Microsoft.AspNetCore.Http.HttpRequest request, string prefixName) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(this Microsoft.AspNetCore.Http.HttpRequest request, bool dispose) -> void
-static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetETagHandler(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Abstracts.IETagHandler
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.Edm.IEdmModel
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(this Microsoft.AspNetCore.Http.HttpRequest request, int pageSize, object instance, System.Func<object, string> objectToSkipTokenValue) -> System.Uri

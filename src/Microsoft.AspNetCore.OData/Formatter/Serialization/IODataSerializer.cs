@@ -18,9 +18,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     public interface IODataSerializer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IODataSerializer"/> class.
+        /// The kind of OData payload that this serializer generates.
         /// </summary>
-        /// <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         ODataPayloadKind ODataPayloadKind { get; }
 
         /// <summary>

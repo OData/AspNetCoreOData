@@ -2891,6 +2891,11 @@
             <param name="isDelta">Is delta</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer">
+            <summary>
+            Interface for all <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer" />s that deserialize into an object backed by <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
@@ -3979,9 +3984,8 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.ODataPayloadKind">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> class.
+            The kind of OData payload that this serializer generates.
             </summary>
-            <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
@@ -4575,6 +4579,7 @@
             Creates an <see cref="T:Microsoft.OData.ODataProperty"/> with name <paramref name="elementName"/> and value
             based on the object represented by <paramref name="graph"/>.
             </summary>
+            <param name="serializer">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer"/> writing the property value.</param>
             <param name="graph">The object to base the value of the property on.</param>
             <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
             <param name="elementName">The name of the property.</param>
