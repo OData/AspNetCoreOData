@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Initializes a new instance of the <see cref="ODataCollectionSerializer"/> class.
         /// </summary>
         /// <param name="serializerProvider">The serializer provider to use to serialize nested objects.</param>
-        public ODataCollectionSerializer(ODataSerializerProvider serializerProvider)
+        public ODataCollectionSerializer(IODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Collection, serializerProvider)
         {
         }
@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (enumerable != null)
             {
-                ODataEdmTypeSerializer itemSerializer = null;
+                IODataEdmTypeSerializer itemSerializer = null;
                 foreach (object item in enumerable)
                 {
                     if (item == null)
@@ -202,25 +202,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             AddTypeNameAnnotationAsNeeded(value, writeContext.MetadataLevel);
             return value;
-        }
-
-        internal override ODataProperty CreateProperty(object graph, IEdmTypeReference expectedType, string elementName,
-            ODataSerializerContext writeContext)
-        {
-            Contract.Assert(elementName != null);
-            var property = CreateODataValue(graph, expectedType, writeContext);
-            if (property != null)
-            {
-                return new ODataProperty
-                {
-                    Name = elementName,
-                    Value = property
-                };
-            }
-            else
-            {
-                return null;
-            }
         }
 
         /// <summary>

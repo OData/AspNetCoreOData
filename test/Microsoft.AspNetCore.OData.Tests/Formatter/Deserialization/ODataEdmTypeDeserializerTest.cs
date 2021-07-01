@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void Ctor_SetsProperty_DeserializerProvider()
         {
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             var deserializer = new Mock<ODataEdmTypeDeserializer>(ODataPayloadKind.Unsupported, deserializerProvider.Object);
 
             Assert.Same(deserializerProvider.Object, deserializer.Object.DeserializerProvider);

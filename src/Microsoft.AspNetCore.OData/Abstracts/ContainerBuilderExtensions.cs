@@ -62,8 +62,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<SkipTokenHandler, DefaultSkipTokenHandler>(ServiceLifetime.Singleton);
 
             // SerializerProvider and DeserializerProvider.
-            builder.AddService<ODataSerializerProvider, DefaultODataSerializerProvider>(ServiceLifetime.Singleton);
-            builder.AddService<ODataDeserializerProvider, DefaultODataDeserializerProvider>(ServiceLifetime.Singleton);
+            builder.AddService<IODataSerializerProvider, ODataSerializerProvider>(ServiceLifetime.Singleton);
+            builder.AddService<IODataDeserializerProvider, ODataDeserializerProvider>(ServiceLifetime.Singleton);
 
             // Deserializers.
             builder.AddService<ODataResourceDeserializer>(ServiceLifetime.Singleton);

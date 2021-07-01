@@ -17,7 +17,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> that can read OData collection payloads.
+    /// Represents an <see cref="IODataDeserializer"/> that can read OData collection payloads.
     /// </summary>
     public class ODataCollectionDeserializer : ODataEdmTypeDeserializer
     {
@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataCollectionDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataCollectionDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataCollectionDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Collection, deserializerProvider)
         {
         }
@@ -132,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull("elementType");
             }
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
             if (deserializer == null)
             {
                 throw new SerializationException(

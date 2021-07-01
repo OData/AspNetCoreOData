@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     /// the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
     /// Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
     /// </remarks>
-    public abstract class ODataDeserializer
+    public abstract class ODataDeserializer : IODataDeserializer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataDeserializer"/> class.
@@ -26,18 +26,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             ODataPayloadKind = payloadKind;
         }
 
-        /// <summary>
-        /// The kind of ODataPayload this deserializer handles.
-        /// </summary>
+        /// <inheritdoc />
         public ODataPayloadKind ODataPayloadKind { get; private set; }
 
-        /// <summary>
-        /// Reads an <see cref="IODataRequestMessage"/> using messageReader.
-        /// </summary>
-        /// <param name="messageReader">The messageReader to use.</param>
-        /// <param name="type">The type of the object to read into.</param>
-        /// <param name="readContext">The read context.</param>
-        /// <returns>The deserialized object.</returns>
+        /// <inheritdoc/>
         public virtual Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
         {
             throw Error.NotSupported(SRResources.DeserializerDoesNotSupportRead, GetType().Name);

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.AspNetCore.OData.Tests.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -24,9 +23,9 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 {
-    public class DefaultODataSerializerProviderTests
+    public class ODataSerializerProviderTests
     {
-        private static ODataSerializerProvider _serializerProvider = GetServiceProvider().GetRequiredService<ODataSerializerProvider>();
+        private static IODataSerializerProvider _serializerProvider = GetServiceProvider().GetRequiredService<IODataSerializerProvider>();
 
         private static IEdmModel _edmModel = GetEdmModel();
 
@@ -64,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void DefaultOdataSerializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
         {
             ExceptionAssert.ThrowsArgumentNull(
-                () => new DefaultODataSerializerProvider(serviceProvider: null),
+                () => new ODataSerializerProvider(serviceProvider: null),
                 "serviceProvider");
         }
 
@@ -97,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(EdmCoreModel.Instance);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(type, request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(type, request);
 
             // Assert
             Assert.NotEqual(EdmPrimitiveTypeKind.None, edmPrimitiveTypeKind);
@@ -116,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             request.ODataFeature().Path = odataPath;
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(type, request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(type, request);
 
             // Assert
             Assert.NotEqual(EdmPrimitiveTypeKind.None, edmPrimitiveTypeKind);
@@ -131,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(TestEnum), request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(TestEnum), request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -148,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             request.ODataFeature().Path = odataPath;
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(TestEnum), request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(TestEnum), request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -272,7 +271,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -288,7 +287,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(Address), request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(Address), request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -310,7 +309,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(collectionType, request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(collectionType, request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -332,7 +331,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(collectionType, request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(collectionType, request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -355,7 +354,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(EdmCoreModel.Instance);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(payloadType, request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(payloadType, request);
 
             // Assert
             Assert.NotNull(serializer);
@@ -369,8 +368,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer firstCallSerializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
-            ODataSerializer secondCallSerializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
+            IODataSerializer firstCallSerializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
+            IODataSerializer secondCallSerializer = _serializerProvider.GetODataPayloadSerializer(typeof(Product), request);
 
             // Assert
             Assert.Same(firstCallSerializer, secondCallSerializer);
@@ -383,7 +382,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(UnknownEntityType), request);
+            IODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(typeof(UnknownEntityType), request);
 
             // Assert
             Assert.Null(serializer);
@@ -405,8 +404,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmTypeReference edmType = new Mock<IEdmTypeReference>().Object;
 
             // Act
-            ODataSerializer serializer1 = _serializerProvider.GetEdmTypeSerializer(edmType);
-            ODataSerializer serializer2 = _serializerProvider.GetEdmTypeSerializer(edmType);
+            IODataSerializer serializer1 = _serializerProvider.GetEdmTypeSerializer(edmType);
+            IODataSerializer serializer2 = _serializerProvider.GetEdmTypeSerializer(edmType);
 
             // Assert
             Assert.Same(serializer2, serializer1);
@@ -416,7 +415,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
 
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();

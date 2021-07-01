@@ -2846,29 +2846,71 @@
         <member name="F:Microsoft.AspNetCore.OData.Formatter.DefaultODataETagHandler.NullLiteralInETag">
             <summary>null literal that needs to be return in ETag value when the value is null</summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer">
             <summary>
-            The default <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider"/>.
+            An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/> is used to read an ODataMessage into a CLR object.
+            </summary>
+            <remarks>
+            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer" />. A CLR type is supported if it is one of
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer.ODataPayloadKind">
+            <summary>
+            The kind of ODataPayload this deserializer handles.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.#ctor(System.IServiceProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider"/> class.
+            Reads an <see cref="T:Microsoft.OData.IODataRequestMessage"/> using messageReader.
             </summary>
-            <param name="serviceProvider">The service provider.</param>
+            <param name="messageReader">The messageReader to use.</param>
+            <param name="type">The type of the object to read into.</param>
+            <param name="readContext">The read context.</param>
+            <returns>The deserialized object.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
-            <inheritdoc />
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider">
+            <summary>
+            Represents a factory that creates an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/>.
+            </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.DefaultODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
-            <inheritdoc />
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> for the given type.
+            </summary>
+            <param name="type">The CLR type.</param>
+            <param name="request">The request being deserialized.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> for the given EDM type.
+            </summary>
+            <param name="edmType">The EDM type.</param>
+            <param name="isDelta">Is delta</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer">
+            <summary>
+            Interface for all <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer" />s that deserialize into an object backed by <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataEdmTypeDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
+            </summary>
+            <param name="item">The item to deserialize.</param>
+            <param name="edmType">The EDM type of the object to read into.</param>
+            <param name="readContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext"/>.</param>
+            <returns>The deserialized object.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> for reading OData action parameters.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/> for reading OData action parameters.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataActionPayloadDeserializer"/> class.
             </summary>
@@ -2884,10 +2926,10 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData collection payloads.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/> that can read OData collection payloads.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataCollectionDeserializer"/> class.
             </summary>
@@ -2910,10 +2952,10 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData delta resource sets.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/> that can read OData delta resource sets.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaResourceSetDeserializer"/> class.
             </summary>
@@ -2979,22 +3021,14 @@
             <param name="payloadKind">The kind of payload this deserializer handles.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.ODataPayloadKind">
-            <summary>
-            The kind of ODataPayload this deserializer handles.
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer.ReadAsync(Microsoft.OData.ODataMessageReader,System.Type,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
-            <summary>
-            Reads an <see cref="T:Microsoft.OData.IODataRequestMessage"/> using messageReader.
-            </summary>
-            <param name="messageReader">The messageReader to use.</param>
-            <param name="type">The type of the object to read into.</param>
-            <param name="readContext">The read context.</param>
-            <returns>The deserialized object.</returns>
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext">
             <summary>
-            This class encapsulates the state and settings that get passed to <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/>.
+            This class encapsulates the state and settings that get passed to <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext.ResourceType">
@@ -3029,24 +3063,20 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider">
             <summary>
-            Represents a factory that creates an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/>.
+            The default <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.#ctor(System.IServiceProvider)">
             <summary>
-            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> for the given type.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider"/> class.
             </summary>
-            <param name="type">The CLR type.</param>
-            <param name="request">The request being deserialized.</param>
-            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can deserialize the given type.</returns>
+            <param name="serviceProvider">The service provider.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetEdmTypeDeserializer(Microsoft.OData.Edm.IEdmTypeReference,System.Boolean)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> for the given EDM type.
-            </summary>
-            <param name="edmType">The EDM type.</param>
-            <param name="isDelta">Is delta</param>
-            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider.GetODataDeserializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer">
             <summary>
@@ -3059,26 +3089,20 @@
             </summary>
             <param name="payloadKind">The kind of OData payload that this deserializer reads.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.#ctor(Microsoft.OData.ODataPayloadKind,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.#ctor(Microsoft.OData.ODataPayloadKind,Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer"/> class.
             </summary>
             <param name="payloadKind">The kind of OData payload this deserializer handles.</param>
-            <param name="deserializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider"/>.</param>
+            <param name="deserializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider"/>.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.DeserializerProvider">
             <summary>
-            The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider"/> to use for deserializing inner items.
+            The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider"/> to use for deserializing inner items.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEdmTypeDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
-            <summary>
-            Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
-            </summary>
-            <param name="item">The item to deserialize.</param>
-            <param name="edmType">The EDM type of the object to read into.</param>
-            <param name="readContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext"/>.</param>
-            <returns>The deserialized object.</returns>
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEntityReferenceLinkDeserializer">
             <summary>
@@ -3138,7 +3162,7 @@
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> for reading OData resource payloads.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer"/> class.
             </summary>
@@ -3250,7 +3274,7 @@
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData resource sets.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer"/> class.
             </summary>
@@ -3379,10 +3403,6 @@
             <summary>
             An interface that defines a property to access a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping"/> objects.
             </summary>
-            <remarks>
-            MediaTypeMapping is part of the platform in AspNet but defined here for AspNetCore to allow for reusing
-            the classes derive form it for managing media type mapping.
-            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.MediaType.IMediaTypeMappingCollection.MediaTypeMappings">
             <summary>
@@ -3393,14 +3413,10 @@
             <summary>
             A class to support matching media types.
             </summary>
-            <remarks>
-            This is part of the platform in AspNet but defined here for AspNetCore to allow for reusing
-            the classes derive form it for managing media type mapping.
-            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping.#ctor(System.String)">
             <summary>
-            Initializes a new instance of a System.Net.Http.Formatting.MediaTypeMapping with
+            Initializes a new instance of a <see cref="T:Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping"/> with
             the given mediaType value.
             </summary>
             <param name="mediaType">The mediaType that is associated with the request.</param>
@@ -3924,29 +3940,81 @@
             <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/>.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider">
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer">
             <summary>
-            The default implementation of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/>.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> that serializes instances of objects backed by an <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.#ctor(System.IServiceProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider"/> class.
+            Creates an <see cref="T:Microsoft.OData.ODataValue"/> for the object represented by <paramref name="graph"/>.
             </summary>
-            <param name="serviceProvider">The root container.</param>
+            <param name="graph">The value of the <see cref="T:Microsoft.OData.ODataValue"/> to be created.</param>
+            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataValue"/> created.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference)">
-            <inheritdoc />
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Writes the given object specified by the parameter graph as a part of an existing OData message using the given
+            messageWriter and the writeContext.
+            </summary>
+            <param name="graph">The object to be written.</param>
+            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to be used for writing.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataSerializerProvider.GetODataPayloadSerializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
-            <inheritdoc />
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer">
+            <summary>
+            An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> is used to write a CLR object to an ODataMessage.
+            </summary>
+            <remarks>
+            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer" />. A CLR type is supported if it is one of
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            Uri[] which maps to ODataReferenceLinks payload, etc.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.ODataPayloadKind">
+            <summary>
+            The kind of OData payload that this serializer generates.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Writes the given object specified by the parameter graph as a whole using the given messageWriter and writeContext.
+            </summary>
+            <param name="graph">The object to be written</param>
+            <param name="type">The type of the object to be written.</param>
+            <param name="messageWriter">The <see cref="T:Microsoft.OData.ODataMessageWriter"/> to be used for writing.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider">
+            <summary>
+            An <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> is a factory for creating <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer"/> for the given edmType.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetODataPayloadSerializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for the given <paramref name="type"/>.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> for which the serializer is being requested.</param>
+            <param name="request">The request for which the response is being serialized.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> for the given type.</returns>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer">
             <summary>
             ODataSerializer for serializing collection of primitive or enum types.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer"/> class.
             </summary>
@@ -3989,11 +4057,11 @@
             The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResourceSet payload.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer"/>.
             </summary>
-            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
+            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
@@ -4049,7 +4117,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> that serializes instances of objects backed by an <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> that serializes instances of objects backed by an <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.#ctor(Microsoft.OData.ODataPayloadKind)">
@@ -4058,36 +4126,23 @@
             </summary>
             <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.#ctor(Microsoft.OData.ODataPayloadKind,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.#ctor(Microsoft.OData.ODataPayloadKind,Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer"/> class.
             </summary>
             <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
-            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write inner objects.</param>
+            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> to use to write inner objects.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.SerializerProvider">
             <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> that can be used to write inner objects.
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> that can be used to write inner objects.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Writes the given object specified by the parameter graph as a part of an existing OData message using the given
-            messageWriter and the writeContext.
-            </summary>
-            <param name="graph">The object to be written.</param>
-            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-            <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to be used for writing.</param>
-            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+            <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Creates an <see cref="T:Microsoft.OData.ODataValue"/> for the object represented by <paramref name="graph"/>.
-            </summary>
-            <param name="graph">The value of the <see cref="T:Microsoft.OData.ODataValue"/> to be created.</param>
-            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
-            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
-            <returns>The <see cref="T:Microsoft.OData.ODataValue"/> created.</returns>
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEntityReferenceLinkSerializer">
             <summary>
@@ -4120,7 +4175,7 @@
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing <see cref="T:Microsoft.OData.Edm.IEdmEnumType" />'s.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer"/>.
             </summary>
@@ -4225,7 +4280,7 @@
             ODataSerializer for serializing instances of <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> or <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -4328,11 +4383,11 @@
             OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" /> or <see cref="T:Microsoft.OData.Edm.IEdmComplexType"/>
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer"/>.
             </summary>
-            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> to use to write nested entries.</param>
+            <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
@@ -4369,7 +4424,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer">
             <summary>
-            An ODataSerializer is used to write a CLR object to an ODataMessage.
+            Base class for <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> implementations.
             </summary>
             <remarks>
             Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
@@ -4384,18 +4439,10 @@
             <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind">
-            <summary>
-            Gets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.ODataPayloadKind"/> that this serializer generates.
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Writes the given object specified by the parameter graph as a whole using the given messageWriter and writeContext.
-            </summary>
-            <param name="graph">The object to be written</param>
-            <param name="type">The type of the object to be written.</param>
-            <param name="messageWriter">The <see cref="T:Microsoft.OData.ODataMessageWriter"/> to be used for writing.</param>
-            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext">
             <summary>
@@ -4519,26 +4566,34 @@
             Gets or sets the navigation property being expanded.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerPropertyHelper.CreateProperty(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer,System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataProperty"/> with name <paramref name="elementName"/> and value
+            based on the object represented by <paramref name="graph"/>.
+            </summary>
+            <param name="serializer">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer"/> writing the property value.</param>
+            <param name="graph">The object to base the value of the property on.</param>
+            <param name="expectedType">The expected EDM type of the object represented by <paramref name="graph"/>.</param>
+            <param name="elementName">The name of the property.</param>
+            <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> created.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider">
             <summary>
-            An ODataSerializerProvider is a factory for creating <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/>s.
+            The default implementation of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/>.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider"/> class.
+            </summary>
+            <param name="serviceProvider">The root container.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference)">
-            <summary>
-            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer"/> for the given edmType.
-            </summary>
-            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/>.</returns>
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type,Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Gets an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for the given <paramref name="type"/>.
-            </summary>
-            <param name="type">The <see cref="T:System.Type"/> for which the serializer is being requested.</param>
-            <param name="request">The request for which the response is being serialized.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for the given type.</returns>
-            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+            <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer">
             <summary>

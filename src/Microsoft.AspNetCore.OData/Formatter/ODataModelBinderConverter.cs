@@ -70,8 +70,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 IEdmEnumTypeReference edmEnumType = edmTypeReference.AsEnum();
                 Contract.Assert(edmEnumType != null);
 
-                ODataDeserializerProvider deserializerProvider =
-                    requestContainer.GetRequiredService<ODataDeserializerProvider>();
+                IODataDeserializerProvider deserializerProvider =
+                    requestContainer.GetRequiredService<IODataDeserializerProvider>();
 
                 ODataEnumDeserializer deserializer =
                     (ODataEnumDeserializer)deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
@@ -177,8 +177,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmCollectionTypeReference collectionType = edmTypeReference as IEdmCollectionTypeReference;
             Contract.Assert(collectionType != null);
 
-            ODataDeserializerProvider deserializerProvider =
-                requestContainer.GetRequiredService<ODataDeserializerProvider>();
+            IODataDeserializerProvider deserializerProvider =
+                requestContainer.GetRequiredService<IODataDeserializerProvider>();
             ODataCollectionDeserializer deserializer =
                 (ODataCollectionDeserializer)deserializerProvider.GetEdmTypeDeserializer(collectionType);
 
@@ -270,7 +270,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataResourceSetWrapper resourceSet =
                 odataReader.ReadResourceOrResourceSet() as ODataResourceSetWrapper;
 
-            ODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
+            IODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
 
             ODataResourceSetDeserializer resourceSetDeserializer =
                 (ODataResourceSetDeserializer)deserializerProvider.GetEdmTypeDeserializer(collectionType);
@@ -318,7 +318,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataResourceWrapper topLevelResource = item as ODataResourceWrapper;
             Contract.Assert(topLevelResource != null);
 
-            ODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
+            IODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
 
             ODataResourceDeserializer entityDeserializer =
                 (ODataResourceDeserializer)deserializerProvider.GetEdmTypeDeserializer(edmTypeReference);

@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Initializes a new instance of <see cref="ODataEnumSerializer"/>.
         /// </summary>
-        public ODataEnumSerializer(ODataSerializerProvider serializerProvider)
+        public ODataEnumSerializer(IODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Property, serializerProvider)
         {
         }
@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            await messageWriter.WritePropertyAsync(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
+            await messageWriter.WritePropertyAsync(this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

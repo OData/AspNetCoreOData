@@ -52,14 +52,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
             MediaTypeHeaderValue contentType,
             HttpRequest request,
             IHeaderDictionary requestHeaders,
-            ODataSerializerProvider serializerProvider)
+            IODataSerializerProvider serializerProvider)
         {
             if (model == null)
             {
                 throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
             }
 
-            ODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
+            IODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
 
             ODataPath path = request.ODataFeature().Path;
             IEdmNavigationSource targetNavigationSource = GetTargetNavigationSource(path, model);
@@ -148,10 +148,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        internal static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
-            ODataSerializerProvider serializerProvider)
+        internal static IODataSerializer GetSerializer(Type type, object value, HttpRequest request,
+            IODataSerializerProvider serializerProvider)
         {
-            ODataSerializer serializer;
+            IODataSerializer serializer;
 
             IEdmObject edmObject = value as IEdmObject;
             if (edmObject != null)

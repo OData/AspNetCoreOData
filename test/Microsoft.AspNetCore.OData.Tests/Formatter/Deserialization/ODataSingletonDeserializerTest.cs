@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private IEdmModel _edmModel;
         private IEdmSingleton _singleton;
         private readonly ODataDeserializerContext _readContext;
-        private readonly ODataDeserializerProvider _deserializerProvider;
+        private readonly IODataDeserializerProvider _deserializerProvider;
 
         private sealed class EmployeeModel
         {
@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(EmployeeModel)
             };
 
-            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
         }
 
         [Fact]

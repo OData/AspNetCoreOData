@@ -20,16 +20,16 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
-    public class DefaultODataDeserializerProviderTests
+    public class ODataDeserializerProviderTests
     {
-        private static ODataDeserializerProvider _deserializerProvider = GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+        private static IODataDeserializerProvider _deserializerProvider = GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
-        public void DefaultODataDeserializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
+        public void ODataDeserializerProvider_Ctor_ThrowsArgumentNull_ServiceProvider()
         {
             // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new DefaultODataDeserializerProvider(null), "serviceProvider");
+            ExceptionAssert.ThrowsArgumentNull(() => new ODataDeserializerProvider(null), "serviceProvider");
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(model: null);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Uri), request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Uri), request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(EdmCoreModel.Instance);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(type, request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(type, request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Address), request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(typeof(Address), request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(collectionType, request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(collectionType, request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -140,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(collectionType, request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(collectionType, request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(deltaType, request);
+            IODataDeserializer deserializer = _deserializerProvider.GetODataDeserializer(deltaType, request);
 
             // Assert
             Assert.NotNull(deserializer);
@@ -174,8 +174,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             HttpRequest request = GetRequest(_edmModel);
 
             // Act
-            ODataDeserializer firstCallDeserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
-            ODataDeserializer secondCallDeserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
+            IODataDeserializer firstCallDeserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
+            IODataDeserializer secondCallDeserializer = _deserializerProvider.GetODataDeserializer(typeof(Product), request);
 
             // Assert
             Assert.Same(firstCallDeserializer, secondCallDeserializer);
@@ -245,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, ODataDeserializerProvider>();
 
             // Deserializers.
             services.AddSingleton<ODataResourceDeserializer>();

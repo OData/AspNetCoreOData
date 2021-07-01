@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void Ctor_SetsProperty_SerializerProvider()
         {
             // Arrange & Act
-            ODataSerializerProvider serializerProvider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider serializerProvider = new Mock<IODataSerializerProvider>().Object;
             var serializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Unsupported, serializerProvider).Object;
 
             // Assert

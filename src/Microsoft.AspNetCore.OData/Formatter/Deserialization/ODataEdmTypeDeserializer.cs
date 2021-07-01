@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     /// <summary>
     /// Base class for all <see cref="ODataDeserializer" />s that deserialize into an object backed by <see cref="IEdmType"/>.
     /// </summary>
-    public abstract class ODataEdmTypeDeserializer : ODataDeserializer
+    public abstract class ODataEdmTypeDeserializer : ODataDeserializer, IODataEdmTypeDeserializer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataEdmTypeDeserializer"/> class.
@@ -24,8 +24,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataEdmTypeDeserializer"/> class.
         /// </summary>
         /// <param name="payloadKind">The kind of OData payload this deserializer handles.</param>
-        /// <param name="deserializerProvider">The <see cref="ODataDeserializerProvider"/>.</param>
-        protected ODataEdmTypeDeserializer(ODataPayloadKind payloadKind, ODataDeserializerProvider deserializerProvider)
+        /// <param name="deserializerProvider">The <see cref="IODataDeserializerProvider"/>.</param>
+        protected ODataEdmTypeDeserializer(ODataPayloadKind payloadKind, IODataDeserializerProvider deserializerProvider)
             : this(payloadKind)
         {
             if (deserializerProvider == null)
@@ -37,17 +37,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
-        /// The <see cref="ODataDeserializerProvider"/> to use for deserializing inner items.
+        /// The <see cref="IODataDeserializerProvider"/> to use for deserializing inner items.
         /// </summary>
-        public ODataDeserializerProvider DeserializerProvider { get; private set; }
+        public IODataDeserializerProvider DeserializerProvider { get; private set; }
 
-        /// <summary>
-        /// Deserializes the item into a new object of type corresponding to <paramref name="edmType"/>.
-        /// </summary>
-        /// <param name="item">The item to deserialize.</param>
-        /// <param name="edmType">The EDM type of the object to read into.</param>
-        /// <param name="readContext">The <see cref="ODataDeserializerContext"/>.</param>
-        /// <returns>The deserialized object.</returns>
+        /// <inheritdoc/>
         public virtual object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
         {
             throw Error.NotSupported(SRResources.DoesNotSupportReadInLine, GetType().Name);
