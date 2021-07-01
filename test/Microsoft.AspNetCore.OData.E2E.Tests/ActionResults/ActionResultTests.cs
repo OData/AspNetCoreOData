@@ -7,27 +7,29 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.ActionResults;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
     public class ActionResultTests : WebApiTestBase<ActionResultTests>
     {
-        public ActionResultTests(WebApiTestFixture<ActionResultTests> fixture)
-            : base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public ActionResultTests(WebApiTestFixture<ActionResultTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(CustomersController), typeof(ODataEndpointController));
+            ConfigureServicesAction = (services) =>
+            {
+                services.ConfigureControllers(typeof(CustomersController), typeof(ODataEndpointController));
 
-            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel("actionresult", ActionResultEdmModel.GetEdmModel()));
+                services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
+                    .AddModel("actionresult", ActionResultEdmModel.GetEdmModel()));
+            };
         }
 
         [Fact]
@@ -60,11 +62,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(await response.Content.ReadAsStringAsync());
+            List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(responseContent);
 
             Customer customer = Assert.Single(customers);
             Assert.Equal("CustId", customer.Id);
@@ -87,11 +91,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+            List<Customer> customers = JToken.Parse(responseContent)["value"].ToObject<List<Customer>>();
 
             Customer customer = Assert.Single(customers);
             Assert.Equal("CustId", customer.Id);
@@ -114,11 +120,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
+
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+            List<Customer> customers = JToken.Parse(responseContent)["value"].ToObject<List<Customer>>();
 
             Customer customer = Assert.Single(customers);
             Assert.Equal("CustId", customer.Id);

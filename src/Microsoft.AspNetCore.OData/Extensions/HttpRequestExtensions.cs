@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,19 +13,23 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Microsoft.AspNetCore.OData.Extensions
+namespace Microsoft.AspNetCore.OData
 {
+
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequest"/>.
     /// </summary>
     public static class HttpRequestExtensions
     {
         /// <summary>
-        /// Gets the <see cref="IODataFeature"/> from the services container.
+        /// Returns the <see cref="IODataFeature"/> from the DI container.
         /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>The <see cref="IODataFeature"/> from the services container.</returns>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <returns>The <see cref="IODataFeature"/> from the DI container.</returns>
         public static IODataFeature ODataFeature(this HttpRequest request)
         {
             if (request == null)
@@ -40,9 +41,9 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Gets the <see cref="IODataBatchFeature"/> from the services container.
+        /// Returns the <see cref="IODataBatchFeature"/> instance from the DI container.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The <see cref="IODataBatchFeature"/> from the services container.</returns>
         public static IODataBatchFeature ODataBatchFeature(this HttpRequest request)
         {
@@ -55,9 +56,24 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Returns the <see cref="ODataOptions"/> instance from the DI container.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <returns>The <see cref="ODataOptions"/> instance from the DI container.</returns>
+        public static ODataOptions ODataOptions(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            return request.HttpContext.ODataOptions();
+        }
+
+        /// <summary>
         /// Gets the <see cref="IEdmModel"/> from the request container.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The <see cref="IEdmModel"/> from the request container.</returns>
         public static IEdmModel GetModel(this HttpRequest request)
         {
@@ -70,9 +86,130 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>In situations where </remarks>
+        public static LinkedServiceProvider GetLinkedServiceProvider(this HttpRequest request)
+        {
+            return new LinkedServiceProvider(request.GetRouteServices(), request.HttpContext.RequestServices);
+        }
+
+        /// <summary>
+        /// Returns the service <typeparamref name="T"/> from the available DI containers. Optionally checks the route-specific 
+        /// services first, and then falls back to the application-wide container if <typeparamref name="T"/> was not found.
+        /// </summary>
+        /// <typeparam name="T">The type of service to return from the DI containers.</typeparam>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <param name="checkRouteServices">
+        /// A boolean indicating whether or not to check the route-specific DI container first. Defaults to true.
+        /// </param>
+        /// <returns></returns>
+        public static T GetService<T>(this HttpRequest request, bool checkRouteServices = true)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            T service = default;
+            if (checkRouteServices)
+            {
+                var routeServices = request.GetRouteServices();
+                if (routeServices != null)
+                {
+                    service = routeServices.GetService<T>();
+                }
+            }
+
+            if (service is not null)
+            {
+                return service;
+            }
+
+            if (request.HttpContext.RequestServices == null)
+            {
+                throw new ODataException(SRResources.RequestServicesOnHttpContextIsNull);
+            }
+
+            return request.HttpContext.RequestServices.GetService<T>();
+        }
+
+        /// <summary>
+        /// Returns the services <typeparamref name="T"/> from the available DI containers. Optionally checks the route-specific 
+        /// services first, and then falls back to the application-wide container if <typeparamref name="T"/> was not found.
+        /// </summary>
+        /// <typeparam name="T">The type of services to return from the DI containers.</typeparam>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <param name="checkRouteServices">
+        /// A boolean indicating whether or not to check the route-specific DI container first. Defaults to true.
+        /// </param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetServices<T>(this HttpRequest request, bool checkRouteServices = true)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            IEnumerable<T> services = default;
+            if (checkRouteServices)
+            {
+                var routeServices = request.GetRouteServices();
+                if (routeServices != null)
+                {
+                    services = routeServices.GetServices<T>();
+                }
+            }
+
+            if (services is not null)
+            {
+                return services;
+            }
+
+            return request.HttpContext.RequestServices.GetServices<T>();
+        }
+
+        /// <summary>
+        /// Returns the service <typeparamref name="T"/> from the available DI containers. Optionally checks the route-specific 
+        /// services first, and then falls back to the application-wide container if <typeparamref name="T"/> was not found.
+        /// </summary>
+        /// <typeparam name="T">The type of service to return from the DI containers.</typeparam>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <param name="checkRouteServices">
+        /// A boolean indicating whether or not to check the route-specific DI container first. Defaults to true.
+        /// </param>
+        /// <returns></returns>
+        public static T GetRequiredService<T>(this HttpRequest request, bool checkRouteServices = true)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            T service = default;
+            if (checkRouteServices)
+            {
+                var routeServices = request.GetRouteServices();
+                if (routeServices != null)
+                {
+                    service = routeServices.GetService<T>();
+                }
+            }
+
+            if (service is not null)
+            {
+                return service;
+            }
+
+            return request.HttpContext.RequestServices.GetRequiredService<T>();
+        }
+
+        /// <summary>
         /// Gets the <see cref="TimeZoneInfo"/> setting.
         /// </summary>
-        /// <param name="request">The http request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>null or the time zone info.</returns>
         public static TimeZoneInfo GetTimeZoneInfo(this HttpRequest request)
         {
@@ -81,40 +218,29 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            TimeZoneInfo timeZone = null;
-            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions != null && odataOptions.Value != null)
-            {
-                timeZone = odataOptions.Value.TimeZone;
-            }
-
-            return timeZone;
+            return request.ODataOptions().TimeZone;
         }
 
         /// <summary>
         /// Gets the bool value indicating whether the non-dollar prefix query option.
         /// </summary>
-        /// <param name="request">The http request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>True/false.</returns>
-        public static bool IsNoDollarQueryEnable(this HttpRequest request)
+        public static bool IsNoDollarQueryEnabled(this HttpRequest request)
         {
             if (request == null)
             {
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions != null && odataOptions.Value != null)
-            {
-                return odataOptions.Value.EnableNoDollarQueryOptions;
-            }
+            return request.ODataOptions().EnableNoDollarQueryOptions;
 
-            return false;
         }
 
         /// <summary>
         /// Gets a value indicating if this is a count request.
         /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns></returns>
         public static bool IsCountRequest(this HttpRequest request)
         {
@@ -130,7 +256,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Gets the <see cref="ODataMessageWriterSettings"/> from the request container.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The <see cref="ODataMessageWriterSettings"/> from the request container.</returns>
         public static ODataMessageReaderSettings GetReaderSettings(this HttpRequest request)
         {
@@ -139,13 +265,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<ODataMessageReaderSettings>();
+            return request.GetRequiredService<ODataMessageReaderSettings>();
         }
 
         /// <summary>
         /// Gets the <see cref="ODataMessageWriterSettings"/> from the request container.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The <see cref="ODataMessageWriterSettings"/> from the request container.</returns>
         public static ODataMessageWriterSettings GetWriterSettings(this HttpRequest request)
         {
@@ -154,12 +280,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<ODataMessageWriterSettings>();
+            return request.GetRequiredService<ODataMessageWriterSettings>();
         }
 
         /// <summary>
         /// get the deserializer provider associated with the request.
         /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns></returns>
         public static IODataDeserializerProvider GetDeserializerProvider(this HttpRequest request)
         {
@@ -168,13 +295,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetRequiredService<IODataDeserializerProvider>();
+            return request.GetRequiredService<IODataDeserializerProvider>();
         }
 
         /// <summary>
         /// Creates a link for the next page of results; To be used as the value of @odata.nextLink.
         /// </summary>
-        /// <param name="request">The request on which to base the next page link.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <param name="pageSize">The number of results allowed per page.</param>
         /// <param name="instance">Object which can be used to generate the skiptoken value.</param>
         /// <param name="objectToSkipTokenValue">Function that takes in the last object and returns the skiptoken value string.</param>
@@ -202,12 +329,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Creates an ETag from concurrency property names and values.
         /// </summary>
-        /// <param name="request">The input property names and values.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <param name="properties">The input property names and values.</param>
         /// <param name="timeZone">The Time zone info.</param>
         /// <returns>The generated ETag string.</returns>
         public static string CreateETag(this HttpRequest request, IDictionary<string, object> properties, TimeZoneInfo timeZone = null)
         {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
             return request.GetETagHandler().CreateETag(properties, timeZone)?.ToString();
         }
 
@@ -223,13 +355,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            return request.GetSubServiceProvider().GetService<IETagHandler>();
+            return request.GetService<IETagHandler>();
         }
 
         /// <summary>
         /// Checks whether the request is a POST targeted at a resource path ending in /$query.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>true if the request path has $query segment.</returns>
         internal static bool IsODataQueryRequest(this HttpRequest request)
         {
@@ -251,16 +383,16 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Gets the dependency injection container for the OData request.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The dependency injection container.</returns>
-        public static IServiceProvider GetSubServiceProvider(this HttpRequest request)
+        public static IServiceProvider GetRouteServices(this HttpRequest request)
         {
             if (request == null)
             {
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            IServiceProvider requestContainer = request.ODataFeature().SubServiceProvider;
+            IServiceProvider requestContainer = request.ODataFeature().Services;
             if (requestContainer != null)
             {
                 return requestContainer;
@@ -273,32 +405,32 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
-            return request.CreateSubServiceProvider(request.ODataFeature().PrefixName);
+            return request.CreateRouteServices(request.ODataFeature().PrefixName);
         }
 
         /// <summary>
         /// Creates a request container that associates with the <paramref name="request"/>.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <param name="prefixName">The name of the route.</param>
         /// <returns>The request container created.</returns>
-        public static IServiceProvider CreateSubServiceProvider(this HttpRequest request, string prefixName)
+        public static IServiceProvider CreateRouteServices(this HttpRequest request, string prefixName)
         {
             if (request == null)
             {
                 throw Error.ArgumentNull(nameof(request));
             }
 
-            if (request.ODataFeature().SubServiceProvider != null)
+            if (request.ODataFeature().Services != null)
             {
-                throw Error.InvalidOperation(SRResources.SubRequestServiceProviderAlreadyExists);
+                return request.ODataFeature().Services;
             }
 
             IServiceScope requestScope = request.CreateRequestScope(prefixName);
             IServiceProvider requestContainer = requestScope.ServiceProvider;
 
             request.ODataFeature().RequestScope = requestScope;
-            request.ODataFeature().SubServiceProvider = requestContainer;
+            request.ODataFeature().Services = requestContainer;
 
             return requestContainer;
         }
@@ -307,17 +439,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Deletes the request container from the <paramref name="request"/> and disposes
         /// the container if <paramref name="dispose"/> is <c>true</c>.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <param name="dispose">
         /// Returns <c>true</c> to dispose the request container after deletion; <c>false</c> otherwise.
         /// </param>
-        public static void DeleteSubRequestProvider(this HttpRequest request, bool dispose)
+        public static void DeleteRouteServices(this HttpRequest request, bool dispose)
         {
             if (request.ODataFeature().RequestScope != null)
             {
                 IServiceScope requestScope = request.ODataFeature().RequestScope;
                 request.ODataFeature().RequestScope = null;
-                request.ODataFeature().SubServiceProvider = null;
+                request.ODataFeature().Services = null;
 
                 if (dispose)
                 {
@@ -329,20 +461,17 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Create a scoped request.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <param name="prefixName">The prefix name.</param>
         /// <returns></returns>
         private static IServiceScope CreateRequestScope(this HttpRequest request, string prefixName)
         {
-            IOptions<ODataOptions> odataOptionsOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>();
-            if (odataOptionsOptions == null)
+            if (request == null)
             {
-                throw Error.InvalidOperation(SRResources.MissingODataServices, nameof(ODataOptions));
+                throw Error.ArgumentNull(nameof(request));
             }
 
-            ODataOptions options = odataOptionsOptions.Value;
-
-            IServiceProvider rootContainer = options.GetODataServiceProvider(prefixName);
+            IServiceProvider rootContainer = request.ODataOptions().GetRouteServices(prefixName);
             IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
             // Bind scoping request into the OData container.
@@ -357,7 +486,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Gets the OData version from the request context.
         /// </summary>
-        /// <param name="request">The request.</param>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>The OData version.</returns>
         public static ODataVersion GetODataVersion(this HttpRequest request)
         {
@@ -431,5 +560,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             return null;
         }
+
     }
+
 }

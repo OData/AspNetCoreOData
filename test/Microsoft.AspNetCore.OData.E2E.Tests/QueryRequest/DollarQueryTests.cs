@@ -1,49 +1,51 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class DollarQueryTests : WebApiTestBase<DollarQueryTests>
     {
+
         private const string CustomersResourcePath = "odata/DollarQueryCustomers";
         private const string SingleCustomerResourcePath = "odata/DollarQueryCustomers(1)";
         private const string ApplicationJsonODataMinimalMetadataStreamingTrue = "application/json;odata.metadata=minimal;odata.streaming=true";
         private const string ApplicationJsonODataMinimalMetadataStreamingFalse = "application/json;odata.metadata=minimal;odata.streaming=false";
 
-        public DollarQueryTests(WebApiTestFixture<DollarQueryTests> fixture)
-            : base(fixture)
+        public DollarQueryTests(WebApiTestFixture<DollarQueryTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-        }
-
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            services.ConfigureControllers(typeof(DollarQueryCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
-        }
-
-        protected static void UpdateConfigure(IApplicationBuilder app)
-        {
-            // Add OData /$query middleware
-            app.UseODataQueryRequest();
-
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
-                endpoints.MapControllers();
-            });
+                services.ConfigureControllers(typeof(DollarQueryCustomersController));
+                services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            };
+
+            ConfigureAction = (IApplicationBuilder app) =>
+            {
+                // Add OData /$query middleware
+                app.UseODataQueryRequest();
+
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+            };
         }
 
         public static TheoryDataSet<string, string> ODataQueryOptionsData

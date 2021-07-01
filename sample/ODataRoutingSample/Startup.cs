@@ -3,16 +3,15 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Routing.Conventions;
-using Microsoft.AspNetCore.OData;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.OData;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample
@@ -57,10 +56,10 @@ namespace ODataRoutingSample
             IEdmModel model3 = EdmModelBuilder.GetEdmModelV3();
 
             services.AddControllers()
-                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                .AddOData(opt => opt.EnableAllFeatures(5)
                     .AddModel(model0)
                     .AddModel("v1", model1)
-                    .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
+                    .AddModel("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddModel("v3", model3)
                     .Conventions.Add(new MyConvention())
                 );

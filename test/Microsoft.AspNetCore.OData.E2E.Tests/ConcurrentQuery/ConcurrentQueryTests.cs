@@ -8,30 +8,33 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     /// <summary>
     /// Ensures that concurrent execution of EnableQuery is thread-safe.
     /// </summary>
     public class ConcurrentQueryTests : WebApiTestBase<ConcurrentQueryTests>
     {
-        public ConcurrentQueryTests(WebApiTestFixture<ConcurrentQueryTests> fixture)
-            : base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public ConcurrentQueryTests(WebApiTestFixture<ConcurrentQueryTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(CustomersController));
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                services.ConfigureControllers(typeof(CustomersController));
 
-            var model = ConcurrentQueryEdmModel.GetEdmModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("concurrentquery", model)
-                .Count().Filter().OrderBy().Expand().SetMaxTop(null));
+                var model = ConcurrentQueryEdmModel.GetEdmModel();
+                services.AddControllers().AddOData(opt => opt.AddModel("concurrentquery", model)
+                    .Count().Filter().OrderBy().Expand().SetMaxTop(null));
+            };
         }
 
         /// <summary>
@@ -62,13 +65,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
 
                     List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
 
-                    return (i: i, length: customers.Count);
+                    return (i, length: customers.Count);
                 }));
 
             // Assert
-            foreach (var result in results)
+            foreach (var (i, length) in results)
             {
-                Assert.Equal(100 - result.i, result.length);
+                Assert.Equal(100 - i, length);
             }
         }
     }

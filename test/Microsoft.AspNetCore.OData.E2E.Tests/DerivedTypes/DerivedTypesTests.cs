@@ -1,27 +1,30 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Net.Http;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class DerivedTypeTests : WebApiTestBase<DerivedTypeTests>
     {
-        public DerivedTypeTests(WebApiTestFixture<DerivedTypeTests> fixture)
-            : base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public DerivedTypeTests(WebApiTestFixture<DerivedTypeTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(CustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            ConfigureServicesAction = (services) =>
+            {
+                services.ConfigureControllers(typeof(CustomersController));
+                services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            };
         }
 
         private static IEdmModel GetEdmModel()
@@ -44,12 +47,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
-            string py = await response.Content.ReadAsStringAsync();
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
+
             // Assert
             Assert.True(response.IsSuccessStatusCode);
 
             string expectedContent = "\"value\":[{\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"}]";
-            Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+            Assert.Contains(expectedContent, responseContent);
         }
 
         [Theory]
@@ -65,12 +70,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
 
             string expectedContent = "\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"";
-            Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+            Assert.Contains(expectedContent, responseContent);
         }
 
         [Fact]
@@ -84,6 +91,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             // Assert
             Assert.False(response.IsSuccessStatusCode);
@@ -101,13 +110,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
 
             string expectedContent = "\"value\":[{\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"," +
                 "\"Orders\":[{\"Id\":2,\"Amount\":230},{\"Id\":3,\"Amount\":150}]}]";
-            Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+            Assert.Contains(expectedContent, responseContent);
         }
 
         [Theory]
@@ -123,13 +134,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
+
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
 
             string expectedContent = "\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"," +
                 "\"Orders\":[{\"Id\":2,\"Amount\":230},{\"Id\":3,\"Amount\":150}]";
-            Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+            Assert.Contains(expectedContent, responseContent);
         }
     }
 }

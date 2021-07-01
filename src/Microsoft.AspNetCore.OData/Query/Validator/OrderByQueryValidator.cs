@@ -87,12 +87,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static OrderByQueryValidator GetOrderByQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new OrderByQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<OrderByQueryValidator>();
+            return context?.RequestContainer?.GetService<OrderByQueryValidator>() ?? new OrderByQueryValidator();
         }
 
         private static bool IsAllowed(ODataValidationSettings validationSettings, string propertyName)

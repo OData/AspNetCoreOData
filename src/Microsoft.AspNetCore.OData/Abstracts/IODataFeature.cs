@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the request container.
         /// </summary>
-        IServiceProvider SubServiceProvider { get; set; }
+        IServiceProvider Services { get; set; }
 
         /// <summary>
         /// Gets or sets the batch route data.

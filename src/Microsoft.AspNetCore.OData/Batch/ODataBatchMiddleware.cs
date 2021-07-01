@@ -71,10 +71,10 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             Contract.Assert(options != null);
 
-            foreach (var model in options.RouteComponents)
+            foreach (var route in options.RouteComponents)
             {
-                IServiceProvider subServiceProvider = model.Value.ServiceProvider;
-                if (subServiceProvider == null)
+                IServiceProvider routeServices = route.Value.ServiceProvider;
+                if (routeServices == null)
                 {
                     continue;
                 }
@@ -82,18 +82,18 @@ namespace Microsoft.AspNetCore.OData.Batch
                 // If a batch handler is present, register the route with the batch path mapper. This will be used
                 // by the batching middleware to handle the batch request. Batching still requires the injection
                 // of the batching middleware via UseODataBatching().
-                ODataBatchHandler batchHandler = subServiceProvider.GetService<ODataBatchHandler>();
+                ODataBatchHandler batchHandler = routeServices.GetService<ODataBatchHandler>();
                 if (batchHandler != null)
                 {
-                    batchHandler.PrefixName = model.Key;
-                    string batchPath = string.IsNullOrEmpty(model.Key)  ? "/$batch" : $"/{model.Key}/$batch";
+                    batchHandler.PrefixName = route.Key;
+                    string batchPath = string.IsNullOrEmpty(route.Key)  ? "/$batch" : $"/{route.Key}/$batch";
 
                     if (_batchMapping == null)
                     {
                         _batchMapping = new ODataBatchPathMapping();
                     }
 
-                    _batchMapping.AddRoute(model.Key, batchPath, batchHandler);
+                    _batchMapping.AddRoute(route.Key, batchPath, batchHandler);
                 }
             }
         }

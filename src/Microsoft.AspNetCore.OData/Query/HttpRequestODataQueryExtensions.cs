@@ -1,21 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.Net.Http.Headers;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Net.Http.Headers;
-using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -46,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 // get the etag handler, and parse the etag
-                IETagHandler etagHandler = request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
+                IETagHandler etagHandler = request.GetRequiredService<IETagHandler>();
                 IDictionary<string, object> properties = etagHandler.ParseETag(entityTagHeaderValue) ?? new Dictionary<string, object>();
                 IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
 

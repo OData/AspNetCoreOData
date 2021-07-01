@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -61,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Context = context;
             RawSelect = select;
             RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
+            Validator = context?.RequestContainer?.GetService<SelectExpandQueryValidator>() ?? new SelectExpandQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -96,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Context = context;
             RawSelect = select;
             RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
+            Validator = context?.RequestContainer?.GetService<SelectExpandQueryValidator>() ?? new SelectExpandQueryValidator();
 
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,

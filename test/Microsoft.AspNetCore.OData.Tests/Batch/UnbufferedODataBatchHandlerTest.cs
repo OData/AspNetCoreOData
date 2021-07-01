@@ -401,9 +401,9 @@ foo
             request.ContentType = "multipart/mixed;boundary=\"09f27d33-41ea-4334-8ace-1738bd2793a9\"";
             request.ContentLength = 431;
             httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            //IServiceProvider sp = request.GetRouteServices();
 
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(request.Body, request.Headers, sp);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(request.Body, request.Headers/*, sp*/);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
 
             ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();
@@ -476,9 +476,9 @@ Host: example.com
             httpContext.Request.ContentType = "multipart/mixed;boundary=\"86aef3eb-4af6-4750-a66d-df65e3f31ab0\"";
             httpContext.Request.ContentLength = 431;
             httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            //IServiceProvider sp = request.GetRouteServices();
 
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, request.Headers, sp);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(httpContext.Request.Body, request.Headers/*, sp*/);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
 
             ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();
@@ -522,9 +522,9 @@ Host: example.com
             request.ContentType = "multipart/mixed;boundary=\"75148e61-e67a-4bb7-ac0f-78fa30d0da30\"";
             request.ContentLength = 431;
             httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            //IServiceProvider sp = request.GetRouteServices();
 
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, request.Headers, sp);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(httpContext.Request.Body, request.Headers/*, sp*/);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
 
             ODataBatchReader batchReader = await oDataMessageReader.CreateODataBatchReaderAsync();

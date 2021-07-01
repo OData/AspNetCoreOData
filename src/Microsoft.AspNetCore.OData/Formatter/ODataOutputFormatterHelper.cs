@@ -70,12 +70,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
             string annotationFilter = null;
             if (!string.IsNullOrEmpty(preferHeader))
             {
-                ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(response.Body, response.Headers);
+                ODataMessageWrapper messageWrapper = ODataMessageWrapper.Create(response.Body, response.Headers);
                 messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetSubServiceProvider());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapper.Create(new StreamWrapper(response.Body), response.Headers/*, request.GetRouteServices()*/);
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;

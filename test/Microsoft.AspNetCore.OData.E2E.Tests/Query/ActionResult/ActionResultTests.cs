@@ -7,36 +7,32 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
     /// <summary>
     /// EnableQuery attribute works correctly when controller returns ActionResult.
     /// </summary>
-    public class ActionResultTests : WebODataTestBase<ActionResultTests.Startup>
+    public class ODataActionResultTests : WebApiTestBase<ODataActionResultTests>
     {
-        /// <summary>
-        /// Startup class.
-        /// </summary>
-        public class Startup : TestStartupBase
+
+        public ODataActionResultTests(WebApiTestFixture<ODataActionResultTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            public override void ConfigureServices(IServiceCollection services)
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = ActionResultEdmModel.GetEdmModel();
-                services.AddControllers().AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
-            }
-        }
-
-        public ActionResultTests(WebODataTestFixture<Startup> fixture)
-            : base(fixture)
-        {
+                services.AddControllers().AddOData(options => options.AddModel("odata", model).EnableAllFeatures(2));
+            };
         }
 
         /// <summary>
@@ -52,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = await this.Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -78,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = await this.Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -104,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = await this.Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

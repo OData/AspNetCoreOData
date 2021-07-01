@@ -1,27 +1,34 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     // The test can't work in EFCore, because it's not supported with Groupby and selectmany on collection.
     // Later, we'd swith it to EF6.
-    public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
+    public class EntitySetAggregationTests : WebApiTestBase<EntitySetAggregationTests>
     {
-        public class TestsStartup : TestStartupBase
+
+        private const string AggregationTestBaseUrl = "aggregation/Customers";
+
+        public EntitySetAggregationTests(WebApiTestFixture<EntitySetAggregationTests> factory, ITestOutputHelper output)
+            : base(factory, output)
         {
-            public override void ConfigureServices(IServiceCollection services)
+            ConfigureServicesAction = (services) =>
             {
                 // Use the sql server got the access error.
                 services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EntitySetAggregationContext;Trusted_Connection=True;"));
@@ -30,16 +37,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
-                services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
-                    .AddModel("aggregation", edmModel));
-            }
-        }
-
-        private const string AggregationTestBaseUrl = "aggregation/Customers";
-
-        public EntitySetAggregationTests(WebODataTestFixture<TestsStartup> factory)
-            : base(factory)
-        {
+                services.AddControllers().AddOData(opt => opt.AddModel("aggregation", edmModel).EnableAllFeatures());
+            };
         }
 
         [Theory(Skip = "See the comments above")]
@@ -56,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = await Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             var result = await response.Content.ReadAsObject<JObject>();
@@ -81,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = CreateClient().SendAsync(request).Result;
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -108,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = CreateClient().SendAsync(request).Result;
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -135,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = CreateClient().SendAsync(request).Result;
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -157,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = CreateClient().SendAsync(request).Result;
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -179,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = CreateClient().SendAsync(request).Result;
 
             // Assert
             var result = await response.Content.ReadAsObject<JObject>();

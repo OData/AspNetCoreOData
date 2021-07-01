@@ -74,16 +74,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static SelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SelectExpandQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SelectExpandQueryValidator>();
-        }
-
         private static void ValidateDepth(SelectExpandClause selectExpand, int maxDepth)
         {
             // do a DFS to see if there is any node that is too deep.

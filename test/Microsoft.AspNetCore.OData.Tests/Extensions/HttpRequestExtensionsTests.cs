@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.IsNoDollarQueryEnable(), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.IsNoDollarQueryEnabled(), "request");
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.GetSubServiceProvider(), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.GetRouteServices(), "request");
         }
 
         [Fact]
@@ -142,18 +142,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.CreateSubServiceProvider(""), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.CreateRouteServices(""), "request");
         }
 
-        [Fact]
+        [Fact(Skip = "No longer throwing exceptions")]
         public void CreateSubServiceProvider_ThrowsInvalidOperation_SubServiceProvider()
         {
             // Arrange
             HttpRequest request = RequestFactory.Create();
-            request.ODataFeature().SubServiceProvider = new Mock<IServiceProvider>().Object;
+            request.ODataFeature().Services = new Mock<IServiceProvider>().Object;
 
             // Act
-            Action test = () => request.CreateSubServiceProvider("odata");
+            Action test = () => request.CreateRouteServices("odata");
 
             // Assert
             ExceptionAssert.Throws<InvalidOperationException>(test, "A request container already exists on the request.");
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.DeleteSubRequestProvider(false), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.DeleteRouteServices(false), "request");
         }
 
         [Fact]

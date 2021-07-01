@@ -185,7 +185,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             ODataVersion odataVersion = GetODataResponseVersion(request);
 
-            IServiceProvider requestContainer = request.GetSubServiceProvider();
+            IServiceProvider requestContainer = request.GetRouteServices();
             ODataMessageWriterSettings writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
             writerSettings.Version = odataVersion;
             writerSettings.MessageQuotas = messageQuotas;

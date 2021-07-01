@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
@@ -24,29 +25,23 @@ namespace Microsoft.AspNetCore.OData
         #region Settings
 
         /// <summary>
-        /// Gets or Sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
+        /// Gets or sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
         /// whether to recognize keys as segments or not.
         /// By default, it supports key as segment only if the key is single key.
         /// </summary>
         public ODataUrlKeyDelimiter UrlKeyDelimiter { get; set; } = ODataUrlKeyDelimiter.Slash;
 
         /// <summary>
-        /// Gets or Sets a value indicating if batch requests should continue on error.
+        /// Gets or sets a value indicating if batch requests should continue on error.
         /// By default, it's false.
         /// </summary>
         public bool EnableContinueOnErrorHeader { get; set; }
 
         /// <summary>
-        /// Gets or Sets a value indicating if attribute routing is enabled or not.
+        /// Gets or sets a value indicating if attribute routing is enabled or not.
         /// By default, it's enabled.
         /// </summary>
         public bool EnableAttributeRouting { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a function to build an <see cref="IContainerBuilder"/>.
-        /// Please call it before the "AddModel".
-        /// </summary>
-        public Func<IContainerBuilder> BuilderFactory { get; set; }
 
         /// <summary>
         /// Gets or sets a TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
@@ -59,7 +54,7 @@ namespace Microsoft.AspNetCore.OData
         public IList<IODataControllerActionConvention> Conventions { get; } = new List<IODataControllerActionConvention>();
 
         /// <summary>
-        /// Configure the route options.
+        /// Gets the <see cref="RouteOptions"/> instance responsible for configuring the route templating.
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
 
@@ -80,7 +75,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(IEdmModel model)
         {
-            return AddModel(string.Empty, model, configureAction: null);
+            return AddModel(string.Empty, model, configureServices: null);
         }
 
         /// <summary>
@@ -91,7 +86,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(IEdmModel model, ODataBatchHandler batchHandler)
         {
-            return AddModel(string.Empty, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
+            return AddModel(string.Empty, model, services => services.AddSingleton(sp => batchHandler));
         }
 
         /// <summary>
@@ -103,7 +98,7 @@ namespace Microsoft.AspNetCore.OData
         /// <remarks></remarks>
         public ODataOptions AddModel(string prefix, IEdmModel model)
         {
-            return AddModel(prefix, model, configureAction: null);
+            return AddModel(prefix, model, configureServices: null);
         }
 
         /// <summary>
@@ -115,7 +110,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddModel(string prefix, IEdmModel model, ODataBatchHandler batchHandler)
         {
-            return AddModel(prefix, model, builder => builder.AddService(ServiceLifetime.Singleton, sp => batchHandler));
+            return AddModel(prefix, model, services => services.AddSingleton(sp => batchHandler));
         }
 
         /// <summary>
@@ -123,11 +118,11 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="prefix">The model related prefix.</param>
         /// <param name="model">The <see cref="IEdmModel"/> to add to the specified route.</param>
-        /// <param name="configureAction">
-        /// A <see cref="Action{IContainerBuilder}"/> lambda method that allows you to add services directly to the DI container just prior to finalization.
+        /// <param name="configureServices">
+        /// A <see cref="Action{IServiceCollection}"/> lambda method that allows you to add services directly to the DI container just prior to finalization.
         /// </param>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
-        public ODataOptions AddModel(string prefix, IEdmModel model, Action<IContainerBuilder> configureAction)
+        public ODataOptions AddModel(string prefix, IEdmModel model, Action<IServiceCollection> configureServices)
         {
             if (model == null)
             {
@@ -140,7 +135,7 @@ namespace Microsoft.AspNetCore.OData
             }
 
             // Consider to use Lazy<IServiceProvider> ?
-            IServiceProvider serviceProvider = BuildRouteContainer(model, configureAction);
+            IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);
             RouteComponents[prefix] = (model, serviceProvider);
             return this;
         }
@@ -150,7 +145,7 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="prefix">The route name (the route prefix name).</param>
         /// <returns>The root service provider for the route (prefix) name.</returns>
-        public IServiceProvider GetODataServiceProvider(string prefix)
+        public IServiceProvider GetRouteServices(string prefix)
         {
             if (prefix != null && RouteComponents.ContainsKey(prefix))
             {
@@ -246,7 +241,7 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
-        public ODataOptions SetMaxTop(int? maxTopValue)
+        public ODataOptions SetMaxTop(int? maxTopValue = null)
         {
             if (maxTopValue.HasValue && maxTopValue.Value < 0)
             {
@@ -275,47 +270,29 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="model">The Edm model.</param>
         /// <param name="setupAction">The setup config.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildRouteContainer(IEdmModel model, Action<IContainerBuilder> setupAction)
+        private IServiceProvider BuildRouteContainer(IEdmModel model, Action<IServiceCollection> setupAction)
         {
             Contract.Assert(model != null);
 
-            IContainerBuilder odataContainerBuilder = null;
-            if (this.BuilderFactory != null)
-            {
-                odataContainerBuilder = this.BuilderFactory();
-                if (odataContainerBuilder == null)
-                {
-                    throw Error.InvalidOperation(SRResources.NullContainerBuilder);
-                }
-            }
-            else
-            {
-                odataContainerBuilder = new DefaultContainerBuilder();
-            }
+            ServiceCollection services = new ServiceCollection();
 
-            // Inject the core odata services.
-            odataContainerBuilder.AddDefaultODataServices();
+            // Inject the developer's services first. 
+            setupAction?.Invoke(services);
+
+            services.AddScopedODataServices();
 
             // Inject the default query setting from this options.
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => this.QuerySettings);
-
-            // Inject the default Web API OData services.
-            odataContainerBuilder.AddDefaultWebApiServices();
+            services.AddSingleton(sp => QuerySettings);
 
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton,
-                typeof(ODataUriResolver),
-                sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
+            services.AddSingleton<ODataUriResolver>(sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
             // Inject the Edm model.
             // From Current ODL implment, such injection only be used in reader and writer if the input
             // model is null.
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => model);
+            services.AddSingleton(sp => model);
 
-            // Inject the customized services.
-            setupAction?.Invoke(odataContainerBuilder);
-
-            return odataContainerBuilder.BuildContainer();
+            return services.BuildServiceProvider();
         }
     }
 }

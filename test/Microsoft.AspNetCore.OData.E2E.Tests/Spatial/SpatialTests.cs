@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
+using Microsoft.AspNetCore.OData.E2E.Tests.Spatial;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,32 +16,31 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
-    public class SpatialTests : WebODataTestBase<SpatialTests.SpatialTestsStartup>
+
+    public class SpatialTests : WebApiTestBase<SpatialTests>
     {
-        public class SpatialTestsStartup : TestStartupBase
+
+        public SpatialTests(WebApiTestFixture<SpatialTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            public override void ConfigureServices(IServiceCollection services)
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
                 services.ConfigureControllers(typeof(SpatialCustomersController), typeof(MetadataController));
 
                 IEdmModel model = IsofEdmModel.GetEdmModel();
                 services.AddControllers().AddOData(options => options.AddModel("odata", model));
-            }
-        }
-
-        public SpatialTests(WebODataTestFixture<SpatialTestsStartup> factory)
-            : base(factory)
-        {
+            };
         }
 
         [Fact]
         public async Task SpatialModelMetadataTest()
         {
             // Arrange & Act
-            HttpResponseMessage response = await this.Client.GetAsync("odata/$metadata");
+            HttpResponseMessage response = await CreateClient().GetAsync("odata/$metadata");
 
             // Assert
             var stream = await response.Content.ReadAsStreamAsync();
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
         public async Task QuerySpatialEntity()
         {
             // Arrange & Act
-            HttpResponseMessage response = await Client.GetAsync("odata/SpatialCustomers(2)");
+            HttpResponseMessage response = await CreateClient().GetAsync("odata/SpatialCustomers(2)");
             JObject responseString = await response.Content.ReadAsObject<JObject>();
 
             // Assert
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
             request.Content.Headers.ContentLength = payload.Length;
-            HttpResponseMessage response = await Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
             request.Content = new StringContent(payload);
             request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
             request.Content.Headers.ContentLength = payload.Length;
-            HttpResponseMessage response = await Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

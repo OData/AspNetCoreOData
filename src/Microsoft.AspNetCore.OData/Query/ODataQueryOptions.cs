@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Contract.Assert(context.RequestContainer == null);
-            context.RequestContainer = request.GetSubServiceProvider();
+            context.RequestContainer = request.GetLinkedServiceProvider();
             context.Request = request;
 
             Context = context;
@@ -1051,13 +1051,7 @@ namespace Microsoft.AspNetCore.OData.Query
         private void Initialize(ODataQueryContext context)
         {
             Contract.Assert(context != null);
-
-            ODataUriResolver uriResolver = null;
-            if (context.RequestContainer != null)
-            {
-                uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
-            }
-
+            ODataUriResolver uriResolver = context?.Request?.GetService<ODataUriResolver>();
             if (uriResolver != null)
             {
                 _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
@@ -1065,7 +1059,7 @@ namespace Microsoft.AspNetCore.OData.Query
             else
             {
                 // Use the global setting
-                _enableNoDollarSignQueryOptions = context.Request.IsNoDollarQueryEnable();
+                _enableNoDollarSignQueryOptions = context.Request.IsNoDollarQueryEnabled();
             }
 
             // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
@@ -1087,7 +1081,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = ODataQueryValidator.GetODataQueryValidator(context);
+            Validator = context?.Request?.GetService<ODataQueryValidator>() ?? new ODataQueryValidator();
         }
     }
 }

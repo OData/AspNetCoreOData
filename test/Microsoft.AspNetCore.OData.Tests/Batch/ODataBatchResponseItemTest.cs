@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             {
                 { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(new MemoryStream(), headers);
+            IODataResponseMessage odataResponse = ODataMessageWrapper.Create(new MemoryStream(), headers);
             ODataMessageWriter messageWriter = new ODataMessageWriter(odataResponse);
 
             // Act & Assert
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             };
 
             MemoryStream ms = new MemoryStream();
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+            IODataResponseMessage odataResponse = ODataMessageWrapper.Create(ms, headers);
 
             HeaderDictionary responseHeaders = new HeaderDictionary
             {
@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                 { "Content-Type", $"multipart/mixed;charset=utf-8;boundary={Guid.NewGuid()}" },
             };
             MemoryStream ms = new MemoryStream();
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+            IODataResponseMessage odataResponse = ODataMessageWrapper.Create(ms, headers);
 
             HeaderDictionary responseHeaders = new HeaderDictionary
             {
@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             };
 
             MemoryStream ms = new MemoryStream();
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+            IODataResponseMessage odataResponse = ODataMessageWrapper.Create(ms, headers);
 
             string contentId = Guid.NewGuid().ToString();
             HttpResponse httpResponse = CreateResponse("any", new HeaderDictionary(), "text/example;charset=utf-8");
@@ -143,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             };
 
             MemoryStream ms = new MemoryStream();
-            IODataResponseMessage odataResponse = ODataMessageWrapperHelper.Create(ms, headers);
+            IODataResponseMessage odataResponse = ODataMessageWrapper.Create(ms, headers);
 
             string contentId = Guid.NewGuid().ToString();
             HttpResponse httpResponse = CreateResponse("any", new HeaderDictionary(), "text/example;charset=utf-8");

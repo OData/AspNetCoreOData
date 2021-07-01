@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         public Task SerializeToStreamAsync(Stream stream)
         {
             // how to dispose it?
-            IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(stream, Headers, _requestContainer);
+            IODataResponseMessage responseMessage = ODataMessageWrapper.Create(stream, Headers/*, _requestContainer*/);
             return WriteToResponseMessageAsync(responseMessage);
         }
 

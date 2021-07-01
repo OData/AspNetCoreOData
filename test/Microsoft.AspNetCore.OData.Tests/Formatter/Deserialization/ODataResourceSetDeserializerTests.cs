@@ -219,7 +219,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 { "Content-Type", "application/json" }
             };
 
-            IODataRequestMessage request = ODataMessageWrapperHelper.Create(await content.ReadAsStreamAsync(), headerDict);
+            IODataRequestMessage request = ODataMessageWrapper.Create(await content.ReadAsStreamAsync(), headerDict);
             ODataMessageReader reader = new ODataMessageReader(request, new ODataMessageReaderSettings(), _model);
             var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
             ODataDeserializerContext readContext = new ODataDeserializerContext

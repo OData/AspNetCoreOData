@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
             ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
             httpContext.ODataFeature().Path = new ODataPath();
             httpContext.ODataFeature().Model = new EdmModel();
-            httpContext.ODataFeature().SubServiceProvider = new ServiceCollection().BuildServiceProvider();
+            httpContext.ODataFeature().Services = new ServiceCollection().BuildServiceProvider();
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => filter.OnActionExecuted(context), "etagHandler");

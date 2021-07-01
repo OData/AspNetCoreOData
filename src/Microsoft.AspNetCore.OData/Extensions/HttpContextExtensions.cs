@@ -3,8 +3,10 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.OData.Extensions
+namespace Microsoft.AspNetCore.OData
 {
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/>.
@@ -27,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             if (odataFeature == null)
             {
                 odataFeature = new ODataFeature();
-                httpContext.Features.Set<IODataFeature>(odataFeature);
+                httpContext.Features.Set(odataFeature);
             }
 
             return odataFeature;
@@ -49,10 +51,27 @@ namespace Microsoft.AspNetCore.OData.Extensions
             if (odataBatchFeature == null)
             {
                 odataBatchFeature = new ODataBatchFeature();
-                httpContext.Features.Set<IODataBatchFeature>(odataBatchFeature);
+                httpContext.Features.Set(odataBatchFeature);
             }
 
             return odataBatchFeature;
         }
+
+        /// <summary>
+        /// Returns the <see cref="ODataOptions"/> instance from the DI container.
+        /// </summary>
+        /// <param name="context">The <see cref="HttpContext"/> instance to extend.</param>
+        /// <returns>The <see cref="ODataOptions"/> instance from the DI container.</returns>
+        public static ODataOptions ODataOptions(this HttpContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            return context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
+        }
+
+
     }
 }

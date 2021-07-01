@@ -446,7 +446,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             ODataUrlKeyDelimiter keyDelimiter = ODataUrlKeyDelimiter.Parentheses;
-            ODataOptions options = writeContext.Request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
+            ODataOptions options = writeContext.Request.ODataOptions();
             if (options != null)
             {
                 keyDelimiter = options.UrlKeyDelimiter;

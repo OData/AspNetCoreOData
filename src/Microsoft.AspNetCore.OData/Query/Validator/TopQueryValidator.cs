@@ -8,6 +8,7 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
+
     /// <summary>
     /// Represents a validator used to validate a <see cref="TopQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
@@ -54,12 +55,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new TopQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<TopQueryValidator>();
+            return context?.RequestContainer?.GetService<TopQueryValidator>() ?? new TopQueryValidator();
         }
+
     }
+
 }

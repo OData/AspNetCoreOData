@@ -5,25 +5,28 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class SingleResultTests : WebApiTestBase<SingleResultTests>
     {
-        public SingleResultTests(WebApiTestFixture<SingleResultTests> fixture)
-            :base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public SingleResultTests(WebApiTestFixture<SingleResultTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(CustomersController));
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                services.ConfigureControllers(typeof(CustomersController));
 
-            services.AddControllers().AddOData(opt => opt.AddModel("singleresult", SingleResultEdmModel.GetEdmModel())
-                .Count().Filter().OrderBy().Expand().SetMaxTop(null));
+                services.AddControllers().AddOData(opt => opt.AddModel("singleresult", SingleResultEdmModel.GetEdmModel())
+                    .Count().Filter().OrderBy().Expand().SetMaxTop(null));
+            };
         }
 
         [Fact]
@@ -59,5 +62,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
     }
+
 }

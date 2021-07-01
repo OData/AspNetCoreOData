@@ -1,10 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.DollarFormat;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
@@ -12,22 +9,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFormat
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class DollarFormatOverrideAcceptMediaTypeTests : WebApiTestBase<DollarFormatOverrideAcceptMediaTypeTests>
     {
-        public DollarFormatOverrideAcceptMediaTypeTests(WebApiTestFixture<DollarFormatOverrideAcceptMediaTypeTests> fixture)
-            :base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public DollarFormatOverrideAcceptMediaTypeTests(WebApiTestFixture<DollarFormatOverrideAcceptMediaTypeTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            IEdmModel model = GetEdmModel();
-            services.ConfigureControllers(typeof(DollarFormatCustomersController), typeof(MetadataController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            ConfigureServicesAction = (services) =>
+            {
+                IEdmModel model = GetEdmModel();
+                services.ConfigureControllers(typeof(DollarFormatCustomersController), typeof(MetadataController));
+                services.AddControllers().AddOData(opt => opt.AddModel("odata", model).EnableAllFeatures());
+            };
         }
 
         public static TheoryDataSet<string> BasicMediaTypes

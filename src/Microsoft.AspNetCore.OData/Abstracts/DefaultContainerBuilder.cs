@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     internal class DefaultContainerBuilder : IContainerBuilder
     {
-        private readonly IServiceCollection services = new ServiceCollection();
+        internal readonly IServiceCollection services = new ServiceCollection();
 
         /// <summary>
         /// Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationType"/>.
