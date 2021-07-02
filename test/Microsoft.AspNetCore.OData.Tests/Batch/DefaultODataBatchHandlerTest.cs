@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
             HttpContext context = new DefaultHttpContext();
-            context.ODataFeature().SubServiceProvider = _serviceProvider;
+            context.ODataFeature().Services = _serviceProvider;
             HttpRequest request = context.Request;
 
             // Act & Assert

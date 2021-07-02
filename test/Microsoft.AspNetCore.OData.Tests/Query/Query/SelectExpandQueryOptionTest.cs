@@ -260,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_PreserveOtherOptions(bool autoSelect)
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var entityType = model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity");
             var context = new ODataQueryContext(
                 model,
@@ -293,7 +293,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_AllSelected()
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
@@ -349,7 +349,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_NotAllSelected()
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
@@ -422,7 +422,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_WithMultipleProperties()
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
@@ -531,7 +531,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_WithNestedLevels()
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));
@@ -617,7 +617,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ProcessLevelsCorrectly_WithMaxNestedLevels()
         {
             // Arrange
-            var model = ODataLevelsTest.GetEdmModel();
+            var model = QueryDepthTests.GetEdmModel();
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.LevelsEntity"));

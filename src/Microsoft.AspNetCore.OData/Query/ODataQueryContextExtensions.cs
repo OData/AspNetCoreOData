@@ -4,7 +4,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -12,9 +11,7 @@ namespace Microsoft.AspNetCore.OData.Query
     {
         public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
         {
-            ODataQuerySettings updatedSettings = (context == null || context.RequestContainer == null)
-                ? new ODataQuerySettings()
-                : context.RequestContainer.GetRequiredService<ODataQuerySettings>();
+            ODataQuerySettings updatedSettings = context?.Request?.GetService<ODataQuerySettings>() ?? new ODataQuerySettings();
 
             updatedSettings.CopyFrom(querySettings);
 
@@ -30,12 +27,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         public static SkipTokenHandler GetSkipTokenHandler(this ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return DefaultSkipTokenHandler.Instance;
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenHandler>();
+            return context?.Request?.GetService<SkipTokenHandler>() ?? DefaultSkipTokenHandler.Instance;
         }
 
         /// <summary>
@@ -59,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Query
             FilterBinder binder = null;
             if (context.RequestContainer != null)
             {
-                binder = context.RequestContainer.GetService<FilterBinder>();
+                binder = context?.Request?.GetService<FilterBinder>();
                 if (binder != null && binder.Model != context.Model)
                 {
                     // TODO: Wtf, Need refactor these codes?

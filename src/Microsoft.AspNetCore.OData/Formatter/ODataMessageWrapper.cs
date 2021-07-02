@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter
@@ -13,12 +15,44 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// <summary>
     /// Wrapper for IODataRequestMessage and IODataResponseMessage.
     /// </summary>
-    internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMessageAsync, IODataPayloadUriConverter, IContainerProvider, IDisposable
+    internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMessageAsync, IODataPayloadUriConverter, /*IContainerProvider,*/ IDisposable
     {
         private Stream _stream;
         private Dictionary<string, string> _headers;
         private IDictionary<string, string> _contentIdMapping;
         private static readonly Regex ContentIdReferencePattern = new Regex(@"\$\d", RegexOptions.Compiled);
+
+        #region Static Instance Factories
+
+        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers)
+        {
+            return Create(stream, headers, contentIdMapping: null);
+        }
+
+        //internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IServiceProvider container)
+        //{
+        //    return Create(stream, headers, null, container);
+        //}
+
+        //internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider container)
+        //{
+        //    ODataMessageWrapper responseMessageWrapper = Create(stream, headers, contentIdMapping);
+        //    //responseMessageWrapper.Container = container;
+
+        //    return responseMessageWrapper;
+        //}
+
+        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping)
+        {
+            return new ODataMessageWrapper(
+                stream,
+                headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value)),
+                contentIdMapping);
+        }
+
+        #endregion
+
+        #region Constructors
 
         public ODataMessageWrapper()
             : this(stream: null, headers: null)
@@ -48,6 +82,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             _contentIdMapping = contentIdMapping ?? new Dictionary<string, string>();
         }
+
+        #endregion
 
         public IEnumerable<KeyValuePair<string, string>> Headers
         {
@@ -92,8 +128,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw new NotImplementedException();
             }
         }
-
-        public IServiceProvider Container { get; set; }
 
         public string GetHeader(string headerName)
         {

@@ -772,9 +772,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
             mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>(), It.IsAny<TimeZoneInfo>())).Returns(etagHeaderValue);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
+            var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (services) =>
             {
-                config.AddService<IETagHandler>(ServiceLifetime.Singleton, (services) => mockETagHandler.Object);
+                services.AddSingleton<IETagHandler>(sp => mockETagHandler.Object);
             }));
             request.ODataFeature().PrefixName = "route";
             _entityContext.Request = request;

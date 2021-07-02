@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             // how to dispose it?
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(request.Body, request.Headers, requestContainer);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(request.Body, request.Headers/*, requestContainer*/);
             ODataMessageReaderSettings settings = requestContainer.GetRequiredService<ODataMessageReaderSettings>();
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
             return oDataMessageReader;

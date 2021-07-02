@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -26,7 +24,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// </remarks>
     internal class ODataBodyModelBinder : IModelBinder
     {
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We don't want to fail in model binding.")]
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext == null)
@@ -80,14 +77,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 Request = request,
                 ResourceType = bindingContext.ModelType,
                 TimeZone = tzi,
-                //        ResourceEdmType = edmTypeReference,
+                //ResourceEdmType = edmTypeReference,
             };
         }
 
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public static async Task<IDictionary<string, object>> ReadODataBodyAsync(ModelBindingContext bindingContext)
         {
-            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();
+            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext?.Request?.GetService<ODataActionPayloadDeserializer>();
             if (deserializer == null)
             {
                 return null;
@@ -96,8 +93,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataDeserializerContext context = BuildDeserializerContext(bindingContext);
             HttpRequest request = bindingContext.HttpContext.Request;
 
-            IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(request.Body, request.Headers);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(request.Body, request.Headers);
             IEdmModel model = request.GetModel();
             using (var messageReader = new ODataMessageReader(oDataRequestMessage, null, model))
             {

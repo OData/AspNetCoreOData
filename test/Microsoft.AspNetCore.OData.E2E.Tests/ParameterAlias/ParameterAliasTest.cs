@@ -1,32 +1,35 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
+using Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
-    public class ParameterAliasTest : WebApiTestBase<ParameterAliasTest>
+
+    public class ParameterAliasTests : WebApiTestBase<ParameterAliasTests>
     {
-        public ParameterAliasTest(WebApiTestFixture<ParameterAliasTest> fixture)
-            :base(fixture)
-        {
-        }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public ParameterAliasTests(WebApiTestFixture<ParameterAliasTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(TradesController));
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                services.ConfigureControllers(typeof(TradesController));
 
-            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel(GetModel()));
+                services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
+                    .AddModel(GetModel()));
+            };
         }
 
         private static IEdmModel GetModel()
@@ -56,7 +59,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
            return builder.GetEdmModel();
         }
 
-        #region Test
         [Fact]
         public async Task ParameterAliasInFunctionCall()
         {
@@ -119,6 +121,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
             HttpClient client = CreateClient();
 
             HttpResponseMessage response = await client.GetAsync(queryUri);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Output.WriteLine(responseContent);
 
             var json = await response.Content.ReadAsObject<JObject>();
             var result = json["value"] as JArray;
@@ -138,6 +142,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
             //var json = await response.Content.ReadAsObject<JObject>();
             //Assert.Equal("Corn", (string)json["value"]);
         }
-        #endregion
+
     }
+
 }

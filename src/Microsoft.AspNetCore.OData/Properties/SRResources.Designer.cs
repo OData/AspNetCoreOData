@@ -1582,6 +1582,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The HttpContext.RequestServices was null. Check your settings..
+        /// </summary>
+        internal static string RequestServicesOnHttpContextIsNull {
+            get {
+                return ResourceManager.GetString("RequestServicesOnHttpContextIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input parameters &apos;{0}&apos; is not subset of function parameters &apos;{1}&apos;..
         /// </summary>
         internal static string RequiredParametersNotSubsetOfFunctionParameters {

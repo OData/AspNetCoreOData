@@ -83,8 +83,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             string prefix = "odata{version}";
             HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
             request.ODataFeature().PrefixName = prefix;
+            request.ODataFeature().Services = sp;
             request.RouteValues = new RouteValueDictionary(new { version = value });
-            request.HttpContext.RequestServices = sp; // global level SP
 
             // Act
             string odataLink = request.CreateODataLink();
@@ -109,8 +109,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             string prefix = "odata{version}";
             HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
             request.ODataFeature().PrefixName = prefix;
+            request.ODataFeature().Services = sp;
             request.RouteValues = new RouteValueDictionary(new { version = value });
-            request.HttpContext.RequestServices = sp; // global level SP
 
             // Act
             string odataLink = request.CreateODataLink(MetadataSegment.Instance);

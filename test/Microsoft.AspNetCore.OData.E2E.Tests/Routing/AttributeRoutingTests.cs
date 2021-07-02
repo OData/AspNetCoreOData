@@ -1,44 +1,45 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.ModelBuilder;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class AttributeRoutingTests : WebApiTestBase<AttributeRoutingTests>
     {
-        public AttributeRoutingTests(WebApiTestFixture<AttributeRoutingTests> fixture)
-           : base(fixture)
+
+        public AttributeRoutingTests(WebApiTestFixture<AttributeRoutingTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-        }
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                services.ConfigureControllers(typeof(DogsController), typeof(CatsController), typeof(OwnersController));
 
-        // following the Fixture convention.
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            services.ConfigureControllers(typeof(DogsController), typeof(CatsController), typeof(OwnersController));
+                ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+                builder.EntitySet<Dog>("Dogs").EntityType.Collection.Function("BestDog").Returns<string>();
+                builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
+                var model1 = builder.GetEdmModel();
 
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Dog>("Dogs").EntityType.Collection.Function("BestDog").Returns<string>();
-            builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
-            var model1 = builder.GetEdmModel();
+                builder = new ODataConventionModelBuilder();
+                builder.EntitySet<Cat>("Cats").EntityType.Collection.Function("BestCat").Returns<string>();
+                builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
+                var model2 = builder.GetEdmModel();
 
-            builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Cat>("Cats").EntityType.Collection.Function("BestCat").Returns<string>();
-            builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
-            var model2 = builder.GetEdmModel();
-
-            services.AddControllers().AddOData(opt => opt.AddModel("dog", model1).AddModel("cat", model2));
+                services.AddControllers().AddOData(opt => opt.AddModel("dog", model1).AddModel("cat", model2));
+            };
         }
 
         [Theory]

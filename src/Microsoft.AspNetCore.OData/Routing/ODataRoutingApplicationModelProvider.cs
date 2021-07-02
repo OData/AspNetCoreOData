@@ -51,10 +51,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             // apply non-attribute convention routing.
-            var routes = _options.Models;
-            foreach (var route in routes)
+            foreach (var route in _options.RouteComponents)
             {
-                IEdmModel model = route.Value.Item1;
+                IEdmModel model = route.Value.EdmModel;
                 if (model == null || model.EntityContainer == null)
                 {
                     continue;

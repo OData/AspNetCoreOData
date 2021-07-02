@@ -1,12 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.OData;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder.Config;
-using Microsoft.OData.UriParser;
+using System;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
 {
@@ -40,14 +37,14 @@ namespace Microsoft.AspNetCore.OData.TestCommon
         /// <param name="model">The Edm model.</param>
         public MockServiceProvider(IEdmModel model)
         {
-            _serviceProvider = BuilderDefaultServiceProvider(b => b.AddService(ServiceLifetime.Singleton, sp => model));
+            _serviceProvider = BuilderDefaultServiceProvider(services => services.AddSingleton(sp => model));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MockServiceProvider"/> class.
         /// </summary>
         /// <param name="setupAction">The setup action.</param>
-        public MockServiceProvider(Action<IContainerBuilder> setupAction)
+        public MockServiceProvider(Action<IServiceCollection> setupAction)
         {
             _serviceProvider = BuilderDefaultServiceProvider(setupAction);
         }
@@ -57,24 +54,20 @@ namespace Microsoft.AspNetCore.OData.TestCommon
             return _serviceProvider?.GetService(serviceType);
         }
 
-        private static IServiceProvider BuilderDefaultServiceProvider(Action<IContainerBuilder> setupAction)
+        private static IServiceProvider BuilderDefaultServiceProvider(Action<IServiceCollection> setupAction)
         {
-            IContainerBuilder odataContainerBuilder = new DefaultContainerBuilder();
+            ServiceCollection services = new ServiceCollection();
 
-            odataContainerBuilder.AddDefaultODataServices();
-
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => new DefaultQuerySettings());
-
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, typeof(ODataUriResolver),
-                sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
-
-            // Inject the default Web API OData services.
-            odataContainerBuilder.AddDefaultWebApiServices();
+            services
+                .AddODataCore()
+                .AddODataDefaultServices()
+                .AddODataWebApiServices()
+                .AddScopedODataServices();
 
             // Inject the customized services.
-            setupAction?.Invoke(odataContainerBuilder);
+            setupAction?.Invoke(services);
 
-            return odataContainerBuilder.BuildContainer();
+            return services.BuildServiceProvider();
         }
     }
 }

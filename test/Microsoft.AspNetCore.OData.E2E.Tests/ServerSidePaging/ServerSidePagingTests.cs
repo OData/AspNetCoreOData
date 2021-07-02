@@ -4,27 +4,29 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
     {
-        public ServerSidePagingTests(WebApiTestFixture<ServerSidePagingTests> fixture)
-            : base(fixture)
-        {
-        }
 
-        // following the Fixture convention.
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public ServerSidePagingTests(WebApiTestFixture<ServerSidePagingTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            IEdmModel edmModel = GetEdmModel();
-            services.ConfigureControllers(typeof(ServerSidePagingCustomersController));
-            services.AddControllers().AddOData(opt => opt.Expand().AddModel("{a}", edmModel));
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                IEdmModel edmModel = GetEdmModel();
+                services.ConfigureControllers(typeof(ServerSidePagingCustomersController));
+                services.AddControllers().AddOData(opt => opt.Expand().AddModel("{a}", edmModel));
+            };
         }
 
         protected static IEdmModel GetEdmModel()
@@ -80,5 +82,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
                 Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$expand=ServerSidePagingOrders&$skip=5", nextLink.GetString());
             }
         }
+
     }
+
 }

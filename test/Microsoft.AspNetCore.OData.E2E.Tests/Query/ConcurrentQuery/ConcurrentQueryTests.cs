@@ -13,31 +13,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
 {
     /// <summary>
     /// EnableQuery attribute works correctly when controller returns ActionResult.
     /// </summary>
-    public class ConcurrentQueryTests : WebODataTestBase<ConcurrentQueryTests.Startup>
+    public class ConcurrentQueryTests : WebApiTestBase<ConcurrentQueryTests>
     {
-        /// <summary>
-        /// Startup class.
-        /// </summary>
-        public class Startup : TestStartupBase
+ 
+        public ConcurrentQueryTests(WebApiTestFixture<ConcurrentQueryTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            public override void ConfigureServices(IServiceCollection services)
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = ConcurrentQueryEdmModel.GetEdmModel();
                 services.AddControllers().AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
-            }
-        }
-
-        public ConcurrentQueryTests(WebODataTestFixture<Startup> fixture)
-            : base(fixture)
-        {
+            };
         }
 
         /// <summary>
@@ -60,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
                     request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
-                    HttpResponseMessage response = await this.Client.SendAsync(request);
+                    HttpResponseMessage response = await CreateClient().SendAsync(request);
 
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

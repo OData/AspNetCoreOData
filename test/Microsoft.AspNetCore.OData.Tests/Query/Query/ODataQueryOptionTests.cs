@@ -1040,9 +1040,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ApplyTo_DoesnotApply_IfSetApplied(string queryOption, AllowedQueryOptions appliedQueryOptions)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost" + queryOption);
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<Customer>("Customers");
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost" + queryOption);
             ODataQueryContext context = new ODataQueryContext(builder.GetEdmModel(), typeof(Customer));
             ODataQueryOptions options = new ODataQueryOptions(context, request);
             IQueryable<Customer> customers =
@@ -1114,7 +1114,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await CreateClient().GetAsync(url);
             var responseString = await response.Content.ReadAsStringAsync();
 
             // Assert

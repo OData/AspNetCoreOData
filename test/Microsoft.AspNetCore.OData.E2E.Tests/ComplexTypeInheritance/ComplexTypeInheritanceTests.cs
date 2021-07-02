@@ -8,31 +8,34 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class ComplexTypeInheritanceTests : WebApiTestBase<ComplexTypeInheritanceTests>
     {
-        public ComplexTypeInheritanceTests(WebApiTestFixture<ComplexTypeInheritanceTests> fixture)
-            :base(fixture)
-        {
-        }
 
-        // following the Fixture convention.
-        protected static void UpdateConfigureServices(IServiceCollection services)
+        public ComplexTypeInheritanceTests(WebApiTestFixture<ComplexTypeInheritanceTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            services.ConfigureControllers(typeof(MetadataController), typeof(WindowsController));
+            ConfigureServicesAction = (services) =>
+            {
+                services.ConfigureControllers(typeof(MetadataController), typeof(WindowsController));
 
-            var edmModel1 = ComplexTypeInheritanceEdmModels.GetConventionModel();
-            var edmModel2 = ComplexTypeInheritanceEdmModels.GetExplicitModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("convention", edmModel1)
-                .AddModel("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+                var edmModel1 = ComplexTypeInheritanceEdmModels.GetConventionModel();
+                var edmModel2 = ComplexTypeInheritanceEdmModels.GetExplicitModel();
+                services.AddControllers().AddOData(opt => opt.AddModel("convention", edmModel1)
+                    .AddModel("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            };
+
         }
 
         public static TheoryDataSet<string, string> MediaTypes

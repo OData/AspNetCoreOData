@@ -1,67 +1,47 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
-using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.AspNetCore.OData.E2E.Tests.OpenType;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
-    // this convention is used to stop the conventions for a certain route prefix.
-    // Here, we stop to apply routing conventions for "attributeRouting" route prefix.
-    public class StopODataRoutingConvention : IODataControllerActionConvention
+
+    public class OpenTypeTests : WebApiTestBase<OpenTypeTests>
     {
-        public int Order => int.MinValue;
 
-        public bool AppliesToAction(ODataControllerActionContext context)
+        public OpenTypeTests(WebApiTestFixture<OpenTypeTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
-            if (context.Prefix == "attributeRouting")
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
-                return true;
-            }
+                services.ConfigureControllers(typeof(AccountsController), typeof(ODataEndpointController));
 
-            return false;
-        }
+                IEdmModel model1 = OpenComplexTypeEdmModel.GetTypedConventionModel();
 
-        public bool AppliesToController(ODataControllerActionContext context)
-        {
-            return true;
-        }
-    }
+                services.AddControllers().AddOData(opt =>
+                {
+                    opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
+                    .AddModel("convention", model1)
+                    .AddModel("attributeRouting", model1)
+                    .AddModel("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
+                    .Conventions.Add(new StopODataRoutingConvention());
 
-    public class TypedOpenTypeTest : WebApiTestBase<TypedOpenTypeTest>
-    {
-        public TypedOpenTypeTest(WebApiTestFixture<TypedOpenTypeTest> fixture)
-            :base(fixture)
-        {
-        }
-
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            services.ConfigureControllers(typeof(AccountsController), typeof(ODataEndpointController));
-
-            IEdmModel model1 = OpenComplexTypeEdmModel.GetTypedConventionModel();
-
-            services.AddControllers().AddOData(opt =>
-            {
-                opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddModel("convention", model1)
-                .AddModel("attributeRouting", model1)
-                .AddModel("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
-                .Conventions.Add(new StopODataRoutingConvention());
-
-                // simply suppress the route number from conventional routing
-                opt.RouteOptions.EnableUnqualifiedOperationCall = false;
-                opt.RouteOptions.EnableKeyAsSegment = false;
-            });
+                    // simply suppress the route number from conventional routing
+                    opt.RouteOptions.EnableUnqualifiedOperationCall = false;
+                    opt.RouteOptions.EnableKeyAsSegment = false;
+                });
+            };
         }
 
         [Theory]

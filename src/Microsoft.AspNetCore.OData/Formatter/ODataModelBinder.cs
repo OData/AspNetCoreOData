@@ -6,12 +6,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -62,7 +60,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     if (paramValue != null)
                     {
                         HttpRequest request = bindingContext.HttpContext.Request;
-                        object model = ConvertTo(paramValue, bindingContext, request.GetSubServiceProvider());
+                        LinkedServiceProvider linkedServiceProvider = new LinkedServiceProvider(request.GetRouteServices(), request.HttpContext.RequestServices);
+                        object model = ConvertTo(paramValue, bindingContext, linkedServiceProvider);
                         bindingContext.Result = ModelBindingResult.Success(model);
                         return Task.CompletedTask;
                     }
@@ -141,10 +140,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel edmModel = request.GetModel();
 
             TimeZoneInfo timeZone = null;
-            IOptions<ODataOptions> odataOptions = request.HttpContext.RequestServices.GetService<IOptions<ODataOptions>>();
-            if (odataOptions != null && odataOptions.Value != null)
+            ODataOptions odataOptions = request.ODataOptions();
+            if (odataOptions != null)
             {
-                timeZone = odataOptions.Value.TimeZone;
+                timeZone = odataOptions.TimeZone;
             }
 
             return new ODataDeserializerContext

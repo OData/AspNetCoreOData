@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            Assert.Empty(odataOptions.Models);
+            Assert.Empty(odataOptions.RouteComponents);
         }
 
         [Fact]
@@ -101,10 +101,10 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            var model = Assert.Single(odataOptions.Models);
+            var model = Assert.Single(odataOptions.RouteComponents);
             Assert.Equal("odata", model.Key);
-            Assert.Same(coreModel, model.Value.Item1);
-            Assert.NotNull(model.Value.Item2);
+            Assert.Same(coreModel, model.Value.EdmModel);
+            Assert.NotNull(model.Value.ServiceProvider);
         }
 
         [Fact]
@@ -135,10 +135,10 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            var model = Assert.Single(odataOptions.Models);
+            var model = Assert.Single(odataOptions.RouteComponents);
             Assert.Equal("odata", model.Key);
-            Assert.Same(coreModel, model.Value.Item1);
-            Assert.NotNull(model.Value.Item2);
+            Assert.Same(coreModel, model.Value.EdmModel);
+            Assert.NotNull(model.Value.ServiceProvider);
         }
     }
 

@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             HttpRequest request = context.Request;
-            IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
+            IServiceProvider requestContainer = request.CreateRouteServices(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             using (ODataMessageReader reader = request.GetODataMessageReader(requestContainer))
@@ -112,14 +112,14 @@ namespace Microsoft.AspNetCore.OData.Batch
                         IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
                         foreach (HttpContext changeSetContext in changeSetContexts)
                         {
-                            changeSetContext.Request.DeleteSubRequestProvider(false);
+                            changeSetContext.Request.DeleteRouteServices(false);
                         }
                         requests.Add(new ChangeSetRequestItem(changeSetContexts));
                     }
                     else if (batchReader.State == ODataBatchReaderState.Operation)
                     {
                         HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
-                        operationContext.Request.DeleteSubRequestProvider(false);
+                        operationContext.Request.DeleteRouteServices(false);
                         requests.Add(new OperationRequestItem(operationContext));
                     }
                 }

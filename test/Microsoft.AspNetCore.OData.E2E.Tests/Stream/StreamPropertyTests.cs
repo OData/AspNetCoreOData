@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.StreamProperty;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,16 +17,27 @@ using Microsoft.OData.Edm.Vocabularies.V1;
 using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.StreamProperty
+namespace Microsoft.AspNetCore.OData.E2E.Tests
 {
+
     public class StreamPropertyTests : WebApiTestBase<StreamPropertyTests>
     {
+
         private static IEdmModel EdmModel;
 
-        public StreamPropertyTests(WebApiTestFixture<StreamPropertyTests> fixture)
-           : base(fixture)
+        public StreamPropertyTests(WebApiTestFixture<StreamPropertyTests> fixture, ITestOutputHelper output)
+            : base(fixture, output)
         {
+            ConfigureServicesAction = (IServiceCollection services) =>
+            {
+                EdmModel = GetEdmModel();
+
+                services.ConfigureControllers(typeof(MetadataController), typeof(StreamCustomersController));
+
+                services.AddControllers().AddOData(opt => opt.AddModel("odata", EdmModel));
+            };
         }
 
         [Fact]
@@ -95,15 +107,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.StreamProperty
             Assert.Equal(new byte[] { 3, 4, 5, 6 }, byteArray);
         }
 
-        // following the Fixture convention.
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            EdmModel = GetEdmModel();
-
-            services.ConfigureControllers(typeof(MetadataController), typeof(StreamCustomersController));
-
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", EdmModel));
-        }
 
         public static byte[] ReadAllBytes(Stream instream)
         {

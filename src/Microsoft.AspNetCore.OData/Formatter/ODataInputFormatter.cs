@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.ReadUntypedAsString = false;
 
                 IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetSubServiceProvider());
+                    ODataMessageWrapper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping()/*, request.GetRouteServices()*/);
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
                 disposes.Add(oDataMessageReader);
 
@@ -287,7 +287,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = odataFeature.Model;
             expectedPayloadType = null;
 
-            IODataDeserializerProvider deserializerProvider = request.GetSubServiceProvider().GetRequiredService<IODataDeserializerProvider>();
+            IODataDeserializerProvider deserializerProvider = request.GetRequiredService<IODataDeserializerProvider>();
 
             // Get the deserializer using the CLR type first from the deserializer provider.
             IODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);

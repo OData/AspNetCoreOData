@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                 headerDict[head.Key] = new StringValues(head.Value.ToArray());
             }
 
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(contentStream, headerDict/*, new MockServiceProvider()*/);
+            IODataRequestMessage oDataRequestMessage = ODataMessageWrapper.Create(contentStream, headerDict/*, new MockServiceProvider()*/);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
             return oDataMessageReader;
         }

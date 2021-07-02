@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -107,16 +108,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions);
             }
-        }
-
-        internal static ODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new ODataQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<ODataQueryValidator>();
         }
 
         private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)

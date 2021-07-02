@@ -163,7 +163,7 @@ namespace ODataRoutingSample.OpenApi
         {
             Contract.Assert(options != null);
 
-            foreach (var model in options.Models)
+            foreach (var model in options.RouteComponents)
             {
                 string openapiPath = string.IsNullOrEmpty(model.Key) ? $"/{_requestName}" : $"/{model.Key}/{_requestName}";
                 AddRoute(model.Key, openapiPath);

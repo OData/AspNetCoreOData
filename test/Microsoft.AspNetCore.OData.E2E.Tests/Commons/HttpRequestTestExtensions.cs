@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
             }
 
             IEdmModel model = request.GetModel();
-            IServiceProvider sp = request.GetSubServiceProvider();
+            IServiceProvider sp = request.GetRouteServices();
             string serviceRoot = request.CreateODataLink();
             ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri, sp);
             return uriParser.ParsePath();

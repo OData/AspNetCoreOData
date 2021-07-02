@@ -61,12 +61,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new CountQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<CountQueryValidator>();
+            return context?.RequestContainer?.GetService<CountQueryValidator>() ?? new CountQueryValidator();
         }
     }
 }

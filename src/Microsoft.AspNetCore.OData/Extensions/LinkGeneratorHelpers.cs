@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             Contract.Assert(routePattern != null);
 
             HttpContext httpContext = request.HttpContext;
-            TemplateBinderFactory factory = request.HttpContext.RequestServices.GetRequiredService<TemplateBinderFactory>();
+            TemplateBinderFactory factory = request.GetRequiredService<TemplateBinderFactory>();
             TemplateBinder templateBinder = factory.Create(routePattern);
 
             RouteValueDictionary ambientValues = GetAmbientValues(httpContext);

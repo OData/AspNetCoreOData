@@ -48,9 +48,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         IServiceScope RequestScope { get; set; }
 
         /// <summary>
-        /// Gets or sets the request container.
+        /// Gets or sets the service provider.
         /// </summary>
-        IServiceProvider SubServiceProvider { get; set; }
+        IServiceProvider Services { get; set; }
 
         /// <summary>
         /// Gets or sets the batch route data.

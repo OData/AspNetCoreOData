@@ -77,10 +77,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             HttpRequest request = context.Request;
 
             IServiceCollection services = new ServiceCollection();
-            if (setupAction != null)
-            {
-                services.Configure(setupAction);
-            }
+
+            services
+                .AddControllers()
+                .AddOData(setupAction ?? ((options) => { }));
+
+            services
+                //RWM: The Scoped services should not be added to this container if we're properly configuring the system.
+                .AddScopedODataServices()
+                .AddLogging();
 
             context.RequestServices = services.BuildServiceProvider();
 
@@ -220,7 +225,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             IEdmModel model = request.GetModel();
 
             ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), new Uri(link.LocalPath, UriKind.Relative),
-                request.GetSubServiceProvider());
+                request.GetRouteServices());
 
             var odataPath = uriParser.ParsePath();
 

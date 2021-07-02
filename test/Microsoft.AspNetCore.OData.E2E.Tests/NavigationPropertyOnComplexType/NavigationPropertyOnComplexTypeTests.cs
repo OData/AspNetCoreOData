@@ -18,11 +18,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 {
     // TODO: the test cases in this class hangs on the Azure Build pipeline, don't know the root cause yet.
 #if false
-    public class NavigationPropertyOnComplexTypeTests : WebODataTestBase<NavigationPropertyOnComplexTypeTests.Startup>
+    public class NavigationPropertyOnComplexTypeTests : WebApiTestBase<NavigationPropertyOnComplexTypeTests.Startup>
     {
         public class Startup : TestStartupBase
         {
-            public override void ConfigureServices(IServiceCollection services)
+            ConfigureServicesAction = (IServiceCollection services) =>
             {
                 services.ConfigureControllers(typeof(PeopleController));
 
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
 
         private const string PeopleBaseUrl = "odata/People";
 
-        public NavigationPropertyOnComplexTypeTests(WebODataTestFixture<Startup> factory)
+        public NavigationPropertyOnComplexTypeTests(WebApiTestFixture<Startup> factory)
             : base(factory)
         {
         }
@@ -284,7 +284,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NavigationPropertyOnComplexType
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
 
             // Act
-            HttpResponseMessage response = await this.Client.SendAsync(request);
+            HttpResponseMessage response = await CreateClient().SendAsync(request);
             string result = await response.Content.ReadAsStringAsync();
 
             // Assert
