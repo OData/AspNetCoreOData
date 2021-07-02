@@ -26,14 +26,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="action">The given action model.</param>
         /// <returns>True/False.</returns>
-        public static bool IsNonODataAction(this ActionModel action)
+        public static bool IsODataIgnored(this ActionModel action)
         {
             if (action == null)
             {
                 throw Error.ArgumentNull(nameof(action));
             }
 
-            return action.Attributes.Any(a => a is NonODataActionAttribute);
+            return action.Attributes.Any(a => a is ODataIgnoredAttribute);
         }
 
         /// <summary>

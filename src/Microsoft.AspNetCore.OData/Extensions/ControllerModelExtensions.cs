@@ -8,24 +8,26 @@ using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
+
     /// <summary>
     /// The extension methods for the <see cref="ControllerModel"/>.
     /// </summary>
     public static class ControllerModelExtensions
     {
+
         /// <summary>
         /// Test whether the controller is not suitable for OData controller.
         /// </summary>
         /// <param name="controller">The given controller model.</param>
         /// <returns>True/False.</returns>
-        public static bool IsNonODataController(this ControllerModel controller)
+        public static bool IsODataIgnored(this ControllerModel controller)
         {
             if (controller == null)
             {
                 throw Error.ArgumentNull(nameof(controller));
             }
 
-            return controller.Attributes.Any(a => a is NonODataControllerAttribute);
+            return controller.Attributes.Any(a => a is ODataIgnoredAttribute);
         }
 
         /// <summary>
@@ -61,5 +63,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             return controller.Attributes.OfType<T>().FirstOrDefault();
         }
+
     }
+
 }

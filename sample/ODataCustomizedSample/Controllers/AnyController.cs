@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.OData.Routing.Attributes;
 namespace ODataCustomizedSample.Controllers
 {
     [Route("")]
-    [ODataRouting]
+    [ODataAttributeRouting]
     public class AnyController : ControllerBase
     {
         [HttpGet("Players")] // ~Players

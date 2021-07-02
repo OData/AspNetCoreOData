@@ -11,7 +11,7 @@ namespace ODataCustomizedSample.Controllers
     [Route("odata")]
     public class HandAbolusteController : ControllerBase
     {
-        [ODataRouting]
+        [ODataAttributeRouting]
         [HttpGet("/explicit/Employees({key})/Goto(lat={lat},lon={lon})")]
         [HttpGet("~/convention/Employees({key})/ODataCustomizedSample.Models.Goto(lat={lat},lon={lon})")]
         public string Goto(int key, double lat, double lon)

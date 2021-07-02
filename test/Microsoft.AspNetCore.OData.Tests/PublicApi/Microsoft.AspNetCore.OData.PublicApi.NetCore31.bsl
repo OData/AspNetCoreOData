@@ -730,7 +730,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static bool IsNonODataAction (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+	public static bool IsODataIgnored (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
 }
 
 [
@@ -750,7 +750,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensi
 	[
 	ExtensionAttribute(),
 	]
-	public static bool IsNonODataController (Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller)
+	public static bool IsODataIgnored (Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller)
 }
 
 [
@@ -2608,36 +2608,29 @@ public abstract class Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrappe
 [
 AttributeUsageAttribute(),
 ]
-public class Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute : System.Attribute {
-	public ODataModelAttribute ()
-	public ODataModelAttribute (string model)
+public class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteComponentAttribute : System.Attribute {
+	public ODataRouteComponentAttribute ()
+	public ODataRouteComponentAttribute (string routePrefix)
 
-	string Model  { public get; }
+	string RoutePrefix  { public get; }
 }
 
 [
 AttributeUsageAttribute(),
 ]
-public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.NonODataActionAttribute : System.Attribute {
-	public NonODataActionAttribute ()
+public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataAttributeRoutingAttribute : System.Attribute {
+	public ODataAttributeRoutingAttribute ()
 }
 
 [
 AttributeUsageAttribute(),
 ]
-public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.NonODataControllerAttribute : System.Attribute {
-	public NonODataControllerAttribute ()
+public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataIgnoredAttribute : System.Attribute {
+	public ODataIgnoredAttribute ()
 }
 
 [
-AttributeUsageAttribute(),
-]
-public sealed class Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute : System.Attribute {
-	public ODataRoutingAttribute ()
-}
-
-[
-ODataRoutingAttribute(),
+ODataAttributeRoutingAttribute(),
 ]
 public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	protected ODataController ()

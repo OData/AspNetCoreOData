@@ -10,8 +10,8 @@ using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1
 {
-    [ODataModel("v1")]
-    [ODataRouting]
+    [ODataRouteComponent("v1")]
+    [ODataAttributeRouting]
     public class OrganizationsController : Controller
     {
         [EnableQuery]

@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
     /// <summary>
     /// The base controller class for OData.
     /// </summary>
-    [ODataRouting]
+    [ODataAttributeRouting]
     public abstract class ODataController : ControllerBase
     {
         /// <summary>
