@@ -157,8 +157,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void BindUriFunctionName_CanBindInstanceMethod()
         {
-            const string FUNCTION_NAME = "padright";
-            MethodInfo padRightInstanceMethodInfo = typeof(string).GetMethod("PadRight", new Type[] { typeof(int) });
+            // this test originally used "padright" as case, it has a running conflict with 'CustomMethod_InstanceMethodOfDeclaringType' in 'FilterBinderTests"
+            // Therefore, let's change it to use "PadLeft" as case.
+            // TODO: need to refactor the static logic for UriFunctionsBinder.
+            const string FUNCTION_NAME = "padLeft";
+            MethodInfo padRightInstanceMethodInfo = typeof(string).GetMethod("PadLeft", new Type[] { typeof(int) });
 
             try
             {

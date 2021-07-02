@@ -54,12 +54,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new TopQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<TopQueryValidator>();
+            return context?.RequestContainer?.GetService<TopQueryValidator>() ?? new TopQueryValidator();
         }
     }
 }

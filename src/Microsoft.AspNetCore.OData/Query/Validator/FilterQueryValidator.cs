@@ -579,12 +579,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static FilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new FilterQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<FilterQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<FilterQueryValidator>()
+                ?? new FilterQueryValidator();
         }
 
         private void EnterLambda(ODataValidationSettings validationSettings)

@@ -111,12 +111,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static ODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new ODataQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<ODataQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<ODataQueryValidator>()
+                ?? new ODataQueryValidator();
         }
 
         private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)

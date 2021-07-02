@@ -88,8 +88,8 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
-	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] Models  { public get; }
 	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] RouteComponents  { public get; }
 	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
@@ -125,10 +125,6 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature {
 	System.Nullable`1[[System.Guid]] ChangeSetId  { public abstract get; public abstract set; }
 	string ContentId  { public abstract get; public abstract set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ContentIdMapping  { public abstract get; }
-}
-
-public interface Microsoft.AspNetCore.OData.Abstracts.IODataBuilder {
-	Microsoft.Extensions.DependencyInjection.IServiceCollection Services  { public abstract get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Abstracts.IODataFeature {

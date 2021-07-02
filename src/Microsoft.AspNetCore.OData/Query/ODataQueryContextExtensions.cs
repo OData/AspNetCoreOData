@@ -12,9 +12,8 @@ namespace Microsoft.AspNetCore.OData.Query
     {
         public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
         {
-            ODataQuerySettings updatedSettings = (context == null || context.RequestContainer == null)
-                ? new ODataQuerySettings()
-                : context.RequestContainer.GetRequiredService<ODataQuerySettings>();
+            ODataQuerySettings updatedSettings =
+                context?.RequestContainer?.GetRequiredService<ODataQuerySettings>() ?? new ODataQuerySettings();
 
             updatedSettings.CopyFrom(querySettings);
 
@@ -30,12 +29,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         public static SkipTokenHandler GetSkipTokenHandler(this ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return DefaultSkipTokenHandler.Instance;
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenHandler>();
+            return context?.RequestContainer?.GetRequiredService<SkipTokenHandler>() ?? DefaultSkipTokenHandler.Instance;
         }
 
         /// <summary>

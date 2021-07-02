@@ -61,8 +61,6 @@ Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ChangeSetId.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ContentId.get -> string
 Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ContentId.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature.ContentIdMapping.get -> System.Collections.Generic.IDictionary<string, string>
-Microsoft.AspNetCore.OData.Abstracts.IODataBuilder
-Microsoft.AspNetCore.OData.Abstracts.IODataBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause.get -> Microsoft.OData.UriParser.Aggregation.ApplyClause
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.ApplyClause.set -> void
@@ -684,10 +682,10 @@ Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.Expand() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(string prefix) -> System.IServiceProvider
-Microsoft.AspNetCore.OData.ODataOptions.Models.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel, System.IServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
+Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel, System.IServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataOptions

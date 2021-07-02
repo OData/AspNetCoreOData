@@ -36,12 +36,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static SkipQueryValidator GetSkipQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SkipQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipQueryValidator>();
+            return context?.RequestContainer?.GetService<SkipQueryValidator>() ?? new SkipQueryValidator();
         }
     }
 }

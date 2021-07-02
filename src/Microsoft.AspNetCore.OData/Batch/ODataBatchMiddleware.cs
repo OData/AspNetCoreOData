@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             Contract.Assert(options != null);
 
-            foreach (var model in options.Models)
+            foreach (var model in options.RouteComponents)
             {
                 IServiceProvider subServiceProvider = model.Value.Item2;
                 if (subServiceProvider == null)
