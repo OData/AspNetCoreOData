@@ -145,7 +145,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Services">
             <summary>
-            Gets or sets the request container.
+            Gets or sets the service provider.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.BatchRouteData">
@@ -296,7 +296,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Services">
             <summary>
-            Gets or sets the request container.
+            Gets or sets the service provider.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BatchRouteData">

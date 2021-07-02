@@ -56,7 +56,7 @@ namespace ODataRoutingSample
             IEdmModel model3 = EdmModelBuilder.GetEdmModelV3();
 
             services.AddControllers()
-                .AddOData(opt => opt.EnableAllFeatures(5)
+                .AddOData(opt => opt.EnableODataQuery(5)
                     .AddModel(model0)
                     .AddModel("v1", model1)
                     .AddModel("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())

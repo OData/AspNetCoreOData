@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests
             {
                 IEdmModel model = GetEdmModel();
                 services.ConfigureControllers(typeof(DollarFormatCustomersController), typeof(MetadataController));
-                services.AddControllers().AddOData(opt => opt.AddModel("odata", model).EnableAllFeatures());
+                services.AddControllers().AddOData(opt => opt.AddModel("odata", model).EnableODataQuery(null));
             };
         }
 

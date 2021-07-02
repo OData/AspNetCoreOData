@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = ActionResultEdmModel.GetEdmModel();
-                services.AddControllers().AddOData(options => options.AddModel("odata", model).EnableAllFeatures(2));
+                services.AddControllers().AddOData(options => options.AddModel("odata", model).EnableODataQuery(2));
             };
         }
 

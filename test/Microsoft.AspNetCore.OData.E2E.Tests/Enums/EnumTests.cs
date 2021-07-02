@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests
                 IEdmModel model1 = EnumsEdmModel.GetConventionModel();
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
-                services.AddControllers().AddOData(opt => opt.EnableAllFeatures(5)
+                services.AddControllers().AddOData(opt => opt.EnableODataQuery(5)
                     .AddModel("convention", model1)
                     .AddModel("explicit", model2));
             };
