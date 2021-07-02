@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;

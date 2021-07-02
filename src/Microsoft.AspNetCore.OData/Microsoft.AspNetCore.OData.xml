@@ -2852,7 +2852,7 @@
             </summary>
             <remarks>
             Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer" />. A CLR type is supported if it is one of
-            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload,
             Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
             </remarks>
         </member>
@@ -3970,7 +3970,7 @@
             </summary>
             <remarks>
             Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer" />. A CLR type is supported if it is one of
-            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload,
             Uri[] which maps to ODataReferenceLinks payload, etc.
             </remarks>
         </member>
@@ -6013,9 +6013,9 @@
               Looks up a localized string similar to The HttpActionContext.ActionDescriptor is null..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionContextMustHaveRequest">
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionDescriptorNotControllerActionDescriptor">
             <summary>
-              Looks up a localized string similar to The HttpActionContext.Request is null..
+              Looks up a localized string similar to ActionDescriptor is not ControllerActionDescriptor..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionExecutedContextMustHaveRequest">
@@ -6541,6 +6541,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelBinderUtil_ValueCannotBeEnum">
             <summary>
               Looks up a localized string similar to The binding value &apos;{0}&apos; cannot be bound to the enum type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelBindingContextMustHaveRequest">
+            <summary>
+              Looks up a localized string similar to The model binding context requires an attached request in order to model binding..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ModelMissingFromReadContext">
@@ -8623,81 +8628,6 @@
             Gets the <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> for the current node.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption">
-            <summary>
-            This defines a $orderby OData query option for querying.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
-            <summary>
-            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> based on the raw $orderby value and
-            an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
-            </summary>
-            <param name="rawValue">The raw value for $orderby query. It can be null or empty.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Context">
-            <summary>
-             Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByNodes">
-            <summary>
-            Gets the mutable list of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByPropertyNode"/> instances for this query option.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue">
-            <summary>
-             Gets the raw $orderby value.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator">
-            <summary>
-            Gets or sets the OrderBy Query Validator.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause">
-            <summary>
-            Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause"/> for this query option.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0})">
-            <summary>
-            Apply the $orderby query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
-            <summary>
-            Apply the $orderby query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo(System.Linq.IQueryable)">
-            <summary>
-            Apply the $orderby query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
-            <summary>
-            Apply the $orderby query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
-            <summary>
-            Validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
-            </summary>
-            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext">
             <summary>
             This defines some context information used to perform query composition.
@@ -9647,6 +9577,81 @@
             <summary>
              Gets the raw $deltatoken query value from the incoming request Uri if exists.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption">
+            <summary>
+            This defines a $orderby OData query option for querying.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+            <summary>
+            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> based on the raw $orderby value and
+            an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="rawValue">The raw value for $orderby query. It can be null or empty.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Context">
+            <summary>
+             Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByNodes">
+            <summary>
+            Gets the mutable list of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByPropertyNode"/> instances for this query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue">
+            <summary>
+             Gets the raw $orderby value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator">
+            <summary>
+            Gets or sets the OrderBy Query Validator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause">
+            <summary>
+            Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause"/> for this query option.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0})">
+            <summary>
+            Apply the $orderby query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $orderby query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo(System.Linq.IQueryable)">
+            <summary>
+            Apply the $orderby query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply the $orderby query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption">
             <summary>

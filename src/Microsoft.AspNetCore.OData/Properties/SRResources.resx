@@ -402,14 +402,17 @@
   <data name="QueryCannotBeEmpty" xml:space="preserve">
     <value>The value for OData query '{0}' cannot be empty.</value>
   </data>
+  <data name="ActionDescriptorNotControllerActionDescriptor" xml:space="preserve">
+    <value>ActionDescriptor is not ControllerActionDescriptor.</value>
+  </data>
   <data name="FailedToBuildEdmModelBecauseReturnTypeIsNull" xml:space="preserve">
     <value>Cannot create an EDM model as the action '{0}' on controller '{1}' has a void return type.</value>
   </data>
   <data name="FailedToRetrieveTypeToBuildEdmModel" xml:space="preserve">
     <value>Cannot create an EDM model as the action '{0}' on controller '{1}' has a return type '{2}' that does not implement IEnumerable&lt;T&gt;.</value>
   </data>
-  <data name="ActionContextMustHaveRequest" xml:space="preserve">
-    <value>The HttpActionContext.Request is null.</value>
+  <data name="ModelBindingContextMustHaveRequest" xml:space="preserve">
+    <value>The model binding context requires an attached request in order to model binding.</value>
   </data>
   <data name="NotAllowedLogicalOperator" xml:space="preserve">
     <value>Logical operator '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>

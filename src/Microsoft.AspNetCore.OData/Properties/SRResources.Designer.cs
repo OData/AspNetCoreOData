@@ -70,11 +70,11 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The HttpActionContext.Request is null..
+        ///   Looks up a localized string similar to ActionDescriptor is not ControllerActionDescriptor..
         /// </summary>
-        internal static string ActionContextMustHaveRequest {
+        internal static string ActionDescriptorNotControllerActionDescriptor {
             get {
-                return ResourceManager.GetString("ActionContextMustHaveRequest", resourceCulture);
+                return ResourceManager.GetString("ActionDescriptorNotControllerActionDescriptor", resourceCulture);
             }
         }
         
@@ -1020,6 +1020,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ModelBinderUtil_ValueCannotBeEnum {
             get {
                 return ResourceManager.GetString("ModelBinderUtil_ValueCannotBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The model binding context requires an attached request in order to model binding..
+        /// </summary>
+        internal static string ModelBindingContextMustHaveRequest {
+            get {
+                return ResourceManager.GetString("ModelBindingContextMustHaveRequest", resourceCulture);
             }
         }
         

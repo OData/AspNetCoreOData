@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="orderByClause">The orderby clause representing property access.</param>
         public OrderByCountNode(OrderByClause orderByClause)
         {
-            OrderByClause = orderByClause ?? throw new ArgumentNullException(nameof(orderByClause));
+            OrderByClause = orderByClause ?? throw Error.ArgumentNull(nameof(orderByClause));
             Direction = orderByClause.Direction;
         }
 

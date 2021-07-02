@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (orderByClause == null)
             {
-                throw new ArgumentNullException(nameof(orderByClause));
+                throw Error.ArgumentNull(nameof(orderByClause));
             }
 
             Direction = orderByClause.Direction;

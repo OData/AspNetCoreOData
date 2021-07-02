@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
@@ -19,11 +18,12 @@ namespace Microsoft.AspNetCore.OData.Query
         public OrderByOpenPropertyNode(OrderByClause orderByClause)
             : base(orderByClause)
         {
-            OrderByClause = orderByClause ?? throw new ArgumentNullException(nameof(orderByClause));
+            OrderByClause = orderByClause ?? throw Error.ArgumentNull(nameof(orderByClause));
 
             var openPropertyExpression = orderByClause.Expression as SingleValueOpenPropertyAccessNode;
             if (openPropertyExpression == null)
             {
+                // TODO: need refactor the error message
                 throw new ODataException(SRResources.OrderByClauseNotSupported);
             }
 
