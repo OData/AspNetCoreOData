@@ -4,13 +4,6 @@
         <name>Microsoft.AspNetCore.OData</name>
     </assembly>
     <members>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ContainerBuilderExtensions.AddDefaultWebApiServices(Microsoft.OData.IContainerBuilder)">
-            <summary>
-            Injects the default Web API OData services.
-            </summary>
-            <param name="builder">The container builder.</param>
-            <returns>The calling itself.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder">
             <summary>
             The default container builder implementation based on the Microsoft dependency injection framework.
@@ -123,7 +116,7 @@
             Gets or sets the OData path.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.PrefixName">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutePrefix">
             <summary>
             Gets/sets the route prefix name
             </summary>
@@ -143,7 +136,7 @@
             Gets or sets the request scope.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SubServiceProvider">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Services">
             <summary>
             Gets or sets the request container.
             </summary>
@@ -242,7 +235,7 @@
             Maybe it's unnecessary later.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PrefixName">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutePrefix">
             <summary>
             Gets or sets the route prefix name.
             </summary>
@@ -257,7 +250,7 @@
             Gets or sets the request scope.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SubServiceProvider">
+        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Services">
             <summary>
             Gets or sets the request container.
             </summary>
@@ -318,6 +311,13 @@
             Gets the data store used routing conventions to store any custom route data.
             </summary>
             <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ContainerBuilderExtensions.AddDefaultWebApiServices(Microsoft.OData.IContainerBuilder)">
+            <summary>
+            Injects the default Web API OData services.
+            </summary>
+            <param name="builder">The container builder.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
             <summary>
@@ -2567,17 +2567,24 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            Return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
             </summary>
-            <param name="httpContext">The Http context.</param>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
-            Extension method to return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
+            Return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
             </summary>
-            <param name="httpContext">The Http context.</param>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns the <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)"/> instance from the DI container.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
+            <returns>The <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)"/> instance from the DI container.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions">
             <summary>
@@ -2586,37 +2593,44 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataFeature(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.
+            Returns the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the DI container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> from the services container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataBatchFeature(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the services container.
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the DI container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the services container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Returns the <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpRequest)"/> instance from the DI container.
+            </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <returns>The <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpRequest)"/> instance from the DI container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:System.TimeZoneInfo"/> setting.
             </summary>
-            <param name="request">The http request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>null or the time zone info.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the bool value indicating whether the non-dollar prefix query option.
             </summary>
-            <param name="request">The http request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>True/false.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(Microsoft.AspNetCore.Http.HttpRequest)">
@@ -2629,27 +2643,28 @@
             <summary>
             Gets the <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetWriterSettings(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.OData.ODataMessageWriterSettings"/> from the request container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             get the deserializer provider associated with the request.
             </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(Microsoft.AspNetCore.Http.HttpRequest,System.Int32,System.Object,System.Func{System.Object,System.String})">
             <summary>
             Creates a link for the next page of results; To be used as the value of @odata.nextLink.
             </summary>
-            <param name="request">The request on which to base the next page link.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <param name="pageSize">The number of results allowed per page.</param>
             <param name="instance">Object which can be used to generate the skiptoken value.</param>
             <param name="objectToSkipTokenValue">Function that takes in the last object and returns the skiptoken value string.</param>
@@ -2659,7 +2674,7 @@
             <summary>
             Creates an ETag from concurrency property names and values.
             </summary>
-            <param name="request">The input property names and values.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <param name="properties">The input property names and values.</param>
             <param name="timeZone">The Time zone info.</param>
             <returns>The generated ETag string.</returns>
@@ -2668,54 +2683,54 @@
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IETagHandler"/> from the services container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsODataQueryRequest(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Checks whether the request is a POST targeted at a resource path ending in /$query.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>true if the request path has $query segment.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetRouteServices(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the dependency injection container for the OData request.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The dependency injection container.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateSubServiceProvider(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateRouteServices(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
             <summary>
             Creates a request container that associates with the <paramref name="request"/>.
             </summary>
-            <param name="request">The request.</param>
-            <param name="prefixName">The name of the route.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <param name="routePrefix">The route prefix for this request. Should match an entry in <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.RouteComponents"/>.</param>
             <returns>The request container created.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(Microsoft.AspNetCore.Http.HttpRequest,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ClearRouteServices(Microsoft.AspNetCore.Http.HttpRequest,System.Boolean)">
             <summary>
-            Deletes the request container from the <paramref name="request"/> and disposes
-            the container if <paramref name="dispose"/> is <c>true</c>.
+            Removes the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope"/> and <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Services"/> from 
+            the <paramref name="request"/> and optionally disposes of the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope"/>.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <param name="dispose">
-            Returns <c>true</c> to dispose the request container after deletion; <c>false</c> otherwise.
+            Specifies whether or not to dispose of the <see cref="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope"/>. Defaults to false.
             </param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateRequestScope(Microsoft.AspNetCore.Http.HttpRequest,System.String)">
             <summary>
             Create a scoped request.
             </summary>
-            <param name="request">The request.</param>
-            <param name="prefixName">The prefix name.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <param name="routePrefix">The route prefix for this request. Should match an entry in <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.RouteComponents"/>.</param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the OData version from the request context.
             </summary>
-            <param name="request">The request.</param>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The OData version.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions">
@@ -5757,10 +5772,11 @@
             <param name="options"></param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
-            <summary>
-            Contains the detail configurations of a given OData request.
-            </summary>
-            <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
+            
+             <summary>
+             Contains the detail configurations of a given OData request.
+             </summary>
+             <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter">
             <summary>
@@ -5778,13 +5794,7 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting">
             <summary>
             Gets or sets a value indicating if attribute routing is enabled or not.
-            By default, it's enabled.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory">
-            <summary>
-            Gets or sets a function to build an <see cref="T:Microsoft.OData.IContainerBuilder"/>.
-            Please call it before the "AddModel".
+            Defaults to true.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.TimeZone">
@@ -5806,16 +5816,16 @@
             <summary>
             Contains the OData <see cref="T:Microsoft.OData.Edm.IEdmModel"/> instances and dependency injection containers for specific routes.
             </summary>
-            <remarks>Do not modify this dictionary yourself. Instead, use the 'AddModel()` methods for registering model instances.</remarks>
+            <remarks>DO NOT modify this dictionary yourself. Instead, use the 'AddRouteComponents()` methods for registering model instances.</remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to the default route.
             </summary>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/>, as well as the given <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>, to the default route.
             </summary>
@@ -5823,38 +5833,47 @@
             <param name="batchHandler">The batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/> to add.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to the specified route.
             </summary>
-            <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+            <param name="routePrefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler)">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/>, as well as the given <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>, to the specified route.
             </summary>
-            <param name="prefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
+            <param name="routePrefix">The model related prefix. It could be null which means there's no prefix when access this model.</param>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add.</param>
             <param name="batchHandler">The $batch handler <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler"/>.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddModel(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.String,Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> using the service configuration.
             </summary>
-            <param name="prefix">The model related prefix.</param>
+            <param name="routePrefix">The model related prefix.</param>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add.</param>
-            <param name="configureAction">The sub service configuration action.</param>
+            <param name="configureServices">The sub service configuration action.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.GetRouteServices(System.String)">
             <summary>
             Get the root service provider for a given route (prefix) name.
             </summary>
-            <param name="prefix">The route name (the route prefix name).</param>
+            <param name="routePrefix">The route name (the route prefix name).</param>
             <returns>The root service provider for the route (prefix) name.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryFeatures(System.Nullable{System.Int32})">
+            <summary>
+            Enables all OData query features in one command.
+            </summary>
+            <param name="maxTopValue">
+            The maximum value of $top that a client can request. Defaults to <see langword="null"/>, which does not set an upper limit.
+            </param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.Expand">
             <summary>
@@ -5909,7 +5928,7 @@
             Gets the query setting.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainBuilder(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.OData.IContainerBuilder})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
             <summary>
             Build the container.
             </summary>
@@ -6850,6 +6869,11 @@
               Looks up a localized string similar to The route option disables qualified and unqualified operation call. At least one option should enable..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteServicesAlreadyExist">
+            <summary>
+              Looks up a localized string similar to A dependency injection container for this request already exists..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SegmentShouldBeKind">
             <summary>
               Looks up a localized string similar to The input segment should be &apos;{0}&apos; in &apos;{1}&apos;..
@@ -6883,11 +6907,6 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTopLimitExceeded">
             <summary>
               Looks up a localized string similar to The limit of &apos;{0}&apos; for {1} query has been exceeded. The value from the incoming request is &apos;{2}&apos;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.SubRequestServiceProviderAlreadyExists">
-            <summary>
-              Looks up a localized string similar to A request container already exists on the request..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TargetKindNotImplemented">

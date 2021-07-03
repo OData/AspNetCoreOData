@@ -36,8 +36,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys
             IEdmModel model = AlternateKeysEdmModel.GetEdmModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel("odata", model,
-                builder => builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new AlternateKeysODataUriResolver(model))));
+                .AddRouteComponents("odata", model,
+                services => services.AddSingleton<ODataUriResolver>(sp => new AlternateKeysODataUriResolver(model))));
         }
 
         [Fact]

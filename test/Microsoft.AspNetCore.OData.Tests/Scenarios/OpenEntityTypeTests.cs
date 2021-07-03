@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
         {
             // Arrange
             IEdmModel model = GetUntypedEdmModel();
-            var server = TestServerUtils.Create(opt => opt.AddModel("odata", model).Count(), typeof(UntypedSimpleOpenCustomersController));
+            var server = TestServerUtils.Create(opt => opt.AddRouteComponents("odata", model).Count(), typeof(UntypedSimpleOpenCustomersController));
             var client = server.CreateClient();
 
             // Act
@@ -186,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             string requestUri = "http://localhost/odata/SimpleOpenCustomers?" + select;
 
             IEdmModel model = GetEdmModel();
-            var server = TestServerUtils.Create(opt => opt.AddModel("odata", model).Select(), typeof(SimpleOpenCustomersController));
+            var server = TestServerUtils.Create(opt => opt.AddRouteComponents("odata", model).Select(), typeof(SimpleOpenCustomersController));
             var client =  server.CreateClient();
 
             // Act
@@ -418,7 +418,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
 
         private HttpClient GetClient(IEdmModel model, params Type[] controllers)
         {
-            var server = TestServerUtils.Create(opt => opt.AddModel("odata", model), controllers);
+            var server = TestServerUtils.Create(opt => opt.AddRouteComponents("odata", model), controllers);
             return server.CreateClient();
         }
 

@@ -26,10 +26,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("employees");
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
 
-            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddModel(routeName, _model));
+            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, _model));
             request.ODataFeature().Model = _model;
             request.ODataFeature().Path = path;
-            request.ODataFeature().PrefixName = routeName;
+            request.ODataFeature().RoutePrefix = routeName;
 
             var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
             var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);

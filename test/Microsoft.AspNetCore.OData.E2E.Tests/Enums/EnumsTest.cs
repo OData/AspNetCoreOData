@@ -31,8 +31,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                .AddModel("convention", model1)
-                .AddModel("explicit", model2));
+                .AddRouteComponents("convention", model1)
+                .AddRouteComponents("explicit", model2));
         }
 
         public EnumsTest(WebApiTestFixture<EnumsTest> fixture)

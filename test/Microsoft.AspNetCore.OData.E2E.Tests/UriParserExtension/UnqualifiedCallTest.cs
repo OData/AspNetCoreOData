@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
             services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController), typeof(MetadataController));
 
             IEdmModel model = UriParserExtenstionEdmModel.GetEdmModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model));
         }
 
         public static TheoryDataSet<string, string, string> UnqualifiedCallCases

@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         {
             _edmModel = GetEdmModel();
             _options = new ODataOptions();
-            _options.AddModel(_edmModel);
+            _options.AddRouteComponents(_edmModel);
             _attributeConvention = CreateConvention();
         }
 

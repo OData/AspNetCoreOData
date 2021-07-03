@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
 
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(DominiosController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).Expand().Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).Expand().Select());
         }
 
         private static IEdmModel GetEdmModel()

@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(Color)
             };
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddModel("odata", _edmModel));
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddRouteComponents("odata", _edmModel));
 
             // Act
             object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),

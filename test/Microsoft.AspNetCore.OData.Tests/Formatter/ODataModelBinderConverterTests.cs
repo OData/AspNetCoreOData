@@ -92,8 +92,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = GetEdmModel();
             IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
             IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Model = model,
@@ -121,8 +121,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = GetEdmModel();
             IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
             IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Model = model,
@@ -161,8 +161,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = GetEdmModel();
             IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
             IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Model = model,
@@ -189,8 +189,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = GetEdmModel();
             IEdmEntityType customerType = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "CustomerWithKeys");
             IEdmTypeReference edmTypeReference = new EdmEntityTypeReference(customerType, false);
-            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Model = model,

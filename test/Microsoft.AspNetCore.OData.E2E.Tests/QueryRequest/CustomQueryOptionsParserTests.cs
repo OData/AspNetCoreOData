@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(DollarQueryCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
             services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>());
             // NOTE: The following statement also does what is expected

@@ -310,7 +310,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             var controllers = new[] { typeof(OpenCustomersController) };
 
             var model = GetEdmModel();
-            var server = TestServerUtils.Create(opt => opt.AddModel("odata", model), typeof(OpenCustomersController));
+            var server = TestServerUtils.Create(opt => opt.AddRouteComponents("odata", model), typeof(OpenCustomersController));
             return server.CreateClient();
         }
     }

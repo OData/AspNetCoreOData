@@ -134,8 +134,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return;
             }
 
-            IEdmModel model = context.Options.RouteComponents[prefix].Item1;
-            IServiceProvider sp = context.Options.RouteComponents[prefix].Item2;
+            IEdmModel model = context.Options.RouteComponents[prefix].EdmModel;
+            IServiceProvider sp = context.Options.RouteComponents[prefix].ServiceProvider;
 
             SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
                         attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);

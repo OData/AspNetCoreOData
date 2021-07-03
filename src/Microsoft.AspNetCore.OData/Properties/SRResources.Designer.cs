@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SRResources {
@@ -1627,6 +1627,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A dependency injection container for this request already exists..
+        /// </summary>
+        internal static string RouteServicesAlreadyExist {
+            get {
+                return ResourceManager.GetString("RouteServicesAlreadyExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input segment should be &apos;{0}&apos; in &apos;{1}&apos;..
         /// </summary>
         internal static string SegmentShouldBeKind {
@@ -1686,15 +1695,6 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SkipTopLimitExceeded {
             get {
                 return ResourceManager.GetString("SkipTopLimitExceeded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A request container already exists on the request..
-        /// </summary>
-        internal static string SubRequestServiceProviderAlreadyExists {
-            get {
-                return ResourceManager.GetString("SubRequestServiceProviderAlreadyExists", resourceCulture);
             }
         }
         

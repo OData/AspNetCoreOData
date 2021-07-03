@@ -77,15 +77,15 @@ Microsoft.AspNetCore.OData.Abstracts.IODataFeature.NextLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.NextLink.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Path.get -> Microsoft.OData.UriParser.ODataPath
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Path.set -> void
-Microsoft.AspNetCore.OData.Abstracts.IODataFeature.PrefixName.get -> string
-Microsoft.AspNetCore.OData.Abstracts.IODataFeature.PrefixName.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RequestScope.get -> Microsoft.Extensions.DependencyInjection.IServiceScope
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RequestScope.set -> void
+Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutePrefix.get -> string
+Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutePrefix.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.RoutingConventionsStore.get -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause.get -> Microsoft.OData.UriParser.SelectExpandClause
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SelectExpandClause.set -> void
-Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SubServiceProvider.get -> System.IServiceProvider
-Microsoft.AspNetCore.OData.Abstracts.IODataFeature.SubServiceProvider.set -> void
+Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Services.get -> System.IServiceProvider
+Microsoft.AspNetCore.OData.Abstracts.IODataFeature.Services.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCount.get -> long?
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCount.set -> void
 Microsoft.AspNetCore.OData.Abstracts.IODataFeature.TotalCountFunc.get -> System.Func<long>
@@ -119,15 +119,15 @@ Microsoft.AspNetCore.OData.Abstracts.ODataFeature.NextLink.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.ODataFeature() -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Path.get -> Microsoft.OData.UriParser.ODataPath
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Path.set -> void
-Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PrefixName.get -> string
-Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PrefixName.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope.get -> Microsoft.Extensions.DependencyInjection.IServiceScope
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RequestScope.set -> void
+Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutePrefix.get -> string
+Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutePrefix.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.RoutingConventionsStore.get -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause.get -> Microsoft.OData.UriParser.SelectExpandClause
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SelectExpandClause.set -> void
-Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SubServiceProvider.get -> System.IServiceProvider
-Microsoft.AspNetCore.OData.Abstracts.ODataFeature.SubServiceProvider.set -> void
+Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Services.get -> System.IServiceProvider
+Microsoft.AspNetCore.OData.Abstracts.ODataFeature.Services.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCount.get -> long?
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCount.set -> void
 Microsoft.AspNetCore.OData.Abstracts.ODataFeature.TotalCountFunc.get -> System.Func<long>
@@ -664,13 +664,11 @@ Microsoft.AspNetCore.OData.ODataMvcOptionsSetup
 Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.MvcOptions options) -> void
 Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.ODataMvcOptionsSetup() -> void
 Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.AddModel(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.AddModel(string prefix, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.AddModel(string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.AddModel(string prefix, Microsoft.OData.Edm.IEdmModel model, System.Action<Microsoft.OData.IContainerBuilder> configureAction) -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.get -> System.Func<Microsoft.OData.IContainerBuilder>
-Microsoft.AspNetCore.OData.ODataOptions.BuilderFactory.set -> void
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Conventions.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention>
 Microsoft.AspNetCore.OData.ODataOptions.Count() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
@@ -679,13 +677,14 @@ Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
+Microsoft.AspNetCore.OData.ODataOptions.EnableQueryFeatures(int? maxTopValue = null) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Expand() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.GetODataServiceProvider(string prefix) -> System.IServiceProvider
+Microsoft.AspNetCore.OData.ODataOptions.GetRouteServices(string routePrefix) -> System.IServiceProvider
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
-Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel, System.IServiceProvider)>
+Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel EdmModel, System.IServiceProvider ServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataOptions
@@ -1487,22 +1486,24 @@ static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.HasAttrib
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.IsODataIgnored(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataFeature
+static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.ODataOptions
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ClearRouteServices(this Microsoft.AspNetCore.Http.HttpRequest request, bool dispose = false) -> void
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary<string, object> properties, System.TimeZoneInfo timeZone = null) -> string
-static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateSubServiceProvider(this Microsoft.AspNetCore.Http.HttpRequest request, string prefixName) -> System.IServiceProvider
-static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.DeleteSubRequestProvider(this Microsoft.AspNetCore.Http.HttpRequest request, bool dispose) -> void
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateRouteServices(this Microsoft.AspNetCore.Http.HttpRequest request, string routePrefix) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetDeserializerProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializerProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetETagHandler(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Abstracts.IETagHandler
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.Edm.IEdmModel
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(this Microsoft.AspNetCore.Http.HttpRequest request, int pageSize, object instance, System.Func<object, string> objectToSkipTokenValue) -> System.Uri
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataVersion
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetReaderSettings(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataMessageReaderSettings
-static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetSubServiceProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.IServiceProvider
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetRouteServices(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.TimeZoneInfo
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetWriterSettings(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataMessageWriterSettings
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(this Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(this Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataBatchFeature(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataFeature(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Abstracts.IODataFeature
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataOptions(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.ODataOptions
 static Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions.IsSuccessStatusCode(this Microsoft.AspNetCore.Http.HttpResponse response) -> bool
 static Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(this Microsoft.AspNetCore.Http.HttpRequest request, params Microsoft.OData.UriParser.ODataPathSegment[] segments) -> string
 static Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IList<Microsoft.OData.UriParser.ODataPathSegment> segments) -> string

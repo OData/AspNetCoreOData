@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         public void ODataInputFormattersForReadTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", _edmModel));
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", _edmModel));
             request.Configure("odata", _edmModel, new ODataPath());
 
             IEnumerable<ODataInputFormatter> odataFormatters = _formatters.Where(f => CanReadType(f, type, request));

@@ -58,10 +58,10 @@ namespace ODataRoutingSample
 
             services.AddControllers()
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                    .AddModel(model0)
-                    .AddModel("v1", model1)
-                    .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
-                    .AddModel("v3", model3)
+                    .AddRouteComponents(model0)
+                    .AddRouteComponents("v1", model1)
+                    .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
+                    .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())
                 );
 

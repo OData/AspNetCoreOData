@@ -21,9 +21,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             string routeName = "OData";
             IEdmModel model = GetSampleModel();
-            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddModel(routeName, model));
+            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, model));
             request.ODataFeature().Model = model;
-            request.ODataFeature().PrefixName = routeName;
+            request.ODataFeature().RoutePrefix = routeName;
 
             var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
             var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);

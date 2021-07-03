@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     if (paramValue != null)
                     {
                         HttpRequest request = bindingContext.HttpContext.Request;
-                        object model = ConvertTo(paramValue, bindingContext, request.GetSubServiceProvider());
+                        object model = ConvertTo(paramValue, bindingContext, request.GetRouteServices());
                         bindingContext.Result = ModelBindingResult.Success(model);
                         return Task.CompletedTask;
                     }
