@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             // This container is for the overall batch request.
             HttpRequest request = context.Request;
-            IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
+            IServiceProvider requestContainer = request.CreateRouteServices(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             // How to dispose it?
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             cancellationToken.ThrowIfCancellationRequested();
             HttpContext operationContext = await batchReader.ReadOperationRequestAsync(originalRequest.HttpContext, batchId, cancellationToken).ConfigureAwait(false);
 
-            operationContext.Request.DeleteSubRequestProvider(false);
+            operationContext.Request.ClearRouteServices();
             OperationRequestItem operation = new OperationRequestItem(operationContext);
 
             ODataBatchResponseItem responseItem = await operation.SendRequestAsync(handler).ConfigureAwait(false);

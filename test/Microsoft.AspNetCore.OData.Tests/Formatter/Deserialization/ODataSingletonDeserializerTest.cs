@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         private ODataMessageReader GetODataMessageReader(string content)
         {
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddModel("odata", _edmModel));
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddRouteComponents("odata", _edmModel));
 
             //request.Content = new StringContent(content);
             //request.Headers.Add("OData-Version", "4.0");

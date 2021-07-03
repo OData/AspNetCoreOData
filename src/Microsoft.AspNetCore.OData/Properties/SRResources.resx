@@ -618,8 +618,8 @@
   <data name="NullContainerBuilder" xml:space="preserve">
     <value>The container builder created by the container builder factory must not be null.</value>
   </data>
-  <data name="SubRequestServiceProviderAlreadyExists" xml:space="preserve">
-    <value>A request container already exists on the request.</value>
+  <data name="RouteServicesAlreadyExist" xml:space="preserve">
+    <value>A request container for this request already exists.</value>
   </data>
   <data name="ModelPrefixAlreadyUsed" xml:space="preserve">
     <value>The prefix '{0}' was already used for other Edm model.</value>

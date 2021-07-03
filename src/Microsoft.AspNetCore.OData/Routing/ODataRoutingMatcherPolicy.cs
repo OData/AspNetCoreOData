@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                 if (odataPath != null)
                 {
-                    odataFeature.PrefixName = metadata.Prefix;
+                    odataFeature.RoutePrefix = metadata.Prefix;
                     odataFeature.Model = metadata.Model;
                     odataFeature.Path = odataPath;
 

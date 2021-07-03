@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public static async Task<IDictionary<string, object>> ReadODataBodyAsync(ModelBindingContext bindingContext)
         {
-            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();
+            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetRouteServices().GetService<ODataActionPayloadDeserializer>();
             if (deserializer == null)
             {
                 return null;

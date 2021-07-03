@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             IEdmModel typelessEdmModel = GetTypelessModel();
 
             services.ConfigureControllers(typeof(CustomersController), typeof(UntypedCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).AddModel("typeless", typelessEdmModel));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).AddRouteComponents("typeless", typelessEdmModel));
         }
 
         public ODataActionTests(WebApiTestFixture<ODataActionTests> fixture)

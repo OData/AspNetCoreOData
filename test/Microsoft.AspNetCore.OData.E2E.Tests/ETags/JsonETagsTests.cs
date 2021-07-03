@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController), typeof(MetadataController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel));
             services.AddControllers(opt => opt.Filters.Add(new ETagActionFilterAttribute()));
         }
 

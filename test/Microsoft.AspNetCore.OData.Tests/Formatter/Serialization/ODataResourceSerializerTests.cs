@@ -736,8 +736,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Returns(properties[1]);
 
             //var config = RoutingConfigurationFactory.CreateWithRootContainer("Route");
-            var request = RequestFactory.Create(opt => opt.AddModel("route", _model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", _model));
+            request.ODataFeature().RoutePrefix = "route";
             _entityContext.Request = request;
 
             // Act
@@ -772,11 +772,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
             mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>(), It.IsAny<TimeZoneInfo>())).Returns(etagHeaderValue);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", _model, services =>
             {
-                config.AddService<IETagHandler>(ServiceLifetime.Singleton, (services) => mockETagHandler.Object);
+                services.AddSingleton<IETagHandler>(sp => mockETagHandler.Object);
             }));
-            request.ODataFeature().PrefixName = "route";
+            request.ODataFeature().RoutePrefix = "route";
             _entityContext.Request = request;
 
             // Act
@@ -951,8 +951,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1033,8 +1033,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1102,8 +1102,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1166,8 +1166,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -2123,8 +2123,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         private static ResourceContext CreateContext(IEdmModel model, string expectedMetadataPrefix)
         {
-            var request = RequestFactory.Create("get", expectedMetadataPrefix, opt => opt.AddModel("OData", model));
-            request.ODataFeature().PrefixName = "OData";
+            var request = RequestFactory.Create("get", expectedMetadataPrefix, opt => opt.AddRouteComponents("OData", model));
+            request.ODataFeature().RoutePrefix = "OData";
             request.ODataFeature().Model = model;
             return new ResourceContext
             {

@@ -876,7 +876,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 DefaultODataPathParser pathParser = new DefaultODataPathParser();
 
                 IList<ODataProperty> properties = null;
-                var path = pathParser.Parse(model, serviceRootUri, id, request.GetSubServiceProvider());
+                var path = pathParser.Parse(model, serviceRootUri, id, request.GetRouteServices());
                 KeySegment keySegment = path.OfType<KeySegment>().LastOrDefault();
                 if (keySegment != null)
                 {

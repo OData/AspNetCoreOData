@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
             // model.SetPayloadValueConverter(new MyConverter());
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel("odata", model));
+                .AddRouteComponents("odata", model));
         }
 
         [Theory]

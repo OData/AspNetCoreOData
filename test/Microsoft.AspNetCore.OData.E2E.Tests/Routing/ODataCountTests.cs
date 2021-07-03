@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(DollarCountEntitiesController), typeof(ODataEndpointController));
-            services.AddControllers().AddOData(opt => opt.AddModel(edmModel).Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents(edmModel).Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
         }
 
         public ODataCountTests(WebApiTestFixture<ODataCountTests> fixture)

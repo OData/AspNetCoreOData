@@ -53,9 +53,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             services.AddControllers().AddOData(opt =>
             {
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddModel("convention", model1)
-                .AddModel("attributeRouting", model1)
-                .AddModel("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
+                .AddRouteComponents("convention", model1)
+                .AddRouteComponents("attributeRouting", model1)
+                .AddRouteComponents("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
                 .Conventions.Add(new StopODataRoutingConvention());
 
                 // simply suppress the route number from conventional routing

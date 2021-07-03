@@ -103,7 +103,7 @@ namespace ODataDynamicModel.Extensions
                     ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                     if (odataPath != null)
                     {
-                        odataFeature.PrefixName = metadata.Prefix;
+                        odataFeature.RoutePrefix = metadata.Prefix;
                         odataFeature.Model = model;
                         odataFeature.Path = odataPath;
 

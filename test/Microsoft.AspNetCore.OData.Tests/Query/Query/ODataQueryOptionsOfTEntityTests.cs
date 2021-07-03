@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
 
-            HttpRequest request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            HttpRequest request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
 
             EntitySetSegment entitySetSegment = new EntitySetSegment(customers);
             ODataPath odataPath = new ODataPath(new[] { entitySetSegment });
@@ -122,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             customer.HasKey(c => c.Id);
             customer.Property(c => c.Id);
             IEdmModel model = builder.GetEdmModel();
-            HttpRequest request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            HttpRequest request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
             ODataQueryContext context = new ODataQueryContext(model, typeof(QCustomer));
 
             // Act

@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Contract.Assert(context.RequestContainer == null);
-            context.RequestContainer = request.GetSubServiceProvider();
+            context.RequestContainer = request.GetRouteServices();
             context.Request = request;
 
             Context = context;

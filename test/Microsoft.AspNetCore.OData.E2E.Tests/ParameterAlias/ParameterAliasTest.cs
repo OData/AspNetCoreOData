@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
             services.ConfigureControllers(typeof(TradesController));
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel(GetModel()));
+                .AddRouteComponents(GetModel()));
         }
 
         private static IEdmModel GetModel()

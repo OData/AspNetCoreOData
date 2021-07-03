@@ -1209,7 +1209,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             //    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/OData/OData.svc/Products");
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/Products", opt => opt.AddModel("odata", model));
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/Products", opt => opt.AddRouteComponents("odata", model));
 
             //request.Content = new StringContent(content);
             //request.Headers.Add("OData-Version", "4.0");

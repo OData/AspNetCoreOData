@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
             var model2 = builder.GetEdmModel();
 
-            services.AddControllers().AddOData(opt => opt.AddModel("dog", model1).AddModel("cat", model2));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("dog", model1).AddRouteComponents("cat", model2));
         }
 
         [Theory]

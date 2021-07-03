@@ -12,7 +12,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     internal class DefaultContainerBuilder : IContainerBuilder
     {
-        private readonly IServiceCollection services = new ServiceCollection();
+
+        internal IServiceCollection Services { get; } = new ServiceCollection();
 
         /// <summary>
         /// Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationType"/>.
@@ -35,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw Error.ArgumentNull(nameof(implementationType));
             }
 
-            services.Add(new ServiceDescriptor(
+            Services.Add(new ServiceDescriptor(
                 serviceType, implementationType, TranslateServiceLifetime(lifetime)));
 
             return this;
@@ -62,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 throw Error.ArgumentNull(nameof(implementationFactory));
             }
 
-            services.Add(new ServiceDescriptor(
+            Services.Add(new ServiceDescriptor(
                 serviceType, implementationFactory, TranslateServiceLifetime(lifetime)));
 
             return this;
@@ -75,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <returns>The container built by this builder.</returns>
         public virtual IServiceProvider BuildContainer()
         {
-            return services.BuildServiceProvider();
+            return Services.BuildServiceProvider();
         }
 
         private static Microsoft.Extensions.DependencyInjection.ServiceLifetime TranslateServiceLifetime(

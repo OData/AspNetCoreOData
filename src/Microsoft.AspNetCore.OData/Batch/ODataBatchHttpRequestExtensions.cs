@@ -185,7 +185,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             ODataVersion odataVersion = GetODataResponseVersion(request);
 
-            IServiceProvider requestContainer = request.GetSubServiceProvider();
+            IServiceProvider requestContainer = request.GetRouteServices();
             ODataMessageWriterSettings writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
             writerSettings.Version = odataVersion;
             writerSettings.MessageQuotas = messageQuotas;
@@ -292,7 +292,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             // string requestUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, request.Path);
             // use requestUri to remove the "$batch"?
 
-            request.ODataFeature().PrefixName = oDataPrefixName;
+            request.ODataFeature().RoutePrefix = oDataPrefixName;
 
             RouteValueDictionary batchRouteData = request.ODataFeature().BatchRouteData;
             if (batchRouteData != null && batchRouteData.Any())

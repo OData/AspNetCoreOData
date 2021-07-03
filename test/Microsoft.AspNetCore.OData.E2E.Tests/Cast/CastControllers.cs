@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         protected string GetRoutePrefix()
         {
             IODataFeature feature = Request.ODataFeature();
-            return feature.PrefixName;
+            return feature.RoutePrefix;
         }
     }
 }

@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             var server = TestServerUtils.Create(opt =>
             {
                 opt.Select().OrderBy().Filter().Expand().Count().SetMaxTop(null);
-                opt.AddModel("odata", modelBuilder.GetEdmModel());
+                opt.AddRouteComponents("odata", modelBuilder.GetEdmModel());
             },
             controllers);
 

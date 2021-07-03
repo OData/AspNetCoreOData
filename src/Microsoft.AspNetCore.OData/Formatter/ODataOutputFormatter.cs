@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             type = TypeHelper.GetTaskInnerTypeOrSelf(type);
 
-            IODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<IODataSerializerProvider>();
+            IODataSerializerProvider serializerProvider = request.GetRouteServices().GetRequiredService<IODataSerializerProvider>();
 
             // See if this type is a SingleResult or is derived from SingleResult.
             bool isSingleResult = false;
@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             Uri baseAddress = GetBaseAddressInternal(request);
             MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
-            IODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<IODataSerializerProvider>();
+            IODataSerializerProvider serializerProvider = request.GetRouteServices().GetRequiredService<IODataSerializerProvider>();
 
             return ODataOutputFormatterHelper.WriteToStreamAsync(
                 type,

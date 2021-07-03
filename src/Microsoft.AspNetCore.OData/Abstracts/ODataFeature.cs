@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the route prefix name.
         /// </summary>
-        public string PrefixName { get; set; }
+        public string RoutePrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the OData base address.
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the request container.
         /// </summary>
-        public IServiceProvider SubServiceProvider { get; set; }
+        public IServiceProvider Services { get; set; }
 
         /// <summary>
         /// Gets or sets the batch route data.
