@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="IDeltaLink" /> allows and tracks changes to an added link.
     /// </summary>
-    public interface IDeltaLink : IDeltaLinkBase
+    internal interface IDeltaLink : IDeltaLinkBase
     {
     }
 }

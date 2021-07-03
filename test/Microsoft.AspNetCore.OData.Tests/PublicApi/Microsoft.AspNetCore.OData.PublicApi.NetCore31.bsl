@@ -444,21 +444,9 @@ public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaSetItem {
 	bool TrySetPropertyValue (string name, object value)
 }
 
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink : IDeltaLinkBase, IDeltaSetItem {
-}
-
 public interface Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource : IDelta, IDeltaSetItem {
 	System.Uri Id  { public abstract get; public abstract set; }
 	System.Nullable`1[[Microsoft.OData.DeltaDeletedEntryReason]] Reason  { public abstract get; public abstract set; }
-}
-
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLink : IDeltaLinkBase, IDeltaSetItem {
-}
-
-public interface Microsoft.AspNetCore.OData.Deltas.IDeltaLinkBase : IDeltaSetItem {
-	string Relationship  { public abstract get; public abstract set; }
-	System.Uri Source  { public abstract get; public abstract set; }
-	System.Uri Target  { public abstract get; public abstract set; }
 }
 
 public interface Microsoft.AspNetCore.OData.Deltas.IDeltaSet : IEnumerable, ICollection`1, IEnumerable`1 {
@@ -486,18 +474,6 @@ public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.D
 	public abstract bool TryGetPropertyValue (string name, out System.Object& value)
 	public virtual bool TrySetMember (System.Dynamic.SetMemberBinder binder, object value)
 	public abstract bool TrySetPropertyValue (string name, object value)
-}
-
-public abstract class Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1 : IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
-	protected DeltaLinkBase`1 ()
-	protected DeltaLinkBase`1 (System.Type structuralType)
-
-	System.Type ExpectedClrType  { public virtual get; }
-	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
-	string Relationship  { public virtual get; public virtual set; }
-	System.Uri Source  { public virtual get; public virtual set; }
-	System.Type StructuredType  { public virtual get; }
-	System.Uri Target  { public virtual get; public virtual set; }
 }
 
 [
@@ -545,20 +521,6 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 
 	System.Type ExpectedClrType  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
-}
-
-public sealed class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1 : DeltaLinkBase`1, IDeltaDeletedLink, IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
-	public DeltaDeletedLink`1 ()
-	public DeltaDeletedLink`1 (System.Type structuralType)
-
-	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
-}
-
-public sealed class Microsoft.AspNetCore.OData.Deltas.DeltaLink`1 : DeltaLinkBase`1, IDeltaLink, IDeltaLinkBase, IDeltaSetItem, ITypedDelta {
-	public DeltaLink`1 ()
-	public DeltaLink`1 (System.Type structuralType)
-
-	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 }
 
 [
@@ -1768,8 +1730,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeltaReso
 	]
 	public virtual System.Threading.Tasks.Task`1[[System.Object]] ReadAsync (Microsoft.OData.ODataMessageReader messageReader, System.Type type, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 
-	public virtual object ReadDeltaDeletedLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper deletedLink, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
-	public virtual object ReadDeltaLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper link, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	internal virtual object ReadDeltaDeletedLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper deletedLink, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	internal virtual object ReadDeltaLink (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkWrapper link, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object ReadDeltaResource (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resource, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual System.Collections.IEnumerable ReadDeltaResourceSet (Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaResourceSetWrapper deltaResourceSet, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object ReadInline (object item, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)

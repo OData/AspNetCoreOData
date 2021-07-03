@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// Base class for delta link.
     /// </summary>
-    public abstract class DeltaLinkBase<T> : ITypedDelta, IDeltaLinkBase where T : class
+    internal abstract class DeltaLinkBase<T> : ITypedDelta, IDeltaLinkBase where T : class
     {
         /// <summary>
         /// Initializes a new instance of <see cref="DeltaLinkBase{T}"/>.

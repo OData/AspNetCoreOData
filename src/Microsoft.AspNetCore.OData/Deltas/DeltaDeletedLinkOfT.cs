@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="DeltaDeletedLink{T}" /> allows and tracks changes to delta deleted link.
     /// </summary>
-    public sealed class DeltaDeletedLink<T> : DeltaLinkBase<T>, IDeltaDeletedLink where T: class
+    internal sealed class DeltaDeletedLink<T> : DeltaLinkBase<T>, IDeltaDeletedLink where T: class
     {
         /// <summary>
         /// Initializes a new instance of <see cref="DeltaDeletedLink{T}"/>.

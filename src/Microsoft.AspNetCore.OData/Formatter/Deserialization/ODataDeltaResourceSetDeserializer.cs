@@ -260,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="elementType">The element type.</param>
         /// <param name="readContext">The deserializer context.</param>
         /// <returns>The created object.</returns>
-        public virtual object ReadDeltaDeletedLink(ODataDeltaDeletedLinkWrapper deletedLink, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
+        internal virtual object ReadDeltaDeletedLink(ODataDeltaDeletedLinkWrapper deletedLink, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
         {
             if (deletedLink == null)
             {
@@ -302,7 +302,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="elementType">The element type.</param>
         /// <param name="readContext">The deserializer context.</param>
         /// <returns>The created object.</returns>
-        public virtual object ReadDeltaLink(ODataDeltaLinkWrapper link, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
+        internal virtual object ReadDeltaLink(ODataDeltaLinkWrapper link, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
         {
             if (link == null)
             {

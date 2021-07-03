@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
     /// </summary>
-    public interface IDeltaDeletedLink : IDeltaLinkBase
+    internal interface IDeltaDeletedLink : IDeltaLinkBase
     {
     }
 }
