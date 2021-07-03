@@ -1224,7 +1224,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 opt =>
                 {
                     opt.Count().OrderBy().Filter().Expand().SetMaxTop(null);
-                    opt.AddModel("odata", model);
+                    opt.AddRouteComponents("odata", model);
                 },
                 controllers);
 

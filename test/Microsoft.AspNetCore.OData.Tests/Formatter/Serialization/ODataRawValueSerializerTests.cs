@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Stream stream = new MemoryStream();
             mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             var messageWriter = new ODataMessageWriter(mockRequest.Object);
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel(EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents(EdmCoreModel.Instance));
             request.ODataFeature().Path = new ODataPath(CountSegment.Instance);
             var context = new ODataSerializerContext { Request = request };
 

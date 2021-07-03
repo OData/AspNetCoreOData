@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             // if no, calculate the base address
             string uriString = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase);
-            string prefix = oDataFeature.PrefixName;
+            string prefix = oDataFeature.RoutePrefix;
             if (string.IsNullOrEmpty(prefix))
             {
                 baseAddress = uriString;

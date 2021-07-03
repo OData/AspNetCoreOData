@@ -33,8 +33,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
             services.ConfigureControllers(typeof(FilesController));
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddModel("convention", DateTimeOffsetEdmModel.GetConventionModel())
-                .AddModel("explicit", DateTimeOffsetEdmModel.GetExplicitModel()));
+                .AddRouteComponents("convention", DateTimeOffsetEdmModel.GetConventionModel())
+                .AddRouteComponents("explicit", DateTimeOffsetEdmModel.GetExplicitModel()));
         }
         #endregion
 

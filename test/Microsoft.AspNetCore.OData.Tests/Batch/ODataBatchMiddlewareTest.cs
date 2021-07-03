@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public void Ctor_NullBatchMapping_WithServiceProvider_WithoutBatchHandler()
         {
             // Arrange
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, null);
 
             // Act & Assert
@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public void Ctor_NullBatchMapping_WithServiceProvider_WithBatchHandler()
         {
             // Arrange
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, new DefaultODataBatchHandler()));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, new DefaultODataBatchHandler()));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, null);
 
             // Act & Assert
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                     return Task.CompletedTask;
                 });
 
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
             HttpContext context = new DefaultHttpContext();
             context.Request.Path = new PathString("/odata/$batch");

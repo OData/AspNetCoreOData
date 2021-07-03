@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
                 services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
-                    .AddModel("aggregation", edmModel));
+                    .AddRouteComponents("aggregation", edmModel));
             }
         }
 

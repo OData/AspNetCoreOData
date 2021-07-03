@@ -70,8 +70,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
             await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
 
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataMessageReaderSettings readSettings = new ODataMessageReaderSettings();
             ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage), readSettings, model);
             ODataDeserializerContext context = new ODataDeserializerContext
@@ -104,8 +104,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             IEdmNavigationProperty navigationProperty = GetNavigationProperty(model);
 
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Request = request,

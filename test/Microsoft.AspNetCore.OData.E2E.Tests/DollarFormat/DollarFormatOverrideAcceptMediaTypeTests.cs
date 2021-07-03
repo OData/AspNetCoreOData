@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFormat
         {
             IEdmModel model = GetEdmModel();
             services.ConfigureControllers(typeof(DollarFormatCustomersController), typeof(MetadataController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         public static TheoryDataSet<string> BasicMediaTypes

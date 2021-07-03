@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(ServerSidePagingCustomersController));
-            services.AddControllers().AddOData(opt => opt.Expand().AddModel("{a}", edmModel));
+            services.AddControllers().AddOData(opt => opt.Expand().AddRouteComponents("{a}", edmModel));
         }
 
         protected static IEdmModel GetEdmModel()

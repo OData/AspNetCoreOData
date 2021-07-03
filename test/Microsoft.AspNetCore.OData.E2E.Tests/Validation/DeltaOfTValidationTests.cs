@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Validation
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(PatchCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetModel()));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetModel()));
         }
 
         private static IEdmModel GetModel()

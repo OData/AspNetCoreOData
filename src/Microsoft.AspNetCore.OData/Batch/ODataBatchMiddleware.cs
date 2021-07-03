@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             foreach (var model in options.RouteComponents)
             {
-                IServiceProvider subServiceProvider = model.Value.Item2;
+                IServiceProvider subServiceProvider = model.Value.ServiceProvider;
                 if (subServiceProvider == null)
                 {
                     continue;

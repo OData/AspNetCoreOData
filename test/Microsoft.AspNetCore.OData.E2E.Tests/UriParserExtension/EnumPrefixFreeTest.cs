@@ -26,10 +26,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
             services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController), typeof(MetadataController));
 
             IEdmModel model = UriParserExtenstionEdmModel.GetEdmModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model,
-                builder =>
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model,
+                services =>
                 {
-                    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(ODataUriResolver), sp => new StringAsEnumResolver() { EnableCaseInsensitive = true });
+                    services.AddSingleton<ODataUriResolver>(sp => new StringAsEnumResolver() { EnableCaseInsensitive = true });
                 }
                 ));
         }

@@ -299,7 +299,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext queryContext = new ODataQueryContext(model, edmType, path);
             queryContext.DefaultQuerySettings.EnableSkipToken = enableSkipToken;
 
-            var request = RequestFactory.Create(opt => opt.AddModel(model));
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents(model));
             ResourceContext resource = new ResourceContext();
             ODataSerializerContext context = new ODataSerializerContext(resource, edmProperty, queryContext, null)
             {

@@ -15,7 +15,7 @@ namespace ODataDynamicModel.Extensions
         public MyODataRoutingApplicationModelProvider(
             IOptions<ODataOptions> options)
         {
-            options.Value.AddModel("odata/{datasource}", EdmCoreModel.Instance);
+            options.Value.AddRouteComponents("odata/{datasource}", EdmCoreModel.Instance);
         }
 
         /// <summary>

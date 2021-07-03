@@ -3,18 +3,22 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
+
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/>.
     /// </summary>
     public static class HttpContextExtensions
     {
+
         /// <summary>
-        /// Extension method to return the <see cref="IODataFeature"/> from the <see cref="HttpContext"/>.
+        /// Return the <see cref="IODataFeature"/> from the <see cref="HttpContext"/>.
         /// </summary>
-        /// <param name="httpContext">The Http context.</param>
+        /// <param name="httpContext">The <see cref="HttpContext"/> instance to extend.</param>
         /// <returns>The <see cref="IODataFeature"/>.</returns>
         public static IODataFeature ODataFeature(this HttpContext httpContext)
         {
@@ -27,16 +31,16 @@ namespace Microsoft.AspNetCore.OData.Extensions
             if (odataFeature == null)
             {
                 odataFeature = new ODataFeature();
-                httpContext.Features.Set<IODataFeature>(odataFeature);
+                httpContext.Features.Set(odataFeature);
             }
 
             return odataFeature;
         }
 
         /// <summary>
-        /// Extension method to return the <see cref="IODataBatchFeature"/> from the <see cref="HttpContext"/>.
+        /// Return the <see cref="IODataBatchFeature"/> from the <see cref="HttpContext"/>.
         /// </summary>
-        /// <param name="httpContext">The Http context.</param>
+        /// <param name="httpContext">The <see cref="HttpContext"/> instance to extend.</param>
         /// <returns>The <see cref="IODataBatchFeature"/>.</returns>
         public static IODataBatchFeature ODataBatchFeature(this HttpContext httpContext)
         {
@@ -49,10 +53,27 @@ namespace Microsoft.AspNetCore.OData.Extensions
             if (odataBatchFeature == null)
             {
                 odataBatchFeature = new ODataBatchFeature();
-                httpContext.Features.Set<IODataBatchFeature>(odataBatchFeature);
+                httpContext.Features.Set(odataBatchFeature);
             }
 
             return odataBatchFeature;
         }
+
+        /// <summary>
+        /// Returns the <see cref="ODataOptions"/> instance from the DI container.
+        /// </summary>
+        /// <param name="httpContext">The <see cref="HttpContext"/> instance to extend.</param>
+        /// <returns>The <see cref="ODataOptions"/> instance from the DI container.</returns>
+        public static ODataOptions ODataOptions(this HttpContext httpContext)
+        {
+            if (httpContext == null)
+            {
+                throw Error.ArgumentNull(nameof(httpContext));
+            }
+
+            return httpContext.RequestServices?.GetService<IOptions<ODataOptions>>()?.Value;
+        }
+
     }
+
 }

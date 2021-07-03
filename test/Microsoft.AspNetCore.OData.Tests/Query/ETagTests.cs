@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmEntityType customer = model.SchemaElements.OfType<IEdmEntityType>().FirstOrDefault(e => e.Name == "MyEtagCustomer");
             IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
             ODataPath odataPath = new ODataPath(new[] { new EntitySetSegment(customers) });
-            var request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            var request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
             request.ODataFeature().Path = odataPath;
 
             ETag etagCustomer = request.GetETag(etagHeaderValue);
@@ -311,7 +311,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet orders = model.FindDeclaredEntitySet("Orders");
             ODataPath odataPath = new ODataPath(new[] {new EntitySetSegment(orders) });
-            var request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            var request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
             request.ODataFeature().Path = odataPath;
 
             ETag etagCustomer = request.GetETag(etagHeaderValue);

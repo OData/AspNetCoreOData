@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            options.AddModel("odata", _model);
+            options.AddRouteComponents("odata", _model);
 
             IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            options.AddModel("odata", _model);
+            options.AddRouteComponents("odata", _model);
 
             IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            options.AddModel("odata", _model);
+            options.AddRouteComponents("odata", _model);
 
             IODataControllerActionConvention[] conventions = new IODataControllerActionConvention[]
             {
@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            options.AddModel("odata", _model);
+            options.AddRouteComponents("odata", _model);
 
             LoggerFactory loggerFactory = new LoggerFactory();
             var logger = new Logger<AttributeRoutingConvention>(loggerFactory);

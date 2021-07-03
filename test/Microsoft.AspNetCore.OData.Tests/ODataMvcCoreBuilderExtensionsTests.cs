@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
-            builder.AddOData(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            builder.AddOData(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
             IServiceProvider provider = services.BuildServiceProvider();
 
             // Assert
@@ -125,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             builder.AddOData((options, serviceProvider) =>
             {
                 var edmModel = serviceProvider.GetRequiredService<IEdmModel>();
-                options.AddModel("odata", edmModel);
+                options.AddRouteComponents("odata", edmModel);
             });
 
             IServiceProvider provider = services.BuildServiceProvider();

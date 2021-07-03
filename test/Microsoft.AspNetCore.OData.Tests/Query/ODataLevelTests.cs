@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 services.ConfigureControllers(typeof(LevelsEntitiesController));
 
                 IEdmModel model = GetEdmModel();
-                services.AddControllers().AddOData(options => options.AddModel("odata", model)
+                services.AddControllers().AddOData(options => options.AddRouteComponents("odata", model)
                 .SetMaxTop(null).Expand().Select().OrderBy().Filter());
             }
         }

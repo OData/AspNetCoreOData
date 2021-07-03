@@ -680,8 +680,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.AutoExpandCustomer"));
-            var request = RequestFactory.Create("Get", url, opt => opt.AddModel(model));
-            request.ODataFeature().PrefixName = "";
+            var request = RequestFactory.Create("Get", url, opt => opt.AddRouteComponents(model));
+            request.ODataFeature().RoutePrefix = "";
             request.ODataFeature().Model = model;
             var queryOption = new ODataQueryOptions(context, request);
             queryOption.AddAutoSelectExpandProperties();

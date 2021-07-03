@@ -105,8 +105,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
             EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             request.ODataFeature().Model = model;
             request.ODataFeature().Path = new ODataPath(entitySetSeg);
 

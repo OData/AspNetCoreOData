@@ -41,8 +41,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
             services.AddControllers().AddOData(opt =>
             {
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                    .AddModel("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
-                    .AddModel("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel());
+                    .AddRouteComponents("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
+                    .AddRouteComponents("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel());
                 opt.TimeZone = timeZoneInfo;
             });
         }

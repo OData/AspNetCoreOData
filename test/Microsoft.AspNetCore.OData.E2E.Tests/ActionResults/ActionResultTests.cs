@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
             services.ConfigureControllers(typeof(CustomersController), typeof(ODataEndpointController));
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel("actionresult", ActionResultEdmModel.GetEdmModel()));
+                .AddRouteComponents("actionresult", ActionResultEdmModel.GetEdmModel()));
         }
 
         [Fact]

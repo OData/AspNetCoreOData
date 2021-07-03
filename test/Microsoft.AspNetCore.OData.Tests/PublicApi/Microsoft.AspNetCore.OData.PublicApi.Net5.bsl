@@ -83,26 +83,30 @@ public class Microsoft.AspNetCore.OData.ODataMvcOptionsSetup : IConfigureOptions
 public class Microsoft.AspNetCore.OData.ODataOptions {
 	public ODataOptions ()
 
-	System.Func`1[[Microsoft.OData.IContainerBuilder]] BuilderFactory  { public get; public set; }
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention]] Conventions  { public get; }
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
 	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
+	[
+	TupleElementNamesAttribute(),
+	]
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] RouteComponents  { public get; }
+
 	Microsoft.AspNetCore.OData.Routing.ODataRouteOptions RouteOptions  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 	Microsoft.OData.ODataUrlKeyDelimiter UrlKeyDelimiter  { public get; public set; }
 
-	public Microsoft.AspNetCore.OData.ODataOptions AddModel (Microsoft.OData.Edm.IEdmModel model)
-	public Microsoft.AspNetCore.OData.ODataOptions AddModel (Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
-	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model)
-	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
-	public Microsoft.AspNetCore.OData.ODataOptions AddModel (string prefix, Microsoft.OData.Edm.IEdmModel model, System.Action`1[[Microsoft.OData.IContainerBuilder]] configureAction)
+	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (Microsoft.OData.Edm.IEdmModel model)
+	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
+	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (string routePrefix, Microsoft.OData.Edm.IEdmModel model)
+	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
+	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (string routePrefix, Microsoft.OData.Edm.IEdmModel model, System.Action`1[[Microsoft.Extensions.DependencyInjection.IServiceCollection]] configureServices)
 	public Microsoft.AspNetCore.OData.ODataOptions Count ()
+	public Microsoft.AspNetCore.OData.ODataOptions EnableQueryFeatures (params System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataOptions Expand ()
 	public Microsoft.AspNetCore.OData.ODataOptions Filter ()
-	public System.IServiceProvider GetODataServiceProvider (string prefix)
+	public System.IServiceProvider GetRouteServices (string routePrefix)
 	public Microsoft.AspNetCore.OData.ODataOptions OrderBy ()
 	public Microsoft.AspNetCore.OData.ODataOptions Select ()
 	public Microsoft.AspNetCore.OData.ODataOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
@@ -136,11 +140,11 @@ public interface Microsoft.AspNetCore.OData.Abstracts.IODataFeature {
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; public abstract set; }
 	System.Uri NextLink  { public abstract get; public abstract set; }
 	Microsoft.OData.UriParser.ODataPath Path  { public abstract get; public abstract set; }
-	string PrefixName  { public abstract get; public abstract set; }
 	Microsoft.Extensions.DependencyInjection.IServiceScope RequestScope  { public abstract get; public abstract set; }
+	string RoutePrefix  { public abstract get; public abstract set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] RoutingConventionsStore  { public abstract get; }
 	Microsoft.OData.UriParser.SelectExpandClause SelectExpandClause  { public abstract get; public abstract set; }
-	System.IServiceProvider SubServiceProvider  { public abstract get; public abstract set; }
+	System.IServiceProvider Services  { public abstract get; public abstract set; }
 	System.Nullable`1[[System.Int64]] TotalCount  { public abstract get; public abstract set; }
 	System.Func`1[[System.Int64]] TotalCountFunc  { public abstract get; public abstract set; }
 }
@@ -191,11 +195,11 @@ public class Microsoft.AspNetCore.OData.Abstracts.ODataFeature : IODataFeature {
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; public virtual set; }
 	System.Uri NextLink  { public virtual get; public virtual set; }
 	Microsoft.OData.UriParser.ODataPath Path  { public virtual get; public virtual set; }
-	string PrefixName  { public virtual get; public virtual set; }
 	Microsoft.Extensions.DependencyInjection.IServiceScope RequestScope  { public virtual get; public virtual set; }
+	string RoutePrefix  { public virtual get; public virtual set; }
 	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] RoutingConventionsStore  { public virtual get; }
 	Microsoft.OData.UriParser.SelectExpandClause SelectExpandClause  { public virtual get; public virtual set; }
-	System.IServiceProvider SubServiceProvider  { public virtual get; public virtual set; }
+	System.IServiceProvider Services  { public virtual get; public virtual set; }
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; public virtual set; }
 	System.Func`1[[System.Int64]] TotalCountFunc  { public virtual get; public virtual set; }
 }
@@ -766,6 +770,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions 
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.OData.Abstracts.IODataFeature ODataFeature (Microsoft.AspNetCore.Http.HttpContext httpContext)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.OData.ODataOptions ODataOptions (Microsoft.AspNetCore.Http.HttpContext httpContext)
 }
 
 [
@@ -775,17 +784,17 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static void ClearRouteServices (Microsoft.AspNetCore.Http.HttpRequest request, params bool dispose)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static string CreateETag (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZone)
 
 	[
 	ExtensionAttribute(),
 	]
-	public static System.IServiceProvider CreateSubServiceProvider (Microsoft.AspNetCore.Http.HttpRequest request, string prefixName)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static void DeleteSubRequestProvider (Microsoft.AspNetCore.Http.HttpRequest request, bool dispose)
+	public static System.IServiceProvider CreateRouteServices (Microsoft.AspNetCore.Http.HttpRequest request, string routePrefix)
 
 	[
 	ExtensionAttribute(),
@@ -820,7 +829,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static System.IServiceProvider GetSubServiceProvider (Microsoft.AspNetCore.Http.HttpRequest request)
+	public static System.IServiceProvider GetRouteServices (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
 	ExtensionAttribute(),
@@ -851,6 +860,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.OData.Abstracts.IODataFeature ODataFeature (Microsoft.AspNetCore.Http.HttpRequest request)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.OData.ODataOptions ODataOptions (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
 [

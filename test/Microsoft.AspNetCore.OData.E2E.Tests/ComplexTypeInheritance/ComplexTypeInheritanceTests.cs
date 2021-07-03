@@ -31,8 +31,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
 
             var edmModel1 = ComplexTypeInheritanceEdmModels.GetConventionModel();
             var edmModel2 = ComplexTypeInheritanceEdmModels.GetExplicitModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("convention", edmModel1)
-                .AddModel("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("convention", edmModel1)
+                .AddRouteComponents("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         public static TheoryDataSet<string, string> MediaTypes

@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
 
             services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController), typeof(MetadataController));
 
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).RouteOptions.EnableUnqualifiedOperationCall = false);
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model).RouteOptions.EnableUnqualifiedOperationCall = false);
         }
 
         public static TheoryDataSet<string, string, HttpStatusCode> urisForOldDefaultConfig

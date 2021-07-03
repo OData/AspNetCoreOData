@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
 
                     foreach (string dataSourceType in CastTest.dataSourceTypes)
                     {
-                        opt.AddModel(dataSourceType, edmModel);
+                        opt.AddRouteComponents(dataSourceType, edmModel);
                     }
                 });
             }

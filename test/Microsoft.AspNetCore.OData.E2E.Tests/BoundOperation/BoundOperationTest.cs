@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
 
             services.AddControllers().AddOData(opt =>
             {
-                opt.AddModel("AttributeRouting", edmModel).AddModel("ConventionRouting", edmModel);
+                opt.AddRouteComponents("AttributeRouting", edmModel).AddRouteComponents("ConventionRouting", edmModel);
                 opt.EnableAttributeRouting = false;
             });
 
