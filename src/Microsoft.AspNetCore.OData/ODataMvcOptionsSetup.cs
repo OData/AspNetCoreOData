@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Configure the default <see cref="MvcOptions"/>
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The <see cref="MvcOptions"/> to configure.</param>
         public void Configure(MvcOptions options)
         {
             if (options == null)

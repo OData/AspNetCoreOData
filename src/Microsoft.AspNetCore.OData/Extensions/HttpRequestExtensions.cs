@@ -17,13 +17,11 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
-
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequest"/>.
     /// </summary>
     public static class HttpRequestExtensions
     {
-
         /// <summary>
         /// Returns the <see cref="IODataFeature"/> from the DI container.
         /// </summary>

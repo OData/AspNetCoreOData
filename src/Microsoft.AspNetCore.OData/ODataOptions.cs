@@ -16,7 +16,6 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
 {
-
     ///
     /// <summary>
     /// Contains the detail configurations of a given OData request.
@@ -24,7 +23,6 @@ namespace Microsoft.AspNetCore.OData
     /// <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
     public class ODataOptions
     {
-
         #region Settings
         /// <summary>
         /// Gets or sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
@@ -299,7 +297,5 @@ namespace Microsoft.AspNetCore.OData
 
             return builder.BuildContainer();
         }
-
     }
-
 }

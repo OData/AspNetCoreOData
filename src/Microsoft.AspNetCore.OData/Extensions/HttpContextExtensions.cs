@@ -8,13 +8,11 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
-
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/>.
     /// </summary>
     public static class HttpContextExtensions
     {
-
         /// <summary>
         /// Return the <see cref="IODataFeature"/> from the <see cref="HttpContext"/>.
         /// </summary>
@@ -73,7 +71,5 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             return httpContext.RequestServices?.GetService<IOptions<ODataOptions>>()?.Value;
         }
-
     }
-
 }
