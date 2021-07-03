@@ -156,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             Action test = () => request.CreateRouteServices("odata");
 
             // Assert
-            ExceptionAssert.Throws<InvalidOperationException>(test, "A request container already exists on the request.");
+            ExceptionAssert.Throws<InvalidOperationException>(test, "A dependency injection container for this request already exists.");
         }
 
         [Fact]

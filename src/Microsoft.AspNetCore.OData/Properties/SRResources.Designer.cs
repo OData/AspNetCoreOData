@@ -1627,7 +1627,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A request container for this request already exists..
+        ///   Looks up a localized string similar to A dependency injection container for this request already exists..
         /// </summary>
         internal static string RouteServicesAlreadyExist {
             get {

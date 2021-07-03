@@ -6871,7 +6871,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.RouteServicesAlreadyExist">
             <summary>
-              Looks up a localized string similar to A request container for this request already exists..
+              Looks up a localized string similar to A dependency injection container for this request already exists..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SegmentShouldBeKind">
