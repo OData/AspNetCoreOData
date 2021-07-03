@@ -8,7 +8,7 @@ ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstu
 ## 1. Introduction
 
 This is the official ASP.NET Core OData repository.
-[ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0-preview) is a server side library built upon ODataLib and ASP.NET Core.
+[ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0) is a server side library built upon ODataLib and ASP.NET Core.
 
 **Blogs**:
 
@@ -49,7 +49,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<BookStoreContext>(opt => opt.UseInMemoryDatabase("BookLists"));
-        services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()));
+        services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
