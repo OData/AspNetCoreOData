@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             ActionModel action = null;
-            ExceptionAssert.ThrowsArgumentNull(() => action.IsNonODataAction(), "action");
+            ExceptionAssert.ThrowsArgumentNull(() => action.IsODataIgnored(), "action");
         }
 
         [Theory]
@@ -34,12 +34,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             List<object> attributes = new List<object>();
             if (expected)
             {
-                attributes.Add(new NonODataActionAttribute());
+                attributes.Add(new ODataIgnoredAttribute());
             }
             ActionModel action = new ActionModel(_methodInfo, attributes);
 
             // Act
-            bool actual = action.IsNonODataAction();
+            bool actual = action.IsODataIgnored();
 
             // Assert
             Assert.Equal(expected, actual);

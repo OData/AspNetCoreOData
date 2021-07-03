@@ -19,8 +19,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for an OData template string.
-    /// It looks for the <see cref="ODataRoutingAttribute"/> on controller
-    /// and <see cref="ODataRoutingAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
+    /// It looks for the <see cref="ODataAttributeRoutingAttribute"/> on controller
+    /// and <see cref="ODataAttributeRoutingAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -60,8 +60,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             ControllerModel controllerModel = context.Controller;
             ActionModel actionModel = context.Action;
 
-            bool isODataController = controllerModel.Attributes.Any(a => a is ODataRoutingAttribute);
-            bool isODataAction = actionModel.Attributes.Any(a => a is ODataRoutingAttribute);
+            bool isODataController = controllerModel.Attributes.Any(a => a is ODataAttributeRoutingAttribute);
+            bool isODataAction = actionModel.Attributes.Any(a => a is ODataAttributeRoutingAttribute);
 
             // At least one of controller or action has "ODataRoutingAttribute"
             // The best way is to derive your controller from ODataController.

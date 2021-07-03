@@ -275,7 +275,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             }
         }
 
-        [ODataRouting] // using this attribute if not derived from ODataController
+        [ODataAttributeRouting] // using this attribute if not derived from ODataController
         [Route("Customers")]
         [Route("Orders")]
         private class WithPrefixController
@@ -290,19 +290,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Route("VipCustomer")]
         public class SingletonTestControllerWithPrefix
         {
-            [ODataRouting]
+            [ODataAttributeRouting]
             [HttpGet("")]
             public void GetVipCustomerWithPrefix()
             {
             }
 
-            [ODataRouting]
+            [ODataAttributeRouting]
             [HttpPost("Orders")]
             public void GetVipCustomerOrdersWithPrefix()
             {
             }
 
-            [ODataRouting]
+            [ODataAttributeRouting]
             [HttpGet("Name")]
             public void GetVipCustomerNameWithPrefix()
             {

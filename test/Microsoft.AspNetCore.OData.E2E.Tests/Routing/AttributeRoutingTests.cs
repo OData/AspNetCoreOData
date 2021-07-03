@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
     }
 
-    [ODataRouting]
+    [ODataAttributeRouting]
     public class CatsController : ControllerBase
     {
         private static IList<Cat> cats = Enumerable.Range(1, 5)

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace ODataRoutingSample.Controllers.v1
 {
-    [ODataModel("v1")]
+    [ODataRouteComponent("v1")]
     public class ODataOperationImportController : ControllerBase
     {
         [HttpGet]

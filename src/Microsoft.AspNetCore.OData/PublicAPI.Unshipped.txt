@@ -1077,16 +1077,14 @@ Microsoft.AspNetCore.OData.Results.SingleResult<T>.Queryable.get -> System.Linq.
 Microsoft.AspNetCore.OData.Results.SingleResult<T>.SingleResult(System.Linq.IQueryable<T> queryable) -> void
 Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>
 Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.UpdatedODataResult(T entity) -> void
-Microsoft.AspNetCore.OData.Routing.Attributes.NonODataActionAttribute
-Microsoft.AspNetCore.OData.Routing.Attributes.NonODataActionAttribute.NonODataActionAttribute() -> void
-Microsoft.AspNetCore.OData.Routing.Attributes.NonODataControllerAttribute
-Microsoft.AspNetCore.OData.Routing.Attributes.NonODataControllerAttribute.NonODataControllerAttribute() -> void
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute.Model.get -> string
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute.ODataModelAttribute() -> void
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataModelAttribute.ODataModelAttribute(string model) -> void
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute
-Microsoft.AspNetCore.OData.Routing.Attributes.ODataRoutingAttribute.ODataRoutingAttribute() -> void
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataAttributeRoutingAttribute
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataAttributeRoutingAttribute.ODataAttributeRoutingAttribute() -> void
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataIgnoredAttribute
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataIgnoredAttribute.ODataIgnoredAttribute() -> void
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteComponentAttribute
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteComponentAttribute.ODataRouteComponentAttribute() -> void
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteComponentAttribute.ODataRouteComponentAttribute(string routePrefix) -> void
+Microsoft.AspNetCore.OData.Routing.Attributes.ODataRouteComponentAttribute.RoutePrefix.get -> string
 Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController
 Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController.GetMetadata() -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController.GetServiceDocument() -> Microsoft.OData.ODataServiceDocument
@@ -1483,10 +1481,10 @@ static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(t
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> T
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, string keyPrefix = "key") -> bool
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasParameter<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string parameterName) -> bool
-static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsNonODataAction(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
+static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsODataIgnored(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.GetAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> T
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.HasAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
-static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.IsNonODataController(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
+static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.IsODataIgnored(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.CreateETag(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary<string, object> properties, System.TimeZoneInfo timeZone = null) -> string

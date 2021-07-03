@@ -381,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         // [HttpGet] & [ODataModel] will create an odata convention routing for this method.
         // [HttpGet("odata/....")] will create an attribute routing.
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundIntCollectionFunction(key={key},intValues={intValues})")]
         public bool IntCollectionFunction(int key, [FromODataUri] IEnumerable<int?> intValues)
         {
@@ -398,7 +398,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundEnumFunction(key={key},color={color})")]
         public bool EnumFunction(int key, [FromODataUri] EdmEnumObject color)
         {
@@ -409,7 +409,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundEnumCollectionFunction(key={key},colors={colors})")]
         public bool EnumCollectionFunction(int key, [FromODataUri] EdmEnumObjectCollection colors)
         {
@@ -433,7 +433,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundComplexFunction(key={key},address={address})")]
         public bool ComplexFunction(int key, [FromODataUri] EdmComplexObject address)
         {
@@ -452,7 +452,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundComplexCollectionFunction(key={key},addresses={addresses})")]
         public bool ComplexCollectionFunction(int key, [FromODataUri] EdmComplexObjectCollection addresses)
         {
@@ -483,7 +483,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundEntityFunction(key={key},customer={customer})")]
         public bool EntityFunction(int key, [FromODataUri] EdmEntityObject customer)
         {
@@ -516,7 +516,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
 
         [HttpGet]
-        [ODataModel("odata")]
+        [ODataRouteComponent("odata")]
         [HttpGet("odata/UnboundCollectionEntityFunction(key={key},customers={customers})")]
         public bool CollectionEntityFunction(int key, [FromODataUri] EdmEntityObjectCollection customers)
         {

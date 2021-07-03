@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace ODataRoutingSample.Controllers.v3
 {
-    [ODataRouting]
+    [ODataAttributeRouting]
     [Route("v3")]
     public class tenantsController : Controller
     {

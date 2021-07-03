@@ -11,7 +11,7 @@ using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1
 {
-    [ODataModel("v1")]
+    [ODataRouteComponent("v1")]
     public class CompaniesController : ControllerBase
     {
         [HttpGet]

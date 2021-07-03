@@ -7,7 +7,7 @@ using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers
 {
-    [ODataModel("v2{data}")]
+    [ODataRouteComponent("v2{data}")]
     public class VipOrderController : ControllerBase
     {
         [HttpGet]
