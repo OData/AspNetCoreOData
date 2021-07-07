@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
+        public virtual IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
         {
             if (edmType == null)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <inheritdoc />
-        public IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
+        public virtual IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
         {
             if (type == null)
             {

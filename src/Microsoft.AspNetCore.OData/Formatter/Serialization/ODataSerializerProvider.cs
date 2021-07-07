@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public IODataEdmTypeSerializer GetEdmTypeSerializer(IEdmTypeReference edmType)
+        public virtual IODataEdmTypeSerializer GetEdmTypeSerializer(IEdmTypeReference edmType)
         {
             if (edmType == null)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <inheritdoc />
-        public IODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
+        public virtual IODataSerializer GetODataPayloadSerializer(Type type, HttpRequest request)
         {
             if (type == null)
             {
