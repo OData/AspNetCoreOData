@@ -16,7 +16,7 @@ public static IEdmModel GetEdmModel()
 ## Mixing ASP.NET Routing and OData Routing in one controller
 
 Be noted, we should avoid this scenario. It's better to create two controllers,
-One for ASP.NET Routing, the other for OData routing.
+one for ASP.NET routing, the other for OData routing.
 
 ```C#
 [ApiController]
