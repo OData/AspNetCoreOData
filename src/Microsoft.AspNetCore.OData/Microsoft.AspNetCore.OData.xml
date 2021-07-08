@@ -10048,8 +10048,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="allNode"></param>
-            <param name="settings"></param>
+            <param name="allNode">The all node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10059,8 +10059,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="anyNode"></param>
-            <param name="settings"></param>
+            <param name="anyNode">The any node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10070,8 +10070,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="binaryOperatorNode"></param>
-            <param name="settings"></param>
+            <param name="binaryOperatorNode">The binary operator node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateLogicalOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10083,8 +10083,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="binaryNode"></param>
-            <param name="settings"></param>
+            <param name="binaryNode">The binary operator node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateArithmeticOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10094,8 +10094,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="binaryNode"></param>
-            <param name="settings"></param>
+            <param name="binaryNode">The binary operator node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10105,8 +10105,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="constantNode"></param>
-            <param name="settings"></param>
+            <param name="constantNode">The constant node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10116,15 +10116,15 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="convertNode"></param>
-            <param name="settings"></param>
+            <param name="convertNode">The convert node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
             Override this method to restrict the '$count' inside the filter query.
             </summary>
-            <param name="countNode"></param>
-            <param name="settings"></param>
+            <param name="countNode">The count node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10134,9 +10134,9 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="sourceNode"></param>
-            <param name="navigationProperty"></param>
-            <param name="settings"></param>
+            <param name="sourceNode">The source node to validate.</param>
+            <param name="navigationProperty">The navigation property.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10146,8 +10146,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="rangeVariable"></param>
-            <param name="settings"></param>
+            <param name="rangeVariable">The range variable node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10158,7 +10158,7 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="propertyAccessNode">The single value property access node.</param>
-            <param name="settings">The settings.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10168,8 +10168,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="singleComplexNode"></param>
-            <param name="settings"></param>
+            <param name="singleComplexNode">The single complex node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10179,8 +10179,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="propertyAccessNode"></param>
-            <param name="settings"></param>
+            <param name="propertyAccessNode">The collection property access node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10190,8 +10190,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="collectionComplexNode"></param>
-            <param name="settings"></param>
+            <param name="collectionComplexNode">The collection complex node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10201,8 +10201,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="node"></param>
-            <param name="settings"></param>
+            <param name="node">The single value function call node to validate.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10224,8 +10224,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="unaryOperatorNode"></param>
-            <param name="settings"></param>
+            <param name="unaryOperatorNode">The unary operator node.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10235,8 +10235,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="node"></param>
-            <param name="settings"></param>
+            <param name="node">The query node.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10246,8 +10246,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="collectionResourceCastNode"></param>
-            <param name="settings"></param>
+            <param name="collectionResourceCastNode">The collection resource cast node.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -10257,8 +10257,8 @@
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
-            <param name="singleResourceCastNode"></param>
-            <param name="settings"></param>
+            <param name="singleResourceCastNode">The single resource cast node.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
