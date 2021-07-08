@@ -442,7 +442,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             Contract.Assert(nodeIn != null);
 
-            return new CountNode((CollectionNode)nodeIn.Source.Accept(this));
+            return new CountNode((CollectionNode)nodeIn.Source.Accept(this), nodeIn.FilterClause, nodeIn.SearchClause);
         }
     }
 }

@@ -2504,6 +2504,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator {
 	protected virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
+	public virtual void ValidateCountNode (Microsoft.OData.UriParser.CountNode countNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateLogicalOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)

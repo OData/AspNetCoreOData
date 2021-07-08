@@ -10119,6 +10119,13 @@
             <param name="convertNode"></param>
             <param name="settings"></param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Override this method to restrict the '$count' inside the filter query.
+            </summary>
+            <param name="countNode"></param>
+            <param name="settings"></param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
             Override this method for the navigation property node.
