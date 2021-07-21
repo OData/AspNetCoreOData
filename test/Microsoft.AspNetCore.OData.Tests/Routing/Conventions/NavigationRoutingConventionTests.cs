@@ -143,6 +143,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Theory]
         [InlineData("PostToName")]
         [InlineData("Get")]
+        [InlineData("GetSubOrdersFrom")]
+        [InlineData("PostToSubOrdersFrom")]
+        [InlineData("PutToSubOrderFrom")]
+        [InlineData("PatchToSubOrderFrom")]
         public void PropertyRoutingConventionDoesNothingForNotSupportedAction(string actionName)
         {
             // Arrange
@@ -267,6 +271,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             { }
 
             public void Get(int key)
+            { }
+
+            public void GetSubOrdersFrom(int key)
+            { }
+
+            public void PostToSubOrdersFrom(int key)
+            { }
+
+            public void PutToSubOrderFrom(int key)
+            { }
+
+            public void PatchToSubOrderFrom(int key)
             { }
         }
 

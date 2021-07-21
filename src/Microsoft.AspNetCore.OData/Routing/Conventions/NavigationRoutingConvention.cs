@@ -57,15 +57,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ActionModel action = context.Action;
 
-            // Filter by the action name.
-            // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
-            string actionName = action.ActionName;
-            string method = SplitActionName(actionName, out string property, out string declared);
-            if (method == null || string.IsNullOrEmpty(property))
-            {
-                return false;
-            }
-
             IEdmNavigationSource navigationSource = context.NavigationSource;
 
             // filter by action parameter
@@ -78,11 +69,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
+            // Filter by the action name.
+            // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
+            string actionName = action.ActionName;
+            string method = SplitActionName(actionName, out string property, out string declared);
+            if (method == null || string.IsNullOrEmpty(property))
+            {
+                return false;
+            }
+
             // Find the declaring type of the property if we have the declaring type name in the action name.
             // Otherwise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
+                if (declared.Length == 0) 
+                {
+                    // Early return for the following cases: Get|PostTo|PutTo|PatchTo{NavigationProperty}From
+                    return false;
+                }
+
                 declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
                 if (declaringEntityType == null)
                 {

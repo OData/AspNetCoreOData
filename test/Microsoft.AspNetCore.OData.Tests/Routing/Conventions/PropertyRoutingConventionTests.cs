@@ -188,6 +188,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [InlineData("PostToName")]
         [InlineData("Get")]
         [InlineData("PostToSubAddressOfUsAddressFromVipCustomer")]
+        [InlineData("GetSubAddressFrom")]
+        [InlineData("PostToSubAddressFrom")]
+        [InlineData("PutToSubAddressFrom")]
+        [InlineData("PatchToSubAddressFrom")]
+        [InlineData("DeleteToSubAddressFrom")]
+        [InlineData("GetSubAddressOfUsAddressFrom")]
+        [InlineData("PostToSubAddressOfUsAddressFrom")]
+        [InlineData("PutToSubAddressOfUsAddressFrom")]
+        [InlineData("PatchToSubAddressOfUsAddressFrom")]
+        [InlineData("DeleteToSubAddressOfUsAddressFrom")]
+        [InlineData("GetAddressOf")]
+        [InlineData("PostToLocationsOf")]
+        [InlineData("PutToAddressOf")]
+        [InlineData("PatchToAddressOf")]
         public void PropertyRoutingConventionDoesNothingForNotSupportedAction(string actionName)
         {
             // Arrange
@@ -242,6 +256,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
+            container.AddEntitySet("AnotherCustomers", customer);
             container.AddSingleton("Me", customer);
             model.AddElement(container);
             return model;
@@ -334,6 +349,62 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Post to non-collection is not allowed.
             public void PostToSubAddressOfUsAddressFromVipCustomer()
             { }
+
+            public void GetSubAddressFrom(int key)
+            {
+            }
+
+            public void PostToSubAddressFrom(int key)
+            {
+            }
+
+            public void PutToSubAddressFrom(int key)
+            {
+            }
+
+            public void PatchToSubAddressFrom(int key)
+            {
+            }
+
+            public void DeleteToSubAddressFrom(int key)
+            {
+            }
+
+            public void GetSubAddressOfUsAddressFrom(int key)
+            {
+            }
+
+            public void PostToSubAddressOfUsAddressFrom(int key)
+            {
+            }
+
+            public void PutToSubAddressOfUsAddressFrom(int key)
+            {
+            }
+
+            public void PatchToSubAddressOfUsAddressFrom(int key)
+            {
+            }
+
+            public void DeleteToSubAddressOfUsAddressFrom(int key)
+            {
+            }
+
+            public void GetAddressOf(int key)
+            {
+            }
+
+            public void PostToLocationsOf(int key)
+            {
+            }
+
+            public void PutToAddressOf(int key)
+            {
+            }
+
+            public void PatchToAddressOf(int key)
+            {
+            }
         }
 
         private class UnknownController

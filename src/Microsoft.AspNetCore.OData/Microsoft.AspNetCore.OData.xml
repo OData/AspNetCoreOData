@@ -10878,7 +10878,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention">
@@ -10963,7 +10963,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention">
@@ -11180,13 +11180,13 @@
             <param name="isOnCollection">The out of collection binding flag.</param>
             <returns>The operation name.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
             <summary>
-            Verify the parameter of the Edm operation meets the parameter defined in action.
+            Verify the parameter of the Edm operation matches the parameter defined in action.
             </summary>
             <param name="operation">The Edm operation.</param>
             <param name="action">The action model.</param>
-            <returns>true/false.</returns>
+            <returns>true if the parameter of the Edm operation matches the parameter defined in the action; otherwise, false.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AddSelector(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext,Microsoft.OData.Edm.IEdmOperation,System.Boolean,Microsoft.OData.Edm.IEdmEntityType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
@@ -11232,6 +11232,10 @@
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention">
             <summary>
             An implementation of <see cref="T:Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention"/> that handles entity reference manipulations.
+            Conventions:
+            GET|DELETE ~/entityset/key/navigationproperty/$ref
+            GET|POST|PUT|DELETE ~/entityset/key/navigationproperty/key/$ref
+            GET|POST|PUT|DELETE ~/entityset/key/cast/navigationproperty/key/$ref
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention.Order">

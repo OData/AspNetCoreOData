@@ -67,6 +67,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmEntityType castTypeFromActionName = null;
             if (cast != null)
             {
+                if (cast.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - {OperationName}On
+                    // - {OperationName}OnCollectionOf
+                    return;
+                }
+
                 castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast) as IEdmEntityType;
                 if (castTypeFromActionName == null)
                 {
@@ -150,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 // TODO: need discussion ahout:
                 // 1) Do we need to match the whole parameter count?
                 // 2) Do we need to select the best match? So far, i don't think and let it go.
-                if (!IsOperationParameterMeet(edmOperation, context.Action))
+                if (!IsOperationParameterMatched(edmOperation, context.Action))
                 {
                     continue;
                 }
@@ -198,12 +206,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Verify the parameter of the Edm operation meets the parameter defined in action.
+        /// Verify the parameter of the Edm operation matches the parameter defined in action.
         /// </summary>
         /// <param name="operation">The Edm operation.</param>
         /// <param name="action">The action model.</param>
-        /// <returns>true/false.</returns>
-        protected abstract bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action);
+        /// <returns>true if the parameter of the Edm operation matches the parameter defined in the action; otherwise, false.</returns>
+        protected abstract bool IsOperationParameterMatched(IEdmOperation operation, ActionModel action);
 
         /// <summary>
         /// Add the template to the action

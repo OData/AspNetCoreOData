@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return true;
             }
 
-            // 2. process the derive type (cast) by searching all derived types
+            // 2. process the derived type (cast) by searching all derived types
             // GetFrom{EntityTypeName} or Get{EntitySet}From{EntityTypeName}
             int index = actionName.IndexOf("From", StringComparison.Ordinal);
             if (index == -1)
@@ -73,6 +73,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string castTypeName = actionName.Substring(index + 4); // + 4 means to skip the "From"
+
+            if (castTypeName.Length == 0)
+            {
+                // Early return for the following cases:
+                // - Get|Post|PatchFrom
+                // - Get|Patch{EntitySet}From
+                // - Post{EntityType}From
+                return false;
+            }
 
             IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
             if (castType == null)

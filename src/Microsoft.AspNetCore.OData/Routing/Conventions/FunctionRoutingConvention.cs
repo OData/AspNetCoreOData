@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <inheritdoc />
-        protected override bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action)
+        protected override bool IsOperationParameterMatched(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
             Contract.Assert(action != null);
