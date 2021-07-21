@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
-            IEdmOperationImport operationImport = segment.OperationImports.FirstOrDefault();
+            IEdmOperationImport operationImport = segment.OperationImports.First();
             if (!operationImport.IsActionImport())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "ActionImport", "ActionImportSegmentTemplate"));

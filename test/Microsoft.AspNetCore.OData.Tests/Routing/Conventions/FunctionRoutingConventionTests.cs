@@ -232,6 +232,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Theory]
         [InlineData("Get")]
         [InlineData("UnknownFunction")]
+        [InlineData("NonSupportedOn")]
+        [InlineData("NonSupportedOnCollectionOf")]
         public void PropertyRoutingConventionDoesNothingForNotSupportedAction(string actionName)
         {
             // Arrange
@@ -382,6 +384,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             [HttpGet]
             public void UnknownFunction()
             { }
+
+            [HttpGet]
+            public void NonSupportedOn()
+            {
+            }
+
+            [HttpGet]
+            public void NonSupportedOnCollectionOf()
+            {
+            }
         }
 
         private class MeController

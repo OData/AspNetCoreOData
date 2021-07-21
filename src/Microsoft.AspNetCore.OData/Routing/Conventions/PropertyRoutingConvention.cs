@@ -87,6 +87,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
+                if (declared.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}From
+                    // - Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}Of{Cast}From
+                    return false;
+                }
+
                 declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
                 if (declaringEntityType == null)
                 {
@@ -105,9 +113,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmComplexType castType = null;
+            IEdmComplexType castType;
+            // Only process structural property
+            IEdmStructuredType castComplexType = null;
             if (cast != null)
             {
+                if (cast.Length == 0)
+                {
+                    // Avoid unnecessary call to FindTypeInheritance
+                    // Cases handled: Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}Of
+                    return false;
+                }
+
                 IEdmType propertyElementType = edmProperty.Type.Definition.AsElementType();
                 if (propertyElementType.TypeKind == EdmTypeKind.Complex)
                 {
@@ -123,12 +140,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // only support complex type cast, (TODO: maybe consider to support Edm.PrimitiveType cast)
                     return false;
                 }
-            }
 
-            // only process structural property
-            IEdmStructuredType castComplexType = null;
-            if (cast != null)
-            {
                 IEdmTypeReference propertyType = edmProperty.Type;
                 if (propertyType.IsCollection())
                 {

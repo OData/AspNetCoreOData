@@ -65,6 +65,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (IsSupportedActionName(actionPrefix, singletonName, out httpMethod))
             {
                 string castTypeName = actionMethodName.Substring(index + 4);
+                if (castTypeName.Length == 0)
+                {
+                    // Early return for the following cases: Get|Put|PatchFrom
+                    return false;
+                }
+
                 IEdmEntityType entityType = context.Singleton.EntityType();
 
                 // Shall we cast to base type and the type itself? I think yes.

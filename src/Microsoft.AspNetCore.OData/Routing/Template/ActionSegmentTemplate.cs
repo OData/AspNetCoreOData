@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(segment));
             }
 
-            IEdmOperation operation = segment.Operations.FirstOrDefault();
+            IEdmOperation operation = segment.Operations.First();
             if (!operation.IsAction())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "Action", "ActionSegmentTemplate"));

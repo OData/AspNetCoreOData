@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(operationSegment));
             }
 
-            IEdmOperation operation = operationSegment.Operations.FirstOrDefault();
+            IEdmOperation operation = operationSegment.Operations.First();
             if (!operation.IsFunction())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "Function", "FunctionSegmentTemplate"));

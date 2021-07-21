@@ -2645,7 +2645,7 @@ public abstract class Microsoft.AspNetCore.OData.Routing.Conventions.OperationRo
 	protected static void AddSelector (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context, Microsoft.OData.Edm.IEdmOperation edmOperation, bool hasKeyParameter, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmEntityType castType)
 	public abstract bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
 	public virtual bool AppliesToController (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
-	protected abstract bool IsOperationParameterMeet (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+	protected abstract bool IsOperationParameterMatched (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
 	protected void ProcessOperations (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource)
 }
 
@@ -2655,7 +2655,7 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvent
 	int Order  { public virtual get; }
 
 	public virtual bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
-	protected virtual bool IsOperationParameterMeet (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+	protected virtual bool IsOperationParameterMatched (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention : IODataControllerActionConvention {
@@ -2691,7 +2691,7 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConve
 	int Order  { public virtual get; }
 
 	public virtual bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
-	protected virtual bool IsOperationParameterMeet (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+	protected virtual bool IsOperationParameterMatched (Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.MetadataRoutingConvention : IODataControllerActionConvention {

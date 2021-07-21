@@ -197,6 +197,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Theory]
         [InlineData("Post")]
         [InlineData("UnknownAction")]
+        [InlineData("NonSupportedOn")]
+        [InlineData("NonSupportedOnCollectionOf")]
         public void PropertyRoutingConventionDoesNothingForNotSupportedAction(string actionName)
         {
             // Arrange
@@ -339,6 +341,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             [HttpPost]
             public void UnknownAction()
             { }
+
+            [HttpPost]
+            public void NonSupportedOn(int key, ODataActionParameters parameters)
+            {
+            }
+
+            [HttpPost]
+            public void NonSupportedOnCollectionOf(ODataActionParameters parameters)
+            {
+            }
         }
 
         private class MeController

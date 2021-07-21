@@ -19,7 +19,7 @@ abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.GenerateNextPageLink(
 abstract Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.Values.get -> System.Collections.Generic.Dictionary<string, object>
 abstract Microsoft.AspNetCore.OData.Results.PageResult.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
-abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
+abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 abstract Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.Order.get -> int
 abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options) -> System.Collections.Generic.IEnumerable<string>
 abstract Microsoft.AspNetCore.OData.Routing.Template.ODataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context) -> bool
@@ -1335,10 +1335,10 @@ override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultA
 override Microsoft.AspNetCore.OData.Results.PageResult<T>.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 override Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
+override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.Order.get -> int
 override Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
-override Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.IsOperationParameterMeet(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
+override Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
 override Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.Order.get -> int
 override Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.BatchSegment segment) -> void
 override Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.CountSegment segment) -> void

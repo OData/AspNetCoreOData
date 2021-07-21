@@ -15,6 +15,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// An implementation of <see cref="IODataControllerActionConvention"/> that handles entity reference manipulations.
+    /// Conventions:
+    /// GET|DELETE ~/entityset/key/navigationproperty/$ref
+    /// GET|POST|PUT|DELETE ~/entityset/key/navigationproperty/key/$ref
+    /// GET|POST|PUT|DELETE ~/entityset/key/cast/navigationproperty/key/$ref
     /// </summary>
     public class RefRoutingConvention : IODataControllerActionConvention
     {
@@ -50,8 +54,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
             // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
             string method = SplitRefActionName(actionMethodName, out string httpMethod, out string property, out string declaring);
-            if (method == null)
+            if (method == null || (property != null && property.Length == 0))
             {
+                // Early return for the following cases: Get|Create|DeleteRefTo
                 return false;
             }
 
@@ -71,6 +76,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmStructuredType declaringType = entityType;
             if (declaring != null)
             {
+                if (declaring.Length == 0)
+                {
+                    // Early return for the following cases: Get|Create|DeleteRefTo{NavigationProperty}From
+                    return false;
+                }
+
                 declaringType = entityType.FindTypeInInheritance(context.Model, declaring);
                 if (declaringType == null)
                 {
