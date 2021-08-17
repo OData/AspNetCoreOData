@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Find the declaring type of the property if we have the declaring type name in the action name.
-            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            // either wise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {

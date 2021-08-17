@@ -398,7 +398,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             return MangleClrTypeName(clrType);
         }
 
-        // TODO (workitem 336): Support nested types and anonymous types.
+        // TODO (work item 336): Support nested types and anonymous types.
         private static string MangleClrTypeName(Type type)
         {
             Contract.Assert(type != null);

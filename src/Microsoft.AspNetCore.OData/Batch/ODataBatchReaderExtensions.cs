@@ -186,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             // store the request container as a feature of the request and we don't want
             // the features added to one context/request to be visible on another.
             //
-            // Note that just about everything inm the HttpContext and HttpRequest is
+            // Note that just about everything in the HttpContext and HttpRequest is
             // backed by one of these features. So reusing the features means the HttContext
             // and HttpRequests are the same without needing to copy properties. To make them
             // different, we need to avoid copying certain features to that the objects don't

@@ -283,7 +283,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         }
 
         [Theory]
-        [InlineData(null, false, true)] // This is an interesting cas for null propagation.
+        [InlineData(null, false, true)] // This is an interesting case for null propagation.
         [InlineData(5.0, false, false)]
         [InlineData(5.5, true, true)]
         public void Negation(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)

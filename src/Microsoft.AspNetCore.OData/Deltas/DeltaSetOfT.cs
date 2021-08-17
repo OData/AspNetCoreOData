@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                         break;
 
                     default:
-                        throw Error.InvalidOperation($"Unknow delta type {delta.GetType()}");
+                        throw Error.InvalidOperation($"Unknown delta type {delta.GetType()}");
                 }
             }
         }

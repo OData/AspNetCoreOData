@@ -11,7 +11,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> that can read OData primitve types.
+    /// Represents an <see cref="ODataDeserializer"/> that can read OData primitive types.
     /// </summary>
     public class ODataPrimitiveDeserializer : ODataEdmTypeDeserializer
     {

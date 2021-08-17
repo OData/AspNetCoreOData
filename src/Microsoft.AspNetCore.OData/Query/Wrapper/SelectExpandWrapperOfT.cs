@@ -15,7 +15,7 @@ expressions, one for the root level person and the second for the expanded Frien
 The first wrapper has the Container property set (contains Name and Friend values) where as the second wrapper
 has the Instance property set as it contains all the properties of the expanded person.
 
-The below four classes workaround that entity framework limitation by defining a seperate type for each
+The below four classes workaround that entity framework limitation by defining a separate type for each
 property selection combination possible. */
     /// <summary>
     /// Represents a container class that contains properties that are either selected or expanded using $select and $expand.

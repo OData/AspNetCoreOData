@@ -300,7 +300,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 if (structuralTypeInfo.IsNavigationPropertyDefined(firstNavigationSegment.NavigationProperty))
                 {
-                    // It's not allowed to have mulitple navigation expanded or referenced.
+                    // It's not allowed to have multiple navigation expanded or referenced.
                     // for example: "$expand=nav($top=2),nav($skip=3)" is not allowed and will be merged (or throw exception) at ODL side.
                     ExpandedNavigationSelectItem expanded = expandReferenceItem as ExpandedNavigationSelectItem;
                     if (expanded != null)
@@ -365,7 +365,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // If the first segment is not a property segment,
-            // that segment must be the last segment, so the remainging segments should be null.
+            // that segment must be the last segment, so the remaining segments should be null.
             Contract.Assert(remainingSegments == null);
 
             NavigationPropertySegment navigationSegment = segment as NavigationPropertySegment;
@@ -609,7 +609,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
-        /// An internal cache class used to provide the propert, operations
+        /// An internal cache class used to provide the property, operations
         /// and do verification on the given <see cref="IEdmStructuredType"/>.
         /// </summary>
         internal class EdmStructuralTypeInfo

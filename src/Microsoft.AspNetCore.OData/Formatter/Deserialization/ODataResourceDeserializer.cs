@@ -276,7 +276,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
-        /// Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// Deserializes the delete information from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
         /// <param name="resource">The object into which the nested properties should be read.</param>
         /// <param name="resourceWrapper">The resource object containing the nested properties.</param>

@@ -339,7 +339,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate property accessor.
+        /// Override this method to validate property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -386,7 +386,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate single complex property accessor.
+        /// Override this method to validate single complex property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -411,7 +411,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate collection property accessor.
+        /// Override this method to validate collection property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -436,7 +436,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate collection complex property accessor.
+        /// Override this method to validate collection complex property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.

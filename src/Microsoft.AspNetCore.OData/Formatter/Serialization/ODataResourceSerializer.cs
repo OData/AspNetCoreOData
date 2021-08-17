@@ -222,7 +222,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 // write object.
 
-                // TODO: enable overriding serializer based on type. Currentlky requires serializer supports WriteDeltaObjectinline, because it takes an ODataDeltaWriter
+                // TODO: enable overriding serializer based on type. Currently requires serializer supports WriteDeltaObjectinline, because it takes an ODataDeltaWriter
                 // ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
                 // if (serializer == null)
                 // {
@@ -1322,7 +1322,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (serializerContext.Path != null)
                 {
                     // Note: The navigation source may be different from the path if the instance has redefined the context
-                    // (for example, in a flattended delta response)
+                    // (for example, in a flattened delta response)
                     if (serializerContext.NavigationSource == null || serializerContext.NavigationSource == serializerContext.Path.GetNavigationSource())
                     {
                         edmType = serializerContext.Path.GetEdmType();

@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         public IEdmTypeReference EdmType { get; }
 
         /// <summary>
-        /// Gets the paraemter value.
+        /// Gets the parameter value.
         /// </summary>
         public object Value { get; }
     }

@@ -55,12 +55,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExceptionAssert.ThrowsArgumentNull(bindUriFunction, "methodInfo");
         }
 
-        // Add - succ
+        // Add - succeeds
         // Add already exists - fail
 
         // Type of MethodInfo:
         // Static MethodInfo
-        // Static Extenral MethoInfo
+        // Static External MethoInfo
         // Instance
         // Instance different declaring type
         // Add instance when static exists
@@ -300,8 +300,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         // Remove -
         // Removed not existing
-        // Remove static when instance is tregistered - faile
-        // Remove instance when static is tregistered - faile
+        // Remove static when instance is registered - failed
+        // Remove instance when static is registered - failed
 
         [Fact]
         public void UnbindUriFunctionName_CanUnbind()

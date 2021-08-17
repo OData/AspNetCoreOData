@@ -1612,7 +1612,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("now" == node.Name);
 
-            // Function Now() does not take any arguemnts.
+            // Function Now() does not take any arguments.
             Expression[] arguments = BindArguments(node.Parameters);
             Contract.Assert(arguments.Length == 0);
 

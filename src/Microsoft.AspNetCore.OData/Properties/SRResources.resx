@@ -142,7 +142,7 @@
     <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
   </data>
   <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
-    <value>The input key count '{0}' doesn't match the number '{1}' of the key of entity type '{2}'.</value>
+    <value>The input key count '{0}' does not match the number '{1}' of the key of entity type '{2}'.</value>
   </data>
   <data name="CannotFindKeyInEntityType" xml:space="preserve">
     <value>Cannot find key '{0}' in the '{1}' type.</value>
@@ -487,7 +487,7 @@
     <value>Cannot compare an enum of type '{0}' to an expression of type '{1}'.</value>
   </data>
   <data name="PropertyOrPathWasRemovedFromContext" xml:space="preserve">
-    <value>Property or path {0} isn't available in the current context. It was removed in earlier transformation.</value>
+    <value>Property or path {0} is not available in the current context. It was removed in earlier transformation.</value>
   </data>
   <data name="QueryNodeBindingNotSupported" xml:space="preserve">
     <value>Binding OData QueryNode of kind '{0}' is not supported by '{1}'.</value>

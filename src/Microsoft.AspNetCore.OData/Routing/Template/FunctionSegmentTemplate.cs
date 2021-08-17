@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
                 // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // Because, In this request, the comming route data has the following:
+                // Because, In this request, the coming route data has the following:
                 // min = 1
                 // max = 2,ave=3
                 // Therefore, we need to combine the route data together and separate them using "," again.

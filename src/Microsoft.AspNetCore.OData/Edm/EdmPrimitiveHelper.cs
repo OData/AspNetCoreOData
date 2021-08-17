@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     try
                     {
                         // Note that we are not casting the return value to nullable<T> as even if we do it
-                        // CLR would unbox it back to T.
+                        // CLR would un-box it back to T.
                         return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
                     }
                     catch (InvalidCastException)

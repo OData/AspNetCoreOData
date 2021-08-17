@@ -220,7 +220,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             return null;
         }
 
-        // Build a naviation link unconditionally, it doesn't depend on metadata level but does require a non-null link builder.
+        // Build a navigation link unconditionally, it doesn't depend on metadata level but does require a non-null link builder.
         internal Uri BuildNavigationLink(ResourceContext instanceContext, IEdmNavigationProperty navigationProperty)
         {
             if (instanceContext == null)

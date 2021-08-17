@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
         /// <param name="keys">The input key mappings, the key string is case-sensitive, the value string should wrapper with { and }.</param>
-        /// <param name="entityType">The declaring type containes the key.</param>
+        /// <param name="entityType">The declaring type contains the key.</param>
         /// <param name="navigationSource">The navigation source. It could be null.</param>
         public KeySegmentTemplate(IDictionary<string, string> keys, IEdmEntityType entityType, IEdmNavigationSource navigationSource)
         {

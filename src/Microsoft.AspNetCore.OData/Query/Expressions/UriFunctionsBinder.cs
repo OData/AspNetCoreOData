@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Bind the given function name to the given MethodInfo.
         /// The binding helps to create an Expression out of the method.
         /// You can bind a static method, a static extension method, and an instance method.
-        /// You should be carefull about binding instance methods - the declaring type of the method i.e the instance type, 
+        /// You should be careful about binding instance methods - the declaring type of the method i.e the instance type,
         /// will be considered as the first argument of the function.
         /// </summary>
         /// <param name="functionName">The uri function name that appears in the OData request uri.</param>
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="methodInfo">The MethodInfo to unbind from the given function name.</param>
         /// <exception cref="ArgumentNullException">Function name argument is Null or empty</exception>
         /// <exception cref="ArgumentNullException">MethodInfo argument is Null</exception>
-        /// <returns>'True' if function has unbinded. 'False' otherwise.</returns>
+        /// <returns>'True' if function has unbind. 'False' otherwise.</returns>
         public static bool UnbindUriFunctionName(string functionName, MethodInfo methodInfo)
         {
             // Validation

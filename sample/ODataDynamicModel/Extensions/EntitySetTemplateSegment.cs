@@ -27,7 +27,7 @@ namespace ODataDynamicModel.Extensions
 
             string entitySetName = classname as string;
 
-            // if you want to support case-insenstivie
+            // if you want to support case-insensitive
             var edmEntitySet = context.Model.EntityContainer.EntitySets()
                 .FirstOrDefault(e => string.Equals(entitySetName, e.Name, StringComparison.OrdinalIgnoreCase));
 

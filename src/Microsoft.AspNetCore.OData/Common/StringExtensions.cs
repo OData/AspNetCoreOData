@@ -163,7 +163,7 @@ namespace Microsoft.AspNetCore.OData.Common
 
         /// <summary>
         /// Each key/value pair is separated using ",".
-        /// Each value could be a string using single quote, so it could have "," and escaped doulbe single quote.
+        /// Each value could be a string using single quote, so it could have "," and escaped double single quote.
         /// "minSalary=2,maxSalary=3"
         /// "minSalary='af''d,2,897abc' , maxSalary=3"
         /// </summary>

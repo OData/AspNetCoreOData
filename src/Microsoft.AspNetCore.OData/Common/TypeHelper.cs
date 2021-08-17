@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Return the undering type or itself.
+        /// Return the underlying type or itself.
         /// </summary>
         /// <param name="type">The input type.</param>
         /// <returns>The underlying type.</returns>

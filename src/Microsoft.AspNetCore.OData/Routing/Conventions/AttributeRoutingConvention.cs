@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // So, #1 matches the "odata" prefix route
             //     #2 matches the non-odata prefix route
             // Since #1 and #2 can be considered starting with "",
-            // In order to avoiding ambugious, let's compare non-empty route prefix first,
+            // In order to avoiding ambiguous, let's compare non-empty route prefix first,
             // If no match, then compare empty route prefix.
             string emptyPrefix = null;
             foreach (var prefix in prefixes)

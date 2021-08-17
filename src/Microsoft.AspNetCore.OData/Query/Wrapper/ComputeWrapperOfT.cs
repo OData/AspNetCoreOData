@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                 var instanceContainer = this.Instance as DynamicTypeWrapper;
                 if (instanceContainer != null)
                 {
-                    // Add proeprties generated in previous transformations to the collection
+                    // Add properties generated in previous transformations to the collection
                     base.Values.MergeWithReplace(instanceContainer.Values);
                 }
                 else

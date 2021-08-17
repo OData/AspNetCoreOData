@@ -9,7 +9,7 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing <see cref="ODataServiceDocument" />'s for generating servicedoc's.
+    /// Represents an <see cref="ODataSerializer"/> for serializing <see cref="ODataServiceDocument" />'s for generating service document.
     /// </summary>
     public class ODataServiceDocumentSerializer : ODataSerializer
     {

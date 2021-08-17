@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// <summary>
     ///  Represents a template that can match a <see cref="PathTemplateSegment"/>.
     ///  From OData Lib:
-    ///  If template parseing enabled, any literal wrappered with "{" and "}" is considered as PathTemplateSegment.
+    ///  If template parsing enabled, any literal wrapped with "{" and "}" is considered as PathTemplateSegment.
     ///  So, here's the design (so far, we can add more later):
     ///  {property} ==> declared property
     ///  {dynamicproperty} => dynamic property

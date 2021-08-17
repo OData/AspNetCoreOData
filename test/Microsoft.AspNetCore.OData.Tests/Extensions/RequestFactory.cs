@@ -176,7 +176,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         /// <summary>
-        /// Confgiures the http request with OData values.
+        /// Configures the http request with OData values.
         /// </summary>
         /// <param name="request">The http request.</param>
         /// <param name="prefix">The prefix.</param>

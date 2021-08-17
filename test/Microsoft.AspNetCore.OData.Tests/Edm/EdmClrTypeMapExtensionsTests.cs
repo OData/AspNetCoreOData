@@ -185,7 +185,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay))]
         public void GetClrTypeWorksAsExpectedForStandardPrimitive(EdmPrimitiveTypeKind kind, Type expected)
         {
-            // #1 Arrange & Act & Assert for nullable equasls to false
+            // #1 Arrange & Act & Assert for nullable equals to false
             IEdmPrimitiveTypeReference primitiveType = EdmCoreModel.Instance.GetPrimitive(kind, false);
             Type clrType = EdmModel.GetClrType(primitiveType);
             Assert.Equal(expected, clrType);

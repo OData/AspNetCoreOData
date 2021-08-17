@@ -96,7 +96,7 @@ namespace ODataRoutingSample
 
             app.UseRouting();
 
-            // Test middelware
+            // Test middleware
             app.Use(next => context =>
             {
                 var endpoint = context.GetEndpoint();

@@ -6,7 +6,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Routing.Template
 {
     /// <summary>
-    /// Default implemetation for <see cref="IODataTemplateTranslator"/>.
+    /// Default implementation for <see cref="IODataTemplateTranslator"/>.
     /// </summary>
     internal class DefaultODataTemplateTranslator : IODataTemplateTranslator
     {

@@ -371,7 +371,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return intValue;
             }
 
-            // todo: if it is Ieee754Compatible, parse decimal after double
+            // Todo: if it is Ieee754Compatible, parse decimal after double
             if (Decimal.TryParse(value, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out decimal decimalValue))
             {
                 return decimalValue;

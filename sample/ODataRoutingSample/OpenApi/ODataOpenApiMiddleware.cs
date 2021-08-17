@@ -68,7 +68,7 @@ namespace ODataRoutingSample.OpenApi
         }
 
         /// <summary>
-        /// processe a $openapi request.
+        /// process a $openapi request.
         /// </summary>
         /// <param name="context">The http context.</param>
         /// <param name="prefixName">The related prefix.</param>
@@ -114,7 +114,7 @@ namespace ODataRoutingSample.OpenApi
 
             OpenApiSpecVersion specVersion = OpenApiSpecVersion.OpenApi3_0; // by default
             // $format=application/json;version=2.0
-            // $format=application/ymal;version=2.0
+            // $format=application/yaml;version=2.0
             // accept=application/json;version3.0
             HttpRequest request = context.Request;
 

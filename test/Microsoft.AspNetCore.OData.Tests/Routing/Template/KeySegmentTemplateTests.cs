@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Action test = () => new KeySegmentTemplate(new Dictionary<string, string>(), _customerType, _customers);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(test, "The input key count '0' doesn't match the number '1' of the key of entity type 'NS.Customer'.");
+            ExceptionAssert.Throws<ODataException>(test, "The input key count '0' does not match the number '1' of the key of entity type 'NS.Customer'.");
         }
 
         [Fact]

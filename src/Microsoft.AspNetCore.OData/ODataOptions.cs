@@ -16,7 +16,6 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData
 {
-    ///
     /// <summary>
     /// Contains the detail configurations of a given OData request.
     /// </summary>
@@ -54,7 +53,7 @@ namespace Microsoft.AspNetCore.OData
         public IList<IODataControllerActionConvention> Conventions { get; } = new List<IODataControllerActionConvention>();
 
         /// <summary>
-        /// Gets the <see cref="RouteOptions"/> instance responsible for configuring the route templating.
+        /// Gets the <see cref="RouteOptions"/> instance responsible for configuring the route template.
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
 
@@ -288,7 +287,7 @@ namespace Microsoft.AspNetCore.OData
             builder.Services.AddSingleton<ODataUriResolver>(sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
             // Inject the Edm model.
-            // From Current ODL implment, such injection only be used in reader and writer if the input
+            // From Current ODL implement, such injection only be used in reader and writer if the input
             // model is null.
             builder.Services.AddSingleton(sp => model);
 

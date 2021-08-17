@@ -6,7 +6,7 @@ using Microsoft.OData;
 namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 {
     /// <summary>
-    /// Encapuslates an <see cref="ODataEntityReferenceLink"/>.
+    /// Encapsulates an <see cref="ODataEntityReferenceLink"/>.
     /// </summary>
     public class ODataEntityReferenceLinkWrapper : ODataItemWrapper
     {

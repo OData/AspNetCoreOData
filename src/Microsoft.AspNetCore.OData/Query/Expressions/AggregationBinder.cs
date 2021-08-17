@@ -183,7 +183,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //          Value = $it.B.D
                 //      }
                 // }
-                // We are generated references (in currentContainerExpression) from  the begining of the  Select ($it.Value, then $it.Next.Value etc.)
+                // We are generated references (in currentContainerExpression) from  the beginning of the  Select ($it.Value, then $it.Next.Value etc.)
                 // We have proper match we need insert properties in reverse order
                 // After this 
                 // properties = { $it.B.D, $it.B.C}
@@ -350,7 +350,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             MethodInfo selectManyMethod
                 = ExpressionHelperMethods.EnumerableSelectManyGeneric.MakeGenericMethod(baseElementType, selectedElementType);
 
-            // Create the lambda that acceses the property in the selectMany clause.
+            // Create the lambda that access the property in the selectMany clause.
             var selectManyParam = Expression.Parameter(baseElementType, "$it");
             var propertyExpression = Expression.Property(selectManyParam, expression.Expression.NavigationProperty.Name);
 
@@ -405,7 +405,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression CreatePropertyAggregateExpression(ParameterExpression accum, AggregateExpression expression, Type baseType)
         {
-            // accum type is IGrouping<,baseType> that implements IEnumerable<baseType> 
+            // accumulate type is IGrouping<,baseType> that implements IEnumerable<baseType> 
             // we need cast it to IEnumerable<baseType> during expression building (IEnumerable)$it
             // however for EF6 we need to use $it.AsQueryable() due to limitations in types of casts that will properly translated
             Expression asQuerableExpression = null;

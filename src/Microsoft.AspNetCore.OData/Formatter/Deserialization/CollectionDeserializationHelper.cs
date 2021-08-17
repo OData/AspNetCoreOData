@@ -150,7 +150,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (collectionType.IsArray)
             {
-                // We dont know the size of the collection in advance. So, create a list and later call ToArray. 
+                // We don't know the size of the collection in advance. So, create a list and later call ToArray.
                 instance = Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType)) as IEnumerable;
                 return true;
             }

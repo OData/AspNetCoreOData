@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // TODO: refactor here
-            // If we have mulitple same function defined, we should match the best one?
+            // If we have multiple same function defined, we should match the best one?
             IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name == operationName);
             foreach (IEdmOperation edmOperation in candidates)
             {
@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     }
                 }
 
-                // TODO: need discussion ahout:
+                // TODO: need discussion about:
                 // 1) Do we need to match the whole parameter count?
                 // 2) Do we need to select the best match? So far, i don't think and let it go.
                 if (!IsOperationParameterMatched(edmOperation, context.Action))
@@ -292,7 +292,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Contract.Assert(action != null);
 
             IDictionary<string, string> requiredParameters = new Dictionary<string, string>();
-            // we can allow the action has other parameters except the functio parameters.
+            // we can allow the action has other parameters except the function parameters.
             foreach (var parameter in operation.Parameters.Skip(1))
             {
                 if (action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))

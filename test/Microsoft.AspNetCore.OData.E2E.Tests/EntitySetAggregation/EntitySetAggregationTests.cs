@@ -15,8 +15,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 {
-    // The test can't work in EFCore, because it's not supported with Groupby and selectmany on collection.
-    // Later, we'd swith it to EF6.
+    // The test can't work in EFCore, because it's not supported with Groupby and select many on collection.
+    // Later, we'd switch it to EF6.
     public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
     {
         public class TestsStartup : TestStartupBase

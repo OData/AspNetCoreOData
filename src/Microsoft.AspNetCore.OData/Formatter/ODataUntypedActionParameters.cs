@@ -14,7 +14,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// to invoke a particular Action. The Parameter values are stored in the dictionary keyed using the Parameter name.
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "ODataUntypedActionParameters is more appropriate here.")]
-    [SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "ODataUntypedActionParameters is not serializable.")]
     [NonValidatingParameterBinding]
     public class ODataUntypedActionParameters : Dictionary<string, object>
     {

@@ -938,7 +938,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.ExpressionLexer.AdvanceToNextOccurenceOf(System.Char)">
             <summary>
-            Advance the pointer to the next occurence of the given value, swallowing all characters in between.
+            Advance the pointer to the next occurrence of the given value, swallowing all characters in between.
             </summary>
             <param name="endingValue">the ending delimiter.</param>
         </member>
@@ -1077,7 +1077,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetUnderlyingTypeOrSelf(System.Type)">
             <summary>
-            Return the undering type or itself.
+            Return the underlying type or itself.
             </summary>
             <param name="type">The input type.</param>
             <returns>The underlying type.</returns>
@@ -2008,7 +2008,7 @@
             Gets the Org.OData.Core.V1.AcceptableMediaTypes
             </summary>
             <param name="model">The Edm model.</param>
-            <param name="target">The vocabulary annotatable target.</param>
+            <param name="target">The vocabulary annotate target.</param>
             <returns>null or the collection of media type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrencyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmNavigationSource)">
@@ -2105,7 +2105,7 @@
             Resolve the navigation source using the input identifier
             </summary>
             <param name="model">The Edm model.</param>
-            <param name="identifier">The indentifier</param>
+            <param name="identifier">The identifier</param>
             <param name="enableCaseInsensitive">Enable case insensitive</param>
             <returns>Null or the found navigation source.</returns>
         </member>
@@ -2502,7 +2502,7 @@
             </summary>
             <typeparam name="T">The required attribute type.</typeparam>
             <param name="action">The given action model.</param>
-            <returns>Null or the corresponing attribute.</returns>
+            <returns>Null or the corresponding attribute.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
             <summary>
@@ -2518,7 +2518,7 @@
             Adds the OData selector model to the action.
             </summary>
             <param name="action">The given action model.</param>
-            <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
+            <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
             <param name="prefix">The prefix.</param>
             <param name="model">The Edm model.</param>
             <param name="path">The OData path template.</param>
@@ -2628,7 +2628,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Gets the bool value indicating whether the non-dollar prefix query option.
+            Gets the boolean value indicating whether the non-dollar prefix query option.
             </summary>
             <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>True/false.</returns>
@@ -3121,7 +3121,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData primitve types.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData primitive types.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer.#ctor">
@@ -3179,7 +3179,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyDeletedResource(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
-            Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            Deserializes the delete information from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
             </summary>
             <param name="resource">The object into which the nested properties should be read.</param>
             <param name="resourceWrapper">The resource object containing the nested properties.</param>
@@ -3774,7 +3774,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.Value">
             <summary>
-            Gets the paraemter value.
+            Gets the parameter value.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters">
@@ -4583,7 +4583,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer">
             <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing <see cref="T:Microsoft.OData.ODataServiceDocument" />'s for generating servicedoc's.
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing <see cref="T:Microsoft.OData.ODataServiceDocument" />'s for generating service document.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.#ctor">
@@ -4715,7 +4715,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo">
             <summary>
-            An internal cache class used to provide the propert, operations
+            An internal cache class used to provide the property, operations
             and do verification on the given <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
             </summary>
         </member>
@@ -4788,13 +4788,13 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
             <summary>
-            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection"/> class.
             </summary>
             <param name="edmType">The edm type of the collection.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject})">
             <summary>
-            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollection"/> class.
             </summary>
             <param name="edmType">The edm type of the collection.</param>
             <param name="list">The list that is wrapped by the new collection.</param>
@@ -5150,13 +5150,13 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
             <summary>
-            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection"/> class.
             </summary>
             <param name="edmType">The edm type of the collection.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmEnumObject})">
             <summary>
-            Initialzes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection"/> class.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObjectCollection"/> class.
             </summary>
             <param name="edmType">The edm type of the collection.</param>
             <param name="list">The list that is wrapped by the new collection.</param>
@@ -5489,7 +5489,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper">
             <summary>
-            Encapuslates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataEntityReferenceLink"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLinkWrapper.#ctor(Microsoft.OData.ODataEntityReferenceLink)">
@@ -5760,11 +5760,10 @@
             <param name="options">The <see cref="T:Microsoft.AspNetCore.Mvc.MvcOptions"/> to configure.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptions">
-            
-             <summary>
-             Contains the detail configurations of a given OData request.
-             </summary>
-             <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
+            <summary>
+            Contains the detail configurations of a given OData request.
+            </summary>
+            <remarks>Caution: The properties in this class should not be <see langword="null"/>.</remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter">
             <summary>
@@ -5797,7 +5796,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions">
             <summary>
-            Gets the <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions"/> instance responsible for configuring the route templating.
+            Gets the <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions"/> instance responsible for configuring the route template.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteComponents">
@@ -5981,7 +5980,7 @@
             <param name="functionSignature">The new custom function signature.</param>
             <param name="methodInfo">The MethodInfo to bind the given function name.</param>
             <exception cref="T:System.Exception">Any exception thrown by 'CustomUriFunctions.RemoveCustomUriFunction' and 'UriFunctionsBinder.UnbindUriFunctionName' methods.</exception>
-            <returns>'True' if the fucntion signature has successfully removed and unbinded. 'False' otherwise.</returns>
+            <returns>'True' if the function signature has successfully removed and unbounded. 'False' otherwise.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.SRResources">
             <summary>
@@ -6401,7 +6400,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InputKeyNotMatchEntityTypeKey">
             <summary>
-              Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
+              Looks up a localized string similar to The input key count &apos;{0}&apos; does not match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidAttributeRoutingTemplateSegment">
@@ -6786,7 +6785,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyOrPathWasRemovedFromContext">
             <summary>
-              Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
+              Looks up a localized string similar to Property or path {0} is not available in the current context. It was removed in earlier transformation..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyTypeOverflow">
@@ -7357,7 +7356,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer">
             <summary>
-            Reperesent properties used in groupby and aggregate clauses to make them accessiable in further clauses/transformations
+            Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations
             </summary>
             <remakrs>
             When we have $apply=groupby((Prop1,Prop2, Prop3))&amp;$orderby=Prop1, Prop2
@@ -7380,12 +7379,12 @@
             Prop3 could be referenced us $it => (int)$it.Next.Next.Value
             Generic type for Value is used to avoid type casts for on primitive types that not supported in EF
             
-            Also we have 4 use cases and base type have all requiered properties to support no cast usage. 
+            Also we have 4 use cases and base type have all required properties to support no cast usage. 
             1. Primitive property with Next
             2. Primitive property without Next
             3. Nested property with Next
             4. Nested property without Next
-            However, EF doesn't allow to set different properties for the same type in two places in an lamba-expression => using new type with just new name to workaround that issue
+            However, EF doesn't allow to set different properties for the same type in two places in an lambda-expression => using new type with just new name to workaround that issue
             
             </remakrs>
         </member>
@@ -7590,9 +7589,9 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
             <summary>
             Gets or sets a value indicating whether queries with expanded navigations should be formulated
-            to encourage correlated subquery results to be buffered.
-            Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
-            by buffering results from the subquery.
+            to encourage correlated sub-query results to be buffered.
+            Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
+            by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
         </member>
@@ -7856,7 +7855,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ContainsAutoSelectExpandProperty(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Determine if the query containes auto select expand property.
+            Determine if the query contains auto select expand property.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
@@ -8313,7 +8312,7 @@
             <summary>
             Process the <see cref="T:Microsoft.OData.UriParser.ExpandedReferenceSelectItem"/>.
             </summary>
-            <param name="expandedItem">The expaned item.</param>
+            <param name="expandedItem">The expanded item.</param>
             <param name="navigationSource">The navigation source.</param>
             <param name="currentLevelPropertiesInclude">The current level properties included.</param>
             <param name="propertiesToExpand">out/ref, the property expanded.</param>
@@ -8336,7 +8335,7 @@
             <param name="source">The source contains the navigation property.</param>
             <param name="structuredType">The structured type or its derived type contains the navigation property.</param>
             <param name="navigationProperty">The expanded navigation property.</param>
-            <param name="expandedItem">The expanded navigation select item. It may contain the neste query options.</param>
+            <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
             <param name="includedProperties">The container to hold the created property.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BuildSelectedProperty(System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression})">
@@ -8348,7 +8347,7 @@
             <param name="source">The source contains the structural property.</param>
             <param name="structuredType">The structured type or its derived type contains the structural property.</param>
             <param name="structuralProperty">The selected structural property.</param>
-            <param name="pathSelectItem">The selected item. It may contain the neste query options and could be null.</param>
+            <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
             <param name="includedProperties">The container to hold the created property.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BuildDynamicProperty(System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression})">
@@ -8366,7 +8365,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.IsClassicEF(System.Linq.IQueryable)">
             <summary>
-            Checks IQueryable provider for need of EF6 oprimization
+            Checks IQueryable provider for need of EF6 optimization
             </summary>
             <param name="query"></param>
             <returns>True if EF6 optimization are needed.</returns>
@@ -8384,7 +8383,7 @@
             Bind the given function name to the given MethodInfo.
             The binding helps to create an Expression out of the method.
             You can bind a static method, a static extension method, and an instance method.
-            You should be carefull about binding instance methods - the declaring type of the method i.e the instance type, 
+            You should be careful about binding instance methods - the declaring type of the method i.e the instance type,
             will be considered as the first argument of the function.
             </summary>
             <param name="functionName">The uri function name that appears in the OData request uri.</param>
@@ -8401,7 +8400,7 @@
             <param name="methodInfo">The MethodInfo to unbind from the given function name.</param>
             <exception cref="T:System.ArgumentNullException">Function name argument is Null or empty</exception>
             <exception cref="T:System.ArgumentNullException">MethodInfo argument is Null</exception>
-            <returns>'True' if function has unbinded. 'False' otherwise.</returns>
+            <returns>'True' if function has unbind. 'False' otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.UriFunctionsBinder.GetMethodLiteralSignature(System.String,System.Reflection.MethodInfo)">
             <summary>
@@ -9047,9 +9046,9 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.EnableCorrelatedSubqueryBuffering">
             <summary>
             Gets or sets a value indicating whether queries with expanded navigations should be formulated
-            to encourage correlated subquery results to be buffered.
-            Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
-            by buffering results from the subquery.
+            to encourage correlated sub-query results to be buffered.
+            Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
+            by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
         </member>
@@ -9374,7 +9373,7 @@
             Gets the Func of entities number that satisfy the given query if the response should include a count query option, or <c>null</c> otherwise.
             </summary>
             <param name="query">The query to compute the count for.</param>
-            <returns>The the Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
+            <returns>The Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler">
             <summary>
@@ -9953,7 +9952,7 @@
             Creates a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty"/> class.
             </summary>
             <param name="propertySegment">The property segment that has this select expand item.</param>
-            <param name="navigationSource">The targe navigation source of this property segment.</param>
+            <param name="navigationSource">The target navigation source of this property segment.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty.ToPathSelectItem">
             <summary>
@@ -10151,7 +10150,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Override this method to validate property accessor.
+            Override this method to validate property accessors.
             </summary>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -10162,7 +10161,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Override this method to validate single complex property accessor.
+            Override this method to validate single complex property accessors.
             </summary>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -10173,7 +10172,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Override this method to validate collection property accessor.
+            Override this method to validate collection property accessors.
             </summary>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -10184,7 +10183,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Override this method to validate collection complex property accessor.
+            Override this method to validate collection complex property accessors.
             </summary>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
@@ -11623,7 +11622,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableNonParenthesisForEmptyParameterFunction">
             <summary>
-            Gets or sets a value indicating whther to generate non parenthsis for non-parameter function.
+            Gets or sets a value indicating whether to generate non parenthesis for non-parameter function.
             Used in conventional routing.
             </summary>
         </member>
@@ -12148,7 +12147,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator">
             <summary>
-            Default implemetation for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator"/>.
+            Default implementation for <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.IODataTemplateTranslator"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator.Translate(Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
@@ -12330,7 +12329,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate" /> class.
             </summary>
             <param name="keys">The input key mappings, the key string is case-sensitive, the value string should wrapper with { and }.</param>
-            <param name="entityType">The declaring type containes the key.</param>
+            <param name="entityType">The declaring type contains the key.</param>
             <param name="navigationSource">The navigation source. It could be null.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.KeySegmentTemplate.#ctor(Microsoft.OData.UriParser.KeySegment)">
@@ -12671,7 +12670,7 @@
             <summary>
              Represents a template that can match a <see cref="T:Microsoft.OData.UriParser.PathTemplateSegment"/>.
              From OData Lib:
-             If template parseing enabled, any literal wrappered with "{" and "}" is considered as PathTemplateSegment.
+             If template parsing enabled, any literal wrapped with "{" and "}" is considered as PathTemplateSegment.
              So, here's the design (so far, we can add more later):
              {property} ==> declared property
              {dynamicproperty} => dynamic property

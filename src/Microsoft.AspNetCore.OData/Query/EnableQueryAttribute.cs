@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     returnType = returnType.GetGenericArguments().First();
                 }
 
-                // For NetCore2.2+ new type ActionResult<> was created which encapculates IActionResult and T result.
+                // For NetCore2.2+ new type ActionResult<> was created which encapsulates IActionResult and T result.
                 if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
                 {
                     returnType = returnType.GetGenericArguments().First();
@@ -704,7 +704,7 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Determine if the query containes auto select expand property.
+        /// Determine if the query contains auto select expand property.
         /// </summary>
         /// <param name="responseValue">The response value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>

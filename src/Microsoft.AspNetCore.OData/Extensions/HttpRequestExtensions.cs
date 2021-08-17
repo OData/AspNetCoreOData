@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
-        /// Gets the bool value indicating whether the non-dollar prefix query option.
+        /// Gets the boolean value indicating whether the non-dollar prefix query option.
         /// </summary>
         /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
         /// <returns>True/false.</returns>

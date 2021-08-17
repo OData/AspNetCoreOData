@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <typeparam name="T">The required attribute type.</typeparam>
         /// <param name="action">The given action model.</param>
-        /// <returns>Null or the corresponing attribute.</returns>
+        /// <returns>Null or the corresponding attribute.</returns>
         public static T GetAttribute<T>(this ActionModel action)
         {
             if (action == null)
@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
             else
             {
-                // multipe keys
+                // multiple keys
                 foreach (var key in keys)
                 {
                     string keyName = $"{keyPrefix}{key.Name}";
@@ -122,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
+        /// <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>
@@ -154,7 +154,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             // public class CustomersController : Controller
             // {}
             // let's always create new selector model for action.
-            // Since the new created selector model is absolute attribute route, tthe controller attribute route doesn't apply to this selector model.
+            // Since the new created selector model is absolute attribute route, the controller attribute route doesn't apply to this selector model.
             bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
 
             // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,

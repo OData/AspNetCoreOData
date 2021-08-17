@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SRResources {
@@ -781,7 +781,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
+        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; does not match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
         /// </summary>
         internal static string InputKeyNotMatchEntityTypeKey {
             get {
@@ -1474,7 +1474,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
+        ///   Looks up a localized string similar to Property or path {0} is not available in the current context. It was removed in earlier transformation..
         /// </summary>
         internal static string PropertyOrPathWasRemovedFromContext {
             get {

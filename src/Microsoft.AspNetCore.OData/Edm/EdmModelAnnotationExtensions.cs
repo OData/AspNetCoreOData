@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// Gets the Org.OData.Core.V1.AcceptableMediaTypes
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="target">The vocabulary annotatable target.</param>
+        /// <param name="target">The vocabulary annotate target.</param>
         /// <returns>null or the collection of media type.</returns>
         internal static IList<string> GetAcceptableMediaTypes(this IEdmModel model, IEdmVocabularyAnnotatable target)
         {
@@ -284,7 +284,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 model.TryGetAlternateKeys(entityType, coreAlternateTerm, out alternateCoreKeys);
             }
 
-            // for back compability, let's support the community.alternatekey
+            // for back compatibility, let's support the community.alternatekey
             IEnumerable<IDictionary<string, IEdmPathExpression>> alternateKeys = null;
             IEdmTerm communityAlternateTerm = AlternateKeysVocabularyModel.Instance.FindDeclaredTerm("OData.Community.Keys.V1.AlternateKeys");
             if (communityAlternateTerm != null)

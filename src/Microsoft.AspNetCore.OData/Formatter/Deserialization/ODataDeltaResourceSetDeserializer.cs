@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             EdmDeltaCollectionType edmCollectionType = new EdmDeltaCollectionType(edmType);
             edmType = new EdmCollectionTypeReference(edmCollectionType);
 
-            // TODO: is it ok to read the top level collection of entity?
+            // TODO: is it OK to read the top level collection of entity?
             if (!(edmType.IsCollection() && edmType.AsCollection().ElementType().IsStructured()))
             {
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);

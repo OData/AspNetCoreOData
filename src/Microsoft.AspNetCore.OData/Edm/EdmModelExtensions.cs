@@ -217,7 +217,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// Resolve the navigation source using the input identifier
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="identifier">The indentifier</param>
+        /// <param name="identifier">The identifier</param>
         /// <param name="enableCaseInsensitive">Enable case insensitive</param>
         /// <returns>Null or the found navigation source.</returns>
         public static IEdmNavigationSource ResolveNavigationSource(this IEdmModel model, string identifier, bool enableCaseInsensitive = false)

@@ -203,7 +203,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             OperationSegment operationSegment = path.LastSegment as OperationSegment;
             if (operationSegment != null)
             {
-                // OData modelbuilder uses an annotation to save the function returned entity set.
+                // OData model builder uses an annotation to save the function returned entity set.
                 // TODO: we need to refactor it later.
                 ReturnedEntitySetAnnotation entitySetAnnotation = model.GetAnnotationValue<ReturnedEntitySetAnnotation>(operationSegment.Operations.Single());
                 if (entitySetAnnotation != null)

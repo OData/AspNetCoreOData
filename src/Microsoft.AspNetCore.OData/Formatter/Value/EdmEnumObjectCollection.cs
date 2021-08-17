@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         private IEdmCollectionTypeReference _edmType;
 
         /// <summary>
-        /// Initialzes a new instance of the <see cref="EdmEnumObjectCollection"/> class.
+        /// Initializes a new instance of the <see cref="EdmEnumObjectCollection"/> class.
         /// </summary>
         /// <param name="edmType">The edm type of the collection.</param>
         public EdmEnumObjectCollection(IEdmCollectionTypeReference edmType)
@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <summary>
-        /// Initialzes a new instance of the <see cref="EdmEnumObjectCollection"/> class.
+        /// Initializes a new instance of the <see cref="EdmEnumObjectCollection"/> class.
         /// </summary>
         /// <param name="edmType">The edm type of the collection.</param>
         /// <param name="list">The list that is wrapped by the new collection.</param>

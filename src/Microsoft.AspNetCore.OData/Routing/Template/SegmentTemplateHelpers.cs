@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Contract.Assert(routeValues != null);
             Contract.Assert(parameterMappings != null);
 
-            // If we have a function(p1, p2, p3), where p3 is optinal parameter.
+            // If we have a function(p1, p2, p3), where p3 is optional parameter.
             // In controller, we may have two functions:
             // IActionResult function(p1, p2)   --> #1
             // IActionResult function(p1, p2, p3)  --> #2

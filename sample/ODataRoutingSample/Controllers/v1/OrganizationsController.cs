@@ -57,7 +57,7 @@ namespace ODataRoutingSample.Controllers.v1
   "value":[
    {
       "@odata.id":"Organizations(42)",
-      "Name":"Micrsoft"
+      "Name":"Microsoft"
    },
    {
      "@odata.context":"http://localhost/$metadata#Organizations/$deletedLink",
@@ -103,19 +103,19 @@ namespace ODataRoutingSample.Controllers.v1
         [HttpGet]
         public IActionResult GetPrice([FromODataUri] string organizationId, [FromODataUri] string partId)
         {
-            return Ok($"Caculated the price using {organizationId} and {partId}");
+            return Ok($"Calculated the price using {organizationId} and {partId}");
         }
 
         [HttpGet("v1/Organizations/GetPrice2(organizationId={orgId},partId={parId})")]
         public IActionResult GetMorePrice(string orgId, string parId)
         {
-            return Ok($"Caculated the price using {orgId} and {parId}");
+            return Ok($"Calculated the price using {orgId} and {parId}");
         }
 
         [HttpGet("v1/Organizations/GetPrice2(organizationId={orgId},partId={parId})/GetPrice2(organizationId={orgId2},partId={parId2})")]
         public IActionResult GetMorePrice2(string orgId, string parId, string orgId2, string parId2)
         {
-            return Ok($"Caculated the price using {orgId} and {parId} | using {orgId2} and {parId2}");
+            return Ok($"Calculated the price using {orgId} and {parId} | using {orgId2} and {parId2}");
         }
 
         [HttpPost("v1/Organizations/GetByAccount(accountId={aId})/MarkAsFavourite")]

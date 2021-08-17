@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             //   -or-
             //   Single valued: singleton
             // Copy over other path segments such as: not a navigation path segment, contained navigation property,
-            // single valued navigation property with navigation source targetting an entity set (we won't have key
+            // single valued navigation property with navigation source targeting an entity set (we won't have key
             // information for that navigation property.)
             _segments.Reverse();
             NavigationPropertySegment navigationPropertySegment = null;

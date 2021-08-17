@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Microsoft.AspNetCore.OData.Query.Container
 {
-    // wraps a constant value so that EntityFramework paramterizes the constant.
+    // wraps a constant value so that EntityFramework parametrizes the constant.
     internal abstract class LinqParameterContainer
     {
         private static ConcurrentDictionary<Type, Func<object, LinqParameterContainer>> _ctors = new ConcurrentDictionary<Type, Func<object, LinqParameterContainer>>();

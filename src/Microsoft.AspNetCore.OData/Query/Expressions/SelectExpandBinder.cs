@@ -459,7 +459,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Process the <see cref="ExpandedReferenceSelectItem"/>.
         /// </summary>
-        /// <param name="expandedItem">The expaned item.</param>
+        /// <param name="expandedItem">The expanded item.</param>
         /// <param name="navigationSource">The navigation source.</param>
         /// <param name="currentLevelPropertiesInclude">The current level properties included.</param>
         /// <param name="propertiesToExpand">out/ref, the property expanded.</param>
@@ -496,7 +496,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else
             {
                 // for example: $expand=nav, if we couldn't find a structural property in the path, it means we get the last navigation segment.
-                // So, the remaing segments should be null and the last segment should be "NavigationPropertySegment".
+                // So, the remaining segments should be null and the last segment should be "NavigationPropertySegment".
                 Contract.Assert(remainingSegments == null);
 
                 NavigationPropertySegment firstNavigationPropertySegment = firstNonTypeSegment as NavigationPropertySegment;
@@ -550,7 +550,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else
             {
                 // If we can't find a PropertySegment, the $select path maybe selecting an operation, a navigation or dynamic property.
-                // And the remaing segments should be null.
+                // And the remaining segments should be null.
                 Contract.Assert(remainingSegments == null);
 
                 // For operation (action/function), needn't process it.
@@ -566,7 +566,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return false;
         }
 
-        // To test whether the currect selection is SelectAll on an open type
+        // To test whether the current selection is SelectAll on an open type
         private static bool IsSelectAllOnOpenType(SelectExpandClause selectExpandClause, IEdmStructuredType structuredType)
         {
             if (structuredType == null || !structuredType.IsOpen)
@@ -679,7 +679,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source">The source contains the navigation property.</param>
         /// <param name="structuredType">The structured type or its derived type contains the navigation property.</param>
         /// <param name="navigationProperty">The expanded navigation property.</param>
-        /// <param name="expandedItem">The expanded navigation select item. It may contain the neste query options.</param>
+        /// <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
         internal void BuildExpandedProperty(Expression source, IEdmStructuredType structuredType,
             IEdmNavigationProperty navigationProperty, ExpandedReferenceSelectItem expandedItem,
@@ -754,7 +754,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source">The source contains the structural property.</param>
         /// <param name="structuredType">The structured type or its derived type contains the structural property.</param>
         /// <param name="structuralProperty">The selected structural property.</param>
-        /// <param name="pathSelectItem">The selected item. It may contain the neste query options and could be null.</param>
+        /// <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
         internal void BuildSelectedProperty(Expression source, IEdmStructuredType structuredType,
             IEdmStructuralProperty structuralProperty, PathSelectItem pathSelectItem,
@@ -1061,7 +1061,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var selectMethod = GetSelectMethod(elementType, projection.Type);
             Expression selectedExpresion = Expression.Call(selectMethod, source, selector);
 
-            // Append ToList() to collection as a hint to LINQ provider to buffer correlated subqueries in memory and avoid executing N+1 queries
+            // Append ToList() to collection as a hint to LINQ provider to buffer correlated sub-queries in memory and avoid executing N+1 queries
             if (_settings.EnableCorrelatedSubqueryBuffering)
             {
                 selectedExpresion = Expression.Call(ExpressionHelperMethods.QueryableToList.MakeGenericMethod(projection.Type), selectedExpresion);

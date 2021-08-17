@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData
             }
             catch
             {
-                // Clear in case of excpetion
+                // Clear in case of exception
                 RemoveCustomUriFunction(functionName, functionSignature, methodInfo);
                 throw;
             }
@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="functionSignature">The new custom function signature.</param>
         /// <param name="methodInfo">The MethodInfo to bind the given function name.</param>
         /// <exception cref="Exception">Any exception thrown by 'CustomUriFunctions.RemoveCustomUriFunction' and 'UriFunctionsBinder.UnbindUriFunctionName' methods.</exception>
-        /// <returns>'True' if the fucntion signature has successfully removed and unbinded. 'False' otherwise.</returns>
+        /// <returns>'True' if the function signature has successfully removed and unbounded. 'False' otherwise.</returns>
         public static bool RemoveCustomUriFunction(string functionName,
             FunctionSignatureWithReturnType functionSignature, MethodInfo methodInfo)
         {
