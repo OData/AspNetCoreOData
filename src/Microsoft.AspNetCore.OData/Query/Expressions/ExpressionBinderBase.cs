@@ -138,11 +138,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (leftUnderlyingType == typeof(DateTime) && rightUnderlyingType == typeof(DateTimeOffset))
             {
-                right = DateTimeOffsetToDateTime(right);
+                right = DateTimeOffsetToDateTime(right, QuerySettings.TimeZone);
             }
             else if (rightUnderlyingType == typeof(DateTime) && leftUnderlyingType == typeof(DateTimeOffset))
             {
-                left = DateTimeOffsetToDateTime(left);
+                left = DateTimeOffsetToDateTime(left, QuerySettings.TimeZone);
             }
 
             if ((IsDateOrOffset(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
@@ -981,7 +981,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        internal static Expression DateTimeOffsetToDateTime(Expression expression)
+        internal static Expression DateTimeOffsetToDateTime(Expression expression, TimeZoneInfo timeZoneInfo)
         {
             var unaryExpression = expression as UnaryExpression;
             if (unaryExpression != null)
@@ -996,7 +996,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var dto = parameterizedConstantValue as DateTimeOffset?;
             if (dto != null)
             {
-                expression = Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime)));
+                expression = Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
             }
             return expression;
         }

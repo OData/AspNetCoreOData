@@ -9006,6 +9006,11 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings" /> class.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.TimeZone">
+            <summary>
+            Gets or sets the <see cref="T:System.TimeZoneInfo"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.ModelBoundPageSize">
             <summary>
             Gets or sets the maximum number of query results to return based on the type or property.

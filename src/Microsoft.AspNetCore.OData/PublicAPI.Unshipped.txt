@@ -898,6 +898,8 @@ Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleReferenceNavigationPro
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.ODataQuerySettings() -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize.get -> int?
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize.set -> void
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.TimeZone.get -> System.TimeZoneInfo
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.TimeZone.set -> void
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Apply.get -> string
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Count.get -> string

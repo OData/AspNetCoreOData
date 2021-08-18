@@ -369,6 +369,8 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 _querySettings.ModelBoundPageSize = querySettings.PageSize;
             }
+
+            _querySettings.TimeZone = request.GetTimeZoneInfo();
         }
 
         /// <summary>

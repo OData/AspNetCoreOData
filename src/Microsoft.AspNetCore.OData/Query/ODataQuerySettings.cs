@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using System;
+
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
@@ -20,6 +22,11 @@ namespace Microsoft.AspNetCore.OData.Query
             EnsureStableOrdering = true;
             EnableConstantParameterization = true;
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of query results to return based on the type or property.
@@ -125,6 +132,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         internal void CopyFrom(ODataQuerySettings settings)
         {
+            TimeZone = settings.TimeZone;
             EnsureStableOrdering = settings.EnsureStableOrdering;
             EnableConstantParameterization = settings.EnableConstantParameterization;
             HandleNullPropagation = settings.HandleNullPropagation;
