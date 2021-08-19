@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+//-----------------------------------------------------------------------------
+// <copyright file="WeatherForecastController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
