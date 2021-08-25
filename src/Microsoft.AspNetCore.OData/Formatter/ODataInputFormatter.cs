@@ -203,10 +203,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
                 oDataReaderSettings.Version = version;
 
-                // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
-                // In ODL 8.x, ReadUntypedAsString option will be deleted.
-                oDataReaderSettings.ReadUntypedAsString = false;
-
                 IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetRouteServices());
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);

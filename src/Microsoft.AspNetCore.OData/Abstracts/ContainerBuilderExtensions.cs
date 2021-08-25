@@ -42,6 +42,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 EnableMessageStreamDisposal = false,
                 MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+
+                // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
+                // In ODL 8.x, ReadUntypedAsString option will be deleted.
+                ReadUntypedAsString = false
             });
 
             builder.AddServicePrototype(new ODataMessageWriterSettings
