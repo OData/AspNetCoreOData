@@ -25,11 +25,11 @@ namespace Microsoft.AspNetCore.OData.Deltas
     public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     {
         // cache property accessors for this type and all its derived types.
-        private static ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>> _propertyCache
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>> _propertyCache
             = new ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>>();
 
         private Dictionary<string, PropertyAccessor<T>> _allProperties;
-        private HashSet<string> _updatableProperties;
+        private List<string> _updatableProperties;
 
         private HashSet<string> _changedProperties;
 
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         private T _instance;
         private Type _structuredType;
 
-        private PropertyInfo _dynamicDictionaryPropertyinfo;
+        private readonly PropertyInfo _dynamicDictionaryPropertyinfo;
         private HashSet<string> _changedDynamicProperties;
         private IDictionary<string, object> _dynamicDictionaryCache;
 
@@ -98,15 +98,18 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         /// <inheritdoc/>
         public virtual Type StructuredType
-        {
-            get
-            {
-                return _structuredType;
-            }
-        }
+            => _structuredType;
 
         /// <inheritdoc/>
         public virtual Type ExpectedClrType => typeof(T);
+
+        /// <summary>
+        /// The list of property names that can be updated.
+        /// </summary>
+        /// <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+        /// considered to be changed.</remarks>
+        public IList<string> UpdatableProperties
+            => _updatableProperties;
 
         /// <inheritdoc/>
         public override void Clear()
@@ -172,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 }
             }
 
-            if (this._deltaNestedResources.ContainsKey(name))
+            if (_deltaNestedResources.ContainsKey(name))
             {
                 // If this is a nested resource, get the value from the dictionary of nested resources.
                 object deltaNestedResource = _deltaNestedResources[name];
@@ -259,7 +262,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public override IEnumerable<string> GetChangedPropertyNames()
         {
-            return _changedProperties.Concat(_deltaNestedResources.Keys);
+            return _changedProperties.Intersect(_updatableProperties).Concat(_deltaNestedResources.Keys);
         }
 
         /// <summary>
@@ -269,7 +272,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public override IEnumerable<string> GetUnchangedPropertyNames()
         {
-            return _updatableProperties.Except(GetChangedPropertyNames());
+            // UpdatableProperties could include arbitrary strings, filter by _allProperties
+            return _updatableProperties.Intersect(_allProperties.Keys).Except(GetChangedPropertyNames());
         }
 
         /// <summary>
@@ -295,7 +299,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             // For regular non-structural properties at current level.
             PropertyAccessor<T>[] propertiesToCopy =
-                this._changedProperties.Select(s => _allProperties[s]).ToArray();
+                _changedProperties.Intersect(_updatableProperties).Select(s => _allProperties[s]).ToArray();
             foreach (PropertyAccessor<T> propertyToCopy in propertiesToCopy)
             {
                 propertyToCopy.Copy(_instance, original);
@@ -498,12 +502,11 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             if (updatableProperties != null)
             {
-                _updatableProperties = new HashSet<string>(updatableProperties);
-                _updatableProperties.IntersectWith(_allProperties.Keys);
+                _updatableProperties = updatableProperties.Intersect(_allProperties.Keys).ToList();
             }
             else
             {
-                _updatableProperties = new HashSet<string>(_allProperties.Keys);
+                _updatableProperties = new List<string>(_allProperties.Keys);
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -618,7 +621,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 throw Error.ArgumentNull("name");
             }
 
-            if (!_updatableProperties.Contains(name))
+            if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
                 return false;
             }
@@ -648,7 +651,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 throw Error.ArgumentNull("name");
             }
 
-            if (!_updatableProperties.Contains(name))
+            if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
                 return false;
             }

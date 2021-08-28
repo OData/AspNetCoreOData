@@ -180,6 +180,7 @@ Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType, Sys
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetInstance() -> T
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Patch(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Put(T original) -> void
+Microsoft.AspNetCore.OData.Deltas.Delta<T>.UpdatableProperties.get -> System.Collections.Generic.IList<string>
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource() -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource(System.Type structuralType) -> void

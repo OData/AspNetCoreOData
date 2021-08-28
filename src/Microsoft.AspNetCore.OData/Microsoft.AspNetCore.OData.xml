@@ -1615,6 +1615,13 @@
         <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
             <inheritdoc/>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.UpdatableProperties">
+            <summary>
+            The list of property names that can be updated.
+            </summary>
+            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+            considered to be changed.</remarks>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
             <inheritdoc/>
         </member>

@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             {
                 MethodInfo getDefaultValue = typeof(DeltaTest).GetMethod("GetDefaultValue");
 
-                var defaultValues = typeof(DeltaModel).GetProperties().Select(p => new[] { p.Name, getDefaultValue.MakeGenericMethod(p.PropertyType).Invoke(obj: null, parameters: null) });
+                IEnumerable<object[]> defaultValues = typeof(DeltaModel).GetProperties().Select(p => new[] { p.Name, getDefaultValue.MakeGenericMethod(p.PropertyType).Invoke(obj: null, parameters: null) });
                 return defaultValues.Concat(new object[][]
                 {
                     new object[] { "StringProperty" , "42" },
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void TryGetPropertyValue_ThrowsArgumentNull_original()
         {
             // Arrange & Act
-            var delta = new Delta<Base>();
+            Delta<Base> delta = new Delta<Base>();
             ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetPropertyValue(null, out _), "name");
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void TryGetPropertyType_ThrowsArgumentNull_original()
         {
             // Arrange & Act
-            var delta = new Delta<Base>();
+            Delta<Base> delta = new Delta<Base>();
             ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetPropertyType(null, out _), "name");
         }
 
@@ -82,8 +82,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         {
             Delta<DeltaModel> delta = new Delta<DeltaModel>();
 
-            Type propertyType;
-            Assert.True(delta.TryGetPropertyType(propertyName, out propertyType));
+            Assert.True(delta.TryGetPropertyType(propertyName, out _));
 
             Assert.True(delta.TrySetPropertyValue(propertyName, value));
 
@@ -102,9 +101,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
                 dynamicType, null, dynamicDictionaryPropertyinfo);
 
             // Act & Assert
-            Type propertyType;
             string propertyName = "DynamicPropertyName";
-            Assert.False(delta.TryGetPropertyType(propertyName, out propertyType));
+            Assert.False(delta.TryGetPropertyType(propertyName, out _));
 
             // Act & Assert
             object value = 42;
@@ -136,27 +134,102 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         [Fact]
         public void CanGetChangedPropertyNames()
         {
-            var original = new AddressEntity { ID = 1, City = "Redmond", State = "NY", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
-
             dynamic delta = new Delta<AddressEntity>();
-            var idelta = delta as IDelta;
+            IDelta idelta = delta as IDelta;
             // modify in the way we expect the formatter too.
             idelta.TrySetPropertyValue("City", "Sammamish");
             Assert.Single(idelta.GetChangedPropertyNames());
             Assert.Equal("City", idelta.GetChangedPropertyNames().Single());
+            Assert.Equal(4, idelta.GetUnchangedPropertyNames().Count());
 
             // read the property back
-            object city = null;
+            object city;
             Assert.True(idelta.TryGetPropertyValue("City", out city));
             Assert.Equal("Sammamish", city);
 
             // modify the way people will through custom code
             delta.StreetAddress = "23213 NE 15th Ct";
-            var mods = idelta.GetChangedPropertyNames().ToArray();
-            Assert.Equal(2, mods.Count());
+            string[] mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Equal(2, mods.Length);
             Assert.Contains("StreetAddress", mods);
             Assert.Contains("City", mods);
             Assert.Equal("23213 NE 15th Ct", delta.StreetAddress);
+            Assert.Equal(3, idelta.GetUnchangedPropertyNames().Count());
+        }
+
+        [Fact]
+        public void CanGetChangedPropertyNamesButOnlyUpdatable()
+        {
+            dynamic delta = new Delta<AddressEntity>();
+            IDelta idelta = delta as IDelta;
+            // modify in the way we expect the formatter too.
+            idelta.TrySetPropertyValue("City", "Sammamish");
+            Assert.Single(idelta.GetChangedPropertyNames());
+            Assert.Equal("City", idelta.GetChangedPropertyNames().Single());
+            Assert.Equal(4, idelta.GetUnchangedPropertyNames().Count());
+
+            // read the property back
+            object city;
+            Assert.True(idelta.TryGetPropertyValue("City", out city));
+            Assert.Equal("Sammamish", city);
+
+            // limit updatable properties
+            delta.UpdatableProperties.Clear();
+            delta.UpdatableProperties.Add("City");
+            delta.UpdatableProperties.Add("StreetAddress");
+
+            // modify the way people will through custom code
+            delta.StreetAddress = "23213 NE 15th Ct";
+            string[] mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Equal(2, mods.Length);
+            Assert.Contains("StreetAddress", mods);
+            Assert.Contains("City", mods);
+            Assert.Equal("23213 NE 15th Ct", delta.StreetAddress);
+            Assert.Empty(idelta.GetUnchangedPropertyNames());
+
+            // try to modify an un-updatable property
+            idelta.TrySetPropertyValue("State", "IA");
+            mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Equal(2, mods.Length);
+            Assert.Contains("StreetAddress", mods);
+            Assert.Contains("City", mods);
+            Assert.Null(delta.State);
+            Assert.Empty(idelta.GetUnchangedPropertyNames());
+
+            // limit a property that has been updated
+            delta.UpdatableProperties.Remove("StreetAddress");
+            mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Single(mods);
+            Assert.Contains("City", mods);
+            Assert.Null(delta.State);
+            Assert.Empty(idelta.GetUnchangedPropertyNames());
+
+            // enable a property that has not been updated
+            delta.UpdatableProperties.Add("State");
+            mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Single(mods);
+            Assert.Contains("City", mods);
+            Assert.Null(delta.State);
+            Assert.Single(idelta.GetUnchangedPropertyNames());
+            Assert.Equal("State", idelta.GetUnchangedPropertyNames().Single());
+
+            // enable a property that doesn't exist
+            delta.UpdatableProperties.Add("Bogus");
+            mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Single(mods);
+            Assert.Contains("City", mods);
+            Assert.Null(delta.State);
+            Assert.Single(idelta.GetUnchangedPropertyNames());
+            Assert.Equal("State", idelta.GetUnchangedPropertyNames().Single());
+
+            // set a property that doesn't exist
+            Assert.False(delta.TrySetPropertyValue("Bogus", "Bad"));
+            mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Single(mods);
+            Assert.Contains("City", mods);
+            Assert.Null(delta.State);
+            Assert.Single(idelta.GetUnchangedPropertyNames());
+            Assert.Equal("State", idelta.GetUnchangedPropertyNames().Single());
         }
 
         [Fact]
@@ -173,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         [Fact]
         public void CanPatch()
         {
-            var original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+            AddressEntity original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
 
             dynamic delta = new Delta<AddressEntity>();
             delta.City = "Sammamish";
@@ -193,7 +266,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void CanPatch_OpenType()
         {
             // Arrange
-            var address = new SimpleOpenAddress
+            SimpleOpenAddress address = new SimpleOpenAddress
             {
                 City = "City",
                 Street = "Street",
@@ -205,7 +278,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             };
 
             PropertyInfo propertyInfo = typeof(SimpleOpenAddress).GetProperty("Properties");
-            var delta = new Delta<SimpleOpenAddress>(typeof(SimpleOpenAddress), null, propertyInfo);
+            Delta<SimpleOpenAddress> delta = new Delta<SimpleOpenAddress>(typeof(SimpleOpenAddress), null, propertyInfo);
             delta.TrySetPropertyValue("City", "ChangedCity");
             delta.TrySetPropertyValue("IntProp", 1);
 
@@ -226,7 +299,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void CanPut_OpenType()
         {
             // Arrange
-            var address = new SimpleOpenAddress
+            SimpleOpenAddress address = new SimpleOpenAddress
             {
                 City = "City",
                 Street = "Street",
@@ -238,7 +311,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             };
 
             PropertyInfo propertyInfo = typeof(SimpleOpenAddress).GetProperty("Properties");
-            var delta = new Delta<SimpleOpenAddress>(typeof(SimpleOpenAddress), null, propertyInfo);
+            Delta<SimpleOpenAddress> delta = new Delta<SimpleOpenAddress>(typeof(SimpleOpenAddress), null, propertyInfo);
             delta.TrySetPropertyValue("City", "ChangedCity");
             delta.TrySetPropertyValue("IntProp", 1);
 
@@ -256,7 +329,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void CopyUnchangedValues_ThrowsArgumentNull_original()
         {
             // Arrange & Act
-            var delta = new Delta<Base>();
+            Delta<Base> delta = new Delta<Base>();
             ExceptionAssert.ThrowsArgumentNull(() => delta.CopyUnchangedValues(null), "original");
         }
 
@@ -264,19 +337,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         public void CopyChangedValues_ThrowsArgumentNull_original()
         {
             // Arrange & Act
-            var delta = new Delta<Base>();
+            Delta<Base> delta = new Delta<Base>();
             ExceptionAssert.ThrowsArgumentNull(() => delta.CopyChangedValues(null), "original");
         }
 
         [Fact]
         public void CanCopyUnchangedValues()
         {
-            var original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+            AddressEntity original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
 
             dynamic delta = new Delta<AddressEntity>();
             delta.City = "Sammamish";
             delta.StreetAddress = "23213 NE 15th Ct";
-            var idelta = delta as Delta<AddressEntity>;
+            Delta<AddressEntity> idelta = delta as Delta<AddressEntity>;
             idelta.CopyUnchangedValues(original);
             // unchanged values have been reset to defaults
             Assert.Equal(0, original.ID);
@@ -290,12 +363,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         [Fact]
         public void CanPut()
         {
-            var original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+            AddressEntity original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
 
             dynamic delta = new Delta<AddressEntity>();
             delta.City = "Sammamish";
             delta.StreetAddress = "23213 NE 15th Ct";
-            var idelta = delta as Delta<AddressEntity>;
+            Delta<AddressEntity> idelta = delta as Delta<AddressEntity>;
             idelta.Put(original);
 
             // unchanged values have been reset to defaults
@@ -312,7 +385,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         {
             dynamic delta = new Delta<AddressEntity>();
             delta.StreetAddress = "Test";
-            var idelta = delta as IDelta;
+            IDelta idelta = delta as IDelta;
             Assert.Single(idelta.GetChangedPropertyNames());
             idelta.Clear();
             Assert.Empty(idelta.GetChangedPropertyNames());
@@ -321,7 +394,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         [Fact]
         public void CanCreateDeltaOfDerivedTypes()
         {
-            var delta = new Delta<Base>(typeof(Derived));
+            Delta<Base> delta = new Delta<Base>(typeof(Derived));
             Assert.IsType<Derived>(delta.GetInstance());
         }
 
@@ -396,7 +469,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             // Arrange
             string expectedString = "hello, world";
             int expectedInt = 24;
-            var delta = new Delta<Base>(typeof(Base), new[] { "BaseInt" });
+            Delta<Base> delta = new Delta<Base>(typeof(Base), new[] { "BaseInt" });
             delta.TrySetPropertyValue("BaseInt", expectedInt);
 
             Base entity = new Base { BaseInt = 42, BaseString = expectedString };
@@ -407,6 +480,57 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             // Assert
             Assert.Equal(expectedInt, entity.BaseInt);
             Assert.Equal(expectedString, entity.BaseString);
+        }
+
+        [Fact]
+        public void Put_DoesNotClear_ChangedNonUpdatableProperties()
+        {
+            // Arrange
+            string expectedString = "hello, world";
+            int expectedInt = 24;
+            Delta<Base> delta = new Delta<Base>(typeof(Base));
+            delta.TrySetPropertyValue("BaseInt", expectedInt);
+            delta.UpdatableProperties.Clear();
+            delta.UpdatableProperties.Add("BaseInt");
+
+            Base entity = new Base { BaseInt = 42, BaseString = expectedString };
+
+            // Act
+            delta.Put(entity);
+
+            // Assert
+            Assert.Equal(expectedInt, entity.BaseInt);
+            Assert.Equal(expectedString, entity.BaseString);
+        }
+
+        [Fact]
+        public void Patch_DoesNotSet_ChangedUpdatableProperties()
+        {
+            AddressEntity original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+
+            dynamic delta = new Delta<AddressEntity>();
+            delta.City = "Sammamish";
+            delta.StreetAddress = "23213 NE 15th Ct";
+
+            IDelta idelta = delta as IDelta;
+            string[] mods = idelta.GetChangedPropertyNames().ToArray();
+            Assert.Equal(2, mods.Length);
+            Assert.Contains("StreetAddress", mods);
+            Assert.Contains("City", mods);
+
+            delta.UpdatableProperties.Clear();
+            delta.UpdatableProperties.Add("City");
+
+            delta.Patch(original);
+            // unchanged
+            Assert.Equal(1, original.ID);
+            Assert.Equal("WA", original.State);
+            Assert.Equal("21110 NE 44th St", original.StreetAddress);
+            Assert.Equal(98074, original.ZipCode);
+            // changed
+            Assert.Equal("Sammamish", original.City);
+
+            Assert.Equal(delta.GetChangedPropertyNames(), new[] { "City" });
         }
 
         [Fact]
@@ -509,10 +633,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         }
 
         public static TheoryDataSet<string, string, object> ODataFormatter_Can_Read_Delta_DataSet
-        {
-            get
-            {
-                return new TheoryDataSet<string, string, object>()
+            => new TheoryDataSet<string, string, object>()
                 {
                     { "IntProperty", "23", 23 },
                     { "LongProperty", String.Format(CultureInfo.InvariantCulture, "'{0}'", Int64.MaxValue), Int64.MaxValue }, // longs are serialized as strings in odata json
@@ -534,20 +655,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
                     { "CollectionProperty", "[ 1, 2, 3 ]", new Collection<int> { 1, 2, 3} },
                     { "ComplexModelCollectionProperty", "[ { 'ComplexIntProperty' : 42 } ]", new Collection<ComplexModel> { new ComplexModel { ComplexIntProperty = 42 } } }
                 };
-            }
-        }
 
         public static TheoryDataSet<Type> TypedDelta_Returns_Correct_ExpectedClrType_And_ActualType_DataSet
-        {
-            get
-            {
-                return new TheoryDataSet<Type>()
+            => new TheoryDataSet<Type>()
                 {
                     { typeof(SimpleOpenCustomer) },
                     { typeof(SimpleVipCustomer) }
                 };
-            }
-        }
 
         [Theory]
         [MemberData(nameof(TypedDelta_Returns_Correct_ExpectedClrType_And_ActualType_DataSet))]
@@ -567,7 +681,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
 
         public static T GetDefaultValue<T>()
         {
-            return default(T);
+            return default;
         }
 
         private class DeltaModel
