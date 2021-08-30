@@ -133,7 +133,6 @@ namespace ODataDynamicModel.Controllers
             return Ok(nav);
         }
 
-
         /// <summary>
         /// Set the <see cref="SelectExpandClause"/> on ODataFeature.
         /// Without this, the response does not contains navigation property included in $expand
@@ -152,11 +151,10 @@ namespace ODataDynamicModel.Controllers
             //At this point, we should have valid entity segment and entity type.
             //If there is invalid entity in the query, then OData routing should return 404 error before executing this api
             var segment = odataPath.FirstSegment as EntitySetSegment;
-            IEdmNavigationSource? source = segment?.EntitySet;
+            IEdmNavigationSource source = segment?.EntitySet;
             ODataQueryOptionParser parser = new(Request.GetModel(), edmEntityType, source, options);
             //Set the SelectExpand Clause on the ODataFeature otherwise  Odata formatter won't show the expand and select properties in the response.
             Request.ODataFeature().SelectExpandClause = parser.ParseSelectAndExpand();
-
         }
     }
 }
