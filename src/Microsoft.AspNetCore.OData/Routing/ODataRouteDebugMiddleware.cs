@@ -27,6 +27,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     [ExcludeFromCodeCoverage]
     internal class ODataRouteDebugMiddleware
     {
+        private static IReadOnlyList<string> EmptyHeaders = Array.Empty<string>();
         private readonly RequestDelegate _next;
         private readonly string _routePattern;
 
@@ -41,6 +42,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 throw Error.ArgumentNull(nameof(routePattern));
             }
+
             // ensure _routePattern starts with /
             _routePattern = routePattern.StartsWith('/') ? routePattern : $"/{routePattern}";
             _next = next ?? throw Error.ArgumentNull(nameof(next)); ;
@@ -112,8 +114,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             return routInfoList;
         }
 
-        private static IReadOnlyList<string> EmptyHeaders = Array.Empty<string>();
-
         internal static async Task WriteRoutesAsJson(HttpContext context, IList<EndpointRouteInfo> routeInfoList)
         {
             var options = new JsonSerializerOptions()
@@ -153,7 +153,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             context.Response.ContentType = "text/html";
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
-
 
         internal static bool AcceptsJson(IHeaderDictionary headers)
         {
@@ -209,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 <body>
     <h1 id=""odata"">OData Endpoint Mappings</h1>
     <p>
-        <a href=""#standard"">Got to none OData endpoint mappings</a>
+        <a href=""#standard"">Go to none OData endpoint mappings</a>
     </p>
     <table>
         <tr>
