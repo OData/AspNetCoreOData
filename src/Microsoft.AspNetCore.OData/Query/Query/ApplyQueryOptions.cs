@@ -8,7 +8,6 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
@@ -178,8 +177,6 @@ namespace Microsoft.AspNetCore.OData.Query
                     IFilterBinder binder = Context.GetFilterBinder(querySettings);
 
                     query = binder.Bind(filterBinderContext);
-                    /*Expression filter = FilterBinder.Bind(query, filterTransformation.FilterClause, ResultClrType, Context, querySettings);
-                    query = ExpressionHelpers.Where(query, filter, ResultClrType);*/
                 }
             }
 
