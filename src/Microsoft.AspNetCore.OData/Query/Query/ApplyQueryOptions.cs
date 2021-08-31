@@ -170,8 +170,8 @@ namespace Microsoft.AspNetCore.OData.Query
                         Source = query,
                         FilterClause = filterTransformation.FilterClause,
                         QueryContext = Context,
-                        QuerySettings = updatedSettings,
-                        ElementClrType = Context.ElementClrType
+                        QuerySettings = querySettings,
+                        ElementClrType = ResultClrType
                     };
 
                     IFilterBinder binder = Context.GetFilterBinder(querySettings);

@@ -79,6 +79,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(context.FilterClause != null);
             Contract.Assert(context.ElementClrType != null);
 
+            _filterType = context.ElementClrType;
+            BaseQuery = context.Source;
+
             LambdaExpression filter = BindFilterClause(this, context.FilterClause, context.ElementClrType);
 
             return filter;
@@ -91,9 +94,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(context.OrderByClause != null);
             Contract.Assert(context.ElementClrType != null);
 
-            LambdaExpression filter = BindOrderByClause(this, context.OrderByClause, context.ElementClrType);
+            _filterType = context.ElementClrType;
+            BaseQuery = context.Source;
 
-            return filter;
+            LambdaExpression orderByExpression = BindOrderByClause(this, context.OrderByClause, context.ElementClrType);
+
+            return orderByExpression;
         }
 
         internal static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
