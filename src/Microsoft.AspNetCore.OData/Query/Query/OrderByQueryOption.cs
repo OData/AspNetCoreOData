@@ -323,7 +323,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 ElementClrType = Context.ElementClrType
             };
 
-            IFilterBinder binder = Context.GetFilterBinder(querySettings);
+            IFilterBinder binder = Context.GetFilterBinder(updatedSettings);
             LambdaExpression orderByExpression = binder.BindOrderByClause(filterBinderContext) as LambdaExpression;
             querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
                 alreadyOrdered);

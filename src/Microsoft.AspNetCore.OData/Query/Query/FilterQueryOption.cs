@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 ElementClrType = Context.ElementClrType
             };
 
-            IFilterBinder binder = Context.GetFilterBinder(querySettings);
+            IFilterBinder binder = Context.GetFilterBinder(updatedSettings);
 
             query = binder.Bind(filterBinderContext);
             return query;
