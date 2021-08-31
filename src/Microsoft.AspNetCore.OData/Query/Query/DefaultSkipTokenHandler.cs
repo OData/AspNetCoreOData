@@ -14,6 +14,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
@@ -274,7 +275,14 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.InvalidOperation("Unable to get property values from the skiptoken value.");
             }
 
-            ExpressionBinderBase binder = context.GetFilterBinder(querySettings);
+            IFilterBinder iFilterBinder = context.GetFilterBinder(querySettings);
+            ExpressionBinderBase binder = iFilterBinder as ExpressionBinderBase;
+
+            if (binder == null)
+            {
+                binder = new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+            }
+
             bool parameterizeConstant = querySettings.EnableConstantParameterization;
             ParameterExpression param = Expression.Parameter(context.ElementClrType);
             Expression where = null;

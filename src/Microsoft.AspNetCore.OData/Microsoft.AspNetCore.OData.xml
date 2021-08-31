@@ -8222,6 +8222,15 @@
             For testing purposes only.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <inheritdoc/>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
@@ -8414,6 +8423,67 @@
             <param name="source">The original <see cref="T:System.Object"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
             <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext">
+            <summary>
+            Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.Source">
+            <summary>
+            Gets or sets the original <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.FilterClause">
+            <summary>
+            Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.FilterClause"/> for this query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.OrderByClause">
+            <summary>
+            Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> for this query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.QuerySettings">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.QueryContext">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.ElementClrType">
+            <summary>
+            Gets or sets the CLR type of the element.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
+            <summary>
+            Exposes the ability to translate an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <summary>
+            Applies an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
+            </summary>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
+            <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindOrderByClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
+            </summary>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
+            <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>

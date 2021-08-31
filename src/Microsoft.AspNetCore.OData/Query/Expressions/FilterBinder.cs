@@ -15,7 +15,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -26,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// Translates an OData $filter parse tree represented by <see cref="FilterClause"/> to
     /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
     /// </summary>
-    public class FilterBinder : ExpressionBinderBase
+    public class FilterBinder : ExpressionBinderBase, IFilterBinder
     {
         private const string ODataItParameterName = "$it";
         private const string ODataThisParameterName = "$this";
@@ -59,19 +58,42 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _filterType = filterType;
         }
 
-        internal static Expression Bind(IQueryable baseQuery, FilterClause filterClause, Type filterType,
-            ODataQueryContext context, ODataQuerySettings querySettings)
+        /// <inheritdoc/>
+        public virtual IQueryable Bind(FilterBinderContext context)
         {
-            Contract.Assert(filterClause != null);
-            Contract.Assert(filterType != null);
             Contract.Assert(context != null);
+            Contract.Assert(context.FilterClause != null);
+            Contract.Assert(context.ElementClrType != null);
 
-            FilterBinder binder = context.GetFilterBinder(querySettings);
+            IQueryable query = context.Source;
+            Expression filterExpression = BindFilterClause(context);
 
-            binder._filterType = filterType;
-            binder.BaseQuery = baseQuery;
+            query = ExpressionHelpers.Where(query, filterExpression, context.ElementClrType);
+            return query;
+        }
 
-            return BindFilterClause(binder, filterClause, filterType);
+        /// <inheritdoc/>
+        public virtual Expression BindFilterClause(FilterBinderContext context)
+        {
+            Contract.Assert(context != null);
+            Contract.Assert(context.FilterClause != null);
+            Contract.Assert(context.ElementClrType != null);
+
+            LambdaExpression filter = BindFilterClause(this, context.FilterClause, context.ElementClrType);
+
+            return filter;
+        }
+
+        /// <inheritdoc/>
+        public virtual Expression BindOrderByClause(FilterBinderContext context)
+        {
+            Contract.Assert(context != null);
+            Contract.Assert(context.OrderByClause != null);
+            Contract.Assert(context.ElementClrType != null);
+
+            LambdaExpression filter = BindOrderByClause(this, context.OrderByClause, context.ElementClrType);
+
+            return filter;
         }
 
         internal static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
@@ -86,21 +108,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return filter;
-        }
-
-        internal static LambdaExpression Bind(IQueryable baseQuery, OrderByClause orderBy, Type elementType,
-            ODataQueryContext context, ODataQuerySettings querySettings)
-        {
-            Contract.Assert(orderBy != null);
-            Contract.Assert(elementType != null);
-            Contract.Assert(context != null);
-
-            FilterBinder binder = context.GetFilterBinder(querySettings);
-
-            binder._filterType = elementType;
-            binder.BaseQuery = baseQuery;
-
-            return BindOrderByClause(binder, orderBy, elementType);
         }
 
         internal static LambdaExpression BindOrderByClause(FilterBinder binder, OrderByClause orderBy, Type elementType)

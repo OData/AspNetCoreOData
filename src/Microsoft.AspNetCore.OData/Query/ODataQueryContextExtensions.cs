@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="context">The query context.</param>
         /// <param name="querySettings">The query setting.</param>
         /// <returns>The built <see cref="FilterBinder"/>.</returns>
-        public static FilterBinder GetFilterBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
+        public static IFilterBinder GetFilterBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
         {
             if (context == null)
             {
@@ -54,14 +54,20 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(querySettings));
             }
 
-            FilterBinder binder = null;
+            IFilterBinder binder = null;
             if (context.RequestContainer != null)
             {
-                binder = context.RequestContainer.GetService<FilterBinder>();
-                if (binder != null && binder.Model != context.Model)
+                binder = context.RequestContainer.GetService<IFilterBinder>();
+
+                FilterBinder filterBinder = binder as FilterBinder;
+                if (filterBinder != null)
                 {
-                    // TODO: Wtf, Need refactor these codes?
-                    binder.Model = context.Model;
+                    if (filterBinder.Model != context.Model)
+                    {
+                        filterBinder.Model = context.Model;
+                    }
+
+                    return filterBinder;
                 }
             }
 

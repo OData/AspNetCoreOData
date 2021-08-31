@@ -165,8 +165,21 @@ namespace Microsoft.AspNetCore.OData.Query
                 else if (transformation.Kind == TransformationNodeKind.Filter)
                 {
                     var filterTransformation = transformation as FilterTransformationNode;
-                    Expression filter = FilterBinder.Bind(query, filterTransformation.FilterClause, ResultClrType, Context, querySettings);
-                    query = ExpressionHelpers.Where(query, filter, ResultClrType);
+
+                    FilterBinderContext filterBinderContext = new FilterBinderContext()
+                    {
+                        Source = query,
+                        FilterClause = filterTransformation.FilterClause,
+                        QueryContext = Context,
+                        QuerySettings = updatedSettings,
+                        ElementClrType = Context.ElementClrType
+                    };
+
+                    IFilterBinder binder = Context.GetFilterBinder(querySettings);
+
+                    query = binder.Bind(filterBinderContext);
+                    /*Expression filter = FilterBinder.Bind(query, filterTransformation.FilterClause, ResultClrType, Context, querySettings);
+                    query = ExpressionHelpers.Where(query, filter, ResultClrType);*/
                 }
             }
 

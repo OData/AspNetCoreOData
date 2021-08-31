@@ -199,12 +199,24 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
+                FilterBinderContext filterBinderContext = new FilterBinderContext()
+                {
+                    Source = null,
+                    FilterClause = filterClause,
+                    QueryContext = _context,
+                    QuerySettings = querySettings,
+                    ElementClrType = clrElementType
+                };
+
+                IFilterBinder binder = _context.GetFilterBinder(querySettings);
+
                 if (isCollection)
                 {
                     Expression filterSource = nullablePropertyValue;
 
                     // TODO: Implement proper support for $select/$expand after $apply
-                    Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
+                    Expression filterPredicate = binder.BindFilterClause(filterBinderContext);
+                    //Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, _context, querySettings);
                     filterResult = Expression.Call(
                         ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(clrElementType),
                         filterSource,
@@ -214,7 +226,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings) as LambdaExpression;
+                    //LambdaExpression filterLambdaExpression = FilterBinder.Bind(null, filterClause, clrElementType, _context, querySettings) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(filterBinderContext) as LambdaExpression;
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));
@@ -919,8 +932,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
-                LambdaExpression orderByExpression =
-                    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpandQuery.Context, querySettings);
+                FilterBinderContext filterBinderContext = new FilterBinderContext()
+                {
+                    Source = null,
+                    OrderByClause = orderbyClause,
+                    QueryContext = _context,
+                    QuerySettings = querySettings,
+                    ElementClrType = elementType
+                };
+
+                IFilterBinder binder = _context.GetFilterBinder(querySettings);
+                LambdaExpression orderByExpression = binder.BindOrderByClause(filterBinderContext) as LambdaExpression;
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }
 
