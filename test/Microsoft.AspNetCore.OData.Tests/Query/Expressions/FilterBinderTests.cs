@@ -2686,6 +2686,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => binder.BindAnyNode(null), "anyNode");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindCountNode(null), "node");
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleResourceCastFunctionCall(null), "node");
         }
 
         [Fact]

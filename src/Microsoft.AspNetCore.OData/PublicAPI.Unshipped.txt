@@ -1639,6 +1639,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollection
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindConvertNode(Microsoft.OData.UriParser.ConvertNode convertNode) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCountNode(Microsoft.OData.UriParser.CountNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindDynamicPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindInNode(Microsoft.OData.UriParser.InNode inNode) -> System.Linq.Expressions.Expression
@@ -1648,6 +1649,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByCla
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindRangeVariable(Microsoft.OData.UriParser.RangeVariable rangeVariable) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode singleComplexNode) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastFunctionCall(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode) -> System.Linq.Expressions.Expression

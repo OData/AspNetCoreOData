@@ -8239,6 +8239,14 @@
             <param name="node">The node to bind.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCountNode(Microsoft.OData.UriParser.CountNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CountNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CountNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindDynamicPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
@@ -8248,6 +8256,14 @@
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastFunctionCall(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
             represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.

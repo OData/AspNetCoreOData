@@ -155,8 +155,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        private Expression BindCountNode(CountNode node)
+        /// <summary>
+        /// Binds a <see cref="CountNode"/> to create a LINQ <see cref="Expression"/> that
+        /// represents the semantics of the <see cref="CountNode"/>.
+        /// </summary>
+        /// <param name="node">The node to bind.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        public virtual Expression BindCountNode(CountNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             Expression source = Bind(node.Source);
             Expression countExpression = Expression.Constant(null, typeof(long?));
             Type elementType;
@@ -298,8 +309,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        private Expression BindSingleResourceCastFunctionCall(SingleResourceFunctionCallNode node)
+        /// <summary>
+        /// Binds a <see cref="SingleResourceFunctionCallNode"/> to create a LINQ <see cref="Expression"/> that
+        /// represents the semantics of the <see cref="SingleResourceFunctionCallNode"/>.
+        /// </summary>
+        /// <param name="node">The node to bind.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        public virtual Expression BindSingleResourceCastFunctionCall(SingleResourceFunctionCallNode node)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
             Contract.Assert(ClrCanonicalFunctions.CastFunctionName == node.Name);
 
             Expression[] arguments = BindArguments(node.Parameters);
