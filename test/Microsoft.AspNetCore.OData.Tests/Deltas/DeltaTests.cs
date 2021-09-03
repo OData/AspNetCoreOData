@@ -115,6 +115,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         }
 
         [Fact]
+        public void TrySetPropertyValue_ThrowsArgumentNull_name()
+        {
+            // Arrange & Act
+            Delta<CustomerEntity> delta = new Delta<CustomerEntity>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.TrySetPropertyValue(null, "Invalid"), "name");
+        }
+
+        [Fact]
         public void TrySetPropertyValue_ThrowsInvalidOperation_IfDynamicContainerWithoutSetter()
         {
             // Arrange
@@ -155,6 +163,73 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             Assert.Contains("City", mods);
             Assert.Equal("23213 NE 15th Ct", delta.StreetAddress);
             Assert.Equal(3, idelta.GetUnchangedPropertyNames().Count());
+        }
+
+        [Fact]
+        public void CanGetChangedNestedPropertyNames()
+        {
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+            IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+            AddressEntity Address = new AddressEntity();
+            Address.ID = 42;
+            Address.StreetAddress = "23213 NE 15th Ct";
+            Address.City = "Sammamish";
+            Address.State = "WA";
+            Address.ZipCode = 98074;
+
+            // modify in the way we expect the formatter too.
+            ideltaCustomer.TrySetPropertyValue("Address", Address);
+            Assert.Single(ideltaCustomer.GetChangedPropertyNames());
+            Assert.Equal("Address", ideltaCustomer.GetChangedPropertyNames().Single());
+            Assert.Equal(3, ideltaCustomer.GetUnchangedPropertyNames().Count());
+
+            // read the property back
+            Assert.True(ideltaCustomer.TryGetPropertyValue("Address", out object address));
+            Assert.Equal(Address, address);
+
+            // read the instance
+            CustomerEntity instance = deltaCustomer.GetInstance();
+            Assert.Equal(Address, instance.Address);
+        }
+
+        [Fact]
+        public void CanGetChangedNestedDeltaPropertyNames()
+        {
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+            IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+            dynamic deltaAddress = new Delta<AddressEntity>();
+            IDelta ideltaAddress = deltaAddress as IDelta;
+
+            // modify
+            ideltaAddress.TrySetPropertyValue("City", "Sammamish");
+            ideltaAddress.TrySetPropertyValue("StreetAddress", "23213 NE 15th Ct");
+            Assert.Equal(3, ideltaAddress.GetUnchangedPropertyNames().Count());
+            string[] mods = ideltaAddress.GetChangedPropertyNames().ToArray();
+            Assert.Equal(2, mods.Length);
+            Assert.Contains("StreetAddress", mods);
+            Assert.Contains("City", mods);
+            Assert.Equal("23213 NE 15th Ct", deltaAddress.StreetAddress);
+            Assert.Equal("Sammamish", deltaAddress.City);
+
+            // read the property back
+            Assert.True(ideltaAddress.TryGetPropertyValue("City", out var city));
+            Assert.Equal("Sammamish", city);
+            Assert.True(ideltaAddress.TryGetPropertyValue("StreetAddress", out var streetAddress));
+            Assert.Equal("23213 NE 15th Ct", streetAddress);
+
+            // modify the nested property
+            ideltaCustomer.TrySetPropertyValue("Address", ideltaAddress);
+            Assert.Single(ideltaCustomer.GetChangedPropertyNames());
+            Assert.Equal("Address", ideltaCustomer.GetChangedPropertyNames().Single());
+            Assert.Equal(3, ideltaCustomer.GetUnchangedPropertyNames().Count());
+
+            // read the nested property back
+            Assert.True(ideltaCustomer.TryGetPropertyValue("Address", out dynamic nestedAddress));
+            Assert.IsAssignableFrom<AddressEntity>(nestedAddress);
+            Assert.Equal("Sammamish", nestedAddress.City);
+            Assert.Equal("23213 NE 15th Ct", nestedAddress.StreetAddress);
         }
 
         [Fact]
@@ -244,6 +319,42 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
         }
 
         [Fact]
+        public void CannotSetNestedDeltaPropertyBadName()
+        {
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+            IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+            dynamic deltaAddress = new Delta<AddressEntity>();
+            IDelta ideltaAddress = deltaAddress as IDelta;
+
+            // Nested Delta with bad name
+            Assert.False(ideltaCustomer.TrySetPropertyValue("Bogus", ideltaAddress));
+
+            // Nested Delta with good name, but not updatable
+            deltaCustomer.UpdatableProperties.Clear();
+            Assert.False(ideltaCustomer.TrySetPropertyValue("Address", ideltaAddress));
+        }
+
+        [Fact]
+        public void CannotSetNestedDeltaPropertyNameTwice()
+        {
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+            IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+            dynamic deltaAddress = new Delta<AddressEntity>();
+            IDelta ideltaAddress = deltaAddress as IDelta;
+
+            // modify the nested property
+            ideltaCustomer.TrySetPropertyValue("Address", ideltaAddress);
+            Assert.Single(ideltaCustomer.GetChangedPropertyNames());
+            Assert.Equal("Address", ideltaCustomer.GetChangedPropertyNames().Single());
+            Assert.Equal(3, ideltaCustomer.GetUnchangedPropertyNames().Count());
+
+            // modify again
+            Assert.False(ideltaCustomer.TrySetPropertyValue("Address", ideltaAddress));
+        }
+
+        [Fact]
         public void CanPatch()
         {
             AddressEntity original = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
@@ -293,6 +404,60 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             // changed
             Assert.Equal("ChangedCity", address.City);
             Assert.Equal(1, address.Properties["IntProp"]);
+        }
+
+        [Fact]
+        public void CanPatchNestedProperty()
+        {
+            AddressEntity originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+            CustomerEntity originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+            dynamic deltaAddress = new Delta<AddressEntity>();
+            deltaAddress.City = "Sammamish";
+            deltaAddress.StreetAddress = "23213 NE 15th Ct";
+
+            deltaCustomer.Address = deltaAddress;
+
+            deltaCustomer.Patch(originalCustomer);
+            // unchanged
+            Assert.Equal(7, originalCustomer.ID);
+            Assert.Equal("Bob", originalCustomer.FirstName);
+            Assert.Equal("Smith", originalCustomer.LastName);
+            Assert.Equal(1, originalCustomer.Address.ID);
+            Assert.Equal(98074, originalCustomer.Address.ZipCode);
+            Assert.Equal("WA", originalCustomer.Address.State);
+            // changed
+            Assert.Equal("Sammamish", originalCustomer.Address.City);
+            Assert.Equal("23213 NE 15th Ct", originalCustomer.Address.StreetAddress);
+        }
+
+        [Fact]
+        public void CanPatchNestedPropertyNullOriginal()
+        {
+            AddressEntity originalAddress = null;
+            CustomerEntity originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+            dynamic deltaAddress = new Delta<AddressEntity>();
+            deltaAddress.City = "Sammamish";
+            deltaAddress.StreetAddress = "23213 NE 15th Ct";
+
+            deltaCustomer.Address = deltaAddress;
+
+            deltaCustomer.Patch(originalCustomer);
+            // unchanged
+            Assert.Equal(7, originalCustomer.ID);
+            Assert.Equal("Bob", originalCustomer.FirstName);
+            Assert.Equal("Smith", originalCustomer.LastName);
+            Assert.Equal(0, originalCustomer.Address.ID);
+            Assert.Equal(0, originalCustomer.Address.ZipCode);
+            Assert.Null(originalCustomer.Address.State);
+            // changed
+            Assert.Equal("Sammamish", originalCustomer.Address.City);
+            Assert.Equal("23213 NE 15th Ct", originalCustomer.Address.StreetAddress);
         }
 
         [Fact]
@@ -844,7 +1009,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             }
         }
 
-        public class AddressEntity
+        public class CustomerEntity
+        {
+            public int ID { get; set; }
+
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public AddressEntity Address { get; set; }
+        }
+
+        public class AddressEntity : IEquatable<AddressEntity>
         {
             public int ID { get; set; }
 
@@ -855,6 +1031,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             public string State { get; set; }
 
             public int ZipCode { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as AddressEntity);
+            }
+
+            public bool Equals(AddressEntity other)
+            {
+                if (other is null)
+                {
+                    return false;
+                }
+
+                if (Object.ReferenceEquals(other, this))
+                {
+                    return true;
+                }
+
+                return ID == other.ID &&
+                       StreetAddress == other.StreetAddress &&
+                       City == other.City &&
+                       State == other.State &&
+                       ZipCode == other.ZipCode;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(ID, StreetAddress, City, State, ZipCode);
+            }
         }
 
         public class AddressWithDynamicContainer
