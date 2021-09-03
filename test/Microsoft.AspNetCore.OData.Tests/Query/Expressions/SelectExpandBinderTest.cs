@@ -90,7 +90,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: select, expand: null, context: _context);
 
             // Act
-            IQueryable queryable = SelectExpandBinder.Bind(_queryable, _settings, selectExpand);
+            //IQueryable queryable = SelectExpandBinder.Bind(_queryable, _settings, selectExpand);
+
+            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
+            {
+                SelectExpandQuery = selectExpand,
+                QuerySettings = _settings,
+                QueryContext = selectExpand.Context
+            };
+
+            SelectExpandBinder binder = new SelectExpandBinder(_settings, selectExpand.Context);
+            IQueryable queryable = binder.Bind(_queryable, selectExpandBinderContext);
 
             // Assert
             Assert.NotNull(queryable);
@@ -107,7 +117,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption("Orders", "Orders,Orders($expand=Customer)", _context);
 
             // Act
-            IQueryable queryable = SelectExpandBinder.Bind(_queryable, _settings, selectExpand);
+            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
+            {
+                SelectExpandQuery = selectExpand,
+                QuerySettings = _settings,
+                QueryContext = selectExpand.Context
+            };
+
+            SelectExpandBinder binder = new SelectExpandBinder(_settings, selectExpand.Context);
+            IQueryable queryable = binder.Bind(_queryable, selectExpandBinderContext);
 
             // Assert
             IEnumerator enumerator = queryable.GetEnumerator();
@@ -133,7 +151,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(null, "Orders($expand=Customer($select=City))", _context);
 
             // Act
-            IQueryable queryable = SelectExpandBinder.Bind(_queryable, _settings, selectExpand);
+            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
+            {
+                SelectExpandQuery = selectExpand,
+                QuerySettings = _settings,
+                QueryContext = selectExpand.Context
+            };
+
+            SelectExpandBinder binder = new SelectExpandBinder(_settings, selectExpand.Context);
+            IQueryable queryable = binder.Bind(_queryable, selectExpandBinderContext);
 
             // Assert
             var unaryExpression = (UnaryExpression)((MethodCallExpression)queryable.Expression).Arguments.Single(a => a is UnaryExpression);

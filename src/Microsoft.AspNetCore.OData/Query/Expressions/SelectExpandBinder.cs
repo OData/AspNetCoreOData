@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// Applies the given <see cref="SelectExpandQueryOption"/> to the given <see cref="IQueryable"/>.
     /// </summary>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
-    internal class SelectExpandBinder
+    public class SelectExpandBinder : ISelectExpandBinder
     {
         private ODataQueryContext _context;
         private IEdmModel _model;
@@ -45,46 +45,30 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _settings = settings;
         }
 
-        public static IQueryable Bind(IQueryable queryable, ODataQuerySettings settings, SelectExpandQueryOption selectExpandQuery)
+        /// <inheritdoc/>
+        public virtual IQueryable Bind(IQueryable source, SelectExpandBinderContext context)
         {
-            Contract.Assert(queryable != null);
+            Contract.Assert(source != null);
+            Contract.Assert(context != null);
+            Contract.Assert(context.SelectExpandQuery != null);
+
+            return Bind(source, context.SelectExpandQuery);
+        }
+
+        /// <inheritdoc/>
+        public virtual object Bind(object source, SelectExpandBinderContext context)
+        {
+            Contract.Assert(source != null);
+            Contract.Assert(context != null);
+            Contract.Assert(context.SelectExpandQuery != null);
+
+            return Bind(source, context.SelectExpandQuery);
+        }
+
+        /// <inheritdoc/>
+        public virtual Expression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery)
+        {
             Contract.Assert(selectExpandQuery != null);
-
-            SelectExpandBinder binder = new SelectExpandBinder(settings, selectExpandQuery.Context);
-            return binder.Bind(queryable, selectExpandQuery);
-        }
-
-        public static object Bind(object entity, ODataQuerySettings settings, SelectExpandQueryOption selectExpandQuery)
-        {
-            Contract.Assert(entity != null);
-            Contract.Assert(selectExpandQuery != null);
-
-            SelectExpandBinder binder = new SelectExpandBinder(settings, selectExpandQuery.Context);
-            return binder.Bind(entity, selectExpandQuery);
-        }
-
-        private object Bind(object entity, SelectExpandQueryOption selectExpandQuery)
-        {
-            // Needn't to verify the input, that's done at upper level.
-            LambdaExpression projectionLambda = GetProjectionLambda(selectExpandQuery);
-
-            // TODO: cache this ?
-            return projectionLambda.Compile().DynamicInvoke(entity);
-        }
-
-        private IQueryable Bind(IQueryable queryable, SelectExpandQueryOption selectExpandQuery)
-        {
-            // Needn't to verify the input, that's done at upper level.
-            Type elementType = selectExpandQuery.Context.ElementClrType;
-
-            LambdaExpression projectionLambda = GetProjectionLambda(selectExpandQuery);
-
-            MethodInfo selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(elementType, projectionLambda.Body.Type);
-            return selectMethod.Invoke(null, new object[] { queryable, projectionLambda }) as IQueryable;
-        }
-
-        private LambdaExpression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery)
-        {
             Type elementType = selectExpandQuery.Context.ElementClrType;
             IEdmNavigationSource navigationSource = selectExpandQuery.Context.NavigationSource;
             ParameterExpression source = Expression.Parameter(elementType, "$it");
@@ -96,6 +80,26 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
 
             return projectionLambdaExpression;
+        }
+
+        private object Bind(object entity, SelectExpandQueryOption selectExpandQuery)
+        {
+            // Needn't to verify the input, that's done at upper level.
+            LambdaExpression projectionLambda = GetProjectionLambda(selectExpandQuery) as LambdaExpression;
+
+            // TODO: cache this ?
+            return projectionLambda.Compile().DynamicInvoke(entity);
+        }
+
+        private IQueryable Bind(IQueryable queryable, SelectExpandQueryOption selectExpandQuery)
+        {
+            // Needn't to verify the input, that's done at upper level.
+            Type elementType = selectExpandQuery.Context.ElementClrType;
+
+            LambdaExpression projectionLambda = GetProjectionLambda(selectExpandQuery) as LambdaExpression;
+
+            MethodInfo selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(elementType, projectionLambda.Body.Type);
+            return selectMethod.Invoke(null, new object[] { queryable, projectionLambda }) as IQueryable;
         }
 
         internal Expression ProjectAsWrapper(Expression source, SelectExpandClause selectExpandClause,

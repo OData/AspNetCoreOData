@@ -210,7 +210,16 @@ namespace Microsoft.AspNetCore.OData.Query
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, queryable);
 
-            return SelectExpandBinder.Bind(queryable, updatedSettings, this);
+            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
+            {
+                SelectExpandQuery = this,
+                QuerySettings = updatedSettings,
+                QueryContext = Context
+            };
+
+            ISelectExpandBinder binder = Context.GetSelectExpandBinder(updatedSettings);
+
+            return binder.Bind(queryable, selectExpandBinderContext);
         }
 
         /// <summary>
@@ -236,7 +245,16 @@ namespace Microsoft.AspNetCore.OData.Query
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, query: null);
 
-            return SelectExpandBinder.Bind(entity, updatedSettings, this);
+            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
+            {
+                SelectExpandQuery = this,
+                QuerySettings = updatedSettings,
+                QueryContext = Context
+            };
+
+            ISelectExpandBinder binder = Context.GetSelectExpandBinder(updatedSettings);
+
+            return binder.Bind(entity, selectExpandBinderContext);
         }
 
         /// <summary>
