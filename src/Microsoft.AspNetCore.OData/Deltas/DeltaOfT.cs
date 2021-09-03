@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -614,10 +615,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private bool TrySetPropertyValueInternal(string name, object value)
         {
-            if (name == null)
-            {
-                throw Error.ArgumentNull("name");
-            }
+            Debug.Assert(name != null, "Argument name is null");
 
             if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
@@ -644,10 +642,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private bool TrySetNestedResourceInternal(string name, object deltaNestedResource)
         {
-            if (name == null)
-            {
-                throw Error.ArgumentNull("name");
-            }
+            Debug.Assert(name != null, "Argument name is null");
 
             if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
