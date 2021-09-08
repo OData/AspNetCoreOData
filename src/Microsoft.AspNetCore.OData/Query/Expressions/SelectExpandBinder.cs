@@ -99,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ParameterExpression source = Expression.Parameter(elementType, "$it");
 
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
-            Expression projectionExpression = ProjectElement(source, selectExpandQuery.SelectExpandClause, _context.ElementType as IEdmStructuredType, navigationSource);
+            Expression projectionExpression = ProjectElement(source, selectExpandQuery.SelectExpandClause, selectExpandQuery.Context.ElementType as IEdmStructuredType, navigationSource);
 
             // expression looks like -> source => new Wrapper { Instance = source .... }
             LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
