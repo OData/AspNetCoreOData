@@ -217,7 +217,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 QueryContext = Context
             };
 
-            ISelectExpandBinder binder = Context.GetSelectExpandBinder(updatedSettings);
+            ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
             return binder.Bind(queryable, selectExpandBinderContext);
         }
@@ -252,7 +252,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 QueryContext = Context
             };
 
-            ISelectExpandBinder binder = Context.GetSelectExpandBinder(updatedSettings);
+            ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
             return binder.Bind(entity, selectExpandBinderContext);
         }

@@ -2492,7 +2492,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
-	public SelectExpandBinder (Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings, Microsoft.AspNetCore.OData.Query.ODataQueryContext context)
+	public SelectExpandBinder ()
 
 	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
 	public virtual object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)

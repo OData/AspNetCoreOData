@@ -8334,6 +8334,11 @@
             Applies the given <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> to the given <see cref="T:System.Linq.IQueryable"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/> class.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor(Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             For testing purposes only.
@@ -8766,7 +8771,7 @@
             <param name="querySettings">The query setting.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSelectExpandBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSelectExpandBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.
             </summary>

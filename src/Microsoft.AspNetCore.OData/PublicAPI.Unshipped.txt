@@ -837,6 +837,8 @@ Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQuery) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.SelectExpandBinder() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QueryContext.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QueryContext.set -> void

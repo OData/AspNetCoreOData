@@ -74,16 +74,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="context">The query context.</param>
         /// <param name="querySettings">The query settings.</param>
         /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
-        public static ISelectExpandBinder GetSelectExpandBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
+        public static ISelectExpandBinder GetSelectExpandBinder(this ODataQueryContext context)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
-            }
-
-            if (querySettings == null)
-            {
-                throw Error.ArgumentNull(nameof(querySettings));
             }
 
             ISelectExpandBinder binder = null;
@@ -92,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 binder = context.RequestContainer.GetService<ISelectExpandBinder>();
             }
 
-            return binder ?? new SelectExpandBinder(querySettings, context);
+            return binder ?? new SelectExpandBinder();
         }
     }
 }

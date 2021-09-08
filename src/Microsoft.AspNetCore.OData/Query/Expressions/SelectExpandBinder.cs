@@ -33,6 +33,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private IEdmModel _model;
         private ODataQuerySettings _settings;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SelectExpandBinder"/> class.
+        /// </summary>
         public SelectExpandBinder() {  }
 
         /// <summary>
