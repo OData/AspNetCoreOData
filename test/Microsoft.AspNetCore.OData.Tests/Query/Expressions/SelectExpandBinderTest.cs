@@ -90,8 +90,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: select, expand: null, context: _context);
 
             // Act
-            //IQueryable queryable = SelectExpandBinder.Bind(_queryable, _settings, selectExpand);
-
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
                 SelectExpandQuery = selectExpand,
