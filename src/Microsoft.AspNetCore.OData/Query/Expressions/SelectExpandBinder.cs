@@ -33,7 +33,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private IEdmModel _model;
         private ODataQuerySettings _settings;
 
-        public SelectExpandBinder(ODataQuerySettings settings, ODataQueryContext context)
+        public SelectExpandBinder() {  }
+
+        /// <summary>
+        /// For testing purposes only.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        internal SelectExpandBinder(ODataQuerySettings settings, ODataQueryContext context)
         {
             Contract.Assert(settings != null);
             Contract.Assert(context != null);
@@ -51,6 +57,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
             Contract.Assert(context != null);
             Contract.Assert(context.SelectExpandQuery != null);
+            Contract.Assert(context.QueryContext != null);
+            Contract.Assert(context.QueryContext.Model != null);
+            Contract.Assert(context.QuerySettings != null);
+            Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
+
+            _context = context.QueryContext;
+            _model = _context.Model;
+            _settings = context.QuerySettings;
 
             return Bind(source, context.SelectExpandQuery);
         }
@@ -61,6 +75,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
             Contract.Assert(context != null);
             Contract.Assert(context.SelectExpandQuery != null);
+            Contract.Assert(context.QueryContext != null);
+            Contract.Assert(context.QueryContext.Model != null);
+            Contract.Assert(context.QuerySettings != null);
+            Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
+
+            _context = context.QueryContext;
+            _model = _context.Model;
+            _settings = context.QuerySettings;
 
             return Bind(source, context.SelectExpandQuery);
         }
