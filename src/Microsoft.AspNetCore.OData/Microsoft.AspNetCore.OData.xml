@@ -8231,6 +8231,9 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.CreateBinaryExpression(Microsoft.OData.UriParser.BinaryOperatorKind,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
+            <inheritdoc/>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
@@ -8500,6 +8503,16 @@
             </summary>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.CreateBinaryExpression(Microsoft.OData.UriParser.BinaryOperatorKind,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from two expressions.
+            </summary>
+            <param name="binaryOperator"></param>
+            <param name="left"></param>
+            <param name="right"></param>
+            <param name="liftToNull"></param>
+            <returns></returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>

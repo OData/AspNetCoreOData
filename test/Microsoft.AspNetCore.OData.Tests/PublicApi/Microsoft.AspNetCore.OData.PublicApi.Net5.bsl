@@ -2454,7 +2454,11 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.IQueryable Bind (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindFilterClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindOrderByClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
+<<<<<<< HEAD
 >>>>>>> 596836a8d... Fix public api and builder extension
+=======
+	System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
+>>>>>>> 42d6d3cdb... Add CreateBinaryExpression to the interface
 }
 
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
@@ -2500,6 +2504,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 	public virtual System.Linq.Expressions.Expression BindSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode node)
 	public virtual System.Linq.Expressions.Expression BindSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode)
+	public virtual System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
