@@ -8948,11 +8948,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetFilterBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.
             </summary>
             <param name="context">The query context.</param>
             <param name="querySettings">The query setting.</param>
-            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSelectExpandBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>

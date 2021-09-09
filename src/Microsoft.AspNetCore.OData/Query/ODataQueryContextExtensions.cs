@@ -37,11 +37,11 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Gets the <see cref="FilterBinder"/>.
+        /// Gets the <see cref="IFilterBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
         /// <param name="querySettings">The query setting.</param>
-        /// <returns>The built <see cref="FilterBinder"/>.</returns>
+        /// <returns>The <see cref="IFilterBinder"/>.</returns>
         public static IFilterBinder GetFilterBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
         {
             if (context == null)
