@@ -8508,11 +8508,11 @@
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from two expressions.
             </summary>
-            <param name="binaryOperator"></param>
-            <param name="left"></param>
-            <param name="right"></param>
-            <param name="liftToNull"></param>
-            <returns></returns>
+            <param name="binaryOperator">The <see cref="T:Microsoft.OData.UriParser.BinaryOperatorKind"/> for the returned <see cref="T:System.Linq.Expressions.Expression"/>.</param>
+            <param name="left">The <see cref="T:System.Linq.Expressions.Expression"/> on the left side.</param>
+            <param name="right">The <see cref="T:System.Linq.Expressions.Expression"/> on the right side.</param>
+            <param name="liftToNull">If the operator's return type is lifted to a nullable type.</param>
+            <returns>An <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>
