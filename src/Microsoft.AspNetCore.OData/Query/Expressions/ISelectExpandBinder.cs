@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the select/expand query has been applied to.</returns>
+        /// <returns>The new <see cref="IQueryable"/> after the select/expand query has been applied.</returns>
         IQueryable Bind(IQueryable source, SelectExpandBinderContext context);
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The original <see cref="object"/>.</param>
         /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
-        /// <returns>The new <see cref="object"/> after the select/expand query has been applied to.</returns>
+        /// <returns>The new <see cref="object"/> after the select/expand query has been applied.</returns>
         object Bind(object source, SelectExpandBinderContext context);
 
         /// <summary>
