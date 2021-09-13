@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
@@ -64,6 +65,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(context != null);
             Contract.Assert(context.FilterClause != null);
             Contract.Assert(context.ElementClrType != null);
+
+            Model = context.QueryContext.Model;
+            QuerySettings = context.QuerySettings;
+            InternalAssembliesResolver = AssemblyResolverHelper.Default;
 
             IQueryable query = context.Source;
             Expression filterExpression = BindFilterClause(context);
