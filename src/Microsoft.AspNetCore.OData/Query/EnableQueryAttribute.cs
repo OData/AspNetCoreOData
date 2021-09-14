@@ -738,7 +738,7 @@ namespace Microsoft.AspNetCore.OData.Query
             if (path != null)
             {
                 string name;
-                EdmHelpers.GetPropertyAndStructuredTypeFromPath(path, out property, out structuredType, out name);
+                (property, structuredType, name) = path.GetPropertyAndStructuredTypeFromPath();
             }
 
             if (baseEntityType != null)

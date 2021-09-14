@@ -5,9 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Routing
 {
@@ -120,6 +122,89 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             return handler.PathLiteral;
+        }
+
+        /// <summary>
+        /// Gets the property and structured type from <see cref="ODataPath"/>.
+        /// TODO: The logic implenetation is not good and do need refactor it later.
+        /// </summary>
+        /// <param name="path">The OData path.</param>
+        /// <returns>The property, structured type and the name.</returns>
+        internal static (IEdmProperty, IEdmStructuredType, string) GetPropertyAndStructuredTypeFromPath(this ODataPath path)
+        {
+            if (path == null)
+            {
+                return (null, null, string.Empty);
+            }
+
+            IEdmStructuredType structuredType = null;
+            string typeCast = string.Empty;
+            IEnumerable<ODataPathSegment> reverseSegments = path.Reverse();
+            foreach (var segment in reverseSegments)
+            {
+                if (segment is NavigationPropertySegment navigationPathSegment)
+                {
+                    IEdmProperty property = navigationPathSegment.NavigationProperty;
+                    if (structuredType == null)
+                    {
+                        structuredType = navigationPathSegment.NavigationProperty.ToEntityType();
+                    }
+
+                    string name = navigationPathSegment.NavigationProperty.Name + typeCast;
+                    return (property, structuredType, name);
+                }
+
+                if (segment is PropertySegment propertyAccessPathSegment)
+                {
+                    IEdmProperty property = propertyAccessPathSegment.Property;
+                    if (structuredType == null)
+                    {
+                        structuredType = property.Type.GetElementType() as IEdmStructuredType;
+                    }
+
+                    string name = property.Name + typeCast;
+                    return (property, structuredType, name);
+                }
+
+                if (segment is EntitySetSegment entitySetSegment)
+                {
+                    if (structuredType == null)
+                    {
+                        structuredType = entitySetSegment.EntitySet.EntityType();
+                    }
+
+                    string name = entitySetSegment.EntitySet.Name + typeCast;
+                    return (null, structuredType, name);
+                }
+
+                if (segment is SingletonSegment singletonSegment)
+                {
+                    if (structuredType == null)
+                    {
+                        structuredType = singletonSegment.Singleton.EntityType();
+                    }
+
+                    string name = singletonSegment.Singleton.Name + typeCast;
+                    return (null, structuredType, name);
+                }
+
+                if (segment is TypeSegment typeSegment)
+                {
+                    structuredType = typeSegment.EdmType.AsElementType() as IEdmStructuredType;
+                    typeCast = "/" + structuredType;
+                }
+                else if (segment is KeySegment || segment is CountSegment)
+                {
+                    // do nothing, just go to next segment, what about if meet OperationSegment?
+                }
+                else
+                {
+                    // if we meet any other segments, just return (null, null, string.Empty);
+                    break;
+                }
+            }
+
+            return (null, null, string.Empty);
         }
 
         #region BACKUP

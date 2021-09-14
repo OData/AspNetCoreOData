@@ -17,6 +17,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 {
     public class EdmHelpersTests
     {
+        [Fact]
+        public void GetElementTypeOrSelf_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            IEdmTypeReference actualTypeRef = typeReference.GetElementTypeOrSelf();
+            Assert.Null(actualTypeRef);
+
+            // 2) non-collection
+            typeReference = EdmCoreModel.Instance.GetString(false);
+            actualTypeRef = typeReference.GetElementTypeOrSelf();
+            Assert.Same(actualTypeRef, typeReference);
+
+            // 3) Collection
+            typeReference = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetString(false)));
+            actualTypeRef = typeReference.GetElementTypeOrSelf();
+            Assert.Same(actualTypeRef, typeReference.AsCollection().ElementType());
+        }
+
+        [Fact]
+        public void GetElementType_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            IEdmType actualTypeRef = typeReference.GetElementType();
+            Assert.Null(actualTypeRef);
+
+            // 2) non-collection
+            typeReference = EdmCoreModel.Instance.GetString(false);
+            actualTypeRef = typeReference.GetElementType();
+            Assert.Same(actualTypeRef, typeReference.Definition);
+
+            // 3) Collection
+            typeReference = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetString(false)));
+            actualTypeRef = typeReference.GetElementType();
+            Assert.Same(actualTypeRef, typeReference.AsCollection().ElementType().Definition);
+        }
+
         public static TheoryDataSet<IEdmType, bool, Type> ToEdmTypeReferenceTestData
         {
             get

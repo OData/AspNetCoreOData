@@ -189,18 +189,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (Path != null)
             {
-                IEdmProperty property;
-                IEdmStructuredType structuredType;
-                string name;
-                EdmHelpers.GetPropertyAndStructuredTypeFromPath(
-                    Path,
-                    out property,
-                    out structuredType,
-                    out name);
-
-                TargetProperty = property;
-                TargetStructuredType = structuredType;
-                TargetName = name;
+                (TargetProperty, TargetStructuredType, TargetName) = Path.GetPropertyAndStructuredTypeFromPath();
             }
             else
             {

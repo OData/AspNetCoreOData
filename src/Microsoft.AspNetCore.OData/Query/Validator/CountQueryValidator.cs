@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -49,15 +51,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 {
                     if (property == null)
                     {
-                        throw new InvalidOperationException(Error.Format(
-                            SRResources.NotCountableEntitySetUsedForCount,
-                            name));
+                        throw new InvalidOperationException(Error.Format(SRResources.NotCountableEntitySetUsedForCount, name));
                     }
                     else
                     {
-                        throw new InvalidOperationException(Error.Format(
-                            SRResources.NotCountablePropertyUsedForCount,
-                            name));
+                        throw new InvalidOperationException(Error.Format(SRResources.NotCountablePropertyUsedForCount, name));
                     }
                 }
             }

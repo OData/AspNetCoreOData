@@ -1989,6 +1989,20 @@
             Provides the functionalities related to the Edm type.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementTypeOrSelf(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Get element type reference if it's collection or return itself
+            </summary>
+            <param name="typeReference">The test type reference.</param>
+            <returns>Element type or itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementType(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Get the elementType if it's collection or return itself's type
+            </summary>
+            <param name="edmTypeReference">The test type reference.</param>
+            <returns>Element type or itself.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.ToCollection(Microsoft.OData.Edm.IEdmType,System.Boolean)">
             <summary>
             Converts the <see cref="T:Microsoft.OData.Edm.IEdmType"/> to <see cref="T:Microsoft.OData.Edm.IEdmCollectionType"/>.
@@ -11334,6 +11348,14 @@
             </summary>
             <param name="segments">The path segments.</param>
             <returns>The string representation of the Context Url path.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions.GetPropertyAndStructuredTypeFromPath(Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Gets the property and structured type from <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
+            TODO: The logic implenetation is not good and do need refactor it later.
+            </summary>
+            <param name="path">The OData path.</param>
+            <returns>The property, structured type and the name.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler">
             <summary>

@@ -420,17 +420,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return ((IEdmComplexType)type).Name;
         }
 
-        public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
-        {
-            if (typeReference.TypeKind() == EdmTypeKind.Collection)
-            {
-                IEdmCollectionTypeReference collectType = typeReference.AsCollection();
-                return collectType.ElementType();
-            }
-
-            return typeReference;
-        }
-
         /// <summary>
         /// 
         /// </summary>

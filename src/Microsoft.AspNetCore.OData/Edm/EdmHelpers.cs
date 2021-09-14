@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -14,7 +13,6 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.ModelBuilder.Config;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
 {
@@ -24,12 +22,43 @@ namespace Microsoft.AspNetCore.OData.Edm
     internal static class EdmHelpers
     {
         /// <summary>
+        /// Get element type reference if it's collection or return itself
+        /// </summary>
+        /// <param name="typeReference">The test type reference.</param>
+        /// <returns>Element type or itself.</returns>
+        public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
+        {
+            if (typeReference == null)
+            {
+                return typeReference;
+            }
+
+            if (typeReference.TypeKind() == EdmTypeKind.Collection)
+            {
+                IEdmCollectionTypeReference collectType = typeReference.AsCollection();
+                return collectType.ElementType();
+            }
+
+            return typeReference;
+        }
+
+        /// <summary>
+        /// Get the elementType if it's collection or return itself's type
+        /// </summary>
+        /// <param name="edmTypeReference">The test type reference.</param>
+        /// <returns>Element type or itself.</returns>
+        public static IEdmType GetElementType(this IEdmTypeReference edmTypeReference)
+        {
+            return edmTypeReference.GetElementTypeOrSelf()?.Definition;
+        }
+
+        /// <summary>
         /// Converts the <see cref="IEdmType"/> to <see cref="IEdmCollectionType"/>.
         /// </summary>
         /// <param name="edmType">The given Edm type.</param>
         /// <param name="isNullable">Nullable or not.</param>
         /// <returns>The collection type.</returns>
-        public static IEdmCollectionType ToCollection(this IEdmType edmType, bool isNullable)
+public static IEdmCollectionType ToCollection(this IEdmType edmType, bool isNullable)
         {
             if (edmType == null)
             {
@@ -329,74 +358,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return autoSelectProperties;
-        }
-
-        public static void GetPropertyAndStructuredTypeFromPath(IEnumerable<ODataPathSegment> segments,
-            out IEdmProperty property, out IEdmStructuredType structuredType, out string name)
-        {
-            property = null;
-            structuredType = null;
-            name = String.Empty;
-            string typeCast = String.Empty;
-            if (segments != null)
-            {
-                IEnumerable<ODataPathSegment> reverseSegments = segments.Reverse();
-                foreach (var segment in reverseSegments)
-                {
-                    NavigationPropertySegment navigationPathSegment = segment as NavigationPropertySegment;
-                    if (navigationPathSegment != null)
-                    {
-                        property = navigationPathSegment.NavigationProperty;
-                        if (structuredType == null)
-                        {
-                            structuredType = navigationPathSegment.NavigationProperty.ToEntityType();
-                        }
-
-                        name = navigationPathSegment.NavigationProperty.Name + typeCast;
-                        return;
-                    }
-
-                    PropertySegment propertyAccessPathSegment = segment as PropertySegment;
-                    if (propertyAccessPathSegment != null)
-                    {
-                        property = propertyAccessPathSegment.Property;
-                        if (structuredType == null)
-                        {
-                            structuredType = GetElementType(property.Type) as IEdmStructuredType;
-                        }
-                        name = property.Name + typeCast;
-                        return;
-                    }
-
-                    EntitySetSegment entitySetSegment = segment as EntitySetSegment;
-                    if (entitySetSegment != null)
-                    {
-                        if (structuredType == null)
-                        {
-                            structuredType = entitySetSegment.EntitySet.EntityType();
-                        }
-                        name = entitySetSegment.EntitySet.Name + typeCast;
-                        return;
-                    }
-
-                    TypeSegment typeSegment = segment as TypeSegment;
-                    if (typeSegment != null)
-                    {
-                        structuredType = GetElementType(typeSegment.EdmType.ToEdmTypeReference(false)) as IEdmStructuredType;
-                        typeCast = "/" + structuredType;
-                    }
-                }
-            }
-        }
-
-        public static IEdmType GetElementType(IEdmTypeReference edmTypeReference)
-        {
-            if (edmTypeReference.IsCollection())
-            {
-                return edmTypeReference.AsCollection().ElementType().Definition;
-            }
-
-            return edmTypeReference.Definition;
         }
 
         public static bool IsTopLimitExceeded(IEdmProperty property, IEdmStructuredType structuredType,
