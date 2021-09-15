@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// an <see cref="Expression"/>
         /// </summary>
         /// <param name="selectExpandQuery">The <see cref="SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
-        /// <returns>An <see cref="Expression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
-        Expression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery);
+        /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
+        LambdaExpression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery);
     }
 }

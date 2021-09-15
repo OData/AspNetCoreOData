@@ -8292,7 +8292,7 @@
             </summary>
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the select/expand query has been applied to.</returns>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the select/expand query has been applied.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Object,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
             <summary>
@@ -8301,7 +8301,7 @@
             </summary>
             <param name="source">The original <see cref="T:System.Object"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied to.</returns>
+            <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption)">
             <summary>
@@ -8309,7 +8309,7 @@
             an <see cref="T:System.Linq.Expressions.Expression"/>
             </summary>
             <param name="selectExpandQuery">The <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
-            <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.</returns>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>
