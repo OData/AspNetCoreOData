@@ -700,7 +700,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IEdmModel model = context.SelectExpandQuery.Context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
-            ModelBoundQuerySettings querySettings = EdmHelpers.GetModelBoundQuerySettings(navigationProperty, edmEntityType, model);
+            ModelBoundQuerySettings querySettings = _model.GetModelBoundQuerySettings(navigationProperty, edmEntityType);
 
             // TODO: Process $apply and $compute in the $expand here, will support later.
             // $apply=...; $compute=...
@@ -813,7 +813,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ModelBoundQuerySettings querySettings = null;
             if (propertyStructuredType != null)
             {
-                querySettings = EdmHelpers.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType, model);
+                querySettings = _context.Model.GetModelBoundQuerySettings(structuralProperty, propertyStructuredType);
             }
 
             int? modelBoundPageSize = querySettings == null ? null : querySettings.PageSize;

@@ -1823,6 +1823,46 @@
             Gets the expected type of the entity for which the changes are tracked.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.AutoSelectExpandHelper.HasAutoSelectProperty(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty)">
+            <summary>
+            Tests whether there are auto select properties.
+            So far, we only test one depth for auto select, shall we go through the deeper depth?
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="structuredType">The type from value or from path.</param>
+            <param name="property">The property form path, it can be null.</param>
+            <returns>true/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.AutoSelectExpandHelper.HasAutoExpandProperty(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty)">
+            <summary>
+            Tests whether there are auto expand properties.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="structuredType">The Edm structured type.</param>
+            <param name="property">The property form path, it can be null.</param>
+            <returns>true/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.AutoSelectExpandHelper.GetAutoSelectPaths(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,Microsoft.OData.ModelBuilder.Config.ModelBoundQuerySettings)">
+            <summary>
+            Gets the auto select paths.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="structuredType">The Edm structured type.</param>
+            <param name="pathProperty">The property form path, it can be null.</param>
+            <param name="querySettings">The query settings.</param>
+            <returns>The auto expand paths.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.AutoSelectExpandHelper.GetAutoExpandPaths(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Boolean,Microsoft.OData.ModelBuilder.Config.ModelBoundQuerySettings)">
+            <summary>
+            Gets the auto expand paths.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="structuredType">The Edm structured type.</param>
+            <param name="property">The property starting from, it can be null.</param>
+            <param name="isSelectPresent">Is dollar select presented.</param>
+            <param name="querySettings">The query settings.</param>
+            <returns>The auto expand paths.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder">
             <summary>
             This class builds a cache that allows for efficient look up of bindable operation by EntityType. 
@@ -2274,6 +2314,37 @@
             A URL that can be used to retrieve a copy of the resource.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.ExpandModelPath">
+             <summary>
+             The navigation property path is a model path with the following restriction:
+              A non-null path MUST resolve to a model element whose type is an entity type, or a collection of entity types, e.g. a navigation property.
+            
+             If a path segment is a qualified name, it represents a type cast, and the segment MUST be the name of a type in scope.
+             If a path segment is a simple identifier, it MUST be the name of a child model element of the model element identified by the preceding path part, or a structural or navigation property of the instance identified by the preceding path part.
+             A model path MAY contain any number of segments representing collection-valued structural or navigation properties.
+             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.#ctor(System.Collections.Generic.IEnumerable{Microsoft.OData.Edm.IEdmElement})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.ExpandModelPath" /> class.
+            </summary>
+            <param name="nodes">The segment nodes.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.Navigation">
+            <summary>
+            Gets the navigation property resolved from this path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.NavigationPropertyPath">
+            <summary>
+            Gets the navigation property path, it doesn't include the navigation property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.ExpandPath">
+            <summary>
+            Gets the whole expand path.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation">
             <summary>
             The Edm model name annotation.
@@ -2472,6 +2543,23 @@
             </summary>
             <param name="context">An feed context wrapping the feed instance.</param>
             <returns>The generated link.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath">
+            <summary>
+            The select property path is a model path with the following restriction:
+            1) only include type case and structural property
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.SelectModelPath.#ctor(System.Collections.Generic.IEnumerable{Microsoft.OData.Edm.IEdmElement})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath" /> class.
+            </summary>
+            <param name="nodes">The segment nodes.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.SelectModelPath.SelectPath">
+            <summary>
+            Gets the select path.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1">
             <summary>
@@ -6914,6 +7002,11 @@
               Looks up a localized string similar to The type &apos;{0}&apos; is not a structured type. Only structured types support $select and $expand..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ShouldHaveNavigationPropertyInNavigationExpandPath">
+            <summary>
+              Looks up a localized string similar to A navigation property expand path should have navigation property in the path..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SingleResultHasMoreThanOneEntity">
             <summary>
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
@@ -7876,13 +7969,13 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ContainsAutoSelectExpandProperty(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Determine if the query contains auto select expand property.
+            Determine if the query contains auto select and expand property.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-            <param name="request">The OData path.</param>
-            <returns></returns>
+            <param name="request">The Http request.</param>
+            <returns>true/false</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type,Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor)">
             <summary>

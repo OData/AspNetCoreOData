@@ -154,6 +154,17 @@ namespace Microsoft.AspNetCore.OData.Routing
                     return (property, structuredType, name);
                 }
 
+                if (segment is OperationSegment operationSegment)
+                {
+                    if (structuredType == null)
+                    {
+                        structuredType = operationSegment.EdmType as IEdmStructuredType;
+                    }
+
+                    string name = operationSegment.Operations.First().FullName() + typeCast;
+                    return (null, structuredType, name);
+                }
+
                 if (segment is PropertySegment propertyAccessPathSegment)
                 {
                     IEdmProperty property = propertyAccessPathSegment.Property;
