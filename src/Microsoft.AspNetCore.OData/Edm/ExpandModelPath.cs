@@ -84,7 +84,10 @@ namespace Microsoft.AspNetCore.OData.Edm
                     foundNavProp = true;
                     Navigation = navigationProperty;
 
-                    // identifiers.Add(navigationProperty.Name); // don't add the navigation property into
+                    // don't add the navigation property into identifiers
+                    // Because the navigation property path (without the last navigation property name) is used to retrieve the navigation
+                    // property binding. See "ODL api, FindNavigationTarget".
+                    // identifiers.Add(navigationProperty.Name);
                 }
                 else
                 {

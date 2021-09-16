@@ -25,8 +25,8 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="edmModel">The Edm model.</param>
         /// <param name="structuredType">The type from value or from path.</param>
-        /// <param name="property">The property form path, it can be null.</param>
-        /// <returns>true/false.</returns>
+        /// <param name="property">The property from path, it can be null.</param>
+        /// <returns>true if the structured type has auto select properties; otherwise false.</returns>
         public static bool HasAutoSelectProperty(this IEdmModel edmModel, IEdmStructuredType structuredType, IEdmProperty property)
         {
             if (edmModel == null)
@@ -45,6 +45,8 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             foreach (IEdmStructuredType edmStructuredType in structuredTypes)
             {
+                // for top type, let's retrieve its properties and the properties from base type of top type if has.
+                // for derived type, let's retrieve the declared properties.
                 IEnumerable<IEdmStructuralProperty> properties = edmStructuredType == structuredType
                         ? edmStructuredType.StructuralProperties()
                         : edmStructuredType.DeclaredStructuralProperties();
@@ -66,8 +68,8 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="edmModel">The Edm model.</param>
         /// <param name="structuredType">The Edm structured type.</param>
-        /// <param name="property">The property form path, it can be null.</param>
-        /// <returns>true/false.</returns>
+        /// <param name="property">The property from path, it can be null.</param>
+        /// <returns>true if the structured type has auto expand properties; otherwise false.</returns>
         public static bool HasAutoExpandProperty(this IEdmModel edmModel, IEdmStructuredType structuredType, IEdmProperty property)
         {
             if (edmModel == null)
@@ -97,6 +99,8 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             foreach (IEdmStructuredType edmStructuredType in structuredTypes)
             {
+                // for top type, let's retrieve its properties and the properties from base type of top type if has.
+                // for derived type, let's retrieve the declared properties.
                 IEnumerable<IEdmProperty> properties = edmStructuredType == structuredType
                         ? edmStructuredType.Properties()
                         : edmStructuredType.DeclaredProperties;
@@ -138,9 +142,9 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="edmModel">The Edm model.</param>
         /// <param name="structuredType">The Edm structured type.</param>
-        /// <param name="pathProperty">The property form path, it can be null.</param>
+        /// <param name="pathProperty">The property from path, it can be null.</param>
         /// <param name="querySettings">The query settings.</param>
-        /// <returns>The auto expand paths.</returns>
+        /// <returns>The auto select paths.</returns>
         public static IList<SelectModelPath> GetAutoSelectPaths(this IEdmModel edmModel, IEdmStructuredType structuredType,
             IEdmProperty pathProperty, ModelBoundQuerySettings querySettings = null)
         {
@@ -162,17 +166,11 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             foreach (IEdmStructuredType edmStructuredType in structuredTypes)
             {
-                IEnumerable<IEdmStructuralProperty> properties;
-                if (edmStructuredType == structuredType)
-                {
-                    // for base type, let's retrieve its properties and the properties from base type of base type if have.
-                    properties = edmStructuredType.StructuralProperties();
-                }
-                else
-                {
-                    // for derived type, let's retrieve the declared properties.
+                // for top type, let's retrieve its properties and the properties from base type of top type if has.
+                // for derived type, let's retrieve the declared properties.
+                IEnumerable<IEdmStructuralProperty> properties = (edmStructuredType == structuredType) ?
+                    edmStructuredType.StructuralProperties() :
                     properties = edmStructuredType.DeclaredStructuralProperties();
-                }
 
                 foreach (IEdmStructuralProperty property in properties)
                 {
@@ -199,7 +197,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="edmModel">The Edm model.</param>
         /// <param name="structuredType">The Edm structured type.</param>
         /// <param name="property">The property starting from, it can be null.</param>
-        /// <param name="isSelectPresent">Is dollar select presented.</param>
+        /// <param name="isSelectPresent">Is $select presented.</param>
         /// <param name="querySettings">The query settings.</param>
         /// <returns>The auto expand paths.</returns>
         public static IList<ExpandModelPath> GetAutoExpandPaths(this IEdmModel edmModel, IEdmStructuredType structuredType,
@@ -322,11 +320,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                             IEdmTypeReference typeRef = property.Type.GetElementTypeOrSelf();
                             if (typeRef.IsComplex() && edmModel.CanExpand(typeRef.AsComplex().ComplexDefinition(), structuralProperty))
                             {
-                                IEdmStructuredType subStrucutredType = typeRef.AsStructured().StructuredDefinition();
+                                IEdmStructuredType subStructuredType = typeRef.AsStructured().StructuredDefinition();
 
                                 nodes.Push(structuralProperty);
 
-                                edmModel.GetAutoExpandPaths(subStrucutredType, structuralProperty, nodes, visited, results, isSelectPresent, querySettings);
+                                edmModel.GetAutoExpandPaths(subStructuredType, structuralProperty, nodes, visited, results, isSelectPresent, querySettings);
 
                                 nodes.Pop();
                             }
@@ -337,7 +335,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                             if (IsAutoExpand(navigationProperty, pathProperty, edmStructuredType, edmModel, isSelectPresent, querySettings))
                             {
                                 nodes.Push(navigationProperty);
-                                results.Add(new ExpandModelPath(nodes.Reverse())); // find an auto-expand navigation property path
+                                results.Add(new ExpandModelPath(nodes.Reverse())); // found  an auto-expand navigation property path
                                 nodes.Pop();
                             }
                             break;
