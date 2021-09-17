@@ -213,8 +213,7 @@ namespace Microsoft.AspNetCore.OData.Query
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
                 SelectExpandQuery = this,
-                QuerySettings = updatedSettings,
-                QueryContext = Context
+                QuerySettings = updatedSettings
             };
 
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();
@@ -248,8 +247,7 @@ namespace Microsoft.AspNetCore.OData.Query
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
                 SelectExpandQuery = this,
-                QuerySettings = updatedSettings,
-                QueryContext = Context
+                QuerySettings = updatedSettings
             };
 
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();

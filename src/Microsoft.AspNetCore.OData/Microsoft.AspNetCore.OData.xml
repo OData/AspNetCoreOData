@@ -8303,14 +8303,6 @@
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
             <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption)">
-            <summary>
-            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/>
-            </summary>
-            <param name="selectExpandQuery">The <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
-            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.</returns>
-        </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>
         </member>
@@ -8351,7 +8343,12 @@
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption)">
-            <inheritdoc/>
+            <summary>
+            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>
+            </summary>
+            <param name="selectExpandQuery">The <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetSelectExpandProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem}@,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.UriParser.ExpandedReferenceSelectItem}@,System.Collections.Generic.ISet{Microsoft.OData.Edm.IEdmStructuralProperty}@)">
             <summary>
@@ -8429,11 +8426,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpandQuery">
             <summary>
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> which contains the $select and $expand query options.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QueryContext">
-            <summary>
-            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.ResultClrType">

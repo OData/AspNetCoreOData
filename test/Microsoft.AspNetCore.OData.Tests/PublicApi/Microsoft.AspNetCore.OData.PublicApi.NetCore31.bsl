@@ -2448,7 +2448,6 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
 	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
 	object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
-	System.Linq.Expressions.LambdaExpression GetProjectionLambda (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQuery)
 }
 
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
@@ -2502,7 +2501,6 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : I
 public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext {
 	public SelectExpandBinderContext ()
 
-	Microsoft.AspNetCore.OData.Query.ODataQueryContext QueryContext  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpandQuery  { public get; public set; }
 }

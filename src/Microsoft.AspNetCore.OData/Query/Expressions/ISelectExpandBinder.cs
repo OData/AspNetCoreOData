@@ -34,13 +34,5 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
         /// <returns>The new <see cref="object"/> after the select/expand query has been applied.</returns>
         object Bind(object source, SelectExpandBinderContext context);
-
-        /// <summary>
-        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
-        /// an <see cref="Expression"/>
-        /// </summary>
-        /// <param name="selectExpandQuery">The <see cref="SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
-        /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
-        LambdaExpression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery);
     }
 }

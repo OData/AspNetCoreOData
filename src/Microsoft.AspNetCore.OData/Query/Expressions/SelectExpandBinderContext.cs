@@ -23,10 +23,5 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets or sets the <see cref="SelectExpandQueryOption"/> which contains the $select and $expand query options.
         /// </summary>
         public SelectExpandQueryOption SelectExpandQuery { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.
-        /// </summary>
-        public ODataQueryContext QueryContext { get; set; }
     }
 }

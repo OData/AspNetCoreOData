@@ -60,12 +60,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
             Contract.Assert(context != null);
             Contract.Assert(context.SelectExpandQuery != null);
-            Contract.Assert(context.QueryContext != null);
-            Contract.Assert(context.QueryContext.Model != null);
+            Contract.Assert(context.SelectExpandQuery.Context != null);
+            Contract.Assert(context.SelectExpandQuery.Context.Model != null);
             Contract.Assert(context.QuerySettings != null);
             Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
-            _context = context.QueryContext;
+            _context = context.SelectExpandQuery.Context;
             _model = _context.Model;
             _settings = context.QuerySettings;
 
@@ -78,19 +78,24 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
             Contract.Assert(context != null);
             Contract.Assert(context.SelectExpandQuery != null);
-            Contract.Assert(context.QueryContext != null);
-            Contract.Assert(context.QueryContext.Model != null);
+            Contract.Assert(context.SelectExpandQuery.Context != null);
+            Contract.Assert(context.SelectExpandQuery.Context.Model != null);
             Contract.Assert(context.QuerySettings != null);
             Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
-            _context = context.QueryContext;
+            _context = context.SelectExpandQuery.Context;
             _model = _context.Model;
             _settings = context.QuerySettings;
 
             return Bind(source, context.SelectExpandQuery);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
+        /// an <see cref="Expression"/>
+        /// </summary>
+        /// <param name="selectExpandQuery">The <see cref="SelectExpandQueryOption"/> which contains the $select and $expand query options.</param>
+        /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
         public virtual LambdaExpression GetProjectionLambda(SelectExpandQueryOption selectExpandQuery)
         {
             Contract.Assert(selectExpandQuery != null);
