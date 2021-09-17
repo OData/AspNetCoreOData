@@ -681,6 +681,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The source contains the navigation property.</param>
         /// <param name="context">Wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="structuredType">The structured type or its derived type contains the navigation property.</param>
         /// <param name="navigationProperty">The expanded navigation property.</param>
         /// <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
@@ -759,6 +760,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The source contains the structural property.</param>
         /// <param name="context">Wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="structuredType">The structured type or its derived type contains the structural property.</param>
         /// <param name="structuralProperty">The selected structural property.</param>
         /// <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
@@ -852,6 +854,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The source contains the dynamic property.</param>
         /// <param name="context">The wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="structuredType">The structured type contains the dynamic property.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
         internal void BuildDynamicProperty(Expression source, SelectExpandBinderContext context, IEdmStructuredType structuredType,
             IList<NamedPropertyExpression> includedProperties)
