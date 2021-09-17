@@ -80,11 +80,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            ISelectExpandBinder binder = null;
-            if (context.RequestContainer != null)
-            {
-                binder = context.RequestContainer.GetService<ISelectExpandBinder>();
-            }
+            ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
 
             return binder ?? new SelectExpandBinder();
         }

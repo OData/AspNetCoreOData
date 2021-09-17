@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="context">The <see cref="SelectExpandBinderContext"/> which is a wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
         /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
-        public virtual LambdaExpression GetProjectionLambda(SelectExpandBinderContext context)
+        protected virtual LambdaExpression GetProjectionLambda(SelectExpandBinderContext context)
         {
             Contract.Assert(context != null);
             Type elementType = context.SelectExpandQuery.Context.ElementClrType;
@@ -332,7 +332,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 if (propertiesToExpand != null || propertiesToInclude != null || autoSelectedProperties != null || isSelectingOpenTypeSegments)
                 {
                     Expression propertyContainerCreation =
-                        BuildPropertyContainer(source, context, structuredType, propertiesToExpand, propertiesToInclude, autoSelectedProperties, isSelectingOpenTypeSegments);
+                        BuildPropertyContainer(context, source, structuredType, propertiesToExpand, propertiesToInclude, autoSelectedProperties, isSelectingOpenTypeSegments);
 
                     if (propertyContainerCreation != null)
                     {
@@ -625,7 +625,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        private Expression BuildPropertyContainer(Expression source, SelectExpandBinderContext context,
+        private Expression BuildPropertyContainer(SelectExpandBinderContext context, Expression source,
             IEdmStructuredType structuredType,
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand,
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude,
