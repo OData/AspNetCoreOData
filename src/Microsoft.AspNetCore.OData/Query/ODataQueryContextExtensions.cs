@@ -72,7 +72,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Gets the <see cref="ISelectExpandBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
-        /// <param name="querySettings">The query settings.</param>
         /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
         public static ISelectExpandBinder GetSelectExpandBinder(this ODataQueryContext context)
         {

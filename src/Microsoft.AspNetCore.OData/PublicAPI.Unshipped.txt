@@ -1631,7 +1631,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleReso
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
-virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQuery) -> System.Linq.Expressions.LambdaExpression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.Expressions.LambdaExpression
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.AllowedQueryOptions ignoreQueryOptions) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
