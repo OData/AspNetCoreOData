@@ -83,8 +83,4 @@
     </PropertyGroup>
   </Target>
 
-  <ItemGroup>
-    <EditorConfigFiles Remove="D:\github\odata\AspNetCoreOData\src\Microsoft.AspNetCore.OData\.editorconfig" />
-  </ItemGroup>
-
 </Project>
