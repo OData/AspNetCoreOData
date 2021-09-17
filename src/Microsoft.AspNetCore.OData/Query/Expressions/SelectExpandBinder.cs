@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ParameterExpression source = Expression.Parameter(elementType, "$it");
 
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
-            Expression projectionExpression = ProjectElement(source, context, selectExpandClause, structuredType, navigationSource);
+            Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
 
             // expression looks like -> source => new Wrapper { Instance = source .... }
             LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else
             {
                 // new Wrapper { v1 = source.property ... }
-                return ProjectElement(source, context, selectExpandClause, structuredType, navigationSource);
+                return ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
             }
         }
 
@@ -263,7 +263,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Generates the expression
         //      source => new Wrapper { Instance = source, Container = new PropertyContainer { ..expanded properties.. } }
-        internal Expression ProjectElement(Expression source, SelectExpandBinderContext context, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
+        internal Expression ProjectElement(SelectExpandBinderContext context, Expression source, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
         {
             Contract.Assert(source != null);
 
@@ -584,7 +584,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return false;
         }
 
-        private Expression CreateTotalCountExpression(SelectExpandBinderContext context, Expression source, bool? countOption)
+        private static Expression CreateTotalCountExpression(SelectExpandBinderContext context, Expression source, bool? countOption)
         {
             Expression countExpression = Expression.Constant(null, typeof(long?));
             if (countOption == null || !countOption.Value)
@@ -639,7 +639,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 foreach (var propertyToExpand in propertiesToExpand)
                 {
                     // $expand=abc or $expand=abc/$ref
-                    BuildExpandedProperty(source, context, structuredType, propertyToExpand.Key, propertyToExpand.Value, includedProperties);
+                    BuildExpandedProperty(context, source, structuredType, propertyToExpand.Key, propertyToExpand.Value, includedProperties);
                 }
             }
 
@@ -648,7 +648,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 foreach (var propertyToInclude in propertiesToInclude)
                 {
                     // $select=abc($select=...,$filter=...,$compute=...)....
-                    BuildSelectedProperty(source, context, structuredType, propertyToInclude.Key, propertyToInclude.Value, includedProperties);
+                    BuildSelectedProperty(context, source, structuredType, propertyToInclude.Key, propertyToInclude.Value, includedProperties);
                 }
             }
 
@@ -667,7 +667,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (isSelectingOpenTypeSegments)
             {
-                BuildDynamicProperty(source, context, structuredType, includedProperties);
+                BuildDynamicProperty(context, source, structuredType, includedProperties);
             }
 
             // create a property container that holds all these property names and values.
@@ -679,13 +679,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// The property name is the navigation property name.
         /// The property value is the navigation property value from the source and applied the nested query options.
         /// </summary>
-        /// <param name="source">The source contains the navigation property.</param>
         /// <param name="context">Wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="source">The source contains the navigation property.</param>
         /// <param name="structuredType">The structured type or its derived type contains the navigation property.</param>
         /// <param name="navigationProperty">The expanded navigation property.</param>
         /// <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildExpandedProperty(Expression source, SelectExpandBinderContext context, IEdmStructuredType structuredType,
+        internal void BuildExpandedProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmNavigationProperty navigationProperty, ExpandedReferenceSelectItem expandedItem,
             IList<NamedPropertyExpression> includedProperties)
         {
@@ -758,13 +758,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// The property name is the structural property name.
         /// The property value is the structural property value from the source and applied the nested query options.
         /// </summary>
-        /// <param name="source">The source contains the structural property.</param>
         /// <param name="context">Wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="source">The source contains the structural property.</param>
         /// <param name="structuredType">The structured type or its derived type contains the structural property.</param>
         /// <param name="structuralProperty">The selected structural property.</param>
         /// <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildSelectedProperty(Expression source, SelectExpandBinderContext context, IEdmStructuredType structuredType,
+        internal void BuildSelectedProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmStructuralProperty structuralProperty, PathSelectItem pathSelectItem,
             IList<NamedPropertyExpression> includedProperties)
         {
@@ -852,11 +852,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Build the dynamic properties into the included properties.
         /// </summary>
-        /// <param name="source">The source contains the dynamic property.</param>
         /// <param name="context">The wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
+        /// <param name="source">The source contains the dynamic property.</param>
         /// <param name="structuredType">The structured type contains the dynamic property.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildDynamicProperty(Expression source, SelectExpandBinderContext context, IEdmStructuredType structuredType,
+        internal static void BuildDynamicProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
             IList<NamedPropertyExpression> includedProperties)
         {
             Contract.Assert(source != null);
@@ -909,7 +909,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return new SelectExpandClause(selectItems, false);
         }
 
-        private Expression AddOrderByQueryForSource(SelectExpandBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
+        private static Expression AddOrderByQueryForSource(SelectExpandBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
         {
             if (orderbyClause != null)
             {
@@ -993,7 +993,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //      new Wrapper { }
             if (structuredType != null)
             {
-                projection = ProjectElement(element, context, selectExpandClause, structuredType, navigationSource);
+                projection = ProjectElement(context, element, selectExpandClause, structuredType, navigationSource);
             }
             else
             {
