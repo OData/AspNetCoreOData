@@ -8326,11 +8326,6 @@
             Applies the given <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> to the given <see cref="T:System.Linq.IQueryable"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/> class.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
             <inheritdoc/>
         </member>
@@ -8384,6 +8379,7 @@
             </summary>
             <param name="source">The source contains the navigation property.</param>
             <param name="context">Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="structuredType">The structured type or its derived type contains the navigation property.</param>
             <param name="navigationProperty">The expanded navigation property.</param>
             <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
             <param name="includedProperties">The container to hold the created property.</param>
@@ -8396,6 +8392,7 @@
             </summary>
             <param name="source">The source contains the structural property.</param>
             <param name="context">Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="structuredType">The structured type or its derived type contains the structural property.</param>
             <param name="structuralProperty">The selected structural property.</param>
             <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
             <param name="includedProperties">The container to hold the created property.</param>
@@ -8406,6 +8403,7 @@
             </summary>
             <param name="source">The source contains the dynamic property.</param>
             <param name="context">The wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="structuredType">The structured type contains the dynamic property.</param>
             <param name="includedProperties">The container to hold the created property.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext">
