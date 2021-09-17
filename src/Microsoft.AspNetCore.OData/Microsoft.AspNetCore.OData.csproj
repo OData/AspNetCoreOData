@@ -17,6 +17,8 @@
   <Import Project="..\..\tool\build.props" />
 
   <ItemGroup>
+    <None Remove=".editorconfig" />
+    <AdditionalFiles Remove=".editorconfig" />
     <None Remove="Microsoft.AspNetCore.OData.xml" />
   </ItemGroup>
   
@@ -30,13 +32,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.7" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.9.0" />
-    <PackageReference Include="Microsoft.OData.Edm" Version="7.9.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.9.2" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.9.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Spatial" Version="7.9.0" />
+    <PackageReference Include="Microsoft.Spatial" Version="7.9.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,5 +82,9 @@
       <NuspecProperties>$(NuspecProperties);SourcesRoot=$(SourcesRoot)</NuspecProperties>
     </PropertyGroup>
   </Target>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\github\odata\AspNetCoreOData\src\Microsoft.AspNetCore.OData\.editorconfig" />
+  </ItemGroup>
 
 </Project>
