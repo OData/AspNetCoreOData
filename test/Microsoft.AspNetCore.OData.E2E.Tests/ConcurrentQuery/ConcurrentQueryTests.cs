@@ -75,5 +75,39 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
                 Assert.Equal(100 - result.i, result.length);
             }
         }
+
+        [Fact]
+        public async Task ConcurrentExpandQueryExecutionIsThreadSafe()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Bumping thread count to allow higher parallelization.
+            ThreadPool.SetMinThreads(100, 100);
+
+            // Act
+            var results = await Task.WhenAll(
+                Enumerable.Range(1, 100)
+                .Select(async i =>
+                {
+                    string queryUrl = $"concurrentquery/Customers?$expand=Orders";
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+                    request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                    List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+
+                    return customers.Count;
+                }));
+
+            // Assert
+            foreach (var result in results)
+            {
+                Assert.Equal(100, result);
+            }
+        }
     }
 }

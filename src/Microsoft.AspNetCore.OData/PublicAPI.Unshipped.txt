@@ -833,6 +833,19 @@ Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetDynamicProp
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetFlattenedPropertyExpression(string propertyPath) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder(System.IServiceProvider requestContainer) -> void
+Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder
+Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
+Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.SelectExpandBinder() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QueryContext.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QueryContext.set -> void
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.QuerySettings.set -> void
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpandBinderContext() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpandQuery.get -> Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpandQuery.set -> void
 Microsoft.AspNetCore.OData.Query.FilterQueryOption
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
@@ -1616,6 +1629,9 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleComp
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.Expressions.LambdaExpression
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.AllowedQueryOptions ignoreQueryOptions) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable

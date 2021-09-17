@@ -67,5 +67,22 @@ namespace Microsoft.AspNetCore.OData.Query
 
             return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
         }
+
+        /// <summary>
+        /// Gets the <see cref="ISelectExpandBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
+        public static ISelectExpandBinder GetSelectExpandBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
+
+            return binder ?? new SelectExpandBinder();
+        }
     }
 }

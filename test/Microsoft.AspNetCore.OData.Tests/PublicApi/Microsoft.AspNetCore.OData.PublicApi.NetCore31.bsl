@@ -2445,6 +2445,11 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; }
 }
 
+public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
+	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+	object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+}
+
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
 	protected ExpressionBinderBase (System.IServiceProvider requestContainer)
 
@@ -2483,6 +2488,21 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 	public virtual System.Linq.Expressions.Expression BindSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode node)
 	public virtual System.Linq.Expressions.Expression BindSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode)
+}
+
+public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
+	public SelectExpandBinder ()
+
+	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+	public virtual object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+	protected virtual System.Linq.Expressions.LambdaExpression GetProjectionLambda (Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext {
+	public SelectExpandBinderContext ()
+
+	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpandQuery  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {
