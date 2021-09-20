@@ -2445,20 +2445,16 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; }
 }
 
-<<<<<<< HEAD
-public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
-	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
-	object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
-=======
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.IQueryable Bind (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindFilterClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindOrderByClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-<<<<<<< HEAD
->>>>>>> 596836a8d... Fix public api and builder extension
-=======
 	System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
->>>>>>> 42d6d3cdb... Add CreateBinaryExpression to the interface
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
+	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+	object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
 }
 
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
@@ -2507,6 +2503,17 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 	public virtual System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
 }
 
+public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext {
+	public FilterBinderContext ()
+
+	System.Type ElementClrType  { public get; public set; }
+	Microsoft.OData.UriParser.FilterClause FilterClause  { public get; public set; }
+	Microsoft.OData.UriParser.OrderByClause OrderByClause  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.ODataQueryContext QueryContext  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
+	System.Linq.IQueryable Source  { public get; public set; }
+}
+
 public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
 	public SelectExpandBinder ()
 
@@ -2520,15 +2527,6 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderCont
 
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpandQuery  { public get; public set; }
-public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext {
-	public FilterBinderContext ()
-
-	System.Type ElementClrType  { public get; public set; }
-	Microsoft.OData.UriParser.FilterClause FilterClause  { public get; public set; }
-	Microsoft.OData.UriParser.OrderByClause OrderByClause  { public get; public set; }
-	Microsoft.AspNetCore.OData.Query.ODataQueryContext QueryContext  { public get; public set; }
-	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
-	System.Linq.IQueryable Source  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {

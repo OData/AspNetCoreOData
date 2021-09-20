@@ -203,12 +203,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 {
                     Source = null,
                     FilterClause = filterClause,
-                    QueryContext = _context,
+                    QueryContext = queryContext,
                     QuerySettings = querySettings,
                     ElementClrType = clrElementType
                 };
 
-                IFilterBinder binder = _context.GetFilterBinder(querySettings);
+                IFilterBinder binder = queryContext.GetFilterBinder(querySettings);
 
                 if (isCollection)
                 {
@@ -930,16 +930,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
+                ODataQueryContext queryContext = context.SelectExpandQuery.Context;
+
                 FilterBinderContext filterBinderContext = new FilterBinderContext()
                 {
                     Source = null,
                     OrderByClause = orderbyClause,
-                    QueryContext = _context,
+                    QueryContext = queryContext,
                     QuerySettings = querySettings,
                     ElementClrType = elementType
                 };
 
-                IFilterBinder binder = _context.GetFilterBinder(querySettings);
+                IFilterBinder binder = queryContext.GetFilterBinder(querySettings);
                 LambdaExpression orderByExpression = binder.BindOrderByClause(filterBinderContext) as LambdaExpression;
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }

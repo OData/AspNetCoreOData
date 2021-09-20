@@ -8419,29 +8419,6 @@
             <param name="node">The node to bind.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
-            <summary>
-            Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
-            <summary>
-            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
-            </summary>
-            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the select/expand query has been applied.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Object,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
-            <summary>
-            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Object"/>.
-            </summary>
-            <param name="source">The original <see cref="T:System.Object"/>.</param>
-            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext">
             <summary>
             Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.
@@ -8513,6 +8490,30 @@
             <param name="right">The <see cref="T:System.Linq.Expressions.Expression"/> on the right side.</param>
             <param name="liftToNull">If the operator's return type is lifted to a nullable type.</param>
             <returns>An <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
+            <summary>
+            Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
+            <summary>
+            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the select/expand query has been applied.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Object,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
+            <summary>
+            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Object"/>.
+            </summary>
+            <param name="source">The original <see cref="T:System.Object"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
+            <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>
