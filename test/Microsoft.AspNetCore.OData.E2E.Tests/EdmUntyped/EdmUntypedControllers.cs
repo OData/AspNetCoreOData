@@ -49,17 +49,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             Assert.Equal(2, key);
 
             // Let's verify the 'delta' from the "Patch" test case
-            delta.TryGetPropertyValue("Frequency", out object frequency);
+            Assert.True(delta.TryGetPropertyValue("Frequency", out object frequency));
             Assert.Equal(Frequency.BiWeekly, frequency);
-            delta.TryGetPropertyValue("Weight", out object weight);
+            Assert.True(delta.TryGetPropertyValue("Weight", out object weight));
             Assert.Equal(6.24, weight);
 
-            delta.TryGetPropertyValue("HomeAddress", out object homeAddressObj);
+            Assert.True(delta.TryGetPropertyValue("HomeAddress", out object homeAddressObj));
             Address homeAddress = Assert.IsType<Address>(homeAddressObj);
             Assert.Equal("YouStreet", homeAddress.Street);
             Assert.Equal("YouCity", homeAddress.City);
 
-            delta.TryGetPropertyValue("Addresses", out object addressesObj);
+            Assert.True(delta.TryGetPropertyValue("Addresses", out object addressesObj));
             Assert.Collection((IList<Address>)addressesObj,
                 e =>
                 {
