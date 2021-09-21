@@ -146,7 +146,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(readContext));
             }
 
-            if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) && structuredType.FullName() != resourceWrapper.Resource.TypeName)
+            if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) &&
+                structuredType.FullName() != resourceWrapper.Resource.TypeName &&
+                resourceWrapper.Resource.TypeName != "Edm.Untyped")
             {
                 // received a derived type in a base type deserializer. delegate it to the appropriate derived type deserializer.
                 IEdmModel model = readContext.Model;
@@ -360,7 +362,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(resourceInfoWrapper));
             }
 
-            IEdmProperty edmProperty = structuredType.FindProperty(resourceInfoWrapper.NestedResourceInfo.Name);
+            // ODL has "FindProperty" method to find property using property name case-sensitive.
+            // We use "ResolveProperty" method to support case-insensitive
+            IEdmProperty edmProperty = structuredType.StructuredDefinition().ResolveProperty(resourceInfoWrapper.NestedResourceInfo.Name);
             if (edmProperty == null)
             {
                 if (!structuredType.IsOpen())
