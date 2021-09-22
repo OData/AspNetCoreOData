@@ -64,6 +64,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     if (filterBinder.Model != context.Model)
                     {
+                        // TODO: Wtf, Need refactor these codes?
                         filterBinder.Model = context.Model;
                     }
 

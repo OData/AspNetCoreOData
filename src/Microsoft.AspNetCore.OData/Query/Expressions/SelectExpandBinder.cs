@@ -931,6 +931,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 };
 
                 ODataQueryContext queryContext = context.SelectExpandQuery.Context;
+                IFilterBinder binder = queryContext.GetFilterBinder(querySettings);
 
                 FilterBinderContext filterBinderContext = new FilterBinderContext()
                 {
@@ -941,7 +942,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     ElementClrType = elementType
                 };
 
-                IFilterBinder binder = queryContext.GetFilterBinder(querySettings);
                 LambdaExpression orderByExpression = binder.BindOrderByClause(filterBinderContext) as LambdaExpression;
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }

@@ -164,6 +164,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 else if (transformation.Kind == TransformationNodeKind.Filter)
                 {
                     var filterTransformation = transformation as FilterTransformationNode;
+                    IFilterBinder binder = Context.GetFilterBinder(querySettings);
 
                     FilterBinderContext filterBinderContext = new FilterBinderContext()
                     {
@@ -173,8 +174,6 @@ namespace Microsoft.AspNetCore.OData.Query
                         QuerySettings = querySettings,
                         ElementClrType = ResultClrType
                     };
-
-                    IFilterBinder binder = Context.GetFilterBinder(querySettings);
 
                     query = binder.Bind(filterBinderContext);
                 }

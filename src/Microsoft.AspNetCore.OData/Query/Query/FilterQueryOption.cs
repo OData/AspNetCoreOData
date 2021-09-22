@@ -143,6 +143,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Contract.Assert(filterClause != null);
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
+            IFilterBinder binder = Context.GetFilterBinder(updatedSettings);
 
             FilterBinderContext filterBinderContext = new FilterBinderContext()
             {
@@ -152,8 +153,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 QuerySettings = updatedSettings,
                 ElementClrType = Context.ElementClrType
             };
-
-            IFilterBinder binder = Context.GetFilterBinder(updatedSettings);
 
             query = binder.Bind(filterBinderContext);
             return query;
