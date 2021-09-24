@@ -8222,13 +8222,13 @@
             For testing purposes only.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.CreateBinaryExpression(Microsoft.OData.UriParser.BinaryOperatorKind,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
@@ -8424,11 +8424,6 @@
             Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.Source">
-            <summary>
-            Gets or sets the original <see cref="T:System.Linq.IQueryable"/>.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.FilterClause">
             <summary>
             Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.FilterClause"/> for this query option.
@@ -8460,24 +8455,27 @@
             an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
             Applies an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to an <see cref="T:System.Linq.IQueryable"/>.
             </summary>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
             </summary>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindOrderByClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindOrderByClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
             </summary>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>
@@ -8974,6 +8972,13 @@
             </summary>
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>

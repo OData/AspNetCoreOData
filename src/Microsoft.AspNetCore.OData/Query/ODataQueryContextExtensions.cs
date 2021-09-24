@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -90,6 +91,23 @@ namespace Microsoft.AspNetCore.OData.Query
             ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
 
             return binder ?? new SelectExpandBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAssemblyResolver"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IAssemblyResolver"/>.</returns>
+        public static IAssemblyResolver GetAssemblyResolver(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IAssemblyResolver resolver = context.RequestContainer?.GetService<IAssemblyResolver>();
+
+            return resolver ?? AssemblyResolverHelper.Default;
         }
     }
 }

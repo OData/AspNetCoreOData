@@ -201,7 +201,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 FilterBinderContext filterBinderContext = new FilterBinderContext()
                 {
-                    Source = null,
                     FilterClause = filterClause,
                     QueryContext = queryContext,
                     QuerySettings = querySettings,
@@ -215,7 +214,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     Expression filterSource = nullablePropertyValue;
 
                     // TODO: Implement proper support for $select/$expand after $apply
-                    Expression filterPredicate = binder.BindFilterClause(filterBinderContext);
+                    Expression filterPredicate = binder.BindFilterClause(null, filterBinderContext);
                     filterResult = Expression.Call(
                         ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(clrElementType),
                         filterSource,
@@ -225,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(filterBinderContext) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(null, filterBinderContext) as LambdaExpression;
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));
@@ -935,14 +934,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 FilterBinderContext filterBinderContext = new FilterBinderContext()
                 {
-                    Source = null,
                     OrderByClause = orderbyClause,
                     QueryContext = queryContext,
                     QuerySettings = querySettings,
                     ElementClrType = elementType
                 };
 
-                LambdaExpression orderByExpression = binder.BindOrderByClause(filterBinderContext) as LambdaExpression;
+                LambdaExpression orderByExpression = binder.BindOrderByClause(null, filterBinderContext) as LambdaExpression;
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }
 

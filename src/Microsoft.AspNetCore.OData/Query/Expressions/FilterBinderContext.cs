@@ -18,11 +18,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public class FilterBinderContext
     {
         /// <summary>
-        /// Gets or sets the original <see cref="IQueryable"/>.
-        /// </summary>
-        public IQueryable Source { get; set; }
-
-        /// <summary>
         /// Gets or sets the parsed <see cref="Microsoft.OData.UriParser.FilterClause"/> for this query option.
         /// </summary>
         public FilterClause FilterClause { get; set; }

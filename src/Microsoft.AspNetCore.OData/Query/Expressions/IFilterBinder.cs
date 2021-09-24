@@ -20,23 +20,26 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Applies an OData $filter parse tree represented by <see cref="FilterClause"/> to an <see cref="IQueryable"/>.
         /// </summary>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>The new <see cref="IQueryable"/> after the filter query has been applied to.</returns>
-        IQueryable Bind(FilterBinderContext context);
+        IQueryable Bind(IQueryable source, FilterBinderContext context);
 
         /// <summary>
         /// Creates an <see cref="Expression"/> from an OData $filter parse tree represented by <see cref="FilterClause"/>.
         /// </summary>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>An <see cref="Expression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
-        Expression BindFilterClause(FilterBinderContext context);
+        Expression BindFilterClause(IQueryable source, FilterBinderContext context);
 
         /// <summary>
         /// Creates an <see cref="Expression"/> from an OData $orderby parse tree represented by <see cref="OrderByClause"/>.
         /// </summary>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>An <see cref="Expression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
-        Expression BindOrderByClause(FilterBinderContext context);
+        Expression BindOrderByClause(IQueryable source, FilterBinderContext context);
 
         /// <summary>
         /// Creates an <see cref="Expression"/> from two expressions.

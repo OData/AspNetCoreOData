@@ -45,14 +45,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             FilterBinderContext filterBinderContext = new FilterBinderContext()
             {
-                Source = null,
                 FilterClause = filterClause,
                 QueryContext = context,
                 QuerySettings = querySettings,
                 ElementClrType = filterType
             };
 
-            return binder.BindFilterClause(filterBinderContext);
+            return binder.BindFilterClause(null, filterBinderContext);
         }
     }
 

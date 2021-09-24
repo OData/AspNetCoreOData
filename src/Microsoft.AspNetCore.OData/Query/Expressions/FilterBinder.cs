@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual IQueryable Bind(FilterBinderContext context)
+        public virtual IQueryable Bind(IQueryable source, FilterBinderContext context)
         {
             Contract.Assert(context != null);
             Contract.Assert(context.FilterClause != null);
@@ -68,24 +68,24 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Model = context.QueryContext.Model;
             QuerySettings = context.QuerySettings;
-            InternalAssembliesResolver = AssemblyResolverHelper.Default;
+            InternalAssembliesResolver = context.QueryContext.GetAssemblyResolver();
 
-            IQueryable query = context.Source;
-            Expression filterExpression = BindFilterClause(context);
+            IQueryable query = source;
+            Expression filterExpression = BindFilterClause(source, context);
 
             query = ExpressionHelpers.Where(query, filterExpression, context.ElementClrType);
             return query;
         }
 
         /// <inheritdoc/>
-        public virtual Expression BindFilterClause(FilterBinderContext context)
+        public virtual Expression BindFilterClause(IQueryable source, FilterBinderContext context)
         {
             Contract.Assert(context != null);
             Contract.Assert(context.FilterClause != null);
             Contract.Assert(context.ElementClrType != null);
 
             _filterType = context.ElementClrType;
-            BaseQuery = context.Source;
+            BaseQuery = source;
 
             LambdaExpression filter = BindFilterClause(this, context.FilterClause, context.ElementClrType);
 
@@ -93,14 +93,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual Expression BindOrderByClause(FilterBinderContext context)
+        public virtual Expression BindOrderByClause(IQueryable source, FilterBinderContext context)
         {
             Contract.Assert(context != null);
             Contract.Assert(context.OrderByClause != null);
             Contract.Assert(context.ElementClrType != null);
 
             _filterType = context.ElementClrType;
-            BaseQuery = context.Source;
+            BaseQuery = source;
 
             LambdaExpression orderByExpression = BindOrderByClause(this, context.OrderByClause, context.ElementClrType);
 

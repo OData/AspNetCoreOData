@@ -147,14 +147,13 @@ namespace Microsoft.AspNetCore.OData.Query
 
             FilterBinderContext filterBinderContext = new FilterBinderContext()
             {
-                Source = query,
                 FilterClause = filterClause,
                 QueryContext = Context,
                 QuerySettings = updatedSettings,
                 ElementClrType = Context.ElementClrType
             };
 
-            query = binder.Bind(filterBinderContext);
+            query = binder.Bind(query, filterBinderContext);
             return query;
         }
 

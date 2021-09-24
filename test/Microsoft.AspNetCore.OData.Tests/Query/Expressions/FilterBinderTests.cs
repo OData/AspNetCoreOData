@@ -3092,14 +3092,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             FilterBinderContext filterBinderContext = new FilterBinderContext()
             {
-                Source = null,
                 FilterClause = filterClause,
                 QueryContext = context,
                 QuerySettings = querySettings,
                 ElementClrType = filterType
             };
 
-            return binder.BindFilterClause(filterBinderContext) as Expression<Func<TEntityType, bool>>;
+            return binder.BindFilterClause(null, filterBinderContext) as Expression<Func<TEntityType, bool>>;
         }
 
         private FilterClause CreateFilterNode(string filter, IEdmModel model, Type entityType)
