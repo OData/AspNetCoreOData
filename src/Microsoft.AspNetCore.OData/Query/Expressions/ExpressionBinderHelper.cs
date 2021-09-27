@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -14,17 +13,11 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query.Container;
-using Microsoft.AspNetCore.OData.Query.Wrapper;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
@@ -34,16 +27,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public static class ExpressionBinderHelper
     {
-        internal static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
-        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
-        internal static readonly string DictionaryStringObjectIndexerName = typeof(Dictionary<string, object>).GetDefaultMembers()[0].Name;
+        private static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
+        private static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
 
-        internal static readonly Expression NullConstant = Expression.Constant(null);
-        internal static readonly Expression FalseConstant = Expression.Constant(false);
-        internal static readonly Expression TrueConstant = Expression.Constant(true);
-        internal static readonly Expression ZeroConstant = Expression.Constant(0);
+        private static readonly Expression NullConstant = Expression.Constant(null);
+        private static readonly Expression FalseConstant = Expression.Constant(false);
+        private static readonly Expression TrueConstant = Expression.Constant(true);
+        private static readonly Expression ZeroConstant = Expression.Constant(0);
 
-        internal static readonly Dictionary<BinaryOperatorKind, ExpressionType> BinaryOperatorMapping = new Dictionary<BinaryOperatorKind, ExpressionType>
+        private static readonly Dictionary<BinaryOperatorKind, ExpressionType> BinaryOperatorMapping = new Dictionary<BinaryOperatorKind, ExpressionType>
         {
             { BinaryOperatorKind.Add, ExpressionType.Add },
             { BinaryOperatorKind.And, ExpressionType.AndAlso },

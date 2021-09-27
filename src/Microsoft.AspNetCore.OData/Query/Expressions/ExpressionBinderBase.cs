@@ -10,7 +10,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -34,14 +33,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public abstract class ExpressionBinderBase
     {
-        internal static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
-        internal static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
+        #region Properties
         internal static readonly string DictionaryStringObjectIndexerName = typeof(Dictionary<string, object>).GetDefaultMembers()[0].Name;
 
         internal static readonly Expression NullConstant = Expression.Constant(null);
         internal static readonly Expression FalseConstant = Expression.Constant(false);
         internal static readonly Expression TrueConstant = Expression.Constant(true);
-        internal static readonly Expression ZeroConstant = Expression.Constant(0);
 
         // .NET 6 adds a new overload: TryParse<TEnum>(ReadOnlySpan<Char>, TEnum)
         // Now, with `TryParse<TEnum>(String, TEnum)`, there will have two versions with two parameters
@@ -52,23 +49,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 typeof(string),
                 Type.MakeGenericMethodParameter(0).MakeByRefType()
             });
-
-        internal static readonly Dictionary<BinaryOperatorKind, ExpressionType> BinaryOperatorMapping = new Dictionary<BinaryOperatorKind, ExpressionType>
-        {
-            { BinaryOperatorKind.Add, ExpressionType.Add },
-            { BinaryOperatorKind.And, ExpressionType.AndAlso },
-            { BinaryOperatorKind.Divide, ExpressionType.Divide },
-            { BinaryOperatorKind.Equal, ExpressionType.Equal },
-            { BinaryOperatorKind.GreaterThan, ExpressionType.GreaterThan },
-            { BinaryOperatorKind.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual },
-            { BinaryOperatorKind.LessThan, ExpressionType.LessThan },
-            { BinaryOperatorKind.LessThanOrEqual, ExpressionType.LessThanOrEqual },
-            { BinaryOperatorKind.Modulo, ExpressionType.Modulo },
-            { BinaryOperatorKind.Multiply, ExpressionType.Multiply },
-            { BinaryOperatorKind.NotEqual, ExpressionType.NotEqual },
-            { BinaryOperatorKind.Or, ExpressionType.OrElse },
-            { BinaryOperatorKind.Subtract, ExpressionType.Subtract },
-        };
 
         internal IEdmModel Model { get; set; }
 
@@ -87,7 +67,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// </summary>
         internal IDictionary<string, Expression> FlattenedPropertyContainer;
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionBinderBase"/> class.
         /// </summary>
@@ -120,7 +102,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             QuerySettings = querySettings;
             Model = model;
         }
+        #endregion
 
+        #region Abstract properties and methods
         /// <summary>
         /// Binds a <see cref="QueryNode"/> to create a LINQ <see cref="Expression"/> that represents the semantics
         /// of the <see cref="QueryNode"/>.
@@ -136,7 +120,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <returns></returns>
         protected abstract ParameterExpression Parameter { get; }
+        #endregion
 
+        #region Bind Node methods
         /// <summary>
         /// Binds a <see cref="ConstantNode"/> to create a LINQ <see cref="Expression"/> that
         /// represents the semantics of the <see cref="ConstantNode"/>.
@@ -788,7 +774,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
             }
         }
+        #endregion
 
+        #region Private helper methods
         private static void ValidateAllStringArguments(string functionName, Expression[] arguments)
         {
             if (arguments.Any(arg => arg.Type != typeof(string)))
@@ -910,7 +898,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             return null;
         }
+        #endregion
 
+        #region Protected methods
         /// <summary>
         /// Bind function arguments
         /// </summary>
@@ -991,7 +981,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
         }
+        #endregion
 
+        #region Internal methods
         internal string GetFullPropertyPath(SingleValueNode node)
         {
             string path = null;
@@ -1340,5 +1332,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
             }
         }
+        #endregion
     }
 }
