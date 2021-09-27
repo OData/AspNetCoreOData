@@ -252,9 +252,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var source = Bind(openNode.Source);
             Expression propertyAccessExpression;
             if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True &&
-                IsNullable(source.Type) && source != _lambdaParameters[ODataItParameterName])
+                ExpressionBinderHelper.IsNullable(source.Type) && source != _lambdaParameters[ODataItParameterName])
             {
-                propertyAccessExpression = Expression.Property(RemoveInnerNullPropagation(source), prop.Name);
+                propertyAccessExpression = Expression.Property(ExpressionBinderHelper.RemoveInnerNullPropagation(source, QuerySettings), prop.Name);
             }
             else
             {
@@ -399,7 +399,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
             Contract.Assert(elementType != null);
 
-            if (IsIQueryable(source.Type))
+            if (ExpressionBinderHelper.IsIQueryable(source.Type))
             {
                 return Expression.Call(null, ExpressionHelperMethods.QueryableOfType.MakeGenericMethod(elementType), source);
             }
@@ -463,7 +463,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Expression right = Bind(binaryOperatorNode.Right);
 
             // handle null propagation only if either of the operands can be null
-            bool isNullPropagationRequired = QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && (IsNullable(left.Type) || IsNullable(right.Type));
+            bool isNullPropagationRequired = QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && (ExpressionBinderHelper.IsNullable(left.Type) || ExpressionBinderHelper.IsNullable(right.Type));
             if (isNullPropagationRequired)
             {
                 // |----------------------------------------------------------------|
@@ -483,8 +483,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // |--------|-----------|---------------|---------------|-----------|
 
                 // before we start with null propagation, convert the operators to nullable if already not.
-                left = ToNullable(left);
-                right = ToNullable(right);
+                left = ExpressionBinderHelper.ToNullable(left);
+                right = ExpressionBinderHelper.ToNullable(right);
 
                 bool liftToNull = true;
                 if (left == NullConstant || right == NullConstant)
@@ -493,11 +493,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
 
                 // Expression trees do a very good job of handling the 3VL truth table if we pass liftToNull true.
-                return CreateBinaryExpression(binaryOperatorNode.OperatorKind, left, right, liftToNull: liftToNull);
+                return ExpressionBinderHelper.CreateBinaryExpression(binaryOperatorNode.OperatorKind, left, right, liftToNull: liftToNull, QuerySettings);
             }
             else
             {
-                return CreateBinaryExpression(binaryOperatorNode.OperatorKind, left, right, liftToNull: false);
+                return ExpressionBinderHelper.CreateBinaryExpression(binaryOperatorNode.OperatorKind, left, right, liftToNull: false, QuerySettings);
             }
         }
 
@@ -527,7 +527,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 collectionItemType = genericArgs[0];
             }
 
-            if (IsIQueryable(collection.Type))
+            if (ExpressionBinderHelper.IsIQueryable(collection.Type))
             {
                 Expression containsExpression = singleValue.Type != collectionItemType ? Expression.Call(null, ExpressionHelperMethods.QueryableCastGeneric.MakeGenericMethod(singleValue.Type), collection) : collection;
                 return Expression.Call(null, ExpressionHelperMethods.QueryableContainsGeneric.MakeGenericMethod(singleValue.Type), containsExpression, singleValue);
@@ -569,7 +569,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression ApplyNullPropagationForFilterBody(Expression body)
         {
-            if (IsNullable(body.Type))
+            if (ExpressionBinderHelper.IsNullable(body.Type))
             {
                 if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
                 {
@@ -742,10 +742,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ExitLamdbaScope();
 
-            if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && IsNullable(source.Type))
+            if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type))
             {
                 // IFF(source == null) null; else Any(body);
-                all = ToNullable(all);
+                all = ExpressionBinderHelper.ToNullable(all);
                 return Expression.Condition(
                     test: Expression.Equal(source, NullConstant),
                     ifTrue: Expression.Constant(null, all.Type),
@@ -796,10 +796,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ExitLamdbaScope();
 
-            if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && IsNullable(source.Type))
+            if (QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type))
             {
                 // IFF(source == null) null; else Any(body);
-                any = ToNullable(any);
+                any = ExpressionBinderHelper.ToNullable(any);
                 return Expression.Condition(
                     test: Expression.Equal(source, NullConstant),
                     ifTrue: Expression.Constant(null, any.Type),
@@ -996,7 +996,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (filter == null)
             {
-                if (IsIQueryable(source.Type))
+                if (ExpressionBinderHelper.IsIQueryable(source.Type))
                 {
                     return Expression.Call(null, ExpressionHelperMethods.QueryableEmptyAnyGeneric.MakeGenericMethod(elementType), source);
                 }
@@ -1007,7 +1007,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                if (IsIQueryable(source.Type))
+                if (ExpressionBinderHelper.IsIQueryable(source.Type))
                 {
                     return Expression.Call(null, ExpressionHelperMethods.QueryableNonEmptyAnyGeneric.MakeGenericMethod(elementType), source, filter);
                 }
@@ -1027,7 +1027,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             TypeHelper.IsCollection(source.Type, out elementType);
             Contract.Assert(elementType != null);
 
-            if (IsIQueryable(source.Type))
+            if (ExpressionBinderHelper.IsIQueryable(source.Type))
             {
                 return Expression.Call(null, ExpressionHelperMethods.QueryableAllGeneric.MakeGenericMethod(elementType), source, filter);
             }

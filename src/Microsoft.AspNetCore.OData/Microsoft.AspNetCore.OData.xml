@@ -8034,34 +8034,6 @@
             </summary>
             <param name="requestContainer">The request container.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
-            <summary>
-            Gets property for dynamic properties dictionary.
-            </summary>
-            <param name="openNode"></param>
-            <returns>Returns CLR property for dynamic properties container.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.EnsureFlattenedPropertyContainer(System.Linq.Expressions.ParameterExpression)">
-            <summary>
-            Analyze previous query and extract grouped properties.
-            </summary>
-            <param name="source"></param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetFlattenedPropertyExpression(System.String)">
-            <summary>
-            Gets expression for property from previously aggregated query
-            </summary>
-            <param name="propertyPath"></param>
-            <returns>Returns null if no aggregations were used so far</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.IsFlatteningSource(System.Linq.Expressions.Expression)">
-            <summary>
-            Recognize $it.Source where $it is FlatteningWrapper
-            Using that do avoid wrapping it redundant into Null propagation 
-            </summary>
-            <param name="source"></param>
-            <returns></returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
@@ -8100,12 +8072,45 @@
             <param name="node">The node to bind.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.IsFlatteningSource(System.Linq.Expressions.Expression)">
+            <summary>
+            Recognize $it.Source where $it is FlatteningWrapper
+            Using that do avoid wrapping it redundant into Null propagation 
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindArguments(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.QueryNode})">
             <summary>
             Bind function arguments
             </summary>
             <param name="nodes"></param>
             <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
+            <summary>
+            Gets property for dynamic properties dictionary.
+            </summary>
+            <param name="openNode"></param>
+            <returns>Returns CLR property for dynamic properties container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.EnsureFlattenedPropertyContainer(System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Analyze previous query and extract grouped properties.
+            </summary>
+            <param name="source"></param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetFlattenedPropertyExpression(System.String)">
+            <summary>
+            Gets expression for property from previously aggregated query
+            </summary>
+            <param name="propertyPath"></param>
+            <returns>Returns null if no aggregations were used so far</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderHelper">
+            <summary>
+            The helper class for all expression binders.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder">
             <summary>

@@ -118,8 +118,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     var binaryNode = (BinaryOperatorNode)node;
                     var leftExpression = BindAccessor(binaryNode.Left, baseElement);
                     var rightExpression = BindAccessor(binaryNode.Right, baseElement);
-                    return CreateBinaryExpression(binaryNode.OperatorKind, leftExpression, rightExpression,
-                        liftToNull: true);
+                    return ExpressionBinderHelper.CreateBinaryExpression(binaryNode.OperatorKind, leftExpression, rightExpression,
+                        liftToNull: true, QuerySettings);
                 case QueryNodeKind.Convert:
                     var convertNode = (ConvertNode)node;
                     return CreateConvertExpression(convertNode, BindAccessor(convertNode.Source, baseElement));
