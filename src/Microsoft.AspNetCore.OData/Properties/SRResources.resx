@@ -600,6 +600,9 @@
   <data name="InvalidLastSegmentInSelectExpandPath" xml:space="preserve">
     <value>The last segment '{0}' of the select or expand query option is not supported.</value>
   </data>
+  <data name="ShouldHaveNavigationPropertyInNavigationExpandPath" xml:space="preserve">
+    <value>A navigation property expand path should have navigation property in the path.</value>
+  </data>
   <data name="BatchRequestInvalidMediaType" xml:space="preserve">
     <value>The batch request must have '{0}' or '{1}' as the media type.</value>
   </data>
