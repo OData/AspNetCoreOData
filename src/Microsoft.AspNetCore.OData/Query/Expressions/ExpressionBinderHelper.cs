@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// <summary>
     /// The helper class for all expression binders.
     /// </summary>
-    public static class ExpressionBinderHelper
+    internal static class ExpressionBinderHelper
     {
         private static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
         private static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         };
 
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
-        internal static Expression CreateBinaryExpression(BinaryOperatorKind binaryOperator, Expression left, Expression right, bool liftToNull, ODataQuerySettings querySettings)
+        public static Expression CreateBinaryExpression(BinaryOperatorKind binaryOperator, Expression left, Expression right, bool liftToNull, ODataQuerySettings querySettings)
         {
             ExpressionType binaryExpressionType;
 
@@ -179,7 +179,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression MakePropertyAccess(PropertyInfo propertyInfo, Expression argument, ODataQuerySettings querySettings)
+        public static Expression MakePropertyAccess(PropertyInfo propertyInfo, Expression argument, ODataQuerySettings querySettings)
         {
             Expression propertyArgument = argument;
             if (querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
@@ -197,7 +197,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         // creates an expression for the corresponding OData function.
-        internal static Expression MakeFunctionCall(MemberInfo member, ODataQuerySettings querySettings, params Expression[] arguments)
+        public static Expression MakeFunctionCall(MemberInfo member, ODataQuerySettings querySettings, params Expression[] arguments)
         {
             Contract.Assert(member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Method);
 
@@ -235,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return CreateFunctionCallWithNullPropagation(functionCall, arguments, querySettings);
         }
 
-        internal static Expression CreateFunctionCallWithNullPropagation(Expression functionCall, Expression[] arguments, ODataQuerySettings querySettings)
+        public static Expression CreateFunctionCallWithNullPropagation(Expression functionCall, Expression[] arguments, ODataQuerySettings querySettings)
         {
             if (querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
             {
@@ -268,7 +268,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         // this method converts back "arg == null ? null : convert(arg)" to "arg"
         // Also, note that we can do this generically only because none of the odata functions that we support can take null
         // as an argument.
-        internal static Expression RemoveInnerNullPropagation(Expression expression, ODataQuerySettings querySettings)
+        public static Expression RemoveInnerNullPropagation(Expression expression, ODataQuerySettings querySettings)
         {
             Contract.Assert(expression != null);
 
@@ -326,7 +326,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression CheckForNull(Expression expression)
+        public static Expression CheckForNull(Expression expression)
         {
             if (IsNullable(expression.Type) && expression.NodeType != ExpressionType.Constant)
             {
@@ -343,12 +343,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return arguments.Select(arg => ExtractValueFromNullableExpression(arg));
         }
 
-        internal static Expression ExtractValueFromNullableExpression(Expression source)
+        public static Expression ExtractValueFromNullableExpression(Expression source)
         {
             return Nullable.GetUnderlyingType(source.Type) != null ? Expression.Property(source, "Value") : source;
         }
 
-        internal static Expression BindHas(Expression left, Expression flag, ODataQuerySettings querySettings)
+        public static Expression BindHas(Expression left, Expression flag, ODataQuerySettings querySettings)
         {
             Contract.Assert(TypeHelper.IsEnum(left.Type));
             Contract.Assert(flag.Type == typeof(Enum));
@@ -457,17 +457,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return source;
         }
 
-        internal static bool IsIQueryable(Type type)
+        public static bool IsIQueryable(Type type)
         {
             return typeof(IQueryable).IsAssignableFrom(type);
         }
 
-        internal static bool IsDoubleOrDecimal(Type type)
+        public static bool IsDoubleOrDecimal(Type type)
         {
             return IsType<double>(type) || IsType<decimal>(type);
         }
 
-        internal static bool IsDateAndTimeRelated(Type type)
+        public static bool IsDateAndTimeRelated(Type type)
         {
             return IsType<Date>(type) ||
                 IsType<DateTime>(type) ||
@@ -476,52 +476,52 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 IsType<TimeSpan>(type);
         }
 
-        internal static bool IsDateRelated(Type type)
+        public static bool IsDateRelated(Type type)
         {
             return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type);
         }
 
-        internal static bool IsTimeRelated(Type type)
+        public static bool IsTimeRelated(Type type)
         {
             return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type);
         }
 
-        internal static bool IsDateOrOffset(Type type)
+        public static bool IsDateOrOffset(Type type)
         {
             return IsType<DateTime>(type) || IsType<DateTimeOffset>(type);
         }
 
-        internal static bool IsDateTime(Type type)
+        public static bool IsDateTime(Type type)
         {
             return IsType<DateTime>(type);
         }
 
-        internal static bool IsTimeSpan(Type type)
+        public static bool IsTimeSpan(Type type)
         {
             return IsType<TimeSpan>(type);
         }
 
-        internal static bool IsTimeOfDay(Type type)
+        public static bool IsTimeOfDay(Type type)
         {
             return IsType<TimeOfDay>(type);
         }
 
-        internal static bool IsDate(Type type)
+        public static bool IsDate(Type type)
         {
             return IsType<Date>(type);
         }
 
-        internal static bool IsInteger(Type type)
+        public static bool IsInteger(Type type)
         {
             return IsType<short>(type) || IsType<int>(type) || IsType<long>(type);
         }
 
-        internal static bool IsType<T>(Type type) where T : struct
+        public static bool IsType<T>(Type type) where T : struct
         {
             return type == typeof(T) || type == typeof(T?);
         }
 
-        internal static Expression ConvertToEnumUnderlyingType(Expression expression, Type enumType, Type enumUnderlyingType)
+        public static Expression ConvertToEnumUnderlyingType(Expression expression, Type enumType, Type enumUnderlyingType)
         {
             object parameterizedConstantValue = ExtractParameterizedConstant(expression);
             if (parameterizedConstantValue != null)
@@ -561,7 +561,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Extract the constant that would have been encapsulated into LinqParameterContainer if this
         // expression represents it else return null.
-        internal static object ExtractParameterizedConstant(Expression expression)
+        public static object ExtractParameterizedConstant(Expression expression)
         {
             if (expression.NodeType == ExpressionType.MemberAccess)
             {
@@ -589,7 +589,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        internal static Expression DateTimeOffsetToDateTime(Expression expression, TimeZoneInfo timeZoneInfo)
+        public static Expression DateTimeOffsetToDateTime(Expression expression, TimeZoneInfo timeZoneInfo)
         {
             var unaryExpression = expression as UnaryExpression;
             if (unaryExpression != null)
@@ -609,7 +609,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return expression;
         }
 
-        internal static bool IsNullable(Type t)
+        public static bool IsNullable(Type t)
         {
             if (!t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)))
             {
@@ -619,7 +619,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return false;
         }
 
-        internal static Type ToNullable(Type t)
+        public static Type ToNullable(Type t)
         {
             if (IsNullable(t))
             {
@@ -631,7 +631,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression ToNullable(Expression expression)
+        public static Expression ToNullable(Expression expression)
         {
             if (!IsNullable(expression.Type))
             {
@@ -641,7 +641,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return expression;
         }
 
-        internal static Expression ConvertNull(Expression expression, Type type)
+        public static Expression ConvertNull(Expression expression, Type type)
         {
             ConstantExpression constantExpression = expression as ConstantExpression;
             if (constantExpression != null && constantExpression.Value == null)
@@ -654,7 +654,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression BindCastToStringType(Expression source)
+        public static Expression BindCastToStringType(Expression source)
         {
             Expression sourceValue;
 

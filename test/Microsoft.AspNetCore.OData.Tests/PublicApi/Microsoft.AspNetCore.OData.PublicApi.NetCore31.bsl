@@ -2465,9 +2465,6 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBin
 	protected System.Linq.Expressions.Expression GetFlattenedPropertyExpression (string propertyPath)
 }
 
-public sealed class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderHelper {
-}
-
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
 	public FilterBinder (System.IServiceProvider requestContainer)
 
