@@ -40,15 +40,5 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>An <see cref="Expression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
         Expression BindOrderByClause(IQueryable source, FilterBinderContext context);
-
-        /// <summary>
-        /// Creates an <see cref="Expression"/> from two expressions.
-        /// </summary>
-        /// <param name="binaryOperator">The <see cref="BinaryOperatorKind"/> for the returned <see cref="Expression"/>.</param>
-        /// <param name="left">The <see cref="Expression"/> on the left side.</param>
-        /// <param name="right">The <see cref="Expression"/> on the right side.</param>
-        /// <param name="liftToNull">If the operator's return type is lifted to a nullable type.</param>
-        /// <returns>An <see cref="Expression"/>.</returns>
-        Expression CreateBinaryExpression(BinaryOperatorKind binaryOperator, Expression left, Expression right, bool liftToNull);
     }
 }

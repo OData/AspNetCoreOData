@@ -2449,7 +2449,6 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindFilterClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 	System.Linq.Expressions.Expression BindOrderByClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-	System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
@@ -2500,7 +2499,6 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 	public virtual System.Linq.Expressions.Expression BindSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode node)
 	public virtual System.Linq.Expressions.Expression BindSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode)
-	public virtual System.Linq.Expressions.Expression CreateBinaryExpression (Microsoft.OData.UriParser.BinaryOperatorKind binaryOperator, System.Linq.Expressions.Expression left, System.Linq.Expressions.Expression right, bool liftToNull)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext {

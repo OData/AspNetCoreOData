@@ -107,15 +107,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return orderByExpression;
         }
 
-        /// <inheritdoc/>
-        new public virtual Expression CreateBinaryExpression(BinaryOperatorKind binaryOperator, Expression left, Expression right, bool liftToNull)
-        {
-            Contract.Assert(left != null);
-            Contract.Assert(right != null);
-
-            return base.CreateBinaryExpression(binaryOperator, left, right, liftToNull);
-        }
-
         internal static LambdaExpression BindFilterClause(FilterBinder binder, FilterClause filterClause, Type filterType)
         {
             LambdaExpression filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
