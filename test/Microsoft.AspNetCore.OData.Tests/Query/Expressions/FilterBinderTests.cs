@@ -1660,7 +1660,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new[] {SimpleEnum.First, SimpleEnum.Second}, values);
         }
 
@@ -1681,7 +1681,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum?>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, SimpleEnum.Second}, values);
         }
         
@@ -1694,7 +1694,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum?>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, null}, values);
         }
 
@@ -2979,7 +2979,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression<Func<Product, bool>> expression = result.WithNullPropagation;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<string>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<string>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new[] { "Prod1", "Prod2" }, values);
         }
 

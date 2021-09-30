@@ -831,6 +831,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.EnsureFlattene
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.ExpressionBinderBase(System.IServiceProvider requestContainer) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode) -> System.Reflection.PropertyInfo
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetFlattenedPropertyExpression(string propertyPath) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderHelper
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder(System.IServiceProvider requestContainer) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder

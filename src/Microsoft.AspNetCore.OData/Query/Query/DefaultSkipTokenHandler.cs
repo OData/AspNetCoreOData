@@ -304,16 +304,16 @@ namespace Microsoft.AspNetCore.OData.Query
                 Expression constant = parameterizeConstant ? LinqParameterContainer.Parameterize(value.GetType(), value) : Expression.Constant(value);
                 if (directionMap.ContainsKey(key) && directionMap[key] == OrderByDirection.Descending)
                 {
-                    compare = binder.CreateBinaryExpression(BinaryOperatorKind.LessThan, property, constant, true);
+                    compare = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.LessThan, property, constant, true, querySettings);
                 }
                 else
                 {
-                    compare = binder.CreateBinaryExpression(BinaryOperatorKind.GreaterThan, property, constant, true);
+                    compare = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.GreaterThan, property, constant, true, querySettings);
                 }
 
                 if (firstProperty)
                 {
-                    lastEquality = binder.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true);
+                    lastEquality = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true, querySettings);
                     where = compare;
                     firstProperty = false;
                 }
@@ -321,7 +321,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     Expression condition = Expression.AndAlso(lastEquality, compare);
                     where = Expression.OrElse(where, condition);
-                    lastEquality = Expression.AndAlso(lastEquality, binder.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true));
+                    lastEquality = Expression.AndAlso(lastEquality, ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true, querySettings));
                 }
             }
 
