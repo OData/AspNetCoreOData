@@ -73,6 +73,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             string id = caseSensitive ? "ID" : "id";
             string name = caseSensitive ? "Name" : "nAme";
             string frequency = caseSensitive ? "Frequency" : "frequency";
+            string contactGuid = caseSensitive ? "ContactGuid" : "contactguid";
             string weight = caseSensitive ? "Weight" : "weight";
             string homeAddress = caseSensitive ? "HomeAddress" : "homeADDRESS";
             string addresses = caseSensitive ? "Addresses" : "addresses";
@@ -84,6 +85,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
     '{id}':921,
     '{name}':'Fan',
     '{frequency}': 'BiWeekly',
+    '{contactGuid}': '21EC2020-3AEA-1069-A2DD-08002B30309D',
     '{weight}': 3.14,
     '{homeAddress}': {{ 'Street':'MyStreet','City':'MyCity'}},
     '{addresses}':[
@@ -120,6 +122,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
         {
             // Arrange
             string frequency = caseSensitive ? "Frequency" : "frequency";
+            string contactGuid = caseSensitive ? "ContactGuid" : "contactguid";
             string weight = caseSensitive ? "Weight" : "weight";
             string homeAddress = caseSensitive ? "HomeAddress" : "homeADDRESS";
             string addresses = caseSensitive ? "Addresses" : "addresses";
@@ -129,6 +132,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             string content = $@"
 {{
     '{frequency}': 'BiWeekly',
+    '{contactGuid}': '21EC2020-3AEA-1069-A2DD-08002B30309D',
     '{weight}': 6.24,
     '{homeAddress}': {{ 'Street':'YouStreet','City':'YouCity'}},
     '{addresses}':[
