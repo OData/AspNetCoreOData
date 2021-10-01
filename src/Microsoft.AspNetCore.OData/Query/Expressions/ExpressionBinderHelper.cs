@@ -73,11 +73,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (leftUnderlyingType == typeof(DateTime) && rightUnderlyingType == typeof(DateTimeOffset))
             {
-                right = DateTimeOffsetToDateTime(right, querySettings.TimeZone);
+                right = DateTimeOffsetToDateTime(right, querySettings.TimeZone, querySettings);
             }
             else if (rightUnderlyingType == typeof(DateTime) && leftUnderlyingType == typeof(DateTimeOffset))
             {
-                left = DateTimeOffsetToDateTime(left, querySettings.TimeZone);
+                left = DateTimeOffsetToDateTime(left, querySettings.TimeZone, querySettings);
             }
 
             if ((IsDateOrOffset(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
@@ -589,7 +589,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        public static Expression DateTimeOffsetToDateTime(Expression expression, TimeZoneInfo timeZoneInfo)
+        public static Expression DateTimeOffsetToDateTime(Expression expression, TimeZoneInfo timeZoneInfo, ODataQuerySettings settings)
         {
             var unaryExpression = expression as UnaryExpression;
             if (unaryExpression != null)
@@ -604,7 +604,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var dto = parameterizedConstantValue as DateTimeOffset?;
             if (dto != null)
             {
-                expression = Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+	            if (settings.EnableConstantParameterization)
+	            {
+		            return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+	            }
+	            else
+	            {
+		            return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
+	            }
             }
             return expression;
         }
