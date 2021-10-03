@@ -9065,7 +9065,7 @@
             <param name="applySortOptions"></param>
             <returns>An <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> that will produce a stable sort.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Boolean@)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Func{System.Boolean}@)">
             <summary>
             Limits the query results to a maximum number of results.
             </summary>
@@ -9075,7 +9075,7 @@
             <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
             <returns>The limited query results.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Boolean,System.Boolean@)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults``1(System.Linq.IQueryable{``0},System.Int32,System.Boolean,System.Func{System.Boolean}@)">
             <summary>
             Limits the query results to a maximum number of results.
             </summary>

@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Page size to be used by skiptoken implementation for the top-level resource for the request. 
         /// </summary>
-        internal int PageSize { get; set; }
+        internal Func<int> PageSize { get; set; }
 
         /// <summary>
         /// Gets the body values from OData request.

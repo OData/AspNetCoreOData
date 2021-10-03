@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Container
@@ -44,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             Assert.Equal(3, collection.PageSize);
             Assert.Equal(5, collection.TotalCount);
             Assert.True(collection.IsTruncated);
-            Assert.Equal(3, collection.Count);
+            Assert.Equal(3, collection.Count());
             Assert.Equal(new[] { 1, 2, 3 }, collection);
         }
 

@@ -446,13 +446,9 @@ namespace Microsoft.AspNetCore.OData.Query
             ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
             if (pageSize > 0)
             {
-                bool resultsLimited;
+                Func<bool> resultsLimited;
                 result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-                if (resultsLimited && Request.GetEncodedUrl() != null &&
-                    odataFeature.NextLink == null)
-                {
-                    odataFeature.PageSize = pageSize;
-                }
+                odataFeature.PageSize = () => resultsLimited() && Request.GetEncodedUrl() != null && odataFeature.NextLink == null ? pageSize : 0;
             }
 
             odataFeature.QueryOptions = this;
@@ -713,12 +709,12 @@ namespace Microsoft.AspNetCore.OData.Query
             return orderBy;
         }
 
-        internal static IQueryable LimitResults(IQueryable queryable, int limit, bool parameterize, out bool resultsLimited)
+        internal static IQueryable LimitResults(IQueryable queryable, int limit, bool parameterize, out Func<bool> resultsLimited)
         {
             MethodInfo genericMethod = _limitResultsGenericMethod.MakeGenericMethod(queryable.ElementType);
             object[] args = new object[] { queryable, limit, parameterize, null };
             IQueryable results = genericMethod.Invoke(null, args) as IQueryable;
-            resultsLimited = (bool)args[3];
+            resultsLimited = (Func<bool>)args[3];
             return results;
         }
 
@@ -730,7 +726,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="limit">The query result limit.</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, out bool resultsLimited)
+        public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, out Func<bool> resultsLimited)
         {
             return LimitResults<T>(queryable, limit, false, out resultsLimited);
         }
@@ -744,11 +740,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         /// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
         /// <returns>The limited query results.</returns>
-        public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited)
+        public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out Func<bool> resultsLimited)
         {
             TruncatedCollection<T> truncatedCollection = new TruncatedCollection<T>(queryable, limit, parameterize);
-            resultsLimited = truncatedCollection.IsTruncated;
-            return truncatedCollection.AsQueryable();
+            resultsLimited = () => truncatedCollection.IsTruncated;
+            return truncatedCollection;
         }
 
         internal void AddAutoSelectExpandProperties()
