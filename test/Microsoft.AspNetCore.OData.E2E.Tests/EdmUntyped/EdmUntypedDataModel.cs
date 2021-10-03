@@ -18,6 +18,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
 
         public Frequency Frequency { get; set; }
 
+        public Guid ContactGuid { get; set; }
+
         public Double Weight { get; set; }
 
         public Address HomeAddress { get; set; }

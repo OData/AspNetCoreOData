@@ -97,8 +97,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         public override DeltaItemKind Kind => DeltaItemKind.Resource;
 
         /// <inheritdoc/>
-        public virtual Type StructuredType
-            => _structuredType;
+        public virtual Type StructuredType => _structuredType;
 
         /// <inheritdoc/>
         public virtual Type ExpectedClrType => typeof(T);
@@ -108,8 +107,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         /// <remarks>When the list is modified, any modified properties that were removed from the list are no longer
         /// considered to be changed.</remarks>
-        public IList<string> UpdatableProperties
-            => _updatableProperties;
+        public IList<string> UpdatableProperties => _updatableProperties;
 
         /// <inheritdoc/>
         public override void Clear()
