@@ -794,12 +794,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
 
             // Act
-            bool resultsLimited;
+            Func<bool> resultsLimited;
             IQueryable<Customer> result = ODataQueryOptions.LimitResults(queryable, limit, false, out resultsLimited) as IQueryable<Customer>;
 
             // Assert
             Assert.Equal(Math.Min(limit, 4), result.Count());
-            Assert.Equal(resultsLimitedExpected, resultsLimited);
+            Assert.Equal(resultsLimitedExpected, resultsLimited());
         }
 
         [Fact]

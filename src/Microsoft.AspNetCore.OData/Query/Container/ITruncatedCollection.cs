@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.AspNetCore.OData.Query.Container
@@ -25,5 +26,8 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// Gets a value representing if the collection is truncated or not.
         /// </summary>
         bool IsTruncated { get; }
+
+        bool IsAsyncEnumerationPossible { get; }
+        IAsyncEnumerable<object> GetAsyncEnumerable();
     }
 }
