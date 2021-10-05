@@ -2516,6 +2516,8 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBas
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder : Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase, IOrderByBinder {
+	public OrderByBinder (System.IServiceProvider requestContainer)
+
 	public virtual System.Linq.Expressions.Expression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
 }
 

@@ -21,6 +21,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public class OrderByBinder : FilterOrderByBinderBase, IOrderByBinder
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrderByBinder"/> class.
+        /// </summary>
+        /// <param name="requestContainer">The request container.</param>
+        public OrderByBinder(IServiceProvider requestContainer)
+            : base(requestContainer)
+        {
+        }
+
         internal OrderByBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, IEdmModel model)
             : base(settings, assembliesResolver, model)
         {

@@ -8528,6 +8528,12 @@
             an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder"/> class.
+            </summary>
+            <param name="requestContainer">The request container.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
             <inheritdoc/>
         </member>

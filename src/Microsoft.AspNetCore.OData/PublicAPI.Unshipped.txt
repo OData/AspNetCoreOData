@@ -840,6 +840,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder
+Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.OrderByBinder(System.IServiceProvider requestContainer) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext
 Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.ElementClrType.set -> void
