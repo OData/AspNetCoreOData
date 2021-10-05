@@ -2642,8 +2642,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             FilterBinder binder = new FilterBinder(settings, resolver, model);
 
             // Act & Assert
-            QueryNode node = null;
-            ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(node), "node");
+            ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(null), "node");
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => binder.BindDynamicPropertyAccessQueryNode(null), "openNode");

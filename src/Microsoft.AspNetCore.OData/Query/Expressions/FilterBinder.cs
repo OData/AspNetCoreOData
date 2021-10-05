@@ -62,8 +62,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IQueryable query = source;
             Expression filterExpression = BindFilterClause(source, context);
 
-            query = ExpressionHelpers.Where(query, filterExpression, context.ElementClrType);
-            return query;
+            return ExpressionHelpers.Where(query, filterExpression, context.ElementClrType);
         }
 
         /// <inheritdoc/>
@@ -77,9 +76,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _filterType = context.ElementClrType;
             BaseQuery = source;
 
-            LambdaExpression filter = BindFilterClause(context.FilterClause, context.ElementClrType);
-
-            return filter;
+            return BindFilterClause(context.FilterClause, context.ElementClrType);
         }
     }
 }

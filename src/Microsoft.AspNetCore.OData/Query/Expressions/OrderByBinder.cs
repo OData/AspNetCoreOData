@@ -46,15 +46,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _filterType = context.ElementClrType;
             BaseQuery = source;
 
-            LambdaExpression orderByExpression = BindOrderByClause(context.OrderByClause, context.ElementClrType);
-
-            return orderByExpression;
+            return BindOrderByClause(context.OrderByClause, context.ElementClrType);
         }
 
         internal LambdaExpression BindOrderByClause(OrderByClause orderBy, Type elementType)
         {
-            LambdaExpression orderByLambda = BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
-            return orderByLambda;
+            return BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
         }
     }
 }
