@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.OData.Edm;
