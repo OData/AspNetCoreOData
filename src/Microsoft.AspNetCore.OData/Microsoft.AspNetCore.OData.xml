@@ -8228,194 +8228,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindOrderByClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.OData.UriParser.QueryNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
-            of the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCountNode(Microsoft.OData.UriParser.CountNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.CountNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CountNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindDynamicPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/>.
-            </summary>
-            <param name="openNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastFunctionCall(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceCastNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceCastNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionResourceCastNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionResourceCastNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
-            </summary>
-            <param name="sourceNode">The node that represents the navigation source.</param>
-            <param name="navigationProperty">The navigation property to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,System.String)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
-            </summary>
-            <param name="sourceNode">The node that represents the navigation source.</param>
-            <param name="navigationProperty">The navigation property to bind.</param>
-            <param name="propertyPath">The property path.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.BinaryOperatorNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.BinaryOperatorNode"/>.
-            </summary>
-            <param name="binaryOperatorNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindInNode(Microsoft.OData.UriParser.InNode)">
-            <summary>
-            Binds an <see cref="T:Microsoft.OData.UriParser.InNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.InNode"/>.
-            </summary>
-            <param name="inNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindConvertNode(Microsoft.OData.UriParser.ConvertNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.ConvertNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.ConvertNode"/>.
-            </summary>
-            <param name="convertNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindRangeVariable(Microsoft.OData.UriParser.RangeVariable)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.RangeVariable"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.RangeVariable"/>.
-            </summary>
-            <param name="rangeVariable">The range variable to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/>.
-            </summary>
-            <param name="propertyAccessNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionComplexNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionComplexNode"/>.
-            </summary>
-            <param name="collectionComplexNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValuePropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValuePropertyAccessNode"/>.
-            </summary>
-            <param name="propertyAccessNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleComplexNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleComplexNode"/>.
-            </summary>
-            <param name="singleComplexNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.UnaryOperatorNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.UnaryOperatorNode"/>.
-            </summary>
-            <param name="unaryOperatorNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindAllNode(Microsoft.OData.UriParser.AllNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.AllNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.AllNode"/>.
-            </summary>
-            <param name="allNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindAnyNode(Microsoft.OData.UriParser.AnyNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.AnyNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
-            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.AnyNode"/>.
-            </summary>
-            <param name="anyNode">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Parameter">
-            <summary>
-            Get $it parameter
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindSingleValueNode(Microsoft.OData.UriParser.SingleValueNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
-            of the <see cref="T:Microsoft.OData.UriParser.SingleValueNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindCollectionNode(Microsoft.OData.UriParser.CollectionNode)">
-            <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
-            of the <see cref="T:Microsoft.OData.UriParser.CollectionNode"/>.
-            </summary>
-            <param name="node">The node to bind.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext">
             <summary>
             Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/>.
@@ -8424,11 +8236,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.FilterClause">
             <summary>
             Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.FilterClause"/> for this query option.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.OrderByClause">
-            <summary>
-            Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> for this query option.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext.QuerySettings">
@@ -8445,6 +8252,197 @@
             <summary>
             Gets or sets the CLR type of the element.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase">
+            <summary>
+            Translates an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.Bind(Microsoft.OData.UriParser.QueryNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
+            of the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindCountNode(Microsoft.OData.UriParser.CountNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CountNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CountNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindDynamicPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/>.
+            </summary>
+            <param name="openNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceCastFunctionCall(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceCastNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceCastNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionResourceCastNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionResourceCastNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
+            </summary>
+            <param name="sourceNode">The node that represents the navigation source.</param>
+            <param name="navigationProperty">The navigation property to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,System.String)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty"/>.
+            </summary>
+            <param name="sourceNode">The node that represents the navigation source.</param>
+            <param name="navigationProperty">The navigation property to bind.</param>
+            <param name="propertyPath">The property path.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.BinaryOperatorNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.BinaryOperatorNode"/>.
+            </summary>
+            <param name="binaryOperatorNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindInNode(Microsoft.OData.UriParser.InNode)">
+            <summary>
+            Binds an <see cref="T:Microsoft.OData.UriParser.InNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.InNode"/>.
+            </summary>
+            <param name="inNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindConvertNode(Microsoft.OData.UriParser.ConvertNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.ConvertNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.ConvertNode"/>.
+            </summary>
+            <param name="convertNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindRangeVariable(Microsoft.OData.UriParser.RangeVariable)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.RangeVariable"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.RangeVariable"/>.
+            </summary>
+            <param name="rangeVariable">The range variable to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/>.
+            </summary>
+            <param name="propertyAccessNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionComplexNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionComplexNode"/>.
+            </summary>
+            <param name="collectionComplexNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValuePropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValuePropertyAccessNode"/>.
+            </summary>
+            <param name="propertyAccessNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleComplexNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleComplexNode"/>.
+            </summary>
+            <param name="singleComplexNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.UnaryOperatorNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.UnaryOperatorNode"/>.
+            </summary>
+            <param name="unaryOperatorNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindAllNode(Microsoft.OData.UriParser.AllNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.AllNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.AllNode"/>.
+            </summary>
+            <param name="allNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindAnyNode(Microsoft.OData.UriParser.AnyNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.AnyNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.AnyNode"/>.
+            </summary>
+            <param name="anyNode">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.Parameter">
+            <summary>
+            Get $it parameter
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleValueNode(Microsoft.OData.UriParser.SingleValueNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
+            of the <see cref="T:Microsoft.OData.UriParser.SingleValueNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindCollectionNode(Microsoft.OData.UriParser.CollectionNode)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
+            of the <see cref="T:Microsoft.OData.UriParser.CollectionNode"/>.
+            </summary>
+            <param name="node">The node to bind.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
             <summary>
@@ -8468,13 +8466,19 @@
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindOrderByClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
-            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
+            Exposes the ability to translate an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
+            <summary>
+            Applies an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to an <see cref="T:System.Linq.IQueryable"/>.
             </summary>
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
-            <returns>An <see cref="T:System.Linq.Expressions.Expression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
@@ -8517,6 +8521,40 @@
             <param name="left">First byte array.</param>
             <param name="right">Second byte array.</param>
             <returns>true if the arrays are not equal; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder">
+            <summary>
+            Translates an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext">
+            <summary>
+            Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.OrderByClause">
+            <summary>
+            Gets or sets the parsed <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> for this query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.QuerySettings">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.QueryContext">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.ElementClrType">
+            <summary>
+            Gets or sets the CLR type of the element.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
@@ -8958,6 +8996,14 @@
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.
             </summary>
             <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetOrderByBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <param name="querySettings">The query settings.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">

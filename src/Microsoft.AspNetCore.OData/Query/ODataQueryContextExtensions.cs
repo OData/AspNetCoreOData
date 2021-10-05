@@ -94,6 +94,24 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Gets the <see cref="ISelectExpandBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <param name="querySettings">The query settings.</param>
+        /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
+        public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IOrderByBinder binder = context.RequestContainer?.GetService<IOrderByBinder>();
+
+            return binder ?? new OrderByBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+        }
+
+        /// <summary>
         /// Gets the <see cref="IAssemblyResolver"/>.
         /// </summary>
         /// <param name="context">The query context.</param>

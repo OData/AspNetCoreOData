@@ -314,7 +314,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
 
-            FilterBinderContext filterBinderContext = new FilterBinderContext()
+            OrderByBinderContext filterBinderContext = new OrderByBinderContext()
             {
                 OrderByClause = orderbyClause,
                 QueryContext = Context,
@@ -322,8 +322,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 ElementClrType = Context.ElementClrType
             };
 
-            IFilterBinder binder = Context.GetFilterBinder(updatedSettings);
-            LambdaExpression orderByExpression = binder.BindOrderByClause(query, filterBinderContext) as LambdaExpression;
+            IOrderByBinder binder = Context.GetOrderByBinder(updatedSettings);
+            LambdaExpression orderByExpression = binder.Bind(query, filterBinderContext) as LambdaExpression;
             querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
                 alreadyOrdered);
             return querySoFar;

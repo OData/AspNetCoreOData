@@ -54,6 +54,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal ODataQuerySettings QuerySettings { get; set; }
 
+        internal ODataQueryContext QueryContext { get; set; }
+
         internal IAssemblyResolver InternalAssembliesResolver { get; set; }
 
         internal bool HasInstancePropertyContainer;
