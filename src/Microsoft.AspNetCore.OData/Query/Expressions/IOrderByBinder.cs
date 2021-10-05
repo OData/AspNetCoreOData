@@ -12,8 +12,8 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
     /// <summary>
-    /// Exposes the ability to translate an OData $filter parse tree represented by <see cref="FilterClause"/> to
-    /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+    /// Exposes the ability to translate an OData $orderby parse tree represented by <see cref="OrderByClause"/> to
+    /// an <see cref="Expression"/>.
     /// </summary>
     public interface IOrderByBinder
     {
@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="OrderByBinderContext"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the filter query has been applied to.</returns>
+        /// <returns>The <see cref="Expression"/> after the orderby query has been translated.</returns>
         Expression Bind(IQueryable source, OrderByBinderContext context);
     }
 }

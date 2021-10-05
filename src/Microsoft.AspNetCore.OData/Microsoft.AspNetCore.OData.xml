@@ -8468,8 +8468,8 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
-            Exposes the ability to translate an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            Exposes the ability to translate an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
@@ -8478,7 +8478,7 @@
             </summary>
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
+            <returns>The <see cref="T:System.Linq.Expressions.Expression"/> after the orderby query has been translated.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
