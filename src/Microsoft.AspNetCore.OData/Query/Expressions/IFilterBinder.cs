@@ -26,11 +26,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         IQueryable Bind(IQueryable source, FilterBinderContext context);
 
         /// <summary>
-        /// Creates an <see cref="Expression"/> from an OData $filter parse tree represented by <see cref="FilterClause"/>.
+        /// Creates an <see cref="LambdaExpression"/> from an OData $filter parse tree represented by <see cref="FilterClause"/>.
         /// </summary>
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
-        /// <returns>An <see cref="Expression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
-        Expression BindFilterClause(IQueryable source, FilterBinderContext context);
+        /// <returns>An <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
+        LambdaExpression BindFilterClause(IQueryable source, FilterBinderContext context);
     }
 }

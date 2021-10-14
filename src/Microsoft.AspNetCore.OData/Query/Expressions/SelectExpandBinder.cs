@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(null, filterBinderContext) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(null, filterBinderContext);
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));

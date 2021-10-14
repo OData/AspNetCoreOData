@@ -2447,11 +2447,11 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-	System.Linq.Expressions.Expression BindFilterClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
+	System.Linq.Expressions.LambdaExpression BindFilterClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder {
-	System.Linq.Expressions.Expression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	System.Linq.Expressions.LambdaExpression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
@@ -2478,7 +2478,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microso
 	public FilterBinder (System.IServiceProvider requestContainer)
 
 	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-	public virtual System.Linq.Expressions.Expression BindFilterClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
+	public virtual System.Linq.Expressions.LambdaExpression BindFilterClause (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext {
@@ -2518,7 +2518,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBas
 public class Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder : Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase, IOrderByBinder {
 	public OrderByBinder (System.IServiceProvider requestContainer)
 
-	public virtual System.Linq.Expressions.Expression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	public virtual System.Linq.Expressions.LambdaExpression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext {

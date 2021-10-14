@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual Expression BindFilterClause(IQueryable source, FilterBinderContext context)
+        public virtual LambdaExpression BindFilterClause(IQueryable source, FilterBinderContext context)
         {
             if (context == null)
             {
