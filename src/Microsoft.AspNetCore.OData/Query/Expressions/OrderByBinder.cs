@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual Expression Bind(IQueryable source, OrderByBinderContext context)
+        public virtual LambdaExpression Bind(IQueryable source, OrderByBinderContext context)
         {
             if (context == null)
             {

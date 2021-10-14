@@ -838,7 +838,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
-Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.Expressions.LambdaExpression
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
 Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
@@ -1682,7 +1682,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.Bin
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode) -> System.Linq.Expressions.Expression
-virtual Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.Expressions.LambdaExpression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> object
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.IQueryable
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetProjectionLambda(Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context) -> System.Linq.Expressions.LambdaExpression

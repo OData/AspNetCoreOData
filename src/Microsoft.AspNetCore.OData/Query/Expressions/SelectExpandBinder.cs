@@ -940,7 +940,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     ElementClrType = elementType
                 };
 
-                LambdaExpression orderByExpression = binder.Bind(null, filterBinderContext) as LambdaExpression;
+                LambdaExpression orderByExpression = binder.Bind(null, filterBinderContext);
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }
 

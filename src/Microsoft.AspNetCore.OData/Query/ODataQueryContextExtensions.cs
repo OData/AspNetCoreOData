@@ -59,18 +59,6 @@ namespace Microsoft.AspNetCore.OData.Query
             if (context.RequestContainer != null)
             {
                 binder = context.RequestContainer.GetService<IFilterBinder>();
-
-                FilterBinder filterBinder = binder as FilterBinder;
-                if (filterBinder != null)
-                {
-                    if (filterBinder.Model != context.Model)
-                    {
-                        // TODO: Wtf, Need refactor these codes?
-                        filterBinder.Model = context.Model;
-                    }
-
-                    return filterBinder;
-                }
             }
 
             return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);

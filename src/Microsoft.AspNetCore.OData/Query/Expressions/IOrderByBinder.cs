@@ -18,11 +18,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public interface IOrderByBinder
     {
         /// <summary>
-        /// Applies an OData $orderby parse tree represented by <see cref="OrderByClause"/> to an <see cref="IQueryable"/>.
+        /// Creates a <see cref="LambdaExpression"/> from an OData $orderby parse tree represented by <see cref="OrderByClause"/>.
         /// </summary>
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">An instance of the <see cref="OrderByBinderContext"/>.</param>
-        /// <returns>The <see cref="Expression"/> after the orderby query has been translated.</returns>
-        Expression Bind(IQueryable source, OrderByBinderContext context);
+        /// <returns>The <see cref="LambdaExpression"/> after the orderby query has been translated.</returns>
+        LambdaExpression Bind(IQueryable source, OrderByBinderContext context);
     }
 }
