@@ -218,6 +218,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
+        /// Translate a <see cref="FilterSegment"/>.
+        /// </summary>
+        /// <param name="segment">the segment to Translate</param>
+        public override void Handle(FilterSegment segment)
+        {
+            _segmentTemplates.Add(new FilterSegmentTemplate(segment));
+        }
+
+        /// <summary>
         /// Translate a <see cref="BatchSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>

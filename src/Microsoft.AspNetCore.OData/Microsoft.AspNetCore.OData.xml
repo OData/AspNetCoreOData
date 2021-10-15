@@ -11628,6 +11628,12 @@
             </summary>
             <param name="segment">The segment to handle.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.FilterSegment)">
+            <summary>
+            Handle a <see cref="T:Microsoft.OData.UriParser.FilterSegment"/>.
+            </summary>
+            <param name="segment">The segment to handle.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathNavigationSourceHandler.Handle(Microsoft.OData.UriParser.ODataPathSegment)">
             <summary>
             Handle a general path segment.
@@ -11735,6 +11741,12 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.BatchSegment)">
             <summary>
             Handle a <see cref="T:Microsoft.OData.UriParser.BatchSegment"/>.
+            </summary>
+            <param name="segment">The segment to handle.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.Handle(Microsoft.OData.UriParser.FilterSegment)">
+            <summary>
+            Handle a <see cref="T:Microsoft.OData.UriParser.FilterSegment"/>.
             </summary>
             <param name="segment">The segment to handle.</param>
         </member>
@@ -12175,6 +12187,12 @@
             </summary>
             <param name="segment">the segment to Translate</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.FilterSegment)">
+            <summary>
+            Translate a <see cref="T:Microsoft.OData.UriParser.FilterSegment"/>.
+            </summary>
+            <param name="segment">the segment to Translate</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Parser.ODataPathSegmentToTemplateHandler.Handle(Microsoft.OData.UriParser.BatchSegment)">
             <summary>
             Translate a <see cref="T:Microsoft.OData.UriParser.BatchSegment"/>.
@@ -12403,6 +12421,28 @@
             <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.EntitySetSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate">
+            <summary>
+            Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmSingleton"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate.#ctor(Microsoft.OData.UriParser.FilterSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate" /> class.
+            </summary>
+            <param name="segment">The singleton segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate.Segment">
+            <summary>
+            Gets the wrapped singleton segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.FilterSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.FunctionImportSegmentTemplate">

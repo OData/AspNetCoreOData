@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
 using ODataRoutingSample.Models;
+using ODataRoutingSample.Extensions;
 
 namespace ODataRoutingSample
 {
@@ -66,7 +67,8 @@ namespace ODataRoutingSample
                     .AddRouteComponents("v1", model1)
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddRouteComponents("v3", model3)
-                    .Conventions.Add(new MyConvention())
+                   // .Conventions.Add(new MyConvention())
+                   .Conventions.Add(new SetBaseRoutingConvention())
                 );
 
             services.AddSwaggerGen();

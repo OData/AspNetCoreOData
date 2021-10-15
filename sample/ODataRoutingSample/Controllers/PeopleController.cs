@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers
@@ -53,6 +54,17 @@ namespace ODataRoutingSample.Controllers
             }
 
             return Ok(person);
+        }
+
+        // [ODataAttributeRouting]
+        // [HttpGet("People/$filter({filterClause})")] // it's failed in ODL
+        // [HttpGet("People/$filter(true)")] // it can pass the build, but the route template cannot change
+        // [HttpGet("People/$filter(@p1)")] // it also can pass the build, but the route template cannot change.
+        public IActionResult FindPerson(/*[FromRoute] FilterQueryOption filter*/)
+        {
+            FilterQueryOption filter = Request.RouteValues["filter"] as FilterQueryOption;
+
+            return Ok(filter.ApplyTo(_persons.AsQueryable(), new ODataQuerySettings()));
         }
     }
 }

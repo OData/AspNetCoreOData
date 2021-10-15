@@ -280,6 +280,18 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Handle a <see cref="FilterSegment"/>.
+        /// </summary>
+        /// <param name="segment">The segment to handle.</param>
+        public override void Handle(FilterSegment segment)
+        {
+            Contract.Assert(segment != null);
+           // _navigationSource = segment.;
+
+            _pathUriLiteral.Add("$filter");
+        }
+
+        /// <summary>
         /// Handle a <see cref="MetadataSegment"/>.
         /// </summary>
         /// <param name="segment">The segment to handle.</param>
