@@ -2431,6 +2431,15 @@ public interface Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
 	bool IsAsyncEnumerationPossible  { public abstract get; }
 	bool IsTruncated  { public abstract get; }
 	int PageSize  { public abstract get; }
+<<<<<<< Updated upstream
+=======
+
+	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] GetAsyncEnumerable ()
+}
+
+public class Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression {
+	public NamedPropertyExpression (System.Linq.Expressions.Expression name, System.Linq.Expressions.Expression value)
+>>>>>>> Stashed changes
 
 	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] GetAsyncEnumerable ()
 }
@@ -2446,6 +2455,18 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 	int PageSize  { public virtual get; }
 	System.Linq.IQueryProvider Provider  { public virtual get; }
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; }
+<<<<<<< Updated upstream
+=======
+
+	public virtual IEnumerator`1 GetEnumerator ()
+	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection.GetAsyncEnumerable ()
+	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
+	System.Linq.Expressions.Expression BindFilter (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+}
+>>>>>>> Stashed changes
 
 	public virtual IEnumerator`1 GetEnumerator ()
 	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection.GetAsyncEnumerable ()
