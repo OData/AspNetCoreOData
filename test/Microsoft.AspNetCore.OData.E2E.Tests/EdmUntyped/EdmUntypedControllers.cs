@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
@@ -26,6 +27,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             Assert.Equal("Fan", bill.Name);
             Assert.Equal(Frequency.BiWeekly, bill.Frequency);
             Assert.Equal(3.14, bill.Weight);
+
+            Assert.Equal(new Guid("21EC2020-3AEA-1069-A2DD-08002B30309D"), bill.ContactGuid);
 
             Assert.NotNull(bill.HomeAddress);
             Assert.Equal("MyStreet", bill.HomeAddress.Street);
@@ -51,6 +54,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             // Let's verify the 'delta' from the "Patch" test case
             Assert.True(delta.TryGetPropertyValue("Frequency", out object frequency));
             Assert.Equal(Frequency.BiWeekly, frequency);
+
+            Assert.True(delta.TryGetPropertyValue("ContactGuid", out object contractGuid));
+            Assert.Equal(new Guid("21EC2020-3AEA-1069-A2DD-08002B30309D"), contractGuid);
+
             Assert.True(delta.TryGetPropertyValue("Weight", out object weight));
             Assert.Equal(6.24, weight);
 

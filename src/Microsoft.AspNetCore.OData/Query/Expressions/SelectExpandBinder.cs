@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal Expression CreatePropertyNameExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source)
+        internal static Expression CreatePropertyNameExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source)
         {
             Contract.Assert(elementType != null);
             Contract.Assert(property != null);
@@ -146,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return Expression.Constant(property.Name);
         }
 
-        internal Expression CreatePropertyValueExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source, FilterClause filterClause)
+        internal static Expression CreatePropertyValueExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source, FilterClause filterClause)
         {
             Contract.Assert(elementType != null);
             Contract.Assert(property != null);
@@ -944,7 +944,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        private Expression GetNullCheckExpression(SelectExpandBinderContext context, IEdmNavigationProperty propertyToExpand, Expression propertyValue,
+        private static Expression GetNullCheckExpression(SelectExpandBinderContext context, IEdmNavigationProperty propertyToExpand, Expression propertyValue,
             SelectExpandClause projection)
         {
             if (projection == null || propertyToExpand.Type.IsCollection())
