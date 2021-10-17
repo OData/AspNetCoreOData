@@ -7588,20 +7588,6 @@
             </summary>
             <typeparam name="T">The collection element type.</typeparam>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
-            </summary>
-            <param name="source">The collection to be truncated.</param>
-            <param name="pageSize">The page size.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
-            </summary>
-            <param name="source">The queryable collection to be truncated.</param>
-            <param name="pageSize">The page size.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
@@ -7618,30 +7604,34 @@
             <param name="pageSize">The page size.</param>
             <param name="totalCount">The total count.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64})">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
-            </summary>
-            <param name="source">The queryable collection to be truncated.</param>
-            <param name="pageSize">The page size.</param>
-            <param name="totalCount">The total count.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
-            </summary>
-            <param name="source">The queryable collection to be truncated.</param>
-            <param name="pageSize">The page size.</param>
-            <param name="totalCount">The total count.</param>
-            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.PageSize">
             <inheritdoc />
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.IsTruncated">
             <inheritdoc />
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.IsAsyncEnumerationPossible">
+            <summary>
+            Returns true if the underlying collection can be iterated asynchronously.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Microsoft#AspNetCore#OData#Query#Container#ITruncatedCollection#GetAsyncEnumerable">
+            <summary>
+            Returns an iterator which can be used to iterate the underlying collection asynchronously.
+            </summary>
+            <returns></returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.TotalCount">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.ElementType">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Expression">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Provider">
             <inheritdoc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser">

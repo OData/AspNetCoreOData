@@ -134,6 +134,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             PropertyContainer container = ToContainer(containerExpression);
             var result = container.ToDictionary(new IdentityPropertyMapper())["PropertyName"];
             var truncatedCollection = Assert.IsType<TruncatedCollection<int>>(result);
+            // Enumerate the list so that the PageSize gets initialized.
+            truncatedCollection.ToList();
             Assert.True(truncatedCollection.IsTruncated);
             Assert.Equal(pageSize, truncatedCollection.PageSize);
             Assert.Equal(Enumerable.Range(0, pageSize), truncatedCollection);

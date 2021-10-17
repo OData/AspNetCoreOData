@@ -1310,8 +1310,8 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions {
 	public bool IsSupportedQueryOption (string queryOptionName)
 	public static bool IsSystemQueryOption (string queryOptionName)
 	public static bool IsSystemQueryOption (string queryOptionName, bool isDollarSignOptional)
-	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, out System.Boolean& resultsLimited)
-	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, bool parameterize, out System.Boolean& resultsLimited)
+	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, out System.Func`1[[System.Boolean]]& resultsLimited)
+	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, bool parameterize, out System.Func`1[[System.Boolean]]& resultsLimited)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -2428,21 +2428,28 @@ public interface Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper {
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection : IEnumerable {
+	bool IsAsyncEnumerationPossible  { public abstract get; }
 	bool IsTruncated  { public abstract get; }
 	int PageSize  { public abstract get; }
+
+	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] GetAsyncEnumerable ()
 }
 
-public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : List`1, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1, ICollection, IEnumerable, IList, ICountOptionCollection, ITruncatedCollection {
-	public TruncatedCollection`1 (IEnumerable`1 source, int pageSize)
-	public TruncatedCollection`1 (IQueryable`1 source, int pageSize)
+public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : IEnumerable`1, IQueryable`1, IEnumerable, IQueryable, ICountOptionCollection, ITruncatedCollection {
 	public TruncatedCollection`1 (IEnumerable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, bool parameterize)
-	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
-	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount, bool parameterize)
 
+	System.Type ElementType  { public virtual get; }
+	System.Linq.Expressions.Expression Expression  { public virtual get; }
+	bool IsAsyncEnumerationPossible  { public virtual get; }
 	bool IsTruncated  { public virtual get; }
 	int PageSize  { public virtual get; }
+	System.Linq.IQueryProvider Provider  { public virtual get; }
 	System.Nullable`1[[System.Int64]] TotalCount  { public virtual get; }
+
+	public virtual IEnumerator`1 GetEnumerator ()
+	System.Collections.Generic.IAsyncEnumerable`1[[System.Object]] Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection.GetAsyncEnumerable ()
+	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
