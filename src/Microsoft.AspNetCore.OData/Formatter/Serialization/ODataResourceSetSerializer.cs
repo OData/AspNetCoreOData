@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
 	            foreach (object item in enumerable)
 	            {
-		            writeContext.Request.HttpContext.RequestAborted.ThrowIfCancellationRequested();
+		            writeContext.Request?.HttpContext.RequestAborted.ThrowIfCancellationRequested();
 		            lastResource =
 			            await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
 				            .ConfigureAwait(false);
