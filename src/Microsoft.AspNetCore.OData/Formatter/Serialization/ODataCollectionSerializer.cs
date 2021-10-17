@@ -116,21 +116,24 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (writeContext.Request != null)
             {
-	            ODataFeature odataFeature = writeContext.Request.ODataFeature() as ODataFeature;
-	            if (odataFeature.NextLink != null)
+	            if (writeContext.Request.ODataFeature() is ODataFeature odataFeature)
 	            {
-		            collectionStart.NextPageLink = odataFeature.NextLink;
-	            }
-	            else if (odataFeature.QueryOptions != null)
-	            {
-		            // Collection serializer is called only for collection of primitive values - A null object will be supplied since it is a non-entity value
-		            SkipTokenHandler skipTokenHandler = writeContext.QueryOptions.Context.GetSkipTokenHandler();
-		            collectionStart.NextPageLink = skipTokenHandler.GenerateNextPageLink(new Uri(writeContext.Request.GetEncodedUrl()), odataFeature.PageSize(), null, writeContext);
-	            }
+		            if (odataFeature.NextLink != null)
+		            {
+			            collectionStart.NextPageLink = odataFeature.NextLink;
+		            }
+		            else if (odataFeature.QueryOptions != null)
+		            {
+			            // Collection serializer is called only for collection of primitive values - A null object will be supplied since it is a non-entity value
+			            SkipTokenHandler skipTokenHandler = writeContext.QueryOptions.Context.GetSkipTokenHandler();
+			            collectionStart.NextPageLink = skipTokenHandler.GenerateNextPageLink(
+				            new Uri(writeContext.Request.GetEncodedUrl()), odataFeature.PageSize(), null, writeContext);
+		            }
 
-	            if (odataFeature.TotalCount != null)
-	            {
-		            collectionStart.Count = odataFeature.TotalCount;
+		            if (odataFeature.TotalCount != null)
+		            {
+			            collectionStart.Count = odataFeature.TotalCount;
+		            }
 	            }
             }
 

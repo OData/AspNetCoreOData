@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
 
-            if (enumerable is ITruncatedCollection truncatedCollection && truncatedCollection.IsAsyncEnumerationPossible)
+            if (enumerable is ITruncatedCollection {IsAsyncEnumerationPossible: true} truncatedCollection)
             {
 	            await foreach (var item in truncatedCollection.GetAsyncEnumerable().WithCancellation(writeContext.Request.HttpContext.RequestAborted))
 	            {
@@ -160,6 +160,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
 	            foreach (object item in enumerable)
 	            {
+		            writeContext.Request.HttpContext.RequestAborted.ThrowIfCancellationRequested();
 		            lastResource =
 			            await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
 				            .ConfigureAwait(false);
@@ -230,8 +231,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 var odataOperations = CreateODataOperations(operations, resourceSetContext, writeContext);
                 foreach (var odataOperation in odataOperations)
                 {
-                    ODataAction action = odataOperation as ODataAction;
-                    if (action != null)
+	                if (odataOperation is ODataAction action)
                     {
                         resourceSet.AddAction(action);
                     }
@@ -288,7 +288,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             if (resourceSet != null && resourceSet.NextPageLink != null)
             {
                 Uri defaultUri = resourceSet.NextPageLink;
-                return (obj) => { return defaultUri; };
+                return obj => defaultUri;
             }
 
             if (writeContext.ExpandedResource == null)
@@ -296,21 +296,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (writeContext.Request != null && writeContext.QueryContext != null)
                 {
                     SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
-                    return (obj) => { return handler.GenerateNextPageLink(new System.Uri(writeContext.Request.GetEncodedUrl()),
-                        (writeContext.Request.ODataFeature() as ODataFeature).PageSize(), obj, writeContext); };
+                    return obj => handler.GenerateNextPageLink(new Uri(writeContext.Request.GetEncodedUrl()),
+	                    (writeContext.Request.ODataFeature() as ODataFeature).PageSize(), obj, writeContext);
                 }
             }
             else
             {
                 // nested resourceSet
-                ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
-                if (truncatedCollection != null && truncatedCollection.IsTruncated)
+                if (resourceSetInstance is ITruncatedCollection truncatedCollection && truncatedCollection.IsTruncated)
                 {
-                    return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
+                    return (obj) => GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj);
                 }
             }
 
-            return (obj) => { return null; };
+            return obj => null;
         }
 
         /// <summary>

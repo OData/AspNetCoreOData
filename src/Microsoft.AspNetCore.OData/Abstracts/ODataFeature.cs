@@ -29,6 +29,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
         private long? _totalCount;
         private bool _totalCountSet;
+        private Func<int> _pageSize = () => 0;
 
         /// <summary>
         /// Instantiates a new instance of the <see cref="ODataFeature"/> class.
@@ -141,7 +142,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Page size to be used by skiptoken implementation for the top-level resource for the request. 
         /// </summary>
-        internal Func<int> PageSize { get; set; }
+        internal Func<int> PageSize
+        {
+	        get => _pageSize;
+	        set => _pageSize = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Gets the body values from OData request.

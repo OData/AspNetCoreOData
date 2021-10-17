@@ -437,21 +437,23 @@ namespace Microsoft.AspNetCore.OData.Query
                 pageSize = querySettings.ModelBoundPageSize.Value;
             }
 
-            int preferredPageSize = -1;
-            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out var preferredPageSize))
             {
                 pageSize = Math.Min(pageSize, preferredPageSize);
             }
 
-            ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
-            if (pageSize > 0)
+            if (Request.ODataFeature() is ODataFeature odataFeature)
             {
-                Func<bool> resultsLimited;
-                result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-                odataFeature.PageSize = () => resultsLimited() && Request.GetEncodedUrl() != null && odataFeature.NextLink == null ? pageSize : 0;
-            }
+	            if (pageSize > 0)
+	            {
+		            result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out var resultsLimited);
+                    odataFeature.PageSize = () => resultsLimited() && Request.GetEncodedUrl() != null && odataFeature.NextLink == null
+				            ? pageSize
+				            : 0;
+	            }
 
-            odataFeature.QueryOptions = this;
+	            odataFeature.QueryOptions = this;
+            }
 
             return result;
         }

@@ -19,35 +19,12 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// Represents a class that truncates a collection to a given page size.
     /// </summary>
     /// <typeparam name="T">The collection element type.</typeparam>
-    public class TruncatedCollection<T> : ITruncatedCollection, IEnumerable<T>, ICountOptionCollection, IQueryable<T>
+    public class TruncatedCollection<T> : ITruncatedCollection, ICountOptionCollection, IQueryable<T>
     {
         private const int MinPageSize = 1;
 
         private bool? _isTruncated;
-        private int _pageSize;
-        private long? _totalCount;
-        private IQueryable<T> _items;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
-        /// </summary>
-        /// <param name="source">The collection to be truncated.</param>
-        /// <param name="pageSize">The page size.</param>
-        public TruncatedCollection(IEnumerable<T> source, int pageSize)
-        {
-            Initialize(source.Take(checked(pageSize + 1)).AsQueryable(), pageSize);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
-        /// </summary>
-        /// <param name="source">The queryable collection to be truncated.</param>
-        /// <param name="pageSize">The page size.</param>
-        // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
-        // the enumerable version just enumerates and is inefficient.
-        public TruncatedCollection(IQueryable<T> source, int pageSize) : this(source, pageSize, false)
-        {
-        }
+        private readonly IQueryable<T> _items;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
@@ -57,36 +34,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
-        public TruncatedCollection(IQueryable<T> source, int pageSize, bool parameterize)
-        {
-            Initialize(Take(source, pageSize, parameterize), pageSize);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
-        /// </summary>
-        /// <param name="source">The queryable collection to be truncated.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalCount">The total count.</param>
-        public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount)
-        {
-            if (pageSize > 0)
-            {
-                Initialize(pageSize > 0 ? source.Take(checked(pageSize + 1)).AsQueryable() : source.AsQueryable(), pageSize);
-            }
-
-            _totalCount = totalCount;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
-        /// </summary>
-        /// <param name="source">The queryable collection to be truncated.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalCount">The total count.</param>
-        // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
-        // the enumerable version just enumerates and is inefficient.
-        public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount) : this(source, pageSize, totalCount, false)
+        public TruncatedCollection(IQueryable<T> source, int pageSize, bool parameterize): this(Take(source, pageSize, parameterize), pageSize)
         {
         }
 
@@ -96,31 +44,25 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="source">The queryable collection to be truncated.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalCount">The total count.</param>
-        /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
-        // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
-        // the enumerable version just enumerates and is inefficient.
-        public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount, bool parameterize)
-            
+        public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount): this(pageSize > 0 ? source.Take(checked(pageSize + 1)).AsQueryable() : source.AsQueryable(), pageSize)
         {
-            if (pageSize > 0)
-            {
-                Initialize(pageSize > 0 ? Take(source, pageSize, parameterize) : source, pageSize);
-            }
-
-            _totalCount = totalCount;
+	        TotalCount = totalCount;
         }
 
-        private void Initialize(IQueryable<T> enumerable, int pageSize)
+        private TruncatedCollection(IQueryable<T> source, int pageSize)
         {
-	        _items = enumerable;
+	        _items = source;
 
-            if (pageSize < MinPageSize)
-            {
-                throw Error.ArgumentMustBeGreaterThanOrEqualTo("pageSize", pageSize, MinPageSize);
-            }
+	        if (pageSize < MinPageSize)
+	        {
+		        throw Error.ArgumentMustBeGreaterThanOrEqualTo("pageSize", pageSize, MinPageSize);
+	        }
 
-            _pageSize = pageSize;
+	        PageSize = pageSize;
         }
+
+    
+
 
         private static IQueryable<T> Take(IQueryable<T> source, int pageSize, bool parameterize)
         {
@@ -133,20 +75,22 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         }
 
         /// <inheritdoc />
-        public int PageSize
-        {
-            get { return _pageSize; }
-        }
+        public int PageSize { get; }
 
         /// <inheritdoc />
-        public bool IsTruncated
-        {
-            get { return _isTruncated ?? throw new InvalidOperationException();; }
-        }
+        public bool IsTruncated => _isTruncated ?? throw new InvalidOperationException();
 
+        /// <summary>
+        /// Returns true if the underlying collection can be iterated asynchronously.
+        /// </summary>
         public bool IsAsyncEnumerationPossible => _items is IAsyncEnumerable<T>;
         
-        public IAsyncEnumerable<object> GetAsyncEnumerable()
+        /// <summary>
+        /// Returns an iterator which can be used to iterate the underlying collection asynchronously.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        IAsyncEnumerable<object> ITruncatedCollection.GetAsyncEnumerable()
         {
 	        if (!(_items is IAsyncEnumerable<T> asyncEnumerable)) throw new InvalidOperationException();
 	        return new AsyncEnumerableWrapper(asyncEnumerable, this);
@@ -172,21 +116,18 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         }
 
         /// <inheritdoc />
-        public long? TotalCount
-        {
-	        get
-	        {
-		        return _totalCount;
-	        }
-        }
+        public long? TotalCount { get; }
 
         public IEnumerator<T> GetEnumerator()
         {
 	        return new TruncatedCollectionEnumerator(_items, this);
         }
 
+		/// <inheritdoc />
 		public Type ElementType => _items.ElementType;
+		/// <inheritdoc />
         public Expression Expression => _items.Expression;
+		/// <inheritdoc />
         public IQueryProvider Provider => _items.Provider;
 
         private class TruncatedCollectionEnumerator : IEnumerator<T>
