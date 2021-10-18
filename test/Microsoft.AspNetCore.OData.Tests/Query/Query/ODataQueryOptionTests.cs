@@ -797,6 +797,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Func<bool> resultsLimited;
             IQueryable<Customer> result = ODataQueryOptions.LimitResults(queryable, limit, false, out resultsLimited) as IQueryable<Customer>;
 
+            // Ensure that the list is enumerated to make all lazy properties available.
+            result.ToList();
             // Assert
             Assert.Equal(Math.Min(limit, 4), result.Count());
             Assert.Equal(resultsLimitedExpected, resultsLimited());
