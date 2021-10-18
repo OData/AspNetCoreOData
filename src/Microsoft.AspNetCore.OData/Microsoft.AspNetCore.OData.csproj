@@ -32,10 +32,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.7" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.9.2" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.9.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Spatial" Version="7.9.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,10 +67,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>PropertyContainer.generated.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\odata.net-hk\src\Microsoft.OData.Core\Microsoft.OData.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
