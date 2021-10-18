@@ -126,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 		/// <inheritdoc />
 		public Type ElementType => _items.ElementType;
 		/// <inheritdoc />
-        public Expression Expression => _items.Expression;
+        public Expression Expression => _items.Take(PageSize).Expression;
 		/// <inheritdoc />
         public IQueryProvider Provider => _items.Provider;
 
@@ -151,7 +151,9 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 			        return false;
 		        }
 		        _remaining--;
-		        return _items.MoveNext();
+		        if (_items.MoveNext()) return true;
+		        _instance._isTruncated = false;
+		        return false;
 
 	        }
 

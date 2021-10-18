@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmStructuredTypeReference elementType = GetResourceType(resourceSetType);
             ODataResourceSet resourceSet = CreateResourceSet(enumerable, resourceSetType.AsCollection(), writeContext);
 
-            Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(resourceSet, enumerable, writeContext);
+            Func<Func<object, Uri>> nextLinkGenerator = () => GetNextLinkGenerator(resourceSet, enumerable, writeContext);
 
             if (resourceSet == null)
             {
@@ -142,7 +142,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.TypeCannotBeSerialized, elementType.FullName()));
             }
 
-            // set the nextpagelink to null to support JSON odata.streaming.
+            // set the nextpagelink to null to support JSON odata.streaming. But we need to preserve the original NextPageLink because the
+            // GetNextLinkGenerator might reuse the original value if it's not null.
+            var originalNexPageLink = resourceSet.NextPageLink;
             resourceSet.NextPageLink = null;
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
@@ -173,7 +175,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // object before calling WriteEnd(), the next page link will be written at the end, as required for
             // odata.streaming=true support.
 
-            resourceSet.NextPageLink = nextLinkGenerator(lastResource);
+            if (originalNexPageLink != null)
+            {
+	            resourceSet.NextPageLink = originalNexPageLink;
+            }
+
+            resourceSet.NextPageLink = nextLinkGenerator()(lastResource);
 
             await writer.WriteEndAsync().ConfigureAwait(false);
         }
@@ -282,7 +289,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="resourceSet">The resource set describing a collection of structured objects.</param>
         /// <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
         /// <param name="writeContext">The serializer context.</param>
-        /// <returns>The function that generates the NextLink from an object.</returns>
+        /// <returns>The function% that generates the NextLink from an object.</returns>
         internal static Func<object, Uri> GetNextLinkGenerator(ODataResourceSetBase resourceSet, IEnumerable resourceSetInstance, ODataSerializerContext writeContext)
         {
             if (resourceSet != null && resourceSet.NextPageLink != null)

@@ -28,6 +28,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             IEnumerable<int> source = new[] { 1, 2, 3, 5, 7 };
             TruncatedCollection<int> collection = new TruncatedCollection<int>(source, 3, 5);
 
+            // Ensure that the list is enumerated to make all lazy properties available.
+            var x = collection.ToList();
             // Arrange
             Assert.Equal(3, collection.PageSize);
             Assert.Equal(5, collection.TotalCount);

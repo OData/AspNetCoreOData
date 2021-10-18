@@ -4686,7 +4686,7 @@
             <param name="resourceSet">The resource set describing a collection of structured objects.</param>
             <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
             <param name="writeContext">The serializer context.</param>
-            <returns>The function that generates the NextLink from an object.</returns>
+            <returns>The function% that generates the NextLink from an object.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateODataOperation(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
