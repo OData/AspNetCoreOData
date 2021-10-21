@@ -88,9 +88,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     return;
                 }
 
-                Type clrType = edmModel.GetTypeMappingCache().GetClrType(
-                    elementType.ToEdmTypeReference(isNullable: false),
-                    edmModel);
+                Type clrType = edmModel.GetClrType(elementType.ToEdmTypeReference(isNullable: false));
 
                 // CLRType can be missing if untyped registrations were made.
                 if (clrType != null)
@@ -726,7 +724,7 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 throw Error.InvalidOperation(SRResources.QueryGetModelMustNotReturnNull);
             }
-            IEdmType edmType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
+            IEdmType edmType = model.GetEdmTypeReference(elementClrType)?.Definition;
 
             IEdmStructuredType structuredType = edmType as IEdmStructuredType;
             ODataPath path = request.ODataFeature().Path;

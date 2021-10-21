@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return ConvertResourceOrResourceSet(graph, edmTypeReference, readContext);
         }
 
-        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone)
+        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone, IEdmModel edmModel = null)
         {
             if (valueString == null)
             {
@@ -137,8 +137,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // can return the correct Date object.
             if (type == typeof(Date) || type == typeof(Date?))
             {
-                EdmCoreModel model = EdmCoreModel.Instance;
-                IEdmPrimitiveTypeReference dateTypeReference = type.GetEdmPrimitiveTypeReference();
+                IEdmModel model = edmModel ?? EdmCoreModel.Instance;
+                IEdmPrimitiveTypeReference dateTypeReference = model.GetEdmPrimitiveTypeReference(type);
                 return ODataUriUtils.ConvertFromUriLiteral(valueString, ODataVersion.V4, model, dateTypeReference);
             }
 
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             bool isNonStandardEdmPrimitive;
-            type.IsNonstandardEdmPrimitive(out isNonStandardEdmPrimitive);
+            edmModel.IsNonstandardEdmPrimitive(type, out isNonStandardEdmPrimitive);
 
             if (isNonStandardEdmPrimitive)
             {

@@ -12,7 +12,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
@@ -26,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         private static readonly MethodInfo _toArrayMethodInfo = typeof(Enumerable).GetMethod("ToArray");
 
         public static void AddToCollection(this IEnumerable items, IEnumerable collection, Type elementType,
-            Type resourceType, string propertyName, Type propertyType, TimeZoneInfo timeZoneInfo = null)
+            Type resourceType, string propertyName, Type propertyType, ODataDeserializerContext context = null)
         {
             Contract.Assert(items != null);
             Contract.Assert(collection != null);
@@ -53,10 +52,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new SerializationException(message);
             }
 
-            items.AddToCollectionCore(collection, elementType, list, addMethod, timeZoneInfo);
+            items.AddToCollectionCore(collection, elementType, list, addMethod, context);
         }
 
-        public static void AddToCollection(this IEnumerable items, IEnumerable collection, Type elementType, string paramName, Type paramType, TimeZoneInfo timeZoneInfo = null)
+        public static void AddToCollection(this IEnumerable items, IEnumerable collection, Type elementType, string paramName, Type paramType, ODataDeserializerContext context = null)
         {
             Contract.Assert(items != null);
             Contract.Assert(collection != null);
@@ -76,13 +75,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
             }
 
-            items.AddToCollectionCore(collection, elementType, list, addMethod, timeZoneInfo);
+            items.AddToCollectionCore(collection, elementType, list, addMethod, context);
         }
 
-        private static void AddToCollectionCore(this IEnumerable items, IEnumerable collection, Type elementType, IList list, MethodInfo addMethod, TimeZoneInfo timeZoneInfo = null)
+        private static void AddToCollectionCore(this IEnumerable items, IEnumerable collection, Type elementType, IList list, MethodInfo addMethod, ODataDeserializerContext context = null)
         {
+            IEdmModel model = context?.Model;
             bool isNonstandardEdmPrimitiveCollection;
-            elementType.IsNonstandardEdmPrimitive(out isNonstandardEdmPrimitiveCollection);
+            model.IsNonstandardEdmPrimitive(elementType, out isNonstandardEdmPrimitiveCollection);
 
             foreach (object item in items)
             {
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 if (isNonstandardEdmPrimitiveCollection && element != null)
                 {
                     // convert non-standard edm primitives if required.
-                    element = EdmPrimitiveHelper.ConvertPrimitiveValue(element, elementType, timeZoneInfo);
+                    element = EdmPrimitiveHelper.ConvertPrimitiveValue(element, elementType, context?.TimeZone);
                 }
 
                 if (list != null)

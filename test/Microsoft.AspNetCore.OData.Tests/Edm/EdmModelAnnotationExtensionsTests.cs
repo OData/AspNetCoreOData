@@ -205,6 +205,48 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
+        public void GetTypeMapper_ReturnsDefaultTypeMapper_IfNullModelOrWithoutTypeMapper()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+
+            // Arrange & Act & Assert
+            model = EdmCoreModel.Instance;
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+
+            // Arrange & Act & Assert
+            model = new EdmModel();
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+        }
+
+        [Fact]
+        public void SetTypeMapper_ThrowsArugmentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetTypeMapper(null), "model");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetTypeMapper(null), "mapper");
+        }
+
+        [Fact]
+        public void GetAndSetTypeMapper_RoundTrip()
+        {
+            // Arrange
+            IODataTypeMapper mapper = new Mock<IODataTypeMapper>().Object;
+            IEdmModel model = new EdmModel();
+
+            // Act
+            model.SetTypeMapper(mapper);
+            IODataTypeMapper actual = model.GetTypeMapper();
+
+            // Assert
+            Assert.Same(mapper, actual);
+        }
+
+        [Fact]
         public void GetAlternateKeys_ThrowsArugmentNull_ForInputParameters()
         {
             // Arrange & Act & Assert

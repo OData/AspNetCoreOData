@@ -170,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IEnumerable<DateTime> expects = dtos.Select(e => e.LocalDateTime);
 
             // Act
-            DeserializationHelpers.SetCollectionProperty(source, edmProperty, dtos, edmProperty.Name, timeZoneInfo: null);
+            DeserializationHelpers.SetCollectionProperty(source, edmProperty, dtos, edmProperty.Name, context: null);
 
             // Assert
             Assert.Equal(expects, source.DateTimeList);
@@ -191,9 +191,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 new DateTimeOffset(dt, new TimeSpan(+7, 0, 0)),
                 new DateTimeOffset(dt, new TimeSpan(-8, 0, 0))
             };
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                TimeZone = tzi
+            };
 
             // Act
-            DeserializationHelpers.SetCollectionProperty(source, edmProperty, dtos, edmProperty.Name, timeZoneInfo: tzi);
+            DeserializationHelpers.SetCollectionProperty(source, edmProperty, dtos, edmProperty.Name, context: context);
 
             // Assert
             Assert.Equal(new List<DateTime> { dt.AddHours(-8), dt.AddHours(-15), dt }, source.DateTimeList);
@@ -375,7 +379,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             var property = new ODataProperty { Name = "Unknown", Value = "Value" };
             var entityType = new EdmComplexType("namespace", "name");
-            entityType.AddStructuralProperty("Known", typeof(string).GetEdmPrimitiveTypeReference());
+            entityType.AddStructuralProperty("Known", EdmCoreModel.Instance.GetString(true));
 
             var entityTypeReference = new EdmComplexTypeReference(entityType, isNullable: false);
 

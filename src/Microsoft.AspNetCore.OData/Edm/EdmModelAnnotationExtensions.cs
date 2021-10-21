@@ -262,6 +262,48 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
+        /// Gets the OData type mapping provider from the model.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <returns>The <see cref="IODataTypeMapper"/>.</returns>
+        public static IODataTypeMapper GetTypeMapper(this IEdmModel model)
+        {
+            // use the default one if no model or no mapper registered.
+            if (model == null)
+            {
+                return DefaultODataTypeMapper.Default;
+            }
+
+            IODataTypeMapper provider = model.GetAnnotationValue<IODataTypeMapper>(model);
+            if (provider == null)
+            {
+                return DefaultODataTypeMapper.Default;
+            }
+
+            return provider;
+        }
+
+        /// <summary>
+        /// Sets the OData type mapping provider to the model.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="mapper">The given mapper.</param>
+        public static void SetTypeMapper(this IEdmModel model, IODataTypeMapper mapper)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (mapper == null)
+            {
+                throw Error.ArgumentNull(nameof(mapper));
+            }
+
+            model.SetAnnotationValue(model, mapper);
+        }
+
+        /// <summary>
         /// Gets the declared alternate keys of the most defined entity with a declared key present.
         /// Each entity type could define a set of alternate keys.
         /// </summary>

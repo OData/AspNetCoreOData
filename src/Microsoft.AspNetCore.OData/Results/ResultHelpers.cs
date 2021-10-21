@@ -171,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Results
         private static IEdmEntityTypeReference GetEntityType(IEdmModel model, object entity)
         {
             Type entityType = entity.GetType();
-            IEdmTypeReference edmType = model.GetTypeMappingCache().GetEdmType(entityType, model);
+            IEdmTypeReference edmType = model.GetEdmTypeReference(entityType);
             if (edmType == null)
             {
                 throw Error.InvalidOperation(SRResources.ResourceTypeNotInModel, entityType.FullName);

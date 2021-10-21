@@ -128,7 +128,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 return edmTypeReference.AsEntity();
             }
 
-            IEdmTypeReference reference = model.GetTypeMappingCache().GetEdmType(value.GetType(), model);
+            IEdmTypeReference reference = model.GetEdmTypeReference(value.GetType());
             if (reference != null && reference.Definition.IsOrInheritsFrom(edmType))
             {
                 return (IEdmEntityTypeReference)reference;
