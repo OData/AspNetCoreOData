@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 QueryValidationRunBeforeActionExecution = false,
             };
 
-            actionExecutingContext.HttpContext.Items.Add(nameof(RequestQueryData), requestQueryData);
+            actionExecutingContext.HttpContext.Items.TryAdd(nameof(RequestQueryData), requestQueryData);
 
             HttpRequest request = actionExecutingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;

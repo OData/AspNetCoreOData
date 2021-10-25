@@ -989,6 +989,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
+        public void OnActionExecuted_SingleResult_ReturnsSingleItemForMultipleEnableQueryAttributeSet()
+        {
+            BellevueCustomer customer = new BellevueCustomer();
+            SingleResult singleResult = new SingleResult<BellevueCustomer>(new BellevueCustomer[] { customer }.AsQueryable());
+            HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/", singleResult);
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            attribute.OnActionExecuted(actionExecutedContext);
+            attribute.OnActionExecuted(actionExecutedContext);
+            attribute.OnActionExecuted(actionExecutedContext);
+
+            Assert.Equal(HttpStatusCode.OK, actionExecutedContext.Response.StatusCode);
+            Assert.Equal(customer, (actionExecutedContext.Response.Content as ObjectContent).Value);
+        }
+
+        [Fact]
         public void OnActionExecuted_SingleResult_Returns400_IfQueryContainsNonSelectExpand()
         {
             HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/?$top=10", new Customer());
