@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             // primitive value
-            if (edmTypeReference.IsPrimitive())
+            if (edmTypeReference.IsPrimitive() || edmTypeReference.Definition.TypeKind == EdmTypeKind.TypeDefinition)
             {
                 ConstantNode node = graph as ConstantNode;
                 return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType, readContext?.TimeZone);
