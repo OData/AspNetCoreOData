@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -58,6 +59,45 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             var edmTypeReference = new EdmPrimitiveTypeReference(EdmCoreModel.Instance.GetPrimitiveType(edmTypeKind), false);
             var value = new ConstantNode(odataValue, odataValue.ToString(), edmTypeReference);
             var result = ODataModelBinderConverter.Convert(value, edmTypeReference, clrType, "IsActive", null, null);
+            Assert.NotNull(result);
+            Assert.IsType(clrType, result);
+            Assert.Equal(expectedResult, result);
+        }
+
+        /// <summary>
+        /// The set of potential type definition values to test against
+        /// <see cref="ODataModelBinderConverter.Convert(object, IEdmTypeReference, Type, string, OData.Formatter.Deserialization.ODataDeserializerContext, IServiceProvider)"/>.
+        /// </summary>
+        public static TheoryDataSet<object, EdmPrimitiveTypeKind, Type, object> ODataModelBinderConverter_Works_TypeDefinitionTestData
+        {
+            get
+            {
+                return new TheoryDataSet<object, EdmPrimitiveTypeKind, Type, object>
+                {
+                    { "100500", EdmPrimitiveTypeKind.String, typeof(BigInteger), new BigInteger(100500) },
+                    { 300, EdmPrimitiveTypeKind.Int32, typeof(BigInteger), new BigInteger(300) },
+                    { new BigInteger(222), EdmPrimitiveTypeKind.String, typeof(BigInteger),  new BigInteger(222) }
+                };
+            }
+        }
+
+        /// <summary>
+        /// Tests the <see cref="ODataModelBinderConverter.Convert(object, IEdmTypeReference, Type, string, OData.Formatter.Deserialization.ODataDeserializerContext, IServiceProvider)"/>
+        /// method to ensure proper operation against type definition, backed by primitive type.
+        /// </summary>
+        /// <param name="odataValue">The value as it would come across the wire.</param>
+        /// <param name="edmTypeKind">The <see cref="EdmPrimitiveTypeKind"/> to test for.</param>
+        /// <param name="clrType">The CLR type to convert to.</param>
+        /// <param name="expectedResult">The expected value in the correct type to check against.</param>
+        /// <remarks>Contributed by Jevgenijs Fjodorovics (@jfshark).</remarks>
+        [Theory]
+        [MemberData(nameof(ODataModelBinderConverter_Works_TypeDefinitionTestData))]
+        public void Convert_CheckTypeDefinitionPrimitives(object odataValue, EdmPrimitiveTypeKind edmTypeKind, Type clrType, object expectedResult)
+        {
+            var edmTypeDefinition = new EdmTypeDefinition(clrType.Namespace, clrType.Name, edmTypeKind);
+            var edmTypeDefReference = new EdmTypeDefinitionReference(edmTypeDefinition, false);
+
+            var result = ODataModelBinderConverter.Convert(odataValue, edmTypeDefReference, clrType, "IsActive", null, null);
             Assert.NotNull(result);
             Assert.IsType(clrType, result);
             Assert.Equal(expectedResult, result);

@@ -139,6 +139,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else
                 {
+                    if (TypeHelper.TryGetInstance(type, value, out var result))
+                    {
+                        return result;
+                    }
+
                     try
                     {
                         // Note that we are not casting the return value to nullable<T> as even if we do it

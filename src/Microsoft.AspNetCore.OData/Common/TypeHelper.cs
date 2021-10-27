@@ -287,6 +287,40 @@ namespace Microsoft.AspNetCore.OData.Common
             return type;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
+        internal static bool TryGetInstance(Type type, object value, out object instance)
+        {
+            instance = null;
+
+            // Trial to create an instance, using parsing
+            var methodInfo = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { value.GetType(), type.MakeByRefType() }, null);
+            if (methodInfo != null)
+            {
+                object[] parameters = new object[] { value, null };
+                var result = (bool)methodInfo.Invoke(null, parameters);
+                if (result)
+                {
+                    instance = parameters[1];
+                    return true;
+                }
+            }
+
+            try
+            {
+                // Trial to create an instance, using constructor
+                instance = Activator.CreateInstance(type, args: value);
+                if (instance != null)
+                {
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                // Proceed further
+            }
+            return false;
+        }
+
         private static Type GetInnerGenericType(Type interfaceType)
         {
             // Getting the type T definition if the returning type implements IEnumerable<T>
