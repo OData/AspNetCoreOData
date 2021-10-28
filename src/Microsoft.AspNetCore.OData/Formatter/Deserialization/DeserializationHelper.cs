@@ -8,10 +8,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Xml;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
@@ -50,13 +52,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEdmTypeReference propertyType = edmProperty != null ? edmProperty.Type : null;
 
             EdmTypeKind propertyKind;
-            object value = ConvertValue(property.Value, ref propertyType, deserializerProvider, readContext,
-                out propertyKind);
+            object value = ConvertValue(property.Value, ref propertyType, deserializerProvider, readContext, out propertyKind);
 
             if (isDynamicProperty)
             {
-                SetDynamicProperty(resource, resourceType, propertyKind, propertyName, value, propertyType,
-                    readContext.Model);
+                SetDynamicProperty(resource, resourceType, propertyKind, propertyName, value, propertyType, readContext.Model);
             }
             else
             {
@@ -279,6 +279,111 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             typeKind = EdmTypeKind.Primitive;
+
+            return ConvertPrimitiveValueIfString(oDataValue, propertyType);
+        }
+
+        // Since we support property name case-insensitive and enable "ReadUntypedAsString=true" by default.
+        // ODL reads "unknown" property value as "value", not as "ODataUntypedValue".
+        // For most of the primitive types, for example DateTimeOffset, the "value" from ODL is a "string".
+        // We should convert the "string" value to its correct format.
+        // Ideally, ODL should read "case-insensitive" property value as its correct format. So far, ODL hasn't been enabled.
+        internal static object ConvertPrimitiveValueIfString(object oDataValue, IEdmTypeReference propertyType)
+        {
+            string stringValue = oDataValue as string;
+            if (stringValue == null)
+            {
+                return oDataValue;
+            }
+
+            if (propertyType == null || !propertyType.IsPrimitive())
+            {
+                return oDataValue;
+            }
+
+            Type clrType = propertyType.AsPrimitive().GetClrPrimitiveType();
+            if (clrType == null)
+            {
+                return oDataValue;
+            }
+
+            clrType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
+
+            if (clrType == typeof(string))
+            {
+                return oDataValue;
+            }
+
+            if (clrType == typeof(byte[]))
+            {
+                return Convert.FromBase64String(stringValue);
+            }
+
+            if (clrType == typeof(Guid))
+            {
+                return new Guid(stringValue);
+            }
+
+            // Convert.ChangeType does not support TimeSpan.
+            if (clrType == typeof(TimeSpan))
+            {
+                return XmlConvert.ToTimeSpan(stringValue);
+            }
+
+            // Date
+            if (clrType == typeof(Date))
+            {
+                if (Date.TryParse(stringValue, CultureInfo.InvariantCulture, out Date date))
+                {
+                    return date;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+            }
+
+            // TimeOfDay
+            if (clrType == typeof(TimeOfDay))
+            {
+                if (TimeOfDay.TryParse(stringValue, CultureInfo.InvariantCulture, out TimeOfDay date))
+                {
+                    return date;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+            }
+
+            // DateTimeOffset
+            if (clrType == typeof(DateTimeOffset))
+            {
+                if (DateTimeOffset.TryParse(stringValue, out DateTimeOffset dto))
+                {
+                    return dto;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+            }
+
+            if (clrType == typeof(Double) || clrType == typeof(Single))
+            {
+                if (double.TryParse(stringValue, out double d))
+                {
+                    return d;
+                }
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+
+            }
+
+            if (clrType == typeof(Single))
+            {
+                if (Single.TryParse(stringValue, out Single s))
+                {
+                    return s;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+            }
+
+            // for others, for example the spatial primitive types. Let's wait ODL to fix it.
             return oDataValue;
         }
 

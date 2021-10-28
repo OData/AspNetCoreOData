@@ -20,8 +20,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
     {
         private readonly FilesContext _db;
 
-        
-
          public FilesController(FilesContext context)
         {
             context.Database.EnsureCreated();

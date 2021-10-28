@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+
 namespace ODataRoutingSample.Models
 {
     public class Product
@@ -14,6 +16,10 @@ namespace ODataRoutingSample.Models
         public string Category { get; set; }
 
         public Color Color { get; set; }
+
+        public DateTimeOffset CreatedDate { get; set; }
+
+        public DateTimeOffset? UpdatedDate { get; set; }
 
         public virtual ProductDetail Detail { get; set; }
     }
