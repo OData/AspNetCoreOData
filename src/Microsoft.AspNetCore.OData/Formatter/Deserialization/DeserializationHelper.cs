@@ -338,7 +338,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return date;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, stringValue, clrType.FullName));
             }
 
             // TimeOfDay
@@ -349,7 +349,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return date;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, stringValue, clrType.FullName));
             }
 
             // DateTimeOffset
@@ -360,7 +360,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return dto;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, stringValue, clrType.FullName));
             }
 
             if (clrType == typeof(Double) || clrType == typeof(Single))
@@ -369,7 +369,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 {
                     return d;
                 }
-                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, stringValue, clrType.FullName));
 
             }
 
@@ -380,7 +380,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     return s;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, clrType.FullName));
+                throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, stringValue, clrType.FullName));
             }
 
             // for others, for example the spatial primitive types. Let's wait ODL to fix it.

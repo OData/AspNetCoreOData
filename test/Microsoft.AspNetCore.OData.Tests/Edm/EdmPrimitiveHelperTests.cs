@@ -80,8 +80,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                     { 0, typeof(bool), "The value must be a boolean." },
                     { 1024, typeof(byte), "The value has a value that is out of range of type System.Byte." },
                     { "data", typeof(long),  "The value has a format that is not recognized by type System.Int64." },
-                    { "data", typeof(TestStruct),  "The value cannot be converted to type Microsoft.AspNetCore.OData.Tests.Edm.EdmPrimitiveHelperTests+TestStruct." },
-                    { new TestStruct(), typeof(int),  "The value cannot be converted to type System.Int32." }
+                    { "data", typeof(TestStruct),  "The value 'data' cannot be converted to type Microsoft.AspNetCore.OData.Tests.Edm.EdmPrimitiveHelperTests+TestStruct." },
+                    { new TestStruct(), typeof(int),  "The value 'Microsoft.AspNetCore.OData.Tests.Edm.EdmPrimitiveHelperTests+TestStruct' cannot be converted to type System.Int32." }
                 };
 
         public static TheoryDataSet<DateTimeOffset> ConvertDateTime_NonStandardPrimitives_Data

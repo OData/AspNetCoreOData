@@ -706,7 +706,7 @@
     <value>Unable to parse query request payload.</value>
   </data>
   <data name="PropertyCannotBeConverted" xml:space="preserve">
-    <value>The value cannot be converted to type {0}.</value>
+    <value>The value '{0}' cannot be converted to type {1}.</value>
   </data>
   <data name="PropertyTypeOverflow" xml:space="preserve">
     <value>The value has a value that is out of range of type {0}.</value>

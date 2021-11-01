@@ -6834,7 +6834,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyCannotBeConverted">
             <summary>
-              Looks up a localized string similar to The value cannot be converted to type {0}..
+              Looks up a localized string similar to The value &apos;{0}&apos; cannot be converted to type {1}..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyIsNotCollection">

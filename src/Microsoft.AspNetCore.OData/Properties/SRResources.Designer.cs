@@ -1366,7 +1366,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The value cannot be converted to type {0}..
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; cannot be converted to type {1}..
         /// </summary>
         internal static string PropertyCannotBeConverted {
             get {

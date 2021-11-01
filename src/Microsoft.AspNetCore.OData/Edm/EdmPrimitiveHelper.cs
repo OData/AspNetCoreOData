@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, type));
+                        throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, value.ToString(), type));
                     }
                     catch (FormatException)
                     {
