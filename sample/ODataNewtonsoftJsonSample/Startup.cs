@@ -30,7 +30,7 @@ namespace ODataNewtonsoftJsonSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddOData(opt => opt.Select().Filter().AddRouteComponents("odata", GetEdmModel()))
+                .AddOData(opt => opt.Select().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
                 .AddODataNewtonsoftJson()
                 //.AddNewtonsoftJson(
                 //options =>
