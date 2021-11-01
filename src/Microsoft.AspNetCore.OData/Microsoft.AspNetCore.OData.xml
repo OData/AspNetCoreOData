@@ -2730,12 +2730,12 @@
             Gets a boolean indicating whether the link factory follows OData conventions or not.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.ClrToEdmTypeCache">
+        <member name="P:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.ClrToEdmTypeCache">
             <summary>
             <see cref="T:System.Type"/> to <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.EdmToClrTypeCache">
+        <member name="P:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.EdmToClrTypeCache">
             <summary>
             <see cref="T:Microsoft.OData.Edm.IEdmType"/> to <see cref="T:System.Type"/>.
             item1: non-nullable

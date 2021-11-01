@@ -1481,7 +1481,6 @@ static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.IsODataIgnore
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.GetAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> T
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.HasAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
 static Microsoft.AspNetCore.OData.Extensions.ControllerModelExtensions.IsODataIgnored(this Microsoft.AspNetCore.Mvc.ApplicationModels.ControllerModel controller) -> bool
-static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.GetTypeMappingProvider(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Edm.IODataTypeMapper
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataFeature(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.Abstracts.IODataFeature
 static Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(this Microsoft.AspNetCore.Http.HttpContext httpContext) -> Microsoft.AspNetCore.OData.ODataOptions

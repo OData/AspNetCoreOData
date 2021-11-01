@@ -35,15 +35,15 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// The default mapping between Edm primitive type and Clr primitive type.
         /// Primitive types are cross Edm models.
         /// </summary>
-        private static ConcurrentDictionary<Type, IEdmPrimitiveTypeReference> ClrPrimitiveTypes
-            = new ConcurrentDictionary<Type, IEdmPrimitiveTypeReference>();
+        private static IDictionary<Type, IEdmPrimitiveTypeReference> ClrPrimitiveTypes
+            = new Dictionary<Type, IEdmPrimitiveTypeReference>();
 
         /// <summary>
         /// Item1 --> non-nullable
         /// Item2 --> nullable
         /// </summary>
-        private static ConcurrentDictionary<IEdmPrimitiveType, (Type, Type)> EdmPrimitiveTypes
-            = new ConcurrentDictionary<IEdmPrimitiveType, (Type, Type)>();
+        private static IDictionary<IEdmPrimitiveType, (Type, Type)> EdmPrimitiveTypes
+            = new Dictionary<IEdmPrimitiveType, (Type, Type)>();
 
         static DefaultODataTypeMapper()
         {
@@ -189,7 +189,8 @@ namespace Microsoft.AspNetCore.OData.Edm
                 throw Error.ArgumentNull(nameof(edmModel));
             }
 
-            TypeCacheItem map = GetOrCreateCacheItem(edmModel);
+            TypeCacheItem map = _cache.GetOrAdd(edmModel, d => new TypeCacheItem());
+
             // Search from cache
             if (map.TryFindEdmType(clrType, out IEdmTypeReference edmTypeRef))
             {
@@ -319,7 +320,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             assembliesResolver = assembliesResolver ?? AssemblyResolverHelper.Default;
 
             // Let's search from cache
-            TypeCacheItem map = GetOrCreateCacheItem(edmModel);
+            TypeCacheItem map = _cache.GetOrAdd(edmModel, d => new TypeCacheItem());
             if (map.TryFindClrType(edmType, nullable, out Type clrType))
             {
                 return clrType;
@@ -380,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (matchingTypes.Count() > 1)
             {
-                throw Error.Argument("edmTypeReference", SRResources.MultipleMatchingClrTypesForEdmType,
+                throw Error.InvalidOperation(SRResources.MultipleMatchingClrTypesForEdmType,
                     typeName, string.Join(",", matchingTypes.Select(type => type.AssemblyQualifiedName)));
             }
 
@@ -393,17 +394,6 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
         #endregion
 
-        private TypeCacheItem GetOrCreateCacheItem(IEdmModel model)
-        {
-            if (!_cache.TryGetValue(model, out TypeCacheItem map))
-            {
-                map = new TypeCacheItem();
-                _cache[model] = map;
-            }
-
-            return map;
-        }
-
         private static Type ExtractGenericInterface(Type queryType, Type interfaceType)
         {
             Func<Type, bool> matchesInterface = t => t.IsGenericType && t.GetGenericTypeDefinition() == interfaceType;
@@ -412,9 +402,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         private static IEnumerable<Type> GetMatchingTypes(string edmFullName, IAssemblyResolver assembliesResolver)
             => TypeHelper.GetLoadedTypes(assembliesResolver).Where(t => t.IsPublic && t.EdmFullName() == edmFullName);
-
-        private static KeyValuePair<Type, IEdmPrimitiveTypeReference> BuildTypeMapping1<T>(EdmPrimitiveTypeKind primitiveKind)
-            => new KeyValuePair<Type, IEdmPrimitiveTypeReference>(typeof(T), EdmCoreModel.Instance.GetPrimitive(primitiveKind, typeof(T).IsNullable()));
 
         private static void BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind, bool isStandard = true)
         {
@@ -431,12 +418,19 @@ namespace Microsoft.AspNetCore.OData.Edm
                     // for nullable, for example System.String, we don't have non-nullable string.
                     // so, let's save it for both.
                     // And since we make the order un-changable, it means 'nullable' coming first.
-                    // Therefore, for simplicity, we can safe call "TryAdd".
-                    EdmPrimitiveTypes.TryAdd(primitiveType, (type, type));
+                    EdmPrimitiveTypes[primitiveType] = (type, type);
                 }
                 else
                 {
-                    EdmPrimitiveTypes.AddOrUpdate(primitiveType, t => (type, null), (t, o) => (type, o.Item2));
+                    if (EdmPrimitiveTypes.ContainsKey(primitiveType))
+                    {
+                        (Type _, Type edmType2) = EdmPrimitiveTypes[primitiveType];
+                        EdmPrimitiveTypes[primitiveType] = (type, edmType2);
+                    }
+                    else
+                    {
+                        EdmPrimitiveTypes[primitiveType] = (type, null);
+                    }
                 }
             }
         }

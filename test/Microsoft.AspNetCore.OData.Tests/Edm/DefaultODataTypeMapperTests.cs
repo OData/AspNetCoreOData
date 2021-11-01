@@ -121,35 +121,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             Assert.True(primitiveTypeReference.IsNullable);
         }
 
-        //[Theory]
-        //[InlineData(null, null, false)]
-        //[InlineData(typeof(int), typeof(int), false)]
-        //[InlineData(typeof(int?), typeof(int?), false)]
-        //[InlineData(typeof(object), typeof(object), false)]
-        //[InlineData(typeof(MyAddress), typeof(MyAddress), false)]
-        //// non-standard primitive types
-        //[InlineData(typeof(XElement), typeof(string), true)]
-        //[InlineData(typeof(ushort), typeof(int), true)]
-        //[InlineData(typeof(ushort?), typeof(int?), true)]
-        //[InlineData(typeof(uint), typeof(long), true)]
-        //[InlineData(typeof(uint?), typeof(long?), true)]
-        //[InlineData(typeof(ulong), typeof(long), true)]
-        //[InlineData(typeof(ulong?), typeof(long?), true)]
-        //[InlineData(typeof(char[]), typeof(string), true)]
-        //[InlineData(typeof(char), typeof(string), true)]
-        //[InlineData(typeof(char?), typeof(string), true)]
-        //[InlineData(typeof(DateTime), typeof(DateTimeOffset), true)]
-        //[InlineData(typeof(DateTime?), typeof(DateTimeOffset?), true)]
-        //public void IsNonstandardEdmPrimitiveWorksAsExpectedForNonstandardType(Type clrType, Type expectType, bool isNonstandard)
-        //{
-        //    // Arrange & Act
-        //    Type actual = _provider.IsNonstandardEdmPrimitive(clrType, out bool isNonstandardEdmPrimtive);
-
-        //    // Assert
-        //    Assert.Equal(expectType, actual);
-        //    Assert.Equal(isNonstandard, isNonstandardEdmPrimtive);
-        //}
-
         [Theory]
         [InlineData(EdmPrimitiveTypeKind.String, typeof(string), typeof(string))]
         [InlineData(EdmPrimitiveTypeKind.Boolean, typeof(bool?), typeof(bool))]

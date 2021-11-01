@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <summary>
         /// <see cref="Type"/> to <see cref="IEdmTypeReference"/>.
         /// </summary>
-        public ConcurrentDictionary<Type, IEdmTypeReference> ClrToEdmTypeCache = new ConcurrentDictionary<Type, IEdmTypeReference>();
+        public ConcurrentDictionary<Type, IEdmTypeReference> ClrToEdmTypeCache { get; } = new ConcurrentDictionary<Type, IEdmTypeReference>();
 
         public bool TryFindEdmType(Type clrType, out IEdmTypeReference edmType)
         {
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// item1: non-nullable
         /// item2: nullable
         /// </summary>
-        public ConcurrentDictionary<IEdmType, (Type, Type)> EdmToClrTypeCache = new ConcurrentDictionary<IEdmType, (Type, Type)>();
+        public ConcurrentDictionary<IEdmType, (Type, Type)> EdmToClrTypeCache { get; } = new ConcurrentDictionary<IEdmType, (Type, Type)>();
 
         public bool TryFindClrType(IEdmType edmType, bool isNullable, out Type clrType)
         {
