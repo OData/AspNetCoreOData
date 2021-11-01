@@ -49,10 +49,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.KeyValueCannotBeNull, key.Name, edmType.Definition);
             }
 
-            return ConvertValue(value, resourceContext.TimeZone);
+            return ConvertValue(value, resourceContext.TimeZone, resourceContext.EdmModel);
         }
 
-        public static object ConvertValue(object value, TimeZoneInfo timeZone)
+        public static object ConvertValue(object value, TimeZoneInfo timeZone, IEdmModel model)
         {
             Contract.Assert(value != null);
 
@@ -63,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                Contract.Assert(type.GetEdmPrimitiveType() != null);
+                Contract.Assert(model.GetEdmPrimitiveTypeReference(type) != null);
                 value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(value, timeZone);
             }
 
@@ -113,7 +113,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                Contract.Assert(type.GetEdmPrimitiveType() != null);
                 value = ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(value, timeZone);
             }
 

@@ -103,11 +103,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             IEdmModel model = request.GetModel();
-            //IODataTypeMappingProvider typeMappingProvider = _serviceProvider.GetRequiredService<IODataTypeMappingProvider>();
-
-            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
-            //IEdmTypeReference edmType = typeMappingProvider.GetEdmType(model, type);
+            IEdmTypeReference edmType = model.GetEdmTypeReference(type);
 
             if (edmType == null)
             {

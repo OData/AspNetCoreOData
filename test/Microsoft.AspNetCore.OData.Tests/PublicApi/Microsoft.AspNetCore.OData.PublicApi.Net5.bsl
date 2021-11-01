@@ -524,6 +524,13 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 	System.Type StructuredType  { public virtual get; }
 }
 
+public interface Microsoft.AspNetCore.OData.Edm.IODataTypeMapper {
+	System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
+	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetPrimitiveType (System.Type clrType)
+	System.Type GetPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
+}
+
 [
 ExtensionAttribute(),
 ]
@@ -561,7 +568,17 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static Microsoft.AspNetCore.OData.Edm.IODataTypeMapper GetTypeMapper (Microsoft.OData.Edm.IEdmModel model)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static void SetModelName (Microsoft.OData.Edm.IEdmModel model, string name)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void SetTypeMapper (Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper)
 }
 
 [
@@ -609,11 +626,45 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions
 	public static void SetOperationLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder operationLinkBuilder)
 }
 
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetClrType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetClrType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.OData.Edm.IEdmType GetEdmType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetPrimitiveType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType)
+}
+
 public class Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation {
 	public CustomAggregateMethodAnnotation ()
 
 	public Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation AddMethod (string methodToken, System.Collections.Generic.IDictionary`2[[System.Type],[System.Reflection.MethodInfo]] methods)
 	public bool GetMethodInfo (string methodToken, System.Type returnType, out System.Reflection.MethodInfo& methodInfo)
+}
+
+public class Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper : IODataTypeMapper {
+	public DefaultODataTypeMapper ()
+
+	public virtual System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
+	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetPrimitiveType (System.Type clrType)
+	public virtual System.Type GetPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
 }
 
 public class Microsoft.AspNetCore.OData.Edm.EntitySelfLinks {

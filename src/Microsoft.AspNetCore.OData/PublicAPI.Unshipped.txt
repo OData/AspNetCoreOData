@@ -222,6 +222,8 @@ Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation
 Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.AddMethod(string methodToken, System.Collections.Generic.IDictionary<System.Type, System.Reflection.MethodInfo> methods) -> Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation
 Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.CustomAggregateMethodAnnotation() -> void
 Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation.GetMethodInfo(string methodToken, System.Type returnType, out System.Reflection.MethodInfo methodInfo) -> bool
+Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper
+Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.DefaultODataTypeMapper() -> void
 Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions
 Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks
@@ -232,6 +234,12 @@ Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.IdLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.IdLink.set -> void
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.ReadLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.ReadLink.set -> void
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapper
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrType(Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver) -> System.Type
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType) -> Microsoft.OData.Edm.IEdmTypeReference
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable) -> System.Type
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetPrimitiveType(System.Type clrType) -> Microsoft.OData.Edm.IEdmPrimitiveTypeReference
+Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions
 Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation
 Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelName.get -> string
 Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelNameAnnotation(string name) -> void
@@ -1450,7 +1458,9 @@ static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrPropert
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetConcurrencyProperties(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> System.Collections.Generic.IEnumerable<Microsoft.OData.Edm.IEdmStructuralProperty>
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetDynamicPropertyDictionary(this Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmStructuredType edmType) -> System.Reflection.PropertyInfo
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetModelName(this Microsoft.OData.Edm.IEdmModel model) -> string
+static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetTypeMapper(this Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.Edm.IODataTypeMapper
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetModelName(this Microsoft.OData.Edm.IEdmModel model, string name) -> void
+static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetTypeMapper(this Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper) -> void
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource) -> Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetOperationLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation) -> Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasEditLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> editLinkBuilder) -> void
@@ -1459,6 +1469,10 @@ static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasNavigatio
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.HasReadLink(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder<System.Uri> readLinkBuilder) -> void
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetNavigationSourceLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation navigationSourceLinkBuilder) -> void
 static Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetOperationLinkBuilder(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder operationLinkBuilder) -> void
+static Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetClrType(this Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType) -> System.Type
+static Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetClrType(this Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver) -> System.Type
+static Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetEdmType(this Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType) -> Microsoft.OData.Edm.IEdmType
+static Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetPrimitiveType(this Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType) -> System.Type
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, string httpMethods, string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate path, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> void
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.GetAttribute<T>(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> T
 static Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(this Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, string keyPrefix = "key") -> bool
@@ -1555,6 +1569,10 @@ virtual Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.ExecuteChan
 virtual Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.ExecuteOperationAsync(Microsoft.OData.ODataBatchReader batchReader, System.Guid batchId, Microsoft.AspNetCore.Http.HttpRequest originalRequest, Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>
 virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.ExpectedClrType.get -> System.Type
 virtual Microsoft.AspNetCore.OData.Deltas.Delta<T>.StructuredType.get -> System.Type
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetClrType(Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver) -> System.Type
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType) -> Microsoft.OData.Edm.IEdmTypeReference
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable) -> System.Type
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetPrimitiveType(System.Type clrType) -> Microsoft.OData.Edm.IEdmPrimitiveTypeReference
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEditLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel, System.Uri idLink) -> System.Uri
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEntitySelfLinks(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> Microsoft.AspNetCore.OData.Edm.EntitySelfLinks
 virtual Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildIdLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext instanceContext, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> System.Uri
