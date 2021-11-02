@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal Stack<Dictionary<string, ParameterExpression>> _parametersStack = new Stack<Dictionary<string, ParameterExpression>>();
         internal Dictionary<string, ParameterExpression> _lambdaParameters;
         internal Type _filterType;
+
         internal FilterOrderByBinderBase(IServiceProvider requestContainer)
             : base(requestContainer)
         {
@@ -71,14 +72,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
-            CollectionNode collectionNode = node as CollectionNode;
-            SingleValueNode singleValueNode = node as SingleValueNode;
-
-            if (collectionNode != null)
+            if (node is CollectionNode collectionNode)
             {
                 return BindCollectionNode(collectionNode);
             }
-            else if (singleValueNode != null)
+            else if (node is SingleValueNode singleValueNode)
             {
                 return BindSingleValueNode(singleValueNode);
             }
