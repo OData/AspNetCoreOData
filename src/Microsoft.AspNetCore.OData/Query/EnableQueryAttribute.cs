@@ -484,6 +484,19 @@ namespace Microsoft.AspNetCore.OData.Query
                     }
                 }
 
+                // if $count=true is used, add the count to the context. This allows the consuming web site
+                // to retrieve the count in middleware without having to use the odata controller.
+
+                bool countParameterIsTrue = queryOptions.Count?.Value ?? false;
+                if (countParameterIsTrue)
+                {
+                    long? count = request.ODataFeature().TotalCount;
+                    if (count.HasValue)
+                    {
+                        request.HttpContext.Items["ODataCount"] = count;
+                    }
+                }
+
                 return queryable;
             }
         }
