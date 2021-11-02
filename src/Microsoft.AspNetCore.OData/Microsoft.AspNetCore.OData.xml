@@ -8255,8 +8255,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase">
             <summary>
-            Translates an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            Base class for <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.Bind(Microsoft.OData.UriParser.QueryNode)">
@@ -8293,7 +8292,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindSingleResourceCastFunctionCall(Microsoft.OData.UriParser.SingleResourceFunctionCallNode)">
             <summary>
-            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            Binds a <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/> with the cast function to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
             represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleResourceFunctionCallNode"/>.
             </summary>
             <param name="node">The node to bind.</param>
@@ -8456,14 +8455,14 @@
             </summary>
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
-            Creates an <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
+            Creates a <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
             </summary>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
-            <returns>An <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
@@ -9020,11 +9019,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetOrderByBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.
             </summary>
             <param name="context">The query context.</param>
             <param name="querySettings">The query settings.</param>
-            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.</returns>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>

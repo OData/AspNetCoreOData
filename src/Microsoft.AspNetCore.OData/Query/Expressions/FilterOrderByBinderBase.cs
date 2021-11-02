@@ -21,8 +21,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
     /// <summary>
-    /// Translates an OData $filter parse tree represented by <see cref="FilterClause"/> to
-    /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+    /// Base class for <see cref="FilterBinder"/> and <see cref="OrderByBinder"/>.
     /// </summary>
     public class FilterOrderByBinderBase : ExpressionBinderBase
     {
@@ -36,6 +35,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             : base(requestContainer)
         {
         }
+
         internal FilterOrderByBinderBase(IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings settings)
             : base(model, assembliesResolver, settings)
         {
@@ -177,6 +177,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 return GetFlattenedPropertyExpression(openNode.Name) ?? Expression.Property(Bind(openNode.Source), openNode.Name);
             }
+
             PropertyInfo prop = GetDynamicPropertyContainer(openNode);
 
             var propertyAccessExpression = BindPropertyAccessExpression(openNode, prop);
@@ -217,6 +218,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 propertyAccessExpression = Expression.Property(source, prop.Name);
             }
+
             return propertyAccessExpression;
         }
 
@@ -243,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <summary>
-        /// Binds a <see cref="SingleResourceFunctionCallNode"/> to create a LINQ <see cref="Expression"/> that
+        /// Binds a <see cref="SingleResourceFunctionCallNode"/> with the cast function to create a LINQ <see cref="Expression"/> that
         /// represents the semantics of the <see cref="SingleResourceFunctionCallNode"/>.
         /// </summary>
         /// <param name="node">The node to bind.</param>
@@ -526,8 +528,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal LambdaExpression BindExpression(SingleValueNode expression, RangeVariable rangeVariable, Type elementType)
         {
             ParameterExpression filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
-            _lambdaParameters = new Dictionary<string, ParameterExpression>();
-            _lambdaParameters.Add(rangeVariable.Name, filterParameter);
+            _lambdaParameters = new Dictionary<string, ParameterExpression> { { rangeVariable.Name, filterParameter } };
 
             EnsureFlattenedPropertyContainer(filterParameter);
 

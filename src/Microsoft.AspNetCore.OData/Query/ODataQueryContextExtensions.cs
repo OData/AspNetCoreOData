@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 binder = context.RequestContainer.GetService<IFilterBinder>();
             }
 
-            return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+            return binder ?? new FilterBinder(querySettings, context.GetAssemblyResolver(), context.Model);
         }
 
         /// <summary>
@@ -82,11 +82,11 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Gets the <see cref="ISelectExpandBinder"/>.
+        /// Gets the <see cref="IOrderByBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
         /// <param name="querySettings">The query settings.</param>
-        /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
+        /// <returns>The built <see cref="IOrderByBinder"/>.</returns>
         public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
         {
             if (context == null)
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             IOrderByBinder binder = context.RequestContainer?.GetService<IOrderByBinder>();
 
-            return binder ?? new OrderByBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+            return binder ?? new OrderByBinder(querySettings, context.GetAssemblyResolver(), context.Model);
         }
 
         /// <summary>
