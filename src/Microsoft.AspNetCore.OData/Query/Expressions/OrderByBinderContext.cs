@@ -35,5 +35,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets or sets the CLR type of the element.
         /// </summary>
         public Type ElementClrType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property that indicates if an expression has already been ordered.
+        /// </summary>
+        public bool AlreadyOrdered { get; set; }
     }
 }

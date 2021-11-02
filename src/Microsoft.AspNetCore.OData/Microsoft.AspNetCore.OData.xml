@@ -8472,13 +8472,20 @@
             an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
             <summary>
             Creates a <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an OData $orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
             </summary>
-            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext"/>.</param>
             <returns>The <see cref="T:System.Linq.Expressions.LambdaExpression"/> after the orderby query has been translated.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
+            <summary>
+            Applies an OData orderby parse tree represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext"/>.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
@@ -8534,6 +8541,9 @@
             </summary>
             <param name="requestContainer">The request container.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
+            <inheritdoc/>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
             <inheritdoc/>
         </member>
@@ -8560,6 +8570,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.ElementClrType">
             <summary>
             Gets or sets the CLR type of the element.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext.AlreadyOrdered">
+            <summary>
+            Gets or sets the property that indicates if an expression has already been ordered.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">

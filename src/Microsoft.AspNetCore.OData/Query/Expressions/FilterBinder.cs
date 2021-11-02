@@ -25,6 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Initializes a new instance of the <see cref="FilterBinder"/> class.
         /// </summary>
         /// <param name="requestContainer">The request container.</param>
+        [SuppressMessage("ApiDesign", "RS0022:Constructor make noninheritable base class inheritable", Justification = "We have multi-level inheritance")]
         public FilterBinder(IServiceProvider requestContainer)
             : base(requestContainer)
         {

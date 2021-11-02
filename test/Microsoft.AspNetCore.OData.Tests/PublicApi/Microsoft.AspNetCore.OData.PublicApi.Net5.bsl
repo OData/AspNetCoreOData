@@ -2451,7 +2451,8 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder {
-	System.Linq.Expressions.LambdaExpression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	System.Linq.Expressions.LambdaExpression Bind (Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder {
@@ -2518,12 +2519,14 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBas
 public class Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder : Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase, IOrderByBinder {
 	public OrderByBinder (System.IServiceProvider requestContainer)
 
-	public virtual System.Linq.Expressions.LambdaExpression Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	public virtual System.Linq.Expressions.LambdaExpression Bind (Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
+	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext {
 	public OrderByBinderContext ()
 
+	bool AlreadyOrdered  { public get; public set; }
 	System.Type ElementClrType  { public get; public set; }
 	Microsoft.OData.UriParser.OrderByClause OrderByClause  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext QueryContext  { public get; public set; }
