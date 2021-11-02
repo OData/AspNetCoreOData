@@ -484,8 +484,8 @@ namespace Microsoft.AspNetCore.OData.Query
                     }
                 }
 
-                // if $count=true is used, add the count to the context. This allows the consuming web site
-                // to retrieve the count in middleware without having to use the odata controller.
+                // if $count=true is used, add the count to the context. This way, the count can be retrieved in middleware
+                // and for example used to create a response header with this count.
 
                 bool countParameterIsTrue = queryOptions.Count?.Value ?? false;
                 if (countParameterIsTrue)
