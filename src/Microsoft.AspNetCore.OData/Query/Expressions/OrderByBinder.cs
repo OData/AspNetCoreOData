@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         internal OrderByBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, IEdmModel model)
-            : base(settings, assembliesResolver, model)
+            : base(model, assembliesResolver, settings)
         {
         }
 

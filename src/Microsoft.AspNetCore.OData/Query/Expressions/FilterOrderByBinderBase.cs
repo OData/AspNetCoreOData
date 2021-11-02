@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             : base(requestContainer)
         {
         }
-        internal FilterOrderByBinderBase(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, IEdmModel model)
+        internal FilterOrderByBinderBase(IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings settings)
             : base(model, assembliesResolver, settings)
         {
         }

@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         internal FilterBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, IEdmModel model)
-            : base(settings, assembliesResolver, model)
+            : base(model, assembliesResolver, settings)
         {
         }
 
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         [ExcludeFromCodeCoverage]
         internal FilterBinder(ODataQuerySettings querySettings, IAssemblyResolver assembliesResolver, IEdmModel model, Type filterType)
-            : base(querySettings, assembliesResolver, model)
+            : base(model, assembliesResolver, querySettings)
         {
             _filterType = filterType;
         }
