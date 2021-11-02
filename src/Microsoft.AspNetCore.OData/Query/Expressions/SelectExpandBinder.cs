@@ -214,7 +214,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     Expression filterSource = nullablePropertyValue;
 
                     // TODO: Implement proper support for $select/$expand after $apply
-                    Expression filterPredicate = binder.BindFilterClause(null, filterBinderContext);
+                    Expression filterPredicate = binder.BindFilterClause(filterBinderContext);
                     filterResult = Expression.Call(
                         ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(clrElementType),
                         filterSource,
@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(null, filterBinderContext);
+                    LambdaExpression filterLambdaExpression = binder.BindFilterClause(filterBinderContext);
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));

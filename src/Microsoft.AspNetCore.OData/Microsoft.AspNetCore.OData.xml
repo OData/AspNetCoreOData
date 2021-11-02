@@ -8225,7 +8225,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext">
@@ -8458,11 +8458,10 @@
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
             </summary>
-            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>An <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>

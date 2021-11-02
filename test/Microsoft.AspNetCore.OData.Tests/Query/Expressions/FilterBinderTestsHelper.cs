@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 ElementClrType = filterType
             };
 
-            return binder.BindFilterClause(null, filterBinderContext);
+            return binder.BindFilterClause(filterBinderContext);
         }
     }
 
