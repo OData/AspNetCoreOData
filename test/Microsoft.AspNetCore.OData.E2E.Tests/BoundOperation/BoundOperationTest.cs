@@ -5,22 +5,16 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
-using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
-using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Xunit;
@@ -32,8 +26,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BoundOperation
         // following the Fixture convention.
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
             services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
             IEdmModel edmModel = UnBoundFunctionEdmModel.GetEdmModel();

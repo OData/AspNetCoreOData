@@ -105,6 +105,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     else if (edmProperty != null)
                     {
                         ambiguous = true;
+                        break;
                     }
                     else
                     {
