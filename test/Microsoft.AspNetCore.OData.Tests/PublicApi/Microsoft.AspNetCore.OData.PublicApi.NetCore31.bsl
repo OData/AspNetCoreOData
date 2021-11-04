@@ -2483,6 +2483,13 @@ public interface Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
 	int PageSize  { public abstract get; }
 }
 
+public class Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression {
+	public NamedPropertyExpression (System.Linq.Expressions.Expression name, System.Linq.Expressions.Expression value)
+
+	System.Linq.Expressions.Expression Name  { public get; }
+	System.Linq.Expressions.Expression Value  { public get; }
+}
+
 public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : List`1, ICollection`1, IEnumerable`1, IList`1, IReadOnlyCollection`1, IReadOnlyList`1, ICollection, IEnumerable, IList, ICountOptionCollection, ITruncatedCollection {
 	public TruncatedCollection`1 (IEnumerable`1 source, int pageSize)
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize)
@@ -2546,6 +2553,9 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : I
 
 	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
 	public virtual object Bind (object source, Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
+	public virtual void BuildDynamicProperty (Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
+	public virtual System.Linq.Expressions.Expression CreatePropertyNameExpression (Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty property, System.Linq.Expressions.Expression source)
+	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty property, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause)
 	protected virtual System.Linq.Expressions.LambdaExpression GetProjectionLambda (Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext context)
 }
 
