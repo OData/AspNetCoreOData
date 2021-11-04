@@ -8610,6 +8610,12 @@
             <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/> which is a wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
             <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyNameExpression(Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression)">
+            <summary>
+            Translates <paramref name="property"/> name of the property that will be projected
+            after $select execution.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetSelectExpandProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem}@,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.UriParser.ExpandedReferenceSelectItem}@,System.Collections.Generic.ISet{Microsoft.OData.Edm.IEdmStructuralProperty}@)">
             <summary>
             Gets the $select and $expand properties from the given <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/>

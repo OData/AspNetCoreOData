@@ -1357,25 +1357,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Act & Assert
             // #1. Base property on base type
-            Expression property = SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, baseProperty, source);
+            Expression property = binder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, baseProperty, source);
             Assert.Equal(ExpressionType.Constant, property.NodeType);
             Assert.Equal(typeof(string), property.Type);
             Assert.Equal("PrivateOrder", (property as ConstantExpression).Value);
 
             // #2. Base property on derived type
-            property = SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, vipCustomer, baseProperty, source);
+            property = binder.CreatePropertyNameExpression(_selectExpandBinderContext, vipCustomer, baseProperty, source);
             Assert.Equal(ExpressionType.Constant, property.NodeType);
             Assert.Equal(typeof(string), property.Type);
             Assert.Equal("PrivateOrder", (property as ConstantExpression).Value);
 
             // #3. Derived property on base type
-            property = SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, derivedProperty, source);
+            property = binder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, derivedProperty, source);
             Assert.Equal(ExpressionType.Conditional, property.NodeType);
             Assert.Equal(typeof(string), property.Type);
             Assert.Equal("IIF((aCustomer Is QueryVipCustomer), \"Birthday\", null)", property.ToString());
 
             // #4. Derived property on derived type.
-            property = SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, vipCustomer, derivedProperty, source);
+            property = binder.CreatePropertyNameExpression(_selectExpandBinderContext, vipCustomer, derivedProperty, source);
             Assert.Equal(ExpressionType.Constant, property.NodeType);
             Assert.Equal(typeof(string), property.Type);
             Assert.Equal("Birthday", (property as ConstantExpression).Value);
@@ -1392,9 +1392,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(edmProperty);
 
             Expression source = Expression.Parameter(typeof(QueryCustomer), "aCustomer");
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression property = SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, edmProperty, source);
+            Expression property = binder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, edmProperty, source);
 
             // Assert
             Assert.Equal(ExpressionType.Constant, property.NodeType);
@@ -1417,7 +1418,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandBinder binder = GetBinder<QueryCustomer>(model);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => SelectExpandBinder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, subNameProperty, source),
+            ExceptionAssert.Throws<ODataException>(() => binder.CreatePropertyNameExpression(_selectExpandBinderContext, _customer, subNameProperty, source),
                 "The provided mapping does not contain a resource for the resource type 'NS.SubCustomer'.");
         }
         #endregion
@@ -1433,9 +1434,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             IEdmNavigationProperty navProperty = _customer.NavigationProperties().Single(c => c.Name == property);
             Assert.NotNull(navProperty);
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression propertyValue = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, navProperty, source, null);
+            Expression propertyValue = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, navProperty, source, null);
 
             // Assert
             Assert.Equal(ExpressionType.MemberAccess, propertyValue.NodeType);
@@ -1456,9 +1458,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             IEdmNavigationProperty specialProperty = vipCustomer.DeclaredNavigationProperties().First(c => c.Name == property);
             Assert.NotNull(specialProperty);
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression propertyValue = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, specialProperty, source, null);
+            Expression propertyValue = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, specialProperty, source, null);
 
             // Assert
             Assert.Equal(String.Format("({0} As QueryVipCustomer).{1}", source.ToString(), property), propertyValue.ToString());
@@ -1478,9 +1481,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             IEdmStructuralProperty edmProperty = vipCustomer.DeclaredStructuralProperties().First(c => c.Name == property);
             Assert.NotNull(vipCustomer);
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression propertyValue = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, edmProperty, source, null);
+            Expression propertyValue = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, edmProperty, source, null);
 
             // Assert
             Assert.Equal(String.Format("Convert(({0} As QueryVipCustomer).{1}, Nullable`1)", source.ToString(), property), propertyValue.ToString());
@@ -1500,9 +1504,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             IEdmStructuralProperty edmProperty = vipCustomer.DeclaredStructuralProperties().First(c => c.Name == property);
             Assert.NotNull(vipCustomer);
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression propertyValue = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, edmProperty, source, null);
+            Expression propertyValue = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, edmProperty, source, null);
 
             // Assert
             Assert.Equal(String.Format("({0} As QueryVipCustomer).{1}", source.ToString(), property), propertyValue.ToString());
@@ -1515,9 +1520,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             _settings.HandleNullPropagation = HandleNullPropagationOption.True;
             Expression source = Expression.Constant(new QueryCustomer());
             IEdmProperty idProperty = _customer.StructuralProperties().Single(p => p.Name == "Id");
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression property = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, idProperty, source, null);
+            Expression property = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, idProperty, source, null);
 
             // Assert
             // NetFx and NetCore differ in the way Expression is converted to a string.
@@ -1552,9 +1558,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             _settings.HandleNullPropagation = HandleNullPropagationOption.False;
             Expression source = Expression.Constant(new QueryCustomer());
             IEdmProperty idProperty = _customer.StructuralProperties().Single(p => p.Name == "Id");
+            var binder = new SelectExpandBinder();
 
             // Act
-            Expression property = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, idProperty, source, filterClause: null);
+            Expression property = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, idProperty, source, filterClause: null);
 
             // Assert
             Assert.Equal(String.Format("Convert({0}.Id, Nullable`1)", source.ToString()), property.ToString());
@@ -1584,10 +1591,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
             Assert.NotNull(expandItem);
             Assert.NotNull(expandItem.FilterOption);
+            var binder = new SelectExpandBinder();
 
             // Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, ordersProperty, source, expandItem.FilterOption),
+                () => binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, ordersProperty, source, expandItem.FilterOption),
                 String.Format("The provided mapping does not contain a resource for the resource type '{0}'.",
                 ordersProperty.Type.Definition.AsElementType().FullTypeName()));
         }
@@ -1614,9 +1622,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
             Assert.NotNull(expandItem);
             Assert.NotNull(expandItem.FilterOption);
+            var binder = new SelectExpandBinder();
 
             // Act
-            var filterInExpand = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, ordersProperty, source, expandItem.FilterOption);
+            var filterInExpand = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _customer, ordersProperty, source, expandItem.FilterOption);
 
             // Assert
             if (nullOption == HandleNullPropagationOption.True)
@@ -1689,9 +1698,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
             Assert.NotNull(expandItem);
             Assert.NotNull(expandItem.FilterOption);
+            var binder = new SelectExpandBinder();
 
             // Act 
-            var filterInExpand = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _order, customerProperty, order, expandItem.FilterOption);
+            var filterInExpand = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _order, customerProperty, order, expandItem.FilterOption);
 
             // Assert
             var customer = Expression.Lambda(filterInExpand).Compile().DynamicInvoke() as QueryCustomer;
@@ -1723,9 +1733,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
             Assert.NotNull(expandItem);
             Assert.NotNull(expandItem.FilterOption);
+            var binder = new SelectExpandBinder();
 
             // Act
-            var filterInExpand = SelectExpandBinder.CreatePropertyValueExpression(_selectExpandBinderContext, _order, customerProperty, source, expandItem.FilterOption);
+            var filterInExpand = binder.CreatePropertyValueExpression(_selectExpandBinderContext, _order, customerProperty, source, expandItem.FilterOption);
 
             // Assert
             if (nullOption == HandleNullPropagationOption.True)

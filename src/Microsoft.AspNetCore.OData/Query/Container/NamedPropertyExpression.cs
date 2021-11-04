@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// <summary>
     /// Represents a container that captures a named property that is a part of the select expand query.
     /// </summary>
-    internal class NamedPropertyExpression
+    public class NamedPropertyExpression
     {
         public NamedPropertyExpression(Expression name, Expression value)
         {
@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 
         public Expression Value { get; private set; }
 
-        public Expression TotalCount { get; set; }
+        internal Expression TotalCount { get; set; }
 
         // Checks whether this property is null or not. This is required for expanded navigation properties that are null as entityframework cannot
         // create null's of type SelectExpandWrapper<ExpandedProperty> i.e. an expression like 
@@ -36,12 +36,12 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         // cannot be translated by EF. So, we generate the following expression instead,
         //       => new ExpandProperty<Customer> { Value = new SelectExpandWrapper<Customer> { .... }, IsNull = nullCheck }
         // and use Value only if IsNull is false.
-        public Expression NullCheck { get; set; }
+        internal Expression NullCheck { get; set; }
 
-        public int? PageSize { get; set; }
+        internal int? PageSize { get; set; }
 
-        public bool AutoSelected { get; set; }
+        internal bool AutoSelected { get; set; }
 
-        public bool? CountOption { get; set; }
+        internal bool? CountOption { get; set; }
     }
 }

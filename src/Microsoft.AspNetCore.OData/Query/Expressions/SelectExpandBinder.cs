@@ -111,7 +111,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression CreatePropertyNameExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source)
+        ///<summary>
+        ///Translates <paramref name="property"/> name of the property that will be projected
+        ///after $select execution.
+        ///</summary>
+        public virtual Expression CreatePropertyNameExpression(SelectExpandBinderContext context, 
+                                                               IEdmStructuredType elementType, 
+                                                               IEdmProperty property, 
+                                                               Expression source)
         {
             Contract.Assert(elementType != null);
             Contract.Assert(property != null);
@@ -146,7 +153,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return Expression.Constant(property.Name);
         }
 
-        internal static Expression CreatePropertyValueExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source, FilterClause filterClause)
+        public virtual Expression CreatePropertyValueExpression(SelectExpandBinderContext context, 
+                                                                IEdmStructuredType elementType, 
+                                                                IEdmProperty property, 
+                                                                Expression source, 
+                                                                FilterClause filterClause)
         {
             Contract.Assert(elementType != null);
             Contract.Assert(property != null);
@@ -856,8 +867,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source">The source contains the dynamic property.</param>
         /// <param name="structuredType">The structured type contains the dynamic property.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal static void BuildDynamicProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
-            IList<NamedPropertyExpression> includedProperties)
+        public virtual void BuildDynamicProperty(SelectExpandBinderContext context, 
+                                                 Expression source, 
+                                                 IEdmStructuredType structuredType,
+                                                 IList<NamedPropertyExpression> includedProperties)
         {
             Contract.Assert(source != null);
             Contract.Assert(context != null);
@@ -944,8 +957,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        private static Expression GetNullCheckExpression(SelectExpandBinderContext context, IEdmNavigationProperty propertyToExpand, Expression propertyValue,
-            SelectExpandClause projection)
+        private Expression GetNullCheckExpression(SelectExpandBinderContext context, 
+                                                  IEdmNavigationProperty propertyToExpand, 
+                                                  Expression propertyValue,
+                                                  SelectExpandClause projection)
         {
             if (projection == null || propertyToExpand.Type.IsCollection())
             {
