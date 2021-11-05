@@ -835,8 +835,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder(System.IServiceProvider requestContainer) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
-Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.IQueryable
-Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilterClause(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.Expressions.LambdaExpression
+Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context) -> System.Linq.Expressions.LambdaExpression
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.Expressions.LambdaExpression
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.Bind(System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext context) -> System.Linq.IQueryable

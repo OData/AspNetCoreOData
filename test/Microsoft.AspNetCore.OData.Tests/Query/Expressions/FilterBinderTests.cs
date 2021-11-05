@@ -2642,7 +2642,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             FilterBinder binder = new FilterBinder(settings, resolver, model);
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(null), "node");
+            QueryNode node = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.Bind(node), "node");
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => binder.BindDynamicPropertyAccessQueryNode(null), "openNode");
@@ -3097,7 +3098,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 ElementClrType = filterType
             };
 
-            return binder.BindFilterClause(filterBinderContext) as Expression<Func<TEntityType, bool>>;
+            return binder.Bind(filterBinderContext) as Expression<Func<TEntityType, bool>>;
         }
 
         private FilterClause CreateFilterNode(string filter, IEdmModel model, Type entityType)

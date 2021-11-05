@@ -18,18 +18,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public interface IFilterBinder
     {
         /// <summary>
-        /// Applies an OData $filter parse tree represented by <see cref="FilterClause"/> to an <see cref="IQueryable"/>.
-        /// </summary>
-        /// <param name="source">The original <see cref="IQueryable"/>.</param>
-        /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the filter query has been applied.</returns>
-        IQueryable Bind(IQueryable source, FilterBinderContext context);
-
-        /// <summary>
         /// Creates a <see cref="LambdaExpression"/> from an OData $filter parse tree represented by <see cref="FilterClause"/>.
         /// </summary>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
-        LambdaExpression BindFilterClause(FilterBinderContext context);
+        LambdaExpression Bind(FilterBinderContext context);
     }
 }

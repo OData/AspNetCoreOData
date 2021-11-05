@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual IQueryable Bind(IQueryable source, FilterBinderContext context)
+        public virtual LambdaExpression Bind(FilterBinderContext context)
         {
             if (context == null)
             {
@@ -58,21 +58,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             QuerySettings = context.QuerySettings;
             InternalAssembliesResolver = context.QueryContext.GetAssemblyResolver();
             QueryContext = context.QueryContext;
-            BaseQuery = source;
-
-            IQueryable query = source;
-            Expression filterExpression = BindFilterClause(context);
-
-            return ExpressionHelpers.Where(query, filterExpression, context.ElementClrType);
-        }
-
-        /// <inheritdoc/>
-        public virtual LambdaExpression BindFilterClause(FilterBinderContext context)
-        {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
+            //BaseQuery = source;
 
             _filterType = context.ElementClrType;
 

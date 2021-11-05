@@ -8,6 +8,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
@@ -174,7 +175,8 @@ namespace Microsoft.AspNetCore.OData.Query
                         ElementClrType = ResultClrType
                     };
 
-                    query = binder.Bind(query, filterBinderContext);
+                    LambdaExpression filterExpression = binder.Bind(filterBinderContext);
+                    query = ExpressionHelpers.Where(query, filterExpression, ResultClrType);
                 }
             }
 
