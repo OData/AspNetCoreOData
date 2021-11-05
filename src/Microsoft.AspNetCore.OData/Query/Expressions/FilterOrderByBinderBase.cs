@@ -42,6 +42,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
         }
 
+        /// <summary>
+        /// Create a <see cref="LambdaExpression"/> from a $filter query represented by a <see cref="FilterClause"/>.
+        /// </summary>
+        /// <param name="filterClause">The parsed $filter query.</param>
+        /// <param name="filterType">The CLR type of the entity we are filtering.</param>
+        /// <returns>The resulting <see cref="LambdaExpression"/>.</returns>
         internal LambdaExpression BindFilterClause(FilterClause filterClause, Type filterType)
         {
             LambdaExpression filter = BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);

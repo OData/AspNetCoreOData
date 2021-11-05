@@ -62,6 +62,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return BindOrderByClause(source, context.OrderByClause, context.ElementClrType, context.AlreadyOrdered);
         }
 
+        /// <summary>
+        /// Creates a <see cref="LambdaExpression"/> from an $orderby query represented by <see cref="OrderByClause"/>.
+        /// </summary>
+        /// <param name="orderBy">The parsed $orderby query</param>.
+        /// <param name="elementType">The CLR type of the entity to be ordered.</param>
+        /// <returns></returns>
         internal LambdaExpression BindOrderByClause(OrderByClause orderBy, Type elementType)
         {
             return BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
