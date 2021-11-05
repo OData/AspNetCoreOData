@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="clrType">The given CLR type.</param>
         /// <returns>Null or the Edm primitive type.</returns>
-        public virtual IEdmPrimitiveTypeReference GetPrimitiveType(Type clrType)
+        public virtual IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType)
         {
             if (clrType == null)
             {
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="primitiveType">The given Edm primitive type.</param>
         /// <param name="nullable">The nullable or not.</param>
         /// <returns>Null or the CLR type.</returns>
-        public virtual Type GetPrimitiveType(IEdmPrimitiveType primitiveType, bool nullable)
+        public virtual Type GetClrPrimitiveType(IEdmPrimitiveType primitiveType, bool nullable)
         {
             if (primitiveType == null)
             {
@@ -178,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 throw Error.ArgumentNull(nameof(clrType));
             }
 
-            IEdmPrimitiveTypeReference primitiveType = GetPrimitiveType(clrType);
+            IEdmPrimitiveTypeReference primitiveType = GetEdmPrimitiveType(clrType);
             if (primitiveType != null)
             {
                 return primitiveType;
@@ -218,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             Contract.Assert(edmModel != null);
             Contract.Assert(clrType != null);
 
-            IEdmPrimitiveTypeReference primitiveType = GetPrimitiveType(clrType);
+            IEdmPrimitiveTypeReference primitiveType = GetEdmPrimitiveType(clrType);
             if (primitiveType != null)
             {
                 return primitiveType.Definition;
@@ -309,7 +309,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (edmType.TypeKind == EdmTypeKind.Primitive)
             {
-                return GetPrimitiveType((IEdmPrimitiveType)edmType, nullable);
+                return GetClrPrimitiveType((IEdmPrimitiveType)edmType, nullable);
             }
 
             if (edmModel == null)

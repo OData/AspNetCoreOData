@@ -58,10 +58,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(TimeOfDay?), "Edm.TimeOfDay", true)]
         [InlineData(typeof(byte[]), "Edm.Binary", true)]
         [InlineData(typeof(Stream), "Edm.Stream", true)]
-        public void GetPrimitiveType_ForClrType_WorksAsExpected_ForStandardPrimitive(Type clrType, string name, bool nullable)
+        public void GetEdmPrimitiveType_ForClrType_WorksAsExpected_ForStandardPrimitive(Type clrType, string name, bool nullable)
         {
             // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetPrimitiveType(clrType);
+            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(primitiveTypeReference);
@@ -82,10 +82,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(char?), "Edm.String", true)]
         [InlineData(typeof(DateTime), "Edm.DateTimeOffset", false)]
         [InlineData(typeof(DateTime?), "Edm.DateTimeOffset", true)]
-        public void GetPrimitiveType_ForClrType_WorksAsExpected_ForNonStandardPrimitive(Type clrType, string name, bool nullable)
+        public void GetEdmPrimitiveType_ForClrType_WorksAsExpected_ForNonStandardPrimitive(Type clrType, string name, bool nullable)
         {
             // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetPrimitiveType(clrType);
+            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(primitiveTypeReference);
@@ -110,10 +110,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(GeometryMultiLineString), "Edm.GeometryMultiLineString")]
         [InlineData(typeof(GeometryMultiPoint), "Edm.GeometryMultiPoint")]
         [InlineData(typeof(GeometryMultiPolygon), "Edm.GeometryMultiPolygon")]
-        public void GetPrimitiveType_ForClrType_WorksAsExpected_ForSpatialPrimitive(Type clrType, string name)
+        public void GetEdmPrimitiveType_ForClrType_WorksAsExpected_ForSpatialPrimitive(Type clrType, string name)
         {
             // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetPrimitiveType(clrType);
+            IEdmPrimitiveTypeReference primitiveTypeReference = _mapper.GetEdmPrimitiveType(clrType);
 
             // Assert
             Assert.NotNull(primitiveTypeReference);
@@ -139,15 +139,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay?), typeof(TimeOfDay))]
         [InlineData(EdmPrimitiveTypeKind.Binary, typeof(byte[]), typeof(byte[]))]
         [InlineData(EdmPrimitiveTypeKind.Stream, typeof(Stream), typeof(Stream))]
-        public void GetPrimitiveType_ForEdmType_WorksAsExpected_ForStandardPrimitive(EdmPrimitiveTypeKind kind, Type nullExpected, Type nonNullExpected)
+        public void GetClrPrimitiveType_ForEdmType_WorksAsExpected_ForStandardPrimitive(EdmPrimitiveTypeKind kind, Type nullExpected, Type nonNullExpected)
         {
             // Arrange & Act & Assert
             IEdmPrimitiveType primitiveType = EdmCoreModel.Instance.GetPrimitiveType(kind);
-            Type clrType = _mapper.GetPrimitiveType(primitiveType, true);
+            Type clrType = _mapper.GetClrPrimitiveType(primitiveType, true);
             Assert.Equal(nullExpected, clrType);
 
             // Arrange & Act & Assert
-            clrType = _mapper.GetPrimitiveType(primitiveType, false);
+            clrType = _mapper.GetClrPrimitiveType(primitiveType, false);
             Assert.Equal(nonNullExpected, clrType);
         }
 
@@ -168,15 +168,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(EdmPrimitiveTypeKind.GeometryMultiLineString, typeof(GeometryMultiLineString))]
         [InlineData(EdmPrimitiveTypeKind.GeometryMultiPoint, typeof(GeometryMultiPoint))]
         [InlineData(EdmPrimitiveTypeKind.GeometryMultiPolygon, typeof(GeometryMultiPolygon))]
-        public void GetPrimitiveType_ForEdmType_WorksAsExpected_ForSpatialPrimitive(EdmPrimitiveTypeKind kind, Type expected)
+        public void GetClrPrimitiveType_ForEdmType_WorksAsExpected_ForSpatialPrimitive(EdmPrimitiveTypeKind kind, Type expected)
         {
             // Arrange & Act & Assert
             IEdmPrimitiveType primitiveType = EdmCoreModel.Instance.GetPrimitiveType(kind);
-            Type clrType = _mapper.GetPrimitiveType(primitiveType, true);
+            Type clrType = _mapper.GetClrPrimitiveType(primitiveType, true);
             Assert.Equal(expected, clrType);
 
             // Arrange & Act & Assert
-            clrType = _mapper.GetPrimitiveType(primitiveType, false);
+            clrType = _mapper.GetClrPrimitiveType(primitiveType, false);
             Assert.Equal(expected, clrType);
         }
 
@@ -187,11 +187,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         {
             // Arrange & Act & Assert
             IEdmPrimitiveType primitiveType = EdmCoreModel.Instance.GetPrimitiveType(kind);
-            Type clrType = _mapper.GetPrimitiveType(primitiveType, true);
+            Type clrType = _mapper.GetClrPrimitiveType(primitiveType, true);
             Assert.Null(clrType);
 
             // Arrange & Act & Assert
-            clrType = _mapper.GetPrimitiveType(primitiveType, false);
+            clrType = _mapper.GetClrPrimitiveType(primitiveType, false);
             Assert.Null(clrType);
         }
         #endregion

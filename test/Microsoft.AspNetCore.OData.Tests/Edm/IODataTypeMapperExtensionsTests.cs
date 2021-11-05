@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             primitiveRef.SetupGet(x => x.IsNullable).Returns(false);
 
             Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
-            mapper.Setup(s => s.GetPrimitiveType(primitive.Object, false)).Verifiable();
+            mapper.Setup(s => s.GetClrPrimitiveType(primitive.Object, false)).Verifiable();
 
             // Act
             mapper.Object.GetPrimitiveType(primitiveRef.Object);

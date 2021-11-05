@@ -1942,14 +1942,14 @@
             Item2 --> nullable
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetPrimitiveType(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetEdmPrimitiveType(System.Type)">
             <summary>
             Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/> type.
             </summary>
             <param name="clrType">The given CLR type.</param>
             <returns>Null or the Edm primitive type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
             <summary>
             Gets the corresponding <see cref="T:System.Type"/> type for a given Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/>.
             </summary>
@@ -2417,14 +2417,14 @@
             Provides the mapping between CLR type and Edm type.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetPrimitiveType(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetEdmPrimitiveType(System.Type)">
             <summary>
             Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/>.
             </summary>
             <param name="clrType">The given CLR type.</param>
             <returns>Null or the Edm primitive type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
             <summary>
             Gets the corresponding <see cref="T:System.Type"/> for a given Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveType"/>.
             </summary>

@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Arrange
             Type type = typeof(int);
             Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
-            mapper.Setup(x => x.GetPrimitiveType(type)).Verifiable();
+            mapper.Setup(x => x.GetEdmPrimitiveType(type)).Verifiable();
 
             EdmModel model = new EdmModel();
             model.SetTypeMapper(mapper.Object);
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             edmType.Setup(x => x.IsNullable).Returns(true);
 
             Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
-            mapper.Setup(x => x.GetPrimitiveType(edmType.Object.PrimitiveDefinition(), edmType.Object.IsNullable)).Verifiable();
+            mapper.Setup(x => x.GetClrPrimitiveType(edmType.Object.PrimitiveDefinition(), edmType.Object.IsNullable)).Verifiable();
 
             EdmModel model = new EdmModel();
             model.SetTypeMapper(mapper.Object);

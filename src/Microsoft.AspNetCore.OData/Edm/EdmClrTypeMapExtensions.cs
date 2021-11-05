@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <returns>Null or the Edm primitive type.</returns>
         public static IEdmPrimitiveTypeReference GetEdmPrimitiveTypeReference(this Type clrType)
         {
-            return DefaultODataTypeMapper.Default.GetPrimitiveType(clrType);
+            return DefaultODataTypeMapper.Default.GetEdmPrimitiveType(clrType);
         }
 
         /// <summary>
@@ -40,10 +40,10 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null || edmModel is EdmCoreModel)
             {
-                return DefaultODataTypeMapper.Default.GetPrimitiveType(clrType);
+                return DefaultODataTypeMapper.Default.GetEdmPrimitiveType(clrType);
             }
 
-            return edmModel.GetTypeMapper().GetPrimitiveType(clrType);
+            return edmModel.GetTypeMapper().GetEdmPrimitiveType(clrType);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (edmModel == null || edmModel is EdmCoreModel)
             {
-                return DefaultODataTypeMapper.Default.GetPrimitiveType(edmPrimitiveType.PrimitiveDefinition(), edmPrimitiveType.IsNullable);
+                return DefaultODataTypeMapper.Default.GetClrPrimitiveType(edmPrimitiveType.PrimitiveDefinition(), edmPrimitiveType.IsNullable);
             }
 
             return edmModel.GetTypeMapper().GetPrimitiveType(edmPrimitiveType);

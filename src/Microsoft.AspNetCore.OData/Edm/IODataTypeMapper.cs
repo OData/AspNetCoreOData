@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="clrType">The given CLR type.</param>
         /// <returns>Null or the Edm primitive type.</returns>
-        IEdmPrimitiveTypeReference GetPrimitiveType(Type clrType);
+        IEdmPrimitiveTypeReference GetEdmPrimitiveType(Type clrType);
 
         /// <summary>
         /// Gets the corresponding <see cref="Type"/> for a given Edm primitive type <see cref="IEdmPrimitiveType"/>.
@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="primitiveType">The given Edm primitive type.</param>
         /// <param name="nullable">The nullable or not.</param>
         /// <returns>Null or the CLR type.</returns>
-        Type GetPrimitiveType(IEdmPrimitiveType primitiveType, bool nullable);
+        Type GetClrPrimitiveType(IEdmPrimitiveType primitiveType, bool nullable);
 
         /// <summary>
         /// Gets the corresponding Edm type <see cref="IEdmTypeReference"/> for the given CLR type <see cref="Type"/>.

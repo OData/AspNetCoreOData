@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 throw Error.ArgumentNull(nameof(primitiveType));
             }
 
-            return mapper.GetPrimitiveType(primitiveType.PrimitiveDefinition(), primitiveType.IsNullable);
+            return mapper.GetClrPrimitiveType(primitiveType.PrimitiveDefinition(), primitiveType.IsNullable);
         }
 
         /// <summary>
