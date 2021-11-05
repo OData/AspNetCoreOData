@@ -676,6 +676,7 @@ Microsoft.AspNetCore.OData.ODataOptions.UrlKeyDelimiter.set -> void
 Microsoft.AspNetCore.OData.ODataOptionsSetup
 Microsoft.AspNetCore.OData.ODataOptionsSetup.Configure(Microsoft.AspNetCore.OData.ODataOptions options) -> void
 Microsoft.AspNetCore.OData.ODataOptionsSetup.ODataOptionsSetup(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, Microsoft.AspNetCore.OData.Routing.Parser.IODataPathTemplateParser parser) -> void
+Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions
 Microsoft.AspNetCore.OData.ODataUriFunctions
 Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators
 Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Add = 1 -> Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators
@@ -964,6 +965,12 @@ Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.set -> void
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context) -> void
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context) -> void
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider.Order.get -> int
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilter.get -> Microsoft.AspNetCore.Mvc.Filters.IActionFilter
+Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilterProvider(Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter) -> void
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> object
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> System.Linq.IQueryable
@@ -1530,6 +1537,8 @@ static Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(this Micros
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
 static Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> bool
 static Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(string message, System.Exception exception = null) -> Microsoft.AspNetCore.Mvc.SerializableError

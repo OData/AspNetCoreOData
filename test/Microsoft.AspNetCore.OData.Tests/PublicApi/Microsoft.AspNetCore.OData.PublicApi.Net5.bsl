@@ -63,6 +63,21 @@ public sealed class Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions {
 	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
 }
 
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
+}
+
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
@@ -1456,6 +1471,16 @@ public class Microsoft.AspNetCore.OData.Query.OrderByQueryOption {
 	public IOrderedQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public System.Linq.IOrderedQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.QueryFilterProvider : IFilterProvider {
+	public QueryFilterProvider (Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
+
+	int Order  { public virtual get; }
+	Microsoft.AspNetCore.Mvc.Filters.IActionFilter QueryFilter  { public get; }
+
+	public virtual void OnProvidersExecuted (Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context)
+	public virtual void OnProvidersExecuting (Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption {
