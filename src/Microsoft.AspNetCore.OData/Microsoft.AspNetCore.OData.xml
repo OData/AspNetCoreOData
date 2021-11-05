@@ -8260,6 +8260,14 @@
             Base class for <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.BindFilterClause(Microsoft.OData.UriParser.FilterClause,System.Type)">
+            <summary>
+            Create a <see cref="T:System.Linq.Expressions.LambdaExpression"/> from a $filter query represented by a <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
+            </summary>
+            <param name="filterClause">The parsed $filter query.</param>
+            <param name="filterType">The CLR type of the entity we are filtering.</param>
+            <returns>The resulting <see cref="T:System.Linq.Expressions.LambdaExpression"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
@@ -8539,6 +8547,14 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext)">
             <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.BindOrderByClause(Microsoft.OData.UriParser.OrderByClause,System.Type)">
+            <summary>
+            Creates a <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an $orderby query represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
+            </summary>
+            <param name="orderBy">The parsed $orderby query</param>.
+            <param name="elementType">The CLR type of the entity to be ordered.</param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderContext">
             <summary>
