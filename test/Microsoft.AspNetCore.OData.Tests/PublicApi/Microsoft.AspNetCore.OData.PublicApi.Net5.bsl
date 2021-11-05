@@ -2446,8 +2446,7 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
-	System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-	System.Linq.Expressions.LambdaExpression BindFilterClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
+	System.Linq.Expressions.LambdaExpression Bind (System.Linq.Expressions.Expression expression, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder {
@@ -2478,8 +2477,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBin
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microsoft.AspNetCore.OData.Query.Expressions.FilterOrderByBinderBase, IFilterBinder {
 	public FilterBinder (System.IServiceProvider requestContainer)
 
-	public virtual System.Linq.IQueryable Bind (System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
-	public virtual System.Linq.Expressions.LambdaExpression BindFilterClause (Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
+	public virtual System.Linq.Expressions.LambdaExpression Bind (System.Linq.Expressions.Expression expression, Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext {

@@ -175,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         ElementClrType = ResultClrType
                     };
 
-                    LambdaExpression filterExpression = binder.Bind(filterBinderContext);
+                    LambdaExpression filterExpression = binder.Bind(query.Expression, filterBinderContext);
                     query = ExpressionHelpers.Where(query, filterExpression, ResultClrType);
                 }
             }

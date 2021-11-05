@@ -20,8 +20,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Creates a <see cref="LambdaExpression"/> from an OData $filter parse tree represented by <see cref="FilterClause"/>.
         /// </summary>
+        /// <param name="expression">The original <see cref="Expression"/>.</param>
         /// <param name="context">An instance of the <see cref="FilterBinderContext"/>.</param>
         /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/>.</returns>
-        LambdaExpression Bind(FilterBinderContext context);
+        LambdaExpression Bind(Expression expression, FilterBinderContext context);
     }
 }

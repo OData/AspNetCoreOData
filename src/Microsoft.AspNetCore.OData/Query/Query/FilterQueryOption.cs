@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 ElementClrType = Context.ElementClrType
             };
 
-            LambdaExpression filterExpression = binder.Bind(filterBinderContext);
+            LambdaExpression filterExpression = binder.Bind(query.Expression, filterBinderContext);
 
             return ExpressionHelpers.Where(query, filterExpression, Context.ElementClrType); ;
         }

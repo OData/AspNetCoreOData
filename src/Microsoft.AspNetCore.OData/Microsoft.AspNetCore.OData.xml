@@ -8111,9 +8111,14 @@
             The base class for all expression binders.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BaseQuery">
+        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BaseExpression">
             <summary>
-            Base query used for the binder.
+            Base expression used for the binder.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BaseElementType">
+            <summary>
+            Base element type for the binder.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.FlattenedPropertyContainer">
@@ -8222,7 +8227,7 @@
             For testing purposes only.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.Bind(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext">
@@ -8446,10 +8451,11 @@
             an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.Bind(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext)">
             <summary>
             Creates a <see cref="T:System.Linq.Expressions.LambdaExpression"/> from an OData $filter parse tree represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.
             </summary>
+            <param name="expression">The original <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinderContext"/>.</param>
             <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> which can be later applied to an <see cref="T:System.Linq.IQueryable"/>.</returns>
         </member>

@@ -61,9 +61,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal bool HasInstancePropertyContainer;
 
         /// <summary>
-        /// Base query used for the binder.
+        /// Base expression used for the binder.
         /// </summary>
-        internal IQueryable BaseQuery;
+        internal Expression BaseExpression;
+
+        /// <summary>
+        /// Base element type for the binder.
+        /// </summary>
+        internal Type BaseElementType;
 
         /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -949,10 +954,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source"></param>
         protected void EnsureFlattenedPropertyContainer(ParameterExpression source)
         {
-            if (this.BaseQuery != null)
+            if (this.BaseElementType != null)
             {
-                this.HasInstancePropertyContainer = this.BaseQuery.ElementType.IsGenericType
-                    && this.BaseQuery.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+                this.HasInstancePropertyContainer = this.BaseElementType.IsGenericType
+                    && this.BaseElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
                 this.FlattenedPropertyContainer = this.FlattenedPropertyContainer ?? GetFlattenedProperties(source);
             }
@@ -1202,17 +1207,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source)
         {
-            if (this.BaseQuery == null)
+            if (this.BaseElementType == null)
             {
                 return null;
             }
 
-            if (!typeof(GroupByWrapper).IsAssignableFrom(BaseQuery.ElementType))
+            if (!typeof(GroupByWrapper).IsAssignableFrom(BaseElementType))
             {
                 return null;
             }
 
-            var expression = BaseQuery.Expression as MethodCallExpression;
+            var expression = BaseExpression as MethodCallExpression;
             if (expression == null)
             {
                 return null;

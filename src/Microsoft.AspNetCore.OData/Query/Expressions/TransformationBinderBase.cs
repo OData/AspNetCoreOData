@@ -57,7 +57,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(query != null);
 
             this.ClassicEF = IsClassicEF(query);
-            this.BaseQuery = query;
+            this.BaseElementType = query.ElementType;
+            this.BaseExpression = query.Expression;
             EnsureFlattenedPropertyContainer(this.LambdaParameter);
         }
 

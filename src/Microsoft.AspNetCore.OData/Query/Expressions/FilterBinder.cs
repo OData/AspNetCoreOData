@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual LambdaExpression Bind(FilterBinderContext context)
+        public virtual LambdaExpression Bind(Expression expression, FilterBinderContext context)
         {
             if (context == null)
             {
@@ -58,7 +58,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             QuerySettings = context.QuerySettings;
             InternalAssembliesResolver = context.QueryContext.GetAssemblyResolver();
             QueryContext = context.QueryContext;
-            //BaseQuery = source;
+            BaseExpression = expression;
+            BaseElementType = context.ElementClrType;
 
             _filterType = context.ElementClrType;
 

@@ -3098,7 +3098,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 ElementClrType = filterType
             };
 
-            return binder.Bind(filterBinderContext) as Expression<Func<TEntityType, bool>>;
+            return binder.Bind(null, filterBinderContext) as Expression<Func<TEntityType, bool>>;
         }
 
         private FilterClause CreateFilterNode(string filter, IEdmModel model, Type entityType)
