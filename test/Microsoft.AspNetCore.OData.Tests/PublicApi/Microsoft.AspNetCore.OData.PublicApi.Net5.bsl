@@ -525,10 +525,10 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 }
 
 public interface Microsoft.AspNetCore.OData.Edm.IODataTypeMapper {
+	System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
 	System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
 	Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
-	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetPrimitiveType (System.Type clrType)
-	System.Type GetPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
 }
 
 [
@@ -661,10 +661,10 @@ public class Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation {
 public class Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper : IODataTypeMapper {
 	public DefaultODataTypeMapper ()
 
+	public virtual System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
 	public virtual System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
 	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
-	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetPrimitiveType (System.Type clrType)
-	public virtual System.Type GetPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
 }
 
 public class Microsoft.AspNetCore.OData.Edm.EntitySelfLinks {
