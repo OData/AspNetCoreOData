@@ -16,7 +16,6 @@ namespace Microsoft.AspNetCore.OData.Abstracts
     /// </summary>
     internal class DefaultContainerBuilder : IContainerBuilder
     {
-
         internal IServiceCollection Services { get; } = new ServiceCollection();
 
         /// <summary>
