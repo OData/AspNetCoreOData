@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption("Orders", expand: null, context: _context);
             _selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = selectExpandQueryOption,
+                SelectExpand = selectExpandQueryOption,
                 QuerySettings = _settings
             };
         }
@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Act
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = selectExpand,
+                SelectExpand = selectExpand,
                 QuerySettings = _settings
             };
 
@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Act
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = selectExpand,
+                SelectExpand = selectExpand,
                 QuerySettings = _settings
             };
 
@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Act
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = selectExpand,
+                SelectExpand = selectExpand,
                 QuerySettings = _settings
             };
 

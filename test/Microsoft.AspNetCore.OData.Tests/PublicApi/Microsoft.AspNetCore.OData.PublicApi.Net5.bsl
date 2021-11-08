@@ -2578,7 +2578,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderCont
 	public SelectExpandBinderContext ()
 
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
-	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpandQuery  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpand  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {

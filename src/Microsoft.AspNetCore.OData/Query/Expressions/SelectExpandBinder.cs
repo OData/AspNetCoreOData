@@ -34,13 +34,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(source != null);
             Contract.Assert(context != null);
-            Contract.Assert(context.SelectExpandQuery != null);
-            Contract.Assert(context.SelectExpandQuery.Context != null);
-            Contract.Assert(context.SelectExpandQuery.Context.Model != null);
+            Contract.Assert(context.SelectExpand != null);
+            Contract.Assert(context.SelectExpand.Context != null);
+            Contract.Assert(context.SelectExpand.Context.Model != null);
             Contract.Assert(context.QuerySettings != null);
             Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
-            Type elementType = context.SelectExpandQuery.Context.ElementClrType;
+            Type elementType = context.SelectExpand.Context.ElementClrType;
 
             LambdaExpression projectionLambda = GetProjectionLambda(context);
 
@@ -53,9 +53,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(source != null);
             Contract.Assert(context != null);
-            Contract.Assert(context.SelectExpandQuery != null);
-            Contract.Assert(context.SelectExpandQuery.Context != null);
-            Contract.Assert(context.SelectExpandQuery.Context.Model != null);
+            Contract.Assert(context.SelectExpand != null);
+            Contract.Assert(context.SelectExpand.Context != null);
+            Contract.Assert(context.SelectExpand.Context.Model != null);
             Contract.Assert(context.QuerySettings != null);
             Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
 
@@ -74,10 +74,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         protected virtual LambdaExpression GetProjectionLambda(SelectExpandBinderContext context)
         {
             Contract.Assert(context != null);
-            Type elementType = context.SelectExpandQuery.Context.ElementClrType;
-            IEdmStructuredType structuredType = context.SelectExpandQuery.Context.ElementType as IEdmStructuredType;
-            IEdmNavigationSource navigationSource = context.SelectExpandQuery.Context.NavigationSource;
-            SelectExpandClause selectExpandClause = context.SelectExpandQuery.SelectExpandClause;
+            Type elementType = context.SelectExpand.Context.ElementClrType;
+            IEdmStructuredType structuredType = context.SelectExpand.Context.ElementType as IEdmStructuredType;
+            IEdmNavigationSource navigationSource = context.SelectExpand.Context.NavigationSource;
+            SelectExpandClause selectExpandClause = context.SelectExpand.SelectExpandClause;
             ParameterExpression source = Expression.Parameter(elementType, "$it");
 
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(source != null);
 
             IEdmStructuredType declaringType = property.DeclaringType;
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
+            IEdmModel model = context.SelectExpand.Context.Model;
 
             // derived property using cast
             if (elementType != declaringType)
@@ -152,8 +152,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(property != null);
             Contract.Assert(source != null);
 
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
-            ODataQueryContext queryContext = context.SelectExpandQuery.Context;
+            IEdmModel model = context.SelectExpand.Context.Model;
+            ODataQueryContext queryContext = context.SelectExpand.Context;
             ODataQuerySettings settings = context.QuerySettings;
 
             // Expression: source = source as propertyDeclaringType
@@ -267,7 +267,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(source != null);
 
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
+            IEdmModel model = context.SelectExpand.Context.Model;
 
             // If it's not a structural type, just return the source.
             if (structuredType == null)
@@ -697,7 +697,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(includedProperties != null);
 
             IEdmEntityType edmEntityType = navigationProperty.ToEntityType();
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
+            IEdmModel model = context.SelectExpand.Context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             ModelBoundQuerySettings querySettings = model.GetModelBoundQuerySettings(navigationProperty, edmEntityType);
@@ -774,7 +774,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(structuralProperty != null);
             Contract.Assert(includedProperties != null);
 
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
+            IEdmModel model = context.SelectExpand.Context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             // // Expression:
@@ -864,7 +864,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(structuredType != null);
             Contract.Assert(includedProperties != null);
 
-            IEdmModel model = context.SelectExpandQuery.Context.Model;
+            IEdmModel model = context.SelectExpand.Context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             PropertyInfo dynamicPropertyDictionary = model.GetDynamicPropertyDictionary(structuredType);
@@ -920,7 +920,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 };
 
                 LambdaExpression orderByExpression =
-                    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpandQuery.Context, querySettings);
+                    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpand.Context, querySettings);
                 source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }
 
