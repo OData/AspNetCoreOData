@@ -7,14 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.Spatial;
 using Moq;
 using Xunit;
 
@@ -22,108 +19,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 {
     public class EdmClrTypeMapExtensionsTests
     {
-        private static IEdmModel EdmModel = GetEdmModel();
-
-        #region PrimitiveType
-        [Theory]
-        [InlineData(typeof(string), "Edm.String", true)]
-        [InlineData(typeof(bool), "Edm.Boolean", false)]
-        [InlineData(typeof(bool?), "Edm.Boolean", true)]
-        [InlineData(typeof(byte), "Edm.Byte", false)]
-        [InlineData(typeof(byte?), "Edm.Byte", true)]
-        [InlineData(typeof(decimal), "Edm.Decimal", false)]
-        [InlineData(typeof(decimal?), "Edm.Decimal", true)]
-        [InlineData(typeof(double), "Edm.Double", false)]
-        [InlineData(typeof(double?), "Edm.Double", true)]
-        [InlineData(typeof(Guid), "Edm.Guid", false)]
-        [InlineData(typeof(Guid?), "Edm.Guid", true)]
-        [InlineData(typeof(short), "Edm.Int16", false)]
-        [InlineData(typeof(short?), "Edm.Int16", true)]
-        [InlineData(typeof(int), "Edm.Int32", false)]
-        [InlineData(typeof(int?), "Edm.Int32", true)]
-        [InlineData(typeof(long), "Edm.Int64", false)]
-        [InlineData(typeof(long?), "Edm.Int64", true)]
-        [InlineData(typeof(sbyte), "Edm.SByte", false)]
-        [InlineData(typeof(sbyte?), "Edm.SByte", true)]
-        [InlineData(typeof(float), "Edm.Single", false)]
-        [InlineData(typeof(float?), "Edm.Single", true)]
-        [InlineData(typeof(DateTimeOffset), "Edm.DateTimeOffset", false)]
-        [InlineData(typeof(DateTimeOffset?), "Edm.DateTimeOffset", true)]
-        [InlineData(typeof(TimeSpan), "Edm.Duration", false)]
-        [InlineData(typeof(TimeSpan?), "Edm.Duration", true)]
-        [InlineData(typeof(Date), "Edm.Date", false)]
-        [InlineData(typeof(Date?), "Edm.Date", true)]
-        [InlineData(typeof(TimeOfDay), "Edm.TimeOfDay", false)]
-        [InlineData(typeof(TimeOfDay?), "Edm.TimeOfDay", true)]
-        [InlineData(typeof(byte[]), "Edm.Binary", true)]
-        [InlineData(typeof(Stream), "Edm.Stream", true)]
-        public void GetEdmPrimitiveTypeReferenceWorksAsExpectedForStandardPrimitive(Type clrType, string name, bool nullable)
+        [Fact]
+        public void GetEdmPrimitiveTypeReference_Calls_GetPrimitiveTypeOnMapper()
         {
-            // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = clrType.GetEdmPrimitiveTypeReference();
-            IEdmPrimitiveType primitiveType = clrType.GetEdmPrimitiveType();
+            // Arrange
+            Type type = typeof(int);
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetEdmPrimitiveType(type)).Verifiable();
+
+            EdmModel model = new EdmModel();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetEdmPrimitiveTypeReference(type);
 
             // Assert
-            Assert.NotNull(primitiveTypeReference);
-            Assert.Same(primitiveTypeReference.Definition, primitiveType);
-            Assert.Equal(name, primitiveTypeReference.FullName());
-            Assert.Equal(nullable, primitiveTypeReference.IsNullable);
+            mapper.Verify();
         }
 
-        [Theory]
-        [InlineData(typeof(XElement), "Edm.String", true)]
-        [InlineData(typeof(ushort), "Edm.Int32", false)]
-        [InlineData(typeof(ushort?), "Edm.Int32", true)]
-        [InlineData(typeof(uint), "Edm.Int64", false)]
-        [InlineData(typeof(uint?), "Edm.Int64", true)]
-        [InlineData(typeof(ulong), "Edm.Int64", false)]
-        [InlineData(typeof(ulong?), "Edm.Int64", true)]
-        [InlineData(typeof(char[]), "Edm.String", true)]
-        [InlineData(typeof(char), "Edm.String", false)]
-        [InlineData(typeof(char?), "Edm.String", true)]
-        [InlineData(typeof(DateTime), "Edm.DateTimeOffset", false)]
-        [InlineData(typeof(DateTime?), "Edm.DateTimeOffset", true)]
-        public void GetEdmPrimitiveTypeReferenceWorksAsExpectedForNonStandardPrimitive(Type clrType, string name, bool nullable)
+        [Fact]
+        public void GetClrPrimitiveType_Calls_GetPrimitiveTypeOnMapper()
         {
-            // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = clrType.GetEdmPrimitiveTypeReference();
-            IEdmPrimitiveType primitiveType = clrType.GetEdmPrimitiveType();
+            // Arrange
+            Mock<IEdmPrimitiveType> primitiveType = new Mock<IEdmPrimitiveType>();
+            Mock<IEdmPrimitiveTypeReference> edmType = new Mock<IEdmPrimitiveTypeReference>();
+            edmType.Setup(x => x.Definition).Returns(primitiveType.Object);
+            edmType.Setup(x => x.IsNullable).Returns(true);
+
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetClrPrimitiveType(edmType.Object.PrimitiveDefinition(), edmType.Object.IsNullable)).Verifiable();
+
+            EdmModel model = new EdmModel();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetClrPrimitiveType(edmType.Object);
 
             // Assert
-            Assert.NotNull(primitiveTypeReference);
-            Assert.Same(primitiveTypeReference.Definition, primitiveType);
-            Assert.Equal(name, primitiveTypeReference.FullName());
-            Assert.Equal(nullable, primitiveTypeReference.IsNullable);
-        }
-
-        [Theory]
-        [InlineData(typeof(Geography), "Edm.Geography")]
-        [InlineData(typeof(GeographyPoint), "Edm.GeographyPoint")]
-        [InlineData(typeof(GeographyLineString), "Edm.GeographyLineString")]
-        [InlineData(typeof(GeographyPolygon), "Edm.GeographyPolygon")]
-        [InlineData(typeof(GeographyCollection), "Edm.GeographyCollection")]
-        [InlineData(typeof(GeographyMultiLineString), "Edm.GeographyMultiLineString")]
-        [InlineData(typeof(GeographyMultiPoint), "Edm.GeographyMultiPoint")]
-        [InlineData(typeof(GeographyMultiPolygon), "Edm.GeographyMultiPolygon")]
-        [InlineData(typeof(Geometry), "Edm.Geometry")]
-        [InlineData(typeof(GeometryPoint), "Edm.GeometryPoint")]
-        [InlineData(typeof(GeometryLineString), "Edm.GeometryLineString")]
-        [InlineData(typeof(GeometryPolygon), "Edm.GeometryPolygon")]
-        [InlineData(typeof(GeometryCollection), "Edm.GeometryCollection")]
-        [InlineData(typeof(GeometryMultiLineString), "Edm.GeometryMultiLineString")]
-        [InlineData(typeof(GeometryMultiPoint), "Edm.GeometryMultiPoint")]
-        [InlineData(typeof(GeometryMultiPolygon), "Edm.GeometryMultiPolygon")]
-        public void GetEdmTypeWorksAsExpectedForSpatialPrimitive(Type clrType, string name)
-        {
-            // Arrange & Act
-            IEdmPrimitiveTypeReference primitiveTypeReference = clrType.GetEdmPrimitiveTypeReference();
-            IEdmPrimitiveType primitiveType = clrType.GetEdmPrimitiveType();
-
-            // Assert
-            Assert.NotNull(primitiveTypeReference);
-            Assert.Same(primitiveTypeReference.Definition, primitiveType);
-            Assert.Equal(name, primitiveTypeReference.FullName());
-            Assert.True(primitiveTypeReference.IsNullable);
+            mapper.Verify();
         }
 
         [Theory]
@@ -131,7 +64,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(int), typeof(int), false)]
         [InlineData(typeof(int?), typeof(int?), false)]
         [InlineData(typeof(object), typeof(object), false)]
-        [InlineData(typeof(MyAddress), typeof(MyAddress), false)]
         // non-standard primitive types
         [InlineData(typeof(XElement), typeof(string), true)]
         [InlineData(typeof(ushort), typeof(int), true)]
@@ -145,223 +77,138 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         [InlineData(typeof(char?), typeof(string), true)]
         [InlineData(typeof(DateTime), typeof(DateTimeOffset), true)]
         [InlineData(typeof(DateTime?), typeof(DateTimeOffset?), true)]
-        public void IsNonstandardEdmPrimitiveWorksAsExpectedForNonstandardType(Type clrType, Type expectType, bool isNonstandard)
+        public void IsNonstandardEdmPrimitive_WorksAsExpected_ForNonstandardType(Type clrType, Type expectType, bool isNonstandard)
         {
-            // Arrange & Act
-            Type actual = clrType.IsNonstandardEdmPrimitive(out bool isNonstandardEdmPrimtive);
+            // Arrange
+            EdmModel model = new EdmModel();
+            model.SetTypeMapper(DefaultODataTypeMapper.Default);
+
+            // Act
+            Type actual = model.IsNonstandardEdmPrimitive(clrType, out bool isNonstandardEdmPrimtive);
 
             // Assert
             Assert.Equal(expectType, actual);
             Assert.Equal(isNonstandard, isNonstandardEdmPrimtive);
         }
 
-        #endregion
-
-        #region GetClrType
         [Fact]
-        public void GetClrType_ThrowsArgumentNull_EdmType()
-        {
-            // Arrange & Act
-            IAssemblyResolver resolver = new Mock<IAssemblyResolver>().Object;
-            IEdmModel model = new Mock<IEdmModel>().Object;
-            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrType((IEdmTypeReference)null, resolver), "edmTypeReference");
-
-            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrType((IEdmType)null, resolver), "edmType");
-        }
-
-        [Theory]
-        [InlineData(EdmPrimitiveTypeKind.String, typeof(string))]
-        [InlineData(EdmPrimitiveTypeKind.Boolean, typeof(bool))]
-        [InlineData(EdmPrimitiveTypeKind.Byte, typeof(byte))]
-        [InlineData(EdmPrimitiveTypeKind.Decimal, typeof(decimal))]
-        [InlineData(EdmPrimitiveTypeKind.Double, typeof(double))]
-        [InlineData(EdmPrimitiveTypeKind.Guid, typeof(Guid))]
-        [InlineData(EdmPrimitiveTypeKind.Int16, typeof(short))]
-        [InlineData(EdmPrimitiveTypeKind.Int32, typeof(int))]
-        [InlineData(EdmPrimitiveTypeKind.Int64, typeof(long))]
-        [InlineData(EdmPrimitiveTypeKind.SByte, typeof(sbyte))]
-        [InlineData(EdmPrimitiveTypeKind.Single, typeof(float))]
-        [InlineData(EdmPrimitiveTypeKind.Binary, typeof(byte[]))]
-        [InlineData(EdmPrimitiveTypeKind.Stream, typeof(Stream))]
-        [InlineData(EdmPrimitiveTypeKind.DateTimeOffset, typeof(DateTimeOffset))]
-        [InlineData(EdmPrimitiveTypeKind.Duration, typeof(TimeSpan))]
-        [InlineData(EdmPrimitiveTypeKind.Date, typeof(Date))]
-        [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay))]
-        public void GetClrTypeWorksAsExpectedForStandardPrimitive(EdmPrimitiveTypeKind kind, Type expected)
-        {
-            // #1 Arrange & Act & Assert for nullable equals to false
-            IEdmPrimitiveTypeReference primitiveType = EdmCoreModel.Instance.GetPrimitive(kind, false);
-            Type clrType = EdmModel.GetClrType(primitiveType);
-            Assert.Equal(expected, clrType);
-
-            // #2 Arrange & Act & Assert for nullable equals to true
-            primitiveType = EdmCoreModel.Instance.GetPrimitive(kind, true);
-            clrType = EdmModel.GetClrType(primitiveType);
-            if (expected.IsValueType)
-            {
-                Type generic = typeof(Nullable<>);
-                expected = generic.MakeGenericType(expected);
-                Assert.Same(expected, clrType);
-            }
-            else
-            {
-                Assert.Same(expected, clrType);
-            }
-        }
-
-        [Theory]
-        [InlineData(EdmPrimitiveTypeKind.Geography, typeof(Geography))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyPoint, typeof(GeographyPoint))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyLineString, typeof(GeographyLineString))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyPolygon, typeof(GeographyPolygon))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyCollection, typeof(GeographyCollection))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyMultiLineString, typeof(GeographyMultiLineString))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyMultiPoint, typeof(GeographyMultiPoint))]
-        [InlineData(EdmPrimitiveTypeKind.GeographyMultiPolygon, typeof(GeographyMultiPolygon))]
-        [InlineData(EdmPrimitiveTypeKind.Geometry, typeof(Geometry))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryPoint, typeof(GeometryPoint))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryLineString, typeof(GeometryLineString))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryPolygon, typeof(GeometryPolygon))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryCollection, typeof(GeometryCollection))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryMultiLineString, typeof(GeometryMultiLineString))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryMultiPoint, typeof(GeometryMultiPoint))]
-        [InlineData(EdmPrimitiveTypeKind.GeometryMultiPolygon, typeof(GeometryMultiPolygon))]
-        public void GetClrTypeWorksAsExpectedForSpatialPrimitive(EdmPrimitiveTypeKind kind, Type type)
+        public void GetEdmTypeReference_Calls_GetEdmTypeReferenceOnMapper()
         {
             // Arrange
-            IEdmPrimitiveTypeReference primitiveType1 = EdmCoreModel.Instance.GetPrimitive(kind, true);
-            IEdmPrimitiveTypeReference primitiveType2 = EdmCoreModel.Instance.GetPrimitive(kind, false);
+            Type type = typeof(int);
+            EdmModel model = new EdmModel();
+
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetEdmTypeReference(model, type)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
 
             // Act
-            Type clrType1 = EdmModel.GetClrType(primitiveType1);
-            Type clrType2 = EdmModel.GetClrType(primitiveType2);
+            model.GetEdmTypeReference(type);
 
             // Assert
-            Assert.Same(clrType1, clrType2);
-            Assert.Same(type, clrType1);
+            mapper.Verify();
         }
 
-        [Theory]
-        [InlineData("NS.Address", typeof(MyAddress))] // use ClrTypeAnnotation
-        [InlineData("NS.CnAddress", typeof(CnMyAddress))]
-        [InlineData("Microsoft.AspNetCore.OData.Tests.Edm.MyCustomer", typeof(MyCustomer))] // use the full name match
-        public void GetClrTypeWorksAsExpectedForSchemaStrucutralType(string typeName, Type expected)
+        [Fact]
+        public void GetEdmType_Calls_GetEdmTypeReferenceOnMapper()
         {
             // Arrange
-            IEdmType edmType = EdmModel.FindType(typeName);
-            Assert.NotNull(edmType); // Guard
+            Type type = typeof(int);
+            EdmModel model = new EdmModel();
 
-            // #1. Act & Assert
-            IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(true);
-            Type clrType = EdmModel.GetClrType(edmTypeReference, new AssemblyResolver());
-            Assert.Same(expected, clrType);
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetEdmTypeReference(model, type)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
 
-            // #2. Act & Assert
-            edmTypeReference = edmType.ToEdmTypeReference(false);
-            clrType = EdmModel.GetClrType(edmTypeReference);
-            Assert.Same(expected, clrType);
-        }
-
-        [Fact]
-        public void GetClrTypeWorksAsExpectedForSchemaEnumType()
-        {
-            // Arrange
-            IEdmType edmType = EdmModel.FindType("NS.Color");
-            Assert.NotNull(edmType); // Guard
-
-            // #1. Act & Assert
-            IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(true);
-            Type clrType = EdmModel.GetClrType(edmTypeReference);
-            Assert.Same(typeof(MyColor?), clrType);
-
-            // #2. Act & Assert
-            edmTypeReference = edmType.ToEdmTypeReference(false);
-            clrType = EdmModel.GetClrType(edmTypeReference);
-            Assert.Same(typeof(MyColor), clrType);
-        }
-
-        #endregion
-
-        #region GetEdmType
-
-        [Fact]
-        public void GetEdmType_ThrowsArgumentNull_ModelAndClrType()
-        {
-            // Arrange & Act
-            IEdmModel model = null;
-            ExceptionAssert.ThrowsArgumentNull(() => model.GetEdmType(typeof(int)), "edmModel");
-
-            model = new Mock<IEdmModel>().Object;
-            ExceptionAssert.ThrowsArgumentNull(() => model.GetEdmType(null), "clrType");
-        }
-
-        [Fact]
-        public void GetEdmTypeReferenceReturnsNullForUnknownType()
-        {
-            // Arrange & Act & Assert
-            Assert.Null(EdmModel.GetEdmTypeReference(typeof(TypeNotInModel)));
-            Assert.Null(EdmModel.GetEdmType(typeof(TypeNotInModel)));
-        }
-
-        [Theory]
-        [InlineData(typeof(IEnumerable<BaseType>), "NS.BaseType")]
-        [InlineData(typeof(IEnumerable<Derived1Type>), "NS.Derived1Type")]
-        [InlineData(typeof(Derived2Type[]), "NS.Derived2Type")]
-        public void GetEdmTypeReferenceReturnsCollectionForIEnumerableOfT(Type clrType, string typeName)
-        {
-            // Arrange & Act
-            IEdmType edmType = EdmModel.GetEdmType(clrType);
+            // Act
+            model.GetEdmType(type);
 
             // Assert
-            Assert.Equal(EdmTypeKind.Collection, edmType.TypeKind);
-            Assert.Equal(typeName, (edmType as IEdmCollectionType).ElementType.FullName());
-        }
-
-        [Theory]
-        [InlineData(typeof(string), "Edm.String")]
-        [InlineData(typeof(int?), "Edm.Int32")]
-        [InlineData(typeof(MyAddress), "NS.Address")]
-        [InlineData(typeof(CnMyAddress), "NS.CnAddress")]
-        [InlineData(typeof(MyCustomer), "Microsoft.AspNetCore.OData.Tests.Edm.MyCustomer")]
-        [InlineData(typeof(BaseType), "NS.BaseType")]
-        [InlineData(typeof(Derived1Type), "NS.Derived1Type")]
-        [InlineData(typeof(Derived2Type), "NS.Derived2Type")]
-        [InlineData(typeof(SubDerivedType), "NS.SubDerivedType")]
-        public void GetEdmTypeReferenceWorksAsExpectedForEdmType(Type clrType, string typeName)
-        {
-            // Arrange
-            IEdmType expectedEdmType = EdmModel.FindType(typeName);
-            Assert.NotNull(expectedEdmType); // Guard
-
-            // Arrange & Act
-            IEdmTypeReference edmTypeRef = EdmModel.GetEdmTypeReference(clrType);
-            IEdmType edmType = EdmModel.GetEdmType(clrType);
-
-            // Assert
-            Assert.NotNull(edmTypeRef);
-            Assert.Same(expectedEdmType, edmTypeRef.Definition);
-            Assert.Same(expectedEdmType, edmType);
-            Assert.True(edmTypeRef.IsNullable);
+            mapper.Verify();
         }
 
         [Fact]
-        public void GetEdmTypeWorksAsExpectedForSchemaEnumType()
+        public void GetClrType_Calls_GetClrTypeOnMapper()
         {
             // Arrange
-            IEdmType expectedType = EdmModel.FindType("NS.Color");
-            Assert.NotNull(expectedType); // Guard
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+            Mock<IEdmTypeReference> edmTypeRef = new Mock<IEdmTypeReference>();
+            edmTypeRef.Setup(x => x.Definition).Returns(edmType.Object);
+            edmTypeRef.Setup(x => x.IsNullable).Returns(true);
 
-            // #1. Act & Assert
-            IEdmTypeReference colorType = EdmModel.GetEdmTypeReference(typeof(MyColor));
-            Assert.Same(expectedType, colorType.Definition);
-            Assert.False(colorType.IsNullable);
+            EdmModel model = new EdmModel();
 
-            // #2. Act & Assert
-            colorType = EdmModel.GetEdmTypeReference(typeof(MyColor?));
-            Assert.Same(expectedType, colorType.Definition);
-            Assert.True(colorType.IsNullable);
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetClrType(model, edmType.Object, true, AssemblyResolverHelper.Default)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetClrType(edmTypeRef.Object);
+
+            // Assert
+            mapper.Verify();
         }
-        #endregion
+
+        [Fact]
+        public void GetClrTypeWithResolver_Calls_GetClrTypeOnMapper()
+        {
+            // Arrange
+            Mock<IAssemblyResolver> resolver = new Mock<IAssemblyResolver>();
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+            Mock<IEdmTypeReference> edmTypeRef = new Mock<IEdmTypeReference>();
+            edmTypeRef.Setup(x => x.Definition).Returns(edmType.Object);
+            edmTypeRef.Setup(x => x.IsNullable).Returns(true);
+
+            EdmModel model = new EdmModel();
+
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetClrType(model, edmType.Object, true, resolver.Object)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetClrType(edmTypeRef.Object, resolver.Object);
+
+            // Assert
+            mapper.Verify();
+        }
+
+        [Fact]
+        public void GetClrTypeUsingEdmType_Calls_GetClrTypeOnMapper()
+        {
+            // Arrange
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+
+            EdmModel model = new EdmModel();
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetClrType(model, edmType.Object, true, AssemblyResolverHelper.Default)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetClrType(edmType.Object);
+
+            // Assert
+            mapper.Verify();
+        }
+
+        [Fact]
+        public void GetClrTypeUsingEdmTypeWithResolver_Calls_GetClrTypeOnMapper()
+        {
+            // Arrange
+            Mock<IAssemblyResolver> resolver = new Mock<IAssemblyResolver>();
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+
+            EdmModel model = new EdmModel();
+
+            Mock<IODataTypeMapper> mapper = new Mock<IODataTypeMapper>();
+            mapper.Setup(x => x.GetClrType(model, edmType.Object, true, resolver.Object)).Verifiable();
+            model.SetTypeMapper(mapper.Object);
+
+            // Act
+            model.GetClrType(edmType.Object, resolver.Object);
+
+            // Assert
+            mapper.Verify();
+        }
 
         [Theory]
         [InlineData(typeof(MyCustomer), "MyCustomer")]
@@ -374,82 +221,5 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Arrange & Act & Assert
             Assert.Equal(expectedName, clrType.EdmName());
         }
-
-        private static IEdmModel GetEdmModel()
-        {
-            EdmModel model = new EdmModel();
-            EdmComplexType address = new EdmComplexType("NS", "Address");
-            address.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
-            model.AddElement(address);
-            model.SetAnnotationValue(address, new ClrTypeAnnotation(typeof(MyAddress)));
-            var cnAddress = new EdmComplexType("NS", "CnAddress", address);
-            cnAddress.AddStructuralProperty("Zipcode", EdmPrimitiveTypeKind.String);
-            model.AddElement(cnAddress);
-            model.SetAnnotationValue(cnAddress, new ClrTypeAnnotation(typeof(CnMyAddress)));
-
-            var color = new EdmEnumType("NS", "Color");
-            model.AddElement(color);
-            model.SetAnnotationValue(color, new ClrTypeAnnotation(typeof(MyColor)));
-
-            var customer = new EdmEntityType("Microsoft.AspNetCore.OData.Tests.Edm", "MyCustomer");
-            model.AddElement(customer);
-
-            // Inheritance
-            var baseEntity = new EdmEntityType("NS", "BaseType");
-            var derived1Entity = new EdmEntityType("NS", "Derived1Type", baseEntity);
-            var derived2Entity = new EdmEntityType("NS", "Derived2Type", baseEntity);
-            var subDerivedEntity = new EdmEntityType("NS", "SubDerivedType", derived1Entity);
-            model.AddElements(new[] { baseEntity, derived1Entity, derived2Entity, subDerivedEntity });
-            model.SetAnnotationValue(baseEntity, new ClrTypeAnnotation(typeof(BaseType)));
-            model.SetAnnotationValue(derived1Entity, new ClrTypeAnnotation(typeof(Derived1Type)));
-            model.SetAnnotationValue(derived2Entity, new ClrTypeAnnotation(typeof(Derived2Type)));
-            model.SetAnnotationValue(subDerivedEntity, new ClrTypeAnnotation(typeof(SubDerivedType)));
-
-            return model;
-        }
-
-        public class MyAddress
-        {
-            public string City { get; set; }
-        }
-
-        public class CnMyAddress : MyAddress
-        {
-            public string Zipcode { get; set; }
-        }
-
-        public enum MyColor
-        {
-            Red
-        }
-
-        public class BaseType
-        { }
-
-        public class Derived1Type : BaseType
-        { }
-
-        public class Derived2Type : BaseType
-        { }
-
-        public class SubDerivedType : Derived1Type
-        { }
-
-        public class TypeNotInModel
-        { }
-
-        public class AssemblyResolver : IAssemblyResolver
-        {
-            public IEnumerable<Assembly> Assemblies
-            {
-                get
-                {
-                    yield return typeof(AssemblyResolver).Assembly;
-                }
-            }
-        }
     }
-
-    public class MyCustomer
-    { }
 }

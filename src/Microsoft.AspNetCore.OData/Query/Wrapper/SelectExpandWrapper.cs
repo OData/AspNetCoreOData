@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
 
             Type elementType = GetElementType();
 
-            return model.GetTypeMappingCache().GetEdmType(elementType, model);
+            return model.GetEdmTypeReference(elementType);
         }
 
         /// <inheritdoc />

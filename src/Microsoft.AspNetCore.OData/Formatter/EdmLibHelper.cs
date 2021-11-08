@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             else
             {
                 TryGetInnerTypeForDelta(ref type);
-                expectedPayloadType = model.GetTypeMappingCache().GetEdmType(type, model);
+                expectedPayloadType = model.GetEdmTypeReference(type);
             }
 
             return expectedPayloadType;

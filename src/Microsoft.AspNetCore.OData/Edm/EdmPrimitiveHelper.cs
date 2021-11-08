@@ -79,7 +79,18 @@ namespace Microsoft.AspNetCore.OData.Edm
             else
             {
                 type = Nullable.GetUnderlyingType(type) ?? type;
-                if (TypeHelper.IsEnum(type))
+
+                // Convert.ChangeType invalid cast from 'System.String' to 'System.Guid'
+                if (type == typeof(Guid))
+                {
+                    if (str == null)
+                    {
+                        throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
+                    }
+
+                    return Guid.Parse(str);
+                }
+                else if (TypeHelper.IsEnum(type))
                 {
                     if (str == null)
                     {
@@ -128,6 +139,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else
                 {
+                    if (TypeHelper.TryGetInstance(type, value, out var result))
+                    {
+                        return result;
+                    }
+
                     try
                     {
                         // Note that we are not casting the return value to nullable<T> as even if we do it

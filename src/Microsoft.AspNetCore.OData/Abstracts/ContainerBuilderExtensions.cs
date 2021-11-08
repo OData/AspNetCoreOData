@@ -45,7 +45,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
                 // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
                 // In ODL 8.x, ReadUntypedAsString option will be deleted.
-                ReadUntypedAsString = false
+                ReadUntypedAsString = false,
+
+                // Enable read property name case-insensitive from payload.
+                EnablePropertyNameCaseInsensitive = true
             });
 
             builder.AddServicePrototype(new ODataMessageWriterSettings

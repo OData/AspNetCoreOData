@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
 {
@@ -59,6 +60,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
         [HttpPost]
         public IActionResult Post([FromBody]File file)
         {
+            if (file.FileId == 99)
+            {
+                // Special test case for property name case-insensitive
+                Assert.Equal("abc", file.Name);
+                Assert.Equal(DateTimeOffset.Parse("10/28/2021 9:33:26 PM +08:00"), file.CreatedDate);
+                Assert.Equal(DateTimeOffset.Parse("11/1/2021 10:48:12 AM +08:00"), file.DeleteDate);
+
+                // special string used to verify at test case.
+                return Ok("PropertyCaseInsensitive");
+            }
+
             _db.Files.Add(file);
             _db.SaveChanges();
 

@@ -212,7 +212,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = this,
+                SelectExpand = this,
                 QuerySettings = updatedSettings
             };
 
@@ -246,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
             {
-                SelectExpandQuery = this,
+                SelectExpand = this,
                 QuerySettings = updatedSettings
             };
 
@@ -384,6 +384,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             autoSelectItems = new List<SelectItem>();
             autoExpandItems = new List<SelectItem>();
+
+            if (baseEntityType == null)
+            {
+                return;
+            }
+
             IList<SelectModelPath> autoSelectProperties = model.GetAutoSelectPaths(baseEntityType, null, modelBoundQuerySettings);
             foreach (var autoSelectProperty in autoSelectProperties)
             {

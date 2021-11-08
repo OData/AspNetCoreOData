@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(elementClrType));
             }
 
-            ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
+            ElementType = model.GetEdmTypeReference(elementClrType)?.Definition;
 
             if (ElementType == null)
             {
