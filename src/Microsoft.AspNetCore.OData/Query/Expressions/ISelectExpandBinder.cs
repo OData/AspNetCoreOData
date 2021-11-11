@@ -34,5 +34,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
         /// <returns>The new <see cref="object"/> after the select/expand query has been applied.</returns>
         object Bind(object source, SelectExpandBinderContext context);
+
+        // $select=Name&$expand=Orders
+        // $it => new { .... }
+      //  Expression BindSelectExpand(SelectExpandClause selectExpand, QueryBinderContext context);
     }
 }
