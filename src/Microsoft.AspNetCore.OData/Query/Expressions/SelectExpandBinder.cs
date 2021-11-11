@@ -919,9 +919,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
-                LambdaExpression orderByExpression =
-                    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpand.Context, querySettings);
-                source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
+                ODataQueryContext queryContext = context.SelectExpand.Context;
+                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, elementType);
+                IOrderByBinder binder = queryContext.GetOrderByBinder();
+                source = binder.ApplyBind(source, orderbyClause, binderContext);
+
+                //LambdaExpression orderByExpression =
+                //    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpand.Context, querySettings);
+                //source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
             }
 
             return source;

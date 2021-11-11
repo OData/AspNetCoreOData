@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -68,6 +69,23 @@ namespace Microsoft.AspNetCore.OData.Query
             return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
         }
 
+
+        /// <summary>
+        /// Gets the <see cref="FilterBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="FilterBinder"/>.</returns>
+        public static IFilterBinder GetFilterBinder2(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IFilterBinder binder = context.RequestContainer?.GetService<IFilterBinder>();
+            return binder ?? new FilterBinder2();
+        }
+
         /// <summary>
         /// Gets the <see cref="ISelectExpandBinder"/>.
         /// </summary>
@@ -83,6 +101,41 @@ namespace Microsoft.AspNetCore.OData.Query
             ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
 
             return binder ?? new SelectExpandBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IOrderByBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <param name="querySettings">The query settings.</param>
+        /// <returns>The built <see cref="IOrderByBinder"/>.</returns>
+        public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IOrderByBinder binder = context.RequestContainer?.GetService<IOrderByBinder>();
+
+            return binder ?? new OrderByBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAssemblyResolver"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IAssemblyResolver"/>.</returns>
+        public static IAssemblyResolver GetAssemblyResolver(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IAssemblyResolver resolver = context.RequestContainer?.GetService<IAssemblyResolver>();
+
+            return resolver ?? AssemblyResolverHelper.Default;
         }
     }
 }

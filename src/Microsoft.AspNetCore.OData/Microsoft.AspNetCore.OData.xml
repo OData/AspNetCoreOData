@@ -8285,6 +8285,22 @@
             <param name="query"></param>
             <returns>Query with Select that flattens properties</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
+            <summary>
+            Exposes the ability to translate an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to the <see cref="T:System.Linq.Expressions.Expression"/>
+            wrappered in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
+            $orderby=Age
+               |--  x => x.Age
+            </summary>
+            <param name="filterClause">The orderby clause.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The orderBy binder result.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase">
             <summary>
             The base class for all expression binders.
@@ -8572,19 +8588,33 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder2">
             <summary>
-            The default implementation to bind an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>
-            or $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            The default implementation to bind an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to a <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder2.BindFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
-            Binds an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
-               $filter="ProductName eq 'Doritos'"
-                  "$it => ($it.ProductName == \"Doritos\")"
+            Translates an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
+            $filter=Name eq 'Sam'
+               |--  $it => $it.Name == "Sam"
             </summary>
-            <param name="filter">The filter clause <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
+            <param name="filterClause">The filter clause.</param>
             <param name="context">The query binder context.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+            <returns>The filter binder result.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
+            <summary>
+            Exposes the ability to translate an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to the <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
+            $filter=Name eq 'Sam'
+               |--  $it => $it.Name == "Sam"
+            </summary>
+            <param name="filterClause">The filter clause.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The filter binder result.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
@@ -9589,12 +9619,34 @@
             <param name="querySettings">The query setting.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetFilterBinder2(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSelectExpandBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.
             </summary>
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetOrderByBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <param name="querySettings">The query settings.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>

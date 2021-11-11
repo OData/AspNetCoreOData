@@ -1,45 +1,34 @@
 //-----------------------------------------------------------------------------
-// <copyright file="FilterOrderByBinder.cs" company=".NET Foundation">
+// <copyright file="FilterBinder.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
-    public interface IFilterBinder
-    {
-        // "ProductName eq 'Doritos'"
-        // => "$it => ($it.ProductName == \"Doritos\")"
-        Expression BindFilter(FilterClause filter, QueryBinderContext context);
-    }
-
     /// <summary>
-    /// The default implementation to bind an OData $filter represented by <see cref="FilterClause"/>
-    /// or $orderby represented by <see cref="OrderByClause"/> to an <see cref="Expression"/>.
+    /// The default implementation to bind an OData $filter represented by <see cref="FilterClause"/> to a <see cref="Expression"/>.
     /// </summary>
-    public class FilterBinder2 : QueryBinder, IFilterBinder
+    public class FilterBinder2 /*TODO: Remember to change to FilterBinder when finished*/ : QueryBinder, IFilterBinder
     {
         /// <summary>
-        /// Binds an OData $filter represented by <see cref="FilterClause"/> to an <see cref="Expression"/>.
-        ///    $filter="ProductName eq 'Doritos'"
-        ///       "$it => ($it.ProductName == \"Doritos\")"
+        /// Translates an OData $filter represented by <see cref="FilterClause"/> to <see cref="Expression"/>.
+        /// $filter=Name eq 'Sam'
+        ///    |--  $it => $it.Name == "Sam"
         /// </summary>
-        /// <param name="filter">The filter clause <see cref="FilterClause"/>.</param>
+        /// <param name="filterClause">The filter clause.</param>
         /// <param name="context">The query binder context.</param>
-        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        public virtual Expression BindFilter(FilterClause filter, QueryBinderContext context)
+        /// <returns>The filter binder result.</returns>
+        public virtual Expression BindFilter(FilterClause filterClause, QueryBinderContext context)
         {
-            if (filter == null)
+            if (filterClause == null)
             {
-                throw Error.ArgumentNull(nameof(filter));
+                throw Error.ArgumentNull(nameof(filterClause));
             }
 
             if (context == null)
@@ -53,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Type filterType = context.ElementClrType;
 
-            LambdaExpression filterExpr = BindExpression(filter.Expression, filter.RangeVariable, context);
+            LambdaExpression filterExpr = BindExpression(filterClause.Expression, filterClause.RangeVariable, context);
             filterExpr = Expression.Lambda(ApplyNullPropagationForFilterBody(filterExpr.Body, context), filterExpr.Parameters);
 
             Type expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
@@ -64,54 +53,5 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return filterExpr;
         }
-
-        /// <summary>
-        /// Binds an OData $orderby represented by <see cref="OrderByClause"/> to an <see cref="Expression"/>.
-        /// </summary>
-        /// <param name="orderBy">The filter clause <see cref="OrderByClause"/>.</param>
-        /// <param name="context">The query binder context.</param>
-        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        //public virtual Expression BindOrderBy(OrderByClause orderBy, QueryBinderContext context)
-        //{
-        //    if (orderBy == null)
-        //    {
-        //        throw Error.ArgumentNull(nameof(orderBy));
-        //    }
-
-        //    if (context == null)
-        //    {
-        //        throw Error.ArgumentNull(nameof(context));
-        //    }
-
-        //    Type elementType = context.ElementClrType;
-        //    LambdaExpression orderByLambda = BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType, context);
-        //    return orderByLambda;
-        //}
-
-        //private LambdaExpression BindExpression(SingleValueNode expression, RangeVariable rangeVariable, Type elementType, QueryBinderContext context)
-        //{
-        //    ParameterExpression filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
-
-        //    context.AddlambdaParameters(rangeVariable.Name, filterParameter);
-
-        //    // EnsureFlattenedPropertyContainer(filterParameter);
-
-        //    Expression body = Bind(expression, context);
-        //    return Expression.Lambda(body, filterParameter);
-        //}
-
-       
-
-        /// <summary>
-        /// Get $it parameter
-        /// </summary>
-        /// <returns></returns>
-        //protected override ParameterExpression Parameter
-        //{
-        //    get
-        //    {
-        //        return this._lambdaParameters[ODataItParameterName];
-        //    }
-        //}
     }
 }

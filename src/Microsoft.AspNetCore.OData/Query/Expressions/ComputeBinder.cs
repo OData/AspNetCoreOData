@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //      Instance = $it,
             //      Model = parametrized(IEdmModel),
             //      Container => new AggregationPropertyContainer() {
-            //          Name = "X", 
+            //          Name = "Z", 
             //          Value = $it.X + $it.Y, 
             //          Next = new LastInChain() {
             //              Name = "C",
