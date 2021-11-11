@@ -5,65 +5,26 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
-    public class OrderByBinderResult
-    {
-        public OrderByBinderResult(Expression orderByExpression, OrderByDirection direction)
-        {
-            OrderByExpression = orderByExpression;
-            Direction = direction;
-        }
-
-        public Expression OrderByExpression { get; }
-
-        public OrderByDirection Direction { get; }
-
-        public OrderByBinderResult ThenBy { get; set; }
-    }
-
-    public interface IOrderByBinder
-    {
-        // pet => pet.Age
-        // Expression BindOrderBy(OrderByClause orderByClause, QueryBinderContext context);
-
-        OrderByBinderResult BindOrderBy(OrderByClause orderByClause, QueryBinderContext context);
-    }
-
     /// <summary>
-    /// The default implementation to bind an OData $filter represented by <see cref="FilterClause"/>
-    /// or $orderby represented by <see cref="OrderByClause"/> to an <see cref="Expression"/>.
+    /// The default implementation to bind an OData $orderby represented by <see cref="OrderByClause"/>
+    /// an <see cref="Expression"/> wrappered in <see cref="OrderByBinderResult"/>.
     /// </summary>
     public class OrderByBinder : QueryBinder, IOrderByBinder
     {
         /// <summary>
-        /// Binds an OData $orderby represented by <see cref="OrderByClause"/> to an <see cref="Expression"/>.
+        /// Translates an OData $orderby represented by <see cref="OrderByClause"/> to <see cref="Expression"/>.
+        /// $orderby=Age
+        ///    |--  x => x.Age
         /// </summary>
-        /// <param name="orderByClause">The orderby clause <see cref="OrderByClause"/>.</param>
+        /// <param name="orderByClause">The orderby clause.</param>
         /// <param name="context">The query binder context.</param>
-        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        public virtual Expression BindOrderBy1(OrderByClause orderByClause, QueryBinderContext context)
-        {
-            if (orderByClause == null)
-            {
-                throw Error.ArgumentNull(nameof(orderByClause));
-            }
-
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            LambdaExpression orderByLambda = BindExpression(orderByClause.Expression, orderByClause.RangeVariable, context);
-            return orderByLambda;
-        }
-
+        /// <returns>The orderBy binder result.</returns>
         public virtual OrderByBinderResult BindOrderBy(OrderByClause orderByClause, QueryBinderContext context)
         {
             if (orderByClause == null)

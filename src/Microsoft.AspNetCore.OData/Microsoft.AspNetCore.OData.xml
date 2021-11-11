@@ -8586,6 +8586,22 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
+            <summary>
+            Exposes the ability to translate an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to the <see cref="T:System.Linq.Expressions.Expression"/>
+            wrappered in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
+            $orderby=Age
+               |--  x => x.Age
+            </summary>
+            <param name="orderByClause">The orderby clause.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The orderBy binder result.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
             Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
@@ -8630,17 +8646,46 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder">
             <summary>
-            The default implementation to bind an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>
-            or $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            The default implementation to bind an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>
+            an <see cref="T:System.Linq.Expressions.Expression"/> wrappered in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.BindOrderBy1(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
-            Binds an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            Translates an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
+            $orderby=Age
+               |--  x => x.Age
             </summary>
-            <param name="orderByClause">The orderby clause <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.</param>
+            <param name="orderByClause">The orderby clause.</param>
             <param name="context">The query binder context.</param>
-            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+            <returns>The orderBy binder result.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult">
+            <summary>
+            Represents a single order by expression in the $orderby clause.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult.#ctor(System.Linq.Expressions.Expression,Microsoft.OData.UriParser.OrderByDirection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/> class.
+            </summary>
+            <param name="orderByExpression">The orderby expression.</param>
+            <param name="direction">The orderby direction.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult.OrderByExpression">
+            <summary>
+            Gets the orderby expression.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult.Direction">
+            <summary>
+            Gets the orderby direction.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult.ThenBy">
+            <summary>
+            Gets or sets the thenby result.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder">
             <summary>
