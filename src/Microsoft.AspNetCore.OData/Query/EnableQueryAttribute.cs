@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -224,8 +225,8 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 // actionExecutedContext.Result might also indicate a status code that has not yet
                 // been applied to the result; make sure it's also successful.
-                StatusCodeResult statusCodeResult = actionExecutedContext.Result as StatusCodeResult;
-                if (statusCodeResult == null || IsSuccessStatusCode(statusCodeResult.StatusCode))
+                IStatusCodeActionResult statusCodeResult = actionExecutedContext.Result as IStatusCodeActionResult;
+                if (statusCodeResult?.StatusCode == null || IsSuccessStatusCode(statusCodeResult.StatusCode.Value))
                 {
                     ObjectResult responseContent = actionExecutedContext.Result as ObjectResult;
                     if (responseContent != null)
@@ -730,7 +731,7 @@ namespace Microsoft.AspNetCore.OData.Query
             ODataPath path = request.ODataFeature().Path;
 
             IEdmProperty pathProperty = null;
-            IEdmStructuredType pathStructuredType = null; 
+            IEdmStructuredType pathStructuredType = null;
             if (path != null)
             {
                 (pathProperty, pathStructuredType, _) = path.GetPropertyAndStructuredTypeFromPath();
