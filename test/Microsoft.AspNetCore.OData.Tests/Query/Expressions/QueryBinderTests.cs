@@ -86,6 +86,145 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 };
             }
         }
+        private static IEdmModel _model;
+        private static IEdmEntitySet _products;
+        private static IEdmStructuredTypeReference _productTypeReference;
+
+        static QueryBinderTests()
+        {
+            _model = GetEdmModel();
+
+            IEdmEntityType productType = _model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "Product");
+            Assert.NotNull(productType); // Guard
+
+            _products = _model.EntityContainer.FindEntitySet("Products");
+            Assert.NotNull(_products); // Guard
+
+            _productTypeReference = new EdmEntityTypeReference(productType, true);
+        }
+
+
+        [Fact]
+        public void BindCountNode_Works()
+        {
+            // Arrange
+            IEnumerable<Product> products = new[]
+            {
+                new Product
+                {
+                    ProductID = 1,
+                    AlternateAddresses = new Address[] // has 2 address items whose HourseNumber > 8
+                    {
+                        new Address { HouseNumber = 6 },
+                        new Address { HouseNumber = 9 }, //  > 8
+                        new Address { HouseNumber = 10 }, // > 8
+                        new Address { HouseNumber = 3 },
+                        new Address { HouseNumber = 1 },
+                    }
+                },
+                new Product
+                {
+                    ProductID = 2,
+                    AlternateAddresses = new Address[] // only 1 address item whose HourseNumber > 8
+                    {
+                        new Address { HouseNumber = 5 },
+                        new Address { HouseNumber = 6 },
+                        new Address { HouseNumber = 9 }, // > 8
+                        new Address { HouseNumber = 3 },
+                    }
+                },
+                new Product
+                {
+                    ProductID = 3,
+                    AlternateAddresses = new Address[] // has 3 address items whose HourseNumber > 8
+                    {
+                        new Address { HouseNumber = 10 },
+                        new Address { HouseNumber = 11 },
+                        new Address { HouseNumber = 9 },
+                    }
+                },
+            };
+
+            // Act & Assert
+            string filter = "AlternateAddresses/$count eq 5";
+            string expectedExpr = "(Product $it) => $it.AlternateAddresses.LongCount() == #TypedLinqParameterContainer<long>.TypedProperty";
+            RunFilterTestAndVerify(products, filter, new[] { 1 }, expectedExpr);
+
+            // Act & Assert
+            filter = "AlternateAddresses/$count in [3,4]";
+            expectedExpr = "(Product $it) => #TypedLinqParameterContainer<List<long>>.TypedProperty.Contains($it.AlternateAddresses.LongCount())";
+            RunFilterTestAndVerify(products, filter, new[] { 2, 3 }, expectedExpr);
+
+            // Act & Assert
+            filter = "AlternateAddresses/$count($filter=HouseNumber gt 8) gt 2";
+            expectedExpr = "(Product $it) => $it.AlternateAddresses.Where((Address $it) => $it.HouseNumber > #TypedLinqParameterContainer<int>.TypedProperty).LongCount() > #TypedLinqParameterContainer<long>.TypedProperty";
+            RunFilterTestAndVerify(products, filter, new[] { 3 }, expectedExpr);
+        }
+
+        private static readonly ODataQuerySettings _defaultSettings = new ODataQuerySettings
+        {
+            HandleNullPropagation = HandleNullPropagationOption.False
+        };
+
+
+        private void RunFilterTestAndVerify(IEnumerable<Product> products, string filter, int[] expectedIds, string expectedExpr)
+        {
+            // Act - Bind string to Linq.Expression
+            Expression filterExpr = BindFilter<Product>(filter, _model);
+
+            // Assert
+            string acutalExpr = filterExpr.ToString("C#");
+            Assert.Equal(expectedExpr, acutalExpr);
+
+            IEnumerable<Product> results = InvokeFilter(products, filterExpr);
+
+            // Assert
+            Assert.True(expectedIds.SequenceEqual(results.Select(a => a.ProductID))); // ordered id
+        }
+
+        private static Expression BindFilter<T>(string filter, IEdmModel model, ODataQuerySettings querySettings = null, IAssemblyResolver assembliesResolver = null)
+        {
+            Type elementType = typeof(T);
+            FilterClause orderByClause = CreateFilterClause(filter, model, elementType);
+            Assert.NotNull(orderByClause);
+
+            querySettings = querySettings ?? _defaultSettings;
+            QueryBinderContext context = new QueryBinderContext(model, querySettings, elementType)
+            {
+                AssembliesResolver = assembliesResolver,
+                GetNestedFilterBinder = () => new FilterBinder2()
+            };
+
+            IFilterBinder filterBinder = new FilterBinder2();
+            return filterBinder.BindFilter(orderByClause, context);
+        }
+
+        private static FilterClause CreateFilterClause(string filter, IEdmModel model, Type entityType)
+        {
+            IEdmEntityType productType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == entityType.Name);
+            Assert.NotNull(productType); // Guard
+
+            IEdmEntitySet products = model.EntityContainer.FindEntitySet("Products");
+            Assert.NotNull(products); // Guard
+
+            ODataQueryOptionParser parser = new ODataQueryOptionParser(model, productType, products,
+                new Dictionary<string, string> { { "$filter", filter } });
+
+            return parser.ParseFilter();
+        }
+
+        public static IEnumerable<T> InvokeFilter<T>(IEnumerable<T> collection, Expression filterExpr)
+        {
+            LambdaExpression filterLambda = filterExpr as LambdaExpression;
+            Assert.NotNull(filterLambda);
+
+            Type type = typeof(T);
+
+            Delegate function = filterLambda.Compile();
+
+            MethodInfo whereMethod = ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(type);
+            return whereMethod.Invoke(null, new object[] { collection, function }) as IEnumerable<T>;
+        }
 
         [Theory]
         [InlineData(null, true, true)]
@@ -3285,6 +3424,5 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             return str.PadRight(number);
         }
     }
-
 
 }

@@ -54,6 +54,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // So, from top level, $it and $this are the same parameters
             _lambdaParameters[DollarIt] = thisParameters;
             _lambdaParameters[DollarThis] = thisParameters;
+
             // Categories?$expand=Products($filter=OrderItems/any(oi:oi/UnitPrice ne UnitPrice)
         }
 
