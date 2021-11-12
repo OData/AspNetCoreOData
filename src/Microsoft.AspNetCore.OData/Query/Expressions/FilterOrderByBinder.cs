@@ -40,12 +40,24 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // It will be used in sub-filter, for example:  $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
             context.FilterBinder = this;
 
-            Type filterType = context.ElementClrType;
+            Type elementType = context.ElementClrType;
 
-            LambdaExpression filterExpr = BindExpression(filterClause.Expression, filterClause.RangeVariable, context);
+            //string rangeVariableName = filterClause.RangeVariable.Name;
+            //if (!context.TryGetParameter(rangeVariableName, out ParameterExpression filterParameter))
+            //{
+            //    filterParameter = Expression.Parameter(elementType, rangeVariableName);
+            //    context.AddlambdaParameters(rangeVariableName, filterParameter);
+            //}
+
+            Expression body = Bind(filterClause.Expression, context);
+
+            ParameterExpression filterParameter = context.CurrentParameter;
+
+            LambdaExpression filterExpr = Expression.Lambda(body, filterParameter);
+
             filterExpr = Expression.Lambda(ApplyNullPropagationForFilterBody(filterExpr.Body, context), filterExpr.Parameters);
 
-            Type expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
+            Type expectedFilterType = typeof(Func<,>).MakeGenericType(elementType, typeof(bool));
             if (filterExpr.Type != expectedFilterType)
             {
                 throw Error.Argument("filterType", SRResources.CannotCastFilter, filterExpr.Type.FullName, expectedFilterType.FullName);

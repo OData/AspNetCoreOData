@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="orderByClause">The orderby clause.</param>
         /// <param name="context">The query binder context.</param>
-        /// <returns>The orderBy binder result.</returns>
+        /// <returns>The OrderBy binder result, <see cref="OrderByBinderResult"/>.</returns>
         public virtual OrderByBinderResult BindOrderBy(OrderByClause orderByClause, QueryBinderContext context)
         {
             if (orderByClause == null)
@@ -41,7 +41,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             OrderByBinderResult last = null;
             for (OrderByClause clause = orderByClause; clause != null; clause = clause.ThenBy)
             {
-                LambdaExpression orderByLambda = BindExpression(clause.Expression, clause.RangeVariable, context);
+                Expression body = Bind(clause.Expression, context);
+
+                ParameterExpression parameter = context.CurrentParameter;
+
+                LambdaExpression orderByLambda = Expression.Lambda(body, parameter);
 
                 OrderByBinderResult result = new OrderByBinderResult(orderByLambda, clause.Direction);
 

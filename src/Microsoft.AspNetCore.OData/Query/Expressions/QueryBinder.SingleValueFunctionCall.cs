@@ -546,7 +546,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Expression[] arguments = BindArguments(node.Parameters, context);
             Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
-            Expression source = arguments.Length == 1 ? context.Parameter : arguments[0];
+            Expression source = arguments.Length == 1 ? context.CurrentParameter : arguments[0];
             string targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
             IEdmType targetEdmType = context.Model.FindType(targetTypeName);
             Type targetClrType = null;
@@ -625,7 +625,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Edm.Boolean isof(expression,type)
             Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
-            Expression source = arguments.Length == 1 ? context.Parameter : arguments[0];
+            Expression source = arguments.Length == 1 ? context.CurrentParameter : arguments[0];
             if (source == NullConstant)
             {
                 return FalseConstant;

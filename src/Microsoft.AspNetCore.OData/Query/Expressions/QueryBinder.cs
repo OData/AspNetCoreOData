@@ -54,10 +54,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(rangeVariable != null);
             Contract.Assert(context != null);
 
-            Type elementType = context.ElementClrType;
-            ParameterExpression filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
 
-            context.AddlambdaParameters(rangeVariable.Name, filterParameter);
+            if (!context.TryGetParameter(rangeVariable.Name, out ParameterExpression filterParameter))
+            {
+                Type elementType = context.ElementClrType;
+
+                filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
+                context.AddlambdaParameters(rangeVariable.Name, filterParameter);
+            }
 
             // EnsureFlattenedPropertyContainer(filterParameter);
 
@@ -221,7 +225,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // TODO: bug in uri parser is causing this property to be null for the root property.
             if (sourceNode == null)
             {
-                source = context.Parameter;
+                // It means we should use current parameter at current context.
+                source = context.CurrentParameter;
             }
             else
             {
@@ -385,11 +390,34 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             ParameterExpression parameter;
-            // When we have a $this RangeVariable, we still create a $it parameter.
-            // i.e $it => $it instead of $this => $this
+            // When we have a $this RangeVariable, it's refer to "current parameter" in current context.
             if (rangeVariable.Name == "$this")
             {
-                parameter = context.Parameter;
+                parameter = context.CurrentParameter;
+            }
+            else if (rangeVariable.Name == "$it")
+            {
+                // ~/Customers?$select=Addresses($order=City)
+                // ~/Customers?$select=Addresses($order=$it/Name)
+                // Both $orderby.Expression.Source is the RangeVariableRefereneNode, and the name is "$it".
+                // But first refers to "Addresses", and the second refers to "Customers".
+                // We can't simply identify using the "$it" so there's a workaround.
+                if (context.IsNested)
+                {
+                    Type clrType = context.Model.GetClrType(rangeVariable.TypeReference);
+                    if (clrType == context.CurrentParameter.Type)
+                    {
+                        parameter = context.CurrentParameter;
+                    }
+                    else
+                    {
+                        parameter = context.GetParameter("$it");
+                    }
+                }
+                else
+                {
+                    parameter = context.GetParameter("$it");
+                }
             }
             else
             {
@@ -519,11 +547,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // TODO: double check, sam xu
                 //QueryBinderContext subContext = context.CreateSubContext();
                 //subContext.ElementClrType = elementType;
-                context.EnterNextBinderScope(elementType);
+                QueryBinderContext nextBinderContext = new QueryBinderContext(context, elementType);
 
-                filterExpression = context.FilterBinder.BindFilter(node.FilterClause, context);
-
-                context.ExitNextBinderScope();
+                filterExpression = context.FilterBinder.BindFilter(node.FilterClause, nextBinderContext);
 
                 // The source expression looks like: $it.Authors
                 // So the generated countExpression below will look like: $it.Authors.Where($it => $it.Id > 1)
@@ -789,9 +815,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (sourceNode == null)
             {
                 // if the cast is on the root i.e $it (~/Products?$filter=NS.PopularProducts/.....),
-                // source would be null. So bind null to '$it'.
-                // source = _lambdaParameters[ODataItParameterName];
-                source = context.Parameter;
+                // source would be null. So bind null to 'current parameter' at context.
+                source = context.CurrentParameter;
             }
             else
             {
@@ -829,16 +854,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        /// <summary>
-        /// Gets $it parameter
-        /// </summary>
-        /// <returns></returns>
-       // protected abstract ParameterExpression Parameter { get; }
-
-        protected virtual ParameterExpression GetParameter(QueryBinderContext context)
-        {
-            return context.Parameter;
-        }
         #endregion
 
         #region Bind Node methods
@@ -947,9 +962,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             var member = source as MemberExpression;
             return member != null
-                && context.Parameter.Type.IsGenericType
-                && context.Parameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
-                && member.Expression == context.Parameter;
+                && context.CurrentParameter.Type.IsGenericType
+                && context.CurrentParameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
+                && member.Expression == context.CurrentParameter;
         }
 
         private static MethodCallExpression SkipFilters(MethodCallExpression expression)
@@ -1156,7 +1171,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             string propertyName = context.Model.GetClrPropertyName(property);
             propertyPath = propertyPath ?? propertyName;
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type) &&
-                source != context.Parameter &&
+                source != context.CurrentParameter &&
                 !IsFlatteningSource(source, context))
             {
                 Expression cleanSource = ExpressionBinderHelper.RemoveInnerNullPropagation(source, context.QuerySettings);
@@ -1477,7 +1492,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var source = Bind(openNode.Source, context);
             Expression propertyAccessExpression;
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True &&
-                ExpressionBinderHelper.IsNullable(source.Type) && source != context.Parameter)
+                ExpressionBinderHelper.IsNullable(source.Type) && source != context.CurrentParameter)
             {
                 propertyAccessExpression = Expression.Property(ExpressionBinderHelper.RemoveInnerNullPropagation(source, context.QuerySettings), prop.Name);
             }

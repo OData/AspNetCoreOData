@@ -736,8 +736,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 }
             };
 
+            // Customers?$select=Addresses($select=Codes($orderby=$this desc,$it/Name))
+            select = "Addresses($select=Codes($orderby=$this desc,$it/Name))";
             Expression source = Expression.Constant(aCustomer);
             SelectExpandClause selectExpandClause = ParseSelectExpand(select, null, _model, _customer, _customers);
+            PathSelectItem item1 = selectExpandClause.SelectedItems.First() as PathSelectItem;
+            PathSelectItem item2 = item1.SelectAndExpand.SelectedItems.First() as PathSelectItem;
+            OrderByClause orderbyClause = item2.OrderByOption;
+
+            // Customers ?$select = Addresses($orderby =$this / ZipCode,$it / age;$select = Codes($orderby =$this desc,$it / Name))
+            // Customers?$select=Addresses($orderby=$this/ZipCode,$it/age;$select=Codes($orderby=$this desc,$it/Name))
+            select = "Addresses($orderby=Street,$this/ZipCode,$it/Age;$select=Codes($orderby=$this desc,$it/Name))";
+            selectExpandClause = ParseSelectExpand(select, null, _model, _customer, _customers);
+            item1 = selectExpandClause.SelectedItems.First() as PathSelectItem;
+            item2 = item1.SelectAndExpand.SelectedItems.First() as PathSelectItem;
+            orderbyClause = item2.OrderByOption;
+
             Assert.NotNull(selectExpandClause);
 
             // Act

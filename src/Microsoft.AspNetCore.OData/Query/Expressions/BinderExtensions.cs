@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public static class BinderExtensions
     {
-        public static IEnumerable Bind(this IFilterBinder binder, IEnumerable query, FilterClause filterClause, QueryBinderContext context)
+        public static IEnumerable ApplyBind(this IFilterBinder binder, IEnumerable query, FilterClause filterClause, QueryBinderContext context)
         {
             if (binder == null)
             {
@@ -76,6 +76,45 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression filterExp = binder.BindFilter(filterClause, context);
             return ExpressionHelpers.Where(query, filterExp, context.ElementClrType);
+        }
+
+        public static Expression ApplyBind(this IFilterBinder binder, Expression source, FilterClause filterClause, QueryBinderContext context)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (filterClause == null)
+            {
+                throw Error.ArgumentNull(nameof(filterClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            Expression filterExp = binder.BindFilter(filterClause, context);
+
+            Type elementType = context.ElementClrType;
+
+            MethodInfo filterMethod;
+            if (typeof(IQueryable).IsAssignableFrom(source.Type))
+            {
+                filterMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(elementType);
+            }
+            else
+            {
+                filterMethod = ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(elementType);
+            }
+
+            return Expression.Call(filterMethod, source, filterExp);
         }
 
         public static IQueryable ApplyBind(this IOrderByBinder binder, IQueryable query, OrderByClause orderByClause, QueryBinderContext context)

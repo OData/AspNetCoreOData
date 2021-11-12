@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="orderByClause">The orderby clause.</param>
         /// <param name="context">The query binder context.</param>
-        /// <returns>The orderBy binder result.</returns>
+        /// <returns>The OrderBy binder result, <see cref="OrderByBinderResult"/>.</returns>
         OrderByBinderResult BindOrderBy(OrderByClause orderByClause, QueryBinderContext context);
     }
 }

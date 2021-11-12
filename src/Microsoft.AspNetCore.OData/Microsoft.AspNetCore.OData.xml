@@ -8630,7 +8630,7 @@
             </summary>
             <param name="orderByClause">The orderby clause.</param>
             <param name="context">The query binder context.</param>
-            <returns>The orderBy binder result.</returns>
+            <returns>The OrderBy binder result, <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
@@ -8688,7 +8688,7 @@
             </summary>
             <param name="orderByClause">The orderby clause.</param>
             <param name="context">The query binder context.</param>
-            <returns>The orderBy binder result.</returns>
+            <returns>The OrderBy binder result, <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult">
             <summary>
@@ -8911,12 +8911,6 @@
             <param name="unaryOperatorNode">The query node to bind.</param>
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetParameter(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
-            <summary>
-            Gets $it parameter
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindConstantNode(Microsoft.OData.UriParser.ConstantNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
@@ -9156,7 +9150,14 @@
             </summary>
             <param name="model">The Edm model.</param>
             <param name="querySettings">The query setting.</param>
-            <param name="clrType">The element CLR type.</param>
+            <param name="clrType">The current element CLR type in this context (scope).</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
+            </summary>
+            <param name="context">The parent query binder context.</param>
+            <param name="clrType">The The current element CLR type in this context (scope).</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Model">
             <summary>
@@ -9173,6 +9174,11 @@
             Gets the Element Clr type.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AssembliesResolver">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -9182,6 +9188,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AlreadyOrdered">
             <summary>
             Gets or sets the property that indicates if an expression has already been ordered.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter">
+            <summary>
+            Gets the current parameter. Current parameter is the parameter at root of this context.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
