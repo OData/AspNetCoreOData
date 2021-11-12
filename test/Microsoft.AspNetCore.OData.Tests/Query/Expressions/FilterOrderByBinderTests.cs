@@ -74,6 +74,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             }
         }
 
+        [Fact]
+        public void FilterBinder_Binds_Throws_InputParameters()
+        {
+            // Arrange
+            IFilterBinder binder = new FilterBinder2();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindFilter(null, null), "filterClause");
+
+            // Act & Assert
+            SingleValueNode expression = new Mock<SingleValueNode>().Object;
+            RangeVariable range = new Mock<RangeVariable>().Object;
+            FilterClause filterClause = new FilterClause(expression, range);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindFilter(filterClause, null), "context");
+        }
+
         [Theory]
         [InlineData(null, true, true)]
         [InlineData("", false, false)]

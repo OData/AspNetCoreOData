@@ -547,9 +547,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // TODO: double check, sam xu
                 //QueryBinderContext subContext = context.CreateSubContext();
                 //subContext.ElementClrType = elementType;
+                IFilterBinder nestedFilterBinder = context.GetNestedFilterBinder();
                 QueryBinderContext nextBinderContext = new QueryBinderContext(context, elementType);
 
-                filterExpression = context.FilterBinder.BindFilter(node.FilterClause, nextBinderContext);
+                filterExpression = nestedFilterBinder.BindFilter(node.FilterClause, nextBinderContext);
 
                 // The source expression looks like: $it.Authors
                 // So the generated countExpression below will look like: $it.Authors.Where($it => $it.Id > 1)

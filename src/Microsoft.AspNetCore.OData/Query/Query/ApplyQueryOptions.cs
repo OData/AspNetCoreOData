@@ -167,7 +167,11 @@ namespace Microsoft.AspNetCore.OData.Query
                     var filterTransformation = transformation as FilterTransformationNode;
 
                     IFilterBinder binder = Context.GetFilterBinder2();
-                    QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
+                    QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType)
+                    {
+                        GetNestedFilterBinder = () => Context.GetFilterBinder2()
+                    };
+
                     query = binder.ApplyBind(query, filterTransformation.FilterClause, binderContext);
 
                    // Expression filter = FilterBinder.Bind(query, filterTransformation.FilterClause, ResultClrType, Context, querySettings);

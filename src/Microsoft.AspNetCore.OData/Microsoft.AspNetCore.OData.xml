@@ -9144,6 +9144,11 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext">
+            <summary>
+            Encapsulates all binder information about an individual OData query option binding.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
@@ -9179,15 +9184,18 @@
             
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedFilterBinder">
+            <summary>
+            Gets or sets the nested filter binder.
+            For example: we do a orderby and a nested $filter.
+            $orderby=Addresses/$count($filter=HouseNumber gt 8)   or
+            $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
             Or the properties from $compute query options.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AlreadyOrdered">
-            <summary>
-            Gets or sets the property that indicates if an expression has already been ordered.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter">

@@ -357,7 +357,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             querySettings = querySettings ?? _defaultSettings;
             QueryBinderContext context = new QueryBinderContext(model, querySettings, elementType)
             {
-                AssembliesResolver = assembliesResolver
+                AssembliesResolver = assembliesResolver,
+                GetNestedFilterBinder = () => new FilterBinder2()
             };
 
             IOrderByBinder orderByBinder = new OrderByBinder();

@@ -199,7 +199,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
-                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, clrElementType);
+                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, clrElementType)
+                {
+                    GetNestedFilterBinder = () => queryContext.GetFilterBinder2()
+                };
+
                 IFilterBinder binder = queryContext.GetFilterBinder2();
 
                 if (isCollection)
@@ -920,7 +924,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 };
 
                 ODataQueryContext queryContext = context.SelectExpand.Context;
-                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, elementType);
+                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, elementType)
+                {
+                    GetNestedFilterBinder = () => queryContext.GetFilterBinder2()
+                };
+
                 IOrderByBinder binder = queryContext.GetOrderByBinder();
                 source = binder.ApplyBind(source, orderbyClause, binderContext);
 

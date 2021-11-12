@@ -36,19 +36,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            // Save the filter binder into the context internally
-            // It will be used in sub-filter, for example:  $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
-            context.FilterBinder = this;
-
-            Type elementType = context.ElementClrType;
-
-            //string rangeVariableName = filterClause.RangeVariable.Name;
-            //if (!context.TryGetParameter(rangeVariableName, out ParameterExpression filterParameter))
-            //{
-            //    filterParameter = Expression.Parameter(elementType, rangeVariableName);
-            //    context.AddlambdaParameters(rangeVariableName, filterParameter);
-            //}
-
             Expression body = Bind(filterClause.Expression, context);
 
             ParameterExpression filterParameter = context.CurrentParameter;
@@ -56,6 +43,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression filterExpr = Expression.Lambda(body, filterParameter);
 
             filterExpr = Expression.Lambda(ApplyNullPropagationForFilterBody(filterExpr.Body, context), filterExpr.Parameters);
+
+            Type elementType = context.ElementClrType;
 
             Type expectedFilterType = typeof(Func<,>).MakeGenericType(elementType, typeof(bool));
             if (filterExpr.Type != expectedFilterType)

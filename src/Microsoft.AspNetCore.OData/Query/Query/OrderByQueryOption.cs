@@ -321,7 +321,11 @@ namespace Microsoft.AspNetCore.OData.Query
             // TODO: need to refactor it later.
             orderbyClause = new OrderByClause(null, orderbyClause.Expression, orderbyClause.Direction, orderbyClause.RangeVariable);
 
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType);
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            {
+                GetNestedFilterBinder = () => Context.GetFilterBinder2()
+            };
+
             querySoFar = binder.ApplyBind(querySoFar, orderbyClause, binderContext);
 
             //LambdaExpression orderByExpression =

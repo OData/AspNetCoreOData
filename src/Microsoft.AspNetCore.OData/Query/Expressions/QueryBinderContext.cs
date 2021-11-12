@@ -16,6 +16,9 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
+    /// <summary>
+    /// Encapsulates all binder information about an individual OData query option binding.
+    /// </summary>
     public class QueryBinderContext
     {
         private const string DollarIt = "$it";
@@ -107,42 +110,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public IAssemblyResolver AssembliesResolver { get; set; }
 
         /// <summary>
+        /// Gets or sets the nested filter binder.
+        /// For example: we do a orderby and a nested $filter.
+        /// $orderby=Addresses/$count($filter=HouseNumber gt 8)   or
+        /// $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
+        /// </summary>
+        public Func<IFilterBinder> GetNestedFilterBinder { get; set; }
+
+        /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// Or the properties from $compute query options.
         /// </summary>
         public IDictionary<string, Expression> ComputedProperties { get; set; }
 
         internal bool IsNested { get; } = false;
-
-
-        public ParameterExpression ParameterExpression { get; }
-
-        /// <summary>
-        /// Gets or sets the property that indicates if an expression has already been ordered.
-        /// </summary>
-        public bool AlreadyOrdered { get; set; }
-
-        private IFilterBinder _filterBinder;
-        internal IFilterBinder FilterBinder
-        {
-            get
-            {
-                if (_filterBinder == null)
-                {
-                    // use the default filter binder
-                    _filterBinder = new FilterBinder2();
-                }
-
-                return _filterBinder;
-            }
-            set
-            {
-                _filterBinder = value;
-            }
-        }
-
-        public ParameterExpression TopExpression { get; }
-
 
         /// <summary>
         /// Gets the current parameter. Current parameter is the parameter at root of this context.
