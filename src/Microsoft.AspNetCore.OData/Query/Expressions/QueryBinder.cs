@@ -49,26 +49,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             });
         #endregion
 
-        protected LambdaExpression BindExpression(SingleValueNode expression, RangeVariable rangeVariable, QueryBinderContext context)
-        {
-            Contract.Assert(rangeVariable != null);
-            Contract.Assert(context != null);
-
-
-            if (!context.TryGetParameter(rangeVariable.Name, out ParameterExpression filterParameter))
-            {
-                Type elementType = context.ElementClrType;
-
-                filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
-                context.AddlambdaParameters(rangeVariable.Name, filterParameter);
-            }
-
-            // EnsureFlattenedPropertyContainer(filterParameter);
-
-            Expression body = Bind(expression, context);
-            return Expression.Lambda(body, filterParameter);
-        }
-
         #region Bind methods
         /// <summary>
         /// Binds a <see cref="QueryNode"/> to create a LINQ <see cref="Expression"/> that represents the semantics of the <see cref="QueryNode"/>.
@@ -398,7 +378,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             else if (rangeVariable.Name == "$it")
             {
                 // ~/Customers?$select=Addresses($order=City)
-                // ~/Customers?$select=Addresses($order=$it/Name)
+                // ~/Customers?$select=Addresses($filter=$it/City eq City)
                 // Both $orderby.Expression.Source is the RangeVariableRefereneNode, and the name is "$it".
                 // But first refers to "Addresses", and the second refers to "Customers".
                 // We can't simply identify using the "$it" so there's a workaround.
@@ -718,13 +698,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="allNode">The query node to bind.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        public virtual Expression BindAllNode(AllNode allNode, QueryBinderContext context)
+        protected virtual Expression BindAllNode(AllNode allNode, QueryBinderContext context)
         {
             CheckArgumentNull(allNode, context);
 
-            context.EnterLambdaScope();
+           // context.EnterLambdaScope();
 
-            ParameterExpression allIt = context.HandleLambdaParameters(allNode.RangeVariables);
+            (string name, ParameterExpression allIt) = context.HandleLambdaParameters(allNode.RangeVariables);
 
             Expression source;
             Contract.Assert(allNode.Source != null);
@@ -739,7 +719,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression all = All(source, body);
 
-            context.ExitLamdbaScope();
+            context.RemoveParameter(name);
+            //context.ExitLamdbaScope();
 
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type))
             {
@@ -767,9 +748,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             CheckArgumentNull(anyNode, context);
 
-            context.EnterLambdaScope();
+            //context.EnterLambdaScope();
 
-            ParameterExpression anyIt = context.HandleLambdaParameters(anyNode.RangeVariables);
+            (string name, ParameterExpression anyIt) = context.HandleLambdaParameters(anyNode.RangeVariables);
 
             Expression source;
             Contract.Assert(anyNode.Source != null);
@@ -787,13 +768,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 && (bool)(anyNode.Body as ConstantNode).Value == false)
             {
                 // any(false) is the same as just false
-                context.ExitLamdbaScope();
+                context.RemoveParameter(name);
                 return FalseConstant;
             }
 
             Expression any = Any(source, body);
 
-            context.ExitLamdbaScope();
+            context.RemoveParameter(name);
 
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type))
             {

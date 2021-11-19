@@ -331,23 +331,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             }
         }
 
-        //private static (Expression, OrderByDirection) BindOrderBy<T>(string orderBy, IEdmModel model, ODataQuerySettings querySettings = null, IAssemblyResolver assembliesResolver = null)
-        //{
-        //    Type elementType = typeof(T);
-        //    OrderByClause orderByClause = CreateOrderByNode(orderBy, model, elementType);
-        //    Assert.NotNull(orderByClause);
-
-        //    querySettings = querySettings ?? _defaultSettings;
-        //    QueryBinderContext context = new QueryBinderContext(model, querySettings, elementType)
-        //    {
-        //        AssembliesResolver = assembliesResolver
-        //    };
-
-        //    IOrderByBinder orderByBinder = new OrderByBinder();
-        //    Expression orderByExpr = orderByBinder.BindOrderBy(orderByClause, context);
-        //    return (orderByExpr, orderByClause.Direction);
-        //}
-
         private static OrderByBinderResult BindOrderBy<T>(string orderBy, IEdmModel model, ODataQuerySettings querySettings = null, IAssemblyResolver assembliesResolver = null)
         {
             Type elementType = typeof(T);

@@ -18,8 +18,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     {
         /// <summary>
         /// Translates an OData $orderby represented by <see cref="OrderByClause"/> to <see cref="Expression"/>.
-        /// $orderby=Age
+        /// $orderby=Age,Name
         ///    |--  x => x.Age
+        ///    |--  x => x.Name
         /// </summary>
         /// <param name="orderByClause">The orderby clause.</param>
         /// <param name="context">The query binder context.</param>

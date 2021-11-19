@@ -8,8 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -103,10 +105,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         public Type ElementClrType { get; }
 
-        // public virtual ODataQueryContext QueryContext { get; set; }
-
         /// <summary>
-        /// 
+        /// Gets or sets the assembly resolver.
         /// </summary>
         public IAssemblyResolver AssembliesResolver { get; set; }
 
@@ -174,7 +174,95 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        public ParameterExpression HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
+        public void RemoveParameter(string name)
+        {
+            if (name != null)
+            {
+                _lambdaParameters.Remove(name);
+            }
+        }
+
+        internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
+        {
+            ParameterExpression lambdaIt = null;
+            string name = null;
+            foreach (RangeVariable rangeVariable in rangeVariables)
+            {
+                // If the range variable exists, it's from upper layer, skip it.
+                if (_lambdaParameters.ContainsKey(rangeVariable.Name))
+                {
+                    continue;
+                }
+
+                // Work-around issue 481323 where UriParser yields a collection parameter type
+                // for primitive collections rather than the inner element type of the collection.
+                // Remove this block of code when 481323 is resolved.
+                IEdmTypeReference edmTypeReference = rangeVariable.TypeReference;
+                IEdmCollectionTypeReference collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
+                if (collectionTypeReference != null)
+                {
+                    IEdmCollectionType collectionType = collectionTypeReference.Definition as IEdmCollectionType;
+                    if (collectionType != null)
+                    {
+                        edmTypeReference = collectionType.ElementType;
+                    }
+                }
+
+                ParameterExpression parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, AssembliesResolver), rangeVariable.Name);
+                Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
+                lambdaIt = parameter;
+
+                _lambdaParameters.Add(rangeVariable.Name, parameter);
+                name = rangeVariable.Name;
+            }
+
+            // OData spec supports any() / all()
+            //if (lambdaIt == null)
+            //{
+            //    throw new ODataException("TODO: There can be only one parameter in an Any/All lambda");
+            //}
+
+            return (name, lambdaIt);
+        }
+
+        public ParameterExpression HandleLambdaParameters33(IEnumerable<RangeVariable> rangeVariables)
+        {
+            ParameterExpression lambdaIt = null;
+
+            IDictionary<string, ParameterExpression> newParameters = new Dictionary<string, ParameterExpression>(_lambdaParameters);
+            foreach (RangeVariable rangeVariable in rangeVariables)
+            {
+                if (newParameters.ContainsKey(rangeVariable.Name))
+                {
+                    continue;
+                }
+
+                // Work-around issue 481323 where UriParser yields a collection parameter type
+                // for primitive collections rather than the inner element type of the collection.
+                // Remove this block of code when 481323 is resolved.
+                IEdmTypeReference edmTypeReference = rangeVariable.TypeReference;
+                IEdmCollectionTypeReference collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
+                if (collectionTypeReference != null)
+                {
+                    IEdmCollectionType collectionType = collectionTypeReference.Definition as IEdmCollectionType;
+                    if (collectionType != null)
+                    {
+                        edmTypeReference = collectionType.ElementType;
+                    }
+                }
+
+                ParameterExpression parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, AssembliesResolver), rangeVariable.Name);
+                Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
+                lambdaIt = parameter;
+
+                newParameters.Add(rangeVariable.Name, parameter);
+            }
+
+            _lambdaParameters = newParameters;
+            return lambdaIt;
+        }
+
+        public ParameterExpression HandleLambdaParameters1(IEnumerable<RangeVariable> rangeVariables)
         {
             ParameterExpression lambdaIt = null;
 

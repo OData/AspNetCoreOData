@@ -8625,8 +8625,9 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Translates an OData $orderby represented by <see cref="T:Microsoft.OData.UriParser.OrderByClause"/> to <see cref="T:System.Linq.Expressions.Expression"/>.
-            $orderby=Age
+            $orderby=Age,Name
                |--  x => x.Age
+               |--  x => x.Name
             </summary>
             <param name="orderByClause">The orderby clause.</param>
             <param name="context">The query binder context.</param>
@@ -8655,6 +8656,14 @@
             <param name="source">The original <see cref="T:System.Object"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext"/>.</param>
             <returns>The new <see cref="T:System.Object"/> after the select/expand query has been applied.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translate an OData $select or $expand tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="selectExpandClause">The original <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <returns>The $select and $expand binder result.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysEqualMethodInfo">
             <summary>Method info for byte array comparison.</summary>
@@ -9181,7 +9190,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AssembliesResolver">
             <summary>
-            
+            Gets or sets the assembly resolver.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedFilterBinder">
@@ -9207,6 +9216,14 @@
             <summary>
             Applies the given <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> to the given <see cref="T:System.Linq.IQueryable"/>.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translate an OData $select or $expand tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="selectExpandClause">The original <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <returns>The $select and $expand binder result.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.Bind(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext)">
             <inheritdoc/>

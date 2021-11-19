@@ -29,6 +29,39 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
     public class SelectExpandBinder : ISelectExpandBinder
     {
+        /// <summary>
+        /// Translate an OData $select or $expand tree represented by <see cref="SelectExpandClause"/> to an <see cref="Expression"/>.
+        /// </summary>
+        /// <param name="selectExpandClause">The original <see cref="SelectExpandClause"/>.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <returns>The $select and $expand binder result.</returns>
+        public virtual Expression BindSelectExpand(SelectExpandClause selectExpandClause, QueryBinderContext context)
+        {
+            if (selectExpandClause == null)
+            {
+                throw Error.ArgumentNull(nameof(selectExpandClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            //Type elementType = context.ElementClrType;
+            //IEdmStructuredType structuredType = context.SelectExpand.Context.ElementType as IEdmStructuredType;
+            //IEdmNavigationSource navigationSource = context.NavigationSource;
+            //ParameterExpression source = Expression.Parameter(elementType, "$it");
+
+            //// expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
+            // Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
+
+            //// expression looks like -> source => new Wrapper { Instance = source .... }
+            LambdaExpression projectionLambdaExpression = null;
+            //LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
+
+            return projectionLambdaExpression;
+        }
+
         /// <inheritdoc/>
         public virtual IQueryable Bind(IQueryable source, SelectExpandBinderContext context)
         {
