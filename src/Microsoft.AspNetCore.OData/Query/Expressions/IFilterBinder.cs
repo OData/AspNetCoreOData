@@ -23,8 +23,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="filterClause">The filter clause.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>The filter binder result.</returns>
+        /// <remarks>reconsider to return "LambdaExpression"? </remarks>
         Expression BindFilter(FilterClause filterClause, QueryBinderContext context);
-
-        // reconsider it to return "LambdaExpression"?
     }
 }

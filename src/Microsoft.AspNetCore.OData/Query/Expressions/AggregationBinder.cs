@@ -24,11 +24,6 @@ using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
-    public interface IAggregationBinder
-    {
-        Expression BindAggregation(TransformationNode transformation, QueryBinderContext context);
-    }
-
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     internal class AggregationBinder : TransformationBinderBase
     {

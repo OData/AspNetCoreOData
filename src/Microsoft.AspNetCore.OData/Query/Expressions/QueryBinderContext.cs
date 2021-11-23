@@ -23,11 +23,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public class QueryBinderContext
     {
+        /// <summary>
+        /// The parameter name for root type.(it could be renamed as $root).
+        /// </summary>
         private const string DollarIt = "$it";
+
+        /// <summary>
+        /// The parameter name for current type.
+        /// </summary>
         private const string DollarThis = "$this";
 
-        private Stack<IDictionary<string, ParameterExpression>> _parametersStack = new Stack<IDictionary<string, ParameterExpression>>();
-
+        /// <summary>
+        /// All parameters present in current context.
+        /// </summary>
         private IDictionary<string, ParameterExpression> _lambdaParameters;
 
         /// <summary>
@@ -64,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
         /// </summary>
         /// <param name="context">The parent query binder context.</param>
-        /// <param name="clrType">The The current element CLR type in this context (scope).</param>
+        /// <param name="clrType">The current element CLR type in this context (scope).</param>
         public QueryBinderContext(QueryBinderContext context, Type clrType)
         {
             if (context == null)
@@ -156,24 +164,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _lambdaParameters[name] =  parameter;
         }
 
-        public void EnterLambdaScope()
-        {
-            Contract.Assert(_lambdaParameters != null);
-            _parametersStack.Push(_lambdaParameters);
-        }
-
-        public void ExitLamdbaScope()
-        {
-            if (_parametersStack.Count != 0)
-            {
-                _lambdaParameters = _parametersStack.Pop();
-            }
-            else
-            {
-                _lambdaParameters = null;
-            }
-        }
-
         public void RemoveParameter(string name)
         {
             if (name != null)
@@ -223,80 +213,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //}
 
             return (name, lambdaIt);
-        }
-
-        public ParameterExpression HandleLambdaParameters33(IEnumerable<RangeVariable> rangeVariables)
-        {
-            ParameterExpression lambdaIt = null;
-
-            IDictionary<string, ParameterExpression> newParameters = new Dictionary<string, ParameterExpression>(_lambdaParameters);
-            foreach (RangeVariable rangeVariable in rangeVariables)
-            {
-                if (newParameters.ContainsKey(rangeVariable.Name))
-                {
-                    continue;
-                }
-
-                // Work-around issue 481323 where UriParser yields a collection parameter type
-                // for primitive collections rather than the inner element type of the collection.
-                // Remove this block of code when 481323 is resolved.
-                IEdmTypeReference edmTypeReference = rangeVariable.TypeReference;
-                IEdmCollectionTypeReference collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
-                if (collectionTypeReference != null)
-                {
-                    IEdmCollectionType collectionType = collectionTypeReference.Definition as IEdmCollectionType;
-                    if (collectionType != null)
-                    {
-                        edmTypeReference = collectionType.ElementType;
-                    }
-                }
-
-                ParameterExpression parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, AssembliesResolver), rangeVariable.Name);
-                Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
-                lambdaIt = parameter;
-
-                newParameters.Add(rangeVariable.Name, parameter);
-            }
-
-            _lambdaParameters = newParameters;
-            return lambdaIt;
-        }
-
-        public ParameterExpression HandleLambdaParameters1(IEnumerable<RangeVariable> rangeVariables)
-        {
-            ParameterExpression lambdaIt = null;
-
-            IDictionary<string, ParameterExpression> newParameters = new Dictionary<string, ParameterExpression>();
-            foreach (RangeVariable rangeVariable in rangeVariables)
-            {
-                ParameterExpression parameter;
-
-                // Create a Parameter Expression for rangeVariables which are not $it Lambda parameters or $this.
-                if (!_lambdaParameters.TryGetValue(rangeVariable.Name, out parameter) && rangeVariable.Name != DollarThis)
-                {
-                    // Work-around issue 481323 where UriParser yields a collection parameter type
-                    // for primitive collections rather than the inner element type of the collection.
-                    // Remove this block of code when 481323 is resolved.
-                    IEdmTypeReference edmTypeReference = rangeVariable.TypeReference;
-                    IEdmCollectionTypeReference collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
-                    if (collectionTypeReference != null)
-                    {
-                        IEdmCollectionType collectionType = collectionTypeReference.Definition as IEdmCollectionType;
-                        if (collectionType != null)
-                        {
-                            edmTypeReference = collectionType.ElementType;
-                        }
-                    }
-
-                    parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, AssembliesResolver), rangeVariable.Name);
-                    Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
-                    lambdaIt = parameter;
-                }
-                newParameters.Add(rangeVariable.Name, parameter);
-            }
-
-            _lambdaParameters = newParameters;
-            return lambdaIt;
         }
     }
 }

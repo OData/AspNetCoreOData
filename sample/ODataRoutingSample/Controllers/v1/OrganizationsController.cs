@@ -110,7 +110,7 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok($"Calculated the price using {organizationId} and {partId}");
         }
 
-        [HttpGet("v1/Organizations/GetPrice2(organizationId={orgId},partId={parId})")]
+        [HttpGet("v1/Organization--s/GetPrice2(organizationId={orgId},partId={parId})")]
         public IActionResult GetMorePrice(string orgId, string parId)
         {
             return Ok($"Calculated the price using {orgId} and {parId}");
