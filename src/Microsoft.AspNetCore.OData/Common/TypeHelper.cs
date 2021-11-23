@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.ModelBuilder;
 
@@ -30,6 +31,29 @@ namespace Microsoft.AspNetCore.OData.Common
         public static bool IsDynamicTypeWrapper(this Type type)
         {
             return (type != null && typeof(DynamicTypeWrapper).IsAssignableFrom(type));
+        }
+
+        public static bool IsDeltaSetWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
+
+        public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
+
+        public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
+
+        private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
+        {
+            if (type == null)
+            {
+                entityType = null;
+                return false;
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == wrappedType)
+            {
+                entityType = type.GetGenericArguments()[0];
+                return true;
+            }
+
+            return IsTypeWrapper(wrappedType, type.BaseType, out entityType);
         }
 
         /// <summary>

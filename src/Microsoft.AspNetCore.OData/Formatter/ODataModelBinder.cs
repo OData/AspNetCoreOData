@@ -86,7 +86,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                         HttpRequest request = bindingContext.HttpContext.Request;
                         TimeZoneInfo timeZone = request.GetTimeZoneInfo();
-                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType, timeZone);
+                        IEdmModel edmModel = request.GetModel();
+                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType, timeZone, edmModel);
                         if (model != null)
                         {
                             bindingContext.Result = ModelBindingResult.Success(model);

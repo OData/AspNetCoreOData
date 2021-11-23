@@ -154,8 +154,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         case ExpressionType.NotEqual:
                             return Expression.MakeBinary(binaryExpressionType, left, right, liftToNull, method: Linq2ObjectsComparisonMethods.AreByteArraysNotEqualMethodInfo);
                         default:
-                            IEdmPrimitiveType binaryType = typeof(byte[]).GetEdmPrimitiveType();
-                            throw new ODataException(Error.Format(SRResources.BinaryOperatorNotSupported, binaryType.FullName(), binaryType.FullName(), binaryOperator));
+                            throw new ODataException(Error.Format(SRResources.BinaryOperatorNotSupported, "Edm.Binary", "Edm.Binary", binaryOperator));
                     }
                 }
                 else

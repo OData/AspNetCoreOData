@@ -63,6 +63,21 @@ public sealed class Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions {
 	public static Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder AddOData (Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action`2[[Microsoft.AspNetCore.OData.ODataOptions],[System.IServiceProvider]] setupAction)
 }
 
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
+}
+
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
@@ -524,6 +539,13 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 	System.Type StructuredType  { public virtual get; }
 }
 
+public interface Microsoft.AspNetCore.OData.Edm.IODataTypeMapper {
+	System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
+	System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
+	Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
+}
+
 [
 ExtensionAttribute(),
 ]
@@ -561,7 +583,17 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static Microsoft.AspNetCore.OData.Edm.IODataTypeMapper GetTypeMapper (Microsoft.OData.Edm.IEdmModel model)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static void SetModelName (Microsoft.OData.Edm.IEdmModel model, string name)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static void SetTypeMapper (Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper)
 }
 
 [
@@ -609,11 +641,45 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions
 	public static void SetOperationLinkBuilder (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder operationLinkBuilder)
 }
 
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions {
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetClrType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetClrType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.OData.Edm.IEdmType GetEdmType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static System.Type GetPrimitiveType (Microsoft.AspNetCore.OData.Edm.IODataTypeMapper mapper, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType)
+}
+
 public class Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation {
 	public CustomAggregateMethodAnnotation ()
 
 	public Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation AddMethod (string methodToken, System.Collections.Generic.IDictionary`2[[System.Type],[System.Reflection.MethodInfo]] methods)
 	public bool GetMethodInfo (string methodToken, System.Type returnType, out System.Reflection.MethodInfo& methodInfo)
+}
+
+public class Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper : IODataTypeMapper {
+	public DefaultODataTypeMapper ()
+
+	public virtual System.Type GetClrPrimitiveType (Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable)
+	public virtual System.Type GetClrType (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver)
+	public virtual Microsoft.OData.Edm.IEdmPrimitiveTypeReference GetEdmPrimitiveType (System.Type clrType)
+	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmTypeReference (Microsoft.OData.Edm.IEdmModel edmModel, System.Type clrType)
 }
 
 public class Microsoft.AspNetCore.OData.Edm.EntitySelfLinks {
@@ -1405,6 +1471,16 @@ public class Microsoft.AspNetCore.OData.Query.OrderByQueryOption {
 	public IOrderedQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public System.Linq.IOrderedQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.QueryFilterProvider : IFilterProvider {
+	public QueryFilterProvider (Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
+
+	int Order  { public virtual get; }
+	Microsoft.AspNetCore.Mvc.Filters.IActionFilter QueryFilter  { public get; }
+
+	public virtual void OnProvidersExecuted (Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context)
+	public virtual void OnProvidersExecuting (Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption {
@@ -2502,7 +2578,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderCont
 	public SelectExpandBinderContext ()
 
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; public set; }
-	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpandQuery  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpand  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {

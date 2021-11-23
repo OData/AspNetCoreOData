@@ -5,8 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.OData.Edm;
-
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
     /// <summary>
@@ -22,6 +20,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Gets or sets the <see cref="SelectExpandQueryOption"/> which contains the $select and $expand query options.
         /// </summary>
-        public SelectExpandQueryOption SelectExpandQuery { get; set; }
+        public SelectExpandQueryOption SelectExpand { get; set; }
     }
 }

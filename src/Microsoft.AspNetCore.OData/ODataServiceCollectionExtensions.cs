@@ -5,8 +5,10 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -22,14 +24,47 @@ namespace Microsoft.AspNetCore.OData
     /// <summary>
     /// Provides extension methods to add OData services.
     /// </summary>
-    internal static class ODataServiceCollectionExtensions
+    public static class ODataServiceCollectionExtensions
     {
+        /// <summary>
+        /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
+        /// type. To avoid processing unexpected or malicious queries, use the validation settings on
+        /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+        /// http://go.microsoft.com/fwlink/?LinkId=279712.
+        /// </summary>
+        /// <param name="services">The services collection.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddODataQueryFilter(this IServiceCollection services)
+        {
+            return AddODataQueryFilter(services, new EnableQueryAttribute());
+        }
+
+        /// <summary>
+        /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
+        /// type. To avoid processing unexpected or malicious queries, use the validation settings on
+        /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+        /// http://go.microsoft.com/fwlink/?LinkId=279712.
+        /// </summary>
+        /// <param name="services">The services collection.</param>
+        /// <param name="queryFilter">The action filter that executes the query.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddODataQueryFilter(this IServiceCollection services, IActionFilter queryFilter)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IFilterProvider>(new QueryFilterProvider(queryFilter)));
+            return services;
+        }
+
         /// <summary>
         /// Adds the core OData services required for OData requests.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddODataCore(this IServiceCollection services)
+        internal static IServiceCollection AddODataCore(this IServiceCollection services)
         {
             if (services == null)
             {

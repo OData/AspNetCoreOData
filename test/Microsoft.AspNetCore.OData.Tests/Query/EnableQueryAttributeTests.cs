@@ -15,9 +15,19 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -232,6 +242,85 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void OnActionExecuted_Throws_Null_Context()
         {
             ExceptionAssert.ThrowsArgumentNull(() => new EnableQueryAttribute().OnActionExecuted(null), "actionExecutedContext");
+        }
+
+        [Fact]
+        public void OnActionExecuted_HandlesStatusCodesCorrectly()
+        {
+            // Arrange
+            HttpContext httpContext = new DefaultHttpContext();
+            httpContext.Request.Method = "Get";
+            ActionDescriptor actionDescriptor = new ActionDescriptor();
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), actionDescriptor);
+
+            ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), "someController");
+            context.Result = new ObjectResult(new { Error = "Error", Message = "Message" }) { StatusCode = 500 };
+
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            // Act and Assert
+            ExceptionAssert.DoesNotThrow(() => attribute.OnActionExecuted(context));
+        }
+
+        [Fact]
+        public void OnActionExecuted_HandlesRequestsNormally()
+        {
+            IEdmModel model = new CustomersModelWithInheritance().Model;
+
+            var request = RequestFactory.Create("Get", "http://localhost/Customers", opt => opt.AddRouteComponents(model).Filter());
+
+            ODataUriParser parser = new ODataUriParser(model, new Uri("Customers", UriKind.Relative));
+            HttpContext httpContext = request.HttpContext;
+
+            Assert.NotNull(httpContext.RequestServices);
+
+            httpContext.Request.Method = "Get";
+            request.Configure("odata", model, parser.ParsePath());
+            ActionDescriptor actionDescriptor = CreateDescriptors("CustomersController", typeof(CustomersController))
+                                                .First(descriptor => descriptor.ActionName.StartsWith("Get", StringComparison.OrdinalIgnoreCase));
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), actionDescriptor);
+
+            ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new CustomersController());
+            context.Result = new ObjectResult(new List<Customer>() { new Customer { Id = 1, Name = "John Doe" } }) { StatusCode = 200 };
+
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            // Act and Assert
+            ExceptionAssert.DoesNotThrow(() => attribute.OnActionExecuted(context));
+            var result = context.Result as ObjectResult;
+            Assert.NotNull(context.Result);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the [Http]ControllerDescriptor class.
+        /// </summary>
+        /// <returns>A new instance of the [Http]ControllerDescriptor  class.</returns>
+        private static IEnumerable<ControllerActionDescriptor> CreateDescriptors(string name, Type controllerType)
+        {
+            // Create descriptors. Search for non-public methods to pick up public methods in nested classes
+            // as controllers are usually a nested class for the test class ad by default, this are marked private.
+            List<ControllerActionDescriptor> descriptors = new List<ControllerActionDescriptor>();
+            IEnumerable<MethodInfo> methods = controllerType.GetTypeInfo().DeclaredMethods;
+            foreach (MethodInfo methodInfo in methods)
+            {
+                ControllerActionDescriptor descriptor = new ControllerActionDescriptor();
+                descriptor.ControllerName = name;
+                descriptor.ControllerTypeInfo = controllerType.GetTypeInfo();
+                descriptor.ActionName = methodInfo.Name;
+                descriptor.DisplayName = methodInfo.Name;
+                descriptor.MethodInfo = methodInfo;
+                descriptor.Parameters = methodInfo
+                    .GetParameters()
+                    .Select(p => new ParameterDescriptor
+                    {
+                        Name = p.Name,
+                        ParameterType = p.ParameterType
+                    })
+                    .ToList();
+                descriptors.Add(descriptor);
+            }
+
+            return descriptors;
         }
 
 #if NETCORE // Following functionality is only supported in NetCore.
@@ -982,6 +1071,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/", singleResult);
             EnableQueryAttribute attribute = new EnableQueryAttribute();
 
+            attribute.OnActionExecuted(actionExecutedContext);
+
+            Assert.Equal(HttpStatusCode.OK, actionExecutedContext.Response.StatusCode);
+            Assert.Equal(customer, (actionExecutedContext.Response.Content as ObjectContent).Value);
+        }
+
+        [Fact]
+        public void OnActionExecuted_SingleResult_ReturnsSingleItemForMultipleEnableQueryAttributeSet()
+        {
+            BellevueCustomer customer = new BellevueCustomer();
+            SingleResult singleResult = new SingleResult<BellevueCustomer>(new BellevueCustomer[] { customer }.AsQueryable());
+            HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/", singleResult);
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            attribute.OnActionExecuted(actionExecutedContext);
+            attribute.OnActionExecuted(actionExecutedContext);
             attribute.OnActionExecuted(actionExecutedContext);
 
             Assert.Equal(HttpStatusCode.OK, actionExecutedContext.Response.StatusCode);

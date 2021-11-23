@@ -427,7 +427,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Type clrType = value.GetType();
-            return model.GetTypeMappingCache().GetEdmType(clrType, model)?.Definition;
+            return model.GetEdmTypeReference(clrType)?.Definition;
         }
 
         private static IList<string> ParseValue(string value, char delim)

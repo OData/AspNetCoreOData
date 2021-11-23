@@ -337,10 +337,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return FalseConstant;
             }
 
-            bool isSourcePrimitiveOrEnum = source.Type.GetEdmPrimitiveType() != null ||
+            bool isSourcePrimitiveOrEnum = Model.GetEdmPrimitiveTypeReference(source.Type) != null ||
                                            TypeHelper.IsEnum(source.Type);
 
-            bool isTargetPrimitiveOrEnum = clrType.GetEdmPrimitiveType() != null ||
+            bool isTargetPrimitiveOrEnum = Model.GetEdmPrimitiveTypeReference(clrType) != null ||
                                            TypeHelper.IsEnum(clrType);
 
             if (isSourcePrimitiveOrEnum && isTargetPrimitiveOrEnum)
@@ -731,7 +731,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     }
 
                     if ((!targetEdmTypeReference.IsPrimitive() && !targetEdmTypeReference.IsEnum()) ||
-                        (source.Type.GetEdmPrimitiveType() == null && !TypeHelper.IsEnum(source.Type)))
+                        (Model.GetEdmPrimitiveTypeReference(source.Type) == null && !TypeHelper.IsEnum(source.Type)))
                     {
                         // Cast fails and return null.
                         return NullConstant;
@@ -1065,7 +1065,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal Expression ConvertNonStandardPrimitives(Expression source)
         {
             bool isNonstandardEdmPrimitive;
-            Type conversionType = source.Type.IsNonstandardEdmPrimitive(out isNonstandardEdmPrimitive);
+            Type conversionType = Model.IsNonstandardEdmPrimitive(source.Type, out isNonstandardEdmPrimitive);
 
             if (isNonstandardEdmPrimitive)
             {

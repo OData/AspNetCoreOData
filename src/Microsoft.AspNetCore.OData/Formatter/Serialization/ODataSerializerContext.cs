@@ -303,14 +303,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
                 }
 
-                var typeMappingCache = Model.GetTypeMappingCache();
-                edmType = typeMappingCache.GetEdmType(type, Model);
+                edmType = Model.GetEdmTypeReference(type);
 
                 if (edmType == null)
                 {
                     if (instance != null)
                     {
-                        edmType = typeMappingCache.GetEdmType(instance.GetType(), Model);
+                        edmType = Model.GetEdmTypeReference(instance.GetType());
                     }
 
                     if (edmType == null)
@@ -320,7 +319,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else if (instance != null)
                 {
-                    IEdmTypeReference actualType = typeMappingCache.GetEdmType(instance.GetType(), Model);
+                    IEdmTypeReference actualType = Model.GetEdmTypeReference(instance.GetType());
                     if (actualType != null && actualType != edmType)
                     {
                         edmType = actualType;

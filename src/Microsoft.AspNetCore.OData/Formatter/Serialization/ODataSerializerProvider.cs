@@ -123,8 +123,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmModel model = request.GetModel();
 
             // if it is not a special type, assume it has a corresponding EdmType.
-            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
+            IEdmTypeReference edmType = model.GetEdmTypeReference(type);
 
             if (edmType != null)
             {

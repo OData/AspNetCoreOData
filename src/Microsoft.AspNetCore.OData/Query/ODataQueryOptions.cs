@@ -1075,6 +1075,11 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 _queryOptionParser.Resolver = uriResolver;
             }
+            else
+            {
+                // By default, let's enable the property name case-insensitive
+                _queryOptionParser.Resolver = new ODataUriResolver { EnableCaseInsensitive = true };
+            }
 
             BuildQueryOptions(normalizedQueryParameters);
 

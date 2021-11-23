@@ -1920,42 +1920,109 @@
             <param name="methodInfo">The output of method info.</param>
             <returns>True if the method info was found, false otherwise.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper">
+            <summary>
+            The default implementation for <see cref="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.Default">
+            <summary>
+            Creates a static instance for the Default type mapper.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.ClrPrimitiveTypes">
+            <summary>
+            The default mapping between Edm primitive type and Clr primitive type.
+            Primitive types are cross Edm models.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.EdmPrimitiveTypes">
+            <summary>
+            Item1 --> non-nullable
+            Item2 --> nullable
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/> type.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> type for a given Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/>.
+            </summary>
+            <param name="primitiveType">The given Edm primitive type.</param>
+            <param name="nullable">The nullable or not.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper._cache">
+            <summary>
+            The cache used to hold the type mapping between <see cref="T:System.Type"/> and <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the corresponding Edm type <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> for the given CLR type <see cref="T:System.Type"/>.
+            </summary>
+            <param name="edmModel">The given Edm model.</param>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the corresponding Edm type reference.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,System.Boolean,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm type <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <param name="nullable">The nullable or not.</param>
+            <param name="assembliesResolver">The assembly resolver. if it's null, will use the default resolver.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.FindClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Finds the corresponding CLR type for a given Edm type reference.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <param name="assembliesResolver">The assembly resolver.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions">
             <summary>
             The extensions used to map between C# types and Edm types.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions._builtInPrimitiveTypes">
-            <summary>
-            The mapping between Edm primitive type and Clr primitive type.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveTypeReference(System.Type)">
             <summary>
-            Gets the corresponding Edm primitive type for the given CLR type.
+            Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/> type.
             </summary>
             <param name="clrType">The given CLR type.</param>
             <returns>Null or the Edm primitive type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveType(System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
             <summary>
-            Gets the corresponding Edm primitive type for the given CLR type.
+            Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/> type.
             </summary>
+            <param name="edmModel">The Edm model.</param>
             <param name="clrType">The given CLR type.</param>
             <returns>Null or the Edm primitive type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
             <summary>
             Gets the corresponding CLR type for a given Edm primitive type.
             </summary>
+            <param name="edmModel">The Edm model.</param>
             <param name="edmPrimitiveType">The given Edm primitive type.</param>
             <returns>Null or the CLR type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNonstandardEdmPrimitive(System.Type,System.Boolean@)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNonstandardEdmPrimitive(Microsoft.OData.Edm.IEdmModel,System.Type,System.Boolean@)">
             <summary>
             Figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
             and returns the corresponding clr type to which we map like uint => long.
             </summary>
+            <param name="edmModel">The Edm model.</param>
             <param name="clrType">The potential non-standard CLR type.</param>
             <param name="isNonstandardEdmPrimitive">A boolean value out to indicate whether the input CLR type is standard OData primitive type.</param>
             <returns>The standard CLR type or the input CLR type itself.</returns>
@@ -1995,7 +2062,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType)">
             <summary>
-            Gets the corresponding CLR type for a given Edm type reference.
+            Gets the corresponding CLR type for a given Edm type.
             </summary>
             <param name="edmModel">The Edm model.</param>
             <param name="edmType">The Edm type.</param>
@@ -2003,26 +2070,12 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
             <summary>
-            Gets the corresponding CLR type for a given Edm type reference.
+            Gets the corresponding CLR type for a given Edm type.
             </summary>
             <param name="edmModel">The Edm model.</param>
             <param name="edmType">The Edm type.</param>
             <param name="assembliesResolver">The assembly resolver.</param>
             <returns>Null or the CLR type.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable(System.Type)">
-            <summary>
-            Check the input type is nullable type or not.
-            </summary>
-            <param name="type">The input CLR type.</param>
-            <returns>True/False.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNullable``1">
-            <summary>
-            Check the input type is nullable or not.
-            </summary>
-            <typeparam name="T">The test CRL type.</typeparam>
-            <returns>True/False.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmHelpers">
             <summary>
@@ -2117,6 +2170,20 @@
             </summary>
             <param name="model">The Edm model.</param>
             <param name="name">The Edm model name.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetTypeMapper(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Gets the OData type mapping provider from the model.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.SetTypeMapper(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Edm.IODataTypeMapper)">
+            <summary>
+            Sets the OData type mapping provider to the model.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="mapper">The given mapper.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAlternateKeys(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
@@ -2344,6 +2411,85 @@
             <summary>
             Gets the whole expand path.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
+            <summary>
+            Provides the mapping between CLR type and Edm type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetEdmPrimitiveType(System.Type)">
+            <summary>
+            Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/>.
+            </summary>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the Edm primitive type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType,System.Boolean)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveType"/>.
+            </summary>
+            <param name="primitiveType">The given Edm primitive type.</param>
+            <param name="nullable">The nullable or not.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the corresponding Edm type <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> for the given CLR type <see cref="T:System.Type"/>.
+            </summary>
+            <param name="edmModel">The given Edm model.</param>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the corresponding Edm type reference.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmType,System.Boolean,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm type <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
+            </summary>
+            <param name="edmModel">The given Edm model.</param>
+            <param name="edmType">The given Edm type.</param>
+            <param name="nullable">The nullable or not.</param>
+            <param name="assembliesResolver">The assembly resolver.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetPrimitiveType(Microsoft.AspNetCore.OData.Edm.IODataTypeMapper,Microsoft.OData.Edm.IEdmPrimitiveTypeReference)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/>.
+            </summary>
+            <param name="mapper">The type mapper.</param>
+            <param name="primitiveType">The Edm primitive type reference.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetEdmType(Microsoft.AspNetCore.OData.Edm.IODataTypeMapper,Microsoft.OData.Edm.IEdmModel,System.Type)">
+            <summary>
+            Gets the corresponding Edm type <see cref="T:Microsoft.OData.Edm.IEdmType"/> for the given CLR type <see cref="T:System.Type"/>.
+            </summary>
+            <param name="mapper">The type mapper.</param>
+            <param name="edmModel">The given Edm model.</param>
+            <param name="clrType">The given CLR type.</param>
+            <returns>Null or the corresponding Edm type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetClrType(Microsoft.AspNetCore.OData.Edm.IODataTypeMapper,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm type <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.
+            </summary>
+            <param name="mapper">The type mapper.</param>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type reference.</param>
+            <returns>Null or the CLR type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataTypeMapperExtensions.GetClrType(Microsoft.AspNetCore.OData.Edm.IODataTypeMapper,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ModelBuilder.IAssemblyResolver)">
+            <summary>
+            Gets the corresponding <see cref="T:System.Type"/> for a given Edm type <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.
+            </summary>
+            <param name="mapper">The type mapper.</param>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <param name="assembliesResolver">The assembly resolver.</param>
+            <returns>Null or the CLR type.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation">
             <summary>
@@ -2582,6 +2728,18 @@
         <member name="P:Microsoft.AspNetCore.OData.Edm.SelfLinkBuilder`1.FollowsConventions">
             <summary>
             Gets a boolean indicating whether the link factory follows OData conventions or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.ClrToEdmTypeCache">
+            <summary>
+            <see cref="T:System.Type"/> to <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.TypeCacheItem.EdmToClrTypeCache">
+            <summary>
+            <see cref="T:Microsoft.OData.Edm.IEdmType"/> to <see cref="T:System.Type"/>.
+            item1: non-nullable
+            item2: nullable
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions">
@@ -5774,7 +5932,7 @@
             Use OData route debug middleware. You can send request "~/$odata" after enabling this middleware.
             </summary>
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
-            <returns></returns>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataRouteDebug(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)">
             <summary>
@@ -6054,6 +6212,27 @@
             <summary>
             Provides extension methods to add OData services.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Enables query support for actions with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return
+            type. To avoid processing unexpected or malicious queries, use the validation settings on
+            <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+            http://go.microsoft.com/fwlink/?LinkId=279712.
+            </summary>
+            <param name="services">The services collection.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.AspNetCore.Mvc.Filters.IActionFilter)">
+            <summary>
+            Enables query support for actions with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return
+            type. To avoid processing unexpected or malicious queries, use the validation settings on
+            <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+            http://go.microsoft.com/fwlink/?LinkId=279712.
+            </summary>
+            <param name="services">The services collection.</param>
+            <param name="queryFilter">The action filter that executes the query.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataCore(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
@@ -8528,7 +8707,7 @@
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpandQuery">
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinderContext.SelectExpand">
             <summary>
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> which contains the $select and $expand query options.
             </summary>
@@ -9460,6 +9639,52 @@
             </summary> 
             <param name="nodeIn">The node to be translated.</param> 
             <returns>The translated node.</returns> 
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider">
+            <summary>
+            An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.Filters.IFilterProvider" /> that applies an action filter to
+            any action with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return type
+            that doesn't bind a parameter of type <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.#ctor(Microsoft.AspNetCore.Mvc.Filters.IActionFilter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider" /> class.
+            </summary>
+            <param name="queryFilter">The action filter that executes the query.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilter">
+            <summary>
+            Gets the action filter that executes the query.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.Order">
+            <summary>
+            Gets the order value for determining the order of execution of providers. Providers
+            execute in ascending numeric value of the Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order
+            property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
+            <summary>
+            Provides filters to apply to the specified action.
+            </summary>
+            <param name="context">The filter context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
+            <summary>
+            Summary:
+            Called in decreasing Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order,
+            after all Microsoft.AspNetCore.Mvc.Filters.IFilterProviders have executed once.
+            </summary>
+            <param name="context">The Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.IsIQueryable(System.Type)">
+            <summary>
+            Determines whether the given type is IQueryable.
+            </summary>
+            <param name="type">The type</param>
+            <returns><c>true</c> if the type is IQueryable.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption">
             <summary>
