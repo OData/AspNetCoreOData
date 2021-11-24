@@ -17,24 +17,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public interface ISelectExpandBinder
     {
-        /// <summary>
-        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
-        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
-        /// </summary>
-        /// <param name="source">The original <see cref="IQueryable"/>.</param>
-        /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the select/expand query has been applied.</returns>
-        IQueryable Bind(IQueryable source, SelectExpandBinderContext context);
-
-        /// <summary>
-        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
-        /// an <see cref="Expression"/> and applies it to an <see cref="object"/>.
-        /// </summary>
-        /// <param name="source">The original <see cref="object"/>.</param>
-        /// <param name="context">An instance of the <see cref="SelectExpandBinderContext"/>.</param>
-        /// <returns>The new <see cref="object"/> after the select/expand query has been applied.</returns>
-        object Bind(object source, SelectExpandBinderContext context);
-
         // $select=Name&$expand=Orders
         // $it => new { .... }
         /// <summary>

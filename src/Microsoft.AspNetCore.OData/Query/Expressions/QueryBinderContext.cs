@@ -132,6 +132,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         public IDictionary<string, Expression> ComputedProperties { get; set; }
 
+        /// <summary>
+        ///  Gets or Sets the given <see cref="ODataQueryContext"/>.
+        /// </summary>
+        public ODataQueryContext QueryContext { get; set; }
+
         internal bool IsNested { get; } = false;
 
         /// <summary>
