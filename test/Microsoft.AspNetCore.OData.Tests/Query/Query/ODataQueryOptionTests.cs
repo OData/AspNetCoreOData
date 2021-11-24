@@ -673,7 +673,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string queryExpression = ExpressionStringBuilder.ToString(finalQuery.Expression);
             queryExpression = queryExpression.Substring(queryExpression.IndexOf("]") + 2);
 
-            Assert.Equal(queryExpression, expectedExpression);
+            Assert.Equal(expectedExpression, queryExpression);
         }
 
         [Fact]

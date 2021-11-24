@@ -40,9 +40,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 throw Error.ArgumentNull(nameof(assembliesResolver));
             }
 
-            FilterBinder binder = new FilterBinder(querySettings, assembliesResolver, model, filterType);
+            IFilterBinder binder = new FilterBinder();
 
-            return FilterBinder.BindFilterClause(binder, filterClause, filterType);
+            QueryBinderContext context = new QueryBinderContext(model, querySettings, filterType)
+            {
+                AssembliesResolver = assembliesResolver,
+                GetNestedFilterBinder = () => binder
+            };
+
+            return binder.BindFilter(filterClause, context);
         }
     }
 

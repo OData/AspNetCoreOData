@@ -29,6 +29,39 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
     public class SelectExpandBinder : ISelectExpandBinder
     {
+        /// <summary>
+        /// Translate an OData $select or $expand tree represented by <see cref="SelectExpandClause"/> to an <see cref="Expression"/>.
+        /// </summary>
+        /// <param name="selectExpandClause">The original <see cref="SelectExpandClause"/>.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <returns>The $select and $expand binder result.</returns>
+        public virtual Expression BindSelectExpand(SelectExpandClause selectExpandClause, QueryBinderContext context)
+        {
+            if (selectExpandClause == null)
+            {
+                throw Error.ArgumentNull(nameof(selectExpandClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            //Type elementType = context.ElementClrType;
+            //IEdmStructuredType structuredType = context.SelectExpand.Context.ElementType as IEdmStructuredType;
+            //IEdmNavigationSource navigationSource = context.NavigationSource;
+            //ParameterExpression source = Expression.Parameter(elementType, "$it");
+
+            //// expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
+            // Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
+
+            //// expression looks like -> source => new Wrapper { Instance = source .... }
+            LambdaExpression projectionLambdaExpression = null;
+            //LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
+
+            return projectionLambdaExpression;
+        }
+
         /// <inheritdoc/>
         public virtual IQueryable Bind(IQueryable source, SelectExpandBinderContext context)
         {
@@ -199,22 +232,25 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
+                IFilterBinder binder = queryContext.GetFilterBinder();
+                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, clrElementType)
+                {
+                    GetNestedFilterBinder = () => binder
+                };
+
                 if (isCollection)
                 {
                     Expression filterSource = nullablePropertyValue;
 
                     // TODO: Implement proper support for $select/$expand after $apply
-                    Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
-                    filterResult = Expression.Call(
-                        ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(clrElementType),
-                        filterSource,
-                        filterPredicate);
+                    // Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
+                    filterResult = binder.ApplyBind(filterSource, filterClause, binderContext);
 
                     nullablePropertyType = filterResult.Type;
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = binder.BindFilter(filterClause, binderContext) as LambdaExpression;
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));
@@ -919,9 +955,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     HandleNullPropagation = HandleNullPropagationOption.True,
                 };
 
-                LambdaExpression orderByExpression =
-                    FilterBinder.Bind(null, orderbyClause, elementType, context.SelectExpand.Context, querySettings);
-                source = ExpressionHelpers.OrderBy(source, orderByExpression, elementType, orderbyClause.Direction);
+                ODataQueryContext queryContext = context.SelectExpand.Context;
+                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, elementType)
+                {
+                    GetNestedFilterBinder = () => queryContext.GetFilterBinder()
+                };
+
+                IOrderByBinder binder = queryContext.GetOrderByBinder();
+                source = binder.ApplyBind(source, orderbyClause, binderContext);
             }
 
             return source;

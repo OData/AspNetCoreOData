@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -37,35 +38,19 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Gets the <see cref="FilterBinder"/>.
+        /// Gets the <see cref="IFilterBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
-        /// <param name="querySettings">The query setting.</param>
-        /// <returns>The built <see cref="FilterBinder"/>.</returns>
-        public static FilterBinder GetFilterBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
+        /// <returns>The built <see cref="IFilterBinder"/>.</returns>
+        public static IFilterBinder GetFilterBinder(this ODataQueryContext context)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (querySettings == null)
-            {
-                throw Error.ArgumentNull(nameof(querySettings));
-            }
-
-            FilterBinder binder = null;
-            if (context.RequestContainer != null)
-            {
-                binder = context.RequestContainer.GetService<FilterBinder>();
-                if (binder != null && binder.Model != context.Model)
-                {
-                    // TODO: Wtf, Need refactor these codes?
-                    binder.Model = context.Model;
-                }
-            }
-
-            return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+            IFilterBinder binder = context.RequestContainer?.GetService<IFilterBinder>();
+            return binder ?? new FilterBinder();
         }
 
         /// <summary>
@@ -83,6 +68,41 @@ namespace Microsoft.AspNetCore.OData.Query
             ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
 
             return binder ?? new SelectExpandBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IOrderByBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <param name="querySettings">The query settings.</param>
+        /// <returns>The built <see cref="IOrderByBinder"/>.</returns>
+        public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IOrderByBinder binder = context.RequestContainer?.GetService<IOrderByBinder>();
+
+            return binder ?? new OrderByBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAssemblyResolver"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IAssemblyResolver"/>.</returns>
+        public static IAssemblyResolver GetAssemblyResolver(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IAssemblyResolver resolver = context.RequestContainer?.GetService<IAssemblyResolver>();
+
+            return resolver ?? AssemblyResolverHelper.Default;
         }
     }
 }

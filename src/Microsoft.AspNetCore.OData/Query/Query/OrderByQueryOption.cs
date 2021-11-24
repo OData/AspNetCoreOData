@@ -268,6 +268,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     }
                     else
                     {
+                        // could have ensure stable orderby property added
                         querySoFar = ExpressionHelpers.OrderByProperty(querySoFar, Context.Model, edmPropertyWithPath.Property, direction, Context.ElementClrType, alreadyOrdered);
                     }
 
@@ -314,10 +315,19 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
 
-            LambdaExpression orderByExpression =
-                FilterBinder.Bind(query, orderbyClause, Context.ElementClrType, Context, updatedSettings);
-            querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
-                alreadyOrdered);
+            IOrderByBinder binder = Context.GetOrderByBinder();
+
+            // Remove Thenby (make Thenby == null) to make sure we only apply the top orderby
+            // TODO: need to refactor it later.
+            orderbyClause = new OrderByClause(null, orderbyClause.Expression, orderbyClause.Direction, orderbyClause.RangeVariable);
+
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            {
+                GetNestedFilterBinder = () => Context.GetFilterBinder()
+            };
+
+            querySoFar = binder.ApplyBind(querySoFar, orderbyClause, binderContext, alreadyOrdered);
+
             return querySoFar;
         }
 

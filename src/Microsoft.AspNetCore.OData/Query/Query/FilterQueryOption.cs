@@ -144,9 +144,17 @@ namespace Microsoft.AspNetCore.OData.Query
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
 
-            Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
-            query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
-            return query;
+            IFilterBinder binder = Context.GetFilterBinder();
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            {
+                GetNestedFilterBinder = () => binder
+            };
+
+            return binder.ApplyBind(query, filterClause, binderContext);
+
+            //Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
+            //query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
+            //return query;
         }
 
         /// <summary>

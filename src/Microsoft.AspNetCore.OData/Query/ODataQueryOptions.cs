@@ -337,6 +337,8 @@ namespace Microsoft.AspNetCore.OData.Query
             IQueryable result = query;
             IODataFeature odataFeature = Request.ODataFeature();
 
+            // TODO: $compute
+
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, AllowedQueryOptions.Apply))
@@ -346,6 +348,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 this.Context.ElementClrType = Apply.ResultClrType;
             }
 
+            // TODO: need pass the result from $compute to the remaining query options
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
             if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
             {

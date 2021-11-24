@@ -274,7 +274,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.InvalidOperation("Unable to get property values from the skiptoken value.");
             }
 
-            ExpressionBinderBase binder = context.GetFilterBinder(querySettings);
+           // ExpressionBinderBase binder = context.GetFilterBinder(querySettings);
             bool parameterizeConstant = querySettings.EnableConstantParameterization;
             ParameterExpression param = Expression.Parameter(context.ElementClrType);
             Expression where = null;

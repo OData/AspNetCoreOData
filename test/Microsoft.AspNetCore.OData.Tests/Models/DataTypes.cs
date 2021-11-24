@@ -14,6 +14,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
     {
         public int Id { get; set; }
         public Guid GuidProp { get; set; }
+        public DateTime DateTimeProperty { get; set; }
         public DateTimeOffset DateTimeProp { get; set; }
         public DateTimeOffset DateTimeOffsetProp { get; set; }
         public byte[] ByteArrayProp { get; set; }
