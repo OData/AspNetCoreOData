@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
@@ -323,7 +324,9 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>Sanitized route prefix.</returns>
         private string SanitizeRoutePrefix(string routePrefix)
         {
-            if (!routePrefix.StartsWith('/') && !routePrefix.EndsWith('/'))
+            Debug.Assert(routePrefix != null);
+
+            if (routePrefix.Length > 0 && routePrefix[0] != '/' && routePrefix[^1] != '/')
             {
                 return routePrefix;
             }
