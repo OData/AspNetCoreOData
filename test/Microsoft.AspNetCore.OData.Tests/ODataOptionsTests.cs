@@ -140,6 +140,25 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.IsType<ODataFeature>(actual);
         }
 
+        [Theory]
+        [InlineData("/odata", "odata")]
+        [InlineData("/odata/", "odata")]
+        [InlineData("odata/", "odata")]
+        [InlineData("/", "")]
+        public void AddRouteComponents_Strips_RoutePrefix_Leading_And_Trailing_Slashes(string routePrefix, string expectedRoutePrefix)
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents(routePrefix, edmModel, services => services.AddSingleton<IODataFeature, ODataFeature>());
+
+            // Assert
+            Assert.False(options.RouteComponents.ContainsKey(routePrefix));
+            Assert.True(options.RouteComponents.ContainsKey(expectedRoutePrefix));
+        }
+
         [Fact]
         public void AddRouteComponents_Throws_IfModelNull()
         {
@@ -148,6 +167,16 @@ namespace Microsoft.AspNetCore.OData.Tests
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents("odata", null, builder => { }), "model");
+        }
+
+        [Fact]
+        public void AddRouteComponents_Throws_IfRoutePrefixNull()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents(null, EdmCoreModel.Instance, builder => { }), "routePrefix");
         }
 
         [Fact]
@@ -190,6 +219,30 @@ namespace Microsoft.AspNetCore.OData.Tests
             // & Assert
             IServiceProvider sp = options.GetRouteServices("odata");
             Assert.NotNull(sp);
+        }
+
+        [Theory]
+        [InlineData("/odata")]
+        [InlineData("/odata/")]
+        [InlineData("odata/")]
+        public void GetRouteServices_ReturnsCorrectServiceProvider_When_Leading_Or_Trailing_Slashes(string routePrefix)
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents(routePrefix, edmModel);
+
+            // & Assert
+            // can retrieve service provider using original routePrefix
+            IServiceProvider sp = options.GetRouteServices(routePrefix);
+            Assert.NotNull(sp);
+
+            // can retrieve service provider using sanitized routePrefix
+            string sanitizedRoutePrefix = "odata";
+            IServiceProvider sp2 = options.GetRouteServices(sanitizedRoutePrefix);
+            Assert.NotNull(sp2);
         }
 
         #region QuerySetting

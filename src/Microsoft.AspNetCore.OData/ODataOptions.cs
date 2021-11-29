@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
@@ -129,14 +130,22 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            if (RouteComponents.ContainsKey(routePrefix))
+            if (routePrefix == null)
             {
-                throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, routePrefix);
+                throw Error.ArgumentNull(nameof(routePrefix));
             }
+
+            string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
+
+            if (RouteComponents.ContainsKey(sanitizedRoutePrefix))
+            {
+                throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, sanitizedRoutePrefix);
+            }
+
 
             // Consider to use Lazy<IServiceProvider> ?
             IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);
-            RouteComponents[routePrefix] = (model, serviceProvider);
+            RouteComponents[sanitizedRoutePrefix] = (model, serviceProvider);
             return this;
         }
 
@@ -147,9 +156,16 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The root service provider for the route (prefix) name.</returns>
         public IServiceProvider GetRouteServices(string routePrefix)
         {
-            if (routePrefix != null && RouteComponents.ContainsKey(routePrefix))
+            if (routePrefix == null)
             {
-                return RouteComponents[routePrefix].ServiceProvider;
+                return null;
+            }
+
+            string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
+
+            if (RouteComponents.TryGetValue(sanitizedRoutePrefix, out var components))
+            {
+                return components.ServiceProvider;
             }
 
             return null;
@@ -299,6 +315,23 @@ namespace Microsoft.AspNetCore.OData
             setupAction?.Invoke(builder.Services);
 
             return builder.BuildContainer();
+        }
+
+        /// <summary>
+        /// Sanitizes the route prefix by stripping leading and trailing forward slashes.
+        /// </summary>
+        /// <param name="routePrefix">Route prefix to sanitize.</param>
+        /// <returns>Sanitized route prefix.</returns>
+        private string SanitizeRoutePrefix(string routePrefix)
+        {
+            Debug.Assert(routePrefix != null);
+
+            if (routePrefix.Length > 0 && routePrefix[0] != '/' && routePrefix[^1] != '/')
+            {
+                return routePrefix;
+            }
+
+            return routePrefix.Trim('/');
         }
     }
 }
