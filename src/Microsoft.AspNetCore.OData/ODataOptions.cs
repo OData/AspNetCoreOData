@@ -129,14 +129,22 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            if (RouteComponents.ContainsKey(routePrefix))
+            if (routePrefix == null)
             {
-                throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, routePrefix);
+                throw Error.ArgumentNull(nameof(routePrefix));
             }
+
+            string sanitizedRoutePrefix = routePrefix.Trim('/');
+
+            if (RouteComponents.ContainsKey(sanitizedRoutePrefix))
+            {
+                throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, sanitizedRoutePrefix);
+            }
+
 
             // Consider to use Lazy<IServiceProvider> ?
             IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);
-            RouteComponents[routePrefix] = (model, serviceProvider);
+            RouteComponents[sanitizedRoutePrefix] = (model, serviceProvider);
             return this;
         }
 

@@ -140,6 +140,25 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.IsType<ODataFeature>(actual);
         }
 
+        [Theory]
+        [InlineData("/odata")]
+        [InlineData("/odata/")]
+        [InlineData("odata/")]
+        public void AddRouteComponents_Strips_RoutePrefix_Leading_And_Trailing_Slashes(string routePrefix)
+        {
+            // Arrange
+            string expectedRoutePrefix = "odata";
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents(routePrefix, edmModel, services => services.AddSingleton<IODataFeature, ODataFeature>());
+
+            // Assert
+            Assert.False(options.RouteComponents.ContainsKey(routePrefix));
+            Assert.True(options.RouteComponents.ContainsKey(expectedRoutePrefix));
+        }
+
         [Fact]
         public void AddRouteComponents_Throws_IfModelNull()
         {
@@ -148,6 +167,16 @@ namespace Microsoft.AspNetCore.OData.Tests
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents("odata", null, builder => { }), "model");
+        }
+
+        [Fact]
+        public void AddRouteComponents_Throws_IfRoutePrefixNull()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents(null, EdmCoreModel.Instance, builder => { }), "routePrefix");
         }
 
         [Fact]
