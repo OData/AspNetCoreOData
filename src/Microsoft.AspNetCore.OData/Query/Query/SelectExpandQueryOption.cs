@@ -209,16 +209,16 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, queryable);
-
-            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
-            {
-                SelectExpand = this,
-                QuerySettings = updatedSettings
-            };
-
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
-            return binder.Bind(queryable, selectExpandBinderContext);
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            {
+                NavigationSource = Context.NavigationSource,
+                GetNestedFilterBinder = () => Context.GetFilterBinder(),
+                GetNestedOrderByBinder = () => Context.GetOrderByBinder()
+            };
+
+            return binder.ApplyBind(queryable, _selectExpandClause, binderContext);
         }
 
         /// <summary>
@@ -243,16 +243,16 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, query: null);
-
-            SelectExpandBinderContext selectExpandBinderContext = new SelectExpandBinderContext()
-            {
-                SelectExpand = this,
-                QuerySettings = updatedSettings
-            };
-
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
-            return binder.Bind(entity, selectExpandBinderContext);
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            {
+                NavigationSource = Context.NavigationSource,
+                GetNestedFilterBinder = () => Context.GetFilterBinder(),
+                GetNestedOrderByBinder = () => Context.GetOrderByBinder()
+            };
+
+            return binder.ApplyBind(entity, _selectExpandClause, binderContext);
         }
 
         /// <summary>

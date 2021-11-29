@@ -528,7 +528,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //QueryBinderContext subContext = context.CreateSubContext();
                 //subContext.ElementClrType = elementType;
                 IFilterBinder nestedFilterBinder = context.GetNestedFilterBinder();
-                QueryBinderContext nextBinderContext = new QueryBinderContext(context, elementType);
+                QueryBinderContext nextBinderContext = new QueryBinderContext(context, context.QuerySettings, elementType);
 
                 filterExpression = nestedFilterBinder.BindFilter(node.FilterClause, nextBinderContext);
 

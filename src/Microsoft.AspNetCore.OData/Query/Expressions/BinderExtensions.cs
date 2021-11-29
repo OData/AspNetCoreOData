@@ -213,5 +213,80 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return source;
         }
+
+        /// <summary>
+        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>. ALso <see cref="IQueryable"/>
+        /// </summary>
+        /// <param name="binder">The built in <see cref="ISelectExpandBinder"/></param>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
+        /// <param name="selectExpandClause">The OData $select or $expand parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <returns></returns>
+        public static IQueryable ApplyBind(this ISelectExpandBinder binder, IQueryable source, SelectExpandClause selectExpandClause, QueryBinderContext context)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (selectExpandClause == null)
+            {
+                throw Error.ArgumentNull(nameof(selectExpandClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            Type elementType = context.ElementClrType;
+
+            LambdaExpression projectionLambda = binder.BindSelectExpand(selectExpandClause, context) as LambdaExpression;
+
+            MethodInfo selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(elementType, projectionLambda.Body.Type);
+            return selectMethod.Invoke(null, new object[] { source, projectionLambda }) as IQueryable;
+        }
+
+        /// <summary>
+        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="object"/>.
+        /// </summary>
+        /// <param name="binder">The built in <see cref="ISelectExpandBinder"/></param>
+        /// <param name="source">The original <see cref="object"/>.</param>
+        /// <param name="selectExpandClause">The OData $select or $expand parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <returns></returns>
+        public static object ApplyBind(this ISelectExpandBinder binder, object source, SelectExpandClause selectExpandClause, QueryBinderContext context)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (selectExpandClause == null)
+            {
+                throw Error.ArgumentNull(nameof(selectExpandClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            LambdaExpression projectionLambda = binder.BindSelectExpand(selectExpandClause, context) as LambdaExpression;
+
+            return projectionLambda.Compile().DynamicInvoke(source);
+        }
     }
 }

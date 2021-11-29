@@ -47,70 +47,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            //Type elementType = context.ElementClrType;
-            //IEdmStructuredType structuredType = context.SelectExpand.Context.ElementType as IEdmStructuredType;
-            //IEdmNavigationSource navigationSource = context.NavigationSource;
-            //ParameterExpression source = Expression.Parameter(elementType, "$it");
-
-            //// expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
-            // Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
-
-            //// expression looks like -> source => new Wrapper { Instance = source .... }
-            LambdaExpression projectionLambdaExpression = null;
-            //LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
-
-            return projectionLambdaExpression;
-        }
-
-        /// <inheritdoc/>
-        public virtual IQueryable Bind(IQueryable source, SelectExpandBinderContext context)
-        {
-            Contract.Assert(source != null);
-            Contract.Assert(context != null);
-            Contract.Assert(context.SelectExpand != null);
-            Contract.Assert(context.SelectExpand.Context != null);
-            Contract.Assert(context.SelectExpand.Context.Model != null);
-            Contract.Assert(context.QuerySettings != null);
-            Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
-
-            Type elementType = context.SelectExpand.Context.ElementClrType;
-
-            LambdaExpression projectionLambda = GetProjectionLambda(context);
-
-            MethodInfo selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(elementType, projectionLambda.Body.Type);
-            return selectMethod.Invoke(null, new object[] { source, projectionLambda }) as IQueryable;
-        }
-
-        /// <inheritdoc/>
-        public virtual object Bind(object source, SelectExpandBinderContext context)
-        {
-            Contract.Assert(source != null);
-            Contract.Assert(context != null);
-            Contract.Assert(context.SelectExpand != null);
-            Contract.Assert(context.SelectExpand.Context != null);
-            Contract.Assert(context.SelectExpand.Context.Model != null);
-            Contract.Assert(context.QuerySettings != null);
-            Contract.Assert(context.QuerySettings.HandleNullPropagation != HandleNullPropagationOption.Default);
-
-            LambdaExpression projectionLambda = GetProjectionLambda(context);
-
-            // TODO: cache this ?
-            return projectionLambda.Compile().DynamicInvoke(source);
-        }
-
-        /// <summary>
-        /// Translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
-        /// an <see cref="Expression"/>
-        /// </summary>
-        /// <param name="context">The <see cref="SelectExpandBinderContext"/> which is a wrapper for properties used by the <see cref="SelectExpandBinder"/>.</param>
-        /// <returns>A <see cref="LambdaExpression"/> which can be later applied to an <see cref="IQueryable"/> or an <see cref="object"/>.</returns>
-        protected virtual LambdaExpression GetProjectionLambda(SelectExpandBinderContext context)
-        {
-            Contract.Assert(context != null);
-            Type elementType = context.SelectExpand.Context.ElementClrType;
-            IEdmStructuredType structuredType = context.SelectExpand.Context.ElementType as IEdmStructuredType;
-            IEdmNavigationSource navigationSource = context.SelectExpand.Context.NavigationSource;
-            SelectExpandClause selectExpandClause = context.SelectExpand.SelectExpandClause;
+            Type elementType = context.ElementClrType;
+            IEdmStructuredType structuredType = context.ElementType as IEdmStructuredType;
+            IEdmNavigationSource navigationSource = context.NavigationSource;
             ParameterExpression source = Expression.Parameter(elementType, "$it");
 
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
@@ -122,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return projectionLambdaExpression;
         }
 
-        internal Expression ProjectAsWrapper(SelectExpandBinderContext context, Expression source, SelectExpandClause selectExpandClause,
+        internal Expression ProjectAsWrapper(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause,
             IEdmStructuredType structuredType, IEdmNavigationSource navigationSource, OrderByClause orderByClause = null,
             long? topOption = null,
             long? skipOption = null,
@@ -144,14 +83,38 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static Expression CreatePropertyNameExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source)
+        /// <summary>
+        /// Creates an <see cref="Expression"/> from an <see cref="IEdmProperty"/> name.
+        /// </summary>
+        /// <param name="context">The <see cref="QueryBinderContext"/>.</param>
+        /// <param name="elementType">The <see cref="IEdmStructuredType"/> that contains the edmProperty.</param>
+        /// <param name="edmProperty">The <see cref="IEdmProperty"/> from which we are creating an <see cref="Expression"/>.</param>
+        /// <param name="source">The source <see cref="Expression"/>.</param>
+        /// <returns>The created <see cref="Expression"/>.</returns>
+        public virtual Expression CreatePropertyNameExpression(QueryBinderContext context, IEdmStructuredType elementType, IEdmProperty edmProperty, Expression source)
         {
-            Contract.Assert(elementType != null);
-            Contract.Assert(property != null);
-            Contract.Assert(source != null);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
 
-            IEdmStructuredType declaringType = property.DeclaringType;
-            IEdmModel model = context.SelectExpand.Context.Model;
+            if (elementType == null)
+            {
+                throw Error.ArgumentNull(nameof(elementType));
+            }
+
+            if (edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            IEdmStructuredType declaringType = edmProperty.DeclaringType;
+            IEdmModel model = context.Model;
 
             // derived property using cast
             if (elementType != declaringType)
@@ -169,40 +132,64 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     //          source is navigationPropertyDeclaringType ? propertyName : null
                     return Expression.Condition(
                         test: Expression.TypeIs(source, castType),
-                        ifTrue: Expression.Constant(property.Name),
+                        ifTrue: Expression.Constant(edmProperty.Name),
                         ifFalse: Expression.Constant(null, typeof(string)));
                 }
             }
 
             // Expression
             //          "propertyName"
-            return Expression.Constant(property.Name);
+            return Expression.Constant(edmProperty.Name);
         }
 
-        internal static Expression CreatePropertyValueExpression(SelectExpandBinderContext context, IEdmStructuredType elementType, IEdmProperty property, Expression source, FilterClause filterClause)
+        /// <summary>
+        /// Creates an <see cref="Expression"/> from an <see cref="IEdmProperty"/> name.
+        /// </summary>
+        /// <param name="context">The <see cref="QueryBinderContext"/>.</param>
+        /// <param name="elementType">The <see cref="IEdmStructuredType"/> that contains the edmProperty.</param>
+        /// <param name="edmProperty">The <see cref="IEdmProperty"/> from which we are creating an <see cref="Expression"/>.</param>
+        /// <param name="source">The source <see cref="Expression"/>.</param>
+        /// <param name="filterClause">The $filter query represented by <see cref="FilterClause"/>.</param>
+        /// <returns>The created <see cref="Expression"/>.</returns>
+        public virtual Expression CreatePropertyValueExpression(QueryBinderContext context, IEdmStructuredType elementType, IEdmProperty edmProperty, Expression source, FilterClause filterClause)
         {
-            Contract.Assert(elementType != null);
-            Contract.Assert(property != null);
-            Contract.Assert(source != null);
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
 
-            IEdmModel model = context.SelectExpand.Context.Model;
-            ODataQueryContext queryContext = context.SelectExpand.Context;
+            if (elementType == null)
+            {
+                throw Error.ArgumentNull(nameof(elementType));
+            }
+
+            if (edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            IEdmModel model = context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             // Expression: source = source as propertyDeclaringType
-            if (elementType != property.DeclaringType)
+            if (elementType != edmProperty.DeclaringType)
             {
-                Type castType = model.GetClrType(property.DeclaringType);
+                Type castType = model.GetClrType(edmProperty.DeclaringType);
                 if (castType == null)
                 {
-                    throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, property.DeclaringType.FullTypeName()));
+                    throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, edmProperty.DeclaringType.FullTypeName()));
                 }
 
                 source = Expression.TypeAs(source, castType);
             }
 
             // Expression:  source.Property
-            string propertyName = model.GetClrPropertyName(property);
+            string propertyName = model.GetClrPropertyName(edmProperty);
             
             PropertyInfo propertyInfo = source.Type.GetProperty(propertyName, BindingFlags.DeclaredOnly);
             if (propertyInfo == null)
@@ -216,9 +203,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (filterClause != null)
             {
-                bool isCollection = property.Type.IsCollection();
+                bool isCollection = edmProperty.Type.IsCollection();
 
-                IEdmTypeReference edmElementType = (isCollection ? property.Type.AsCollection().ElementType() : property.Type);
+                IEdmTypeReference edmElementType = (isCollection ? edmProperty.Type.AsCollection().ElementType() : edmProperty.Type);
                 Type clrElementType = model.GetClrType(edmElementType);
                 if (clrElementType == null)
                 {
@@ -227,16 +214,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 Expression filterResult = nullablePropertyValue;
 
-                ODataQuerySettings querySettings = new ODataQuerySettings()
-                {
-                    HandleNullPropagation = HandleNullPropagationOption.True,
-                };
-
-                IFilterBinder binder = queryContext.GetFilterBinder();
-                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, clrElementType)
-                {
-                    GetNestedFilterBinder = () => binder
-                };
+                ODataQuerySettings newSettings = new ODataQuerySettings();
+                newSettings.CopyFrom(context.QuerySettings);
+                newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
+                QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, clrElementType);
+                IFilterBinder filterBinder = binderContext.GetNestedFilterBinder();
 
                 if (isCollection)
                 {
@@ -244,16 +226,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                     // TODO: Implement proper support for $select/$expand after $apply
                     // Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
-                    filterResult = binder.ApplyBind(filterSource, filterClause, binderContext);
+                    filterResult = filterBinder.ApplyBind(filterSource, filterClause, binderContext);
 
                     nullablePropertyType = filterResult.Type;
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = binder.BindFilter(filterClause, binderContext) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = filterBinder.BindFilter(filterClause, binderContext) as LambdaExpression;
                     if (filterLambdaExpression == null)
                     {
-                        throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, property.Name, "LambdaExpression"));
+                        throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, "LambdaExpression"));
                     }
 
                     ParameterExpression filterParameter = filterLambdaExpression.Parameters.First();
@@ -299,11 +281,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Generates the expression
         //      source => new Wrapper { Instance = source, Container = new PropertyContainer { ..expanded properties.. } }
-        internal Expression ProjectElement(SelectExpandBinderContext context, Expression source, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
+        internal Expression ProjectElement(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
         {
             Contract.Assert(source != null);
 
-            IEdmModel model = context.SelectExpand.Context.Model;
+            IEdmModel model = context.Model;
 
             // If it's not a structural type, just return the source.
             if (structuredType == null)
@@ -620,8 +602,25 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return false;
         }
 
-        private static Expression CreateTotalCountExpression(SelectExpandBinderContext context, Expression source, bool? countOption)
+        /// <summary>
+        /// Create an <see cref="Expression"/> for the $count in $select or $expand
+        /// </summary>
+        /// <param name="context">The <see cref="QueryBinderContext"/>./param>
+        /// <param name="source">Original <see cref="Expression"/> which we will be appending the count expression.</param>
+        /// <param name="countOption">Boolean to indicate if count value is present in $expand or $select item.</param>
+        /// <returns></returns>
+        public virtual Expression CreateTotalCountExpression(QueryBinderContext context, Expression source, bool? countOption)
         {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
             Expression countExpression = Expression.Constant(null, typeof(long?));
             if (countOption == null || !countOption.Value)
             {
@@ -661,7 +660,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        private Expression BuildPropertyContainer(SelectExpandBinderContext context, Expression source,
+        private Expression BuildPropertyContainer(QueryBinderContext context, Expression source,
             IEdmStructuredType structuredType,
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand,
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude,
@@ -721,7 +720,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="navigationProperty">The expanded navigation property.</param>
         /// <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildExpandedProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
+        internal void BuildExpandedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmNavigationProperty navigationProperty, ExpandedReferenceSelectItem expandedItem,
             IList<NamedPropertyExpression> includedProperties)
         {
@@ -733,7 +732,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(includedProperties != null);
 
             IEdmEntityType edmEntityType = navigationProperty.ToEntityType();
-            IEdmModel model = context.SelectExpand.Context.Model;
+            IEdmModel model = context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             ModelBoundQuerySettings querySettings = model.GetModelBoundQuerySettings(navigationProperty, edmEntityType);
@@ -800,7 +799,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="structuralProperty">The selected structural property.</param>
         /// <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildSelectedProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
+        internal void BuildSelectedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmStructuralProperty structuralProperty, PathSelectItem pathSelectItem,
             IList<NamedPropertyExpression> includedProperties)
         {
@@ -810,7 +809,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(structuralProperty != null);
             Contract.Assert(includedProperties != null);
 
-            IEdmModel model = context.SelectExpand.Context.Model;
+            IEdmModel model = context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             // // Expression:
@@ -892,7 +891,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source">The source contains the dynamic property.</param>
         /// <param name="structuredType">The structured type contains the dynamic property.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal static void BuildDynamicProperty(SelectExpandBinderContext context, Expression source, IEdmStructuredType structuredType,
+        public virtual void BuildDynamicProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
             IList<NamedPropertyExpression> includedProperties)
         {
             Contract.Assert(source != null);
@@ -900,7 +899,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(structuredType != null);
             Contract.Assert(includedProperties != null);
 
-            IEdmModel model = context.SelectExpand.Context.Model;
+            IEdmModel model = context.Model;
             ODataQuerySettings settings = context.QuerySettings;
 
             PropertyInfo dynamicPropertyDictionary = model.GetDynamicPropertyDictionary(structuredType);
@@ -945,23 +944,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return new SelectExpandClause(selectItems, false);
         }
 
-        private static Expression AddOrderByQueryForSource(SelectExpandBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
+        private static Expression AddOrderByQueryForSource(QueryBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
         {
             if (orderbyClause != null)
             {
                 // TODO: Implement proper support for $select/$expand after $apply
-                ODataQuerySettings querySettings = new ODataQuerySettings()
-                {
-                    HandleNullPropagation = HandleNullPropagationOption.True,
-                };
+                ODataQuerySettings newSettings = new ODataQuerySettings();
+                newSettings.CopyFrom(context.QuerySettings);
+                newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
+                QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, elementType);
 
-                ODataQueryContext queryContext = context.SelectExpand.Context;
-                QueryBinderContext binderContext = new QueryBinderContext(queryContext.Model, querySettings, elementType)
-                {
-                    GetNestedFilterBinder = () => queryContext.GetFilterBinder()
-                };
-
-                IOrderByBinder binder = queryContext.GetOrderByBinder();
+                IOrderByBinder binder = binderContext.GetNestedOrderByBinder();
                 source = binder.ApplyBind(source, orderbyClause, binderContext);
             }
 
@@ -985,7 +978,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        private static Expression GetNullCheckExpression(SelectExpandBinderContext context, IEdmNavigationProperty propertyToExpand, Expression propertyValue,
+        private Expression GetNullCheckExpression(QueryBinderContext context, IEdmNavigationProperty propertyToExpand, Expression propertyValue,
             SelectExpandClause projection)
         {
             if (projection == null || propertyToExpand.Type.IsCollection())
@@ -1016,7 +1009,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // new CollectionWrapper<ElementType> { Instance = source.Select((ElementType element) => new Wrapper { }) }
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
-        private Expression ProjectCollection(SelectExpandBinderContext context, Expression source, Type elementType,
+        private Expression ProjectCollection(QueryBinderContext context, Expression source, Type elementType,
             SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource,
             OrderByClause orderByClause,
             long? topOption,
@@ -1146,8 +1139,30 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         //      source is GrandChild ? "GrandChild" : ( source is Child ? "Child" : "Root" )
         // Notice that the order is important here. The most derived type must be the first to check.
         // If entity framework had a way to figure out the type name without selecting the whole object, we don't have to do this magic.
-        internal static Expression CreateTypeNameExpression(Expression source, IEdmStructuredType elementType, IEdmModel model)
+        /// <summary>
+        /// Create <see cref="Expression"/> for Derived types.
+        /// </summary>
+        /// <param name="source">The original <see cref="Expression"/>.</param>
+        /// <param name="elementType">The <see cref="IEdmStructuredType"/> which may contain the derived types.</param>
+        /// <param name="model">The <see cref="IEdmModel"/>.</param>
+        /// <returns>The <see cref="Expression"/> with derived types if any are present.</returns>
+        public virtual Expression CreateTypeNameExpression(Expression source, IEdmStructuredType elementType, IEdmModel model)
         {
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (elementType == null)
+            {
+                throw Error.ArgumentNull(nameof(elementType));
+            }
+
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
             IReadOnlyList<IEdmStructuredType> derivedTypes = GetAllDerivedTypes(elementType, model);
             if (derivedTypes.Count == 0)
             {

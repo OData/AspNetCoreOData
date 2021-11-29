@@ -52,6 +52,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementClrType = clrType ?? throw Error.ArgumentNull(nameof(clrType));
 
+            ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
+
+            if (ElementType == null)
+            {
+                throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
+            }
+
             // Customers?$select=EmailAddresses($filter=endswith($this,'.com') and starswith($it/Name, 'Sam'))
             // Here:
             // $this -> instance in EmailAddresses
@@ -72,13 +79,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
         /// </summary>
         /// <param name="context">The parent query binder context.</param>
+        /// <param name="querySettings">The query setting.</param>
         /// <param name="clrType">The current element CLR type in this context (scope).</param>
-        public QueryBinderContext(QueryBinderContext context, Type clrType)
+        public QueryBinderContext(QueryBinderContext context, ODataQuerySettings querySettings, Type clrType)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
+
+            QuerySettings = querySettings ?? throw Error.ArgumentNull(nameof(querySettings));
 
             // ~/Customers?$select=Addresses($orderby=$this/ZipCode,$it/Age;$select=Codes($orderby=$this desc,$it/Name))
 
@@ -86,7 +96,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Model = context.Model;
 
-            QuerySettings = context.QuerySettings;
+            ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
+
+            if (ElementType == null)
+            {
+                throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
+            }
 
             // Inherit the lambda parameters, $it, $this, etc.
             _lambdaParameters = new Dictionary<string, ParameterExpression>(context._lambdaParameters);
@@ -94,6 +109,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Only update $this parameter.
             ParameterExpression thisParameters = Expression.Parameter(clrType, DollarIt);
             _lambdaParameters[DollarThis] = thisParameters;
+
+            GetNestedFilterBinder = context.GetNestedFilterBinder;
+            GetNestedOrderByBinder = context.GetNestedOrderByBinder;
 
             IsNested = true;
         }
@@ -127,10 +145,25 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public Func<IFilterBinder> GetNestedFilterBinder { get; set; }
 
         /// <summary>
+        /// Gets or sets the nested orderby binder.
+        /// </summary>
+        public Func<IOrderByBinder> GetNestedOrderByBinder { get; set; }
+
+        /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// Or the properties from $compute query options.
         /// </summary>
         public IDictionary<string, Expression> ComputedProperties { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="IEdmType"/> of the element type.
+        /// </summary>
+        public IEdmType ElementType { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEdmNavigationSource"/> that contains the element.
+        /// </summary>
+        public IEdmNavigationSource NavigationSource { get; set; }
 
         internal bool IsNested { get; } = false;
 

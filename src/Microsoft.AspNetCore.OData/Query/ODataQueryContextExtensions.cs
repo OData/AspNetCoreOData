@@ -74,7 +74,6 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Gets the <see cref="IOrderByBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
-        /// <param name="querySettings">The query settings.</param>
         /// <returns>The built <see cref="IOrderByBinder"/>.</returns>
         public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context)
         {
