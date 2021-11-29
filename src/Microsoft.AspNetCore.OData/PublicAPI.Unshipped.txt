@@ -758,6 +758,20 @@ Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(string pr
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection.IsTruncated.get -> bool
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection.PageSize.get -> int
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.AutoSelected.get -> bool
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.AutoSelected.set -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.CountOption.get -> bool?
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.CountOption.set -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.Name.get -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.NamedPropertyExpression(System.Linq.Expressions.Expression name, System.Linq.Expressions.Expression value) -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.NullCheck.get -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.NullCheck.set -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.PageSize.get -> int?
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.PageSize.set -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.TotalCount.get -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.TotalCount.set -> void
+Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression.Value.get -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
 Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.IsTruncated.get -> bool
 Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.PageSize.get -> int
@@ -1723,6 +1737,11 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindToUpper(Mic
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindTrim(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BuildDynamicProperty(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression> includedProperties) -> void
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyNameExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreateTotalCountExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, bool? countOption) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreateTypeNameExpression(System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.AllowedQueryOptions ignoreQueryOptions) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
