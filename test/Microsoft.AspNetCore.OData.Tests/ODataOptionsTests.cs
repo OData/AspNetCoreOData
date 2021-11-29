@@ -141,13 +141,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Theory]
-        [InlineData("/odata")]
-        [InlineData("/odata/")]
-        [InlineData("odata/")]
-        public void AddRouteComponents_Strips_RoutePrefix_Leading_And_Trailing_Slashes(string routePrefix)
+        [InlineData("/odata", "odata")]
+        [InlineData("/odata/", "odata")]
+        [InlineData("odata/", "odata")]
+        [InlineData("/", "")]
+        public void AddRouteComponents_Strips_RoutePrefix_Leading_And_Trailing_Slashes(string routePrefix, string expectedRoutePrefix)
         {
             // Arrange
-            string expectedRoutePrefix = "odata";
             ODataOptions options = new ODataOptions();
             IEdmModel edmModel = EdmCoreModel.Instance;
 
