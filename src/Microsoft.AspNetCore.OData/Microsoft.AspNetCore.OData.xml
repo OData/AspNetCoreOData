@@ -6190,6 +6190,13 @@
             <param name="setupAction">The setup config.</param>
             <returns>The built service provider.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SanitizeRoutePrefix(System.String)">
+            <summary>
+            Sanitizes the route prefix by stripping leading and trailing forward slashes.
+            </summary>
+            <param name="routePrefix">Route prefix to sanitize.</param>
+            <returns>Sanitized route prefix.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataOptionsSetup">
             <summary>
             Sets up default options for <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/>.

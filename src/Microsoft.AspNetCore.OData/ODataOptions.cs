@@ -134,7 +134,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull(nameof(routePrefix));
             }
 
-            string sanitizedRoutePrefix = routePrefix.Trim('/');
+            string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
 
             if (RouteComponents.ContainsKey(sanitizedRoutePrefix))
             {
@@ -155,9 +155,16 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The root service provider for the route (prefix) name.</returns>
         public IServiceProvider GetRouteServices(string routePrefix)
         {
-            if (routePrefix != null && RouteComponents.ContainsKey(routePrefix))
+            if (routePrefix == null)
             {
-                return RouteComponents[routePrefix].ServiceProvider;
+                return null;
+            }
+
+            string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
+
+            if (RouteComponents.TryGetValue(sanitizedRoutePrefix, out var components))
+            {
+                return components.ServiceProvider;
             }
 
             return null;
@@ -307,6 +314,21 @@ namespace Microsoft.AspNetCore.OData
             setupAction?.Invoke(builder.Services);
 
             return builder.BuildContainer();
+        }
+
+        /// <summary>
+        /// Sanitizes the route prefix by stripping leading and trailing forward slashes.
+        /// </summary>
+        /// <param name="routePrefix">Route prefix to sanitize.</param>
+        /// <returns>Sanitized route prefix.</returns>
+        private string SanitizeRoutePrefix(string routePrefix)
+        {
+            if (!routePrefix.StartsWith('/') && !routePrefix.EndsWith('/'))
+            {
+                return routePrefix;
+            }
+
+            return routePrefix.Trim('/');
         }
     }
 }

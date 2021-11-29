@@ -221,6 +221,30 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(sp);
         }
 
+        [Theory]
+        [InlineData("/odata")]
+        [InlineData("/odata/")]
+        [InlineData("odata/")]
+        public void GetRouteServices_ReturnsCorrectServiceProvider_When_Leading_Or_Trailing_Slashes(string routePrefix)
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents(routePrefix, edmModel);
+
+            // & Assert
+            // can retrieve service provider using original routePrefix
+            IServiceProvider sp = options.GetRouteServices(routePrefix);
+            Assert.NotNull(sp);
+
+            // can retrieve service provider using sanitized routePrefix
+            string sanitizedRoutePrefix = "odata";
+            IServiceProvider sp2 = options.GetRouteServices(sanitizedRoutePrefix);
+            Assert.NotNull(sp2);
+        }
+
         #region QuerySetting
         [Fact]
         public void SetMaxTop_Throws_ForWrongValue()
