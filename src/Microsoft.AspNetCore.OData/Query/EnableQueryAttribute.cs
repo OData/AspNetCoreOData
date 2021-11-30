@@ -65,6 +65,8 @@ namespace Microsoft.AspNetCore.OData.Query
             HttpRequest request = actionExecutingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;
 
+            _querySettings.TimeZone = request.GetTimeZoneInfo();
+
             ODataQueryContext queryContext;
 
             // For OData based controllers.
@@ -371,8 +373,6 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 _querySettings.ModelBoundPageSize = querySettings.PageSize;
             }
-
-            _querySettings.TimeZone = request.GetTimeZoneInfo();
         }
 
         /// <summary>
