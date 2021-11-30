@@ -12547,6 +12547,11 @@
             Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnablePropertyNameCaseInsensitive">
+            <summary>
+            Gets/sets a value indicating whether to enable case insensitive for the property name in conventional routing.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyInParenthesis">
             <summary>
             Gets or sets a value indicating whether to generate odata path template as ~/entityset({key}).

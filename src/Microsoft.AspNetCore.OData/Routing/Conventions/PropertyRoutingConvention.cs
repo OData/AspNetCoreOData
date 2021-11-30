@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Find the declaring type of the property if we have the declaring type name in the action name.
-            // either wise, it means the property is defined on the entity type of the navigation source.
+            // otherwise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
@@ -106,7 +106,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            IEdmProperty edmProperty = declaringEntityType.FindProperty(property);
+            bool enablePropertyNameCaseInsensitive = context?.Options?.RouteOptions.EnablePropertyNameCaseInsensitive ?? false;
+            IEdmProperty edmProperty = declaringEntityType.FindProperty(property, enablePropertyNameCaseInsensitive);
             if (edmProperty == null || edmProperty.PropertyKind != EdmPropertyKind.Structural)
             {
                 return false;
