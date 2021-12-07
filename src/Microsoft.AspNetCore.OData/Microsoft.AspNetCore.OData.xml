@@ -2771,12 +2771,13 @@
             <param name="action">The given action model.</param>
             <returns>Null or the corresponding attribute.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.HasODataKeyParameter(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,Microsoft.OData.Edm.IEdmEntityType,System.Boolean,System.String)">
             <summary>
             Test whether the action has the key parameters defined.
             </summary>
             <param name="action">The action model.</param>
             <param name="entityType">The Edm entity type.</param>
+            <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
             <param name="keyPrefix">The key prefix for the action parameter.</param>
             <returns>True/false.</returns>
         </member>

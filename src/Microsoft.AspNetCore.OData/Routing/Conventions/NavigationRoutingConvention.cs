@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // filter by action parameter
             IEdmEntityType entityType = navigationSource.EntityType();
-            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if (!(context.Singleton != null ^ hasKeyParameter))
             {
                 // Singleton, doesn't allow to query property with key

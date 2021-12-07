@@ -58,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             string actionName = context.Action.ActionName;
 
-            bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType);
+            bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if (context.Singleton != null && hasKeyParameter)
             {
                 // Singleton doesn't allow to call action with key.

@@ -125,8 +125,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindStartsWith(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "startswith" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "startswith");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -144,8 +143,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindEndsWith(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "endswith" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "endswith");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -163,8 +161,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindContains(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "contains" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "contains");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -182,8 +179,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindSubstring(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "substring" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "substring");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             if (arguments[0].Type != typeof(string))
@@ -241,8 +237,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindLength(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "length" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "length");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -260,8 +255,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindIndexOf(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "indexof" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "indexof");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -279,8 +273,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindToLower(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "tolower" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "tolower");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -298,8 +291,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindToUpper(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "toupper" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "toupper");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -317,8 +309,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindTrim(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "trim" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "trim");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -336,8 +327,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindConcat(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "concat" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "concat");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             ValidateAllStringArguments(node.Name, arguments);
@@ -355,8 +345,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindDateRelatedProperty(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateRelated(arguments[0].Type));
@@ -392,8 +381,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindTimeRelatedProperty(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsTimeRelated(arguments[0].Type)));
@@ -434,8 +422,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindFractionalSeconds(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "fractionalseconds" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "fractionalseconds");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsTimeRelated(arguments[0].Type)));
@@ -477,8 +464,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindRound(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "round" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "round");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -498,8 +484,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindFloor(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "floor" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "floor");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -519,8 +504,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindCeiling(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "ceiling" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "ceiling");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -540,8 +524,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindCastSingleValue(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "cast" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "cast");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
@@ -616,8 +599,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindIsOf(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "isof" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "isof");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -673,8 +655,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindDate(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "date" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "date");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -694,8 +675,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindTime(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "time" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "time");
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
@@ -715,8 +695,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindNow(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null && "now" == node.Name);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context, "now");
 
             // Function Now() does not take any arguments.
             Expression[] arguments = BindArguments(node.Parameters, context);
@@ -733,8 +712,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected virtual Expression BindCustomMethodExpressionOrNull(SingleValueFunctionCallNode node, QueryBinderContext context)
         {
-            Contract.Assert(node != null);
-            Contract.Assert(context != null);
+            CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
             IEnumerable<Type> methodArgumentsType = arguments.Select(argument => argument.Type);
@@ -747,6 +725,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return null;
+        }
+
+        private static void CheckArgumentNull(SingleValueFunctionCallNode node, QueryBinderContext context, string nodeName)
+        {
+            if (node == null || node.Name != nodeName)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
         }
     }
 }

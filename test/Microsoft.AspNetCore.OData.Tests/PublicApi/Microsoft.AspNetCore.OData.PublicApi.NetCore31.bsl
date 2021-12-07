@@ -753,7 +753,7 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static bool HasODataKeyParameter (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, params string keyPrefix)
+	public static bool HasODataKeyParameter (Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action, Microsoft.OData.Edm.IEdmEntityType entityType, params bool enablePropertyNameCaseInsensitive, params string keyPrefix)
 
 	[
 	ExtensionAttribute(),

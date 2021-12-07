@@ -85,9 +85,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="action">The action model.</param>
         /// <param name="entityType">The Edm entity type.</param>
+        /// <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
         /// <param name="keyPrefix">The key prefix for the action parameter.</param>
         /// <returns>True/false.</returns>
-        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, string keyPrefix = "key")
+        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, bool enablePropertyNameCaseInsensitive = false, string keyPrefix = "key")
         {
             if (action == null)
             {
@@ -112,9 +113,21 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 foreach (var key in keys)
                 {
                     string keyName = $"{keyPrefix}{key.Name}";
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+
+                    if (enablePropertyNameCaseInsensitive)
                     {
-                        return false;
+                        keyName = keyName.ToUpperInvariant();
+                        if (!action.Parameters.Any(p => p.ParameterInfo.Name.ToUpperInvariant() == keyName))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+                        {
+                            return false;
+                        }
                     }
                 }
 

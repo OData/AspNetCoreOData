@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // For entity set, we should have the key parameter
             // For Singleton, we should not have the key parameter
-            bool hasODataKeyParameter = action.HasODataKeyParameter(entityType);
+            bool hasODataKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if ((context.EntitySet != null && !hasODataKeyParameter) ||
                 (context.Singleton != null && hasODataKeyParameter))
             {
@@ -128,14 +128,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
 
             IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
-            bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
+            bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
                 linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
             }
             else
             {
-                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedId");
+                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedId");
                 if (hasNavigationPropertyKeyParameter)
                 {
                     linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");
