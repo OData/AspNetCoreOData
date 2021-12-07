@@ -15,6 +15,23 @@ namespace Microsoft.AspNetCore.OData.Query
 {
     internal static class ODataQueryContextExtensions
     {
+        public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
+        {
+            ODataQuerySettings returnSettings = new ODataQuerySettings();
+            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+            if (settings != null)
+            {
+                returnSettings.CopyFrom(settings);
+            }
+
+            if (returnSettings.HandleNullPropagation == HandleNullPropagationOption.Default)
+            {
+                returnSettings.HandleNullPropagation = HandleNullPropagationOption.True;
+            }
+
+            return returnSettings;
+        }
+
         public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
         {
             ODataQuerySettings updatedSettings =

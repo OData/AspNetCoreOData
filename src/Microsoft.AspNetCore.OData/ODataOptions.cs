@@ -322,7 +322,7 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="routePrefix">Route prefix to sanitize.</param>
         /// <returns>Sanitized route prefix.</returns>
-        private string SanitizeRoutePrefix(string routePrefix)
+        private static string SanitizeRoutePrefix(string routePrefix)
         {
             Debug.Assert(routePrefix != null);
 

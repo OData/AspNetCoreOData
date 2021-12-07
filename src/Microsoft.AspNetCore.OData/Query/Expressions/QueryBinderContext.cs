@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// Or the properties from $compute query options.
         /// </summary>
-        public IDictionary<string, Expression> ComputedProperties { get; set; }
+        public IDictionary<string, Expression> ComputedProperties { get; } = new Dictionary<string, Expression>();
 
         /// <summary>
         /// Gets the <see cref="IEdmType"/> of the element type.
@@ -172,31 +172,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         public ParameterExpression CurrentParameter => _lambdaParameters[DollarThis];
 
+        /// <summary>
+        /// Gets the parameter using parameter name.
+        /// </summary>
+        /// <param name="name">The parameter name.</param>
+        /// <returns>The parameter expression.</returns>
         public ParameterExpression GetParameter(string name)
         {
             return _lambdaParameters[name];
         }
 
-        public bool ContainsParameter(string name)
-        {
-            return _lambdaParameters.ContainsKey(name);
-        }
-
-        public bool TryGetParameter(string name, out ParameterExpression parameter)
-        {
-            return _lambdaParameters.TryGetValue(name, out parameter);
-        }
-
-        public void AddlambdaParameters(string name, ParameterExpression parameter)
-        {
-            if (_lambdaParameters == null)
-            {
-                _lambdaParameters = new Dictionary<string, ParameterExpression>();
-            }
-
-            _lambdaParameters[name] =  parameter;
-        }
-
+        /// <summary>
+        /// Remove the parameter.
+        /// </summary>
+        /// <param name="name">The parameter name.</param>
         public void RemoveParameter(string name)
         {
             if (name != null)

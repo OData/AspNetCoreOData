@@ -208,10 +208,9 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
             }
 
-            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, queryable);
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
             {
                 NavigationSource = Context.NavigationSource,
                 GetNestedFilterBinder = () => Context.GetFilterBinder(),
@@ -242,10 +241,9 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
             }
 
-            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(settings, query: null);
             ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
             {
                 NavigationSource = Context.NavigationSource,
                 GetNestedFilterBinder = () => Context.GetFilterBinder(),

@@ -21,13 +21,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public static class BinderExtensions
     {
         /// <summary>
-        /// 
+        /// Translates an OData $filter represented by <see cref="FilterClause"/> to <see cref="Expression"/> and apply to <see cref="IEnumerable" />.
         /// </summary>
-        /// <param name="binder"></param>
-        /// <param name="query"></param>
-        /// <param name="filterClause"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="binder">The given filter binder.</param>
+        /// <param name="query">The given IEnumerable.</param>
+        /// <param name="filterClause">The filter clause.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The applied result.</returns>
         public static IEnumerable ApplyBind(this IFilterBinder binder, IEnumerable query, FilterClause filterClause, QueryBinderContext context)
         {
             if (binder == null)
@@ -52,13 +52,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <summary>
-        /// Translates an OData $orderby represented by <see cref="OrderByClause"/> to <see cref="Expression"/>.
-        /// $orderby=Age
-        ///    |--  x => x.Age
+        /// Translates an OData $filter represented by <see cref="FilterClause"/> to <see cref="Expression"/> and apply to <see cref="IQueryable" />.
         /// </summary>
-        /// <param name="filterClause">The orderby clause.</param>
+        /// <param name="binder">The given filter binder.</param>
+        /// <param name="query">The given queryable.</param>
+        /// <param name="filterClause">The filter clause.</param>
         /// <param name="context">The query binder context.</param>
-        /// <returns>The orderBy binder result.</returns>
+        /// <returns>The applied result.</returns>
         public static IQueryable ApplyBind(this IFilterBinder binder, IQueryable query, FilterClause filterClause, QueryBinderContext context)
         {
             if (binder == null)
@@ -85,6 +85,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return ExpressionHelpers.Where(query, filterExp, context.ElementClrType);
         }
 
+        /// <summary>
+        /// Translates an OData $filter represented by <see cref="FilterClause"/> to <see cref="Expression"/> and apply to <see cref="Expression" />.
+        /// </summary>
+        /// <param name="binder">The given filter binder.</param>
+        /// <param name="source">The given source.</param>
+        /// <param name="filterClause">The filter clause.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The applied result.</returns>
         public static Expression ApplyBind(this IFilterBinder binder, Expression source, FilterClause filterClause, QueryBinderContext context)
         {
             if (binder == null)
@@ -124,7 +132,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return Expression.Call(filterMethod, source, filterExp);
         }
 
-        public static IQueryable ApplyBind(this IOrderByBinder binder, IQueryable query, OrderByClause orderByClause, QueryBinderContext context, bool alreadyOrdered = false)
+        /// <summary>
+        /// Translates an OData $orderby represented by <see cref="OrderByClause"/> to <see cref="Expression"/> and apply to <see cref="IQueryable" />.
+        /// </summary>
+        /// <param name="binder">The given filter binder.</param>
+        /// <param name="query">The given source.</param>
+        /// <param name="orderByClause">The filter clause.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <param name="alreadyOrdered">The boolean value indicating whether it's ordered or not.</param>
+        /// <returns>The applied result.</returns>
+        public static IQueryable ApplyBind(this IOrderByBinder binder, IQueryable query, OrderByClause orderByClause, QueryBinderContext context, bool alreadyOrdered)
         {
             if (binder == null)
             {
@@ -169,7 +186,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return querySoFar;
         }
 
-        public static Expression ApplyBind(this IOrderByBinder binder, Expression source, OrderByClause orderByClause, QueryBinderContext context)
+        /// <summary>
+        /// Translates an OData $orderby represented by <see cref="OrderByClause"/> to <see cref="Expression"/> and apply to <see cref="Expression" />.
+        /// </summary>
+        /// <param name="binder">The given filter binder.</param>
+        /// <param name="source">The given source.</param>
+        /// <param name="orderByClause">The filter clause.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <param name="alreadyOrdered">The boolean value indicating whether it's ordered or not.</param>
+        /// <returns>The applied result.</returns>
+        public static Expression ApplyBind(this IOrderByBinder binder, Expression source, OrderByClause orderByClause, QueryBinderContext context, bool alreadyOrdered)
         {
             if (binder == null)
             {
@@ -194,7 +220,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             OrderByBinderResult orderByResult = binder.BindOrderBy(orderByClause, context);
 
             Type elementType = context.ElementClrType;
-            bool alreadyOrdered = false;
             OrderByBinderResult result = orderByResult;
             do
             {

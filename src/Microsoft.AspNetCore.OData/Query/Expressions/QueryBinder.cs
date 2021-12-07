@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="node">The query node to bind.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        protected virtual Expression Bind(QueryNode node, QueryBinderContext context)
+        public virtual Expression Bind(QueryNode node, QueryBinderContext context)
         {
             CheckArgumentNull(node, context);
 
@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="node">The query node to bind.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        protected virtual Expression BindCollectionNode(CollectionNode node, QueryBinderContext context)
+        public virtual Expression BindCollectionNode(CollectionNode node, QueryBinderContext context)
         {
             CheckArgumentNull(node, context);
 
@@ -195,6 +195,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="sourceNode">The node that represents the navigation source.</param>
         /// <param name="navigationProperty">The navigation property to bind.</param>
         /// <param name="propertyPath">The property path.</param>
+        /// <param name="context">The query binder context.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, string propertyPath, QueryBinderContext context)
         {
@@ -341,10 +342,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         public virtual Expression BindSingleComplexNode(SingleComplexNode singleComplexNode, QueryBinderContext context)
         {
-            if (singleComplexNode == null)
-            {
-                throw Error.ArgumentNull(nameof(singleComplexNode));
-            }
+            CheckArgumentNull(singleComplexNode, context);
 
             Expression source = Bind(singleComplexNode.Source, context);
             return CreatePropertyAccessExpression(source, context, singleComplexNode.Property, GetFullPropertyPath(singleComplexNode));
@@ -490,6 +488,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public virtual Expression BindCountNode(CountNode node, QueryBinderContext context)
         {
             // $filter=navProp/$count($filter=prop gt 1) gt 2
+
+            CheckArgumentNull(node, context);
 
             Expression source = Bind(node.Source, context);
             Expression countExpression = Expression.Constant(null, typeof(long?));
@@ -698,7 +698,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="allNode">The query node to bind.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
-        protected virtual Expression BindAllNode(AllNode allNode, QueryBinderContext context)
+        public virtual Expression BindAllNode(AllNode allNode, QueryBinderContext context)
         {
             CheckArgumentNull(allNode, context);
 
@@ -938,31 +938,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Recognize $it.Source where $it is FlatteningWrapper
         /// Using that do avoid wrapping it redundant into Null propagation 
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        private bool IsFlatteningSource(Expression source, QueryBinderContext context)
+        /// <param name="source">The source.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>true/false.</returns>
+        private static bool IsFlatteningSource(Expression source, QueryBinderContext context)
         {
             var member = source as MemberExpression;
             return member != null
                 && context.CurrentParameter.Type.IsGenericType
                 && context.CurrentParameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
                 && member.Expression == context.CurrentParameter;
-        }
-
-        private static MethodCallExpression SkipFilters(MethodCallExpression expression)
-        {
-            while (expression.Method.Name == "Where")
-            {
-                expression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
-            }
-
-            return expression;
-        }
-
-        private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
-        {
-            CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
-            CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
         }
 
         private static void CollectAssigments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
@@ -1053,8 +1038,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Bind function arguments
         /// </summary>
-        /// <param name="nodes"></param>
-        /// <returns></returns>
+        /// <param name="nodes">The nodes.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         protected Expression[] BindArguments(IEnumerable<QueryNode> nodes, QueryBinderContext context)
         {
             return nodes.OfType<SingleValueNode>().Select(n => Bind(n, context)).ToArray();
@@ -1064,12 +1050,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets property for dynamic properties dictionary.
         /// </summary>
         /// <param name="openNode"></param>
+        /// <param name="context">The query binder context.</param>
         /// <returns>Returns CLR property for dynamic properties container.</returns>
-        protected PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
+        protected static PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
         {
             if (openNode == null)
             {
                 throw Error.ArgumentNull(nameof(openNode));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
             }
 
             IEdmStructuredType edmStructuredType;
@@ -1093,11 +1085,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Gets expression for property from previously aggregated query
         /// </summary>
-        /// <param name="propertyPath"></param>
+        /// <param name="propertyPath">The property path.</param>
+        /// <param name="context">The query binder context.</param>
         /// <returns>Returns null if no aggregations were used so far</returns>
-        protected Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
+        protected static Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
         {
-            if (context.ComputedProperties == null)
+            if (context == null || context.ComputedProperties == null || !context.ComputedProperties.Any())
             {
                 return null;
             }
@@ -1194,7 +1187,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         // If the expression is of non-standard edm primitive type (like uint), convert the expression to its standard edm type.
         // Also, note that only expressions generated for ushort, uint and ulong can be understood by linq2sql and EF.
         // The rest (char, char[], Binary) would cause issues with linq2sql and EF.
-        internal Expression ConvertNonStandardPrimitives(Expression source, QueryBinderContext context)
+        internal static Expression ConvertNonStandardPrimitives(Expression source, QueryBinderContext context)
         {
             bool isNonstandardEdmPrimitive;
             Type conversionType = context.Model.IsNonstandardEdmPrimitive(source.Type, out isNonstandardEdmPrimitive);
@@ -1485,8 +1478,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return propertyAccessExpression;
         }
 
-        protected Expression ApplyNullPropagationForFilterBody(Expression body, QueryBinderContext context)
+        /// <summary>
+        /// Apply null propagation for filter body.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        protected static Expression ApplyNullPropagationForFilterBody(Expression body, QueryBinderContext context)
         {
+            Contract.Assert(body != null);
+            Contract.Assert(context != null);
+
             if (ExpressionBinderHelper.IsNullable(body.Type))
             {
                 if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)

@@ -287,7 +287,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query)
         {
-            return ApplyTo(query, new ODataQuerySettings());
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyTo(query, querySettings);
         }
 
         /// <summary>
@@ -299,7 +300,8 @@ namespace Microsoft.AspNetCore.OData.Query
         public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions)
         {
             _ignoreQueryOptions = ignoreQueryOptions;
-            return ApplyTo(query, new ODataQuerySettings());
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyTo(query, querySettings);
         }
 
         /// <summary>
@@ -337,6 +339,8 @@ namespace Microsoft.AspNetCore.OData.Query
             IQueryable result = query;
             IODataFeature odataFeature = Request.ODataFeature();
 
+            // Update the query setting
+            querySettings = Context.UpdateQuerySettings(querySettings, query);
             // TODO: $compute
 
             // First apply $apply
@@ -540,7 +544,7 @@ namespace Microsoft.AspNetCore.OData.Query
         public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
             _ignoreQueryOptions = ignoreQueryOptions;
-            return ApplyTo(entity, new ODataQuerySettings());
+            return ApplyTo(entity, querySettings);
         }
 
         /// <summary>
@@ -567,6 +571,9 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
             }
+
+            // Update the query setting
+            querySettings = Context.UpdateQuerySettings(querySettings, query: null);
 
             AddAutoSelectExpandProperties();
 

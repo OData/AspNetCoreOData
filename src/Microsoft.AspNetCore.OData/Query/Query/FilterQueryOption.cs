@@ -142,19 +142,13 @@ namespace Microsoft.AspNetCore.OData.Query
             FilterClause filterClause = FilterClause;
             Contract.Assert(filterClause != null);
 
-            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
-
             IFilterBinder binder = Context.GetFilterBinder();
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType)
             {
                 GetNestedFilterBinder = () => binder
             };
 
             return binder.ApplyBind(query, filterClause, binderContext);
-
-            //Expression filter = FilterBinder.Bind(query, filterClause, Context.ElementClrType, Context, updatedSettings);
-            //query = ExpressionHelpers.Where(query, filter, Context.ElementClrType);
-            //return query;
         }
 
         /// <summary>

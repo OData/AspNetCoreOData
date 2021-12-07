@@ -605,10 +605,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Create an <see cref="Expression"/> for the $count in $select or $expand
         /// </summary>
-        /// <param name="context">The <see cref="QueryBinderContext"/>./param>
+        /// <param name="context">The <see cref="QueryBinderContext"/></param>
         /// <param name="source">Original <see cref="Expression"/> which we will be appending the count expression.</param>
         /// <param name="countOption">Boolean to indicate if count value is present in $expand or $select item.</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="Expression"/> to create.</returns>
         public virtual Expression CreateTotalCountExpression(QueryBinderContext context, Expression source, bool? countOption)
         {
             if (context == null)
@@ -955,7 +955,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, elementType);
 
                 IOrderByBinder binder = binderContext.GetNestedOrderByBinder();
-                source = binder.ApplyBind(source, orderbyClause, binderContext);
+                source = binder.ApplyBind(source, orderbyClause, binderContext, false);
             }
 
             return source;

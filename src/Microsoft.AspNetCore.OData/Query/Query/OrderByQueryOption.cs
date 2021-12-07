@@ -174,7 +174,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
         public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
         {
-            return ApplyToCore(query, new ODataQuerySettings()) as IOrderedQueryable<T>;
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
         }
 
         /// <summary>
@@ -195,7 +196,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
         public IOrderedQueryable ApplyTo(IQueryable query)
         {
-            return ApplyToCore(query, new ODataQuerySettings());
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings);
         }
 
         /// <summary>
@@ -264,7 +266,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     if (propertyNode.OrderByClause != null)
                     {
-                        querySoFar = AddOrderByQueryForProperty(query, querySettings, propertyNode.OrderByClause, querySoFar, direction, alreadyOrdered);
+                        querySoFar = AddOrderByQueryForProperty(querySettings, propertyNode.OrderByClause, querySoFar, alreadyOrdered);
                     }
                     else
                     {
@@ -284,13 +286,13 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     openPropertiesSoFar.Add(openPropertyNode.PropertyName);
                     Contract.Assert(openPropertyNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(query, querySettings, openPropertyNode.OrderByClause, querySoFar, openPropertyNode.Direction, alreadyOrdered);
+                    querySoFar = AddOrderByQueryForProperty(querySettings, openPropertyNode.OrderByClause, querySoFar, alreadyOrdered);
                     alreadyOrdered = true;
                 }
                 else if (countNode != null)
                 {
                     Contract.Assert(countNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(query, querySettings, countNode.OrderByClause, querySoFar, countNode.Direction, alreadyOrdered);
+                    querySoFar = AddOrderByQueryForProperty(querySettings, countNode.OrderByClause, querySoFar, alreadyOrdered);
                     alreadyOrdered = true;
                 }
                 else
@@ -310,18 +312,15 @@ namespace Microsoft.AspNetCore.OData.Query
             return querySoFar as IOrderedQueryable;
         }
 
-        private IQueryable AddOrderByQueryForProperty(IQueryable query, ODataQuerySettings querySettings,
-            OrderByClause orderbyClause, IQueryable querySoFar, OrderByDirection direction, bool alreadyOrdered)
+        private IQueryable AddOrderByQueryForProperty(ODataQuerySettings querySettings, OrderByClause orderbyClause, IQueryable querySoFar, bool alreadyOrdered)
         {
-            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
-
             IOrderByBinder binder = Context.GetOrderByBinder();
 
             // Remove Thenby (make Thenby == null) to make sure we only apply the top orderby
             // TODO: need to refactor it later.
             orderbyClause = new OrderByClause(null, orderbyClause.Expression, orderbyClause.Direction, orderbyClause.RangeVariable);
 
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, updatedSettings, Context.ElementClrType)
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType)
             {
                 GetNestedFilterBinder = () => Context.GetFilterBinder()
             };
