@@ -320,10 +320,7 @@ namespace Microsoft.AspNetCore.OData.Query
             // TODO: need to refactor it later.
             orderbyClause = new OrderByClause(null, orderbyClause.Expression, orderbyClause.Direction, orderbyClause.RangeVariable);
 
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType)
-            {
-                GetNestedFilterBinder = () => Context.GetFilterBinder()
-            };
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
 
             querySoFar = binder.ApplyBind(querySoFar, orderbyClause, binderContext, alreadyOrdered);
 

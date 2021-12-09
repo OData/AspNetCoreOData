@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
@@ -110,9 +109,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ParameterExpression thisParameters = Expression.Parameter(clrType, DollarIt);
             _lambdaParameters[DollarThis] = thisParameters;
 
-            GetNestedFilterBinder = context.GetNestedFilterBinder;
-            GetNestedOrderByBinder = context.GetNestedOrderByBinder;
-
             IsNested = true;
         }
 
@@ -135,19 +131,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets or sets the assembly resolver.
         /// </summary>
         public IAssemblyResolver AssembliesResolver { get; set; }
-
-        /// <summary>
-        /// Gets or sets the nested filter binder.
-        /// For example: we do a orderby and a nested $filter.
-        /// $orderby=Addresses/$count($filter=HouseNumber gt 8)   or
-        /// $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
-        /// </summary>
-        public Func<IFilterBinder> GetNestedFilterBinder { get; set; }
-
-        /// <summary>
-        /// Gets or sets the nested orderby binder.
-        /// </summary>
-        public Func<IOrderByBinder> GetNestedOrderByBinder { get; set; }
 
         /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.

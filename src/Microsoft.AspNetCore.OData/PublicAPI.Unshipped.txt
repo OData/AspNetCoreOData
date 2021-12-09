@@ -881,10 +881,6 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperti
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter.get -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementType.get -> Microsoft.OData.Edm.IEdmType
-Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedFilterBinder.get -> System.Func<Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder>
-Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedFilterBinder.set -> void
-Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedOrderByBinder.get -> System.Func<Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder>
-Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedOrderByBinder.set -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetParameter(string name) -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
@@ -894,7 +890,9 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QueryBinderConte
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.RemoveParameter(string name) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder
-Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.SelectExpandBinder() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.FilterBinder.get -> Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.OrderByBinder.get -> Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
+Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.SelectExpandBinder(Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder filterBinder, Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder orderByBinder) -> void
 Microsoft.AspNetCore.OData.Query.FilterQueryOption
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext

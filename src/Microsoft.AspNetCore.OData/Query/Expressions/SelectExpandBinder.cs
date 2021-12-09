@@ -30,6 +30,35 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public class SelectExpandBinder : ISelectExpandBinder
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="SelectExpandBinder" /> class.
+        /// Select and Expand binder depends on <see cref="IFilterBinder"/> and <see cref="IOrderByBinder"/> to process inner $filter and $orderby.
+        /// </summary>
+        /// <param name="filterBinder">The injected filter binder.</param>
+        /// <param name="orderByBinder">The injected orderby binder.</param>
+        public SelectExpandBinder(IFilterBinder filterBinder, IOrderByBinder orderByBinder)
+        {
+            FilterBinder = filterBinder ?? throw Error.ArgumentNull(nameof(filterBinder));
+            OrderByBinder = orderByBinder ?? throw Error.ArgumentNull(nameof(orderByBinder));
+        }
+
+        /// <summary>
+        /// For unit test only.
+        /// </summary>
+        internal SelectExpandBinder()
+            : this(new FilterBinder(), new OrderByBinder())
+        { }
+
+        /// <summary>
+        /// Gets the filter binder.
+        /// </summary>
+        public IFilterBinder FilterBinder { get; }
+
+        /// <summary>
+        /// Gets the orderby binder.
+        /// </summary>
+        public IOrderByBinder OrderByBinder { get; }
+
+        /// <summary>
         /// Translate an OData $select or $expand tree represented by <see cref="SelectExpandClause"/> to an <see cref="Expression"/>.
         /// </summary>
         /// <param name="selectExpandClause">The original <see cref="SelectExpandClause"/>.</param>
@@ -217,7 +246,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 newSettings.CopyFrom(context.QuerySettings);
                 newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
                 QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, clrElementType);
-                IFilterBinder filterBinder = binderContext.GetNestedFilterBinder();
 
                 if (isCollection)
                 {
@@ -225,13 +253,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                     // TODO: Implement proper support for $select/$expand after $apply
                     // Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
-                    filterResult = filterBinder.ApplyBind(filterSource, filterClause, binderContext);
+                    filterResult = FilterBinder.ApplyBind(filterSource, filterClause, binderContext);
 
                     nullablePropertyType = filterResult.Type;
                 }
                 else if (settings.HandleReferenceNavigationPropertyExpandFilter)
                 {
-                    LambdaExpression filterLambdaExpression = filterBinder.BindFilter(filterClause, binderContext) as LambdaExpression;
+                    LambdaExpression filterLambdaExpression = FilterBinder.BindFilter(filterClause, binderContext) as LambdaExpression;
                     if (filterLambdaExpression == null)
                     {
                         throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, "LambdaExpression"));
@@ -943,7 +971,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return new SelectExpandClause(selectItems, false);
         }
 
-        private static Expression AddOrderByQueryForSource(QueryBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
+        private Expression AddOrderByQueryForSource(QueryBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
         {
             if (orderbyClause != null)
             {
@@ -953,8 +981,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
                 QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, elementType);
 
-                IOrderByBinder binder = binderContext.GetNestedOrderByBinder();
-                source = binder.ApplyBind(source, orderbyClause, binderContext, false);
+                source = OrderByBinder.ApplyBind(source, orderbyClause, binderContext, false);
             }
 
             return source;

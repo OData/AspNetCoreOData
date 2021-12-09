@@ -9134,19 +9134,6 @@
             Gets or sets the assembly resolver.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedFilterBinder">
-            <summary>
-            Gets or sets the nested filter binder.
-            For example: we do a orderby and a nested $filter.
-            $orderby=Addresses/$count($filter=HouseNumber gt 8)   or
-            $filter=collectionProp/$count($filter=Name eq 'abc') gt 2
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetNestedOrderByBinder">
-            <summary>
-            Gets or sets the nested orderby binder.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -9185,6 +9172,29 @@
             <summary>
             Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
             an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor(Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder,Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder" /> class.
+            Select and Expand binder depends on <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/> to process inner $filter and $orderby.
+            </summary>
+            <param name="filterBinder">The injected filter binder.</param>
+            <param name="orderByBinder">The injected orderby binder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor">
+            <summary>
+            For unit test only.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.FilterBinder">
+            <summary>
+            Gets the filter binder.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.OrderByBinder">
+            <summary>
+            Gets the orderby binder.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">

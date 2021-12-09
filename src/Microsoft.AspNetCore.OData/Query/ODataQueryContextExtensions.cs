@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
 
-            return binder ?? new SelectExpandBinder();
+            return binder ?? new SelectExpandBinder(context.GetFilterBinder(), context.GetOrderByBinder());
         }
 
         /// <summary>

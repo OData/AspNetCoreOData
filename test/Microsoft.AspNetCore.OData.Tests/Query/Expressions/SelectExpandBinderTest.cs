@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             _settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             _context = new ODataQueryContext(_model, typeof(QueryCustomer)) { RequestContainer = new MockServiceProvider() };
-            _binder = new SelectExpandBinder();
+            _binder = new SelectExpandBinder(new FilterBinder(), new OrderByBinder());
 
             QueryCustomer customer = new QueryCustomer
             {
@@ -68,8 +68,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             _queryBinderContext = new QueryBinderContext(_model, _settings, selectExpandQueryOption.Context.ElementClrType)
             {
-                GetNestedOrderByBinder = () => new OrderByBinder(),
-                GetNestedFilterBinder = () => new FilterBinder(),
                 NavigationSource = _context.NavigationSource
             };
         }
@@ -80,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var context = new ODataQueryContext(model, typeof(T)) { RequestContainer = new MockServiceProvider() };
 
-            return new SelectExpandBinder();
+            return new SelectExpandBinder(new FilterBinder(), new OrderByBinder());
         }
 
         //[Fact]

@@ -143,10 +143,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Contract.Assert(filterClause != null);
 
             IFilterBinder binder = Context.GetFilterBinder();
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType)
-            {
-                GetNestedFilterBinder = () => binder
-            };
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
 
             return binder.ApplyBind(query, filterClause, binderContext);
         }

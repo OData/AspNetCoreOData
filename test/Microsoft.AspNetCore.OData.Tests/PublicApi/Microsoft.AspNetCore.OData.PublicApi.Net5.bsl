@@ -2685,8 +2685,6 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext {
 	System.Linq.Expressions.ParameterExpression CurrentParameter  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
-	System.Func`1[[Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder]] GetNestedFilterBinder  { public get; public set; }
-	System.Func`1[[Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder]] GetNestedOrderByBinder  { public get; public set; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; }
@@ -2696,7 +2694,10 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext {
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
-	public SelectExpandBinder ()
+	public SelectExpandBinder (Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder filterBinder, Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder orderByBinder)
+
+	Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder FilterBinder  { public get; }
+	Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder OrderByBinder  { public get; }
 
 	public virtual System.Linq.Expressions.Expression BindSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual void BuildDynamicProperty (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)

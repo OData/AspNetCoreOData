@@ -509,32 +509,33 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 countMethod = ExpressionHelperMethods.EnumerableCountGeneric.MakeGenericMethod(elementType);
             }
 
-            MethodInfo whereMethod;
-            if (typeof(IQueryable).IsAssignableFrom(source.Type))
-            {
-                whereMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(elementType);
-            }
-            else
-            {
-                whereMethod = ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(elementType);
-            }
-
             // Bind the inner $filter clause within the $count segment.
             // e.g Books?$filter=Authors/$count($filter=Id gt 1) gt 1
-            Expression filterExpression;
             if (node.FilterClause != null)
             {
-                // TODO: double check, sam xu
-                //QueryBinderContext subContext = context.CreateSubContext();
-                //subContext.ElementClrType = elementType;
-                IFilterBinder nestedFilterBinder = context.GetNestedFilterBinder();
                 QueryBinderContext nextBinderContext = new QueryBinderContext(context, context.QuerySettings, elementType);
 
-                filterExpression = nestedFilterBinder.BindFilter(node.FilterClause, nextBinderContext);
+                Expression body = Bind(node.FilterClause.Expression, nextBinderContext);
+
+                ParameterExpression filterParameter = nextBinderContext.CurrentParameter;
+
+                LambdaExpression filterExpr = Expression.Lambda(body, filterParameter);
+
+                filterExpr = Expression.Lambda(ApplyNullPropagationForFilterBody(filterExpr.Body, nextBinderContext), filterExpr.Parameters);
+
+                MethodInfo whereMethod;
+                if (typeof(IQueryable).IsAssignableFrom(source.Type))
+                {
+                    whereMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(elementType);
+                }
+                else
+                {
+                    whereMethod = ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(elementType);
+                }
 
                 // The source expression looks like: $it.Authors
                 // So the generated countExpression below will look like: $it.Authors.Where($it => $it.Id > 1)
-                source = Expression.Call(null, whereMethod, new[] { source, filterExpression });
+                source = Expression.Call(null, whereMethod, new[] { source, filterExpr });
             }
 
             // append LongCount() method.

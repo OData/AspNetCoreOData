@@ -213,8 +213,6 @@ namespace Microsoft.AspNetCore.OData.Query
             QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
             {
                 NavigationSource = Context.NavigationSource,
-                GetNestedFilterBinder = () => Context.GetFilterBinder(),
-                GetNestedOrderByBinder = () => Context.GetOrderByBinder()
             };
 
             return binder.ApplyBind(queryable, _selectExpandClause, binderContext);
@@ -246,8 +244,6 @@ namespace Microsoft.AspNetCore.OData.Query
             QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
             {
                 NavigationSource = Context.NavigationSource,
-                GetNestedFilterBinder = () => Context.GetFilterBinder(),
-                GetNestedOrderByBinder = () => Context.GetOrderByBinder()
             };
 
             return binder.ApplyBind(entity, _selectExpandClause, binderContext);

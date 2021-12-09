@@ -45,7 +45,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             QueryBinderContext context = new QueryBinderContext(model, querySettings, filterType)
             {
                 AssembliesResolver = assembliesResolver,
-                GetNestedFilterBinder = () => binder
             };
 
             return binder.BindFilter(filterClause, context);
