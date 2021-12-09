@@ -8564,12 +8564,14 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder">
             <summary>
             Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/> or an <see cref="T:System.Object"/>.
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Translate an OData $select or $expand tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            $select=Name&amp;$expand=Orders
+            $it => new { .... }
             </summary>
             <param name="selectExpandClause">The original <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/>.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
@@ -9181,7 +9183,8 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
-            Applies the given <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> to the given <see cref="T:System.Linq.IQueryable"/>.
+            Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">

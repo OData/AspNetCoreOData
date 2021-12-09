@@ -24,9 +24,9 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
     /// <summary>
-    /// Applies the given <see cref="SelectExpandQueryOption"/> to the given <see cref="IQueryable"/>.
+    /// Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to
+    /// an <see cref="Expression"/>.
     /// </summary>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
     public class SelectExpandBinder : ISelectExpandBinder
     {
         /// <summary>
@@ -47,10 +47,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            Type elementType = context.ElementClrType;
             IEdmStructuredType structuredType = context.ElementType as IEdmStructuredType;
             IEdmNavigationSource navigationSource = context.NavigationSource;
-            ParameterExpression source = Expression.Parameter(elementType, "$it");
+            ParameterExpression source = context.CurrentParameter;
 
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
             Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
