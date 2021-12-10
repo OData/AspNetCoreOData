@@ -15,6 +15,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -53,6 +54,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ElementClrType = clrType ?? throw Error.ArgumentNull(nameof(clrType));
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
+
+            LambdaParameter = Expression.Parameter(ElementClrType, DollarIt);
 
             if (ElementType == null)
             {
@@ -193,6 +196,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 _lambdaParameters.Remove(name);
             }
         }
+
+        #region AggregationBinder
+        public TransformationNode Transformation { get; set; }
+
+        public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
+        public IEnumerable<GroupByPropertyNode> GroupingProperties { get; set; }
+
+        public Type GroupByClrType { get; set; }
+        public Type ResultClrType { get; set; }
+        public ParameterExpression LambdaParameter { get; set; }
+        public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
+        public bool ClassicEF { get; set; }
+        #endregion
 
         internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
         {

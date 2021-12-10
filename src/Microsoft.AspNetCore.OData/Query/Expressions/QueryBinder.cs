@@ -1412,6 +1412,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
+        internal QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context)
+        {
+            ParameterExpression source = context.LambdaParameter;
+            if (this.BaseQuery != null)
+            {
+                this.HasInstancePropertyContainer = this.BaseQuery.ElementType.IsGenericType
+                    && this.BaseQuery.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+
+                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source);
+            }
+
+            return context;
+        }
+
         private static Expression Any(Expression source, Expression filter)
         {
             Contract.Assert(source != null);
