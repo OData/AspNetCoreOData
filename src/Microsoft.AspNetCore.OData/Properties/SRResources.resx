@@ -748,4 +748,7 @@
   <data name="TypeMustBeOpenType" xml:space="preserve">
     <value>The type '{0}' must be an open type. The dynamic properties container property is only expected on open types.</value>
   </data>
+  <data name="NotSupportedChildTransformationKind" xml:space="preserve">
+    <value>Transformation kind '{0}' is not supported as a child transformation of kind '{1}'.</value>
+  </data>
 </root>
