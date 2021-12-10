@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 case QueryNodeKind.ResourceRangeVariableReference:
                     return this.LambdaParameter.Type.IsGenericType && this.LambdaParameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
-                        ? (Expression)Expression.Property(this.LambdaParameter, "Source")
+                        ? (Expression)Expression.Property(this.LambdaParameter, QueryConstants.FlatteningWrapperSourceProperty)
                         : this.LambdaParameter;
                 case QueryNodeKind.SingleValuePropertyAccess:
                     var propAccessNode = node as SingleValuePropertyAccessNode;

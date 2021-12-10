@@ -146,23 +146,24 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
             }
 
-            foreach (var transformation in applyClause.Transformations)
+            foreach (TransformationNode transformation in applyClause.Transformations)
             {
                 if (transformation.Kind == TransformationNodeKind.Aggregate || transformation.Kind == TransformationNodeKind.GroupBy)
                 {
-                    var binder = new AggregationBinder(querySettings, assembliesResolver, ResultClrType, Context.Model, transformation);
-                    query = binder.Bind(query);
-                    this.ResultClrType = binder.ResultClrType;
+                    QueryBinderContext queryBinderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
+                    IAggregationBinder binder = Context.GetAggregationBinder();
+                    query = binder.ApplyBind(query, transformation, queryBinderContext, out Type resultClrType);
+                    this.ResultClrType = resultClrType;
                 }
                 else if (transformation.Kind == TransformationNodeKind.Compute)
                 {
-                    var binder = new ComputeBinder(querySettings, assembliesResolver, ResultClrType, Context.Model, (ComputeTransformationNode)transformation);
+                    ComputeBinder binder = new ComputeBinder(querySettings, assembliesResolver, ResultClrType, Context.Model, (ComputeTransformationNode)transformation);
                     query = binder.Bind(query);
                     this.ResultClrType = binder.ResultClrType;
                 }
                 else if (transformation.Kind == TransformationNodeKind.Filter)
                 {
-                    var filterTransformation = transformation as FilterTransformationNode;
+                    FilterTransformationNode filterTransformation = transformation as FilterTransformationNode;
 
                     IFilterBinder binder = Context.GetFilterBinder();
                     QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);

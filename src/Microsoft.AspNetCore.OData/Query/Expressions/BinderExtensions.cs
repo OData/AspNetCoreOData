@@ -7,11 +7,15 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -20,6 +24,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public static class BinderExtensions
     {
+        private const string DollarThis = "$this";
+
         /// <summary>
         /// Translates an OData $filter represented by <see cref="FilterClause"/> to <see cref="Expression"/> and apply to <see cref="IEnumerable" />.
         /// </summary>
@@ -354,6 +360,94 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression searchExp = binder.BindSearch(searchClause, context);
             return ExpressionHelpers.Where(source, searchExp, context.ElementClrType);
+        }
+
+        /// <summary>
+        /// Translate an OData $apply parse tree represented by <see cref="TransformationNode"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+        /// </summary>
+        /// <param name="binder">An instance of <see cref="IAggregationBinder"/>.</param>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
+        /// <param name="transformationNode">The OData $apply parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/> containing the current query context.</param>
+        /// <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+        /// <returns>The applied result.</returns>
+        public static IQueryable ApplyBind(this IAggregationBinder binder, IQueryable source, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (transformationNode == null)
+            {
+                throw Error.ArgumentNull(nameof(transformationNode));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            // Ensure that the flattened properties are populated for the current query context.
+            context.EnsureFlattenedProperties(context.CurrentParameter, source);
+
+            // ApplyBind may be called multiple times if there are multiple groupby transformations
+            // e.g., $apply=groupby((a,b),aggregate(c))/groupby((d),aggregate(e))
+            // In this case, the first groupby will be applied to the original source,
+            // and the second groupby will be applied to the result of the first groupby
+            // There would be no reason to flatten the properties again if they were already flattened
+            if (context.FlattenedProperties == null || context.FlattenedProperties.Count == 0)
+            {
+                AggregationFlatteningResult flatteningResult = binder.FlattenReferencedProperties(
+                    transformationNode,
+                    source,
+                    context);
+
+                if (flatteningResult?.FlattenedExpression != null)
+                {
+                    Type originalTransformationElementType = context.TransformationElementType;
+
+                    QueryBinderValidator.ValidateFlatteningResult(flatteningResult);
+                    context.FlattenedExpressionMapping = flatteningResult.FlattenedPropertiesMapping;
+                    context.SetParameter(DollarThis, flatteningResult.RedefinedContextParameter);
+
+                    LambdaExpression flattenedLambda = flatteningResult.FlattenedExpression as LambdaExpression;
+                    Contract.Assert(flattenedLambda != null, $"{nameof(flattenedLambda)} != null");
+                    Type flattenedType = flattenedLambda.Body.Type;
+                    QueryBinderValidator.ValidateFlattenedExpressionType(flattenedType);
+
+                    source = ExpressionHelpers.Select(source, flattenedLambda, originalTransformationElementType);
+                }
+            }
+
+            // We are aiming for: query.GroupBy($it => new DynamicType1 {...}).Select($it => new DynamicType2 {...})
+            // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
+
+            LambdaExpression groupByLambda = binder.BindGroupBy(transformationNode, context) as LambdaExpression;
+            Contract.Assert(groupByLambda != null, $"{nameof(groupByLambda)} != null");
+            Type groupByType = groupByLambda.Body.Type;
+            QueryBinderValidator.ValidateGroupByExpressionType(groupByType);
+
+            // Invoke GroupBy method
+            IQueryable grouping = ExpressionHelpers.GroupBy(source, groupByLambda, source.ElementType, groupByType);
+
+            LambdaExpression selectLambda = binder.BindSelect(transformationNode, context) as LambdaExpression;
+            Contract.Assert(selectLambda != null, $"{nameof(selectLambda)} != null");
+            resultClrType = selectLambda.Body.Type;
+            QueryBinderValidator.ValidateSelectExpressionType(resultClrType);
+
+            // Invoke Select method
+            Type groupingType = typeof(IGrouping<,>).MakeGenericType(groupByType, context.TransformationElementType);
+
+            IQueryable result = ExpressionHelpers.Select(grouping, selectLambda, groupingType);
+
+            return result;
         }
     }
 }
