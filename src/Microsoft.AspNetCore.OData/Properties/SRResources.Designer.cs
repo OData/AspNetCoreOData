@@ -1240,6 +1240,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transformation kind &apos;{0}&apos; is not supported as a child transformation of kind &apos;{1}&apos;..
+        /// </summary>
+        internal static string NotSupportedChildTransformationKind {
+            get {
+                return ResourceManager.GetString("NotSupportedChildTransformationKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transformation kind {0} is not supported..
         /// </summary>
         internal static string NotSupportedTransformationKind {
@@ -1796,18 +1805,16 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeEnumOrNullableEnum", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; must be an open type. The dynamic properties container property is only expected on open types..
         /// </summary>
-        internal static string TypeMustBeOpenType
-        {
-            get
-            {
+        internal static string TypeMustBeOpenType {
+            get {
                 return ResourceManager.GetString("TypeMustBeOpenType", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from and is not a base type of &apos;{1}&apos;..
         /// </summary>
