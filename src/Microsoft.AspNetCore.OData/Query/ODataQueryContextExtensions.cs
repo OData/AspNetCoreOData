@@ -122,6 +122,23 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Gets the <see cref="IAggregationBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IAggregationBinder"/>.</returns>
+        public static IAggregationBinder GetAggregationBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IAggregationBinder binder = context.RequestContainer?.GetService<IAggregationBinder>();
+
+            return binder ?? new AggregationBinder();
+        }
+
+        /// <summary>
         /// Gets the <see cref="IAssemblyResolver"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
