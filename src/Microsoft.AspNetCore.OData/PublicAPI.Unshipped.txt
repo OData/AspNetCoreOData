@@ -734,6 +734,7 @@ Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators.Or = 1 -> Microsoft.Asp
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.All = Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.DeltaToken | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Supported -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Apply = 1024 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
+Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Compute = 2048 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Count = 64 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.DeltaToken = 512 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Expand = 2 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
@@ -744,7 +745,7 @@ Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.OrderBy = 8 -> Microsoft.As
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Select = 4 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Skip = 32 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.SkipToken = 256 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
-Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Supported = Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Filter | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Expand | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Select | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.OrderBy | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Top | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Skip | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Count | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Format | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.SkipToken | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Apply -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
+Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Supported = Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Filter | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Expand | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Select | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.OrderBy | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Top | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Skip | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Count | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Format | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.SkipToken | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Apply | Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Compute -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Top = 16 -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ApplyClause.get -> Microsoft.OData.UriParser.Aggregation.ApplyClause
@@ -753,6 +754,12 @@ Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ApplyTo(System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ResultClrType.get -> System.Type
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ComputeClause.get -> Microsoft.OData.UriParser.ComputeClause
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ComputeQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.RawValue.get -> string
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ResultClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(string propertyName) -> string
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
@@ -922,6 +929,7 @@ Microsoft.AspNetCore.OData.Query.ODataQueryContext.Path.get -> Microsoft.OData.U
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.RequestContainer.get -> System.IServiceProvider
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Apply.get -> Microsoft.AspNetCore.OData.Query.ApplyQueryOption
+Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Compute.get -> Microsoft.AspNetCore.OData.Query.ComputeQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Count.get -> Microsoft.AspNetCore.OData.Query.CountQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Filter.get -> Microsoft.AspNetCore.OData.Query.FilterQueryOption
@@ -963,6 +971,7 @@ Microsoft.AspNetCore.OData.Query.ODataQuerySettings.TimeZone.get -> System.TimeZ
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.TimeZone.set -> void
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Apply.get -> string
+Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Compute.get -> string
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Count.get -> string
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.DeltaToken.get -> string
 Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Expand.get -> string

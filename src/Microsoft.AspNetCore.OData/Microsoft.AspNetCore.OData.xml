@@ -7639,6 +7639,11 @@
             A value that corresponds to allowing the $apply query option.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Compute">
+            <summary>
+            A value that corresponds to allowing the $compute query option.
+            </summary>
+        </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.AllowedQueryOptions.Supported">
             <summary>
             A value that corresponds to the default query options supported.
@@ -9704,6 +9709,11 @@
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption"/>.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Compute">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Filter">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/>.
@@ -10343,6 +10353,42 @@
             <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption">
+            <summary>
+            This defines a $compute OData query option for querying.
+            The $compute system query option allows clients to define computed properties that can be used in a $select or within a $filter or $orderby expression.
+            Computed properties SHOULD be included as dynamic properties in the result and MUST be included if $select is specified with the computed property name, or star (*).
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.#ctor(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.OData.UriParser.ODataQueryOptionParser)">
+            <summary>
+            Initialize a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/> based on the raw $compute value and
+            an EdmModel from <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
+            </summary>
+            <param name="rawValue">The raw value for $filter query. It can be null or empty.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
+            <param name="queryOptionParser">The <see cref="T:Microsoft.OData.UriParser.ODataQueryOptionParser"/> which is used to parse the query option.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Context">
+            <summary>
+            Gets the given <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ResultClrType">
+            <summary>
+            ClrType for result of transformations
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ComputeClause">
+            <summary>
+            Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ComputeClause"/> for this query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.RawValue">
+            <summary>
+             Gets the raw $compute value.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.CountQueryOption">
             <summary>
             Represents the value of the $count query option and exposes a way to retrieve the number of entities that satisfy a query.
@@ -10544,6 +10590,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Apply">
             <summary>
              Gets the raw $apply query value from the incoming request Uri if exists.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Compute">
+            <summary>
+             Gets the raw $compute query value from the incoming request Uri if exists.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.OrderBy">

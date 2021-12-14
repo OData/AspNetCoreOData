@@ -111,6 +111,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public ApplyQueryOption Apply { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ComputeQueryOption"/>.
+        /// </summary>
+        public ComputeQueryOption Compute { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="FilterQueryOption"/>.
         /// </summary>
         public FilterQueryOption Filter { get; private set; }
@@ -972,6 +977,11 @@ namespace Microsoft.AspNetCore.OData.Query
                         ThrowIfEmpty(kvp.Value, "$apply");
                         RawValues.Apply = kvp.Value;
                         Apply = new ApplyQueryOption(kvp.Value, Context, _queryOptionParser);
+                        break;
+                    case "$compute":
+                        ThrowIfEmpty(kvp.Value, "$compute");
+                        RawValues.Compute = kvp.Value;
+                        Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
                     default:
                         // we don't throw if we can't recognize the query

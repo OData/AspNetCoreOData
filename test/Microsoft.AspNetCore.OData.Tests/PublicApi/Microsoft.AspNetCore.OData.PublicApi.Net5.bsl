@@ -1161,8 +1161,9 @@ public enum Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators : int {
 FlagsAttribute(),
 ]
 public enum Microsoft.AspNetCore.OData.Query.AllowedQueryOptions : int {
-	All = 2047
+	All = 4095
 	Apply = 1024
+	Compute = 2048
 	Count = 64
 	DeltaToken = 512
 	Expand = 2
@@ -1173,7 +1174,7 @@ public enum Microsoft.AspNetCore.OData.Query.AllowedQueryOptions : int {
 	Select = 4
 	Skip = 32
 	SkipToken = 256
-	Supported = 1535
+	Supported = 3583
 	Top = 16
 }
 
@@ -1229,6 +1230,15 @@ public class Microsoft.AspNetCore.OData.Query.ApplyQueryOption {
 	System.Type ResultClrType  { public get; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.ComputeQueryOption {
+	public ComputeQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
+
+	Microsoft.OData.UriParser.ComputeClause ComputeClause  { public get; }
+	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
+	string RawValue  { public get; }
+	System.Type ResultClrType  { public get; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.CountQueryOption {
@@ -1351,6 +1361,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions {
 	public ODataQueryOptions (Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.AspNetCore.Http.HttpRequest request)
 
 	Microsoft.AspNetCore.OData.Query.ApplyQueryOption Apply  { public get; }
+	Microsoft.AspNetCore.OData.Query.ComputeQueryOption Compute  { public get; }
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	Microsoft.AspNetCore.OData.Query.CountQueryOption Count  { public get; }
 	Microsoft.AspNetCore.OData.Query.FilterQueryOption Filter  { public get; }
@@ -1420,6 +1431,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions {
 	public ODataRawQueryOptions ()
 
 	string Apply  { public get; }
+	string Compute  { public get; }
 	string Count  { public get; }
 	string DeltaToken  { public get; }
 	string Expand  { public get; }
