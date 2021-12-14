@@ -17,7 +17,7 @@ using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
-    internal class TransformationBinderBase2 : /*ExpressionBinderBase*/ QueryBinder
+    public class TransformationBinderBase2 : /*ExpressionBinderBase*/ QueryBinder
     {
         /*internal TransformationBinderBase2(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,
             IEdmModel model)*//* : base(model, assembliesResolver, settings)*//*
@@ -55,9 +55,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         protected void PreprocessQuery(IQueryable query, QueryBinderContext context)
         {
             Contract.Assert(query != null);
+            Contract.Assert(context != null);
 
             context.ClassicEF = IsClassicEF(query);
-            //context.BaseQuery = query;
+            context.BaseQuery = query;
             context = EnsureFlattenedPropertyContainer(context);
         }
 
@@ -109,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return CreatePropertyAccessExpression(BindAccessor(singleComplexNode.Source, context, baseElement), context, singleComplexNode.Property, GetFullPropertyPath(singleComplexNode));
                 case QueryNodeKind.SingleValueOpenPropertyAccess:
                     var openNode = node as SingleValueOpenPropertyAccessNode;
-                    return GetFlattenedPropertyExpression(openNode.Name) ?? CreateOpenPropertyAccessExpression(openNode, context);
+                    return GetFlattenedPropertyExpression(openNode.Name, context) ?? CreateOpenPropertyAccessExpression(openNode, context);
                 case QueryNodeKind.None:
                 case QueryNodeKind.SingleNavigationNode:
                     var navNode = (SingleNavigationNode)node;
