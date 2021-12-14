@@ -848,6 +848,8 @@ Microsoft.AspNetCore.OData.Query.ETag.this[string key].set -> void
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable<TEntity> query) -> System.Linq.IQueryable<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ETag() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.AggregationBinder() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindArguments(System.Collections.Generic.IEnumerable<Microsoft.OData.UriParser.QueryNode> nodes) -> System.Linq.Expressions.Expression[]

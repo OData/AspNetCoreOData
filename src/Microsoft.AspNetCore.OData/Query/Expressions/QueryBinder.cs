@@ -1415,15 +1415,77 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context)
         {
             ParameterExpression source = context.LambdaParameter;
-            if (this.BaseQuery != null)
+            if (context.BaseQuery != null)
             {
-                this.HasInstancePropertyContainer = this.BaseQuery.ElementType.IsGenericType
-                    && this.BaseQuery.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+                context.HasInstancePropertyContainer = context.BaseQuery.ElementType.IsGenericType
+                    && context.BaseQuery.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
-                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source);
+                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source, context);
             }
 
             return context;
+        }
+
+        internal IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context)
+        {
+            if (context.BaseQuery == null)
+            {
+                return null;
+            }
+
+            if (!typeof(GroupByWrapper).IsAssignableFrom(context.BaseQuery.ElementType))
+            {
+                return null;
+            }
+
+            var expression = context.BaseQuery.Expression as MethodCallExpression;
+            if (expression == null)
+            {
+                return null;
+            }
+
+            // After $apply we could have other clauses, like $filter, $orderby etc.
+            // Skip of filter expressions
+            expression = SkipFilters(expression);
+
+            if (expression == null)
+            {
+                return null;
+            }
+
+            var result = new Dictionary<string, Expression>();
+            CollectContainerAssignments(source, expression, result);
+            if (context.HasInstancePropertyContainer)
+            {
+                var instanceProperty = Expression.Property(source, "Instance");
+                if (typeof(DynamicTypeWrapper).IsAssignableFrom(instanceProperty.Type))
+                {
+                    var computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+                    computeExpression = SkipFilters(computeExpression);
+                    if (computeExpression != null)
+                    {
+                        CollectContainerAssignments(instanceProperty, computeExpression, result);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static MethodCallExpression SkipFilters(MethodCallExpression expression)
+        {
+            while (expression.Method.Name == "Where")
+            {
+                expression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+            }
+
+            return expression;
+        }
+
+        private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
+        {
+            CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
+            CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
         }
 
         private static Expression Any(Expression source, Expression filter)

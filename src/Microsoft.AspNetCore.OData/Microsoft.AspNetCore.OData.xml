@@ -8312,7 +8312,12 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable`1"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable`1"/> after the ETag has been applied.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable)">
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder">
+            <summary>
+            The default implementation to bind an OData $apply represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ApplyClause"/> to a <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
             For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
@@ -8332,6 +8337,7 @@
             B/D : $it.Container.Next.Value
             </summary>
             <param name="query"></param>
+            <param name="context"></param>
             <returns>Query with Select that flattens properties</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
@@ -9178,6 +9184,16 @@
             </summary>
             <param name="name">The parameter name.</param>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.BaseQuery">
+            <summary>
+            Base query used for the binder.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedPropertyContainer">
+            <summary>
+            Flattened list of properties from base query, for case when binder is applied for aggregated query.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
             Applies the given <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/> to the given <see cref="T:System.Linq.IQueryable"/>.
@@ -9302,6 +9318,13 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.IsClassicEF(System.Linq.IQueryable)">
+            <summary>
+            Checks IQueryable provider for need of EF6 optimization
+            </summary>
+            <param name="query"></param>
+            <returns>True if EF6 optimization are needed.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase2.IsClassicEF(System.Linq.IQueryable)">
             <summary>
             Checks IQueryable provider for need of EF6 optimization
             </summary>

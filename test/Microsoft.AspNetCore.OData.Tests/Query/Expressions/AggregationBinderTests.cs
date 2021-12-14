@@ -214,23 +214,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 return settings;
             };
 
+            QueryBinderContext queryBinderContext = new QueryBinderContext(model, customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }), typeof(T))
+            {
+                Transformation = clause.Transformations.First()
+            };
+
             var binder = classicEF
                 ? new AggregationBinderEFFake(
-                    customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
+                    /*customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
                     assembliesResolver,
                     typeof(T),
                     model,
-                    clause.Transformations.First())
+                    clause.Transformations.First()*/)
                 : new AggregationBinder(
-                    customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
+                    /*customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
                     assembliesResolver,
                     typeof(T),
                     model,
-                    clause.Transformations.First());
+                    clause.Transformations.First()*/);
 
             var query = Enumerable.Empty<T>().AsQueryable();
 
-            var queryResult = binder.Bind(query);
+            var queryResult = binder.Bind(query, queryBinderContext);
 
             var applyExpr = queryResult.Expression;
 
@@ -288,8 +293,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         private class AggregationBinderEFFake : AggregationBinder
         {
-            internal AggregationBinderEFFake(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation) 
-                : base(settings, assembliesResolver, elementType, model, transformation)
+            internal AggregationBinderEFFake(/*ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation*/) 
+                /*: base(settings, assembliesResolver, elementType, model, transformation)*/
             {
             }
 
