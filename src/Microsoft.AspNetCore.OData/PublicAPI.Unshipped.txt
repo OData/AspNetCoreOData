@@ -893,6 +893,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.NavigationSource
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.NavigationSource.set -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QueryBinderContext(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, System.Type clrType) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QueryBinderContext(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, System.Type clrType) -> void
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QueryBinderContext(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, System.Type clrType, Microsoft.OData.UriParser.Aggregation.TransformationNode transformation) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.RemoveParameter(string name) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder

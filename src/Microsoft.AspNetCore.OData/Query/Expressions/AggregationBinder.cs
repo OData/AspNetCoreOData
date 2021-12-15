@@ -178,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return customMethod;
         }
 
-        public IQueryable Bind(IQueryable query, QueryBinderContext context)
+        public IQueryable Bind(IQueryable query, ref QueryBinderContext context)
         {
            context = InitializeBinderComponents(context);
 

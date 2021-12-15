@@ -9109,6 +9109,15 @@
             <param name="querySettings">The query setting.</param>
             <param name="clrType">The current element CLR type in this context (scope).</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type,Microsoft.OData.UriParser.Aggregation.TransformationNode)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="querySettings">The query setting.</param>
+            <param name="clrType">The current element CLR type in this context (scope).</param>
+            <param name="transformation">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
