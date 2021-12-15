@@ -8317,6 +8317,12 @@
             The default implementation to bind an OData $apply represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ApplyClause"/> to a <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
@@ -8532,6 +8538,30 @@
             <param name="filterClause">The filter clause.</param>
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder">
+            <summary>
+            Exposes the ability to translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
             <summary>
@@ -9108,15 +9138,6 @@
             <param name="model">The Edm model.</param>
             <param name="querySettings">The query setting.</param>
             <param name="clrType">The current element CLR type in this context (scope).</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type,Microsoft.OData.UriParser.Aggregation.TransformationNode)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
-            </summary>
-            <param name="model">The Edm model.</param>
-            <param name="querySettings">The query setting.</param>
-            <param name="clrType">The current element CLR type in this context (scope).</param>
-            <param name="transformation">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type)">
             <summary>

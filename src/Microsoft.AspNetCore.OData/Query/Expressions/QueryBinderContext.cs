@@ -53,6 +53,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementClrType = clrType ?? throw Error.ArgumentNull(nameof(clrType));
 
+            LambdaParameter = Expression.Parameter(ElementClrType, DollarIt);
+
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
             // Kennedy: Failing for AggregationBinder.
@@ -75,21 +77,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _lambdaParameters[DollarThis] = thisParameters;
 
             // Categories?$expand=Products($filter=OrderItems/any(oi:oi/UnitPrice ne UnitPrice)
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
-        /// </summary>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="querySettings">The query setting.</param>
-        /// <param name="clrType">The current element CLR type in this context (scope).</param>
-        /// <param name="transformation">The <see cref="TransformationNode"/>.</param>
-        public QueryBinderContext(IEdmModel model, ODataQuerySettings querySettings, Type clrType, TransformationNode transformation)
-            : this(model, querySettings, clrType)
-        {
-            Transformation = transformation;
-
-            LambdaParameter = Expression.Parameter(ElementClrType, DollarIt);
         }
 
         /// <summary>
@@ -212,7 +199,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         #region AggregationBinder
-        public TransformationNode Transformation { get; private set; }
+        //public TransformationNode Transformation { get; private set; }
 
         public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
         public IEnumerable<GroupByPropertyNode> GroupingProperties { get; set; }
