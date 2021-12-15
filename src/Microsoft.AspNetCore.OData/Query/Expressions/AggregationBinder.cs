@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// The default implementation to bind an OData $apply represented by <see cref="ApplyClause"/> to a <see cref="Expression"/>.
     /// </summary>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
-    public class AggregationBinder : TransformationBinderBase2
+    public class AggregationBinder : TransformationBinderBase2, IAggregationBinder
     {
         private const string GroupByContainerProperty = "GroupByContainer";
         /*private TransformationNode _transformation;
@@ -80,11 +80,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _groupByClrType = _groupByClrType ?? typeof(NoGroupByWrapper);
         }*/
 
-        private QueryBinderContext InitializeBinderComponents(QueryBinderContext context)
+        internal QueryBinderContext InitializeBinderComponents(QueryBinderContext context, TransformationNode transformation)
         {
             Contract.Assert(context != null);
-
-            TransformationNode transformation = context.Transformation;
 
             switch (transformation.Kind)
             {
@@ -178,9 +176,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return customMethod;
         }
 
-        public IQueryable Bind(IQueryable query, ref QueryBinderContext context)
+        public IQueryable Bind(IQueryable query, TransformationNode transformationNode, ref QueryBinderContext context)
         {
-           context = InitializeBinderComponents(context);
+           context = InitializeBinderComponents(context, transformationNode);
 
             PreprocessQuery(query, context);
 
@@ -188,11 +186,121 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
             // We are doing Grouping even if only aggregate was specified to have a IQuaryable after aggregation
-            IQueryable grouping = BindGroupBy(query, context);
+            IQueryable grouping = BindGroupBy(query, transformationNode, context);
 
-            IQueryable result = BindSelect(grouping, context);
+            IQueryable result = BindSelect(grouping, transformationNode, context);
 
             return result;
+        }
+
+        /// <inheritdoc/>
+        public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
+        {
+            LambdaExpression groupLambda = null;
+            if (context.GroupingProperties != null && context.GroupingProperties.Any())
+            {
+                // Generates expression
+                // .GroupBy($it => new DynamicTypeWrapper()
+                //                                      {
+                //                                           GroupByContainer => new AggregationPropertyContainer() {
+                //                                               Name = "Prop1",
+                //                                               Value = $it.Prop1,
+                //                                               Next = new AggregationPropertyContainer() {
+                //                                                   Name = "Prop2",
+                //                                                   Value = $it.Prop2, // int
+                //                                                   Next = new LastInChain() {
+                //                                                       Name = "Prop3",
+                //                                                       Value = $it.Prop3
+                //                                                   }
+                //                                               }
+                //                                           }
+                //                                      })
+                List<NamedPropertyExpression> properties = CreateGroupByMemberAssignments(context.GroupingProperties, context);
+
+                var wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
+                List<MemberAssignment> wta = new List<MemberAssignment>();
+                wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
+                groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wta), context.LambdaParameter);
+            }
+            else
+            {
+                // We do not have properties to aggregate
+                // .GroupBy($it => new NoGroupByWrapper())
+                groupLambda = Expression.Lambda(Expression.New(context.GroupByClrType), context.LambdaParameter);
+            }
+
+            return groupLambda;
+        }
+
+        /// <inheritdoc/>
+        public virtual Expression BindSelect(TransformationNode transformationNode, QueryBinderContext context)
+        {
+            // Should return following expression
+            // .Select($it => New DynamicType2()
+            //                  {
+            //                      GroupByContainer = $it.Key.GroupByContainer // If groupby section present
+            //                      Container => new AggregationPropertyContainer() {
+            //                          Name = "Alias1",
+            //                          Value = $it.AsQuaryable().Sum(i => i.AggregatableProperty),
+            //                          Next = new LastInChain() {
+            //                              Name = "Alias2",
+            //                              Value = $it.AsQuaryable().Sum(i => i.AggregatableProperty)
+            //                          }
+            //                      }
+            //                  })
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(context.GroupByClrType, context.TransformationElementType);
+            ParameterExpression accum = Expression.Parameter(groupingType, "$it");
+
+            List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+
+            // Setting GroupByContainer property when previous step was grouping
+            if (context.GroupingProperties != null && context.GroupingProperties.Any())
+            {
+                var wrapperProperty = context.ResultClrType.GetProperty(GroupByContainerProperty);
+
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Property(Expression.Property(accum, "Key"), GroupByContainerProperty)));
+            }
+
+            // Setting Container property when we have aggregation clauses
+            if (context.AggregateExpressions != null)
+            {
+                var properties = new List<NamedPropertyExpression>();
+                foreach (var aggExpression in context.AggregateExpressions)
+                {
+                    properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(accum, aggExpression, context.TransformationElementType, context)));
+                }
+
+                var wrapperProperty = context.ResultClrType.GetProperty("Container");
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
+            }
+
+            var initilizedMember =
+                Expression.MemberInit(Expression.New(context.ResultClrType), wrapperTypeMemberAssignments);
+            var selectLambda = Expression.Lambda(initilizedMember, accum);
+
+            return selectLambda;
+        }
+
+        private IQueryable BindGroupBy(IQueryable query, TransformationNode transformationNode, QueryBinderContext context)
+        {
+            // Call BindGroupBy(context)
+            LambdaExpression groupLambda = BindGroupBy(transformationNode, context) as LambdaExpression;
+
+            // Invoke GroupBy method
+            return ExpressionHelpers.GroupBy(query, groupLambda, query.ElementType, context.GroupByClrType);
+        }
+
+
+
+        private IQueryable BindSelect(IQueryable grouping, TransformationNode transformationNode, QueryBinderContext context)
+        {
+            // Call BindGroupBy(context)
+            LambdaExpression selectLambda = BindSelect(transformationNode, context) as LambdaExpression;
+
+            // Invoke Select method
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(context.GroupByClrType, context.TransformationElementType);
+
+            return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
         }
 
         /// <summary>
@@ -283,7 +391,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Dictionary<SingleValueNode, Expression> _preFlattenedMap = new Dictionary<SingleValueNode, Expression>();
 
-        private IQueryable BindSelect(IQueryable grouping, QueryBinderContext context)
+        /*private IQueryable BindSelect(IQueryable grouping, QueryBinderContext context)
         {
             // Should return following expression
             // .Select($it => New DynamicType2()
@@ -330,7 +438,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             var result = ExpressionHelpers.Select(grouping, selectLambda, groupingType);
             return result;
-        }
+        }*/
 
         private List<MemberAssignment> CreateSelectMemberAssigments(Type type, MemberExpression propertyAccessor,
             IEnumerable<GroupByPropertyNode> properties, QueryBinderContext context)
@@ -613,7 +721,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return WrapConvert(aggregationExpression, context);
         }
 
-        private IQueryable BindGroupBy(IQueryable query, QueryBinderContext context)
+        /*private IQueryable BindGroupBy(IQueryable query, QueryBinderContext context)
         {
             LambdaExpression groupLambda = null;
             Type elementType = query.ElementType;
@@ -650,7 +758,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return ExpressionHelpers.GroupBy(query, groupLambda, elementType, context.GroupByClrType);
-        }
+        }*/
 
         private List<NamedPropertyExpression> CreateGroupByMemberAssignments(IEnumerable<GroupByPropertyNode> nodes, QueryBinderContext context)
         {

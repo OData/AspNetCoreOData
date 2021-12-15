@@ -217,8 +217,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             QueryBinderContext queryBinderContext = new QueryBinderContext(
                 model,
                 customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                typeof(T),
-                clause.Transformations.First());
+                typeof(T));
 
             var binder = classicEF
                 ? new AggregationBinderEFFake(
@@ -236,7 +235,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var query = Enumerable.Empty<T>().AsQueryable();
 
-            var queryResult = binder.Bind(query, ref queryBinderContext);
+            var queryResult = binder.Bind(query, clause.Transformations.First(), ref queryBinderContext);
 
             var applyExpr = queryResult.Expression;
 
