@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -189,7 +190,8 @@ namespace Microsoft.AspNetCore.OData.Query
                  fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
+                 fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$search", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -1084,6 +1086,40 @@ namespace Microsoft.AspNetCore.OData.Query
             // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
             RawValues = new ODataRawQueryOptions();
             IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
+
+            Regex num = new Regex(@"^\d+$");
+
+            if (normalizedQueryParameters.TryGetValue("$search", out string search))
+            {
+                var type = (Microsoft.OData.Edm.EdmEntityType)context.ElementType; List<string> cols = new List<string>();
+
+                if (num.Match(search).Success)
+                {
+                    // if the pk is an int, and the search string is just a number, check for equality - this allows you search by ProductID for example
+                    // this can work pretty good if your product ids identity starts at say 100000 - it will work if they start at 1 also but 
+                    if (type.DeclaredKey.Count() == 1 && type.DeclaredKey.First().Type.FullName() == "Edm.Int32")
+                        cols.Add($"{type.DeclaredKey.First().Name} eq {search}");
+
+                    // we have several tables like Product, Contact, etc. that have an AccountID column that is useful to search on
+                    if (type.Properties().FirstOrDefault(p => p.Name == "AccountID") != null)
+                        cols.Add($"AccountID eq {search}");
+                }
+
+                cols.AddRange(from p in type.DeclaredProperties where p.Type.FullName() == "Edm.String" select $"contains({p.Name},'{search}')");
+
+                if (normalizedQueryParameters.TryGetValue("$filter", out string value))  // if there is already a filter, tack our stuff on the end with an "and"
+                {
+                    value = value + " and (" + string.Join(" or ", cols) + ")";
+                    normalizedQueryParameters.Remove("$filter");
+                    normalizedQueryParameters.Add("$filter", value);
+                }
+                else
+                {
+                    normalizedQueryParameters.Add("$filter", string.Join(" or ", cols));  // otherwise, just add it
+                }
+
+                normalizedQueryParameters.Remove("$search");  // remove it so it won't trigger the brain dead $search that has never been implemented
+            }
 
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
