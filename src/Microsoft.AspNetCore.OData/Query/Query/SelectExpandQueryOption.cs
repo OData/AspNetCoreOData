@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -126,6 +127,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public string RawExpand { get; private set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="ComputeQueryOption"/>.
+        /// </summary>
+        public ComputeQueryOption Compute { get; set; }
+
+        /// <summary>
         /// Gets or sets the $select and $expand query validator.
         /// </summary>
         public SelectExpandQueryValidator Validator { get; set; }
@@ -215,6 +221,11 @@ namespace Microsoft.AspNetCore.OData.Query
                 NavigationSource = Context.NavigationSource,
             };
 
+            if (Compute != null)
+            {
+                binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
+            }
+
             return binder.ApplyBind(queryable, _selectExpandClause, binderContext);
         }
 
@@ -245,6 +256,11 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 NavigationSource = Context.NavigationSource,
             };
+
+            if (Compute != null)
+            {
+                binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
+            }
 
             return binder.ApplyBind(entity, _selectExpandClause, binderContext);
         }

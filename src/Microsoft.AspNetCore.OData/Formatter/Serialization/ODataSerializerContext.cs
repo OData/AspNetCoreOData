@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -90,6 +90,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 SelectExpandClause = expandedNavigationSelectItem.SelectAndExpand;
                 NavigationSource = expandedNavigationSelectItem.NavigationSource;
+
+                SetComputedProperties(expandedNavigationSelectItem.ComputeOption);
             }
             else
             {
@@ -98,6 +100,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     SelectExpandClause = pathSelectItem.SelectAndExpand;
                     NavigationSource = resource.NavigationSource; // Use it's parent navigation source.
+
+                    SetComputedProperties(pathSelectItem.ComputeOption);
                 }
 
                 var referencedNavigation = currentSelectItem as ExpandedReferenceSelectItem;
@@ -105,6 +109,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     ExpandReference = true;
                     NavigationSource = referencedNavigation.NavigationSource;
+
+                    SetComputedProperties(referencedNavigation.ComputeOption);
                 }
             }
 
@@ -178,6 +184,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Gets or sets the <see cref="ODataQueryOptions"/>.
         /// </summary>
         public ODataQueryOptions QueryOptions { get; internal set; }
+
+        /// <summary>
+        /// Gets the computed properties in serializer context.
+        /// It contains all computed properties at current serializer context.
+        /// </summary>
+        public ISet<string> ComputedProperties { get; } = new HashSet<string>();
 
         /// <summary>
         /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
@@ -328,6 +340,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return edmType;
+        }
+
+        internal void SetComputedProperties(ComputeClause computeClause)
+        {
+            if (computeClause == null || !computeClause.ComputedItems.Any())
+            {
+                return;
+            }
+
+            foreach (var item in computeClause.ComputedItems)
+            {
+                ComputedProperties.Add(item.Alias);
+            }
         }
     }
 }

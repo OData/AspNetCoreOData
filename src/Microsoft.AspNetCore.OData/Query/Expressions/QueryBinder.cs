@@ -291,6 +291,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return GetFlattenedPropertyExpression(openNode.Name, context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
             }
 
+            if (context.ComputedProperties.TryGetValue(openNode.Name, out var computedProperty))
+            {
+                return Bind(computedProperty.Expression, context);
+            }
+
             PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
 
             var propertyAccessExpression = BindPropertyAccessExpression(openNode, prop, context);
@@ -367,7 +372,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            ParameterExpression parameter;
+            // Be noted: it's used in $compute for $select and $expand.
+            if (context.Source != null)
+            {
+                return context.Source;
+            }
+
+            Expression parameter;
             // When we have a $this RangeVariable, it's refer to "current parameter" in current context.
             if (rangeVariable.Name == "$this")
             {
@@ -375,10 +386,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else if (rangeVariable.Name == "$it")
             {
-                // ~/Customers?$select=Addresses($order=City)
                 // ~/Customers?$select=Addresses($filter=$it/City eq City)
-                // Both $orderby.Expression.Source is the RangeVariableRefereneNode, and the name is "$it".
-                // But first refers to "Addresses", and the second refers to "Customers".
+                // Both Expression.Source is the RangeVariableRefereneNode, and the name is "$it".
+                // But first refers to "Addresses" in $it/City, and the second (City) refers to "Customers".
                 // We can't simply identify using the "$it" so there's a workaround.
                 if (context.IsNested)
                 {
@@ -1089,21 +1099,21 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="propertyPath">The property path.</param>
         /// <param name="context">The query binder context.</param>
         /// <returns>Returns null if no aggregations were used so far</returns>
-        protected static Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
+        protected Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
         {
             if (context == null || context.ComputedProperties == null || !context.ComputedProperties.Any())
             {
                 return null;
             }
 
-            Expression expression;
-            if (context.ComputedProperties.TryGetValue(propertyPath, out expression))
+            if (context.ComputedProperties.TryGetValue(propertyPath, out var expression))
             {
-                return expression;
+                return Bind(expression.Expression, context);
             }
 
+            return null;
             // TODO: sam xu, return null?
-            throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
+            // throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
         }
         #endregion
 

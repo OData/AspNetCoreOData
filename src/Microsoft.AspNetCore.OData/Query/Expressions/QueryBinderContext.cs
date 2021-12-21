@@ -133,10 +133,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public IAssemblyResolver AssembliesResolver { get; set; }
 
         /// <summary>
-        /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
-        /// Or the properties from $compute query options.
+        /// Gets the compute expressions.
         /// </summary>
-        public IDictionary<string, Expression> ComputedProperties { get; } = new Dictionary<string, Expression>();
+        public IDictionary<string, ComputeExpression> ComputedProperties { get; } = new Dictionary<string, ComputeExpression>();
 
         /// <summary>
         /// Gets the <see cref="IEdmType"/> of the element type.
@@ -154,6 +153,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets the current parameter. Current parameter is the parameter at root of this context.
         /// </summary>
         public ParameterExpression CurrentParameter => _lambdaParameters[DollarThis];
+
+        /// <summary>
+        /// Gets or sets the source.
+        /// Basically for $compute in $select and $expand
+        /// </summary>
+        public Expression Source { get;set; }
 
         /// <summary>
         /// Gets the parameter using parameter name.
@@ -218,6 +223,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //}
 
             return (name, lambdaIt);
+        }
+
+        internal void AddComputedProperties(IEnumerable<ComputeExpression> computedProperties)
+        {
+            if (computedProperties == null)
+            {
+                return;
+            }
+
+            foreach (var property in computedProperties)
+            {
+                ComputedProperties[property.Alias] = property;
+            }
         }
     }
 }

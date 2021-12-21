@@ -1037,7 +1037,62 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
+            // Try to add computed properties
+            if (selectExpandNode.SelectedComputedProperties != null)
+            {
+                foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
+                {
+                    ODataProperty property = CreateComputedProperty(propertyName, resourceContext);
+                    if (property != null)
+                    {
+                        properties.Add(property);
+                    }
+                }
+            }
+
             return properties;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataProperty"/> to be written for the given resource.
+        /// </summary>
+        /// <param name="propertyName">The computed property being written.</param>
+        /// <param name="resourceContext">The context for the resource instance being written.</param>
+        /// <returns>The <see cref="ODataProperty"/> to write.</returns>
+        public virtual ODataProperty CreateComputedProperty(string propertyName, ResourceContext resourceContext)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                throw Error.ArgumentNullOrEmpty(nameof(propertyName));
+            }
+
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceContext));
+            }
+
+            // The computed value is from the Linq expression binding.
+            object propertyValue = resourceContext.GetPropertyValue(propertyName);
+            if (propertyValue == null)
+            {
+                return new ODataProperty { Name = propertyName, Value = null };
+            }
+
+            ODataSerializerContext writeContext = resourceContext.SerializerContext;
+
+            IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(propertyValue, propertyValue.GetType());
+            if (edmTypeReference == null)
+            {
+                throw Error.NotSupported(SRResources.TypeOfDynamicPropertyNotSupported, propertyValue.GetType().FullName, propertyName);
+            }
+
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+            if (serializer == null)
+            {
+                throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmTypeReference.FullName()));
+            }
+
+            return serializer.CreateProperty(propertyValue, edmTypeReference, propertyName, writeContext);
         }
 
         /// <summary>

@@ -34,8 +34,12 @@ namespace Microsoft.AspNetCore.OData.Query
 
         public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
         {
-            ODataQuerySettings updatedSettings =
-                context?.RequestContainer?.GetRequiredService<ODataQuerySettings>() ?? new ODataQuerySettings();
+            ODataQuerySettings updatedSettings = new ODataQuerySettings();
+            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+            if (settings != null)
+            {
+                updatedSettings.CopyFrom(settings);
+            }
 
             updatedSettings.CopyFrom(querySettings);
 

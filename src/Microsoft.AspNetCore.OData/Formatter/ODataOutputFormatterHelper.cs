@@ -141,6 +141,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.Path = path;
                 writeContext.MetadataLevel = metadataLevel;
                 writeContext.QueryOptions = queryOptions;
+                writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
 
                 //Set the SelectExpandClause on the context if it was explicitly specified.
                 if (selectExpandDifferentFromQueryOptions != null)

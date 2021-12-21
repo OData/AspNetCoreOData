@@ -89,6 +89,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             return null;
         }
 
+        public override SingleValueNode Visit(SingleValueOpenPropertyAccessNode nodeIn)
+        {
+            return null;
+        }
+
         public override SingleValueNode Visit(SingleComplexNode nodeIn)
         {
             if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))

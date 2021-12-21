@@ -4600,6 +4600,14 @@
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The navigation link to be written.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComputedProperty(System.String,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given resource.
+            </summary>
+            <param name="propertyName">The computed property being written.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> to write.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStreamProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to be written for the given stream property.
@@ -4785,6 +4793,12 @@
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ComputedProperties">
+            <summary>
+            Gets the computed properties in serializer context.
+            It contains all computed properties at current serializer context.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.QueryContext">
             <summary>
             ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
@@ -4927,6 +4941,11 @@
             Gets the list of dynamic properties to select. It could be null.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectedComputedProperties">
+            <summary>
+            Gets the set of computed property in select.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.SelectAllDynamicProperties">
             <summary>
             Gets the flag to indicate the dynamic property to be included in the response or not.
@@ -4942,7 +4961,7 @@
             Gets the list of OData functions to be included in the response. It could be null.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.Initialize(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.Initialize(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.Boolean,System.Collections.Generic.ISet{System.String})">
             <summary>
             Initialize the Node from <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> for the given <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/>.
             </summary>
@@ -4950,13 +4969,15 @@
             <param name="structuredType">The related structural type to select and expand.</param>
             <param name="model">The Edm model.</param>
             <param name="expandedReference">Is expanded reference.</param>
+            <param name="computedProperties">The computed properties.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.BuildSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.BuildSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.ISet{System.String},Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
             <summary>
             Build $select and $expand clause
             </summary>
             <param name="selectExpandClause">The select expand clause</param>
-            <param name="structuralTypeInfo">The structural type properties.</param>
+            <param name="computedProperties">The structural type properties.</param>
+            <param name="structuralTypeInfo">The computed properties.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.BuildExpandItem(Microsoft.OData.UriParser.ExpandedReferenceSelectItem,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty},Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
             <summary>
@@ -4966,12 +4987,13 @@
             <param name="currentLevelPropertiesInclude">The current properties to include at current level.</param>
             <param name="structuralTypeInfo">The structural type properties.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.BuildSelectItem(Microsoft.OData.UriParser.PathSelectItem,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty},Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.BuildSelectItem(Microsoft.OData.UriParser.PathSelectItem,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty},System.Collections.Generic.ISet{System.String},Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.EdmStructuralTypeInfo)">
             <summary>
             Build the $select item, it maybe $select=complex/abc, $select=abc, $select=nav, etc.
             </summary>
             <param name="pathSelectItem">The expanded reference select item.</param>
             <param name="currentLevelPropertiesInclude">The current properties to include at current level.</param>
+            <param name="computedProperties">The computed properties.</param>
             <param name="structuralTypeInfo">The structural type properties.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode.IsComplexOrCollectionComplex(Microsoft.OData.Edm.IEdmStructuralProperty)">
@@ -9141,8 +9163,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
-            Flattened list of properties from base query, for case when binder is applied for aggregated query.
-            Or the properties from $compute query options.
+            Gets the compute expressions.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementType">
@@ -9158,6 +9179,12 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter">
             <summary>
             Gets the current parameter. Current parameter is the parameter at root of this context.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Source">
+            <summary>
+            Gets or sets the source.
+            Basically for $compute in $select and $expand
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetParameter(System.String)">
@@ -9220,7 +9247,7 @@
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause,Microsoft.OData.UriParser.ComputeClause)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> name.
             </summary>
@@ -9229,6 +9256,7 @@
             <param name="edmProperty">The <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> from which we are creating an <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <param name="filterClause">The $filter query represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
+            <param name="computeClause">The $compute query represented by <see cref="T:Microsoft.OData.UriParser.ComputeClause"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetSelectExpandProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem}@,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.UriParser.ExpandedReferenceSelectItem}@,System.Collections.Generic.ISet{Microsoft.OData.Edm.IEdmStructuralProperty}@)">
@@ -9295,6 +9323,15 @@
             <param name="structuredType">The structured type or its derived type contains the structural property.</param>
             <param name="structuralProperty">The selected structural property.</param>
             <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
+            <param name="includedProperties">The container to hold the created property.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindComputedProperty(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.String,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression})">
+            <summary>
+            Bind the computed property.
+            </summary>
+            <param name="source">The source contains the compute property.</param>
+            <param name="context">Wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="computedProperty">The compute property name.</param>
             <param name="includedProperties">The container to hold the created property.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BuildDynamicProperty(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression})">
@@ -10549,6 +10586,11 @@
             Gets or sets the Filter Query Validator
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.FilterQueryOption.Compute">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterClause">
             <summary>
             Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterClause"/> for this query option.
@@ -10676,6 +10718,11 @@
             Gets or sets the OrderBy Query Validator.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Compute">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause">
             <summary>
             Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause"/> for this query option.
@@ -10744,6 +10791,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.RawExpand">
             <summary>
             Gets the raw $expand value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Compute">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator">

@@ -1331,6 +1331,7 @@ public class Microsoft.AspNetCore.OData.Query.ETag`1 : Microsoft.AspNetCore.ODat
 public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	public FilterQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
+	Microsoft.AspNetCore.OData.Query.ComputeQueryOption Compute  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	Microsoft.OData.UriParser.FilterClause FilterClause  { public get; }
 	string RawValue  { public get; }
@@ -1472,6 +1473,7 @@ public class Microsoft.AspNetCore.OData.Query.OrderByPropertyNode : Microsoft.As
 public class Microsoft.AspNetCore.OData.Query.OrderByQueryOption {
 	public OrderByQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
+	Microsoft.AspNetCore.OData.Query.ComputeQueryOption Compute  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	Microsoft.OData.UriParser.OrderByClause OrderByClause  { public get; }
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.OrderByNode]] OrderByNodes  { public get; }
@@ -1498,6 +1500,7 @@ public class Microsoft.AspNetCore.OData.Query.QueryFilterProvider : IFilterProvi
 public class Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption {
 	public SelectExpandQueryOption (string select, string expand, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
+	Microsoft.AspNetCore.OData.Query.ComputeQueryOption Compute  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	int LevelsMaxLiteralExpansionDepth  { public get; public set; }
 	string RawExpand  { public get; }
@@ -2118,6 +2121,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public ODataResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual void AppendDynamicProperties (Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataProperty CreateComputedProperty (string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual string CreateETag (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateNavigationLink (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataAction CreateODataAction (Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
@@ -2162,6 +2166,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerC
 	public ODataSerializerContext ()
 	public ODataSerializerContext (Microsoft.AspNetCore.OData.Formatter.ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty)
 
+	System.Collections.Generic.ISet`1[[System.String]] ComputedProperties  { public get; }
 	Microsoft.OData.Edm.IEdmProperty EdmProperty  { public get; public set; }
 	Microsoft.AspNetCore.OData.Formatter.ResourceContext ExpandedResource  { public get; public set; }
 	bool ExpandReference  { public get; public set; }
@@ -2205,6 +2210,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode
 	bool SelectAllDynamicProperties  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmAction]] SelectedActions  { public get; }
 	System.Collections.Generic.IDictionary`2[[Microsoft.OData.Edm.IEdmStructuralProperty],[Microsoft.OData.UriParser.PathSelectItem]] SelectedComplexProperties  { public get; }
+	System.Collections.Generic.ISet`1[[System.String]] SelectedComputedProperties  { public get; }
 	System.Collections.Generic.ISet`1[[System.String]] SelectedDynamicProperties  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmFunction]] SelectedFunctions  { public get; }
 	System.Collections.Generic.ISet`1[[Microsoft.OData.Edm.IEdmNavigationProperty]] SelectedNavigationProperties  { public get; }
@@ -2625,7 +2631,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 	protected virtual System.Linq.Expressions.Expression BindTrim (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected static System.Reflection.PropertyInfo GetDynamicPropertyContainer (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
-	protected static System.Linq.Expressions.Expression GetFlattenedPropertyExpression (string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	protected System.Linq.Expressions.Expression GetFlattenedPropertyExpression (string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
 [
@@ -2693,28 +2699,30 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext {
 	public QueryBinderContext (Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, System.Type clrType)
 
 	Microsoft.OData.ModelBuilder.IAssemblyResolver AssembliesResolver  { public get; public set; }
-	System.Collections.Generic.IDictionary`2[[System.String],[System.Linq.Expressions.Expression]] ComputedProperties  { public get; }
+	System.Collections.Generic.IDictionary`2[[System.String],[Microsoft.OData.UriParser.ComputeExpression]] ComputedProperties  { public get; }
 	System.Linq.Expressions.ParameterExpression CurrentParameter  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; }
+	System.Linq.Expressions.Expression Source  { public get; public set; }
 
 	public System.Linq.Expressions.ParameterExpression GetParameter (string name)
 	public void RemoveParameter (string name)
 }
 
-public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : ISelectExpandBinder {
+public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder, ISelectExpandBinder {
 	public SelectExpandBinder (Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder filterBinder, Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder orderByBinder)
 
 	Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder FilterBinder  { public get; }
 	Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder OrderByBinder  { public get; }
 
+	public virtual void BindComputedProperty (System.Linq.Expressions.Expression source, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, string computedProperty, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
 	public virtual System.Linq.Expressions.Expression BindSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual void BuildDynamicProperty (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
 	public virtual System.Linq.Expressions.Expression CreatePropertyNameExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source)
-	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause)
+	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, params Microsoft.OData.UriParser.ComputeClause computeClause)
 	public virtual System.Linq.Expressions.Expression CreateTotalCountExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, System.Nullable`1[[System.Boolean]] countOption)
 	public virtual System.Linq.Expressions.Expression CreateTypeNameExpression (System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model)
 }

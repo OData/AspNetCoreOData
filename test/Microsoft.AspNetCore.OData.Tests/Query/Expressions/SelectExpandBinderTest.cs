@@ -997,7 +997,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
@@ -1007,7 +1007,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectItem selectItem = selectExpandClause.SelectedItems.First();
             PathSelectItem pathSelectItem = Assert.IsType<PathSelectItem>(selectItem); // Guard
 
-            Assert.False(isContainDynamicProperty);
+            Assert.Empty(dynamicPathSegments);
             Assert.Null(propertiesToExpand); // No navigation property to expand
 
             Assert.NotNull(autoSelectedProperties); // auto select the keys
@@ -1043,13 +1043,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
 
             // Assert
-            Assert.False(isContainDynamicProperty);
+            Assert.Empty(dynamicPathSegments);
             Assert.Null(propertiesToExpand);
 
             Assert.NotNull(autoSelectedProperties);
@@ -1078,13 +1078,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
 
             // Assert
-            Assert.False(isContainDynamicProperty);
+            Assert.Empty(dynamicPathSegments);
             Assert.Null(propertiesToExpand); // No navigation property to expand
 
             Assert.NotNull(autoSelectedProperties); // auto select the keys & ETags
@@ -1125,7 +1125,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem > propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude, out propertiesToExpand, out autoSelectedProperties);
 
             // Assert
@@ -1142,7 +1142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(autoSelectedProperties);
 
             Assert.False(selectExpandClause.AllSelected); // guard
-            Assert.Equal(expect, isContainDynamicProperty);
+            Assert.Equal(expect, dynamicPathSegments.Any());
         }
 
         [Theory]
@@ -1160,13 +1160,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
 
             // Assert
-            Assert.False(isContainDynamicProperty);
+            Assert.Empty(dynamicPathSegments);
             Assert.Null(propertiesToInclude);
             Assert.Null(propertiesToExpand);
 
@@ -1194,7 +1194,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
@@ -1205,7 +1205,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(expandedItem);
             var navigationSegment = expandedItem.PathToNavigationProperty.First(p => p is NavigationPropertySegment) as NavigationPropertySegment;
 
-            Assert.False(isContainDynamicProperty); // not container dynamic properties selection
+            Assert.Empty(dynamicPathSegments); // not container dynamic properties selection
             Assert.Null(propertiesToInclude); // no structural properties to include
             Assert.Null(autoSelectedProperties); // no auto select properties
 
@@ -1249,7 +1249,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
@@ -1290,13 +1290,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
             IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
-            bool isContainDynamicProperty = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
+            IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude,
                 out propertiesToExpand,
                 out autoSelectedProperties);
 
             // Arrange
-            Assert.False(isContainDynamicProperty);
+            Assert.Empty(dynamicPathSegments);
 
             Assert.NotNull(selectExpandClause);
             Assert.False(selectExpandClause.AllSelected);
@@ -1888,6 +1888,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                     { "$expand", expand == null ? "" : expand },
                     { "$select", select == null ? "" : select }
                 }).ParseSelectAndExpand();
+        }
+
+        public static IDictionary<string, object> InvokeSelectExpand<T>(T instance, Expression selectExpandExp)
+        {
+            LambdaExpression projectionLambda = selectExpandExp as LambdaExpression;
+
+            SelectExpandWrapper wrapper = projectionLambda.Compile().DynamicInvoke(instance) as SelectExpandWrapper;
+
+            return wrapper.ToDictionary();
         }
     }
 

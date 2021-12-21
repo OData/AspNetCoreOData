@@ -189,6 +189,7 @@ namespace Microsoft.AspNetCore.OData.Query
                  fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
 
@@ -346,7 +347,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
             // Update the query setting
             querySettings = Context.UpdateQuerySettings(querySettings, query);
-            // TODO: $compute
 
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
@@ -361,6 +361,11 @@ namespace Microsoft.AspNetCore.OData.Query
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
             if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
             {
+                if (IsAvailableODataQueryOption(Compute, AllowedQueryOptions.Compute))
+                {
+                    Filter.Compute = Compute;
+                }
+
                 result = Filter.ApplyTo(result, querySettings);
             }
 
@@ -403,6 +408,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (IsAvailableODataQueryOption(orderBy, AllowedQueryOptions.OrderBy))
             {
+                if (IsAvailableODataQueryOption(Compute, AllowedQueryOptions.Compute))
+                {
+                    orderBy.Compute = Compute;
+                }
+
                 result = orderBy.ApplyTo(result, querySettings);
             }
 
@@ -1017,6 +1027,7 @@ namespace Microsoft.AspNetCore.OData.Query
         private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
         {
             var result = default(T);
+            bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, AllowedQueryOptions.Compute);
             bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, AllowedQueryOptions.Select);
             bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, AllowedQueryOptions.Expand);
             if (selectAvailable || expandAvailable)
@@ -1039,6 +1050,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 Request.ODataFeature().SelectExpandClause = processedClause;
                 (Request.ODataFeature() as ODataFeature).QueryOptions = this;
+
+                if (computeAvailable)
+                {
+                    newSelectExpand.Compute = Compute;
+                }
 
                 var type = typeof(T);
                 if (type == typeof(IQueryable))

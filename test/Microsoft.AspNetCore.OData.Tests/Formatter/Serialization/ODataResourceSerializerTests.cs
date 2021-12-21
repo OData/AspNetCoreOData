@@ -646,6 +646,29 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
+        public void CreateResource_Calls_CreateComputedProperty_ForEachSelecteComputedProperty()
+        {
+            // Arrange
+            SelectExpandNode selectExpandNode = new SelectExpandNode();
+            selectExpandNode.SelectedComputedProperties.Add("Computed1");
+            selectExpandNode.SelectedComputedProperties.Add("Computed2");
+
+            ODataProperty[] properties = new ODataProperty[] { new ODataProperty(), new ODataProperty() };
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
+
+            serializer.Setup(s => s.CreateComputedProperty("Computed1", _entityContext)).Returns(properties[0]).Verifiable();
+            serializer.Setup(s => s.CreateComputedProperty("Computed2", _entityContext)).Returns(properties[1]).Verifiable();
+
+            // Act
+            ODataResource entry = serializer.Object.CreateResource(selectExpandNode, _entityContext);
+
+            // Assert
+            serializer.Verify();
+            Assert.Equal(properties, entry.Properties);
+        }
+
+        [Fact]
         public void CreateResource_Calls_CreateStructuralProperty_ForEachSelectedStructuralProperty()
         {
             // Arrange
