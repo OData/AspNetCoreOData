@@ -18,6 +18,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
 using ODataRoutingSample.Models;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using System.Reflection;
+using System.Linq;
 
 namespace ODataRoutingSample
 {
@@ -61,6 +64,16 @@ namespace ODataRoutingSample
             IEdmModel model3 = EdmModelBuilder.GetEdmModelV3();
 
             services.AddControllers()
+                /*  If you want to remove $metadata endpoint, you can use ControllerFeatureProvider as follows
+                .ConfigureApplicationPartManager(manager =>
+                {
+                    manager.FeatureProviders.Remove(manager.FeatureProviders.OfType<ControllerFeatureProvider>().FirstOrDefault());
+                    manager.FeatureProviders.Add(new RemoveMetadataControllerFeatureProvider());
+                })
+
+                or, remove MetadataRoutingConvention in AddOData as
+                     opt.Conventions.Remove(opt.Conventions.First(convention => convention is MetadataRoutingConvention));
+                */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                     .AddRouteComponents(model0)
                     .AddRouteComponents("v1", model1)
@@ -118,6 +131,19 @@ namespace ODataRoutingSample
             {
                 endpoints.MapControllers();
             });
+        }
+    }
+
+    public class RemoveMetadataControllerFeatureProvider : ControllerFeatureProvider
+    {
+        protected override bool IsController(TypeInfo typeInfo)
+        {
+            if (typeInfo.FullName == "Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController")
+            {
+                return false;
+            }
+
+            return base.IsController(typeInfo);
         }
     }
 
