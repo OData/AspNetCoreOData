@@ -313,5 +313,40 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return projectionLambda.Compile().DynamicInvoke(source);
         }
+
+        /// <summary>
+        /// Translate an OData $search parse tree represented by <see cref="SearchClause"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+        /// </summary>
+        /// <param name="binder">The built in <see cref="ISelectExpandBinder"/></param>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
+        /// <param name="searchClause">The OData $search parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <returns>The applied result.</returns>
+        public static IQueryable ApplyBind(this ISearchBinder binder, IQueryable source, SearchClause searchClause, QueryBinderContext context)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (searchClause == null)
+            {
+                throw Error.ArgumentNull(nameof(searchClause));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            Expression searchExp = binder.BindSearch(searchClause, context);
+            return ExpressionHelpers.Where(source, searchExp, context.ElementClrType);
+        }
     }
 }

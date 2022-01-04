@@ -75,6 +75,23 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Gets the <see cref="ISearchBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="ISearchBinder"/>.</returns>
+        public static ISearchBinder GetSearchBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            // We don't provide the default implementation of ISearchBinder,
+            // Actually, how to match is dependent upon the implementation.
+            return context.RequestContainer?.GetService<ISearchBinder>();
+        }
+
+        /// <summary>
         /// Gets the <see cref="ISelectExpandBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>

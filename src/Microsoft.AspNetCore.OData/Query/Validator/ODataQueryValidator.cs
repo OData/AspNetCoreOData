@@ -74,6 +74,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 options.Filter.Validate(validationSettings);
             }
 
+            if (options.Search != null)
+            {
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions);
+            }
+
             if (options.Count != null || options.Request.IsCountRequest())
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions);

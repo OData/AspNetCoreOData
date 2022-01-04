@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Initialize a new instance of <see cref="ComputeQueryOption"/> based on the raw $compute value and
         /// an EdmModel from <see cref="ODataQueryContext"/>.
         /// </summary>
-        /// <param name="rawValue">The raw value for $filter query. It can be null or empty.</param>
+        /// <param name="rawValue">The raw value for $compute query. It can be null or empty.</param>
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
         public ComputeQueryOption(string rawValue, ODataQueryContext context, ODataQueryOptionParser queryOptionParser)

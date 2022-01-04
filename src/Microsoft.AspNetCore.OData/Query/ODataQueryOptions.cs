@@ -121,6 +121,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public FilterQueryOption Filter { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="SearchQueryOption"/>.
+        /// </summary>
+        public SearchQueryOption Search { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="OrderByQueryOption"/>.
         /// </summary>
         public OrderByQueryOption OrderBy { get; private set; }
@@ -189,6 +194,7 @@ namespace Microsoft.AspNetCore.OData.Query
                  fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$search", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
                  fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
@@ -367,6 +373,13 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 result = Filter.ApplyTo(result, querySettings);
+            }
+
+            // If both $search and $filter are specified in the same request, only those items satisfying both criteria are returned
+            // apply $search
+            if (IsAvailableODataQueryOption(Search, AllowedQueryOptions.Search))
+            {
+                result = Search.ApplyTo(result, querySettings);
             }
 
             if (IsAvailableODataQueryOption(Count, AllowedQueryOptions.Count))
@@ -992,6 +1005,11 @@ namespace Microsoft.AspNetCore.OData.Query
                         ThrowIfEmpty(kvp.Value, "$compute");
                         RawValues.Compute = kvp.Value;
                         Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
+                        break;
+                    case "$search":
+                        ThrowIfEmpty(kvp.Value, "$search");
+                        RawValues.Search = kvp.Value;
+                        Search = new SearchQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
                     default:
                         // we don't throw if we can't recognize the query

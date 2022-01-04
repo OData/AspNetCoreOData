@@ -81,13 +81,18 @@ namespace Microsoft.AspNetCore.OData.Query
         Compute = 0x800,
 
         /// <summary>
+        /// A value that corresponds to allowing the $search query option.
+        /// </summary>
+        Search = 0x1000,
+
+        /// <summary>
         /// A value that corresponds to the default query options supported.
         /// </summary>
-        Supported = Filter | OrderBy | Top | Skip | SkipToken | Count | Select | Expand | Format | Apply | Compute,
+        Supported = Filter | OrderBy | Top | Skip | SkipToken | Count | Select | Expand | Format | Apply | Compute | Search,
 
         /// <summary>
         /// A value that corresponds to allowing all query options.
         /// </summary>
-        All = Filter | Expand | Select | OrderBy | Top | Skip | Count | Format | SkipToken | DeltaToken | Apply | Compute
+        All = Filter | Expand | Select | OrderBy | Top | Skip | Count | Format | SkipToken | DeltaToken | Apply | Compute | Search
     }
 }
