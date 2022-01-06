@@ -183,15 +183,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new AggregationPropertyContainer() {Name = CategoryID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Next.Value))), Next = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Value))), }, }, })");
         }
 
-        [Fact]
-        public void ClassicEFQueryShape()
-        {
-            var filters = VerifyQueryDeserialization(
-                "aggregate(SupplierID with sum as SupplierID)",
-                ".GroupBy($it => new NoGroupByWrapper())"
-                + ".Select($it => new NoGroupByAggregationWrapper() {Container = new LastInChain() {Name = SupplierID, Value = $it.AsQueryable().Sum($it => $it.SupplierID), }, })",
-                classicEF: true);
-        }
+        // We are removing support for EFClassic in 8.x
+        //[Fact]
+        //public void ClassicEFQueryShape()
+        //{
+        //    var filters = VerifyQueryDeserialization(
+        //        "aggregate(SupplierID with sum as SupplierID)",
+        //        ".GroupBy($it => new NoGroupByWrapper())"
+        //        + ".Select($it => new NoGroupByAggregationWrapper() {Container = new LastInChain() {Name = SupplierID, Value = $it.AsQueryable().Sum($it => $it.SupplierID), }, })",
+        //        classicEF: true);
+        //}
 
         private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false)
         {
@@ -298,10 +299,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             {
             }
 
-            internal override bool IsClassicEF(IQueryable query)
+            /*internal override bool IsClassicEF(IQueryable query)
             {
                 return true;
-            }
+            }*/
         }
     }
 }

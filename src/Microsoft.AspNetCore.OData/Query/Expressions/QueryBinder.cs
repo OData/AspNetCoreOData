@@ -1415,10 +1415,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context)
         {
             ParameterExpression source = context.LambdaParameter;
-            if (context.BaseQuery != null)
+            if (context.BaseQueryElementType != null)
             {
-                context.HasInstancePropertyContainer = context.BaseQuery.ElementType.IsGenericType
-                    && context.BaseQuery.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+                context.HasInstancePropertyContainer = context.BaseQueryElementType.IsGenericType
+                    && context.BaseQueryElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
                 context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source, context);
             }
@@ -1428,17 +1428,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context)
         {
-            if (context.BaseQuery == null)
+            if (!typeof(GroupByWrapper).IsAssignableFrom(context.BaseQueryElementType))
             {
                 return null;
             }
 
-            if (!typeof(GroupByWrapper).IsAssignableFrom(context.BaseQuery.ElementType))
-            {
-                return null;
-            }
-
-            var expression = context.BaseQuery.Expression as MethodCallExpression;
+            var expression = context.BaseQueryExpression as MethodCallExpression;
             if (expression == null)
             {
                 return null;

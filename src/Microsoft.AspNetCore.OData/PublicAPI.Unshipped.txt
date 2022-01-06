@@ -1406,6 +1406,7 @@ override Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting
 override Microsoft.AspNetCore.OData.Query.ETag.TryGetMember(System.Dynamic.GetMemberBinder binder, out object result) -> bool
 override Microsoft.AspNetCore.OData.Query.ETag.TrySetMember(System.Dynamic.SetMemberBinder binder, object value) -> bool
 override Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
+override Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.Bind(Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task

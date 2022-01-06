@@ -8678,6 +8678,9 @@
             <summary>
             The base class for all expression binders.
             </summary>
+            <summary>
+            The base class for all expression binders.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.Bind(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
@@ -9214,11 +9217,6 @@
             </summary>
             <param name="name">The parameter name.</param>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.BaseQuery">
-            <summary>
-            Base query used for the binder.
-            </summary>
-        </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedPropertyContainer">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -9348,13 +9346,6 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.IsClassicEF(System.Linq.IQueryable)">
-            <summary>
-            Checks IQueryable provider for need of EF6 optimization
-            </summary>
-            <param name="query"></param>
-            <returns>True if EF6 optimization are needed.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase2.IsClassicEF(System.Linq.IQueryable)">
             <summary>
             Checks IQueryable provider for need of EF6 optimization
             </summary>
