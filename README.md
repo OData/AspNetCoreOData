@@ -1,17 +1,15 @@
-ASP.NET Core (.NET 5) OData
+# ASP.NET Core OData 8.x
+---
 
-**Be noted**: Switch to use "main" as default branch. 1/6/2022
-
-============= 
 Component | Build  | Status 
 --------|--------- |---------
 ASP.NET Core OData|Rolling | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-rolling)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1132)
 ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-nightly)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1169)
 .NET Foundation|Release|[![Build status](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)
 
-
-
 ## 1. Introduction
+
+**Be noted**:  Switch to use "main" as default branch. 1/6/2022
 
 This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0) is a server side library built upon ODataLib and ASP.NET Core.
