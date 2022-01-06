@@ -1,77 +1,38 @@
-//-----------------------------------------------------------------------------
-// <copyright file="TransformationBinderBase2.cs" company=".NET Foundation">
+﻿//-----------------------------------------------------------------------------
+// <copyright file="QueryBinder.Transformations.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
-    public class TransformationBinderBase2 : /*ExpressionBinderBase*/ QueryBinder
+    /// <summary>
+    /// The base class for all expression binders.
+    /// </summary>
+    public abstract partial class QueryBinder
     {
-        /*internal TransformationBinderBase2(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,
-            IEdmModel model)*//* : base(model, assembliesResolver, settings)*//*
-        {
-            Contract.Assert(elementType != null);
-            LambdaParameter = Expression.Parameter(elementType, "$it");
-        }
-
-        protected Type ElementType { get { return this.LambdaParameter.Type; } }
-
-        protected ParameterExpression LambdaParameter { get; set; }
-
-        protected bool ClassicEF { get; private set; }
-
-        /// <summary>
-        /// Gets CLR type returned from the query.
-        /// </summary>
-        public Type ResultClrType
-        {
-            get; protected set;
-        }*/
-
-        /// <summary>
-        /// Checks IQueryable provider for need of EF6 optimization
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns>True if EF6 optimization are needed.</returns>
-        internal virtual bool IsClassicEF(IQueryable query)
-        {
-            var providerNS = query.Provider.GetType().Namespace;
-            return (providerNS == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6
-                || providerNS == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace);
-        }
-
-        protected void PreprocessQuery(IQueryable query, QueryBinderContext context)
-        {
-            Contract.Assert(query != null);
-            Contract.Assert(context != null);
-
-            context.ClassicEF = IsClassicEF(query);
-            context.BaseQuery = query;
-            context = EnsureFlattenedPropertyContainer(context);
-        }
-
         protected Expression WrapConvert(Expression expression, QueryBinderContext context)
         {
             // Expression that we are generating looks like Value = $it.PropertyName where Value is defined as object and PropertyName can be value 
             // Proper .NET expression must look like as Value = (object) $it.PropertyName for proper boxing or AccessViolationException will be thrown
             // Cast to object isn't translatable by EF6 as a result skipping (object) in that case
-            return (context.ClassicEF || !expression.Type.IsValueType)
+            return (/*context.ClassicEF || */!expression.Type.IsValueType)
                 ? expression
                 : Expression.Convert(expression, typeof(object));
         }
 
+        /*/// <summary>
+        /// Transforms a <see cref="QueryNode"/> to an <see cref="Expression"/>.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public virtual Expression Bind(QueryNode node, QueryBinderContext context)
         {
             SingleValueNode singleValueNode = node as SingleValueNode;
@@ -81,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             throw Error.Argument(nameof(node), SRResources.OnlySingleValueNodeSupported);
-        }
+        }*/
 
         /*protected override ParameterExpression Parameter
         {
