@@ -560,15 +560,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
                     Assert.NotNull(addressInstance.LineA.PhoneInfo);
                     Assert.Equal(7654321, addressInstance.LineA.PhoneInfo.PhoneNumber);
 
-                    object lineAValue;
-                    // Fetch LineA property using TryGetPropertyValue
-                    Assert.True(address.TryGetPropertyValue("LineA", out lineAValue));
-                    LineDetails lineA = lineAValue as LineDetails;
-                    Assert.NotNull(lineA);
+                    object nestedLineAValue;
+                    // Fetch LineA property using TryGetNestedPropertyValue
+                    Assert.True(address.TryGetNestedPropertyValue("LineA", out nestedLineAValue));
+                    Delta<LineDetails> deltaLineA = nestedLineAValue as Delta<LineDetails>;
+                    Assert.NotNull(deltaLineA);
 
                     // Nested complex property
-                    Assert.NotNull(lineA.PhoneInfo);
-                    Assert.Equal(7654321, lineA.PhoneInfo.PhoneNumber);
+                    dynamic nestedLineA = deltaLineA;
+                    Assert.NotNull(nestedLineA.PhoneInfo);
+                    Assert.Equal(7654321, nestedLineA.PhoneInfo.PhoneNumber);
                     break;
                 default:
                     // Error

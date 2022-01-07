@@ -76,6 +76,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetPropertyType(null, out _), "name");
         }
 
+        [Fact]
+        public void TryGetNestedPropertyValue_ThrowsArgumentNull_original()
+        {
+            // Arrange & Act
+            Delta<Base> delta = new Delta<Base>();
+            ExceptionAssert.ThrowsArgumentNull(() => delta.TryGetNestedPropertyValue(null, out _), "name");
+        }
+
         [Theory]
         [MemberData(nameof(DeltaModelPropertyNamesData))]
         public void RoundTrip_Properties(string propertyName, object value)
@@ -227,9 +235,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
 
             // read the nested property back
             Assert.True(ideltaCustomer.TryGetPropertyValue("Address", out dynamic nestedAddress));
-            Assert.IsAssignableFrom<AddressEntity>(nestedAddress);
+            Assert.IsAssignableFrom<Delta<AddressEntity>>(nestedAddress);
             Assert.Equal("Sammamish", nestedAddress.City);
             Assert.Equal("23213 NE 15th Ct", nestedAddress.StreetAddress);
+        }
+
+        [Fact]
+        public void CannotGetChangedNestedDeltaPropertyNames()
+        {
+            dynamic deltaCustomer = new Delta<CustomerEntity>();
+            IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+            AddressEntity address = new AddressEntity();
+
+            // modify
+            address.City = "Sammamish";
+            address.StreetAddress = "23213 NE 15th Ct";
+
+            // modify the nested property
+            ideltaCustomer.TrySetPropertyValue("Address", address);
+            Assert.Single(ideltaCustomer.GetChangedPropertyNames());
+            Assert.Equal("Address", ideltaCustomer.GetChangedPropertyNames().Single());
+            Assert.Equal(3, ideltaCustomer.GetUnchangedPropertyNames().Count());
+
+            // read the not nested property back using legacy API
+            Assert.True(ideltaCustomer.TryGetPropertyValue("Address", out dynamic deltaAddressEntity));
+            Assert.IsAssignableFrom<AddressEntity>(deltaAddressEntity);
+            AddressEntity addressEntity = deltaAddressEntity as AddressEntity;
+            Assert.Equal("23213 NE 15th Ct", addressEntity.StreetAddress);
+            Assert.Equal("Sammamish", addressEntity.City);
+
+            // read the not nested property back using nested API
+            Assert.False(deltaCustomer.TryGetNestedPropertyValue("Address", out dynamic deltaNestedAddress));
         }
 
         [Fact]

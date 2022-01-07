@@ -62,9 +62,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
             Assert.Equal(6.24, weight);
 
             Assert.True(delta.TryGetPropertyValue("HomeAddress", out object homeAddressObj));
-            Address homeAddress = Assert.IsType<Address>(homeAddressObj);
-            Assert.Equal("YouStreet", homeAddress.Street);
-            Assert.Equal("YouCity", homeAddress.City);
+            Delta<Address> homeAddress = Assert.IsType<Delta<Address>>(homeAddressObj);
+            Address originalHomeAddress = new Address();
+            homeAddress.Patch(originalHomeAddress);
+            Assert.Equal("YouStreet", originalHomeAddress.Street);
+            Assert.Equal("YouCity", originalHomeAddress.City);
 
             Assert.True(delta.TryGetPropertyValue("Addresses", out object addressesObj));
             Assert.Collection((IList<Address>)addressesObj,

@@ -174,18 +174,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 }
             }
 
-            if (_deltaNestedResources.ContainsKey(name))
+            if (TryGetNestedPropertyValue(name, out value))
             {
-                // If this is a nested resource, get the value from the dictionary of nested resources.
-                object deltaNestedResource = _deltaNestedResources[name];
-
-                Contract.Assert(deltaNestedResource != null, "deltaNestedResource != null");
-                Contract.Assert(DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType()));
-
-                // Get the Delta<{NestedResourceType}>._instance using Reflection.
-                FieldInfo field = deltaNestedResource.GetType().GetField("_instance", BindingFlags.NonPublic | BindingFlags.Instance);
-                Contract.Assert(field != null, "field != null");
-                value = field.GetValue(deltaNestedResource);
                 return true;
             }
             else
@@ -201,6 +191,42 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             value = null;
             return false;
+        }
+
+        /// <summary>
+        /// Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+        /// <remarks>
+        /// Only properties that exist on Entity can be retrieved.
+        /// Only modified nested properties can be retrieved.
+        /// The nested Property type will be <see cref="IDelta"/> of its defined type.
+        /// </remarks>
+        /// </summary>
+        /// <param name="name">The name of the nested Property</param>
+        /// <param name="value">The value of the nested Property</param>
+        /// <returns><c>True</c> if the Property was found and is a nested Property</returns>
+        public bool TryGetNestedPropertyValue(string name, out object value)
+        {
+            if (name == null)
+            {
+                throw Error.ArgumentNull(nameof(name));
+            }
+
+            if (!_deltaNestedResources.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            // This is a nested resource, the value returned must be an IDelta<T>
+            // from the dictionary of nested resources to allow the traversal of
+            // hierarchies of Delta<T>.
+            object deltaNestedResource = _deltaNestedResources[name];
+
+            Contract.Assert(deltaNestedResource != null, "deltaNestedResource != null");
+            Contract.Assert(DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType()));
+
+            value = deltaNestedResource;
+            return true;
         }
 
         /// <inheritdoc/>
@@ -291,7 +317,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
             // to prevent unrecognizable information from being applied to original resource.
             if (!_structuredType.IsAssignableFrom(original.GetType()))
             {
-                throw Error.Argument("original", SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
+                throw Error.Argument(nameof(original), SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
             }
 
             RuntimeHelpers.EnsureSufficientExecutionStack();
@@ -354,7 +380,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             if (!_structuredType.IsInstanceOfType(original))
             {
-                throw Error.Argument("original", SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
+                throw Error.Argument(nameof(original), SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
             }
 
             IEnumerable<PropertyAccessor<T>> propertiesToCopy = GetUnchangedPropertyNames().Select(s => _allProperties[s]);
@@ -472,7 +498,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (structuralType == null)
             {
-                throw Error.ArgumentNull("structuralType");
+                throw Error.ArgumentNull(nameof(structuralType));
             }
 
             if (!typeof(T).IsAssignableFrom(structuralType))

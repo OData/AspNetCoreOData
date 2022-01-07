@@ -1631,6 +1631,19 @@
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetNestedPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+            <remarks>
+            Only properties that exist on Entity can be retrieved.
+            Only modified nested properties can be retrieved.
+            The nested Property type will be <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta"/> of its defined type.
+            </remarks>
+            </summary>
+            <param name="name">The name of the nested Property</param>
+            <param name="value">The value of the nested Property</param>
+            <returns><c>True</c> if the Property was found and is a nested Property</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyType(System.String,System.Type@)">
             <inheritdoc/>
         </member>
