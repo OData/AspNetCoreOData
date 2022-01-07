@@ -10,7 +10,7 @@
     <!-- For NuGet Package Dependencies -->
   <PropertyGroup>
     <ODataLibPackageDependency>[7.9.4, 8.0.0)</ODataLibPackageDependency>
-    <ODataModelBuilderPackageDependency>[1.0.7, 2.0.0)</ODataModelBuilderPackageDependency>
+    <ODataModelBuilderPackageDependency>[1.0.8, 2.0.0)</ODataModelBuilderPackageDependency>
   </PropertyGroup>
 
   <!--

@@ -31,7 +31,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.7" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.8" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.4" />
     <PackageReference Include="Microsoft.OData.Edm" Version="7.9.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
