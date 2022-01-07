@@ -7,10 +7,42 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v3
 {
+    public class TestEntitiesController : Controller
+    {
+        /* HttpPatch http://localhost:5000/v3/TestEntities/1/Query
+         * 
+         * Request Body is: 
+{
+    "results": [
+        {
+            "EmailClusterId@odata.type": "#Int64",
+            "EmailClusterId": 2629759514
+        },
+        {
+            "EmailClusterId@odata.type": "#Int64",
+            "EmailClusterId": 2629759515
+        }
+    ]
+}
+         */
+        [HttpPatch]
+        public IActionResult PatchToQuery(int key, Delta<HuntingQueryResults> delta)
+        {
+            var changedPropertyNames = delta.GetChangedPropertyNames();
+
+            HuntingQueryResults original = new HuntingQueryResults();
+            delta.Patch(original);
+
+            return Ok(key);
+        }
+    }
+
     [ODataAttributeRouting]
     [Route("v3")]
     public class tenantsController : Controller

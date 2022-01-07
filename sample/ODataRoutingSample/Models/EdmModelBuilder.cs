@@ -152,6 +152,8 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<DriverDevice>("devices");
             builder.EntitySet<DriverFolder>("folders");
             builder.EntitySet<DriverPage>("pages");
+
+            builder.EntitySet<TestEntity>("TestEntities");
             return builder.GetEdmModel();
         }
     }

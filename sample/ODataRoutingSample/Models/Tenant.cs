@@ -39,4 +39,23 @@ namespace ODataRoutingSample.Models
     {
         public int Id { get; set; }
     }
+
+
+    public class TestEntity
+    {
+        public int Id { get; set; }
+
+        public HuntingQueryResults Query { get; set; }
+    }
+
+    public class HuntingQueryResults
+    {
+        public IList<HuntingRowResult> Results { get; set; }
+    }
+
+    public class HuntingRowResult
+    {
+        public IDictionary<string, object> DynamicProperties { get; set; }
+    }
+
 }
