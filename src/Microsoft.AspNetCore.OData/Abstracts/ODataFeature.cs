@@ -144,8 +144,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         internal Func<int> PageSize
         {
-	        get => _pageSize;
-	        set => _pageSize = value ?? throw new ArgumentNullException(nameof(value));
+            get => _pageSize;
+            set => _pageSize = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>

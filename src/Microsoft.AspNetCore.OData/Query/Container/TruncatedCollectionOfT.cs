@@ -46,19 +46,19 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="totalCount">The total count.</param>
         public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount): this(pageSize > 0 ? source.Take(checked(pageSize + 1)).AsQueryable() : source.AsQueryable(), pageSize)
         {
-	        TotalCount = totalCount;
+            TotalCount = totalCount;
         }
 
         private TruncatedCollection(IQueryable<T> source, int pageSize)
         {
-	        _items = source;
+            _items = source;
 
-	        if (pageSize < MinPageSize)
-	        {
-		        throw Error.ArgumentMustBeGreaterThanOrEqualTo("pageSize", pageSize, MinPageSize);
-	        }
+            if (pageSize < MinPageSize)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo("pageSize", pageSize, MinPageSize);
+            }
 
-	        PageSize = pageSize;
+            PageSize = pageSize;
         }
 
     
@@ -92,27 +92,27 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <exception cref="InvalidOperationException"></exception>
         IAsyncEnumerable<object> ITruncatedCollection.GetAsyncEnumerable()
         {
-	        if (!(_items is IAsyncEnumerable<T> asyncEnumerable)) throw new InvalidOperationException();
-	        return new AsyncEnumerableWrapper(asyncEnumerable, this);
-	        
+            if (!(_items is IAsyncEnumerable<T> asyncEnumerable)) throw new InvalidOperationException();
+            return new AsyncEnumerableWrapper(asyncEnumerable, this);
+            
         }
 
         private class AsyncEnumerableWrapper : IAsyncEnumerable<object>
         {
-	        private readonly IAsyncEnumerable<T> _Items;
-	        private readonly TruncatedCollection<T> _Instance;
+            private readonly IAsyncEnumerable<T> _Items;
+            private readonly TruncatedCollection<T> _Instance;
 
-	        public AsyncEnumerableWrapper(IAsyncEnumerable<T> items, TruncatedCollection<T> instance)
-	        {
-		        _Items = items;
-		        _Instance = instance;
-	        }
+            public AsyncEnumerableWrapper(IAsyncEnumerable<T> items, TruncatedCollection<T> instance)
+            {
+                _Items = items;
+                _Instance = instance;
+            }
 
 
-	        public IAsyncEnumerator<object> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken())
-	        {
-		        return new AsyncTruncatedCollectionEnumerator(_Items, _Instance, cancellationToken); 
-	        }
+            public IAsyncEnumerator<object> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken())
+            {
+                return new AsyncTruncatedCollectionEnumerator(_Items, _Instance, cancellationToken); 
+            }
         }
 
         /// <inheritdoc />
@@ -120,105 +120,105 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 
         public IEnumerator<T> GetEnumerator()
         {
-	        return new TruncatedCollectionEnumerator(_items, this);
+            return new TruncatedCollectionEnumerator(_items, this);
         }
 
-		/// <inheritdoc />
-		public Type ElementType => _items.ElementType;
-		/// <inheritdoc />
+        /// <inheritdoc />
+        public Type ElementType => _items.ElementType;
+        /// <inheritdoc />
         public Expression Expression => _items.Take(PageSize).Expression;
-		/// <inheritdoc />
+        /// <inheritdoc />
         public IQueryProvider Provider => _items.Provider;
 
         private class TruncatedCollectionEnumerator : IEnumerator<T>
         {
-	        private readonly IEnumerator<T> _items;
-	        private readonly TruncatedCollection<T> _instance;
-	        private int _remaining;
+            private readonly IEnumerator<T> _items;
+            private readonly TruncatedCollection<T> _instance;
+            private int _remaining;
 
-	        public TruncatedCollectionEnumerator(IEnumerable<T> items, TruncatedCollection<T> instance)
-	        {
-		        _items = items.GetEnumerator();
-		        _remaining = instance.PageSize;
-		        _instance = instance;
-	        }
+            public TruncatedCollectionEnumerator(IEnumerable<T> items, TruncatedCollection<T> instance)
+            {
+                _items = items.GetEnumerator();
+                _remaining = instance.PageSize;
+                _instance = instance;
+            }
 
-	        public bool MoveNext()
-	        {
-		        if (_remaining == 0)
-		        {
-			        _instance._isTruncated = _items.MoveNext();
-			        return false;
-		        }
-		        _remaining--;
-		        if (_items.MoveNext()) return true;
-		        _instance._isTruncated = false;
-		        return false;
+            public bool MoveNext()
+            {
+                if (_remaining == 0)
+                {
+                    _instance._isTruncated = _items.MoveNext();
+                    return false;
+                }
+                _remaining--;
+                if (_items.MoveNext()) return true;
+                _instance._isTruncated = false;
+                return false;
 
-	        }
+            }
 
-	        public void Reset()
-	        {
-		        _remaining = _instance.PageSize;
-		        _items.Reset();
-	        }
+            public void Reset()
+            {
+                _remaining = _instance.PageSize;
+                _items.Reset();
+            }
 
-	        public T Current => _items.Current;
+            public T Current => _items.Current;
 
-	        object IEnumerator.Current => Current;
+            object IEnumerator.Current => Current;
 
-	        public void Dispose()
-	        {
-		        _items.Dispose();
-	        }
+            public void Dispose()
+            {
+                _items.Dispose();
+            }
         }
         
         private class AsyncTruncatedCollectionEnumerator : IAsyncEnumerator<object>
         {
-	        private readonly IAsyncEnumerator<T> _items;
-	        private readonly TruncatedCollection<T> _instance;
-	        private int _remaining;
-	        private bool _hasStatusBeenReported;
+            private readonly IAsyncEnumerator<T> _items;
+            private readonly TruncatedCollection<T> _instance;
+            private int _remaining;
+            private bool _hasStatusBeenReported;
 
-	        public AsyncTruncatedCollectionEnumerator(IAsyncEnumerable<T> items, TruncatedCollection<T> instance, CancellationToken cancellationToken)
-	        {
-		        _items = items.GetAsyncEnumerator(cancellationToken);
-		        _remaining = instance.PageSize;
-		        _instance = instance;
-	        }
+            public AsyncTruncatedCollectionEnumerator(IAsyncEnumerable<T> items, TruncatedCollection<T> instance, CancellationToken cancellationToken)
+            {
+                _items = items.GetAsyncEnumerator(cancellationToken);
+                _remaining = instance.PageSize;
+                _instance = instance;
+            }
 
-	        public ValueTask<bool> MoveNextAsync()
-	        {
-		        if (_remaining == 0)
-		        {
-			        return UpdateTruncatedListAsync();
-		        }
-		        _remaining--;
-		        return _items.MoveNextAsync();
-	        }
+            public ValueTask<bool> MoveNextAsync()
+            {
+                if (_remaining == 0)
+                {
+                    return UpdateTruncatedListAsync();
+                }
+                _remaining--;
+                return _items.MoveNextAsync();
+            }
 
-	        private async ValueTask<bool> UpdateTruncatedListAsync()
-	        {
-		        _instance._isTruncated = await _items.MoveNextAsync();
-		        _hasStatusBeenReported = true;
-		        return false;
-	        }
+            private async ValueTask<bool> UpdateTruncatedListAsync()
+            {
+                _instance._isTruncated = await _items.MoveNextAsync();
+                _hasStatusBeenReported = true;
+                return false;
+            }
 
-	        public object Current => _items.Current;
+            public object Current => _items.Current;
 
-	        public ValueTask DisposeAsync()
-	        {
-		        if (!_hasStatusBeenReported)
-		        {
-			        _instance._isTruncated = false;
-		        }
-		        return _items.DisposeAsync();
-	        }
+            public ValueTask DisposeAsync()
+            {
+                if (!_hasStatusBeenReported)
+                {
+                    _instance._isTruncated = false;
+                }
+                return _items.DisposeAsync();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-	        return GetEnumerator();
+            return GetEnumerator();
         }
     }
 }

@@ -603,14 +603,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var dto = parameterizedConstantValue as DateTimeOffset?;
             if (dto != null)
             {
-	            if (settings.EnableConstantParameterization)
-	            {
-		            return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
-	            }
-	            else
-	            {
-		            return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
-	            }
+                if (settings.EnableConstantParameterization)
+                {
+                    return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+                }
+                else
+                {
+                    return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
+                }
             }
             return expression;
         }

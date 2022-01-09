@@ -151,22 +151,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (enumerable is ITruncatedCollection {IsAsyncEnumerationPossible: true} truncatedCollection)
             {
-	            await foreach (var item in truncatedCollection.GetAsyncEnumerable().WithCancellation(writeContext.Request.HttpContext.RequestAborted))
-	            {
-		            lastResource = 
-			            await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
-				            .ConfigureAwait(false);
-	            }
+                await foreach (var item in truncatedCollection.GetAsyncEnumerable().WithCancellation(writeContext.Request.HttpContext.RequestAborted))
+                {
+                    lastResource = 
+                        await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
+                            .ConfigureAwait(false);
+                }
             }
             else
             {
-	            foreach (object item in enumerable)
-	            {
-		            writeContext.Request?.HttpContext.RequestAborted.ThrowIfCancellationRequested();
-		            lastResource =
-			            await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
-				            .ConfigureAwait(false);
-	            }
+                foreach (object item in enumerable)
+                {
+                    writeContext.Request?.HttpContext.RequestAborted.ThrowIfCancellationRequested();
+                    lastResource =
+                        await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
+                            .ConfigureAwait(false);
+                }
             }
 
             // Subtle and surprising behavior: If the NextPageLink property is set before calling WriteStart(resourceSet),
@@ -177,7 +177,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (originalNexPageLink != null)
             {
-	            resourceSet.NextPageLink = originalNexPageLink;
+                resourceSet.NextPageLink = originalNexPageLink;
             }
 
             resourceSet.NextPageLink = nextLinkGenerator()(lastResource);
@@ -186,27 +186,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         private static async Task<object> WriteSingleResultElementAsync(ODataWriter writer, ODataSerializerContext writeContext,
-	        object item, IEdmStructuredTypeReference elementType, IODataEdmTypeSerializer resourceSerializer)
+            object item, IEdmStructuredTypeReference elementType, IODataEdmTypeSerializer resourceSerializer)
         {
-	        object lastResource;
-	        lastResource = item;
-	        if (item == null || item is NullEdmComplexObject)
-	        {
-		        if (elementType.IsEntity())
-		        {
-			        throw new SerializationException(SRResources.NullElementInCollection);
-		        }
+            object lastResource;
+            lastResource = item;
+            if (item == null || item is NullEdmComplexObject)
+            {
+                if (elementType.IsEntity())
+                {
+                    throw new SerializationException(SRResources.NullElementInCollection);
+                }
 
-		        // for null complex element, it can be serialized as "null" in the collection.
-		        await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
-		        await writer.WriteEndAsync().ConfigureAwait(false);
-	        }
-	        else
-	        {
-		        await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
-	        }
+                // for null complex element, it can be serialized as "null" in the collection.
+                await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
+            }
 
-	        return lastResource;
+            return lastResource;
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 var odataOperations = CreateODataOperations(operations, resourceSetContext, writeContext);
                 foreach (var odataOperation in odataOperations)
                 {
-	                if (odataOperation is ODataAction action)
+                    if (odataOperation is ODataAction action)
                     {
                         resourceSet.AddAction(action);
                     }
@@ -304,7 +304,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
                     return obj => handler.GenerateNextPageLink(new Uri(writeContext.Request.GetEncodedUrl()),
-	                    (writeContext.Request.ODataFeature() as ODataFeature).PageSize(), obj, writeContext);
+                        (writeContext.Request.ODataFeature() as ODataFeature).PageSize(), obj, writeContext);
                 }
             }
             else

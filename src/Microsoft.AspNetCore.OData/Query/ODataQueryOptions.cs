@@ -479,15 +479,15 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (Request.ODataFeature() is ODataFeature odataFeature)
             {
-	            if (pageSize > 0)
-	            {
-		            result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out var resultsLimited);
+                if (pageSize > 0)
+                {
+                    result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out var resultsLimited);
                     odataFeature.PageSize = () => resultsLimited() && Request.GetEncodedUrl() != null && odataFeature.NextLink == null
-				            ? pageSize
-				            : 0;
-	            }
+                            ? pageSize
+                            : 0;
+                }
 
-	            odataFeature.QueryOptions = this;
+                odataFeature.QueryOptions = this;
             }
 
             return result;
