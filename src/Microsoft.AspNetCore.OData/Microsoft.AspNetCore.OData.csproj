@@ -39,7 +39,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Spatial" Version="7.9.4" />
-    <PackageReference Include="Microsoft.Spatial" Version="7.9.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,7 +70,7 @@
   </ItemGroup>
 
   <ItemGroup>
-     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
