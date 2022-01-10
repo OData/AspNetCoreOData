@@ -208,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 <body>
     <h1 id=""odata"">OData Endpoint Mappings</h1>
     <p>
-        <a href=""#standard"">Go to none OData endpoint mappings</a>
+        <a href=""#standard"">Go to non-OData endpoint mappings</a>
     </p>
     <table>
         <tr>
@@ -218,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         </tr>
         ODATA_ROUTE_CONTENT
     </table>
-    <h1 id=""standard"">None OData Endpoint Mappings</h1>
+    <h1 id=""standard"">Non-OData Endpoint Mappings</h1>
     <p>
         <a href=""#odata"">Go to OData endpoint mappings</a>
     </p>
