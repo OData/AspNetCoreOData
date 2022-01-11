@@ -1360,28 +1360,28 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context)
+        internal static QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context, IQueryable query)
         {
             ParameterExpression source = context.LambdaParameter;
-            if (context.BaseQueryElementType != null)
+            if (query.ElementType != null)
             {
-                context.HasInstancePropertyContainer = context.BaseQueryElementType.IsGenericType
-                    && context.BaseQueryElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+                context.HasInstancePropertyContainer = query.ElementType.IsGenericType
+                    && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
-                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source, context);
+                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source, context, query);
             }
 
             return context;
         }
 
-        internal IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context)
+        internal static IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)
         {
-            if (!typeof(GroupByWrapper).IsAssignableFrom(context.BaseQueryElementType))
+            if (!typeof(GroupByWrapper).IsAssignableFrom(query.ElementType))
             {
                 return null;
             }
 
-            var expression = context.BaseQueryExpression as MethodCallExpression;
+            var expression = query.Expression as MethodCallExpression;
             if (expression == null)
             {
                 return null;

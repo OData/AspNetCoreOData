@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 case TransformationNodeKind.Aggregate:
                     var aggregateClause = transformation as AggregateTransformationNode;
                     context.AggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
-                    context.ResultClrType = typeof(NoGroupByAggregationWrapper);
+                    context.ResultClrType = typeof(NoGroupByAggregationWrapper); // Consider removing this from QueryBinderContext
                     break;
                 case TransformationNodeKind.GroupBy:
                     var groupByClause = transformation as GroupByTransformationNode;
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         }
                     }
 
-                    context.GroupByClrType = typeof(GroupByWrapper);
+                    context.GroupByClrType = typeof(GroupByWrapper); // Consider removing this from QueryBinderContext
                     context.ResultClrType = typeof(AggregationWrapper);
                     break;
                 default:
@@ -194,16 +194,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             context = InitializeBinderComponents(context, transformationNode);
-            context.BaseQueryElementType = query.ElementType;
-            context.BaseQueryExpression = query.Expression;
-            context = EnsureFlattenedPropertyContainer(context);
+            // Update the transformationNode instead of saving to the QueryBinderContext.
+            context = EnsureFlattenedPropertyContainer(context, query);
 
             //PreprocessQuery(query, context);
 
             query = FlattenReferencedProperties(query, context);
 
             // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
-            // We are doing Grouping even if only aggregate was specified to have a IQuaryable after aggregation
+            // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
             IQueryable grouping = BindGroupBy(query, transformationNode, context);
 
             IQueryable result = BindSelect(grouping, transformationNode, context);
