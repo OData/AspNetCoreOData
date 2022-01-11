@@ -89,7 +89,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 case TransformationNodeKind.Aggregate:
                     var aggregateClause = transformation as AggregateTransformationNode;
                     context.AggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
-                    context.ResultClrType = typeof(NoGroupByAggregationWrapper); // Consider removing this from QueryBinderContext
                     break;
                 case TransformationNodeKind.GroupBy:
                     var groupByClause = transformation as GroupByTransformationNode;
@@ -107,7 +106,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         }
                     }
 
-                    context.ResultClrType = typeof(AggregationWrapper);
                     break;
                 default:
                     throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
@@ -173,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return customMethod;
         }
 
-        public IQueryable Bind(IQueryable query, TransformationNode transformationNode, ref QueryBinderContext context)
+        public IQueryable Bind(IQueryable query, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
         {
             if (query == null)
             {
@@ -190,6 +188,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
+            resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
             context = InitializeBinderComponents(context, transformationNode);
             // Update the transformationNode instead of saving to the QueryBinderContext.
             IDictionary<string, Expression> flattenedPropertyContainer = GetFlattenedPropertyContainer(context, query);
@@ -262,13 +261,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //                  })
             var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
             ParameterExpression accum = Expression.Parameter(groupingType, "$it");
+            Type resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
 
-            List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+            List <MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
 
             // Setting GroupByContainer property when previous step was grouping
             if (context.GroupingProperties != null && context.GroupingProperties.Any())
             {
-                var wrapperProperty = context.ResultClrType.GetProperty(GroupByContainerProperty);
+                var wrapperProperty = resultClrType.GetProperty(GroupByContainerProperty);
 
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Property(Expression.Property(accum, "Key"), GroupByContainerProperty)));
             }
@@ -282,12 +282,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(accum, aggExpression, context.TransformationElementType, context)));
                 }
 
-                var wrapperProperty = context.ResultClrType.GetProperty("Container");
+                var wrapperProperty = resultClrType.GetProperty("Container");
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
             }
 
             var initilizedMember =
-                Expression.MemberInit(Expression.New(context.ResultClrType), wrapperTypeMemberAssignments);
+                Expression.MemberInit(Expression.New(resultClrType), wrapperTypeMemberAssignments);
             var selectLambda = Expression.Lambda(initilizedMember, accum);
 
             return selectLambda;
@@ -389,7 +389,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     aliasIdx--;
                 }
 
-                var wrapperProperty = context.ResultClrType.GetProperty(GroupByContainerProperty);
+                var wrapperProperty = typeof(AggregationWrapper).GetProperty(GroupByContainerProperty);
 
                 wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
