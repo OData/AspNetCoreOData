@@ -203,7 +203,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         #region AggregationBinder
         //public TransformationNode Transformation { get; private set; }
 
-        public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
+        //public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
         public IEnumerable<GroupByPropertyNode> GroupingProperties { get; set; }
         public ParameterExpression LambdaParameter { get; set; }
         public Type TransformationElementType { get { return this.LambdaParameter.Type; } }

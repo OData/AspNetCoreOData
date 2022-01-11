@@ -88,7 +88,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 case TransformationNodeKind.Aggregate:
                     var aggregateClause = transformation as AggregateTransformationNode;
-                    context.AggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
                     break;
                 case TransformationNodeKind.GroupBy:
                     var groupByClause = transformation as GroupByTransformationNode;
@@ -98,7 +97,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         if (groupByClause.ChildTransformations.Kind == TransformationNodeKind.Aggregate)
                         {
                             var aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
-                            context.AggregateExpressions = FixCustomMethodReturnTypes(aggregationNode.AggregateExpressions, context);
                         }
                         else
                         {
@@ -113,6 +111,43 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return context;
+        }
+
+        private IEnumerable<AggregateExpressionBase> GetAggregateExpressions(QueryBinderContext context, TransformationNode transformation)
+        {
+            Contract.Assert(context != null);
+            Contract.Assert(transformation != null);
+
+            IEnumerable<AggregateExpressionBase> aggregateExpressions = null;
+
+            switch (transformation.Kind)
+            {
+                case TransformationNodeKind.Aggregate:
+                    var aggregateClause = transformation as AggregateTransformationNode;
+                    aggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
+                    break;
+                case TransformationNodeKind.GroupBy:
+                    var groupByClause = transformation as GroupByTransformationNode;
+                    if (groupByClause.ChildTransformations != null)
+                    {
+                        if (groupByClause.ChildTransformations.Kind == TransformationNodeKind.Aggregate)
+                        {
+                            var aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
+                            aggregateExpressions = FixCustomMethodReturnTypes(aggregationNode.AggregateExpressions, context);
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
+                        SRResources.NotSupportedTransformationKind, transformation.Kind));
+            }
+
+            return aggregateExpressions;
         }
 
         private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessor)
@@ -193,7 +228,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Update the transformationNode instead of saving to the QueryBinderContext.
             IDictionary<string, Expression> flattenedPropertyContainer = GetFlattenedPropertyContainer(context, query);
 
-            query = FlattenReferencedProperties(query, context, flattenedPropertyContainer);
+            IEnumerable<AggregateExpressionBase> aggregateExpressions = GetAggregateExpressions(context, transformationNode);
+
+            query = FlattenReferencedProperties(query, context, flattenedPropertyContainer, aggregateExpressions);
 
             // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
             // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
@@ -262,6 +299,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
             ParameterExpression accum = Expression.Parameter(groupingType, "$it");
             Type resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
+            IEnumerable<AggregateExpressionBase> aggregateExpressions = GetAggregateExpressions(context, transformationNode);
 
             List <MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
 
@@ -274,10 +312,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             // Setting Container property when we have aggregation clauses
-            if (context.AggregateExpressions != null)
+            if (aggregateExpressions != null)
             {
                 var properties = new List<NamedPropertyExpression>();
-                foreach (var aggExpression in context.AggregateExpressions)
+                foreach (var aggExpression in aggregateExpressions)
                 {
                     properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(accum, aggExpression, context.TransformationElementType, context)));
                 }
@@ -338,11 +376,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="query"></param>
         /// <param name="context"></param>
         /// <param name="flattenedPropertyContainer"></param>
+        /// <param name="aggregateExpressions"></param>
         /// <returns>Query with Select that flattens properties</returns>
-        private IQueryable FlattenReferencedProperties(IQueryable query, QueryBinderContext context, IDictionary<string, Expression> flattenedPropertyContainer)
+        private IQueryable FlattenReferencedProperties(IQueryable query, QueryBinderContext context, IDictionary<string, Expression> flattenedPropertyContainer, IEnumerable<AggregateExpressionBase> aggregateExpressions)
         {
-            if (context.AggregateExpressions != null
-                && context.AggregateExpressions.OfType<AggregateExpression>().Any(e => e.Method != AggregationMethod.VirtualPropertyCount)
+            if (aggregateExpressions != null
+                && aggregateExpressions.OfType<AggregateExpression>().Any(e => e.Method != AggregationMethod.VirtualPropertyCount)
                 && context.GroupingProperties != null
                 && context.GroupingProperties.Any()
                 && (flattenedPropertyContainer == null || !flattenedPropertyContainer.Any()))
@@ -352,7 +391,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 List<MemberAssignment> wta = new List<MemberAssignment>();
                 wta.Add(Expression.Bind(sourceProperty, context.LambdaParameter));
 
-                var aggrregatedPropertiesToFlatten = context.AggregateExpressions.OfType<AggregateExpression>().Where(e => e.Method != AggregationMethod.VirtualPropertyCount).ToList();
+                var aggrregatedPropertiesToFlatten = aggregateExpressions.OfType<AggregateExpression>().Where(e => e.Method != AggregationMethod.VirtualPropertyCount).ToList();
                 // Generated Select will be stack like, meaning that first property in the list will be deepest one
                 // For example if we add $it.B.C, $it.B.D, select will look like
                 // new {

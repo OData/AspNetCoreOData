@@ -8770,7 +8770,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Collections.Generic.IDictionary{System.String,System.Linq.Expressions.Expression})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Collections.Generic.IDictionary{System.String,System.Linq.Expressions.Expression},System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase})">
             <summary>
             Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
             For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
@@ -8792,6 +8792,7 @@
             <param name="query"></param>
             <param name="context"></param>
             <param name="flattenedPropertyContainer"></param>
+            <param name="aggregateExpressions"></param>
             <returns>Query with Select that flattens properties</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
