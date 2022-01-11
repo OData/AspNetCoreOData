@@ -360,7 +360,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         Expression.Property(currentContainerExpression, "Value"),
                         type);
                     currentContainerExpression = Expression.Property(currentContainerExpression, "Next");
-                    _preFlattenedMap.Add(aggExpression.Expression, flatAccessExpression);
+                    context.PreFlattenedMap.Add(aggExpression.Expression, flatAccessExpression);
                     aliasIdx--;
                 }
 
@@ -378,8 +378,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return query;
         }
-
-        private Dictionary<SingleValueNode, Expression> _preFlattenedMap = new Dictionary<SingleValueNode, Expression>();
 
         private Expression CreateAggregationExpression(ParameterExpression accum, AggregateExpressionBase expression, Type baseType, QueryBinderContext context)
         {
@@ -501,7 +499,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Expression body;
 
             var lambdaParameter = baseType == context.TransformationElementType ? context.LambdaParameter : Expression.Parameter(baseType, "$it");
-            if (!this._preFlattenedMap.TryGetValue(expression.Expression, out body))
+            if (!context.PreFlattenedMap.TryGetValue(expression.Expression, out body))
             {
                 body = BindAccessor(expression.Expression, context, lambdaParameter);
             }

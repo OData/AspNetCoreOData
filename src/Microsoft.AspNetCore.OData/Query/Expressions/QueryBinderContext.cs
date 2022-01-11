@@ -203,8 +203,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         #region AggregationBinder
         public ParameterExpression LambdaParameter { get; set; }
         public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
-        //public bool ClassicEF { get; set; }
         public bool HasInstancePropertyContainer;
+        public Dictionary<SingleValueNode, Expression> PreFlattenedMap { get; set; } = new Dictionary<SingleValueNode, Expression>();
         #endregion
 
         internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
