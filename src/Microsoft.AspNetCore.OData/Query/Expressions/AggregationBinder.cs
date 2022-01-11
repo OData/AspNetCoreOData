@@ -8,8 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,9 +15,6 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
@@ -32,23 +27,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     {
         private const string GroupByContainerProperty = "GroupByContainer";
 
-        private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessor)
+        /// <inheritdoc/>
+        public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
         {
-            if (propertyAccessor.Type == typeof(object))
-            {
-                return Expression.Call(null, ExpressionHelperMethods.ConvertToDecimal, propertyAccessor);
-            }
-
-            return propertyAccessor;
-        }
-
-        /*public IQueryable Bind(IQueryable query, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
-        {
-            if (query == null)
-            {
-                throw Error.ArgumentNull(nameof(query));
-            }
-
             if (transformationNode == null)
             {
                 throw Error.ArgumentNull(nameof(transformationNode));
@@ -59,24 +40,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
-
-            IDictionary<string, Expression> flattenedPropertyContainer = GetFlattenedPropertyContainer(context, query);
-
-            query = FlattenReferencedProperties(query, context, flattenedPropertyContainer, transformationNode);
-
-            // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
-            // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
-            IQueryable grouping = BindGroupBy(query, transformationNode, context);
-
-            IQueryable result = BindSelect(grouping, transformationNode, context);
-
-            return result;
-        }*/
-
-        /// <inheritdoc/>
-        public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
-        {
             LambdaExpression groupLambda = null;
             IEnumerable<GroupByPropertyNode> groupingProperties = GetGroupingProperties(transformationNode);
             if (groupingProperties != null && groupingProperties.Any())
@@ -117,6 +80,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <inheritdoc/>
         public virtual Expression BindSelect(TransformationNode transformationNode, QueryBinderContext context)
         {
+            if (transformationNode == null)
+            {
+                throw Error.ArgumentNull(nameof(transformationNode));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             // Should return following expression
             // .Select($it => New DynamicType2()
             //                  {
@@ -166,100 +139,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return selectLambda;
         }
 
-        /*/// <summary>
-        /// Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
-        /// For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
-        /// .Select(
-        ///     $it => new FlattenninWrapper () {
-        ///         Source = $it, // Will used in groupby stage
-        ///         Container = new {
-        ///             Value = $it.B.C
-        ///             Next = new {
-        ///                 Value = $it.B.D
-        ///             }
-        ///         }
-        ///     }
-        /// )
-        /// Also we need to populate expressions to access B/C and B/D in aggregate stage. It will look like:
-        /// B/C : $it.Container.Value
-        /// B/D : $it.Container.Next.Value
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="context"></param>
-        /// <param name="flattenedPropertyContainer"></param>
-        /// <param name="transformationNode"></param>
-        /// <returns>Query with Select that flattens properties</returns>
-        private IQueryable FlattenReferencedProperties(
-            IQueryable query,
-            QueryBinderContext context,
-            IDictionary<string, Expression> flattenedPropertyContainer,
-            TransformationNode transformationNode)
+        private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessor)
         {
-            IEnumerable<AggregateExpressionBase> aggregateExpressions = GetAggregateExpressions(context, transformationNode);
-            IEnumerable<GroupByPropertyNode> groupingProperties = GetGroupingProperties(transformationNode);
-
-            if (aggregateExpressions != null
-                && aggregateExpressions.OfType<AggregateExpression>().Any(e => e.Method != AggregationMethod.VirtualPropertyCount)
-                && groupingProperties != null
-                && groupingProperties.Any()
-                && (flattenedPropertyContainer == null || !flattenedPropertyContainer.Any()))
+            if (propertyAccessor.Type == typeof(object))
             {
-                var wrapperType = typeof(FlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
-                var sourceProperty = wrapperType.GetProperty("Source");
-                List<MemberAssignment> wta = new List<MemberAssignment>();
-                wta.Add(Expression.Bind(sourceProperty, context.LambdaParameter));
-
-                var aggrregatedPropertiesToFlatten = aggregateExpressions.OfType<AggregateExpression>().Where(e => e.Method != AggregationMethod.VirtualPropertyCount).ToList();
-                // Generated Select will be stack like, meaning that first property in the list will be deepest one
-                // For example if we add $it.B.C, $it.B.D, select will look like
-                // new {
-                //      Value = $it.B.C
-                //      Next = new {
-                //          Value = $it.B.D
-                //      }
-                // }
-                // We are generated references (in currentContainerExpression) from  the beginning of the  Select ($it.Value, then $it.Next.Value etc.)
-                // We have proper match we need insert properties in reverse order
-                // After this 
-                // properties = { $it.B.D, $it.B.C}
-                // _preFlattendMAp = { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
-                var properties = new NamedPropertyExpression[aggrregatedPropertiesToFlatten.Count];
-                var aliasIdx = aggrregatedPropertiesToFlatten.Count - 1;
-                var aggParam = Expression.Parameter(wrapperType, "$it");
-                var currentContainerExpression = Expression.Property(aggParam, GroupByContainerProperty);
-                foreach (var aggExpression in aggrregatedPropertiesToFlatten)
-                {
-                    var alias = "Property" + aliasIdx.ToString(CultureInfo.CurrentCulture); // We just need unique alias, we aren't going to use it
-
-                    // Add Value = $it.B.C
-                    var propAccessExpression = BindAccessor(aggExpression.Expression, context);
-                    var type = propAccessExpression.Type;
-                    propAccessExpression = WrapConvert(propAccessExpression, context);
-                    properties[aliasIdx] = new NamedPropertyExpression(Expression.Constant(alias), propAccessExpression);
-
-                    // Save $it.Container.Next.Value for future use
-                    UnaryExpression flatAccessExpression = Expression.Convert(
-                        Expression.Property(currentContainerExpression, "Value"),
-                        type);
-                    currentContainerExpression = Expression.Property(currentContainerExpression, "Next");
-                    context.PreFlattenedMap.Add(aggExpression.Expression, flatAccessExpression);
-                    aliasIdx--;
-                }
-
-                var wrapperProperty = typeof(AggregationWrapper).GetProperty(GroupByContainerProperty);
-
-                wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
-
-                var flatLambda = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wta), context.LambdaParameter);
-
-                query = ExpressionHelpers.Select(query, flatLambda, context.TransformationElementType);
-
-                // We applied flattening let .GroupBy know about it.
-                context.LambdaParameter = aggParam; // see how we can update the context
+                return Expression.Call(null, ExpressionHelperMethods.ConvertToDecimal, propertyAccessor);
             }
 
-            return query;
-        }*/
+            return propertyAccessor;
+        }
 
         private Expression CreateAggregationExpression(ParameterExpression accum, AggregateExpressionBase expression, Type baseType, QueryBinderContext context)
         {
@@ -375,7 +263,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (expression.Method == AggregationMethod.VirtualPropertyCount)
             {
                 MethodInfo countMethod = ExpressionHelperMethods.EnumerableCountGeneric.MakeGenericMethod(baseType);
-                return WrapConvert(Expression.Call(null, countMethod, asQuerableExpression), context);
+                return WrapConvert(Expression.Call(null, countMethod, asQuerableExpression));
             }
 
             Expression body;
@@ -478,7 +366,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     throw new ODataException(Error.Format(SRResources.AggregationMethodNotSupported, expression.Method));
             }
 
-            return WrapConvert(aggregationExpression, context);
+            return WrapConvert(aggregationExpression);
         }
 
         private List<NamedPropertyExpression> CreateGroupByMemberAssignments(IEnumerable<GroupByPropertyNode> nodes, QueryBinderContext context)
@@ -489,7 +377,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 var propertyName = grpProp.Name;
                 if (grpProp.Expression != null)
                 {
-                    properties.Add(new NamedPropertyExpression(Expression.Constant(propertyName), WrapConvert(BindAccessor(grpProp.Expression, context), context)));
+                    properties.Add(new NamedPropertyExpression(Expression.Constant(propertyName), WrapConvert(BindAccessor(grpProp.Expression, context))));
                 }
                 else
                 {

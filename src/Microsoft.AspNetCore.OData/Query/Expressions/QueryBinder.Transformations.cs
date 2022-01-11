@@ -26,43 +26,46 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public abstract partial class QueryBinder
     {
-        protected Expression WrapConvert(Expression expression, QueryBinderContext context)
+        /// <summary>
+        /// Wrap a value type with Expression.Convert.
+        /// </summary>
+        /// <param name="expression">The <see cref="Expression"/> to be wrapped.</param>
+        /// <returns>The wrapped  <see cref="Expression"/></returns>
+        protected static Expression WrapConvert(Expression expression)
         {
+            if (expression == null)
+            {
+                throw Error.ArgumentNull(nameof(expression));
+            }
+
             // Expression that we are generating looks like Value = $it.PropertyName where Value is defined as object and PropertyName can be value 
             // Proper .NET expression must look like as Value = (object) $it.PropertyName for proper boxing or AccessViolationException will be thrown
             // Cast to object isn't translatable by EF6 as a result skipping (object) in that case
-            return (/*context.ClassicEF || */!expression.Type.IsValueType)
+            // Update: We have removed support for EF6
+            return (!expression.Type.IsValueType)
                 ? expression
                 : Expression.Convert(expression, typeof(object));
         }
 
-        /*/// <summary>
-        /// Transforms a <see cref="QueryNode"/> to an <see cref="Expression"/>.
+        /// <summary>
+        /// Creates an <see cref="Expression"/> from the <see cref="QueryNode"/>.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public virtual Expression Bind(QueryNode node, QueryBinderContext context)
-        {
-            SingleValueNode singleValueNode = node as SingleValueNode;
-            if (node != null)
-            {
-                return BindAccessor(singleValueNode, context);
-            }
-
-            throw Error.Argument(nameof(node), SRResources.OnlySingleValueNodeSupported);
-        }*/
-
-        /*protected override ParameterExpression Parameter
-        {
-            get
-            {
-                return this.LambdaParameter;
-            }
-        }*/
-
+        /// <param name="node">The <see cref="QueryNode"/> to be bound.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <param name="baseElement">The <see cref="Expression"/> for the base element.</param>
+        /// <returns>The created <see cref="Expression"/>.</returns>
         protected Expression BindAccessor(QueryNode node, QueryBinderContext context, Expression baseElement = null)
         {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
             switch (node.Kind)
             {
                 case QueryNodeKind.ResourceRangeVariableReference:
@@ -106,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal IEnumerable<GroupByPropertyNode> GetGroupingProperties(TransformationNode transformation)
+        internal static IEnumerable<GroupByPropertyNode> GetGroupingProperties(TransformationNode transformation)
         {
             if (transformation.Kind == TransformationNodeKind.GroupBy)
             {

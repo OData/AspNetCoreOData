@@ -360,12 +360,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <summary>
-        /// Translate an OData $search parse tree represented by <see cref="SearchClause"/> to
+        /// Translate an OData $apply parse tree represented by <see cref="TransformationNode"/> to
         /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
         /// </summary>
-        /// <param name="binder">The built in <see cref="ISelectExpandBinder"/></param>
+        /// <param name="binder">The built in <see cref="IAggregationBinder"/></param>
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
-        /// <param name="searchClause">The OData $search parse tree.</param>
+        /// <param name="transformationNode">The OData $apply parse tree.</param>
         /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
         /// <returns>The applied result.</returns>
         public static IQueryable ApplyBind(this IAggregationBinder binder, IQueryable source, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)

@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     // Add Value = $it.B.C
                     var propAccessExpression = BindAccessor(aggExpression.Expression, context);
                     var type = propAccessExpression.Type;
-                    propAccessExpression = WrapConvert(propAccessExpression, context);
+                    propAccessExpression = WrapConvert(propAccessExpression);
                     properties[aliasIdx] = new NamedPropertyExpression(Expression.Constant(alias), propAccessExpression);
 
                     // Save $it.Container.Next.Value for future use

@@ -221,18 +221,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 typeof(T));
 
             var binder = classicEF
-                ? new AggregationBinderEFFake(
-                    /*customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                    assembliesResolver,
-                    typeof(T),
-                    model,
-                    clause.Transformations.First()*/)
-                : new AggregationBinder(
-                    /*customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                    assembliesResolver,
-                    typeof(T),
-                    model,
-                    clause.Transformations.First()*/);
+                ? new AggregationBinderEFFake()
+                : new AggregationBinder();
 
             var query = Enumerable.Empty<T>().AsQueryable();
 
@@ -294,15 +284,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         private class AggregationBinderEFFake : AggregationBinder
         {
-            internal AggregationBinderEFFake(/*ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation*/) 
-                /*: base(settings, assembliesResolver, elementType, model, transformation)*/
+            internal AggregationBinderEFFake()
             {
             }
-
-            /*internal override bool IsClassicEF(IQueryable query)
-            {
-                return true;
-            }*/
         }
     }
 }

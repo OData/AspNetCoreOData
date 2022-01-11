@@ -8892,12 +8892,12 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
             <summary>
-            Translate an OData $search parse tree represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to
+            Translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
             an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
             </summary>
-            <param name="binder">The built in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/></param>
+            <param name="binder">The built in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/></param>
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="searchClause">The OData $search parse tree.</param>
+            <param name="transformationNode">The OData $apply parse tree.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns>The applied result.</returns>
         </member>
@@ -9611,6 +9611,22 @@
             <param name="node">The query node to bind.</param>
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.WrapConvert(System.Linq.Expressions.Expression)">
+            <summary>
+            Wrap a value type with Expression.Convert.
+            </summary>
+            <param name="expression">The <see cref="T:System.Linq.Expressions.Expression"/> to be wrapped.</param>
+            <returns>The wrapped  <see cref="T:System.Linq.Expressions.Expression"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAccessor(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
+            </summary>
+            <param name="node">The <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to be bound.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <param name="baseElement">The <see cref="T:System.Linq.Expressions.Expression"/> for the base element.</param>
+            <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext">
             <summary>
