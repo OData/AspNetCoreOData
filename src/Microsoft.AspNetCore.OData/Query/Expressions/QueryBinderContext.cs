@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
         public IEnumerable<GroupByPropertyNode> GroupingProperties { get; set; }
 
-        public Type GroupByClrType { get; set; }
+        //public Type GroupByClrType { get; set; }
         public Type ResultClrType { get; set; }
         public ParameterExpression LambdaParameter { get; set; }
         public Type TransformationElementType { get { return this.LambdaParameter.Type; } }

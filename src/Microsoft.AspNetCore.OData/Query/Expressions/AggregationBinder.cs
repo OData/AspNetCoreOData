@@ -107,15 +107,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         }
                     }
 
-                    context.GroupByClrType = typeof(GroupByWrapper); // Consider removing this from QueryBinderContext
                     context.ResultClrType = typeof(AggregationWrapper);
                     break;
                 default:
                     throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
                         SRResources.NotSupportedTransformationKind, transformation.Kind));
             }
-
-            context.GroupByClrType = context.GroupByClrType ?? typeof(NoGroupByWrapper);
 
             return context;
         }
@@ -241,7 +238,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 // We do not have properties to aggregate
                 // .GroupBy($it => new NoGroupByWrapper())
-                groupLambda = Expression.Lambda(Expression.New(context.GroupByClrType), context.LambdaParameter);
+                groupLambda = Expression.Lambda(Expression.New(typeof(NoGroupByWrapper)), context.LambdaParameter);
             }
 
             return groupLambda;
@@ -263,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //                          }
             //                      }
             //                  })
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(context.GroupByClrType, context.TransformationElementType);
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
             ParameterExpression accum = Expression.Parameter(groupingType, "$it");
 
             List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
@@ -301,8 +298,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Call BindGroupBy(context)
             LambdaExpression groupLambda = BindGroupBy(transformationNode, context) as LambdaExpression;
 
+            Type groupByType = groupLambda.ReturnType;
+
             // Invoke GroupBy method
-            return ExpressionHelpers.GroupBy(query, groupLambda, query.ElementType, context.GroupByClrType);
+            return ExpressionHelpers.GroupBy(query, groupLambda, query.ElementType, groupByType);
         }
 
 
@@ -313,7 +312,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression selectLambda = BindSelect(transformationNode, context) as LambdaExpression;
 
             // Invoke Select method
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(context.GroupByClrType, context.TransformationElementType);
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
 
             return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
         }
