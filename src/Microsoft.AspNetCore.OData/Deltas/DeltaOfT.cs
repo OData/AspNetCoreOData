@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <param name="name">The name of the nested Property</param>
         /// <param name="value">The value of the nested Property</param>
         /// <returns><c>True</c> if the Property was found and is a nested Property</returns>
-        public bool TryGetNestedPropertyValue(string name, out object value)
+        internal bool TryGetNestedPropertyValue(string name, out object value)
         {
             if (name == null)
             {
