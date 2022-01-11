@@ -195,11 +195,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             context = InitializeBinderComponents(context, transformationNode);
             // Update the transformationNode instead of saving to the QueryBinderContext.
-            context = EnsureFlattenedPropertyContainer(context, query);
+            IDictionary<string, Expression> flattenedPropertyContainer = GetFlattenedPropertyContainer(context, query);
 
-            //PreprocessQuery(query, context);
-
-            query = FlattenReferencedProperties(query, context);
+            query = FlattenReferencedProperties(query, context, flattenedPropertyContainer);
 
             // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
             // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
@@ -340,14 +338,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="context"></param>
+        /// <param name="flattenedPropertyContainer"></param>
         /// <returns>Query with Select that flattens properties</returns>
-        private IQueryable FlattenReferencedProperties(IQueryable query, QueryBinderContext context)
+        private IQueryable FlattenReferencedProperties(IQueryable query, QueryBinderContext context, IDictionary<string, Expression> flattenedPropertyContainer)
         {
             if (context.AggregateExpressions != null
                 && context.AggregateExpressions.OfType<AggregateExpression>().Any(e => e.Method != AggregationMethod.VirtualPropertyCount)
                 && context.GroupingProperties != null
                 && context.GroupingProperties.Any()
-                && (context.FlattenedPropertyContainer == null || !context.FlattenedPropertyContainer.Any()))
+                && (flattenedPropertyContainer == null || !flattenedPropertyContainer.Any()))
             {
                 var wrapperType = typeof(FlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
                 var sourceProperty = wrapperType.GetProperty("Source");

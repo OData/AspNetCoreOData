@@ -1360,18 +1360,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static QueryBinderContext EnsureFlattenedPropertyContainer(QueryBinderContext context, IQueryable query)
+        internal static IDictionary<string, Expression> GetFlattenedPropertyContainer(QueryBinderContext context, IQueryable query)
         {
+            IDictionary<string, Expression> flattenedPropertyContainer = null;
             ParameterExpression source = context.LambdaParameter;
             if (query.ElementType != null)
             {
                 context.HasInstancePropertyContainer = query.ElementType.IsGenericType
                     && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
-                context.FlattenedPropertyContainer = context.FlattenedPropertyContainer ?? GetFlattenedProperties(source, context, query);
+                flattenedPropertyContainer = GetFlattenedProperties(source, context, query);
             }
 
-            return context;
+            return flattenedPropertyContainer;
         }
 
         internal static IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)

@@ -213,10 +213,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         //public bool ClassicEF { get; set; }
         public bool HasInstancePropertyContainer;
 
-        /// <summary>
+        /*/// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// </summary>
-        public IDictionary<string, Expression> FlattenedPropertyContainer;
+        public IDictionary<string, Expression> FlattenedPropertyContainer;*/
         #endregion
 
         internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)

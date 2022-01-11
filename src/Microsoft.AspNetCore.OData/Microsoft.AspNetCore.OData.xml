@@ -8770,7 +8770,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Collections.Generic.IDictionary{System.String,System.Linq.Expressions.Expression})">
             <summary>
             Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
             For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
@@ -8791,6 +8791,7 @@
             </summary>
             <param name="query"></param>
             <param name="context"></param>
+            <param name="flattenedPropertyContainer"></param>
             <returns>Query with Select that flattens properties</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
@@ -9699,11 +9700,6 @@
             Remove the parameter.
             </summary>
             <param name="name">The parameter name.</param>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedPropertyContainer">
-            <summary>
-            Flattened list of properties from base query, for case when binder is applied for aggregated query.
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
