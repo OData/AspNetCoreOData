@@ -201,19 +201,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         #region AggregationBinder
-        //public TransformationNode Transformation { get; private set; }
-
-        //public IEnumerable<AggregateExpressionBase> AggregateExpressions { get; set; }
-        public IEnumerable<GroupByPropertyNode> GroupingProperties { get; set; }
         public ParameterExpression LambdaParameter { get; set; }
         public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
         //public bool ClassicEF { get; set; }
         public bool HasInstancePropertyContainer;
-
-        /*/// <summary>
-        /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
-        /// </summary>
-        public IDictionary<string, Expression> FlattenedPropertyContainer;*/
         #endregion
 
         internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
