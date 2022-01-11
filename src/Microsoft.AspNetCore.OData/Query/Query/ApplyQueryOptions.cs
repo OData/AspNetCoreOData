@@ -151,7 +151,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (transformation.Kind == TransformationNodeKind.Aggregate || transformation.Kind == TransformationNodeKind.GroupBy)
                 {
                     QueryBinderContext queryBinderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
-                    var binder = new AggregationBinder();
+                    IAggregationBinder binder = Context.GetAggregationBinder();
                     query = binder.ApplyBind(query, transformation, queryBinderContext, out Type resultClrType);
                     this.ResultClrType = resultClrType;
                 }

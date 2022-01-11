@@ -10277,6 +10277,13 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAggregationBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.
