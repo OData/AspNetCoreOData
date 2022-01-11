@@ -5,10 +5,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.OData;
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -95,6 +104,101 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, node.Kind,
                         typeof(AggregationBinder).Name);
             }
+        }
+
+        internal IEnumerable<GroupByPropertyNode> GetGroupingProperties(TransformationNode transformation)
+        {
+            if (transformation.Kind == TransformationNodeKind.GroupBy)
+            {
+                GroupByTransformationNode groupByClause = transformation as GroupByTransformationNode;
+
+                return groupByClause.GroupingProperties;
+            }
+
+            return null;
+        }
+
+        internal IEnumerable<AggregateExpressionBase> GetAggregateExpressions(QueryBinderContext context, TransformationNode transformation)
+        {
+            Contract.Assert(context != null);
+            Contract.Assert(transformation != null);
+
+            IEnumerable<AggregateExpressionBase> aggregateExpressions = null;
+
+            switch (transformation.Kind)
+            {
+                case TransformationNodeKind.Aggregate:
+                    var aggregateClause = transformation as AggregateTransformationNode;
+                    aggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
+                    break;
+                case TransformationNodeKind.GroupBy:
+                    var groupByClause = transformation as GroupByTransformationNode;
+                    if (groupByClause.ChildTransformations != null)
+                    {
+                        if (groupByClause.ChildTransformations.Kind == TransformationNodeKind.Aggregate)
+                        {
+                            var aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
+                            aggregateExpressions = FixCustomMethodReturnTypes(aggregationNode.AggregateExpressions, context);
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
+                        SRResources.NotSupportedTransformationKind, transformation.Kind));
+            }
+
+            return aggregateExpressions;
+        }
+
+        internal IEnumerable<AggregateExpressionBase> FixCustomMethodReturnTypes(IEnumerable<AggregateExpressionBase> aggregateExpressions, QueryBinderContext context)
+        {
+            return aggregateExpressions.Select(x =>
+            {
+                var ae = x as AggregateExpression;
+                return ae != null ? FixCustomMethodReturnType(ae, context) : x;
+            });
+        }
+
+        internal AggregateExpression FixCustomMethodReturnType(AggregateExpression expression, QueryBinderContext context)
+        {
+            if (expression.Method != AggregationMethod.Custom)
+            {
+                return expression;
+            }
+
+            var customMethod = GetCustomMethod(expression, context);
+
+            // var typeReference = customMethod.ReturnType.GetEdmPrimitiveTypeReference();
+            var typeReference = context.Model.GetEdmPrimitiveTypeReference(customMethod.ReturnType);
+
+            return new AggregateExpression(expression.Expression, expression.MethodDefinition, expression.Alias, typeReference);
+        }
+
+        internal MethodInfo GetCustomMethod(AggregateExpression expression, QueryBinderContext context)
+        {
+            var propertyLambda = Expression.Lambda(BindAccessor(expression.Expression, context), context.LambdaParameter);
+            Type inputType = propertyLambda.Body.Type;
+
+            string methodToken = expression.MethodDefinition.MethodLabel;
+            var customFunctionAnnotations = context.Model.GetAnnotationValue<CustomAggregateMethodAnnotation>(context.Model);
+
+            MethodInfo customMethod;
+            if (!customFunctionAnnotations.GetMethodInfo(methodToken, inputType, out customMethod))
+            {
+                throw new ODataException(
+                    Error.Format(
+                        SRResources.AggregationNotSupportedForType,
+                        expression.Method,
+                        expression.Expression,
+                        inputType));
+            }
+
+            return customMethod;
         }
 
         private Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)

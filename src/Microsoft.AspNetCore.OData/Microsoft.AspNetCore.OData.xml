@@ -8770,7 +8770,12 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Collections.Generic.IDictionary{System.String,System.Linq.Expressions.Expression},Microsoft.OData.UriParser.Aggregation.TransformationNode)">
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinderHelper">
+            <summary>
+            Helper class for <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinderHelper.FlattenReferencedProperties(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Collections.Generic.IDictionary{System.String,System.Linq.Expressions.Expression},Microsoft.OData.UriParser.Aggregation.TransformationNode)">
             <summary>
             Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
             For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
@@ -8875,6 +8880,17 @@
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translate an OData $search parse tree represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="binder">The built in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/></param>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="searchClause">The OData $search parse tree.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <returns>The applied result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
             <summary>
             Translate an OData $search parse tree represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to
             an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.

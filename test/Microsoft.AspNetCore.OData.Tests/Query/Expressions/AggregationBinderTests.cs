@@ -236,7 +236,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var query = Enumerable.Empty<T>().AsQueryable();
 
-            var queryResult = binder.Bind(query, clause.Transformations.First(), queryBinderContext, out Type resultClrType);
+            var queryResult = binder.ApplyBind(query, clause.Transformations.First(), queryBinderContext, out Type resultClrType);
 
             var applyExpr = queryResult.Expression;
 

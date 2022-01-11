@@ -31,54 +31,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     public class AggregationBinder : QueryBinder, IAggregationBinder
     {
         private const string GroupByContainerProperty = "GroupByContainer";
-        private static IEnumerable<GroupByPropertyNode> GetGroupingProperties(TransformationNode transformation)
-        {
-            if(transformation.Kind == TransformationNodeKind.GroupBy)
-            {
-                GroupByTransformationNode groupByClause = transformation as GroupByTransformationNode;
-
-                return groupByClause.GroupingProperties;
-            }
-
-            return null;
-        }
-
-        private IEnumerable<AggregateExpressionBase> GetAggregateExpressions(QueryBinderContext context, TransformationNode transformation)
-        {
-            Contract.Assert(context != null);
-            Contract.Assert(transformation != null);
-
-            IEnumerable<AggregateExpressionBase> aggregateExpressions = null;
-
-            switch (transformation.Kind)
-            {
-                case TransformationNodeKind.Aggregate:
-                    var aggregateClause = transformation as AggregateTransformationNode;
-                    aggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
-                    break;
-                case TransformationNodeKind.GroupBy:
-                    var groupByClause = transformation as GroupByTransformationNode;
-                    if (groupByClause.ChildTransformations != null)
-                    {
-                        if (groupByClause.ChildTransformations.Kind == TransformationNodeKind.Aggregate)
-                        {
-                            var aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
-                            aggregateExpressions = FixCustomMethodReturnTypes(aggregationNode.AggregateExpressions, context);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException();
-                        }
-                    }
-
-                    break;
-                default:
-                    throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
-                        SRResources.NotSupportedTransformationKind, transformation.Kind));
-            }
-
-            return aggregateExpressions;
-        }
 
         private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessor)
         {
@@ -90,53 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return propertyAccessor;
         }
 
-        private IEnumerable<AggregateExpressionBase> FixCustomMethodReturnTypes(IEnumerable<AggregateExpressionBase> aggregateExpressions, QueryBinderContext context)
-        {
-            return aggregateExpressions.Select(x =>
-            {
-                var ae = x as AggregateExpression;
-                return ae != null ? FixCustomMethodReturnType(ae, context) : x;
-            });
-        }
-
-        private AggregateExpression FixCustomMethodReturnType(AggregateExpression expression, QueryBinderContext context)
-        {
-            if (expression.Method != AggregationMethod.Custom)
-            {
-                return expression;
-            }
-
-            var customMethod = GetCustomMethod(expression, context);
-
-            // var typeReference = customMethod.ReturnType.GetEdmPrimitiveTypeReference();
-            var typeReference = context.Model.GetEdmPrimitiveTypeReference(customMethod.ReturnType);
-
-            return new AggregateExpression(expression.Expression, expression.MethodDefinition, expression.Alias, typeReference);
-        }
-
-        private MethodInfo GetCustomMethod(AggregateExpression expression, QueryBinderContext context)
-        {
-            var propertyLambda = Expression.Lambda(BindAccessor(expression.Expression, context), context.LambdaParameter);
-            Type inputType = propertyLambda.Body.Type;
-
-            string methodToken = expression.MethodDefinition.MethodLabel;
-            var customFunctionAnnotations = context.Model.GetAnnotationValue<CustomAggregateMethodAnnotation>(context.Model);
-
-            MethodInfo customMethod;
-            if (!customFunctionAnnotations.GetMethodInfo(methodToken, inputType, out customMethod))
-            {
-                throw new ODataException(
-                    Error.Format(
-                        SRResources.AggregationNotSupportedForType,
-                        expression.Method,
-                        expression.Expression,
-                        inputType));
-            }
-
-            return customMethod;
-        }
-
-        public IQueryable Bind(IQueryable query, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
+        /*public IQueryable Bind(IQueryable query, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
         {
             if (query == null)
             {
@@ -166,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IQueryable result = BindSelect(grouping, transformationNode, context);
 
             return result;
-        }
+        }*/
 
         /// <inheritdoc/>
         public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
@@ -260,31 +166,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return selectLambda;
         }
 
-        private IQueryable BindGroupBy(IQueryable query, TransformationNode transformationNode, QueryBinderContext context)
-        {
-            // Call BindGroupBy(context)
-            LambdaExpression groupLambda = BindGroupBy(transformationNode, context) as LambdaExpression;
-
-            Type groupByType = groupLambda.ReturnType;
-
-            // Invoke GroupBy method
-            return ExpressionHelpers.GroupBy(query, groupLambda, query.ElementType, groupByType);
-        }
-
-
-
-        private IQueryable BindSelect(IQueryable grouping, TransformationNode transformationNode, QueryBinderContext context)
-        {
-            // Call BindSelect(context)
-            LambdaExpression selectLambda = BindSelect(transformationNode, context) as LambdaExpression;
-
-            // Invoke Select method
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
-
-            return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
-        }
-
-        /// <summary>
+        /*/// <summary>
         /// Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
         /// For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
         /// .Select(
@@ -377,7 +259,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return query;
-        }
+        }*/
 
         private Expression CreateAggregationExpression(ParameterExpression accum, AggregateExpressionBase expression, Type baseType, QueryBinderContext context)
         {
