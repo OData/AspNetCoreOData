@@ -6102,6 +6102,13 @@
             Gets the <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.RouteOptions"/> instance responsible for configuring the route template.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.EnableDependencyInjection(System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Enables dependency injection support for non-model scenario
+            </summary>
+            <param name="configureServices">The configuring action to add the services to the container.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.RouteComponents">
             <summary>
             Contains the OData <see cref="T:Microsoft.OData.Edm.IEdmModel"/> instances and dependency injection containers for specific routes.
@@ -6218,12 +6225,12 @@
             Gets the query setting.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildContainer(System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection},Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Build the container.
             </summary>
-            <param name="model">The Edm model.</param>
             <param name="setupAction">The setup config.</param>
+            <param name="model">The Edm model.</param>
             <returns>The built service provider.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SanitizeRoutePrefix(System.String)">

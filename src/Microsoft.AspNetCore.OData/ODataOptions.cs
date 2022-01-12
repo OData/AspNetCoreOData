@@ -62,6 +62,19 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
 
+        private IServiceProvider ServiceProvider { get; set; }
+
+        /// <summary>
+        /// Enables dependency injection support for non-model scenario
+        /// </summary>
+        /// <param name="configureServices">The configuring action to add the services to the container.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions EnableDependencyInjection(Action<IServiceCollection> configureServices)
+        {
+            ServiceProvider = BuildContainer(configureServices);
+            return this;
+        }
+
         #endregion
 
         #region RouteComponents
@@ -144,7 +157,7 @@ namespace Microsoft.AspNetCore.OData
 
 
             // Consider to use Lazy<IServiceProvider> ?
-            IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);
+            IServiceProvider serviceProvider = BuildContainer(configureServices, model);
             RouteComponents[sanitizedRoutePrefix] = (model, serviceProvider);
             return this;
         }
@@ -158,7 +171,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (routePrefix == null)
             {
-                return null;
+                return ServiceProvider;
             }
 
             string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
@@ -284,13 +297,11 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Build the container.
         /// </summary>
-        /// <param name="model">The Edm model.</param>
         /// <param name="setupAction">The setup config.</param>
+        /// <param name="model">The Edm model.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildRouteContainer(IEdmModel model, Action<IServiceCollection> setupAction)
+        private IServiceProvider BuildContainer(Action<IServiceCollection> setupAction, IEdmModel model = null)
         {
-            Contract.Assert(model != null);
-
             ServiceCollection services = new ServiceCollection();
             DefaultContainerBuilder builder = new DefaultContainerBuilder();
 
@@ -306,10 +317,13 @@ namespace Microsoft.AspNetCore.OData
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
             builder.Services.AddSingleton<ODataUriResolver>(sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
 
-            // Inject the Edm model.
-            // From Current ODL implement, such injection only be used in reader and writer if the input
-            // model is null.
-            builder.Services.AddSingleton(sp => model);
+            if (model != null)
+            {
+                // Inject the Edm model.
+                // From Current ODL implement, such injection only be used in reader and writer if the input
+                // model is null.
+                builder.Services.AddSingleton(sp => model);
+            }
 
             // Inject the customized services.
             setupAction?.Invoke(builder.Services);

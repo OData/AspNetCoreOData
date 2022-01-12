@@ -657,6 +657,7 @@ Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.set -> void
+Microsoft.AspNetCore.OData.ODataOptions.EnableDependencyInjection(System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableQueryFeatures(int? maxTopValue = null) -> Microsoft.AspNetCore.OData.ODataOptions
