@@ -1211,7 +1211,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return source;
         }
 
-        internal Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
+        internal static Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
         {
             Type conversionType = context.Model.GetClrType(convertNode.TypeReference, context.AssembliesResolver);
 

@@ -8899,6 +8899,7 @@
             <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="transformationNode">The OData $apply parse tree.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <param name="resultClrType">The type of Wrapper used to create an expression from the $apply parse tree.</param>
             <returns>The applied result.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase">

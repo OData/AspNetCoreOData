@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //                                      })
                 List<NamedPropertyExpression> properties = CreateGroupByMemberAssignments(groupingProperties, context);
 
-                var wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
+                PropertyInfo wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
                 List<MemberAssignment> wta = new List<MemberAssignment>();
                 wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
                 groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wta), context.LambdaParameter);
@@ -103,38 +103,39 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //                          }
             //                      }
             //                  })
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
-            ParameterExpression accum = Expression.Parameter(groupingType, "$it");
+
+            Type groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
+            ParameterExpression parameterExpression = Expression.Parameter(groupingType, "$it");
             Type resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
             IEnumerable<AggregateExpressionBase> aggregateExpressions = GetAggregateExpressions(context, transformationNode);
             IEnumerable<GroupByPropertyNode> groupingProperties = GetGroupingProperties(transformationNode);
 
-            List <MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+            List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
 
             // Setting GroupByContainer property when previous step was grouping
             if (groupingProperties != null && groupingProperties.Any())
             {
-                var wrapperProperty = resultClrType.GetProperty(GroupByContainerProperty);
+                PropertyInfo wrapperProperty = resultClrType.GetProperty(GroupByContainerProperty);
 
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Property(Expression.Property(accum, "Key"), GroupByContainerProperty)));
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Property(Expression.Property(parameterExpression, "Key"), GroupByContainerProperty)));
             }
 
             // Setting Container property when we have aggregation clauses
             if (aggregateExpressions != null)
             {
-                var properties = new List<NamedPropertyExpression>();
-                foreach (var aggExpression in aggregateExpressions)
+                List<NamedPropertyExpression> properties = new List<NamedPropertyExpression>();
+                foreach (AggregateExpressionBase aggExpression in aggregateExpressions)
                 {
-                    properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(accum, aggExpression, context.TransformationElementType, context)));
+                    properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(parameterExpression, aggExpression, context.TransformationElementType, context)));
                 }
 
-                var wrapperProperty = resultClrType.GetProperty("Container");
+                PropertyInfo wrapperProperty = resultClrType.GetProperty("Container");
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
             }
 
-            var initilizedMember =
+            MemberInitExpression initilizedMember =
                 Expression.MemberInit(Expression.New(resultClrType), wrapperTypeMemberAssignments);
-            var selectLambda = Expression.Lambda(initilizedMember, accum);
+            LambdaExpression selectLambda = Expression.Lambda(initilizedMember, parameterExpression);
 
             return selectLambda;
         }
@@ -179,65 +180,65 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //      })
 
             List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
-            var asQueryableMethod = ExpressionHelperMethods.QueryableAsQueryable.MakeGenericMethod(baseType);
+            MethodInfo asQueryableMethod = ExpressionHelperMethods.QueryableAsQueryable.MakeGenericMethod(baseType);
             Expression asQueryableExpression = Expression.Call(null, asQueryableMethod, accum);
 
             // Create lambda to access the entity set from expression
-            var source = BindAccessor(expression.Expression.Source, context);
+            Expression source = BindAccessor(expression.Expression.Source, context);
             string propertyName = context.Model.GetClrPropertyName(expression.Expression.NavigationProperty);
 
-            var property = Expression.Property(source, propertyName);
+            MemberExpression property = Expression.Property(source, propertyName);
 
-            var baseElementType = source.Type;
-            var selectedElementType = property.Type.GenericTypeArguments.Single();
+            Type baseElementType = source.Type;
+            Type selectedElementType = property.Type.GenericTypeArguments.Single();
 
             // Create method to get property collections to aggregate
             MethodInfo selectManyMethod
                 = ExpressionHelperMethods.EnumerableSelectManyGeneric.MakeGenericMethod(baseElementType, selectedElementType);
 
             // Create the lambda that access the property in the selectMany clause.
-            var selectManyParam = Expression.Parameter(baseElementType, "$it");
-            var propertyExpression = Expression.Property(selectManyParam, expression.Expression.NavigationProperty.Name);
+            ParameterExpression selectManyParam = Expression.Parameter(baseElementType, "$it");
+            MemberExpression propertyExpression = Expression.Property(selectManyParam, expression.Expression.NavigationProperty.Name);
 
             // Collection selector body is IQueryable, we need to adjust the type to IEnumerable, to match the SelectMany signature
             // therefore the delegate type is specified explicitly
-            var collectionSelectorLambdaType = typeof(Func<,>).MakeGenericType(
+            Type collectionSelectorLambdaType = typeof(Func<,>).MakeGenericType(
                 source.Type,
                 typeof(IEnumerable<>).MakeGenericType(selectedElementType));
-            var selectManyLambda = Expression.Lambda(collectionSelectorLambdaType, propertyExpression, selectManyParam);
+            LambdaExpression selectManyLambda = Expression.Lambda(collectionSelectorLambdaType, propertyExpression, selectManyParam);
 
             // Get expression to get collection of entities
-            var entitySet = Expression.Call(null, selectManyMethod, asQueryableExpression, selectManyLambda);
+            MethodCallExpression entitySet = Expression.Call(null, selectManyMethod, asQueryableExpression, selectManyLambda);
 
             // Getting method and lambda expression of groupBy
-            var groupKeyType = typeof(object);
+            Type groupKeyType = typeof(object);
             MethodInfo groupByMethod =
                 ExpressionHelperMethods.EnumerableGroupByGeneric.MakeGenericMethod(selectedElementType, groupKeyType);
-            var groupByLambda = Expression.Lambda(
+            LambdaExpression groupByLambda = Expression.Lambda(
                 Expression.New(groupKeyType),
                 Expression.Parameter(selectedElementType, "$gr"));
 
             // Group entities in a single group to apply select
-            var groupedEntitySet = Expression.Call(null, groupByMethod, entitySet, groupByLambda);
+            MethodCallExpression groupedEntitySet = Expression.Call(null, groupByMethod, entitySet, groupByLambda);
 
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(groupKeyType, selectedElementType);
+            Type groupingType = typeof(IGrouping<,>).MakeGenericType(groupKeyType, selectedElementType);
             ParameterExpression innerAccum = Expression.Parameter(groupingType, "$p");
 
             // Nested properties
             // Create dynamicTypeWrapper to encapsulate the aggregate result
-            var properties = new List<NamedPropertyExpression>();
-            foreach (var aggExpression in expression.Children)
+            List<NamedPropertyExpression> properties = new List<NamedPropertyExpression>();
+            foreach (AggregateExpressionBase aggExpression in expression.Children)
             {
                 properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(innerAccum, aggExpression, selectedElementType, context)));
             }
 
-            var nestedResultType = typeof(EntitySetAggregationWrapper);
-            var wrapperProperty = nestedResultType.GetProperty("Container");
+            Type nestedResultType = typeof(EntitySetAggregationWrapper);
+            PropertyInfo wrapperProperty = nestedResultType.GetProperty("Container");
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
-            var initializedMember =
+            MemberInitExpression initializedMember =
                 Expression.MemberInit(Expression.New(nestedResultType), wrapperTypeMemberAssignments);
-            var selectLambda = Expression.Lambda(initializedMember, innerAccum);
+            LambdaExpression selectLambda = Expression.Lambda(initializedMember, innerAccum);
 
             // Get select method
             MethodInfo selectMethod =

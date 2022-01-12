@@ -367,6 +367,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="source">The original <see cref="IQueryable"/>.</param>
         /// <param name="transformationNode">The OData $apply parse tree.</param>
         /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <param name="resultClrType">The type of Wrapper used to create an expression from the $apply parse tree.</param>
         /// <returns>The applied result.</returns>
         public static IQueryable ApplyBind(this IAggregationBinder binder, IQueryable source, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
         {
