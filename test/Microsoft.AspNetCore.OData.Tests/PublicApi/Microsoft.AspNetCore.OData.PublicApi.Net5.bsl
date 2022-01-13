@@ -118,6 +118,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler)
 	public Microsoft.AspNetCore.OData.ODataOptions AddRouteComponents (string routePrefix, Microsoft.OData.Edm.IEdmModel model, System.Action`1[[Microsoft.Extensions.DependencyInjection.IServiceCollection]] configureServices)
 	public Microsoft.AspNetCore.OData.ODataOptions Count ()
+	public Microsoft.AspNetCore.OData.ODataOptions EnableDependencyInjection (System.Action`1[[Microsoft.Extensions.DependencyInjection.IServiceCollection]] configureServices)
 	public Microsoft.AspNetCore.OData.ODataOptions EnableQueryFeatures (params System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataOptions Expand ()
 	public Microsoft.AspNetCore.OData.ODataOptions Filter ()
