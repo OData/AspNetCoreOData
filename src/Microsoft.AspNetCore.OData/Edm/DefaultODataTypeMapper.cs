@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         static DefaultODataTypeMapper()
         {
-            BuildTypeMapping<string>(EdmPrimitiveTypeKind.String);
+            BuildReferenceTypeMapping<string>(EdmPrimitiveTypeKind.String);
             BuildValueTypeMapping<bool>(EdmPrimitiveTypeKind.Boolean);
             BuildValueTypeMapping<byte>(EdmPrimitiveTypeKind.Byte);
             BuildValueTypeMapping<decimal>(EdmPrimitiveTypeKind.Decimal);
@@ -58,36 +58,36 @@ namespace Microsoft.AspNetCore.OData.Edm
             BuildValueTypeMapping<long>(EdmPrimitiveTypeKind.Int64);
             BuildValueTypeMapping<sbyte>(EdmPrimitiveTypeKind.SByte);
             BuildValueTypeMapping<float>(EdmPrimitiveTypeKind.Single);
-            BuildTypeMapping<byte[]>(EdmPrimitiveTypeKind.Binary);
-            BuildTypeMapping<Stream>(EdmPrimitiveTypeKind.Stream);
+            BuildReferenceTypeMapping<byte[]>(EdmPrimitiveTypeKind.Binary);
+            BuildReferenceTypeMapping<Stream>(EdmPrimitiveTypeKind.Stream);
             BuildValueTypeMapping<DateTimeOffset>(EdmPrimitiveTypeKind.DateTimeOffset);
             BuildValueTypeMapping<TimeSpan>(EdmPrimitiveTypeKind.Duration);
             BuildValueTypeMapping<Date>(EdmPrimitiveTypeKind.Date);
             BuildValueTypeMapping<TimeOfDay>(EdmPrimitiveTypeKind.TimeOfDay);
 
-            BuildTypeMapping<Geography>(EdmPrimitiveTypeKind.Geography);
-            BuildTypeMapping<GeographyPoint>(EdmPrimitiveTypeKind.GeographyPoint);
-            BuildTypeMapping<GeographyLineString>(EdmPrimitiveTypeKind.GeographyLineString);
-            BuildTypeMapping<GeographyPolygon>(EdmPrimitiveTypeKind.GeographyPolygon);
-            BuildTypeMapping<GeographyCollection>(EdmPrimitiveTypeKind.GeographyCollection);
-            BuildTypeMapping<GeographyMultiLineString>(EdmPrimitiveTypeKind.GeographyMultiLineString);
-            BuildTypeMapping<GeographyMultiPoint>(EdmPrimitiveTypeKind.GeographyMultiPoint);
-            BuildTypeMapping<GeographyMultiPolygon>(EdmPrimitiveTypeKind.GeographyMultiPolygon);
-            BuildTypeMapping<Geometry>(EdmPrimitiveTypeKind.Geometry);
-            BuildTypeMapping<GeometryPoint>(EdmPrimitiveTypeKind.GeometryPoint);
-            BuildTypeMapping<GeometryLineString>(EdmPrimitiveTypeKind.GeometryLineString);
-            BuildTypeMapping<GeometryPolygon>(EdmPrimitiveTypeKind.GeometryPolygon);
-            BuildTypeMapping<GeometryCollection>(EdmPrimitiveTypeKind.GeometryCollection);
-            BuildTypeMapping<GeometryMultiLineString>(EdmPrimitiveTypeKind.GeometryMultiLineString);
-            BuildTypeMapping<GeometryMultiPoint>(EdmPrimitiveTypeKind.GeometryMultiPoint);
-            BuildTypeMapping<GeometryMultiPolygon>(EdmPrimitiveTypeKind.GeometryMultiPolygon);
+            BuildReferenceTypeMapping<Geography>(EdmPrimitiveTypeKind.Geography);
+            BuildReferenceTypeMapping<GeographyPoint>(EdmPrimitiveTypeKind.GeographyPoint);
+            BuildReferenceTypeMapping<GeographyLineString>(EdmPrimitiveTypeKind.GeographyLineString);
+            BuildReferenceTypeMapping<GeographyPolygon>(EdmPrimitiveTypeKind.GeographyPolygon);
+            BuildReferenceTypeMapping<GeographyCollection>(EdmPrimitiveTypeKind.GeographyCollection);
+            BuildReferenceTypeMapping<GeographyMultiLineString>(EdmPrimitiveTypeKind.GeographyMultiLineString);
+            BuildReferenceTypeMapping<GeographyMultiPoint>(EdmPrimitiveTypeKind.GeographyMultiPoint);
+            BuildReferenceTypeMapping<GeographyMultiPolygon>(EdmPrimitiveTypeKind.GeographyMultiPolygon);
+            BuildReferenceTypeMapping<Geometry>(EdmPrimitiveTypeKind.Geometry);
+            BuildReferenceTypeMapping<GeometryPoint>(EdmPrimitiveTypeKind.GeometryPoint);
+            BuildReferenceTypeMapping<GeometryLineString>(EdmPrimitiveTypeKind.GeometryLineString);
+            BuildReferenceTypeMapping<GeometryPolygon>(EdmPrimitiveTypeKind.GeometryPolygon);
+            BuildReferenceTypeMapping<GeometryCollection>(EdmPrimitiveTypeKind.GeometryCollection);
+            BuildReferenceTypeMapping<GeometryMultiLineString>(EdmPrimitiveTypeKind.GeometryMultiLineString);
+            BuildReferenceTypeMapping<GeometryMultiPoint>(EdmPrimitiveTypeKind.GeometryMultiPoint);
+            BuildReferenceTypeMapping<GeometryMultiPolygon>(EdmPrimitiveTypeKind.GeometryMultiPolygon);
 
             // non-standard mappings
-            BuildTypeMapping<XElement>(EdmPrimitiveTypeKind.String, isStandard: false);
+            BuildReferenceTypeMapping<XElement>(EdmPrimitiveTypeKind.String, isStandard: false);
             BuildValueTypeMapping<ushort>(EdmPrimitiveTypeKind.Int32, isStandard: false);
             BuildValueTypeMapping<uint>(EdmPrimitiveTypeKind.Int64, isStandard: false);
             BuildValueTypeMapping<ulong>(EdmPrimitiveTypeKind.Int64, isStandard: false);
-            BuildTypeMapping<char[]>(EdmPrimitiveTypeKind.String, isStandard: false);
+            BuildReferenceTypeMapping<char[]>(EdmPrimitiveTypeKind.String, isStandard: false);
             BuildValueTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
             BuildValueTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
 
@@ -426,6 +426,12 @@ namespace Microsoft.AspNetCore.OData.Edm
             // By design: non-nullable will overwrite the item1.
 
             BuildTypeMapping<T?>(primitiveKind, isStandard);
+            BuildTypeMapping<T>(primitiveKind, isStandard);
+        }
+
+        private static void BuildReferenceTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind, bool isStandard = true)
+            where T : class
+        {
             BuildTypeMapping<T>(primitiveKind, isStandard);
         }
     }
