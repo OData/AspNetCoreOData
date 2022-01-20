@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
@@ -163,6 +164,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             return result;
         }
 
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
         private static void AppendRoute(StringBuilder builder, EndpointRouteInfo routeInfo)
         {
             builder.Append("<tr>");

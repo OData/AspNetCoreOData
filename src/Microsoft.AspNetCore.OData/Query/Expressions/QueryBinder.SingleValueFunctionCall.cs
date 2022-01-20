@@ -348,7 +348,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
-            Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateRelated(arguments[0].Type));
+            Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsDateRelated(arguments[0].Type)
+#if NET6_0
+                || ExpressionBinderHelper.IsType<DateOnly>(arguments[0].Type)
+#endif
+                ));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Expression parameter = arguments[0];
@@ -359,6 +363,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Contract.Assert(ClrCanonicalFunctions.DateProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.DateProperties[node.Name];
             }
+#if NET6_0
+            else if (ExpressionBinderHelper.IsType<DateOnly>(parameter.Type))
+            {
+                Contract.Assert(ClrCanonicalFunctions.DateOnlyProperties.ContainsKey(node.Name));
+                property = ClrCanonicalFunctions.DateOnlyProperties[node.Name];
+            }
+#endif
             else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
             {
                 Contract.Assert(ClrCanonicalFunctions.DateTimeProperties.ContainsKey(node.Name));
@@ -384,7 +395,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
-            Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsTimeRelated(arguments[0].Type)));
+
+            Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsTimeRelated(arguments[0].Type)
+#if NET6_0
+                || ExpressionBinderHelper.IsType<TimeOnly>(arguments[0].Type)
+#endif
+                ));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Expression parameter = arguments[0];
@@ -395,6 +411,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Contract.Assert(ClrCanonicalFunctions.TimeOfDayProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.TimeOfDayProperties[node.Name];
             }
+#if NET6_0
+            else if (ExpressionBinderHelper.IsType<TimeOnly>(parameter.Type))
+            {
+                Contract.Assert(ClrCanonicalFunctions.TimeOnlyProperties.ContainsKey(node.Name));
+                property = ClrCanonicalFunctions.TimeOnlyProperties[node.Name];
+            }
+#endif
             else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
             {
                 Contract.Assert(ClrCanonicalFunctions.DateTimeProperties.ContainsKey(node.Name));

@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
@@ -102,6 +104,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
         // Convert the model state errors in to a string (for debugging only).
         // This should be improved once ODataError allows more details.
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
         private static string ConvertModelStateErrors(this IReadOnlyDictionary<string, object> errors)
         {
             StringBuilder builder = new StringBuilder();

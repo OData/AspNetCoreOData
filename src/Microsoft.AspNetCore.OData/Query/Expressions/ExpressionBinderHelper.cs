@@ -96,6 +96,21 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 right = CreateTimeBinaryExpression(right, querySettings);
             }
 
+#if NET6_0
+            if ((IsType<DateOnly>(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
+                (IsDate(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
+            {
+                left = CreateDateBinaryExpression(left, querySettings);
+                right = CreateDateBinaryExpression(right, querySettings);
+            }
+            else if((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
+                (IsTimeOfDay(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
+            {
+                left = CreateTimeBinaryExpression(left, querySettings);
+                right = CreateTimeBinaryExpression(right, querySettings);
+            }
+#endif
+
             if (left.Type != right.Type)
             {
                 // one of them must be nullable and the other is not.
@@ -381,6 +396,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.TimeSpanProperties[propertyName], source, querySettings);
             }
+#if NET6_0
+            else if (IsType<DateOnly>(source.Type))
+            {
+                return MakePropertyAccess(ClrCanonicalFunctions.DateOnlyProperties[propertyName], source, querySettings);
+            }
+            else if (IsType<TimeOnly>(source.Type))
+            {
+                return MakePropertyAccess(ClrCanonicalFunctions.TimeOnlyProperties[propertyName], source, querySettings);
+            }
+#endif
 
             return source;
         }
@@ -407,15 +432,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             source = ConvertToDateTimeRelatedConstExpression(source);
 
+            long ticksPerHour = 36000000000L;
+            long ticksPerMinute = 600000000L;
+            long ticksPerSecond = 10000000L;
+
             // Hour, Minute, Second, Millisecond
             Expression hour = GetProperty(source, ClrCanonicalFunctions.HourFunctionName, querySettings);
             Expression minute = GetProperty(source, ClrCanonicalFunctions.MinuteFunctionName, querySettings);
             Expression second = GetProperty(source, ClrCanonicalFunctions.SecondFunctionName, querySettings);
             Expression milliSecond = GetProperty(source, ClrCanonicalFunctions.MillisecondFunctionName, querySettings);
 
-            Expression hourTicks = Expression.Multiply(Expression.Convert(hour, typeof(long)), Expression.Constant(TimeOfDay.TicksPerHour));
-            Expression minuteTicks = Expression.Multiply(Expression.Convert(minute, typeof(long)), Expression.Constant(TimeOfDay.TicksPerMinute));
-            Expression secondTicks = Expression.Multiply(Expression.Convert(second, typeof(long)), Expression.Constant(TimeOfDay.TicksPerSecond));
+            Expression hourTicks = Expression.Multiply(Expression.Convert(hour, typeof(long)), Expression.Constant(ticksPerHour, typeof(long)));
+            Expression minuteTicks = Expression.Multiply(Expression.Convert(minute, typeof(long)), Expression.Constant(ticksPerMinute, typeof(long)));
+            Expression secondTicks = Expression.Multiply(Expression.Convert(second, typeof(long)), Expression.Constant(ticksPerSecond, typeof(long)));
 
             // return (hour * TicksPerHour + minute * TicksPerMinute + second * TicksPerSecond + millisecond)
             Expression result = Expression.Add(hourTicks, Expression.Add(minuteTicks, Expression.Add(secondTicks, Expression.Convert(milliSecond, typeof(long)))));
@@ -451,6 +480,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 {
                     return Expression.Constant(timeOfDay.Value, typeof(TimeOfDay));
                 }
+
+#if NET6_0
+                var dateOnly = parameterizedConstantValue as DateOnly?;
+                if (dateOnly != null)
+                {
+                    return Expression.Constant(dateOnly.Value, typeof(DateOnly));
+                }
+
+                var timeOnly = parameterizedConstantValue as TimeOnly?;
+                if (timeOnly != null)
+                {
+                    return Expression.Constant(timeOnly.Value, typeof(TimeOnly));
+                }
+#endif
             }
 
             return source;
