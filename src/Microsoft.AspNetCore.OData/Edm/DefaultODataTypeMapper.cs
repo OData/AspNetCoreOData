@@ -47,39 +47,23 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         static DefaultODataTypeMapper()
         {
-            // Do not change the order for the nullable or non-nullable. Put nullable ahead of non-nullable.
-            // By design: non-nullable will overwrite the item1.
             BuildTypeMapping<string>(EdmPrimitiveTypeKind.String);
-            BuildTypeMapping<bool?>(EdmPrimitiveTypeKind.Boolean);
-            BuildTypeMapping<bool>(EdmPrimitiveTypeKind.Boolean);
-            BuildTypeMapping<byte?>(EdmPrimitiveTypeKind.Byte);
-            BuildTypeMapping<byte>(EdmPrimitiveTypeKind.Byte);
-            BuildTypeMapping<decimal?>(EdmPrimitiveTypeKind.Decimal);
-            BuildTypeMapping<decimal>(EdmPrimitiveTypeKind.Decimal);
-            BuildTypeMapping<double?>(EdmPrimitiveTypeKind.Double);
-            BuildTypeMapping<double>(EdmPrimitiveTypeKind.Double);
-            BuildTypeMapping<Guid?>(EdmPrimitiveTypeKind.Guid);
-            BuildTypeMapping<Guid>(EdmPrimitiveTypeKind.Guid);
-            BuildTypeMapping<short?>(EdmPrimitiveTypeKind.Int16);
-            BuildTypeMapping<short>(EdmPrimitiveTypeKind.Int16);
-            BuildTypeMapping<int?>(EdmPrimitiveTypeKind.Int32);
-            BuildTypeMapping<int>(EdmPrimitiveTypeKind.Int32);
-            BuildTypeMapping<long?>(EdmPrimitiveTypeKind.Int64);
-            BuildTypeMapping<long>(EdmPrimitiveTypeKind.Int64);
-            BuildTypeMapping<sbyte?>(EdmPrimitiveTypeKind.SByte);
-            BuildTypeMapping<sbyte>(EdmPrimitiveTypeKind.SByte);
-            BuildTypeMapping<float?>(EdmPrimitiveTypeKind.Single);
-            BuildTypeMapping<float>(EdmPrimitiveTypeKind.Single);
+            BuildValueTypeMapping<bool>(EdmPrimitiveTypeKind.Boolean);
+            BuildValueTypeMapping<byte>(EdmPrimitiveTypeKind.Byte);
+            BuildValueTypeMapping<decimal>(EdmPrimitiveTypeKind.Decimal);
+            BuildValueTypeMapping<double>(EdmPrimitiveTypeKind.Double);
+            BuildValueTypeMapping<Guid>(EdmPrimitiveTypeKind.Guid);
+            BuildValueTypeMapping<short>(EdmPrimitiveTypeKind.Int16);
+            BuildValueTypeMapping<int>(EdmPrimitiveTypeKind.Int32);
+            BuildValueTypeMapping<long>(EdmPrimitiveTypeKind.Int64);
+            BuildValueTypeMapping<sbyte>(EdmPrimitiveTypeKind.SByte);
+            BuildValueTypeMapping<float>(EdmPrimitiveTypeKind.Single);
             BuildTypeMapping<byte[]>(EdmPrimitiveTypeKind.Binary);
             BuildTypeMapping<Stream>(EdmPrimitiveTypeKind.Stream);
-            BuildTypeMapping<DateTimeOffset?>(EdmPrimitiveTypeKind.DateTimeOffset);
-            BuildTypeMapping<DateTimeOffset>(EdmPrimitiveTypeKind.DateTimeOffset);
-            BuildTypeMapping<TimeSpan?>(EdmPrimitiveTypeKind.Duration);
-            BuildTypeMapping<TimeSpan>(EdmPrimitiveTypeKind.Duration);
-            BuildTypeMapping<Date?>(EdmPrimitiveTypeKind.Date);
-            BuildTypeMapping<Date>(EdmPrimitiveTypeKind.Date);
-            BuildTypeMapping<TimeOfDay?>(EdmPrimitiveTypeKind.TimeOfDay);
-            BuildTypeMapping<TimeOfDay>(EdmPrimitiveTypeKind.TimeOfDay);
+            BuildValueTypeMapping<DateTimeOffset>(EdmPrimitiveTypeKind.DateTimeOffset);
+            BuildValueTypeMapping<TimeSpan>(EdmPrimitiveTypeKind.Duration);
+            BuildValueTypeMapping<Date>(EdmPrimitiveTypeKind.Date);
+            BuildValueTypeMapping<TimeOfDay>(EdmPrimitiveTypeKind.TimeOfDay);
 
             BuildTypeMapping<Geography>(EdmPrimitiveTypeKind.Geography);
             BuildTypeMapping<GeographyPoint>(EdmPrimitiveTypeKind.GeographyPoint);
@@ -100,23 +84,16 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             // non-standard mappings
             BuildTypeMapping<XElement>(EdmPrimitiveTypeKind.String, isStandard: false);
-            BuildTypeMapping<ushort?>(EdmPrimitiveTypeKind.Int32, isStandard: false);
-            BuildTypeMapping<ushort>(EdmPrimitiveTypeKind.Int32, isStandard: false);
-            BuildTypeMapping<uint?>(EdmPrimitiveTypeKind.Int64, isStandard: false);
-            BuildTypeMapping<uint>(EdmPrimitiveTypeKind.Int64, isStandard: false);
-            BuildTypeMapping<ulong?>(EdmPrimitiveTypeKind.Int64, isStandard: false);
-            BuildTypeMapping<ulong>(EdmPrimitiveTypeKind.Int64, isStandard: false);
+            BuildValueTypeMapping<ushort>(EdmPrimitiveTypeKind.Int32, isStandard: false);
+            BuildValueTypeMapping<uint>(EdmPrimitiveTypeKind.Int64, isStandard: false);
+            BuildValueTypeMapping<ulong>(EdmPrimitiveTypeKind.Int64, isStandard: false);
             BuildTypeMapping<char[]>(EdmPrimitiveTypeKind.String, isStandard: false);
-            BuildTypeMapping<char?>(EdmPrimitiveTypeKind.String, isStandard: false);
-            BuildTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
-            BuildTypeMapping<DateTime?>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
-            BuildTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
+            BuildValueTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
+            BuildValueTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
 
 #if NET6_0
-            BuildTypeMapping<DateOnly?>(EdmPrimitiveTypeKind.Date, isStandard: false);
-            BuildTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
-            BuildTypeMapping<TimeOnly?>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
-            BuildTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
+            BuildValueTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
+            BuildValueTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
 #endif
         }
         #endregion
@@ -440,6 +417,16 @@ namespace Microsoft.AspNetCore.OData.Edm
                     }
                 }
             }
+        }
+
+        private static void BuildValueTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind, bool isStandard = true)
+            where T : struct
+        {
+            // Do not change the order for the nullable or non-nullable. Put nullable ahead of non-nullable.
+            // By design: non-nullable will overwrite the item1.
+
+            BuildTypeMapping<T?>(primitiveKind, isStandard);
+            BuildTypeMapping<T>(primitiveKind, isStandard);
         }
     }
 }
