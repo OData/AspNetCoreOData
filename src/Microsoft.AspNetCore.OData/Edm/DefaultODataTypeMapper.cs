@@ -387,7 +387,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         private static IEnumerable<Type> GetMatchingTypes(string edmFullName, IAssemblyResolver assembliesResolver)
             => TypeHelper.GetLoadedTypes(assembliesResolver).Where(t => t.IsPublic && t.EdmFullName() == edmFullName);
 
-        private static void BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind, bool isStandard = true)
+        private static void BuildTypeMapping<T>(EdmPrimitiveTypeKind primitiveKind, bool isStandard)
         {
             Type type = typeof(T);
             bool isNullable = type.IsNullable();
