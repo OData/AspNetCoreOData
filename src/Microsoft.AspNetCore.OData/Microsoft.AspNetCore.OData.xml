@@ -1916,11 +1916,6 @@
             <param name="entityType">The EDM entity type.</param>
             <returns>A collection of operations bound to the feed.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.ClrTypeCache">
-            <summary>
-            CLR type cache
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation">
             <summary>
             Allows client to tell OData which are the custom aggregation methods defined.
