@@ -111,6 +111,13 @@ namespace Microsoft.AspNetCore.OData.Edm
             BuildTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
             BuildTypeMapping<DateTime?>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
             BuildTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
+
+#if NET6_0
+            BuildTypeMapping<DateOnly?>(EdmPrimitiveTypeKind.Date, isStandard: false);
+            BuildTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
+            BuildTypeMapping<TimeOnly?>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
+            BuildTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
+#endif
         }
         #endregion
 

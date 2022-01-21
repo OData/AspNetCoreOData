@@ -137,6 +137,26 @@ namespace Microsoft.AspNetCore.OData.Edm
 
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
                 }
+#if NET6_0
+                else if (type == typeof(DateOnly))
+                {
+                    if (value is Date dt)
+                    {
+                        return new DateOnly(dt.Year, dt.Month, dt.Day);
+                    }
+
+                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+                }
+                else if (type == typeof(TimeOnly))
+                {
+                    if (value is TimeOfDay tod)
+                    {
+                        return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
+                    }
+
+                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                }
+#endif
                 else
                 {
                     if (TypeHelper.TryGetInstance(type, value, out var result))

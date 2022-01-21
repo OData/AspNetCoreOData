@@ -121,6 +121,25 @@ namespace Microsoft.AspNetCore.OData.Query
             new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(TimeOfDay).GetProperty("Milliseconds")),
         }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
+#if NET6_0
+        // DateOnly properties
+        public static readonly Dictionary<string, PropertyInfo> DateOnlyProperties = new Dictionary<string, PropertyInfo>
+        {
+            { YearFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Year)) },
+            { MonthFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Month)) },
+            { DayFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Day)) }
+        };
+
+        // TimeOnly properties
+        public static readonly Dictionary<string, PropertyInfo> TimeOnlyProperties = new Dictionary<string, PropertyInfo>
+        {
+            { HourFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Hour)) },
+            { MinuteFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Minute)) },
+            { SecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Second)) },
+            { MillisecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)) }
+        };
+#endif
+
         // TimeSpan properties
         public static readonly Dictionary<string, PropertyInfo> TimeSpanProperties = new[]
         {
