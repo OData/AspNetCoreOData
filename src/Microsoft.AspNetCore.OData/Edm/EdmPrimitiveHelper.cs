@@ -140,9 +140,8 @@ namespace Microsoft.AspNetCore.OData.Edm
 #if NET6_0
                 else if (type == typeof(DateOnly))
                 {
-                    if (value is Date)
+                    if (value is Date dt)
                     {
-                        Date dt = (Date)value;
                         return new DateOnly(dt.Year, dt.Month, dt.Day);
                     }
 
@@ -150,9 +149,8 @@ namespace Microsoft.AspNetCore.OData.Edm
                 }
                 else if (type == typeof(TimeOnly))
                 {
-                    if (value is TimeOfDay)
+                    if (value is TimeOfDay tod)
                     {
-                        TimeOfDay tod = (TimeOfDay)value;
                         return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
                     }
 

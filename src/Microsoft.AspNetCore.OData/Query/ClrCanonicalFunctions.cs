@@ -123,21 +123,21 @@ namespace Microsoft.AspNetCore.OData.Query
 
 #if NET6_0
         // DateOnly properties
-        public static readonly Dictionary<string, PropertyInfo> DateOnlyProperties = new[]
+        public static readonly Dictionary<string, PropertyInfo> DateOnlyProperties = new Dictionary<string, PropertyInfo>
         {
-            new KeyValuePair<string, PropertyInfo>(YearFunctionName, typeof(DateOnly).GetProperty("Year")),
-            new KeyValuePair<string, PropertyInfo>(MonthFunctionName, typeof(DateOnly).GetProperty("Month")),
-            new KeyValuePair<string, PropertyInfo>(DayFunctionName, typeof(DateOnly).GetProperty("Day")),
-        }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            { YearFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Year)) },
+            { MonthFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Month)) },
+            { DayFunctionName, typeof(DateOnly).GetProperty(nameof(DateOnly.Day)) }
+        };
 
-        // TimeOnly
-        public static readonly Dictionary<string, PropertyInfo> TimeOnlyProperties = new[]
+        // TimeOnly properties
+        public static readonly Dictionary<string, PropertyInfo> TimeOnlyProperties = new Dictionary<string, PropertyInfo>
         {
-            new KeyValuePair<string, PropertyInfo>(HourFunctionName, typeof(TimeOnly).GetProperty("Hour")),
-            new KeyValuePair<string, PropertyInfo>(MinuteFunctionName, typeof(TimeOnly).GetProperty("Minute")),
-            new KeyValuePair<string, PropertyInfo>(SecondFunctionName, typeof(TimeOnly).GetProperty("Second")),
-            new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(TimeOnly).GetProperty("Millisecond")),
-        }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            { HourFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Hour)) },
+            { MinuteFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Minute)) },
+            { SecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Second)) },
+            { MillisecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)) }
+        };
 #endif
 
         // TimeSpan properties

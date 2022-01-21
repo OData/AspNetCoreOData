@@ -348,11 +348,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             CheckArgumentNull(node, context);
 
             Expression[] arguments = BindArguments(node.Parameters, context);
-            Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsDateRelated(arguments[0].Type)
-#if NET6_0
-                || ExpressionBinderHelper.IsType<DateOnly>(arguments[0].Type)
-#endif
-                ));
+            Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateRelated(arguments[0].Type));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Expression parameter = arguments[0];
@@ -364,7 +360,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 property = ClrCanonicalFunctions.DateProperties[node.Name];
             }
 #if NET6_0
-            else if (ExpressionBinderHelper.IsType<DateOnly>(parameter.Type))
+            else if (parameter.Type.IsDateOnly())
             {
                 Contract.Assert(ClrCanonicalFunctions.DateOnlyProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.DateOnlyProperties[node.Name];
@@ -396,11 +392,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression[] arguments = BindArguments(node.Parameters, context);
 
-            Contract.Assert(arguments.Length == 1 && (ExpressionBinderHelper.IsTimeRelated(arguments[0].Type)
-#if NET6_0
-                || ExpressionBinderHelper.IsType<TimeOnly>(arguments[0].Type)
-#endif
-                ));
+            Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsTimeRelated(arguments[0].Type));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Expression parameter = arguments[0];
@@ -412,7 +404,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 property = ClrCanonicalFunctions.TimeOfDayProperties[node.Name];
             }
 #if NET6_0
-            else if (ExpressionBinderHelper.IsType<TimeOnly>(parameter.Type))
+            else if (parameter.Type.IsTimeOnly())
             {
                 Contract.Assert(ClrCanonicalFunctions.TimeOnlyProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.TimeOnlyProperties[node.Name];

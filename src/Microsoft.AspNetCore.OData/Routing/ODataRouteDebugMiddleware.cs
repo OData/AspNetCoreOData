@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             return result;
         }
 
-        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The default format provider is fine here.")]
         private static void AppendRoute(StringBuilder builder, EndpointRouteInfo routeInfo)
         {
             builder.Append("<tr>");

@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
         // Convert the model state errors in to a string (for debugging only).
         // This should be improved once ODataError allows more details.
-        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The default format provider is fine here.")]
         private static string ConvertModelStateErrors(this IReadOnlyDictionary<string, object> errors)
         {
             StringBuilder builder = new StringBuilder();

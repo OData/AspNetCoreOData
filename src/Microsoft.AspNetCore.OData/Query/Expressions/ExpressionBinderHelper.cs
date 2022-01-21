@@ -432,19 +432,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             source = ConvertToDateTimeRelatedConstExpression(source);
 
-            long ticksPerHour = 36000000000L;
-            long ticksPerMinute = 600000000L;
-            long ticksPerSecond = 10000000L;
-
             // Hour, Minute, Second, Millisecond
             Expression hour = GetProperty(source, ClrCanonicalFunctions.HourFunctionName, querySettings);
             Expression minute = GetProperty(source, ClrCanonicalFunctions.MinuteFunctionName, querySettings);
             Expression second = GetProperty(source, ClrCanonicalFunctions.SecondFunctionName, querySettings);
             Expression milliSecond = GetProperty(source, ClrCanonicalFunctions.MillisecondFunctionName, querySettings);
 
-            Expression hourTicks = Expression.Multiply(Expression.Convert(hour, typeof(long)), Expression.Constant(ticksPerHour, typeof(long)));
-            Expression minuteTicks = Expression.Multiply(Expression.Convert(minute, typeof(long)), Expression.Constant(ticksPerMinute, typeof(long)));
-            Expression secondTicks = Expression.Multiply(Expression.Convert(second, typeof(long)), Expression.Constant(ticksPerSecond, typeof(long)));
+            Expression hourTicks = Expression.Multiply(Expression.Convert(hour, typeof(long)), Expression.Constant(TimeSpan.TicksPerHour, typeof(long)));
+            Expression minuteTicks = Expression.Multiply(Expression.Convert(minute, typeof(long)), Expression.Constant(TimeSpan.TicksPerMinute, typeof(long)));
+            Expression secondTicks = Expression.Multiply(Expression.Convert(second, typeof(long)), Expression.Constant(TimeSpan.TicksPerSecond, typeof(long)));
 
             // return (hour * TicksPerHour + minute * TicksPerMinute + second * TicksPerSecond + millisecond)
             Expression result = Expression.Add(hourTicks, Expression.Add(minuteTicks, Expression.Add(secondTicks, Expression.Convert(milliSecond, typeof(long)))));
@@ -482,16 +478,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
 
 #if NET6_0
-                var dateOnly = parameterizedConstantValue as DateOnly?;
-                if (dateOnly != null)
+                if (parameterizedConstantValue is DateOnly dateOnly)
                 {
-                    return Expression.Constant(dateOnly.Value, typeof(DateOnly));
+                    return Expression.Constant(dateOnly, typeof(DateOnly));
                 }
 
-                var timeOnly = parameterizedConstantValue as TimeOnly?;
-                if (timeOnly != null)
+                else if (parameterizedConstantValue is TimeOnly timeOnly)
                 {
-                    return Expression.Constant(timeOnly.Value, typeof(TimeOnly));
+                    return Expression.Constant(timeOnly, typeof(TimeOnly));
                 }
 #endif
             }
@@ -511,21 +505,34 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         public static bool IsDateAndTimeRelated(Type type)
         {
-            return IsType<Date>(type) ||
-                IsType<DateTime>(type) ||
-                IsType<DateTimeOffset>(type) ||
-                IsType<TimeOfDay>(type) ||
-                IsType<TimeSpan>(type);
+            return IsType<Date>(type)
+                || IsType<DateTime>(type)
+                || IsType<DateTimeOffset>(type)
+                || IsType<TimeOfDay>(type)
+                || IsType<TimeSpan>(type)
+#if NET6_0
+                || IsType<DateOnly>(type)
+                || IsType<TimeOnly>(type)
+#endif
+                ;
         }
 
         public static bool IsDateRelated(Type type)
         {
+#if NET6_0
+            return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<DateOnly>(type);
+#else
             return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type);
+#endif
         }
 
         public static bool IsTimeRelated(Type type)
         {
+#if NET6_0
+            return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type) || IsType<TimeOnly>(type);
+#else
             return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type);
+#endif
         }
 
         public static bool IsDateOrOffset(Type type)
@@ -552,6 +559,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             return IsType<Date>(type);
         }
+
+#if NET6_0
+        public static bool IsDateOnly(this Type type)
+        {
+            return IsType<DateOnly>(type);
+        }
+
+        public static bool IsTimeOnly(this Type type)
+        {
+            return IsType<TimeOnly>(type);
+        }
+#endif
 
         public static bool IsInteger(Type type)
         {
