@@ -5659,7 +5659,17 @@
             <summary>
             Gets the value of the property with the given name.
             </summary>
-  ft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
+            <param name="propertyName">The name of the property to get.</param>
+            <param name="value">When this method returns, contains the value of the property with the given name, if the property is found;
+            otherwise, null. The parameter is passed uninitialized.</param>
+            <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> that is null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexTypeReference)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject"/> class.
             </summary>
@@ -6459,18 +6469,6 @@
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotDeserializeUnknownProperty">
-            <summary>
-              Looks up a localized string similar to The property &apos;{0}&apos; does not exist on type &apos;{1}&apos;. Make sure to only use property names that are defined by the type..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotFindKeyInEntityType">
-            <summary>
-              Looks up a localized string similar to Cannot find key &apos;{0}&apos; in the &apos;{1}&apos; type..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotFindParameterInOperation">
-            <summary>
-              Looks up a localize.AspNetCore.OData.SRResources.CannotDeserializeUnknownProperty">
             <summary>
               Looks up a localized string similar to The property &apos;{0}&apos; does not exist on type &apos;{1}&apos;. Make sure to only use property names that are defined by the type..
             </summary>
@@ -10734,7 +10732,23 @@
              Gets the raw $select query value from the incoming request Uri if exists.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQuery       <summary>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Expand">
+            <summary>
+             Gets the raw $expand query value from the incoming request Uri if exists.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Count">
+            <summary>
+             Gets the raw $count query value from the incoming request Uri if exists.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.Format">
+            <summary>
+             Gets the raw $format query value from the incoming request Uri if exists.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions.SkipToken">
+            <summary>
              Gets the raw $skiptoken query value from the incoming request Uri if exists.
             </summary>
         </member>
@@ -11078,15 +11092,6 @@
             </summary>
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="querySettings">The query settings to use while applying this query option.</param>
-            <param name="queryOptions">Information about the other query options.</param>
-            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
-            <summary>
-            Apply the $skiptoken query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">The query settings to use while applyingn.</param>
             <param name="queryOptions">Information about the other query options.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
@@ -13275,7 +13280,20 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate" /> class.
             </summary>
             <param name="actionImport">The wrapper action import.</param>
-            <param name="navigationSource">The target navigation sNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Segment">
+            <param name="navigationSource">The target navigation source. it could be null.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.#ctor(Microsoft.OData.UriParser.OperationImportSegment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate" /> class.
+            </summary>
+            <param name="segment">The operation import segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.ActionImport">
+            <summary>
+            Gets the wrapped action import.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ActionImportSegmentTemplate.Segment">
             <summary>
             Gets the action import segment.
             </summary>
@@ -14069,22 +14087,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
