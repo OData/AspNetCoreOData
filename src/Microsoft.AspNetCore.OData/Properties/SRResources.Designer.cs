@@ -448,6 +448,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Custom query option &apos;{0}&apos; that starts with &apos;$&apos; is not supported..
+        /// </summary>
+        internal static string CustomQueryOptionNotSupportedWithDollarSign {
+            get {
+                return ResourceManager.GetString("CustomQueryOptionNotSupportedWithDollarSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The actual entity type &apos;{0}&apos; is not assignable to the expected type &apos;{1}&apos;..
         /// </summary>
         internal static string DeltaEntityTypeNotAssignable {

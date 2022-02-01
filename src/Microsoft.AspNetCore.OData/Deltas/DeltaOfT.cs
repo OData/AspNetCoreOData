@@ -542,7 +542,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
             }
         }
 
-        private bool IsIgnoredProperty(bool isTypeDataContract, PropertyInfo propertyInfo)
+        private static bool IsIgnoredProperty(bool isTypeDataContract, PropertyInfo propertyInfo)
         {
             //This is for Ignoring the property that matches below criteria
             //1. Its marked as NotMapped
