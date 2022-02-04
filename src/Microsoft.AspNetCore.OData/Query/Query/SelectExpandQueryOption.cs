@@ -226,7 +226,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
             }
 
-            return binder.ApplyBind(queryable, _selectExpandClause, binderContext);
+            return binder.ApplyBind(queryable, SelectExpandClause, binderContext);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
             }
 
-            return binder.ApplyBind(entity, _selectExpandClause, binderContext);
+            return binder.ApplyBind(entity, SelectExpandClause, binderContext);
         }
 
         /// <summary>
