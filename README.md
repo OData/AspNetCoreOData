@@ -87,7 +87,9 @@ That's it.
 
 ### 3.1 Building and Testing in Visual Studio
 
-Visual Studio 2019 Preview is necessary to build the project.
+~~Visual Studio 2019 Preview is necessary to build the project.~~
+
+Since the project introducts the .NET 6 targe framework to support `DateOnly` and `TimeOnly`, Visual Studio 2022 is required to build source project. (Edit at 2/10/2022)
 
 ### 3.2 One-click build and test script in command line
 Coming soon.
