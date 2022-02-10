@@ -134,7 +134,14 @@ namespace Microsoft.AspNetCore.OData.Batch
             HttpRequest request = context.Request;
 
             request.Method = batchRequest.Method;
-            request.CopyAbsoluteUrl(batchRequest.Url);
+            if (batchRequest.Url.IsAbsoluteUri)
+            {
+                request.CopyAbsoluteUrl(batchRequest.Url);
+            }
+            else
+            {
+                request.Path = new PathString(string.Concat("/", batchRequest.Url.OriginalString));
+            }
 
             // Not using bufferContentStream. Unlike AspNet, AspNetCore cannot guarantee the disposal
             // of the stream in the context of execution so there is no choice but to copy the stream
