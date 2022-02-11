@@ -49,16 +49,28 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
             return Created(customer);
         }
 
-        public Task CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
+        public IActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
         {
-            return Task.FromResult(StatusCode(StatusCodes.Status204NoContent));
+            return NoContent();
         }
     }
 
     public class DefaultBatchOrdersController : ODataController
     {
+        private static IList<DefaultBatchOrder> _orders = Enumerable.Range(0, 13).Select(i =>
+            new DefaultBatchOrder
+            {
+                Id = i
+            }).ToList();
+
         public DefaultBatchOrdersController()
         {
+        }
+
+        public IActionResult Post([FromBody] DefaultBatchOrder order)
+        {
+            _orders.Add(order);
+            return Created(order);
         }
     }
 }
