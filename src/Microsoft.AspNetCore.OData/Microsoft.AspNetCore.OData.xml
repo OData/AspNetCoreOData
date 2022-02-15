@@ -713,7 +713,7 @@
             Represents an OData batch request.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
             Routes a single OData batch request.
             </summary>
@@ -728,6 +728,11 @@
             </summary>
             <param name="handler">The handler for processing a message.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem"/>.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.ContentIdToLocationMapping">
+            <summary>
+            Default dictionary that ODataBatchRequestItems should use when mapping ID references to URLs
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem">
             <summary>

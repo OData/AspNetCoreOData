@@ -44,8 +44,9 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            Dictionary<string, string> contentIdToLocationMapping = new Dictionary<string, string>();
             List<HttpContext> responseContexts = new List<HttpContext>();
+
+            IDictionary<string, string> contentIdToLocationMapping = this.ContentIdToLocationMapping ?? new Dictionary<string, string>();
 
             foreach (HttpContext context in Contexts)
             {

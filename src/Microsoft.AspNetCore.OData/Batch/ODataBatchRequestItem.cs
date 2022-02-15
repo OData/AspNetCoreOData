@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="contentIdToLocationMapping">The Content-ID to Location mapping.</param>
         /// <returns></returns>
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-        public static async Task SendRequestAsync(RequestDelegate handler, HttpContext context, Dictionary<string, string> contentIdToLocationMapping)
+        public static async Task SendRequestAsync(RequestDelegate handler, HttpContext context, IDictionary<string, string> contentIdToLocationMapping)
         {
             if (handler == null)
             {
@@ -82,6 +82,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="handler">The handler for processing a message.</param>
         /// <returns>A <see cref="ODataBatchResponseItem"/>.</returns>
         public abstract Task<ODataBatchResponseItem> SendRequestAsync(RequestDelegate handler);
+
+        /// <summary>
+        /// Default dictionary that ODataBatchRequestItems should use when mapping ID references to URLs
+        /// </summary>
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Collection needs to be provided externally.")]
+        public IDictionary<string, string> ContentIdToLocationMapping { get; set; }
 
         private static void AddLocationHeaderToMapping(HttpResponse response, IDictionary<string, string> contentIdToLocationMapping, string contentId)
         {

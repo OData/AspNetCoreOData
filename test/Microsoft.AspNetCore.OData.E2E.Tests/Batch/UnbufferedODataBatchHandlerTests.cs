@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------------
-// <copyright file="DefaultODataBatchHandlerTests.cs" company=".NET Foundation">
+// <copyright file="UnbufferedODataBatchHandlerTests.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -21,11 +21,11 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
 {
-    public class DefaultBatchHandlerCUDBatchTests : WebApiTestBase<DefaultBatchHandlerCUDBatchTests>
+    public class UnbufferedBatchHandlerCUDBatchTests : WebApiTestBase<UnbufferedBatchHandlerCUDBatchTests>
     {
         private static IEdmModel edmModel;
 
-        public DefaultBatchHandlerCUDBatchTests(WebApiTestFixture<DefaultBatchHandlerCUDBatchTests> fixture)
+        public UnbufferedBatchHandlerCUDBatchTests(WebApiTestFixture<UnbufferedBatchHandlerCUDBatchTests> fixture)
             : base(fixture)
         {
         }
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
             {
                 opt.EnableQueryFeatures();
                 opt.EnableContinueOnErrorHeader = true;
-                opt.AddRouteComponents("DefaultBatch", edmModel, new DefaultODataBatchHandler());
+                opt.AddRouteComponents("UnbufferedBatch", edmModel, new UnbufferedODataBatchHandler());
             });
         }
 
@@ -69,12 +69,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
         {
             // Arrange
             HttpClient client = CreateClient();
-            string requestUri = "DefaultBatch/$batch";
+            string requestUri = "UnbufferedBatch/$batch";
 
             string host = client.BaseAddress.Host;
             string relativeToServiceRootUri = "DefaultBatchCustomers";
-            string relativeToHostUri = "/DefaultBatch/DefaultBatchCustomers";
-            string absoluteUri = "http://localhost/DefaultBatch/DefaultBatchCustomers";
+            string relativeToHostUri = "/UnbufferedBatch/DefaultBatchCustomers";
+            string absoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchCustomers";
 
             // Act
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -164,8 +164,8 @@ Content-Type: application/json;odata.metadata=minimal
             // Arrange
             HttpClient client = CreateClient();
 
-            string requestUri = "DefaultBatch/$batch";
-            string absoluteUri = "http://localhost/DefaultBatch/DefaultBatchCustomers";
+            string requestUri = "UnbufferedBatch/$batch";
+            string absoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchCustomers";
 
             // Act
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -250,8 +250,8 @@ Content-Type: application/json;odata.metadata=minimal
         {
             // Arrange
             HttpClient client = CreateClient();
-            var requestUri = "DefaultBatch/$batch";
-            string absoluteUri = "http://localhost/DefaultBatch/DefaultBatchCustomers";
+            var requestUri = "UnbufferedBatch/$batch";
+            string absoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchCustomers";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
             HttpContent content = new StringContent(
@@ -315,8 +315,8 @@ GET " + absoluteUri + @"(1) HTTP/1.1
         {
             // Arrange
             HttpClient client = CreateClient();
-            var requestUri = "DefaultBatch/$batch";
-            string absoluteUri = "http://localhost/DefaultBatch/DefaultBatchCustomers";
+            var requestUri = "UnbufferedBatch/$batch";
+            string absoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchCustomers";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
             request.Headers.Add("prefer", "odata.continue-on-error");
@@ -381,10 +381,10 @@ GET " + absoluteUri + @"(1) HTTP/1.1
         {
             // Arrange
             HttpClient client = CreateClient();
-            string requestUri = "DefaultBatch/$batch";
+            string requestUri = "UnbufferedBatch/$batch";
 
-            string defaultBatchCustomersAbsoluteUri = "http://localhost/DefaultBatch/DefaultBatchCustomers";
-            string defaultBatchOrdersAbsoluteUri = "http://localhost/DefaultBatch/DefaultBatchOrders";
+            string defaultBatchCustomersAbsoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchCustomers";
+            string defaultBatchOrdersAbsoluteUri = "http://localhost/UnbufferedBatch/DefaultBatchOrders";
 
             // Act
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
@@ -475,7 +475,7 @@ Content-Type: application/json;odata.metadata=minimal
             // Arrange
             var client = CreateClient();
 
-            var requestUri = "DefaultBatch/$batch";
+            var requestUri = "UnbufferedBatch/$batch";
             var defaultBatchCustomersRelativeUri = "DefaultBatchCustomers";
             var defaultBatchOrdersRelativeUri = "DefaultBatchOrders";
 
