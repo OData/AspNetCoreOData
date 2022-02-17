@@ -24,11 +24,6 @@ namespace Microsoft.AspNetCore.OData.Query
                 returnSettings.CopyFrom(settings);
             }
 
-            if (returnSettings.HandleNullPropagation == HandleNullPropagationOption.Default)
-            {
-                returnSettings.HandleNullPropagation = HandleNullPropagationOption.True;
-            }
-
             return returnSettings;
         }
 
