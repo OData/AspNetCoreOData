@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataResourceSerializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         private ODataResourceSerializer _serializer;
         private ODataSerializerContext _writeContext;
         private ResourceContext _entityContext;
-        private ODataSerializerProvider _serializerProvider;
+        private IODataSerializerProvider _serializerProvider;
         private IEdmEntityTypeReference _customerType;
         private IEdmEntityTypeReference _orderType;
         private IEdmEntityTypeReference _specialCustomerType;
@@ -69,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 ID = 20,
             };
 
-            _serializerProvider = GetServiceProvider().GetService<ODataSerializerProvider>();
+            _serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
             _customerType = _model.GetEdmTypeReference(typeof(Customer)).AsEntity();
             _orderType = _model.GetEdmTypeReference(typeof(Order)).AsEntity();
             _specialCustomerType = _model.GetEdmTypeReference(typeof(SpecialCustomer)).AsEntity();
@@ -91,7 +95,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_MessageWriter()
         {
             // Arrange & Act
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Assert
@@ -104,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_WriteContext()
         {
             // Arrange & Act
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             ODataMessageWriter messageWriter = new ODataMessageWriter(new Mock<IODataRequestMessage>().Object);
 
@@ -118,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_Calls_WriteObjectInline_WithRightEntityType()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             serializer
                 .Setup(s => s.WriteObjectInlineAsync(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
@@ -138,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsArgumentNull_Writer()
         {
             // Arrange & Act
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Assert
@@ -160,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ThrowsSerializationException_WhenGraphIsNull()
         {
             // Arrange & Act
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             ODataWriter messageWriter = new Mock<ODataWriter>().Object;
 
@@ -174,7 +178,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_Calls_CreateSelectExpandNode()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             ODataWriter writer = new Mock<ODataWriter>().Object;
@@ -194,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode();
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             ODataWriter writer = new Mock<ODataWriter>().Object;
 
@@ -214,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataResource entry = new ODataResource();
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
@@ -354,7 +358,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type))
                 .Returns(innerSerializer.Object);
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
@@ -402,7 +406,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
             ordersSerializer.Setup(s => s.WriteObjectInlineAsync(ordersValue, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>())).Verifiable();
 
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type)).Returns(ordersSerializer.Object);
 
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
@@ -450,7 +454,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     Assert.Null(feed.NextPageLink);
                 }).Returns(Task.CompletedTask).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type)).Returns(ordersSerializer.Object);
 
             Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
@@ -491,7 +495,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             writer.Setup(w => w.WriteStartAsync(null as ODataResource)).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(customerProperty.Type))
                 .Returns(ordersSerializer.Object);
 
@@ -549,7 +553,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     Assert.Null(feed.NextPageLink);
                 }).Returns(Task.CompletedTask).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(specialOrdersProperty.Type))
                 .Returns(ordersSerializer.Object);
 
@@ -600,7 +604,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             writer.Setup(w => w.WriteStartAsync(null as ODataResource)).Verifiable();
             Mock<ODataEdmTypeSerializer> ordersSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(customerProperty.Type))
                 .Returns(ordersSerializer.Object);
 
@@ -619,7 +623,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResource_ThrowsArgumentNull_SelectExpandNode()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Act & Assert
@@ -632,13 +636,36 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateResource_ThrowsArgumentNull_EntityContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(
                 () => serializer.CreateResource(new SelectExpandNode(), resourceContext: null),
                 "resourceContext");
+        }
+
+        [Fact]
+        public void CreateResource_Calls_CreateComputedProperty_ForEachSelecteComputedProperty()
+        {
+            // Arrange
+            SelectExpandNode selectExpandNode = new SelectExpandNode();
+            selectExpandNode.SelectedComputedProperties.Add("Computed1");
+            selectExpandNode.SelectedComputedProperties.Add("Computed2");
+
+            ODataProperty[] properties = new ODataProperty[] { new ODataProperty(), new ODataProperty() };
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
+
+            serializer.Setup(s => s.CreateComputedProperty("Computed1", _entityContext)).Returns(properties[0]).Verifiable();
+            serializer.Setup(s => s.CreateComputedProperty("Computed2", _entityContext)).Returns(properties[1]).Verifiable();
+
+            // Act
+            ODataResource entry = serializer.Object.CreateResource(selectExpandNode, _entityContext);
+
+            // Assert
+            serializer.Verify();
+            Assert.Equal(properties, entry.Properties);
         }
 
         [Fact]
@@ -736,8 +763,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 .Returns(properties[1]);
 
             //var config = RoutingConfigurationFactory.CreateWithRootContainer("Route");
-            var request = RequestFactory.Create(opt => opt.AddModel("route", _model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", _model));
+            request.ODataFeature().RoutePrefix = "route";
             _entityContext.Request = request;
 
             // Act
@@ -772,11 +799,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             EntityTagHeaderValue etagHeaderValue = new EntityTagHeaderValue(tag, isWeak: true);
             mockETagHandler.Setup(e => e.CreateETag(It.IsAny<IDictionary<string, object>>(), It.IsAny<TimeZoneInfo>())).Returns(etagHeaderValue);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", _model, (config) =>
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", _model, services =>
             {
-                config.AddService<IETagHandler>(ServiceLifetime.Singleton, (services) => mockETagHandler.Object);
+                services.AddSingleton<IETagHandler>(sp => mockETagHandler.Object);
             }));
-            request.ODataFeature().PrefixName = "route";
+            request.ODataFeature().RoutePrefix = "route";
             _entityContext.Request = request;
 
             // Act
@@ -951,8 +978,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1033,8 +1060,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1102,8 +1129,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1166,8 +1193,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            var request = RequestFactory.Create(opt => opt.AddModel("route", model));
-            request.ODataFeature().PrefixName = "route";
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents("route", model));
+            request.ODataFeature().RoutePrefix = "route";
             SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -1206,7 +1233,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateStructuralProperty_ThrowsArgumentNull_StructuralProperty()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Act & Assert
@@ -1219,7 +1246,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateStructuralProperty_ThrowsArgumentNull_EntityContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
 
@@ -1236,7 +1263,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<IEdmTypeReference> propertyType = new Mock<IEdmTypeReference>();
             propertyType.Setup(t => t.Definition).Returns(new EdmEntityType("Namespace", "Name"));
             Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>(MockBehavior.Strict);
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
             IEdmEntityObject entity = new Mock<IEdmEntityObject>().Object;
             property.Setup(p => p.Type).Returns(propertyType.Object);
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(propertyType.Object)).Returns<ODataEdmTypeSerializer>(null);
@@ -1255,7 +1282,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
             property.Setup(p => p.Name).Returns("PropertyName");
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>(MockBehavior.Strict);
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
             var entity = new { PropertyName = 42 };
             Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Property);
             ODataValue propertyValue = new Mock<ODataValue>().Object;
@@ -1291,7 +1318,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateNavigationLink_ThrowsArgumentNull_NavigationProperty()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Act & Assert
@@ -1304,7 +1331,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateNavigationLink_ThrowsArgumentNull_EntityContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             IEdmNavigationProperty navigationProperty = new Mock<IEdmNavigationProperty>().Object;
 
@@ -1357,7 +1384,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataAction_ThrowsArgumentNull_Action()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             // Act & Assert
@@ -1370,7 +1397,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataAction_ThrowsArgumentNull_EntityContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
             IEdmAction action = new Mock<IEdmAction>().Object;
 
@@ -1481,7 +1508,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateSelectExpandNode_ThrowsArgumentNull_EntityContext()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
 
             ExceptionAssert.ThrowsArgumentNull(
@@ -2001,7 +2028,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             ODataWriter mockWriter = new Mock<ODataWriter>().Object;
             IEdmNavigationProperty ordersProperty = _customerSet.EntityType().DeclaredNavigationProperties().Single();
             Mock<ODataEdmTypeSerializer> expandedItemSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.ResourceSet);
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type))
                 .Returns(expandedItemSerializer.Object);
 
@@ -2123,8 +2150,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
         private static ResourceContext CreateContext(IEdmModel model, string expectedMetadataPrefix)
         {
-            var request = RequestFactory.Create("get", expectedMetadataPrefix, opt => opt.AddModel("OData", model));
-            request.ODataFeature().PrefixName = "OData";
+            var request = RequestFactory.Create("get", expectedMetadataPrefix, opt => opt.AddRouteComponents("OData", model));
+            request.ODataFeature().RoutePrefix = "OData";
             request.ODataFeature().Model = model;
             return new ResourceContext
             {
@@ -2226,7 +2253,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
 
             // Serializers.
             services.AddSingleton<ODataEnumSerializer>();

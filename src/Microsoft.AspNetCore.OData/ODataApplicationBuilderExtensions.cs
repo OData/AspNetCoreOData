@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataApplicationBuilderExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Batch;
@@ -50,7 +54,7 @@ namespace Microsoft.AspNetCore.OData
         /// Use OData route debug middleware. You can send request "~/$odata" after enabling this middleware.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
         public static IApplicationBuilder UseODataRouteDebug(this IApplicationBuilder app)
         {
             return app.UseODataRouteDebug(DefaultODataRouteDebugMiddlewareRoutePattern);

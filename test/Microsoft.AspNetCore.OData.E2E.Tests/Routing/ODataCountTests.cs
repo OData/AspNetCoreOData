@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataCountTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(DollarCountEntitiesController), typeof(ODataEndpointController));
-            services.AddControllers().AddOData(opt => opt.AddModel(edmModel).Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents(edmModel).Count().OrderBy().Filter().Expand().SetMaxTop(null).Select());
         }
 
         public ODataCountTests(WebApiTestFixture<ODataCountTests> fixture)

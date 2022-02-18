@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultSkipTokenHandler.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -270,7 +274,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.InvalidOperation("Unable to get property values from the skiptoken value.");
             }
 
-            ExpressionBinderBase binder = context.GetFilterBinder(querySettings);
+           // ExpressionBinderBase binder = context.GetFilterBinder(querySettings);
             bool parameterizeConstant = querySettings.EnableConstantParameterization;
             ParameterExpression param = Expression.Parameter(context.ElementClrType);
             Expression where = null;
@@ -300,16 +304,16 @@ namespace Microsoft.AspNetCore.OData.Query
                 Expression constant = parameterizeConstant ? LinqParameterContainer.Parameterize(value.GetType(), value) : Expression.Constant(value);
                 if (directionMap.ContainsKey(key) && directionMap[key] == OrderByDirection.Descending)
                 {
-                    compare = binder.CreateBinaryExpression(BinaryOperatorKind.LessThan, property, constant, true);
+                    compare = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.LessThan, property, constant, true, querySettings);
                 }
                 else
                 {
-                    compare = binder.CreateBinaryExpression(BinaryOperatorKind.GreaterThan, property, constant, true);
+                    compare = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.GreaterThan, property, constant, true, querySettings);
                 }
 
                 if (firstProperty)
                 {
-                    lastEquality = binder.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true);
+                    lastEquality = ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true, querySettings);
                     where = compare;
                     firstProperty = false;
                 }
@@ -317,7 +321,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     Expression condition = Expression.AndAlso(lastEquality, compare);
                     where = Expression.OrElse(where, condition);
-                    lastEquality = Expression.AndAlso(lastEquality, binder.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true));
+                    lastEquality = Expression.AndAlso(lastEquality, ExpressionBinderHelper.CreateBinaryExpression(BinaryOperatorKind.Equal, property, constant, true, querySettings));
                 }
             }
 
@@ -423,7 +427,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             Type clrType = value.GetType();
-            return model.GetTypeMappingCache().GetEdmType(clrType, model)?.Definition;
+            return model.GetEdmTypeReference(clrType)?.Definition;
         }
 
         private static IList<string> ParseValue(string value, char delim)

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ETagActionFilterAttribute.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -124,7 +128,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 return edmTypeReference.AsEntity();
             }
 
-            IEdmTypeReference reference = model.GetTypeMappingCache().GetEdmType(value.GetType(), model);
+            IEdmTypeReference reference = model.GetEdmTypeReference(value.GetType());
             if (reference != null && reference.Definition.IsOrInheritsFrom(edmType))
             {
                 return (IEdmEntityTypeReference)reference;

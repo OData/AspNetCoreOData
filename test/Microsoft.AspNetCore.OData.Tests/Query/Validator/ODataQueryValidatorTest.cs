@@ -1,17 +1,19 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQueryValidatorTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
-using Microsoft.OData.ModelBuilder.Config;
 using Moq;
 using Xunit;
 
@@ -43,6 +45,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                     { AllowedQueryOptions.Skip, "$skip=5", "Skip" },
                     { AllowedQueryOptions.Top, "$top=10", "Top" },
                     { AllowedQueryOptions.Apply, "$apply=groupby((Name))", "Apply" },
+                    { AllowedQueryOptions.Compute, "$compute=AmountSpent mul 2 as DoubleAmount", "Compute" },
+                    { AllowedQueryOptions.Search, "$search=text", "Search" },
                     { AllowedQueryOptions.SkipToken, "$skiptoken=__skip__", "SkipToken" },
                 };
             }

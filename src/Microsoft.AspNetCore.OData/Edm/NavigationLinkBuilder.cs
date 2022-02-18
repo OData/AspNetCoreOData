@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="NavigationLinkBuilder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -19,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="followsConventions">Represents whether this factory follows OData conventions or not.</param>
         public NavigationLinkBuilder(Func<ResourceContext, IEdmNavigationProperty, Uri> navigationLinkFactory, bool followsConventions)
         {
-            Factory = navigationLinkFactory ?? throw new ArgumentNullException(nameof(navigationLinkFactory));
+            Factory = navigationLinkFactory ?? throw Error.ArgumentNull(nameof(navigationLinkFactory));
             FollowsConventions = followsConventions;
         }
 

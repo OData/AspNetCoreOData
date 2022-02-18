@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOptionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +31,6 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.Equal(ODataUrlKeyDelimiter.Slash, options.UrlKeyDelimiter); // Guard
             Assert.False(options.EnableContinueOnErrorHeader);
             Assert.True(options.EnableAttributeRouting);
-            Assert.Null(options.BuilderFactory);
             Assert.Equal(TimeZoneInfo.Local, options.TimeZone);
             Assert.True(options.RouteOptions.EnableKeyAsSegment);
             Assert.True(options.EnableNoDollarQueryOptions);
@@ -36,7 +39,6 @@ namespace Microsoft.AspNetCore.OData.Tests
             options.UrlKeyDelimiter = ODataUrlKeyDelimiter.Parentheses;
             options.EnableContinueOnErrorHeader = true;
             options.EnableAttributeRouting = false;
-            options.BuilderFactory = () => null;
             options.TimeZone = TimeZoneInfo.Utc;
             options.RouteOptions.EnableKeyAsSegment = false;
             options.EnableNoDollarQueryOptions = false;
@@ -45,12 +47,11 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.Equal(ODataUrlKeyDelimiter.Parentheses, options.UrlKeyDelimiter);
             Assert.True(options.EnableContinueOnErrorHeader);
             Assert.False(options.EnableAttributeRouting);
-            Assert.NotNull(options.BuilderFactory);
             Assert.Equal(TimeZoneInfo.Utc, options.TimeZone);
             Assert.False(options.RouteOptions.EnableKeyAsSegment);
             Assert.False(options.EnableNoDollarQueryOptions);
 
-            Assert.Empty(options.Models);
+            Assert.Empty(options.RouteComponents);
         }
 
         [Fact]
@@ -73,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("odata")]
-        public void AddModel_WithoutOrWithPrefix_SetModel(string prefix)
+        public void AddRouteComponents_WithoutOrWithPrefix_SetModel(string prefix)
         {
             // Arrange
             ODataOptions options = new ODataOptions();
@@ -82,15 +83,15 @@ namespace Microsoft.AspNetCore.OData.Tests
             // Act
             if (prefix == null)
             {
-                options.AddModel(edmModel);
+                options.AddRouteComponents(edmModel);
             }
             else
             {
-                options.AddModel(prefix, edmModel);
+                options.AddRouteComponents(prefix, edmModel);
             }
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
 
             Assert.Equal(prefix ?? String.Empty, model.Key);
 
@@ -99,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
-        public void AddModel_WithBatchHandler_SetModel()
+        public void AddRouteComponents_WithBatchHandler_SetModel()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
@@ -107,10 +108,10 @@ namespace Microsoft.AspNetCore.OData.Tests
             ODataBatchHandler handler = new Mock<ODataBatchHandler>().Object;
 
             // Act
-            options.AddModel(edmModel, handler);
+            options.AddRouteComponents(edmModel, handler);
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
             Assert.Equal(String.Empty, model.Key);
 
             Assert.Same(edmModel, model.Value.Item1);
@@ -120,17 +121,17 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
-        public void AddModel_WithDependencyInjection_SetModelAndServices()
+        public void AddRouteComponents_WithDependencyInjection_SetModelAndServices()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
             IEdmModel edmModel = EdmCoreModel.Instance;
 
             // Act
-            options.AddModel("odata", edmModel, builder => builder.AddService<IODataFeature, ODataFeature>(Microsoft.OData.ServiceLifetime.Singleton));
+            options.AddRouteComponents("odata", edmModel, services => services.AddSingleton<IODataFeature, ODataFeature>());
 
             // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
             Assert.Equal("odata", model.Key);
 
             Assert.Same(edmModel, model.Value.Item1);
@@ -139,63 +140,55 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.IsType<ODataFeature>(actual);
         }
 
-        [Fact]
-        public void AddModel_CanUse_CustomizedBuilderFactory()
-        {
-            // Arrange
-            IServiceProvider sp = new ServiceCollection().BuildServiceProvider();
-            IContainerBuilder builer = new MyInternalContainerBuilder(sp);
-            ODataOptions options = new ODataOptions();
-            IEdmModel edmModel = EdmCoreModel.Instance;
-            options.BuilderFactory = () => builer;
-
-            // Act
-            options.AddModel("odata", edmModel);
-
-            // Assert
-            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.Models);
-            Assert.Equal("odata", model.Key);
-
-            Assert.Same(edmModel, model.Value.Item1);
-            Assert.NotNull(model.Value.Item2);
-            Assert.Same(sp, model.Value.Item2);
-        }
-
-        [Fact]
-        public void AddModel_Throws_IfBuilderFactoryReturnsNull()
+        [Theory]
+        [InlineData("/odata", "odata")]
+        [InlineData("/odata/", "odata")]
+        [InlineData("odata/", "odata")]
+        [InlineData("/", "")]
+        public void AddRouteComponents_Strips_RoutePrefix_Leading_And_Trailing_Slashes(string routePrefix, string expectedRoutePrefix)
         {
             // Arrange
             ODataOptions options = new ODataOptions();
             IEdmModel edmModel = EdmCoreModel.Instance;
-            options.BuilderFactory = () => null;
 
             // Act
-            Action test = () => options.AddModel("odata", edmModel);
+            options.AddRouteComponents(routePrefix, edmModel, services => services.AddSingleton<IODataFeature, ODataFeature>());
 
             // Assert
-            ExceptionAssert.Throws<InvalidOperationException>(test, "The container builder created by the container builder factory must not be null.");
+            Assert.False(options.RouteComponents.ContainsKey(routePrefix));
+            Assert.True(options.RouteComponents.ContainsKey(expectedRoutePrefix));
         }
 
         [Fact]
-        public void AddModel_Throws_IfModelNull()
+        public void AddRouteComponents_Throws_IfModelNull()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => options.AddModel("odata", null, builder => { }), "model");
+            ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents("odata", null, builder => { }), "model");
         }
 
         [Fact]
-        public void AddModel_Throws_IfPrefixExisted()
+        public void AddRouteComponents_Throws_IfRoutePrefixNull()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => options.AddRouteComponents(null, EdmCoreModel.Instance, builder => { }), "routePrefix");
+        }
+
+        [Fact]
+        public void AddRouteComponents_Throws_IfPrefixExisted()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
             IEdmModel edmModel = EdmCoreModel.Instance;
-            options.AddModel("odata", edmModel);
+            options.AddRouteComponents("odata", edmModel);
 
             // Act
-            Action test = () => options.AddModel("odata", edmModel);
+            Action test = () => options.AddRouteComponents("odata", edmModel);
 
             // Assert
             ExceptionAssert.Throws<InvalidOperationException>(test, "The prefix 'odata' was already used for other Edm model.");
@@ -204,28 +197,52 @@ namespace Microsoft.AspNetCore.OData.Tests
         #endregion
 
         [Fact]
-        public void GetODataServiceProvider_ReturnsNull()
+        public void GetRouteServices_ReturnsNull()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
 
             // Act & Assert
-            Assert.Null(options.GetODataServiceProvider(null));
+            Assert.Null(options.GetRouteServices(null));
         }
 
         [Fact]
-        public void GetODataServiceProvider_ReturnsCorrectServiceProvider()
+        public void GetRouteServices_ReturnsCorrectServiceProvider()
         {
             // Arrange
             ODataOptions options = new ODataOptions();
             IEdmModel edmModel = EdmCoreModel.Instance;
 
             // Act
-            options.AddModel("odata", edmModel);
+            options.AddRouteComponents("odata", edmModel);
 
             // & Assert
-            IServiceProvider sp = options.GetODataServiceProvider("odata");
+            IServiceProvider sp = options.GetRouteServices("odata");
             Assert.NotNull(sp);
+        }
+
+        [Theory]
+        [InlineData("/odata")]
+        [InlineData("/odata/")]
+        [InlineData("odata/")]
+        public void GetRouteServices_ReturnsCorrectServiceProvider_When_Leading_Or_Trailing_Slashes(string routePrefix)
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents(routePrefix, edmModel);
+
+            // & Assert
+            // can retrieve service provider using original routePrefix
+            IServiceProvider sp = options.GetRouteServices(routePrefix);
+            Assert.NotNull(sp);
+
+            // can retrieve service provider using sanitized routePrefix
+            string sanitizedRoutePrefix = "odata";
+            IServiceProvider sp2 = options.GetRouteServices(sanitizedRoutePrefix);
+            Assert.NotNull(sp2);
         }
 
         #region QuerySetting
@@ -339,29 +356,6 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
         #endregion
 
-        private class MyInternalContainerBuilder : IContainerBuilder
-        {
-            private IServiceProvider _sp;
-
-            public MyInternalContainerBuilder(IServiceProvider sp)
-            {
-                _sp = sp;
-            }
-
-            public IContainerBuilder AddService(Microsoft.OData.ServiceLifetime lifetime, Type serviceType, Type implementationType)
-            {
-                return null;
-            }
-
-            public IContainerBuilder AddService(Microsoft.OData.ServiceLifetime lifetime, Type serviceType, Func<IServiceProvider, object> implementationFactory)
-            {
-                return null;
-            }
-
-            public IServiceProvider BuildContainer()
-            {
-                return _sp;
-            }
-        }
     }
+
 }

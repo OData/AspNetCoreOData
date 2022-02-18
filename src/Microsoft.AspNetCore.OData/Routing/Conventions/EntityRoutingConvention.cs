@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EntityRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -53,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmEntityType entityType = entitySet.EntityType();
 
             // if the action has no key parameter, skip it.
-            if (!action.HasODataKeyParameter(entityType))
+            if (!action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
             {
                 return false;
             }
@@ -85,26 +89,27 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         internal static (string, string) Split(string actionName)
         {
             string typeName;
-            string methodName;
+            string methodName = null;
             if (actionName.StartsWith("Get", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(3);
                 methodName = "Get";
             }
             else if (actionName.StartsWith("Put", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(3);
                 methodName = "Put";
             }
             else if (actionName.StartsWith("Patch", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(5);
                 methodName = "Patch";
             }
             else if (actionName.StartsWith("Delete", StringComparison.Ordinal))
             {
-                typeName = actionName.Substring(6);
                 methodName = "Delete";
+            }
+
+            if (methodName != null)
+            {
+                typeName = actionName.Substring(methodName.Length);
             }
             else
             {

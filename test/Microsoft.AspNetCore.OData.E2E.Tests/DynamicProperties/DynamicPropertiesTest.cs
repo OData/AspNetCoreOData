@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DynamicPropertiesTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net;
 using System.Net.Http;
@@ -22,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DynamicProperties
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(DynamicCustomersController), typeof(DynamicSingleCustomerController)/*, typeof(ODataEndpointController)*/);
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()));
         }
 
         //[Fact]

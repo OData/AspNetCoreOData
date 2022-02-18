@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOpenApiMiddleware.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -68,7 +72,7 @@ namespace ODataRoutingSample.OpenApi
         }
 
         /// <summary>
-        /// processe a $openapi request.
+        /// process a $openapi request.
         /// </summary>
         /// <param name="context">The http context.</param>
         /// <param name="prefixName">The related prefix.</param>
@@ -114,7 +118,7 @@ namespace ODataRoutingSample.OpenApi
 
             OpenApiSpecVersion specVersion = OpenApiSpecVersion.OpenApi3_0; // by default
             // $format=application/json;version=2.0
-            // $format=application/ymal;version=2.0
+            // $format=application/yaml;version=2.0
             // accept=application/json;version3.0
             HttpRequest request = context.Request;
 
@@ -163,7 +167,7 @@ namespace ODataRoutingSample.OpenApi
         {
             Contract.Assert(options != null);
 
-            foreach (var model in options.Models)
+            foreach (var model in options.RouteComponents)
             {
                 string openapiPath = string.IsNullOrEmpty(model.Key) ? $"/{_requestName}" : $"/{model.Key}/{_requestName}";
                 AddRoute(model.Key, openapiPath);

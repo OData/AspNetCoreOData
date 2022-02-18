@@ -1,10 +1,16 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRouteDebugMiddleware.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Routing
     [ExcludeFromCodeCoverage]
     internal class ODataRouteDebugMiddleware
     {
+        private static IReadOnlyList<string> EmptyHeaders = Array.Empty<string>();
         private readonly RequestDelegate _next;
         private readonly string _routePattern;
 
@@ -36,6 +43,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 throw Error.ArgumentNull(nameof(routePattern));
             }
+
             // ensure _routePattern starts with /
             _routePattern = routePattern.StartsWith('/') ? routePattern : $"/{routePattern}";
             _next = next ?? throw Error.ArgumentNull(nameof(next)); ;
@@ -107,8 +115,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             return routInfoList;
         }
 
-        private static IReadOnlyList<string> EmptyHeaders = Array.Empty<string>();
-
         internal static async Task WriteRoutesAsJson(HttpContext context, IList<EndpointRouteInfo> routeInfoList)
         {
             var options = new JsonSerializerOptions()
@@ -116,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 WriteIndented = true
             };
             string output = JsonSerializer.Serialize(routeInfoList, options);
-            context.Response.Headers["Content_Type"] = "application/json";
+            context.Response.ContentType = MediaTypeNames.Application.Json;
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
 
@@ -145,20 +151,20 @@ namespace Microsoft.AspNetCore.OData.Routing
             output = output.Replace("ODATA_ROUTE_CONTENT", odataRouteTable.ToString(), StringComparison.Ordinal);
             output = output.Replace("STD_ROUTE_CONTENT", stdRouteTable.ToString(), StringComparison.Ordinal);
 
-            context.Response.Headers["Content-Type"] = "text/html";
+            context.Response.ContentType = "text/html";
             await context.Response.WriteAsync(output).ConfigureAwait(false);
         }
-
 
         internal static bool AcceptsJson(IHeaderDictionary headers)
         {
             var acceptHeaders = MediaTypeHeaderValue.ParseList(headers[HeaderNames.Accept]);
 
             var result = acceptHeaders.Any(h =>
-                h.IsSubsetOf(new MediaTypeHeaderValue("application/json")));
+                h.IsSubsetOf(new MediaTypeHeaderValue(MediaTypeNames.Application.Json)));
             return result;
         }
 
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The default format provider is fine here.")]
         private static void AppendRoute(StringBuilder builder, EndpointRouteInfo routeInfo)
         {
             builder.Append("<tr>");
@@ -204,7 +210,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 <body>
     <h1 id=""odata"">OData Endpoint Mappings</h1>
     <p>
-        <a href=""#standard"">Got to none OData endpoint mappings</a>
+        <a href=""#standard"">Go to non-OData endpoint mappings</a>
     </p>
     <table>
         <tr>
@@ -214,7 +220,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         </tr>
         ODATA_ROUTE_CONTENT
     </table>
-    <h1 id=""standard"">None OData Endpoint Mappings</h1>
+    <h1 id=""standard"">Non-OData Endpoint Mappings</h1>
     <p>
         <a href=""#odata"">Go to OData endpoint mappings</a>
     </p>

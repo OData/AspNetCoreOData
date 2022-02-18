@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FilterBinderTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -26,165 +30,135 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
     {
         private const string NotTesting = "";
 
-        private static readonly Uri _serviceBaseUri = new Uri("http://server/service/");
-
         private static Dictionary<Type, IEdmModel> _modelCache = new Dictionary<Type, IEdmModel>();
 
-        public static TheoryDataSet<decimal?, bool, object> MathRoundDecimal_DataSet
-        {
-            get
-            {
-                return new TheoryDataSet<decimal?, bool, object>
-                {
-                    { null, false, typeof(InvalidOperationException) },
-                    { 5.9m, true, true },
-                    { 5.4m, false, false },
-                };
-            }
-        }
-
-        public static TheoryDataSet<decimal?, bool, object> MathFloorDecimal_DataSet
-        {
-            get
-            {
-                return new TheoryDataSet<decimal?, bool, object>
-                {
-                    { null, false, typeof(InvalidOperationException) },
-                    { 5.4m, true, true },
-                    { 4.4m, false, false },
-                };
-            }
-        }
-
-        public static TheoryDataSet<decimal?, bool, object> MathCeilingDecimal_DataSet
-        {
-            get
-            {
-                return new TheoryDataSet<decimal?, bool, object>
-                {
-                    { null, false, typeof(InvalidOperationException) },
-                    { 4.1m, true, true },
-                    { 5.9m, false, false },
-                };
-            }
-        }
-
-#region Inequalities
+        #region Logical Operators
         [Theory]
         [InlineData(null, true, true)]
         [InlineData("", false, false)]
         [InlineData("Doritos", false, false)]
-        public void EqualityOperatorWithNull(string productName, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_EqualityOperatorWithNull(string productName, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "ProductName eq null",
-                "$it => ($it.ProductName == null)");
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("ProductName eq null", "$it => ($it.ProductName == null)");
 
-            RunFilters(filters,
-                new Product { ProductName = productName },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (falseNullPropagation, trueNullPropagation));
+        }
+
+        [Theory]
+        [InlineData(null, false, false)]
+        [InlineData("", true, true)]
+        [InlineData("Doritos", true, true)]
+        public void LogicalOperators_NotEqualityOperatorWithNull(string productName, bool falseNullPropagation, bool trueNullPropagation)
+        {
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("ProductName ne null", "$it => ($it.ProductName != null)");
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, false, false)]
         [InlineData("", false, false)]
         [InlineData("Doritos", true, true)]
-        public void EqualityOperator(string productName, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_EqualityOperatorWithValue(string productName, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "ProductName eq 'Doritos'",
-                "$it => ($it.ProductName == \"Doritos\")");
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("ProductName eq 'Doritos'", "$it => ($it.ProductName == \"Doritos\")");
 
-            RunFilters(filters,
-                new Product { ProductName = productName },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, true, true)]
         [InlineData("", true, true)]
         [InlineData("Doritos", false, false)]
-        public void NotEqualOperator(string productName, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_NotEqualOperator(string productName, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "ProductName ne 'Doritos'",
-                "$it => ($it.ProductName != \"Doritos\")");
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("ProductName ne 'Doritos'", "$it => ($it.ProductName != \"Doritos\")");
 
-            RunFilters(filters,
-                new Product { ProductName = productName },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, false, false)]
         [InlineData(5.01, true, true)]
         [InlineData(4.99, false, false)]
-        public void GreaterThanOperator(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_GreaterThanOperator(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "UnitPrice gt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice > Convert({0:0.00}))", 5.0),
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice > Convert({0:0.00})) == True)", 5.0));
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("UnitPrice gt 5.00m",
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice > Convert({0:0.00}))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice > Convert({0:0.00})) == True)", 5.0));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, false, false)]
         [InlineData(5.0, true, true)]
         [InlineData(4.99, false, false)]
-        public void GreaterThanEqualOperator(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_GreaterThanEqualOperator(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "UnitPrice ge 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice >= Convert({0:0.00}))", 5.0),
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice >= Convert({0:0.00})) == True)", 5.0));
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("UnitPrice ge 5.00m",
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice >= Convert({0:0.00}))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice >= Convert({0:0.00})) == True)", 5.0));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, false, false)]
         [InlineData(4.99, true, true)]
         [InlineData(5.01, false, false)]
-        public void LessThanOperator(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_LessThanOperator(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "UnitPrice lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice < Convert({0:0.00}))", 5.0),
-                NotTesting);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("UnitPrice lt 5.00m",
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice < Convert({0:0.00}))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice < Convert({0:0.00})) == True)", 5.0));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, false, false)]
         [InlineData(5.0, true, true)]
         [InlineData(5.01, false, false)]
-        public void LessThanOrEqualOperator(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_LessThanOrEqualOperator(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-                "UnitPrice le 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice <= Convert({0:0.00}))", 5.0),
-                NotTesting);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("UnitPrice le 5.00m",
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice <= Convert({0:0.00}))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice <= Convert({0:0.00})) == True)", 5.0));
 
-            RunFilters(filters,
-               new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Fact]
-        public void NegativeNumbers()
+        public void LogicalOperators_NegativeNumbers()
         {
-            VerifyQueryDeserialization(
-                "UnitPrice le -5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice <= Convert({0:0.00}))", -5.0),
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>("UnitPrice le -5.00m",
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice <= Convert({0:0.00}))", -5.0),
                 NotTesting);
         }
 
@@ -193,58 +167,49 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("DateTimeOffsetProp ne DateTimeOffsetProp", "$it => ($it.DateTimeOffsetProp != $it.DateTimeOffsetProp)")]
         [InlineData("DateTimeOffsetProp ge DateTimeOffsetProp", "$it => ($it.DateTimeOffsetProp >= $it.DateTimeOffsetProp)")]
         [InlineData("DateTimeOffsetProp le DateTimeOffsetProp", "$it => ($it.DateTimeOffsetProp <= $it.DateTimeOffsetProp)")]
-        public void DateTimeOffsetInEqualities(string clause, string expectedExpression)
+        public void LogicalOperators_WithDateTimeOffsetInEqualities(string clause, string expectedExpression)
         {
-            // There's currently a bug here. For now, the test checks for the presence of the bug (as a reminder to fix
-            // the test once the bug is fixed).
-            // The following assert shows the behavior with the bug and should be removed once the bug is fixed.
-            ExceptionAssert.Throws<ODataException>(() => Bind("" + clause));
-
-            // TODO: Enable once ODataUriParser handles DateTimeOffsets
-            Assert.NotNull(expectedExpression);
-            // The following call shows the behavior without the bug, and should be enabled once the bug is fixed.
-            //VerifyQueryDeserialization<DataTypes>("" + clause, expectedExpression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<DataTypes>(clause, expectedExpression);
         }
 
         [Theory]
-        [InlineData("DateTimeProp eq DateTimeProp", "$it => ($it.DateTimeProp == $it.DateTimeProp)")]
-        [InlineData("DateTimeProp ne DateTimeProp", "$it => ($it.DateTimeProp != $it.DateTimeProp)")]
-        [InlineData("DateTimeProp ge DateTimeProp", "$it => ($it.DateTimeProp >= $it.DateTimeProp)")]
-        [InlineData("DateTimeProp le DateTimeProp", "$it => ($it.DateTimeProp <= $it.DateTimeProp)")]
-        public void DateInEqualities(string clause, string expectedExpression)
+        [InlineData("DateTimeProperty eq DateTimeProperty", "$it => ($it.DateTimeProperty == $it.DateTimeProperty)")]
+        [InlineData("DateTimeProperty ne DateTimeProperty", "$it => ($it.DateTimeProperty != $it.DateTimeProperty)")]
+        [InlineData("DateTimeProperty ge DateTimeProperty", "$it => ($it.DateTimeProperty >= $it.DateTimeProperty)")]
+        [InlineData("DateTimeProperty le DateTimeProperty", "$it => ($it.DateTimeProperty <= $it.DateTimeProperty)")]
+        public void LogicalOperators_WithDateTimeInEqualities(string clause, string expectedExpression)
         {
-            VerifyQueryDeserialization<DataTypes>(
-                "" + clause,
-                expectedExpression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<DataTypes>(clause, expectedExpression);
         }
-
-#endregion
-
-#region Logical Operators
 
         [Fact]
         [ReplaceCulture]
-        public void BooleanOperatorNullableTypes()
+        public void LogicalOperators_BooleanOperatorNullableTypes()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "UnitPrice eq 5.00m or CategoryID eq 0",
                 "$it => (($it.UnitPrice == Convert(5.00)) OrElse ($it.CategoryID == 0))",
                 NotTesting);
         }
 
         [Fact]
-        public void BooleanComparisonOnNullableAndNonNullableType()
+        public void LogicalOperators_BooleanComparisonOnNullableAndNonNullableType()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "Discontinued eq true",
                 "$it => ($it.Discontinued == Convert(True))",
                 "$it => (($it.Discontinued == Convert(True)) == True)");
         }
 
         [Fact]
-        public void BooleanComparisonOnNullableType()
+        public void LogicalOperators_BooleanComparisonOnNullableType()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "Discontinued eq Discontinued",
                 "$it => ($it.Discontinued == $it.Discontinued)",
                 "$it => (($it.Discontinued == $it.Discontinued) == True)");
@@ -254,191 +219,210 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData(null, null, false, false)]
         [InlineData(5.0, 0, true, true)]
         [InlineData(null, 1, false, false)]
-        public void OrOperator(object unitPrice, object unitsInStock, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_With_OrOperator(object unitPrice, object unitsInStock, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "UnitPrice eq 5.00m or UnitsInStock eq 0",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice == Convert({0:0.00})) OrElse (Convert($it.UnitsInStock) == Convert({1})))", 5.0, 0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice == Convert({0:0.00})) OrElse (Convert($it.UnitsInStock) == Convert({1})))", 5.0, 0),
                 NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice), UnitsInStock = ToNullable<short>(unitsInStock) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(null, null, false, false)]
         [InlineData(5.0, 10, true, true)]
         [InlineData(null, 1, false, false)]
-        public void AndOperator(object unitPrice, object unitsInStock, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_With_AndOperator(object unitPrice, object unitsInStock, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "UnitPrice eq 5.00m and UnitsInStock eq 10.00m",
                 String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice == Convert({0:0.00})) AndAlso (Convert($it.UnitsInStock) == Convert({1:0.00})))", 5.0, 10.0),
                 NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice), UnitsInStock = ToNullable<short>(unitsInStock) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
-        [InlineData(null, false, true)] // This is an interesting cas for null propagation.
+        [InlineData(null, true, false)] // This is an interesting case for null propagation.
         [InlineData(5.0, false, false)]
         [InlineData(5.5, true, true)]
-        public void Negation(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_Negation(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "not (UnitPrice eq 5.00m)",
-                String.Format(CultureInfo.InvariantCulture, "$it => Not(($it.UnitPrice == Convert({0:0.00})))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => Not(($it.UnitPrice == Convert({0:0.00})))", 5.0),
                 NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData(true, false, false)]
         [InlineData(false, true, true)]
-        public void BoolNegation(bool discontinued, bool withNullPropagation, bool withoutNullPropagation)
+        public void LogicalOperators_BoolNegation(bool discontinued, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "not Discontinued",
                 "$it => Convert(Not($it.Discontinued))",
                 "$it => (Not($it.Discontinued) == True)");
 
-            RunFilters(filters,
-                new Product { Discontinued = discontinued },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { Discontinued = discontinued }, (falseNullPropagation, trueNullPropagation));
         }
 
         [Fact]
-        public void NestedNegation()
+        public void LogicalOperators_NestedNegation()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "not (not(not    (Discontinued)))",
                 "$it => Convert(Not(Not(Not($it.Discontinued))))",
                 "$it => (Not(Not(Not($it.Discontinued))) == True)");
         }
-#endregion
+        #endregion
 
-#region Arithmetic Operators
+        #region Arithmetic Operators
         [Theory]
         [InlineData(null, false, false)]
         [InlineData(5.0, true, true)]
         [InlineData(15.01, false, false)]
-        public void Subtraction(object unitPrice, bool withNullPropagation, bool withoutNullPropagation)
+        public void ArithmeticOperators_Subtraction(object unitPrice, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "UnitPrice sub 1.00m lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice - Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
-                String.Format(CultureInfo.InvariantCulture, "$it => ((($it.UnitPrice - Convert({0:0.00})) < Convert({1:0.00})) == True)", 1.0, 5.0));
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice - Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => ((($it.UnitPrice - Convert({0:0.00})) < Convert({1:0.00})) == True)", 1.0, 5.0));
 
-            RunFilters(filters,
-               new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Fact]
-        public void Addition()
+        public void ArithmeticOperators_Addition()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "UnitPrice add 1.00m lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice + Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice + Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
                 NotTesting);
         }
 
         [Fact]
-        public void Multiplication()
+        public void ArithmeticOperators_Multiplication()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "UnitPrice mul 1.00m lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice * Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice * Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
                 NotTesting);
         }
 
         [Fact]
-        public void Division()
+        public void ArithmeticOperators_Division()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "UnitPrice div 1.00m lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice / Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice / Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
                 NotTesting);
         }
 
         [Fact]
-        public void Modulo()
+        public void ArithmeticOperators_Modulo()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "UnitPrice mod 1.00m lt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice % Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.UnitPrice % Convert({0:0.00})) < Convert({1:0.00}))", 1.0, 5.0),
                 NotTesting);
         }
-#endregion
+        #endregion
 
-#region NULL  handling
+        #region NULL handling
         [Theory]
-        [InlineData("UnitsInStock eq UnitsOnOrder", null, null, false, true)]
+        [InlineData("UnitsInStock eq UnitsOnOrder", null, null, true, false)]
         [InlineData("UnitsInStock ne UnitsOnOrder", null, null, false, false)]
         [InlineData("UnitsInStock gt UnitsOnOrder", null, null, false, false)]
         [InlineData("UnitsInStock ge UnitsOnOrder", null, null, false, false)]
         [InlineData("UnitsInStock lt UnitsOnOrder", null, null, false, false)]
         [InlineData("UnitsInStock le UnitsOnOrder", null, null, false, false)]
-        [InlineData("(UnitsInStock add UnitsOnOrder) eq UnitsInStock", null, null, false, true)]
-        [InlineData("(UnitsInStock sub UnitsOnOrder) eq UnitsInStock", null, null, false, true)]
-        [InlineData("(UnitsInStock mul UnitsOnOrder) eq UnitsInStock", null, null, false, true)]
-        [InlineData("(UnitsInStock div UnitsOnOrder) eq UnitsInStock", null, null, false, true)]
-        [InlineData("(UnitsInStock mod UnitsOnOrder) eq UnitsInStock", null, null, false, true)]
+        [InlineData("(UnitsInStock add UnitsOnOrder) eq UnitsInStock", null, null, true, false)]
+        [InlineData("(UnitsInStock sub UnitsOnOrder) eq UnitsInStock", null, null, true, false)]
+        [InlineData("(UnitsInStock mul UnitsOnOrder) eq UnitsInStock", null, null, true, false)]
+        [InlineData("(UnitsInStock div UnitsOnOrder) eq UnitsInStock", null, null, true, false)]
+        [InlineData("(UnitsInStock mod UnitsOnOrder) eq UnitsInStock", null, null, true, false)]
         [InlineData("UnitsInStock eq UnitsOnOrder", 1, null, false, false)]
         [InlineData("UnitsInStock eq UnitsOnOrder", 1, 1, true, true)]
-        public void NullHandling(string filter, object unitsInStock, object unitsOnOrder, bool withNullPropagation, bool withoutNullPropagation)
+        public void NullHandling(string filter, object unitsInStock, object unitsOnOrder, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization("" + filter);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(filter);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitsInStock = ToNullable<short>(unitsInStock), UnitsOnOrder = ToNullable<short>(unitsOnOrder) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
         [InlineData("UnitsInStock eq null", null, true, true)] // NULL == constant NULL is true when null propagation is enabled
         [InlineData("UnitsInStock ne null", null, false, false)]  // NULL != constant NULL is false when null propagation is enabled
-        public void NullHandling_LiteralNull(string filter, object unitsInStock, bool withNullPropagation, bool withoutNullPropagation)
+        public void NullHandling_LiteralNull(string filter, object unitsInStock, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization("" + filter);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(filter);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { UnitsInStock = ToNullable<short>(unitsInStock) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Fact]
         public void NullHandling_StringFunctionWithStringParameret()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "startswith(ProductName, 'Abc')",
                 NotTesting,
                 "$it => (IIF((($it.ProductName == null) OrElse (\"Abc\" == null)), null, Convert($it.ProductName.StartsWith(\"Abc\"))) == True)");
         }
-#endregion
+        #endregion
 
         [Theory]
-        [InlineData("StringProp gt 'Middle'", "Middle", false)]
-        [InlineData("StringProp ge 'Middle'", "Middle", true)]
-        [InlineData("StringProp lt 'Middle'", "Middle", false)]
-        [InlineData("StringProp le 'Middle'", "Middle", true)]
-        [InlineData("StringProp ge StringProp", "", true)]
-        [InlineData("StringProp gt null", "", true)]
-        [InlineData("null gt StringProp", "", false)]
-        [InlineData("'Middle' gt StringProp", "Middle", false)]
-        [InlineData("'a' lt 'b'", "", true)]
-        public void StringComparisons_Work(string filter, string value, bool expectedResult)
+        [InlineData("StringProp gt 'Middle'", "Middle", false, false)]
+        [InlineData("StringProp ge 'Middle'", "Middle", true, true)]
+        [InlineData("StringProp lt 'Middle'", "Middle", false, false)]
+        [InlineData("StringProp le 'Middle'", "Middle", true, true)]
+        [InlineData("StringProp ge StringProp", "", true, true)]
+        [InlineData("StringProp gt null", "", true, true)]
+        [InlineData("null gt StringProp", "", false, false)]
+        [InlineData("'Middle' gt StringProp", "Middle", false, false)]
+        [InlineData("'a' lt 'b'", "", true, true)]
+        public void StringComparisons_Work(string filter, string value, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter);
-            var result = RunFilter(filters.WithoutNullPropagation, new DataTypes { StringProp = value });
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DataTypes>(filter);
 
-            Assert.Equal(expectedResult, result);
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new DataTypes { StringProp = value }, (falseNullPropagation, trueNullPropagation));
         }
 
         // Issue: 477
@@ -451,101 +435,105 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("indexof('hello', StringProp) gt NullableULongProp")]
         public void ComparisonsInvolvingCastsAndNullableValues(string filter)
         {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DataTypes>(filter);
 
-            RunFilters(filters,
-              new DataTypes(),
-              new { WithNullPropagation = false, WithoutNullPropagation = typeof(ArgumentNullException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new DataTypes(), (typeof(ArgumentNullException), false));
         }
 
         [Theory]
         [InlineData(null, null, true, true)]
         [InlineData("not doritos", 0, true, true)]
         [InlineData("Doritos", 1, false, false)]
-        public void Grouping(string productName, object unitsInStock, bool withNullPropagation, bool withoutNullPropagation)
+        public void MultipleLogicOperators_Grouping(string productName, object unitsInStock, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "((ProductName ne 'Doritos') or (UnitPrice lt 5.00m))",
-                String.Format(CultureInfo.InvariantCulture, "$it => (($it.ProductName != \"Doritos\") OrElse ($it.UnitPrice < Convert({0:0.00})))", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => (($it.ProductName != \"Doritos\") OrElse ($it.UnitPrice < Convert({0:0.00})))", 5.0),
                 NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { ProductName = productName, UnitsInStock = ToNullable<short>(unitsInStock) },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Fact]
-        public void MemberExpressions()
+        public void SubMemberExpressions()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "Category/CategoryName eq 'Snacks'",
                 "$it => ($it.Category.CategoryName == \"Snacks\")",
                 "$it => (IIF(($it.Category == null), null, $it.Category.CategoryName) == \"Snacks\")");
 
-            RunFilters(filters,
-                new Product { },
-                new { WithNullPropagation = false, WithoutNullPropagation = typeof(NullReferenceException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product(), (typeof(NullReferenceException), false));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { Category = new Category { CategoryName = "Snacks" } },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
         }
 
         [Fact]
-        public void MemberExpressionsRecursive()
+        public void SubMemberExpressionsRecursive()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "Category/Product/Category/CategoryName eq 'Snacks'",
                 "$it => ($it.Category.Product.Category.CategoryName == \"Snacks\")",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { },
-               new { WithNullPropagation = false, WithoutNullPropagation = typeof(NullReferenceException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product(), (typeof(NullReferenceException), false));
         }
 
         [Fact]
         public void ComplexPropertyNavigation()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "SupplierAddress/City eq 'Redmond'",
                 "$it => ($it.SupplierAddress.City == \"Redmond\")",
                 "$it => (IIF(($it.SupplierAddress == null), null, $it.SupplierAddress.City) == \"Redmond\")");
 
-            RunFilters(filters,
-               new Product { },
-               new { WithNullPropagation = false, WithoutNullPropagation = typeof(NullReferenceException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product(), (typeof(NullReferenceException), false));
 
-            RunFilters(filters,
-               new Product { SupplierAddress = new Address { City = "Redmond" } },
-               new { WithNullPropagation = true, WithoutNullPropagation = true });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { SupplierAddress = new Address { City = "Redmond" } }, (true, true));
         }
 
-#region Any/All
-
+        #region Any/All
         [Fact]
-        public void AnyOnNavigationEnumerableCollections()
+        public void AnyOperator_OnNavigationEnumerableCollections()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "Category/EnumerableProducts/any(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.EnumerableProducts.Any(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                      new Product
                      {
                          Category = new Category
                          {
                              EnumerableProducts = new Product[]
-                        {
-                            new Product { ProductName = "Snacks" },
-                            new Product { ProductName = "NonSnacks" }
-                        }
+                             {
+                                 new Product { ProductName = "Snacks" },
+                                 new Product { ProductName = "NonSnacks" }
+                             }
                          }
                      },
-                     new { WithNullPropagation = true, WithoutNullPropagation = true });
+                     (true, true));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product
                 {
                     Category = new Category
@@ -556,32 +544,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                         }
                     }
                 },
-                new { WithNullPropagation = false, WithoutNullPropagation = false });
+                (false, false));
         }
 
         [Fact]
-        public void AnyOnNavigationQueryableCollections()
+        public void AnyOperator_OnNavigationQueryableCollections()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "Category/QueryableProducts/any(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.QueryableProducts.Any(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
 
-            RunFilters(filters,
-                    new Product
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product
+                {
+                    Category = new Category
                     {
-                        Category = new Category
-                        {
-                            QueryableProducts = new Product[]
+                        QueryableProducts = new Product[]
                         {
                             new Product { ProductName = "Snacks" },
                             new Product { ProductName = "NonSnacks" }
                         }.AsQueryable()
-                        }
-                    },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                    }
+                },
+                (true, true));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product
                 {
                     Category = new Category
@@ -592,7 +583,87 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                         }.AsQueryable()
                     }
                 },
-            new { WithNullPropagation = false, WithoutNullPropagation = false });
+                (false, false));
+        }
+
+        [Fact]
+        public void AnyOperator_WithNestedFilterWithCountNode_OnNavigationQueryableCollections()
+        {
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
+               "Category/QueryableProducts/any(p: p/AlternateAddresses/$count($filter=HouseNumber ge 8) ge 2)",
+               "$it => $it.Category.QueryableProducts.Any(p => (p.AlternateAddresses.Where($it => ($it.HouseNumber >= 8)).LongCount() >= 2))",
+               NotTesting);
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product
+                {
+                    Category = new Category
+                    {
+                        QueryableProducts = new Product[]
+                        {
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 8 } } },
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 9 }, new Address { HouseNumber = 10 } } }
+                        }.AsQueryable()
+                    }
+                },
+                (true, true));
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product
+                {
+                    Category = new Category
+                    {
+                        QueryableProducts = new Product[]
+                        {
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 8 } } },
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 4 } } }  // < 8
+                        }.AsQueryable()
+                    }
+                },
+                (false, false));
+        }
+
+        [Fact]
+        public void AnyOperator_WithNestedAny_OnNavigationQueryableCollections()
+        {
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
+               "Category/QueryableProducts/any(p: p/AlternateAddresses/any(o:o/HouseNumber eq 8))",
+               "$it => $it.Category.QueryableProducts.Any(p => p.AlternateAddresses.Any(o => (o.HouseNumber == 8)))",
+               NotTesting);
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product
+                {
+                    Category = new Category
+                    {
+                        QueryableProducts = new Product[]
+                        {
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 8 } } },
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 9 } } }
+                        }.AsQueryable()
+                    }
+                },
+                (true, true));
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
+                new Product
+                {
+                    Category = new Category
+                    {
+                        QueryableProducts = new Product[]
+                        {
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 10 } } },
+                            new Product { AlternateAddresses = new Address[] { new Address { HouseNumber = 9 } } }
+                        }.AsQueryable()
+                    }
+                },
+                (false, false));
         }
 
         [Theory]
@@ -604,44 +675,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Category/EnumerableProducts/any(P: P/NullableGuidProperty in (dc75698b-581d-488b-9638-3e28dd51d8f7))", "$it => $it.Category.EnumerableProducts.Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Guid]].Contains(P.NullableGuidProperty))", "$it => (IIF((IIF(($it.Category == null), null, $it.Category.EnumerableProducts) == null), null, Convert(IIF(($it.Category == null), null, $it.Category.EnumerableProducts).Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Guid]].Contains(IIF((P == null), null, P.NullableGuidProperty))))) == True)")]
         [InlineData("Category/QueryableProducts/any(P: P/Discontinued in (false, null))", "$it => $it.Category.QueryableProducts.Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Boolean]].Contains(P.Discontinued))", "$it => (IIF((IIF(($it.Category == null), null, $it.Category.QueryableProducts) == null), null, Convert(IIF(($it.Category == null), null, $it.Category.QueryableProducts).Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Boolean]].Contains(IIF((P == null), null, P.Discontinued))))) == True)")]
         [InlineData("Category/EnumerableProducts/any(P: P/Discontinued in (false, null))", "$it => $it.Category.EnumerableProducts.Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Boolean]].Contains(P.Discontinued))", "$it => (IIF((IIF(($it.Category == null), null, $it.Category.EnumerableProducts) == null), null, Convert(IIF(($it.Category == null), null, $it.Category.EnumerableProducts).Any(P => System.Collections.Generic.List`1[System.Nullable`1[System.Boolean]].Contains(IIF((P == null), null, P.Discontinued))))) == True)")]
-        public void AnyInOnNavigation(string filter, string expression, string expressionWithNullPropagation)
+        public void AnyOperator_WithInOperator_OnNavigation(string filter, string falseNullExpression, string trueNullExpression)
         {
-            var filters = VerifyQueryDeserialization(
-               filter,
-               expression,
-               expressionWithNullPropagation);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, falseNullExpression, trueNullExpression);
         }
 
         [Theory]
         [InlineData("Category/QueryableProducts/any(P: false)", "$it => False")]
         [InlineData("Category/QueryableProducts/any(P: false and P/ProductName eq 'Snacks')", "$it => $it.Category.QueryableProducts.Any(P => (False AndAlso (P.ProductName == \"Snacks\")))")]
         [InlineData("Category/QueryableProducts/any(P: true)", "$it => $it.Category.QueryableProducts.Any()")]
-        public void AnyOnNavigation_Contradiction(string filter, string expression)
+        public void AnyOperator_OnNavigation_Contradiction(string filter, string expression)
         {
-            var filters = VerifyQueryDeserialization(
-               filter,
-               expression,
-               NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Fact]
-        public void AnyOnNavigation_NullCollection()
+        public void AnyOperator_OnNavigation_NullCollection()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "Category/EnumerableProducts/any(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.EnumerableProducts.Any(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters,
                      new Product
                      {
                          Category = new Category
                          {
                          }
                      },
-                     new { WithNullPropagation = false, WithoutNullPropagation = typeof(ArgumentNullException) });
+                     (typeof(ArgumentNullException), false));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product
                 {
                     Category = new Category
@@ -652,27 +722,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                         }
                     }
                 },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
         }
 
         [Fact]
-        public void AllOnNavigation_NullCollection()
+        public void AllOperator_OnNavigation_NullCollection()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "Category/EnumerableProducts/all(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.EnumerableProducts.All(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
 
-            RunFilters(filters,
-                     new Product
-                     {
-                         Category = new Category
-                         {
-                         }
-                     },
-                     new { WithNullPropagation = false, WithoutNullPropagation = typeof(ArgumentNullException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters,
+                new Product
+                {
+                    Category = new Category
+                    {
+                    }
+                },
+                (typeof(ArgumentNullException), false));
 
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product
                 {
                     Category = new Category
@@ -683,13 +756,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                         }
                     }
                 },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
         }
 
         [Fact]
         public void MultipleAnys_WithSameRangeVariableName()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "AlternateIDs/any(n: n eq 42) and AlternateAddresses/any(n : n/City eq 'Redmond')",
                "$it => ($it.AlternateIDs.Any(n => (n == 42)) AndAlso $it.AlternateAddresses.Any(n => (n.City == \"Redmond\")))",
                NotTesting);
@@ -698,7 +772,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void MultipleAlls_WithSameRangeVariableName()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "AlternateIDs/all(n: n eq 42) and AlternateAddresses/all(n : n/City eq 'Redmond')",
                "$it => ($it.AlternateIDs.All(n => (n == 42)) AndAlso $it.AlternateAddresses.All(n => (n.City == \"Redmond\")))",
                NotTesting);
@@ -707,7 +782,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AnyOnNavigationEnumerableCollections_EmptyFilter()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/EnumerableProducts/any()",
                "$it => $it.Category.EnumerableProducts.Any()",
                NotTesting);
@@ -716,7 +792,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AnyOnNavigationQueryableCollections_EmptyFilter()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/QueryableProducts/any()",
                "$it => $it.Category.QueryableProducts.Any()",
                NotTesting);
@@ -725,7 +802,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AllOnNavigationEnumerableCollections()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/EnumerableProducts/all(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.EnumerableProducts.All(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
@@ -734,7 +812,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AllOnNavigationQueryableCollections()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/QueryableProducts/all(P: P/ProductName eq 'Snacks')",
                "$it => $it.Category.QueryableProducts.All(P => (P.ProductName == \"Snacks\"))",
                NotTesting);
@@ -743,7 +822,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AnyInSequenceNotNested()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/QueryableProducts/any(P: P/ProductName eq 'Snacks') or Category/QueryableProducts/any(P2: P2/ProductName eq 'Snacks')",
                "$it => ($it.Category.QueryableProducts.Any(P => (P.ProductName == \"Snacks\")) OrElse $it.Category.QueryableProducts.Any(P2 => (P2.ProductName == \"Snacks\")))",
                NotTesting);
@@ -752,7 +832,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AllInSequenceNotNested()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "Category/QueryableProducts/all(P: P/ProductName eq 'Snacks') or Category/QueryableProducts/all(P2: P2/ProductName eq 'Snacks')",
                "$it => ($it.Category.QueryableProducts.All(P => (P.ProductName == \"Snacks\")) OrElse $it.Category.QueryableProducts.All(P2 => (P2.ProductName == \"Snacks\")))",
                NotTesting);
@@ -761,26 +842,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AnyOnPrimitiveCollection()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "AlternateIDs/any(id: id eq 42)",
                "$it => $it.AlternateIDs.Any(id => (id == 42))",
                NotTesting);
 
-            RunFilters(
-                filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { AlternateIDs = new[] { 1, 2, 42 } },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
 
-            RunFilters(
-                filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { AlternateIDs = new[] { 1, 2 } },
-                new { WithNullPropagation = false, WithoutNullPropagation = false });
+                (false, false));
         }
 
         [Fact]
         public void AllOnPrimitiveCollection()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "AlternateIDs/all(id: id eq 42)",
                "$it => $it.AlternateIDs.All(id => (id == 42))",
                NotTesting);
@@ -789,26 +872,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void AnyOnComplexCollection()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "AlternateAddresses/any(address: address/City eq 'Redmond')",
                "$it => $it.AlternateAddresses.Any(address => (address.City == \"Redmond\"))",
                NotTesting);
 
-            RunFilters(
-                filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters,
                 new Product { AlternateAddresses = new[] { new Address { City = "Redmond" } } },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
 
-            RunFilters(
-                filters,
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters,
                 new Product(),
-                new { WithNullPropagation = false, WithoutNullPropagation = typeof(ArgumentNullException) });
+               (typeof(ArgumentNullException), false));
         }
 
         [Fact]
         public void AllOnComplexCollection()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                "AlternateAddresses/all(address: address/City eq 'Redmond')",
                "$it => $it.AlternateAddresses.All(address => (address.City == \"Redmond\"))",
                NotTesting);
@@ -817,16 +902,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void RecursiveAllAny()
         {
-            VerifyQueryDeserialization(
-               "Category/QueryableProducts/all(P: P/Category/EnumerableProducts/any(PP: PP/ProductName eq 'Snacks'))",
-               "$it => $it.Category.QueryableProducts.All(P => P.Category.EnumerableProducts.Any(PP => (PP.ProductName == \"Snacks\")))",
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
+               "Category/QueryableProducts/all(p: p/Category/EnumerableProducts/any(o: o/ProductName eq 'Snacks'))",
+               "$it => $it.Category.QueryableProducts.All(p => p.Category.EnumerableProducts.Any(o => (o.ProductName == \"Snacks\")))",
                NotTesting);
         }
+        #endregion
 
-#endregion
-
-#region String Functions
-
+        #region String Functions
         [Theory]
         [InlineData("Abcd", -1, "Abcd", true, typeof(ArgumentOutOfRangeException))]
         [InlineData("Abcd", 0, "Abcd", true, true)]
@@ -834,14 +918,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Abcd", 3, "d", true, true)]
         [InlineData("Abcd", 4, "", true, true)]
         [InlineData("Abcd", 5, "", true, typeof(ArgumentOutOfRangeException))]
-        public void StringSubstringStart(string productName, int startIndex, string compareString, bool withNullPropagation, object withoutNullPropagation)
+        public void StringSubstringStart(string productName, int index, string compareString, bool trueNullPropagation, object falseNullPropagation)
         {
-            string filter = String.Format("substring(ProductName, {0}) eq '{1}'", startIndex, compareString);
-            var filters = VerifyQueryDeserialization(filter);
+            // Arrange & Act & Assert
+            string filter = $"substring(ProductName, {index}) eq '{compareString}'";
+            var filters = BindFilterAndVerify<Product>(filter);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            Product product = new Product { ProductName = productName };
+            if (falseNullPropagation.GetType() == typeof(bool))
+            {
+                bool boolValue = (bool)falseNullPropagation;
+                InvokeFiltersAndVerify(filters, product, (boolValue, trueNullPropagation));
+            }
+            else
+            {
+                Type typeValue = (Type)falseNullPropagation;
+                InvokeFiltersAndThrows(filters, product, (typeValue, trueNullPropagation));
+            }
         }
 
         [Theory]
@@ -858,266 +952,283 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Abcd", 4, 1, "", true, typeof(ArgumentOutOfRangeException))]
         [InlineData("Abcd", 0, -1, "", true, typeof(ArgumentOutOfRangeException))]
         [InlineData("Abcd", 5, -1, "", true, typeof(ArgumentOutOfRangeException))]
-        public void StringSubstringStartAndLength(string productName, int startIndex, int length, string compareString, bool withNullPropagation, object withoutNullPropagation)
+        public void StringSubstringStartAndLength(string productName, int index, int length, string compareString, bool trueNullPropagation, object falseNullPropagation)
         {
-            string filter = String.Format("substring(ProductName, {0}, {1}) eq '{2}'", startIndex, length, compareString);
-            var filters = VerifyQueryDeserialization(filter);
+            // Arrange & Act & Assert
+            string filter = $"substring(ProductName, {index}, {length}) eq '{compareString}'";
+            var filters = BindFilterAndVerify<Product>(filter);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            Product product = new Product { ProductName = productName };
+            if (falseNullPropagation.GetType() == typeof(bool))
+            {
+                bool boolValue = (bool)falseNullPropagation;
+                InvokeFiltersAndVerify(filters, product, (boolValue, trueNullPropagation));
+            }
+            else
+            {
+                Type typeValue = (Type)falseNullPropagation;
+                InvokeFiltersAndThrows(filters, product, (typeValue, trueNullPropagation));
+            }
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("Abcd", true, true)]
-        [InlineData("Abd", false, false)]
-        public void StringContains(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringContains()
         {
-            // In OData, the order of parameters is actually reversed in the resulting
-            // String.Contains expression
-
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "contains(ProductName, 'Abc')",
                 "$it => $it.ProductName.Contains(\"Abc\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
 
-            filters = VerifyQueryDeserialization(
-                "contains(ProductName, 'Abc')",
-                "$it => $it.ProductName.Contains(\"Abc\")",
-                NotTesting);
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("Abcd", true, true)]
-        [InlineData("Abd", false, false)]
-        public void StringStartsWith(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringStartsWith()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "startswith(ProductName, 'Abc')",
                 "$it => $it.ProductName.StartsWith(\"Abc\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("AAbc", true, true)]
-        [InlineData("Abcd", false, false)]
-        public void StringEndsWith(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringEndsWith()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "endswith(ProductName, 'Abc')",
                 "$it => $it.ProductName.EndsWith(\"Abc\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "AAbc" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("AAbc", true, true)]
-        [InlineData("", false, false)]
-        public void StringLength(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringLength()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "length(ProductName) gt 0",
                 "$it => ($it.ProductName.Length > 0)",
                 "$it => ((IIF(($it.ProductName == null), null, Convert($it.ProductName.Length)) > Convert(0)) == True)");
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "AAbc" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("12345Abc", true, true)]
-        [InlineData("1234Abc", false, false)]
-        public void StringIndexOf(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringIndexOf()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "indexof(ProductName, 'Abc') eq 5",
                 "$it => ($it.ProductName.IndexOf(\"Abc\") == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "12345Abc" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "1234Abc" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("123uctName", true, true)]
-        [InlineData("1234Abc", false, false)]
-        public void StringSubstring(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringSubstring()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "substring(ProductName, 3) eq 'uctName'",
                 "$it => ($it.ProductName.Substring(3) == \"uctName\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
 
-            VerifyQueryDeserialization(
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "123uctName" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "1234Abc" }, (false, false));
+
+            // Arrange & Act & Assert
+
+            BindFilterAndVerify<Product>(
                 "substring(ProductName, 3, 4) eq 'uctN'",
                 "$it => ($it.ProductName.Substring(3, 4) == \"uctN\")",
                 NotTesting);
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("Tasty Treats", true, true)]
-        [InlineData("Tasty Treatss", false, false)]
-        public void StringToLower(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringToLower()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "tolower(ProductName) eq 'tasty treats'",
                 "$it => ($it.ProductName.ToLower() == \"tasty treats\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Tasty Treats" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Tasty Treatss" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("Tasty Treats", true, true)]
-        [InlineData("Tasty Treatss", false, false)]
-        public void StringToUpper(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringToUpper()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "toupper(ProductName) eq 'TASTY TREATS'",
                 "$it => ($it.ProductName.ToUpper() == \"TASTY TREATS\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Tasty Treats" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Tasty Treatss" }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(NullReferenceException))]
-        [InlineData("Tasty Treats", true, true)]
-        [InlineData("Tasty Treatss", false, false)]
-        public void StringTrim(string productName, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void StringFunctions_StringTrim()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "trim(ProductName) eq 'Tasty Treats'",
                 "$it => ($it.ProductName.Trim() == \"Tasty Treats\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { ProductName = productName },
-              new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "   Tasty Treats   " }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "   Tasty Treatss   " }, (false, false));
         }
 
         [Fact]
-        public void StringConcat()
+        public void StringFunctions_StringConcat()
         {
-            var filters = VerifyQueryDeserialization(
-                "concat('Food', 'Bar') eq 'FoodBar'",
-                "$it => (\"Food\".Concat(\"Bar\") == \"FoodBar\")",
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
+                "concat(ProductName, 'Bar') eq 'FoodBar'",
+                "$it => ($it.ProductName.Concat(\"Bar\") == \"FoodBar\")",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { },
-              new { WithNullPropagation = true, WithoutNullPropagation = true });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Food" }, (true, true));
         }
 
         [Fact]
-        public void RecursiveMethodCall()
+        public void StringFunctions_RecursiveMethodCall()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "floor(floor(UnitPrice)) eq 123m",
                 "$it => ($it.UnitPrice.Value.Floor().Floor() == 123)",
                 NotTesting);
 
-            RunFilters(filters,
-              new Product { },
-              new { WithNullPropagation = false, WithoutNullPropagation = typeof(InvalidOperationException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { }, (typeof(InvalidOperationException), false));
         }
+        #endregion
 
-#endregion
-
-#region Date Functions
+        #region Date Functions
         [Fact]
-        public void DateDay()
+        public void DateFunctions_DateDay()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "day(DiscontinuedDate) eq 8",
                 "$it => ($it.DiscontinuedDate.Value.Day == 8)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { },
-               new { WithNullPropagation = false, WithoutNullPropagation = typeof(InvalidOperationException) });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { }, (typeof(InvalidOperationException), false));
 
-            RunFilters(filters,
-               new Product { DiscontinuedDate = new DateTime(2000, 10, 8) },
-               new { WithNullPropagation = true, WithoutNullPropagation = true });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { DiscontinuedDate = new DateTime(2000, 10, 8) }, (true, true));
         }
 
         [Fact]
-        public void DateDayNonNullable()
+        public void DateFunctions_DateDayNonNullable()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "day(NonNullableDiscontinuedDate) eq 8",
                 "$it => ($it.NonNullableDiscontinuedDate.Day == 8)");
         }
 
         [Fact]
-        public void DateMonth()
+        public void DateFunctions_DateMonth()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "month(DiscontinuedDate) eq 8",
                 "$it => ($it.DiscontinuedDate.Value.Month == 8)",
                 NotTesting);
         }
 
         [Fact]
-        public void DateYear()
+        public void DateFunctions_DateYear()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "year(DiscontinuedDate) eq 1974",
                 "$it => ($it.DiscontinuedDate.Value.Year == 1974)",
                 NotTesting);
         }
 
         [Fact]
-        public void DateHour()
+        public void DateFunctions_DateHour()
         {
-            VerifyQueryDeserialization("hour(DiscontinuedDate) eq 8",
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>("hour(DiscontinuedDate) eq 8",
                 "$it => ($it.DiscontinuedDate.Value.Hour == 8)",
                 NotTesting);
         }
 
         [Fact]
-        public void DateMinute()
+        public void DateFunctions_DateMinute()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "minute(DiscontinuedDate) eq 12",
                 "$it => ($it.DiscontinuedDate.Value.Minute == 12)",
                 NotTesting);
         }
 
         [Fact]
-        public void DateSecond()
+        public void DateFunctions_DateSecond()
         {
-            VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "second(DiscontinuedDate) eq 33",
                 "$it => ($it.DiscontinuedDate.Value.Second == 33)",
                 NotTesting);
@@ -1131,9 +1242,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("minute(DiscontinuedOffset) eq 100", "$it => ($it.DiscontinuedOffset.Minute == 100)")]
         [InlineData("second(DiscontinuedOffset) eq 100", "$it => ($it.DiscontinuedOffset.Second == 100)")]
         [InlineData("now() eq 2016-11-08Z", "$it => (DateTimeOffset.UtcNow == 11/08/2016 00:00:00 +00:00)")]
-        public void DateTimeOffsetFunctions(string filter, string expression)
+        public void DateFunctions_DateTimeOffsetFunctions(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
 
         [Theory]
@@ -1143,62 +1255,69 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("hour(Birthday) eq 100", "$it => {0}.Hour == 100)")]
         [InlineData("minute(Birthday) eq 100", "$it => {0}.Minute == 100)")]
         [InlineData("second(Birthday) eq 100", "$it => {0}.Second == 100)")]
-        public void DateTimeFunctions(string filter, string expression)
+        public void DateFunctions_DateTimeFunctions(string filter, string expression)
         {
+            // Arrange & Act & Assert
             string expect = string.Format(expression, "($it.Birthday");
-            VerifyQueryDeserialization(filter, expect);
+            BindFilterAndVerify<Product>(filter, expect);
         }
 
         [Theory]
         [InlineData("year(NullableDateProperty) eq 2015", "$it => ($it.NullableDateProperty.Value.Year == 2015)")]
         [InlineData("month(NullableDateProperty) eq 12", "$it => ($it.NullableDateProperty.Value.Month == 12)")]
         [InlineData("day(NullableDateProperty) eq 23", "$it => ($it.NullableDateProperty.Value.Day == 23)")]
-        public void DateFunctions_Nullable(string filter, string expression)
+        public void DateFunctions_DateFunctions_Nullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Theory]
         [InlineData("year(DateProperty) eq 2015", "$it => ($it.DateProperty.Year == 2015)")]
         [InlineData("month(DateProperty) eq 12", "$it => ($it.DateProperty.Month == 12)")]
         [InlineData("day(DateProperty) eq 23", "$it => ($it.DateProperty.Day == 23)")]
-        public void DateFunctions_NonNullable(string filter, string expression)
+        public void DateFunctions_DateFunctions_NonNullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
 
         [Theory]
         [InlineData("hour(NullableTimeOfDayProperty) eq 10", "$it => ($it.NullableTimeOfDayProperty.Value.Hours == 10)")]
         [InlineData("minute(NullableTimeOfDayProperty) eq 20", "$it => ($it.NullableTimeOfDayProperty.Value.Minutes == 20)")]
         [InlineData("second(NullableTimeOfDayProperty) eq 30", "$it => ($it.NullableTimeOfDayProperty.Value.Seconds == 30)")]
-        public void TimeOfDayFunctions_Nullable(string filter, string expression)
+        public void DateFunctions_TimeOfDayFunctions_Nullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Theory]
         [InlineData("hour(TimeOfDayProperty) eq 10", "$it => ($it.TimeOfDayProperty.Hours == 10)")]
         [InlineData("minute(TimeOfDayProperty) eq 20", "$it => ($it.TimeOfDayProperty.Minutes == 20)")]
         [InlineData("second(TimeOfDayProperty) eq 30", "$it => ($it.TimeOfDayProperty.Seconds == 30)")]
-        public void TimeOfDayFunctions_NonNullable(string filter, string expression)
+        public void DateFunctions_TimeOfDayFunctions_NonNullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
 
         [Theory]
         [InlineData("fractionalseconds(DiscontinuedDate) eq 0.2", "$it => ((Convert($it.DiscontinuedDate.Value.Millisecond) / 1000) == 0.2)")]
         [InlineData("fractionalseconds(NullableTimeOfDayProperty) eq 0.2", "$it => ((Convert($it.NullableTimeOfDayProperty.Value.Milliseconds) / 1000) == 0.2)")]
-        public void FractionalsecondsFunction_Nullable(string filter, string expression)
+        public void DateFunctions_FractionalsecondsFunction_Nullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Theory]
         [InlineData("fractionalseconds(NonNullableDiscontinuedDate) eq 0.2", "$it => ((Convert($it.NonNullableDiscontinuedDate.Millisecond) / 1000) == 0.2)")]
         [InlineData("fractionalseconds(TimeOfDayProperty) eq 0.2", "$it => ((Convert($it.TimeOfDayProperty.Milliseconds) / 1000) == 0.2)")]
-        public void FractionalsecondsFunction_NonNullable(string filter, string expression)
+        public void DateFunctions_FractionalsecondsFunction_NonNullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
 
         [Theory]
@@ -1210,9 +1329,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             "$it => ((((2015-02-26.Year * 10000) + (2015-02-26.Month * 100)) + 2015-02-26.Day) >= ((($it.DiscontinuedDate.Value.Year * 10000) + ($it.DiscontinuedDate.Value.Month * 100)) + $it.DiscontinuedDate.Value.Day))")]
         [InlineData("null ne date(DiscontinuedDate)", "$it => (null != $it.DiscontinuedDate)")]
         [InlineData("date(DiscontinuedDate) eq null", "$it => ($it.DiscontinuedDate == null)")]
-        public void DateFunction_Nullable(string filter, string expression)
+        public void DateFunctions_DateFunction_Nullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Theory]
@@ -1222,9 +1342,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             "$it => (((($it.NonNullableDiscontinuedDate.Year * 10000) + ($it.NonNullableDiscontinuedDate.Month * 100)) + $it.NonNullableDiscontinuedDate.Day) < (((2016-02-26.Year * 10000) + (2016-02-26.Month * 100)) + 2016-02-26.Day))")]
         [InlineData("2015-02-26 ge date(NonNullableDiscontinuedDate)",
             "$it => ((((2015-02-26.Year * 10000) + (2015-02-26.Month * 100)) + 2015-02-26.Day) >= ((($it.NonNullableDiscontinuedDate.Year * 10000) + ($it.NonNullableDiscontinuedDate.Month * 100)) + $it.NonNullableDiscontinuedDate.Day))")]
-        public void DateFunction_NonNullable(string filter, string expression)
+        public void DateFunctions_DateFunction_NonNullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
 
         [Theory]
@@ -1236,9 +1357,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             "$it => (((Convert(01:02:03.0040000.Hours) * 36000000000) + ((Convert(01:02:03.0040000.Minutes) * 600000000) + ((Convert(01:02:03.0040000.Seconds) * 10000000) + Convert(01:02:03.0040000.Milliseconds)))) <= ((Convert($it.DiscontinuedDate.Value.Hour) * 36000000000) + ((Convert($it.DiscontinuedDate.Value.Minute) * 600000000) + ((Convert($it.DiscontinuedDate.Value.Second) * 10000000) + Convert($it.DiscontinuedDate.Value.Millisecond)))))")]
         [InlineData("null ne time(DiscontinuedDate)", "$it => (null != $it.DiscontinuedDate)")]
         [InlineData("time(DiscontinuedDate) eq null", "$it => ($it.DiscontinuedDate == null)")]
-        public void TimeFunction_Nullable(string filter, string expression)
+        public void DateFunctions_TimeFunction_Nullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, NotTesting);
         }
 
         [Theory]
@@ -1248,147 +1370,165 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             "$it => (((Convert($it.NonNullableDiscontinuedDate.Hour) * 36000000000) + ((Convert($it.NonNullableDiscontinuedDate.Minute) * 600000000) + ((Convert($it.NonNullableDiscontinuedDate.Second) * 10000000) + Convert($it.NonNullableDiscontinuedDate.Millisecond)))) >= ((Convert(01:02:03.0040000.Hours) * 36000000000) + ((Convert(01:02:03.0040000.Minutes) * 600000000) + ((Convert(01:02:03.0040000.Seconds) * 10000000) + Convert(01:02:03.0040000.Milliseconds)))))")]
         [InlineData("01:02:03.0040000 le time(NonNullableDiscontinuedDate)",
             "$it => (((Convert(01:02:03.0040000.Hours) * 36000000000) + ((Convert(01:02:03.0040000.Minutes) * 600000000) + ((Convert(01:02:03.0040000.Seconds) * 10000000) + Convert(01:02:03.0040000.Milliseconds)))) <= ((Convert($it.NonNullableDiscontinuedDate.Hour) * 36000000000) + ((Convert($it.NonNullableDiscontinuedDate.Minute) * 600000000) + ((Convert($it.NonNullableDiscontinuedDate.Second) * 10000000) + Convert($it.NonNullableDiscontinuedDate.Millisecond)))))")]
-        public void TimeFunction_NonNullable(string filter, string expression)
+        public void DateFunctions_TimeFunction_NonNullable(string filter, string expression)
         {
-            VerifyQueryDeserialization(filter, expression);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression);
         }
-
-#endregion
+        #endregion
 
         #region Math Functions
-        [Theory, MemberData(nameof(MathRoundDecimal_DataSet))]
-        public void MathRoundDecimal(decimal? unitPrice, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathRoundDecimal()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "round(UnitPrice) gt 5.00m",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice.Value.Round() > {0:0.00})", 5.0),
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.UnitPrice.Value.Round() > {0:0.00})", 5.0),
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { UnitPrice = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 5.9m }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 5.4m }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(5.9d, true, true)]
-        [InlineData(5.4d, false, false)]
-        public void MathRoundDouble(double? weight, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathRoundDouble()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "round(Weight) gt 5d",
-                String.Format(CultureInfo.InvariantCulture, "$it => ($it.Weight.Value.Round() > {0})", 5),
+                string.Format(CultureInfo.InvariantCulture, "$it => ($it.Weight.Value.Round() > {0})", 5),
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Weight = ToNullable<double>(weight) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Weight = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 5.9d }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 5.4d }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(5.9f, true, true)]
-        [InlineData(5.4f, false, false)]
-        public void MathRoundFloat(float? width, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathRoundFloat()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "round(Width) gt 5f",
-                String.Format(CultureInfo.InvariantCulture, "$it => (Convert($it.Width).Value.Round() > {0})", 5),
+                string.Format(CultureInfo.InvariantCulture, "$it => (Convert($it.Width).Value.Round() > {0})", 5),
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Width = ToNullable<float>(width) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Width = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 5.9f }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 5.4f }, (false, false));
         }
 
-        [Theory, MemberData(nameof(MathFloorDecimal_DataSet))]
-        public void MathFloorDecimal(decimal? unitPrice, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathFloorDecimal()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "floor(UnitPrice) eq 5",
                 "$it => ($it.UnitPrice.Value.Floor() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { UnitPrice = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 5.4m }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 4.4m }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(5.4d, true, true)]
-        [InlineData(4.4d, false, false)]
-        public void MathFloorDouble(double? weight, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathFloorDouble()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "floor(Weight) eq 5",
                 "$it => ($it.Weight.Value.Floor() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Weight = ToNullable<double>(weight) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Weight = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 5.4d }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 4.4d }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(5.4f, true, true)]
-        [InlineData(4.4f, false, false)]
-        public void MathFloorFloat(float? width, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathFloorFloat()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "floor(Width) eq 5",
                 "$it => (Convert($it.Width).Value.Floor() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Width = ToNullable<float>(width) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Width = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 5.4f }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 4.4f }, (false, false));
         }
 
-        [Theory, MemberData(nameof(MathCeilingDecimal_DataSet))]
-        public void MathCeilingDecimal(object unitPrice, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathCeilingDecimal()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "ceiling(UnitPrice) eq 5",
                 "$it => ($it.UnitPrice.Value.Ceiling() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { UnitPrice = ToNullable<decimal>(unitPrice) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { UnitPrice = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 4.1m }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { UnitPrice = 5.9m }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(4.1d, true, true)]
-        [InlineData(5.9d, false, false)]
-        public void MathCeilingDouble(double? weight, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathCeilingDouble()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "ceiling(Weight) eq 5",
                 "$it => ($it.Weight.Value.Ceiling() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Weight = ToNullable<double>(weight) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Weight = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 4.1d }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Weight = 5.9d }, (false, false));
         }
 
-        [Theory]
-        [InlineData(null, false, typeof(InvalidOperationException))]
-        [InlineData(4.1f, true, true)]
-        [InlineData(5.9f, false, false)]
-        public void MathCeilingFloat(float? width, bool withNullPropagation, object withoutNullPropagation)
+        [Fact]
+        public void MathFunctions_MathCeilingFloat()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "ceiling(Width) eq 5",
                 "$it => (Convert($it.Width).Value.Ceiling() == 5)",
                 NotTesting);
 
-            RunFilters(filters,
-               new Product { Width = ToNullable<float>(width) },
-               new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { Width = null }, (typeof(InvalidOperationException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 4.1f }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { Width = 5.9f }, (false, false));
         }
 
         [Theory]
@@ -1403,20 +1543,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("ceiling(DecimalProp) eq ceiling(DecimalProp)")]
         public void MathFunctions_VariousTypes(string filter)
         {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter);
-            RunFilters(filters, new DataTypes(), new { WithNullPropagation = true, WithoutNullPropagation = true });
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DataTypes>(filter);
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new DataTypes(), (true, true));
         }
-#endregion
+        #endregion
 
-#region Custom Functions
-
+        #region Custom Functions
         [Fact]
         public void CustomMethod_InstanceMethodOfDeclaringType()
         {
+            // Arrange
             FunctionSignatureWithReturnType padrightStringEdmFunction =
-                    new FunctionSignatureWithReturnType(
+                new FunctionSignatureWithReturnType(
                     EdmCoreModel.Instance.GetString(true),
-                     EdmCoreModel.Instance.GetString(true),
+                    EdmCoreModel.Instance.GetString(true),
                     EdmCoreModel.Instance.GetInt32(false));
 
             MethodInfo padRightStringMethodInfo = typeof(string).GetMethod("PadRight", new Type[] { typeof(int) });
@@ -1428,15 +1571,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 const string expectedProductName = "Abcd ";
 
                 // Add the custom function
+                // Act & Assert
                 CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
                 UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
-                string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
-                var filters = VerifyQueryDeserialization(filter);
+                string filter = string.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
+                var filters = BindFilterAndVerify<Product>(filter);
 
-                RunFilters(filters,
-                  new Product { ProductName = productName },
-                  new { WithNullPropagation = true, WithoutNullPropagation = true });
+                InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (true, true));
             }
             finally
             {
@@ -1448,6 +1590,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void CustomMethod_InstanceMethodNotOfDeclaringType()
         {
+            // Arrange
             FunctionSignatureWithReturnType padrightStringEdmFunction = new FunctionSignatureWithReturnType(
                         EdmCoreModel.Instance.GetString(true),
                         EdmCoreModel.Instance.GetString(true),
@@ -1462,12 +1605,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 const string expectedProductName = "Abcd ";
 
                 // Add the custom function
+                // Act & Assert
                 CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
                 UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
-                string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
+                string filter = string.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
 
-                Action filterToExpression = () => VerifyQueryDeserialization(filter);
+                Action filterToExpression = () => BindFilterAndVerify<Product>(filter);
                 ExceptionAssert.Throws(typeof(NotImplementedException),filterToExpression);
             }
             finally
@@ -1480,6 +1624,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void CustomMethod_StaticExtensionMethod()
         {
+            // Arrange
             FunctionSignatureWithReturnType padrightStringEdmFunction = new FunctionSignatureWithReturnType(
                     EdmCoreModel.Instance.GetString(true),
                     EdmCoreModel.Instance.GetString(true),
@@ -1495,15 +1640,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 const string expectedProductName = "Abcd ";
 
                 // Add the custom function
+                // Act & Assert
                 CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
                 UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
                 string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
-                var filters = VerifyQueryDeserialization(filter);
+                var filters = BindFilterAndVerify<Product>(filter);
 
-                RunFilters(filters,
-                  new Product { ProductName = productName },
-                  new { WithNullPropagation = true, WithoutNullPropagation = true });
+                InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (true, true));
             }
             finally
             {
@@ -1515,6 +1659,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void CustomMethod_StaticMethodNotOfDeclaringType()
         {
+            // Arrange
             FunctionSignatureWithReturnType padrightStringEdmFunction = new FunctionSignatureWithReturnType(
                 EdmCoreModel.Instance.GetString(true),
                 EdmCoreModel.Instance.GetString(true),
@@ -1530,15 +1675,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 const string expectedProductName = "Abcd ";
 
                 // Add the custom function
+                // Act & Assert
                 CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
                 UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
                 string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
-                var filters = VerifyQueryDeserialization(filter);
+                var filters = BindFilterAndVerify<Product>(filter);
 
-                RunFilters(filters,
-                  new Product { ProductName = productName },
-                  new { WithNullPropagation = true, WithoutNullPropagation = true });
+                InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (true, true));
             }
             finally
             {
@@ -1550,6 +1694,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void CustomMethod_AddSignatureAndBindFunctionWithShortcut()
         {
+            // Arrange
             FunctionSignatureWithReturnType padrightStringEdmFunction =
                     new FunctionSignatureWithReturnType(
                     EdmCoreModel.Instance.GetString(true),
@@ -1565,14 +1710,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 const string expectedProductName = "Abcd ";
 
                 // Add the custom function
+                // Act & Assert
                 ODataUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction, padRightStringMethodInfo);
 
                 string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
-                var filters = VerifyQueryDeserialization(filter);
+                var filters = BindFilterAndVerify<Product>(filter);
 
-                RunFilters(filters,
-                  new Product { ProductName = productName },
-                  new { WithNullPropagation = true, WithoutNullPropagation = true });
+                InvokeFiltersAndVerify(filters, new Product { ProductName = productName }, (true, true));
             }
             finally
             {
@@ -1580,19 +1724,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
             }
         }
+        #endregion
 
-#endregion
-
-#region Data Types
+        #region Data Types
         [Fact]
         public void GuidExpression()
         {
-            VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<DataTypes>(
                 "GuidProp eq 0EFDAECF-A9F0-42F3-A384-1295917AF95E",
                 "$it => ($it.GuidProp == 0efdaecf-a9f0-42f3-a384-1295917af95e)");
 
-            // verify case insensitivity
-            VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert - verify case insensitivity ?
+            BindFilterAndVerify<DataTypes>(
                 "GuidProp eq 0EFDAECF-A9F0-42F3-A384-1295917AF95E",
                 "$it => ($it.GuidProp == 0efdaecf-a9f0-42f3-a384-1295917af95e)");
         }
@@ -1603,10 +1747,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         // TODO: [InlineData("DateTimeProp ge datetime'2000-12-12T12:00'", "$it => ($it.DateTimeProp >= {0})")] (uriparser fails on optional seconds)
         public void DateTimeExpression(string clause, string expectedExpression)
         {
+            // Arrange & Act & Assert
             var dateTime = new DateTimeOffset(new DateTime(2000, 12, 12, 12, 0, 0), TimeSpan.Zero);
-            VerifyQueryDeserialization<DataTypes>(
-                "" + clause,
-                String.Format(CultureInfo.InvariantCulture, expectedExpression, dateTime));
+            BindFilterAndVerify<DataTypes>(
+                clause,
+                string.Format(CultureInfo.InvariantCulture, expectedExpression, dateTime));
         }
 
         [Theory]
@@ -1619,91 +1764,90 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("DateTimeOffsetProp gt datetimeoffset'2002-10-10T17:00:00%2B0545'", "$it => ($it.DateTimeOffsetProp > {0})", 5.75)]
         public void DateTimeOffsetExpression(string clause, string expectedExpression, double offsetHours)
         {
+            // Arrange & Act & Assert
             var dateTimeOffset = new DateTimeOffset(2002, 10, 10, 17, 0, 0, TimeSpan.FromHours(offsetHours));
 
-            // There's currently a bug here. For now, the test checks for the presence of the bug (as a reminder to fix
-            // the test once the bug is fixed).
-            // The following assert shows the behavior with the bug and should be removed once the bug is fixed.
-            ExceptionAssert.Throws<ODataException>(() => Bind("" + clause));
-
-            // TODO: No DateTimeOffset parsing in ODataUriParser
-            Assert.NotNull(expectedExpression);
-            // The following call shows the behavior without the bug, and should be enabled once the bug is fixed.
-            //VerifyQueryDeserialization<DataTypes>(
-            //    "" + clause,
-            //    String.Format(CultureInfo.InvariantCulture, expectedExpression, dateTimeOffset));
+            ExceptionAssert.Throws<ODataException>(
+                () => BindFilterAndVerify<DataTypes>(
+                    clause,
+                    string.Format(CultureInfo.InvariantCulture, expectedExpression, dateTimeOffset)));
         }
 
         [Fact]
         public void IntegerLiteralSuffix()
         {
-            // long L
-            VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert - long L
+            BindFilterAndVerify<DataTypes>(
                 "LongProp lt 987654321L and LongProp gt 123456789l",
                 "$it => (($it.LongProp < 987654321) AndAlso ($it.LongProp > 123456789))");
 
-            VerifyQueryDeserialization<DataTypes>(
+            BindFilterAndVerify<DataTypes>(
                 "LongProp lt -987654321L and LongProp gt -123456789l",
                 "$it => (($it.LongProp < -987654321) AndAlso ($it.LongProp > -123456789))");
         }
-        
+
         [Fact]
         public void EnumInExpression()
         {
-            var result = VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<DataTypes>(
                 "SimpleEnumProp in ('First', 'Second')",
                 "$it => System.Collections.Generic.List`1[Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum].Contains($it.SimpleEnumProp)");
-            Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
+
+            Expression<Func<DataTypes, bool>> expression = result.Item2 as Expression<Func<DataTypes, bool>>;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new[] {SimpleEnum.First, SimpleEnum.Second}, values);
         }
 
         [Fact]
         public void EnumInExpression_WithNullValue_Throws()
         {
+            // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => VerifyQueryDeserialization<DataTypes>("SimpleEnumProp in ('First', null)"),
+                () => BindFilterAndVerify<DataTypes>("SimpleEnumProp in ('First', null)"),
                 "A null value was found with the expected type 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum[Nullable=False]'. The expected type 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum[Nullable=False]' does not allow null values.");
         }
 
         [Fact]
         public void EnumInExpression_NullableEnum_WithNullable()
         {
-            var result = VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<DataTypes>(
                 "NullableSimpleEnumProp in ('First', 'Second')",
                 "$it => System.Collections.Generic.List`1[System.Nullable`1[Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum]].Contains($it.NullableSimpleEnumProp)");
-            Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
+            Expression<Func<DataTypes, bool>> expression = result.Item2 as Expression<Func<DataTypes, bool>>;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum?>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, SimpleEnum.Second}, values);
         }
         
         [Fact]
         public void EnumInExpression_NullableEnum_WithNullValue()
         {
-            var result = VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<DataTypes>(
                 "NullableSimpleEnumProp in ('First', null)",
                 "$it => System.Collections.Generic.List`1[System.Nullable`1[Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum]].Contains($it.NullableSimpleEnumProp)");
-            Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
+            Expression<Func<DataTypes, bool>> expression = result.Item2 as Expression<Func<DataTypes, bool>>;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<SimpleEnum?>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, null}, values);
         }
 
         [Fact]
         public void RealLiteralSuffixes()
         {
-            // Float F
-            VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert - Float F
+            BindFilterAndVerify<DataTypes>(
                 "FloatProp lt 4321.56F and FloatProp gt 1234.56f",
                 String.Format(CultureInfo.InvariantCulture, "$it => (($it.FloatProp < {0:0.00}) AndAlso ($it.FloatProp > {1:0.00}))", 4321.56, 1234.56));
 
-            // Decimal M
-            VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert - Decimal M
+            BindFilterAndVerify<DataTypes>(
                 "DecimalProp lt 4321.56M and DecimalProp gt 1234.56m",
                 String.Format(CultureInfo.InvariantCulture, "$it => (($it.DecimalProp < {0:0.00}) AndAlso ($it.DecimalProp > {1:0.00}))", 4321.56, 1234.56));
         }
@@ -1723,9 +1867,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("'いくつかのテキスト'", "いくつかのテキスト")]
         public void StringLiterals(string literal, string expected)
         {
-            VerifyQueryDeserialization<Product>(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "ProductName eq " + literal,
-                String.Format("$it => ($it.ProductName == \"{0}\")", expected));
+                string.Format("$it => ($it.ProductName == \"{0}\")", expected));
         }
 
         [Theory]
@@ -1755,35 +1900,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData('`')]
         public void SpecialCharactersInStringLiteral(char c)
         {
-            var filters = VerifyQueryDeserialization<Product>(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "ProductName eq '" + c + "'",
                 String.Format("$it => ($it.ProductName == \"{0}\")", c));
 
-            RunFilters(
-                filters,
-                new Product { ProductName = c.ToString() },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+            InvokeFiltersAndVerify(filters, new Product { ProductName = c.ToString() }, (true, true));
         }
+        #endregion
 
-#endregion
-
-#region Casts
-
+        #region Casts
         [Fact]
         public void NSCast_OnEnumerableEntityCollection_GeneratesExpression_WithOfTypeOnEnumerable()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "Category/EnumerableProducts/Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/any(p: p/ProductName eq 'ProductName')",
                 "$it => $it.Category.EnumerableProducts.OfType().Any(p => (p.ProductName == \"ProductName\"))",
                 NotTesting);
 
-            Assert.NotNull(filters.WithoutNullPropagation);
+            Assert.NotNull(filters.Item1);
+            Assert.NotNull(filters.Item2);
         }
 
         [Fact]
         public void NSCast_OnQueryableEntityCollection_GeneratesExpression_WithOfTypeOnQueryable()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "Category/QueryableProducts/Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/any(p: p/ProductName eq 'ProductName')",
                 "$it => $it.Category.QueryableProducts.OfType().Any(p => (p.ProductName == \"ProductName\"))",
                 NotTesting);
@@ -1792,24 +1936,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void NSCast_OnEntityCollection_CanAccessDerivedInstanceProperty()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                 "Category/Products/Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/any(p: p/DerivedProductName eq 'DerivedProductName')");
 
-            RunFilters(
+            InvokeFiltersAndVerify(
                 filters,
                 new Product { Category = new Category { Products = new Product[] { new DerivedProduct { DerivedProductName = "DerivedProductName" } } } },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
+                (true, true));
 
-            RunFilters(
+            InvokeFiltersAndVerify(
                 filters,
                 new Product { Category = new Category { Products = new Product[] { new DerivedProduct { DerivedProductName = "NotDerivedProductName" } } } },
-                new { WithNullPropagation = false, WithoutNullPropagation = false });
+                (false, false));
         }
 
         [Fact]
         public void NSCast_OnSingleEntity_GeneratesExpression_WithAsOperator()
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
                 "Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName eq 'ProductName'",
                 "$it => (($it As Product).ProductName == \"ProductName\")",
                 NotTesting);
@@ -1822,11 +1968,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/CategoryID eq 123")]
         public void Inheritance_WithDerivedInstance(string filter)
         {
-            var filters = VerifyQueryDeserialization<DerivedProduct>(filter);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DerivedProduct>(filter);
 
-            RunFilters<DerivedProduct>(filters,
+            InvokeFiltersAndVerify<DerivedProduct>(filters,
               new DerivedProduct { Category = new DerivedCategory { CategoryID = 123 }, ProductName = "ProductName", DerivedProductName = "DerivedProductName" },
-              new { WithNullPropagation = true, WithoutNullPropagation = true });
+              (true, true));
         }
 
         [Theory]
@@ -1835,18 +1982,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/CategoryID eq 123")]
         public void Inheritance_WithBaseInstance(string filter)
         {
-            var filters = VerifyQueryDeserialization<Product>(filter);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(filter);
 
-            RunFilters<Product>(filters,
-              new Product(),
-              new { WithNullPropagation = false, WithoutNullPropagation = typeof(NullReferenceException) });
+            InvokeFiltersAndThrows(filters, new Product(), (typeof(NullReferenceException), false));
         }
 
         [Fact]
         public void CastToNonDerivedType_Throws()
         {
+            // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => VerifyQueryDeserialization<Product>("Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/CategoryID eq 123"),
+                () => BindFilterAndVerify<Product>("Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/CategoryID eq 123"),
                 "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.");
         }
 
@@ -1855,8 +2002,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("ProductName/Edm.String eq 123", "A binary operator with incompatible types was detected. Found operand types 'Edm.String' and 'Edm.Int32' for operator kind 'Equal'.")]
         public void CastToNonEntityType_Throws(string filter, string error)
         {
+            // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => VerifyQueryDeserialization<Product>(filter), error);
+                () => BindFilterAndVerify<Product>(filter), error);
         }
 
         [Theory]
@@ -1865,15 +2013,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Category/Products/Edm.NonExistentType eq 123")]
         public void CastToNonExistantType_Throws(string filter)
         {
+            // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => VerifyQueryDeserialization<Product>(filter),
+                () => BindFilterAndVerify<Product>(filter),
                 "The child type 'Edm.NonExistentType' in a cast was not an entity type. Casts can only be performed on entity types.");
         }
+        #endregion
 
-#endregion
-
-#region cast in query option
-
+        #region cast in query option
         [Theory]
         [InlineData("cast(null,Edm.Int16) eq null", "$it => (null == null)")]
         [InlineData("cast(null,Edm.Int32) eq 123", "$it => (null == Convert(123))")]
@@ -1923,10 +2070,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void CastMethod_Succeeds(string filter, string expectedResult)
         {
             // Arrange & Act & Assert
-            VerifyQueryDeserialization<DataTypes>(
-                filter,
-                expectedResult,
-                NotTesting);
+            BindFilterAndVerify<DataTypes>(filter, expectedResult, NotTesting);
         }
 
         [Theory]
@@ -1935,7 +2079,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void Cast_UndefinedSource_ThrowsODataException(string filter, string errorMessage)
         {
             // Arrange & Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), errorMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), errorMessage);
         }
 
         public static TheoryDataSet<string, string> CastToUnquotedUndefinedTarget
@@ -1968,7 +2112,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 typeName);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), expectedMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), expectedMessage);
         }
 
         public static TheoryDataSet<string> CastToQuotedUndefinedTarget
@@ -1997,7 +2141,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             var expectedMessage = "Cast or IsOf Function must have a type in its arguments.";
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), expectedMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), expectedMessage);
         }
 
         [Theory]
@@ -2038,7 +2182,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             // Arrange & Act & Assert
             // TODO : 1824 Should not throw exception for invalid enum cast in query option.
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), "Enumeration type value can only be casted to or from string.");
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), "Enumeration type value can only be casted to or from string.");
         }
 
         [Theory]
@@ -2058,7 +2202,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void Cast_UnsupportedTarget_ReturnsNull(string filter)
         {
             // Arrange & Act & Assert
-            VerifyQueryDeserialization<DataTypes>(filter, "$it => (null == null)");
+            BindFilterAndVerify<DataTypes>(filter, "$it => (null == null)");
         }
 
         // See OtherFunctions_SomeTwoParameterCasts_ThrowODataException and OtherFunctions_SomeSingleParameterCasts_ThrowODataException
@@ -2073,7 +2217,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             // Arrange & Act & Assert
             // TODO : 1827 Should not throw when the target type of cast is not primitive or enumeration type.
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), expectErrorMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), expectErrorMessage);
         }
 
         [Theory]
@@ -2212,11 +2356,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             };
 
             // Act & Assert
-            var filters = VerifyQueryDeserialization<DataTypes>(
-                filter,
-                expectedResult: NotTesting,
-                expectedResultWithNullPropagation: NotTesting);
-            RunFilters(filters, model, expectedValue: new { WithNullPropagation = true, WithoutNullPropagation = true });
+            var filters = BindFilterAndVerify<DataTypes>(filter);
+            InvokeFiltersAndVerify(filters, model, (true,true));
         }
 
         public static TheoryDataSet<string> CastToUnquotedComplexType
@@ -2243,7 +2384,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.";
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<Product>(filter), expectedMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
         }
 
         public static TheoryDataSet<string> CastToQuotedComplexType
@@ -2271,11 +2412,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             };
 
             // Act & Assert
-            var filters = VerifyQueryDeserialization<Product>(
-                filter,
-                expectedResult: NotTesting,
-                expectedResultWithNullPropagation: NotTesting);
-            RunFilters(filters, model, expectedValue: new { WithNullPropagation = true, WithoutNullPropagation = true });
+            var filters = BindFilterAndVerify<Product>(filter);
+
+            InvokeFiltersAndVerify(filters, model, (true, true));
         }
 
         public static TheoryDataSet<string, string> CastToUnquotedEntityType
@@ -2307,7 +2446,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void CastToUnquotedEntityType_ThrowsODataException(string filter, string expectedMessage)
         {
             // Arrange & Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<Product>(filter), expectedMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
         }
 
         [Theory]
@@ -2316,15 +2455,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void CastToQuotedEntityOrComplexType_DerivedProductName(string filter, string expectedExpression, string expectedExpressionWithNullCheck)
         {
             // Arrange, Act & Assert
-            VerifyQueryDeserialization<Product>(
-                filter,
-                expectedResult: expectedExpression,
-                expectedResultWithNullPropagation: expectedExpressionWithNullCheck);
+            BindFilterAndVerify<Product>(filter, expectedExpression, expectedExpressionWithNullCheck);
         }
-                
-#endregion
+        #endregion
 
-#region 'isof' in query option
+        #region 'isof' in query option
 
         [Theory]
         [InlineData("isof(Edm.Int16)", "$it => IIF(($it Is System.Int16), True, False)")]
@@ -2336,10 +2471,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void IsofMethod_Succeeds(string filter, string expectedResult)
         {
             // Arrange & Act & Assert
-            VerifyQueryDeserialization<Product>(
-                filter,
-                expectedResult,
-                NotTesting);
+            BindFilterAndVerify<Product>(filter, expectedResult, NotTesting);
         }
 
         [Theory]
@@ -2348,7 +2480,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void Isof_WithNullTypeName_ThrowsArgumentNullException(string filter)
         {
             // Arrange & Act & Assert
-            ExceptionAssert.Throws<ArgumentNullException>(() => Bind<Product>(filter),
+            ExceptionAssert.Throws<ArgumentNullException>(() => BindFilterAndVerify<Product>(filter),
                 "Value cannot be null. (Parameter 'qualifiedName')");
         }
 
@@ -2358,7 +2490,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void IsOfUndefinedSource_ThrowsODataException(string filter, string errorMessage)
         {
             // Arrange & Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), errorMessage);
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), errorMessage);
         }
 
         [Theory]
@@ -2430,36 +2562,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             var model = new DataTypes();
 
             // Act & Assert
-            var filters = VerifyQueryDeserialization<DataTypes>(
-                filter,
-                expectedResult: NotTesting,
-                expectedResultWithNullPropagation: NotTesting);
-            RunFilters(filters, model, expectedValue: new { WithNullPropagation = false, WithoutNullPropagation = false });
-        }
-
-        public static TheoryDataSet<string, string> IsOfUndefinedTarget
-        {
-            get
-            {
-                return new TheoryDataSet<string, string>
-                {
-                    { "isof(Edm.DateTime)", "Edm.DateTime" },
-                    { "isof(Edm.Unknown)", "Edm.Unknown" },
-                    { "isof(null,Edm.DateTime)", "Edm.DateTime" },
-                    { "isof(null,Edm.Unknown)", "Edm.Unknown" },
-                    { "isof('2001-01-01T12:00:00.000',Edm.DateTime)", "Edm.DateTime" },
-                    { "isof('',Edm.Unknown)", "Edm.Unknown" },
-                    { "isof(DateTimeProp,Edm.DateTime)", "Edm.DateTime" },
-                    { "isof(IntProp,Edm.Unknown)", "Edm.Unknown" },
-                };
-            }
+            var filters = BindFilterAndVerify<DataTypes>(filter);
+            InvokeFiltersAndVerify(filters, model, (false, false));
         }
 
         // Exception messages here and in IsOfQuotedUndefinedTarget_ThrowsODataException should be consistent.
         // Worse, this message is incorrect -- casts can be performed on most types but _not_ entity types and
         // isof can't be performed.
         [Theory]
-        [MemberData(nameof(IsOfUndefinedTarget))]
+        [InlineData("isof(Edm.DateTime)", "Edm.DateTime")]
+        [InlineData("isof(Edm.Unknown)", "Edm.Unknown")]
+        [InlineData("isof(null,Edm.DateTime)", "Edm.DateTime")]
+        [InlineData("isof(null,Edm.Unknown)", "Edm.Unknown")]
+        [InlineData("isof('2001-01-01T12:00:00.000',Edm.DateTime)", "Edm.DateTime")]
+        [InlineData("isof('',Edm.Unknown)", "Edm.Unknown")]
+        [InlineData("isof(DateTimeProp,Edm.DateTime)", "Edm.DateTime")]
+        [InlineData("isof(IntProp,Edm.Unknown)", "Edm.Unknown")]
         public void IsOfUndefinedTarget_ThrowsODataException(string filter, string typeName)
         {
             // Arrange
@@ -2468,55 +2586,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 typeName);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), expectedMessage);
-        }
-
-        public static TheoryDataSet<string> IsOfQuotedUndefinedTarget
-        {
-            get
-            {
-                return new TheoryDataSet<string>
-                {
-                    { "isof('Edm.DateTime')" },
-                    { "isof('Edm.Unknown')" },
-                    { "isof(null,'Edm.DateTime')" },
-                    { "isof(null,'Edm.Unknown')" },
-                    { "isof('2001-01-01T12:00:00.000','Edm.DateTime')" },
-                    { "isof('','Edm.Unknown')" },
-                    { "isof(DateTimeProp,'Edm.DateTime')" },
-                    { "isof(IntProp,'Edm.Unknown')" },
-                };
-            }
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), expectedMessage);
         }
 
         [Theory]
-        [MemberData(nameof(IsOfQuotedUndefinedTarget))]
+        [InlineData("isof('Edm.DateTime')")]
+        [InlineData("isof('Edm.Unknown')")]
+        [InlineData("isof(null,'Edm.DateTime')")]
+        [InlineData("isof(null,'Edm.Unknown')")]
+        [InlineData("isof('2001-01-01T12:00:00.000','Edm.DateTime')")]
+        [InlineData("isof('','Edm.Unknown')")]
+        [InlineData("isof(DateTimeProp,'Edm.DateTime')")]
+        [InlineData("isof(IntProp,'Edm.Unknown')")]
         public void IsOfQuotedUndefinedTarget_ThrowsODataException(string filter)
         {
             // Arrange
             var expectedMessage = "Cast or IsOf Function must have a type in its arguments.";
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<DataTypes>(filter), expectedMessage);
-        }
-
-        public static TheoryDataSet<string> IsOfUnquotedComplexType
-        {
-            get
-            {
-                return new TheoryDataSet<string>
-                {
-                    { "isof(Microsoft.AspNetCore.OData.Tests.Models.Address)" },
-                    { "isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)" },
-                    { "isof(null, Microsoft.AspNetCore.OData.Tests.Models.Address)" },
-                    { "isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)" },
-                    { "isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)" },
-                };
-            }
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<DataTypes>(filter), expectedMessage);
         }
 
         [Theory]
-        [MemberData(nameof(IsOfUnquotedComplexType))]
+        [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+        [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+        [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+        [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+        [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
         public void IsOfUnquotedComplexType_ThrowsODataException(string filter)
         {
             // Arrange
@@ -2525,68 +2621,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.";
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<Product>(filter), expectedMessage);
-        }
-
-        public static TheoryDataSet<string, string> IsOfUnquotedEntityType
-        {
-            get
-            {
-                return new TheoryDataSet<string, string>
-                {
-                    {
-                        "isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)",
-                        "Cast or IsOf Function must have a type in its arguments."
-                    },
-                    {
-                        "isof(null,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
-                        "Encountered invalid type cast. " +
-                        "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
-                    },
-                    {
-                        "isof(null, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
-                        "Encountered invalid type cast. " +
-                        "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
-                    },
-                    {
-                        "isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
-                        "Encountered invalid type cast. " +
-                        "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
-                    },
-                    {
-                        "isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
-                        "Encountered invalid type cast. " +
-                        "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
-                    },
-                };
-            }
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
         }
 
         [Theory]
-        [MemberData(nameof(IsOfUnquotedEntityType))]
+        [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)", "Cast or IsOf Function must have a type in its arguments.")]
+        [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+            "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+        [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+            "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+        [InlineData("isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+            "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+        [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+            "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
         public void IsOfUnquotedEntityType_ThrowsODataException(string filter, string expectedMessage)
         {
             // Arrange & Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => Bind<Product>(filter), expectedMessage);
-        }
-
-        public static TheoryDataSet<string> IsOfQuotedNonPrimitiveType
-        {
-            get
-            {
-                return new TheoryDataSet<string>
-                {
-                    { "isof('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')" },
-                    { "isof(SupplierAddress,'Microsoft.AspNetCore.OData.Tests.Models.Address')" },
-                    { "isof(SupplierAddress, 'Microsoft.AspNetCore.OData.Tests.Models.Address')" },
-                    { "isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')" },
-                    { "isof(Category, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')" },
-                };
-            }
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
         }
 
         [Theory]
-        [MemberData(nameof(IsOfQuotedNonPrimitiveType))]
+        [InlineData("isof('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')")]
+        [InlineData("isof(SupplierAddress,'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
+        [InlineData("isof(SupplierAddress, 'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
+        [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
+        [InlineData("isof(Category, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
         public void IsOfQuotedNonPrimitiveType_Succeeds(string filter)
         {
             // Arrange
@@ -2597,11 +2656,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             };
 
             // Act & Assert
-           var filters = VerifyQueryDeserialization<Product>(
-                filter,
-                expectedResult: NotTesting,
-                expectedResultWithNullPropagation: NotTesting);
-            RunFilters<Product>(filters, model, expectedValue: new { WithNullPropagation = true, WithoutNullPropagation = true });
+            var filters = BindFilterAndVerify<Product>(filter);
+            InvokeFiltersAndVerify<Product>(filters, model, (true, true));
         }
 
         [Theory]
@@ -2619,15 +2675,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             };
 
             // Act & Assert
-            var filters = VerifyQueryDeserialization<Product>(
-                filter,
-                expectedResult: NotTesting,
-                expectedResultWithNullPropagation: NotTesting);
-            RunFilters<Product>(filters, model, expectedValue: new { WithNullPropagation = false, WithoutNullPropagation = false });
+            var filters = BindFilterAndVerify<Product>(filter);
+            InvokeFiltersAndVerify<Product>(filters, model, (false, false));
         }
+        #endregion
 
-#endregion
-
+#if false
         [Fact]
         public void BindForNodeOnFilterBinder_ThrowsArgumentNull_Node()
         {
@@ -2698,8 +2751,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExceptionAssert.Throws<NotSupportedException>(() => binder.Bind(node),
                 "Binding OData QueryNode of kind 'None' is not supported by 'FilterBinder'.");
         }
+#endif
 
-        #region parameter alias for filter query option
+#region parameter alias for filter query option
 
         [Theory]
         // Parameter alias value is not null.
@@ -2845,42 +2899,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 () => parser.ParseFilter(),
                 "Syntax error: character '#' is not valid at position 11 in 'IntProp eq #p'.");
         }
-
 #endregion
 
-#if NETFX // Binary only supported on Net Framework
         [Theory]
-        [InlineData("UShortProp eq 12", "$it => (Convert($it.UShortProp) == 12)")]
-        [InlineData("ULongProp eq 12L", "$it => (Convert($it.ULongProp) == 12)")]
-        [InlineData("UIntProp eq 12", "$it => (Convert($it.UIntProp) == 12)")]
-        [InlineData("CharProp eq 'a'", "$it => (Convert($it.CharProp.ToString()) == \"a\")")]
-        [InlineData("CharArrayProp eq 'a'", "$it => (new String($it.CharArrayProp) == \"a\")")]
-        [InlineData("BinaryProp eq binary'TWFu'", "$it => ($it.BinaryProp.ToArray() == System.Byte[])")]
-        [InlineData("XElementProp eq '<name />'", "$it => ($it.XElementProp.ToString() == \"<name />\")")]
-        public void NonstandardEdmPrimtives(string filter, string expression)
-        {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter, expression, NotTesting);
-
-            RunFilters(filters,
-                new DataTypes
-                {
-                    UShortProp = 12,
-                    ULongProp = 12,
-                    UIntProp = 12,
-                    CharProp = 'a',
-                    CharArrayProp = new[] { 'a' },
-                    BinaryProp = new Binary(new byte[] { 77, 97, 110 }),
-                    XElementProp = new XElement("name")
-                },
-                new { WithNullPropagation = true, WithoutNullPropagation = true });
-        }
-#endif
-
-        [Theory]
-#if NETFX // Binary only supported on Net Framework
-        [InlineData("BinaryProp eq binary'I6v/'", "$it => ($it.BinaryProp.ToArray() == System.Byte[])", true, true)]
-        [InlineData("BinaryProp ne binary'I6v/'", "$it => ($it.BinaryProp.ToArray() != System.Byte[])", false, false)]
-#endif
         [InlineData("ByteArrayProp eq binary'I6v/'", "$it => ($it.ByteArrayProp == System.Byte[])", true, true)]
         [InlineData("ByteArrayProp ne binary'I6v/'", "$it => ($it.ByteArrayProp != System.Byte[])", false, false)]
         [InlineData("binary'I6v/' eq binary'I6v/'", "$it => (System.Byte[] == System.Byte[])", true, true)]
@@ -2891,18 +2912,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("ByteArrayPropWithNullValue eq null", "$it => ($it.ByteArrayPropWithNullValue == null)", true, true)]
         [InlineData("null ne ByteArrayPropWithNullValue", "$it => (null != $it.ByteArrayPropWithNullValue)", false, false)]
         [InlineData("null eq ByteArrayPropWithNullValue", "$it => (null == $it.ByteArrayPropWithNullValue)", true, true)]
-        public void ByteArrayComparisons(string filter, string expression, bool withNullPropagation, object withoutNullPropagation)
+        public void ByteArrayComparisons(string filter, string expression, bool falseNullPropagation, bool trueNullPropagation)
         {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter, expression, NotTesting);
-            RunFilters(filters,
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DataTypes>(filter, expression, NotTesting);
+            InvokeFiltersAndVerify(filters,
                 new DataTypes
                 {
-#if NETFX // Binary only supported on Net Framework
-                    BinaryProp = new Binary(new byte[] { 35, 171, 255 }),
-#endif
                     ByteArrayProp = new byte[] { 35, 171, 255 }
                 },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withoutNullPropagation });
+                (falseNullPropagation, trueNullPropagation));
         }
 
         [Theory]
@@ -2916,9 +2935,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("binary'AP8Q' div binary'AP8Q'", "Divide")]
         public void DisAllowed_ByteArrayComparisons(string filter, string op)
         {
+            // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(
-                () => Bind<DataTypes>(filter),
-                String.Format(CultureInfo.InvariantCulture, "A binary operator with incompatible types was detected. Found operand types 'Edm.Binary' and 'Edm.Binary' for operator kind '{0}'.", op));
+                () => BindFilterAndVerify<DataTypes>(filter),
+                string.Format(CultureInfo.InvariantCulture, "A binary operator with incompatible types was detected. Found operand types 'Edm.Binary' and 'Edm.Binary' for operator kind '{0}'.", op));
         }
 
         [Theory]
@@ -2928,11 +2948,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("NullableCharProp eq 'a'", "$it => ($it.NullableCharProp.Value.ToString() == \"a\")")]
         public void Nullable_NonstandardEdmPrimitives(string filter, string expression)
         {
-            var filters = VerifyQueryDeserialization<DataTypes>(filter, expression, NotTesting);
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<DataTypes>(filter, expression, NotTesting);
 
-            RunFilters(filters,
+            InvokeFiltersAndThrows(filters,
                 new DataTypes(),
-                new { WithNullPropagation = false, WithoutNullPropagation = typeof(InvalidOperationException) });
+                (typeof(InvalidOperationException), false));
         }
 
         [Theory]
@@ -2941,16 +2962,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("Category/Product/NullableGuidProperty in (dc75698b-581d-488b-9638-3e28dd51d8f7)", "$it => System.Collections.Generic.List`1[System.Nullable`1[System.Guid]].Contains($it.Category.Product.NullableGuidProperty)", "$it => System.Collections.Generic.List`1[System.Nullable`1[System.Guid]].Contains(IIF((IIF(($it.Category == null), null, $it.Category.Product) == null), null, $it.Category.Product.NullableGuidProperty))")]
         public void InOnNavigation(string filter, string expression, string expressionWithNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
-               filter,
-               expression,
-               expressionWithNullPropagation);
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(filter, expression, expressionWithNullPropagation);
         }
 
         [Fact]
         public void MultipleConstants_Are_Parameterized()
         {
-            VerifyQueryDeserialization("ProductName eq '1' or ProductName eq '2' or ProductName eq '3' or ProductName eq '4'",
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>("ProductName eq '1' or ProductName eq '2' or ProductName eq '3' or ProductName eq '4'",
                 "$it => (((($it.ProductName == \"1\") OrElse ($it.ProductName == \"2\")) OrElse ($it.ProductName == \"3\")) OrElse ($it.ProductName == \"4\"))",
                 NotTesting);
         }
@@ -2958,38 +2978,41 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void Constants_Are_Not_Parameterized_IfDisabled()
         {
-            var filters = VerifyQueryDeserialization("ProductName eq '1'", settingsCustomizer: (settings) =>
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>("ProductName eq '1'", settingsCustomizer: (settings) =>
                 {
                     settings.EnableConstantParameterization = false;
                 });
 
-            Assert.Equal("$it => ($it.ProductName == \"1\")", (filters.WithoutNullPropagation as Expression).ToString());
+            Assert.Equal("$it => ($it.ProductName == \"1\")", (filters.Item1 as Expression).ToString());
         }
 
         [Fact]
         public void CollectionConstants_Are_Parameterized()
         {
-            var result = VerifyQueryDeserialization("ProductName in ('Prod1', 'Prod2')",
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<Product>("ProductName in ('Prod1', 'Prod2')",
                 "$it => System.Collections.Generic.List`1[System.String].Contains($it.ProductName)");
 
-            Expression<Func<Product, bool>> expression = result.WithNullPropagation;
+            Expression<Func<Product, bool>> expression = result.Item2 as Expression<Func<Product, bool>>;
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
-            var values = (IList<string>)ExpressionBinderBase.ExtractParameterizedConstant(memberAccess);
+            var values = (IList<string>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
             Assert.Equal(new[] { "Prod1", "Prod2" }, values);
         }
 
         [Fact]
         public void CollectionConstants_Are_Not_Parameterized_If_Disabled()
         {
-            var result = VerifyQueryDeserialization("ProductName in ('Prod1', 'Prod2')",
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<Product>("ProductName in ('Prod1', 'Prod2')",
                 "$it => System.Collections.Generic.List`1[System.String].Contains($it.ProductName)",
                 settingsCustomizer: (settings) =>
                 {
                     settings.EnableConstantParameterization = false;
                 });
 
-            Expression<Func<Product, bool>> expression = result.WithNullPropagation;
+            Expression<Func<Product, bool>> expression = result.Item2 as Expression<Func<Product, bool>>;
             var values = (IList<string>)((ConstantExpression)((MethodCallExpression)expression.Body).Arguments[0]).Value;
             Assert.Equal(new[] { "Prod1", "Prod2" }, values);
         }
@@ -2997,7 +3020,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void CollectionConstants_OfEnums_Are_Not_Parameterized_If_Disabled()
         {
-            var result = VerifyQueryDeserialization<DataTypes>(
+            // Arrange & Act & Assert
+            var result = BindFilterAndVerify<DataTypes>(
                 "SimpleEnumProp in ('First', 'Second')",
                 "$it => System.Collections.Generic.List`1[Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum].Contains($it.SimpleEnumProp)",
                 settingsCustomizer: (settings) =>
@@ -3005,7 +3029,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                     settings.EnableConstantParameterization = false;
                 });
 
-            Expression<Func<DataTypes, bool>> expression = result.WithNullPropagation;
+            Expression<Func<DataTypes, bool>> expression = result.Item2 as Expression<Func<DataTypes, bool>>;
             var values = (IList<SimpleEnum>)((ConstantExpression)((MethodCallExpression)expression.Body).Arguments[0]).Value;
             Assert.Equal(new[] { SimpleEnum.First, SimpleEnum.Second }, values);
         }
@@ -3013,7 +3037,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void FilterByDynamicProperty()
         {
-            VerifyQueryDeserialization<DynamicProduct>("Token eq '1'",
+            // Arrange & Act & Assert
+            BindFilterAndVerify<DynamicProduct>("Token eq '1'",
                 "$it => (Convert(IIF($it.ProductProperties.ContainsKey(Token), $it.ProductPropertiesToken, null)) == \"1\")",
                 "$it => (Convert(IIF((($it.ProductProperties != null) AndAlso $it.ProductProperties.ContainsKey(Token)), $it.ProductPropertiesToken, null)) == \"1\")");
         }
@@ -3023,164 +3048,141 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData(new[] { 1, 2 }, false)]
         public void InOnPrimitiveCollectionPropertyOnRHS(int[] alternateIds, bool withNullPropagation)
         {
-            var filters = VerifyQueryDeserialization(
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
                "42 in AlternateIDs",
                "$it => $it.AlternateIDs.Contains(42)",
                NotTesting);
 
-            RunFilters(
-                filters,
-                new Product { AlternateIDs = alternateIds },
-                new { WithNullPropagation = withNullPropagation, WithoutNullPropagation = withNullPropagation });
+            // Arrange & Act & Assert
+            InvokeFiltersAndVerify(filters, new Product { AlternateIDs = alternateIds }, (withNullPropagation, withNullPropagation));
         }
 
-        #region Negative Tests
+        [Theory]
+        [InlineData("AlternateAddresses/$count gt 2", "$it => ($it.AlternateAddresses.LongCount() > 2)", "$it => ((IIF(($it.AlternateAddresses == null), null, Convert($it.AlternateAddresses.LongCount())) > Convert(2)) == True)")] // Products?$filter=AlternateAddresses/$count gt 2
+        [InlineData("Category/Products/$count($filter=ProductID gt 2) gt 2", "$it => ($it.Category.Products.Where($it => ($it.ProductID > 2)).LongCount() > 2)", "$it => ((IIF((IIF(($it.Category == null), null, $it.Category.Products).Where($it => ($it.ProductID > 2)) == null), null, Convert(IIF(($it.Category == null), null, $it.Category.Products).Where($it => ($it.ProductID > 2)).LongCount())) > Convert(2)) == True)")] // Products?$filter=Category/Products/$count($filter=ProductID gt 2) gt 2
+        public void CountExpression(string clause, string expectedExpression, string expectedExpressionWithNullPropagation)
+        {
+            // Arrange & Act & Assert
+            BindFilterAndVerify<Product>(
+                clause,
+                expectedExpression,
+                expectedExpressionWithNullPropagation);
+        }
+
+#region Negative Tests
 
         [Fact]
         public void TypeMismatchInComparison()
         {
-            ExceptionAssert.Throws<ODataException>(() => Bind("length(123) eq 12"));
+            // Arrange & Act & Assert
+            ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>("length(123) eq 12"));
+        }
+#endregion
+
+#region Helpers
+        internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
+        {
+            ExceptionAssert.Throws(expectedValue.Item1, () => InvokeFilter(instance, filters.Item1));
+
+            bool expected = InvokeFilter(instance, filters.Item2);
+            Assert.Equal(expectedValue.Item2, expected);
         }
 
-        #endregion
-
-        private Expression<Func<Product, bool>> Bind(string filter, ODataQuerySettings querySettings = null)
+        internal static void InvokeFiltersAndVerify<T>((Expression, Expression) filters, T instance, (bool, bool) expectedValue)
         {
-            return Bind<Product>(filter, querySettings);
+            bool expected = InvokeFilter(instance, filters.Item1);
+            Assert.Equal(expectedValue.Item1, expected);
+
+            expected = InvokeFilter(instance, filters.Item2);
+            Assert.Equal(expectedValue.Item2, expected);
         }
 
-        private Expression<Func<T, bool>> Bind<T>(string filter, ODataQuerySettings querySettings = null) where T : class
+        public static bool InvokeFilter<T>(T instance, Expression filter)
         {
-            IEdmModel model = GetModel<T>();
-            FilterClause filterNode = CreateFilterNode(filter, model, typeof(T));
+            Expression<Func<T, bool>> filterExpression = filter as Expression<Func<T, bool>>;
+            Assert.NotNull(filterExpression);
 
-            if (querySettings == null)
+            return filterExpression.Compile().Invoke(instance);
+        }
+
+        internal static Expression BindFilter(IEdmModel model, FilterClause filterClause, Type elementType, ODataQuerySettings querySettings, IAssemblyResolver resolver = null)
+        {
+            IFilterBinder binder = new FilterBinder();
+            QueryBinderContext context = new QueryBinderContext(model, querySettings, elementType)
             {
-                querySettings = CreateSettings();
-            }
-
-            return Bind<T>(filterNode, model, AssemblyResolverHelper.Default, querySettings);
-        }
-
-        private static Expression<Func<TEntityType, bool>> Bind<TEntityType>(FilterClause filterClause, IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
-        {
-            Type filterType = typeof(TEntityType);
-            FilterBinder binder = new FilterBinder(querySettings, assembliesResolver, model, filterType);
-            return FilterBinder.BindFilterClause(binder, filterClause, filterType) as Expression<Func<TEntityType, bool>>;
-        }
-
-        private FilterClause CreateFilterNode(string filter, IEdmModel model, Type entityType)
-        {
-            IEdmEntityType productType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == entityType.Name);
-            Assert.NotNull(productType); // Guard
-
-            IEdmEntitySet products = model.EntityContainer.FindEntitySet("Products");
-            Assert.NotNull(products); // Guard
-
-            ODataQueryOptionParser parser = new ODataQueryOptionParser(model, productType, products,
-                new Dictionary<string, string> { { "$filter", filter } });
-
-            return parser.ParseFilter();
-        }
-
-        private static ODataQuerySettings CreateSettings()
-        {
-            return new ODataQuerySettings
-            {
-                HandleNullPropagation = HandleNullPropagationOption.False // A value other than Default is required for calls to Bind.
+                AssembliesResolver = resolver ?? AssemblyResolverHelper.Default,
             };
+
+            return binder.BindFilter(filterClause, context);
         }
 
-        private void RunFilters<T>(dynamic filters, T product, dynamic expectedValue)
+        /// <summary>
+        /// Returns (FalseNullProp Expression,  TrueNullProp Expression)
+        /// If expectedTrueNullPropagation is same as expectedFalseNullPropagation, don't need provide its value.
+        /// </summary>
+        internal static (Expression, Expression) BindFilterAndVerify<T>(string filter,
+            string expectedFalseNullPropagation = null,
+            string expectedTrueNullPropagation = null,
+            Action<ODataQuerySettings> settingsCustomizer = null,
+            IAssemblyResolver assembliesResolver = null) where T : class
         {
-            var filterWithNullPropagation = filters.WithNullPropagation as Expression<Func<T, bool>>;
-            if (expectedValue.WithNullPropagation is Type)
-            {
-                ExceptionAssert.Throws(expectedValue.WithNullPropagation as Type, () => RunFilter(filterWithNullPropagation, product));
-            }
-            else
-            {
-                Assert.Equal(expectedValue.WithNullPropagation, RunFilter(filterWithNullPropagation, product));
-            }
-
-            var filterWithoutNullPropagation = filters.WithoutNullPropagation as Expression<Func<T, bool>>;
-            if (expectedValue.WithoutNullPropagation is Type)
-            {
-                ExceptionAssert.Throws(expectedValue.WithoutNullPropagation as Type, () => RunFilter(filterWithoutNullPropagation, product));
-            }
-            else
-            {
-                Assert.Equal(expectedValue.WithoutNullPropagation, RunFilter(filterWithoutNullPropagation, product));
-            }
-        }
-
-        private bool RunFilter<T>(Expression<Func<T, bool>> filter, T instance)
-        {
-            return filter.Compile().Invoke(instance);
-        }
-
-        private dynamic VerifyQueryDeserialization(string filter, string expectedResult = null, string expectedResultWithNullPropagation = null, Action<ODataQuerySettings> settingsCustomizer = null)
-        {
-            return VerifyQueryDeserialization<Product>(filter, expectedResult, expectedResultWithNullPropagation, settingsCustomizer);
-        }
-
-        private dynamic VerifyQueryDeserialization<T>(string filter, string expectedResult = null, string expectedResultWithNullPropagation = null, Action<ODataQuerySettings> settingsCustomizer = null) where T : class
-        {
+            Type elementType = typeof(T);
             IEdmModel model = GetModel<T>();
-            FilterClause filterNode = CreateFilterNode(filter, model, typeof(T));
-            IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
+            FilterClause filterClause = CreateFilterClause(filter, model, elementType);
+            Assert.NotNull(filterClause);
 
-            Func<ODataQuerySettings, ODataQuerySettings> customizeSettings = (settings) =>
+            // HandleNullPropagation == false
+            ODataQuerySettings querySettings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
+            settingsCustomizer?.Invoke(querySettings);
+
+            Expression filterExprFalseNull = BindFilter(model, filterClause, elementType, querySettings, assembliesResolver);
+            if (expectedFalseNullPropagation != null && expectedFalseNullPropagation != NotTesting)
             {
-                if (settingsCustomizer != null)
+                VerifyExpression(filterExprFalseNull, expectedFalseNullPropagation);
+            }
+
+            // HandleNullPropagation == true
+            querySettings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True };
+            settingsCustomizer?.Invoke(querySettings);
+            Expression filterExprTrueNull = BindFilter(model, filterClause, elementType, querySettings, assembliesResolver);
+
+            if (expectedTrueNullPropagation != NotTesting)
+            {
+                string nullPropagation = expectedTrueNullPropagation ?? expectedFalseNullPropagation; // Same expected
+                if (nullPropagation != null)
                 {
-                    settingsCustomizer.Invoke(settings);
+                    VerifyExpression(filterExprTrueNull, nullPropagation);
                 }
-
-                return settings;
-            };
-
-            var filterExpr = Bind<T>(
-                filterNode,
-                model,
-                assembliesResolver,
-                customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }));
-
-            if (!String.IsNullOrEmpty(expectedResult))
-            {
-                VerifyExpression(filterExpr, expectedResult);
             }
 
-            expectedResultWithNullPropagation = expectedResultWithNullPropagation ?? expectedResult;
-
-            var filterExprWithNullPropagation = Bind<T>(
-                filterNode,
-                model,
-                assembliesResolver,
-                customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True }));
-
-            if (!String.IsNullOrEmpty(expectedResultWithNullPropagation))
-            {
-                VerifyExpression(filterExprWithNullPropagation, expectedResultWithNullPropagation ?? expectedResult);
-            }
-
-            return new
-            {
-                WithNullPropagation = filterExprWithNullPropagation,
-                WithoutNullPropagation = filterExpr
-            };
+            return (filterExprFalseNull, filterExprTrueNull);
         }
 
-        private void VerifyExpression(Expression filter, string expectedExpression)
+        private static void VerifyExpression(Expression filter, string expectedExpression)
         {
             // strip off the beginning part of the expression to get to the first
             // actual query operator
             string resultExpression = ExpressionStringBuilder.ToString(filter);
             Assert.True(resultExpression == expectedExpression,
-                String.Format("Expected expression '{0}' but the deserializer produced '{1}'", expectedExpression, resultExpression));
+                string.Format("Expected expression '{0}' but the deserializer produced '{1}'", expectedExpression, resultExpression));
         }
 
-        private IEdmModel GetModel<T>() where T : class
+        private static FilterClause CreateFilterClause(string filter, IEdmModel model, Type type)
+        {
+            IEdmEntityType entityType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == type.Name);
+            Assert.NotNull(entityType); // Guard
+
+            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Entities");
+            Assert.NotNull(entitySet); // Guard
+
+            ODataQueryOptionParser parser = new ODataQueryOptionParser(model, entityType, entitySet,
+                new Dictionary<string, string> { { "$filter", filter } });
+
+            return parser.ParseFilter();
+        }
+
+        private static IEdmModel GetModel<T>() where T : class
         {
             Type key = typeof(T);
             IEdmModel value;
@@ -3188,7 +3190,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             if (!_modelCache.TryGetValue(key, out value))
             {
                 ODataModelBuilder model = new ODataConventionModelBuilder();
-                model.EntitySet<T>("Products");
+                model.EntitySet<T>("Entities");
                 if (key == typeof(Product))
                 {
                     model.EntityType<DerivedProduct>().DerivesFrom<Product>();
@@ -3197,6 +3199,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
                 value = _modelCache[key] = model.GetEdmModel();
             }
+
             return value;
         }
 
@@ -3216,6 +3219,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             return str.PadRight(number);
         }
+
+        #endregion
     }
 
     // Used by Custom Method binder tests - by reflection
@@ -3226,5 +3231,4 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             return str.PadRight(width);
         }
     }
-
 }

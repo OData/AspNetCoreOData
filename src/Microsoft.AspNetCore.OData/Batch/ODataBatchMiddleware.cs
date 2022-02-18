@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBatchMiddleware.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics.Contracts;
@@ -53,10 +57,15 @@ namespace Microsoft.AspNetCore.OData.Batch
             {
                 throw Error.ArgumentNull(nameof(context));
             }
-
             string prefixName;
             ODataBatchHandler batchHandler;
-            if (_batchMapping != null && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
+
+            // The batch middleware should not handle the options requests for cors to properly function.
+            bool isPostRequest = HttpMethods.IsPost(context.Request.Method);
+
+            if (isPostRequest
+                && _batchMapping != null
+                && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
             {
                 Contract.Assert(batchHandler != null);
                 await batchHandler.ProcessBatchAsync(context, _next).ConfigureAwait(false);
@@ -71,9 +80,9 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             Contract.Assert(options != null);
 
-            foreach (var model in options.Models)
+            foreach (var model in options.RouteComponents)
             {
-                IServiceProvider subServiceProvider = model.Value.Item2;
+                IServiceProvider subServiceProvider = model.Value.ServiceProvider;
                 if (subServiceProvider == null)
                 {
                     continue;

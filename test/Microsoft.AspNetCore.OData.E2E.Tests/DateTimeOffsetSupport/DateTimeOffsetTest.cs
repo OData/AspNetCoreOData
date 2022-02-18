@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DateTimeOffsetTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -33,8 +37,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
             services.ConfigureControllers(typeof(FilesController));
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddModel("convention", DateTimeOffsetEdmModel.GetConventionModel())
-                .AddModel("explicit", DateTimeOffsetEdmModel.GetExplicitModel()));
+                .AddRouteComponents("convention", DateTimeOffsetEdmModel.GetConventionModel())
+                .AddRouteComponents("explicit", DateTimeOffsetEdmModel.GetExplicitModel()));
         }
         #endregion
 
@@ -176,6 +180,34 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
             // GET ~/Files(?)
             getResponse = await client.GetAsync(fileUri);
             Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateFileEntity_Works_UsingDifferentPropertyNameCase()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+            string filesUri = $"convention/Files";
+            string content =
+                "{" +
+                    "\"fileid\":99," + // use a special ID to test
+                    "\"naMe\":\"abc\"," +
+                    "\"creaTeddate\":\"2021-10-28T21:33:26+08:00\"," +
+                    "\"deLEteDate\":\"2021-11-01T10:48:12+08:00\"" +
+                "}";
+
+            // Act: POST ~/Files
+            HttpRequestMessage postRequest = new HttpRequestMessage(HttpMethod.Post, filesUri);
+            postRequest.Content = new StringContent(content);
+            postRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+
+            var postResponse = await client.SendAsync(postRequest);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+            string payload = await postResponse.Content.ReadAsStringAsync();
+            Assert.Contains("PropertyCaseInsensitive", payload);
         }
         #endregion
 

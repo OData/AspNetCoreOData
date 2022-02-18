@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="PathTemplateSegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -14,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
     /// <summary>
     ///  Represents a template that can match a <see cref="PathTemplateSegment"/>.
     ///  From OData Lib:
-    ///  If template parseing enabled, any literal wrappered with "{" and "}" is considered as PathTemplateSegment.
+    ///  If template parsing enabled, any literal wrapped with "{" and "}" is considered as PathTemplateSegment.
     ///  So, here's the design (so far, we can add more later):
     ///  {property} ==> declared property
     ///  {dynamicproperty} => dynamic property
@@ -105,8 +109,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return null;
             }
 
-            IEdmStructuredType previewEdmType = previous.EdmType as IEdmStructuredType;
-            if (previewEdmType == null)
+            IEdmStructuredType previousEdmType = previous.EdmType as IEdmStructuredType;
+            if (previousEdmType == null)
             {
                 return null;
             }
@@ -117,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
+            IEdmProperty edmProperty = previousEdmType.ResolveProperty(propertyName);
             IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
             if (structuralProperty != null)
             {
@@ -141,8 +145,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return null;
             }
 
-            IEdmStructuredType previewEdmType = previous.EdmType as IEdmStructuredType;
-            if (previewEdmType == null || !previewEdmType.IsOpen)
+            IEdmStructuredType previousEdmType = previous.EdmType as IEdmStructuredType;
+            if (previousEdmType == null || !previousEdmType.IsOpen)
             {
                 return null;
             }
@@ -153,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             }
 
             string propertyName = value as string;
-            IEdmProperty edmProperty = previewEdmType.ResolveProperty(propertyName);
+            IEdmProperty edmProperty = previousEdmType.ResolveProperty(propertyName);
             if (edmProperty != null)
             {
                 return null;

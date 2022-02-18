@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OperationRequestItem.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Threading.Tasks;
@@ -38,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            await SendRequestAsync(handler, Context, null).ConfigureAwait(false);
+            await SendRequestAsync(handler, Context, this.ContentIdToLocationMapping).ConfigureAwait(false);
 
             return new OperationResponseItem(Context);
         }

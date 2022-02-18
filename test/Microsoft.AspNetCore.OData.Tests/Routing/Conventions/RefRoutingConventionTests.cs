@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="RefRoutingConventionTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Globalization;
 using System.Linq;
@@ -95,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
         [Theory]
         [MemberData(nameof(RefConventionTestData))]
-        public void SingletonRoutingConventionTestDataRunsAsExpected(string actionName, string[] templates)
+        public void RefRoutingConventionTestDataRunsAsExpected(string actionName, string[] templates)
         {
             // Arrange
             ControllerModel controller = ControllerModelHelpers.BuildControllerModel<RefCustomersController>(actionName);
@@ -110,6 +114,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Assert
             Assert.Equal(templates.Length, action.Selectors.Count);
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+        }
+
+        [Theory]
+        [InlineData("GetRefTo")]
+        [InlineData("CreateRefTo")]
+        [InlineData("DeleteRefTo")]
+        [InlineData("GetRefToSubOrderFrom")]
+        [InlineData("CreateRefToSubOrderFrom")]
+        [InlineData("DeleteRefToSubOrderFrom")]
+        public void RefRoutingConventionDoesNothingForNotSupportedAction(string actionName)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<RefCustomersController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, _edmModel, controller);
+            context.Action = controller.Actions.First();
+
+            // Act
+            bool returnValue = _refConvention.AppliesToAction(context);
+            Assert.False(returnValue);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
         }
 
         public static IEdmModel GetModel()
@@ -149,6 +178,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             public string DeleteRefToOrders(int key, int relatedKey, string navigationProperty)
             {
                 return string.Format(CultureInfo.InvariantCulture, "DeleteRef({0})({1})({2})", key, relatedKey, navigationProperty);
+            }
+
+            public void GetRefTo(int key, int relatedKey)
+            {
+            }
+
+            public void CreateRefTo(int key, int relatedKey)
+            {
+            }
+
+            public void DeleteRefTo(int key, int relatedKey)
+            {
+            }
+
+            public void GetRefToSubOrderFrom(int key, int relatedKey)
+            {
+            }
+
+            public void CreateRefToSubOrderFrom(int key, int relatedKey)
+            {
+            }
+
+            public void DeleteRefToSubOrderFrom(int key, int relatedKey)
+            {
             }
         }
     }

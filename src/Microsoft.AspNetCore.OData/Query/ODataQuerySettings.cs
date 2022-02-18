@@ -1,5 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQuerySettings.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using System;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -20,6 +26,11 @@ namespace Microsoft.AspNetCore.OData.Query
             EnsureStableOrdering = true;
             EnableConstantParameterization = true;
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="TimeZoneInfo"/>.
+        /// </summary>
+        public TimeZoneInfo TimeZone { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of query results to return based on the type or property.
@@ -86,9 +97,9 @@ namespace Microsoft.AspNetCore.OData.Query
 
         /// <summary>
         /// Gets or sets a value indicating whether queries with expanded navigations should be formulated
-        /// to encourage correlated subquery results to be buffered.
-        /// Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
-        /// by buffering results from the subquery.
+        /// to encourage correlated sub-query results to be buffered.
+        /// Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
+        /// by buffering results from the sub-query.
         /// </summary>
         /// <value>The default value is <c>false</c>.</value>
         public bool EnableCorrelatedSubqueryBuffering { get; set; }
@@ -125,6 +136,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         internal void CopyFrom(ODataQuerySettings settings)
         {
+            TimeZone = settings.TimeZone;
             EnsureStableOrdering = settings.EnsureStableOrdering;
             EnableConstantParameterization = settings.EnableConstantParameterization;
             HandleNullPropagation = settings.HandleNullPropagation;

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FunctionImportSegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -90,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             options = options ?? ODataRouteOptions.Default;
 
-            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthesisForEmptyParameterFunction)
             {
                 yield return $"/{FunctionImport.Name}";
             }
@@ -121,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
                 // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // Because, In this request, the comming route data has the following:
+                // Because, In this request, the coming route data has the following:
                 // min = 1
                 // max = 2,ave=3
                 // Therefore, we need to combine the route data together and separate them using "," again.

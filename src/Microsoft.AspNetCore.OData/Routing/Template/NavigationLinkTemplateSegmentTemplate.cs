@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="NavigationLinkTemplateSegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -112,8 +116,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 IEdmEntityType entityType = edmNavProperty.ToEntityType();
 
                 // only handle the single key
-                IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
                 Contract.Assert(entityType.Key().Count() == 1);
+                IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
                 Contract.Assert(keyProperty != null);
 
                 IDictionary<string, string> keyValuePairs = new Dictionary<string, string>

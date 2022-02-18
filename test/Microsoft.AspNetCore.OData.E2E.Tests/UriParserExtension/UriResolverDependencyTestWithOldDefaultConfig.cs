@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="UriResolverDependencyTestWithOldDefaultConfig.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Net;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
 
             services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController), typeof(MetadataController));
 
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).RouteOptions.EnableUnqualifiedOperationCall = false);
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model).RouteOptions.EnableUnqualifiedOperationCall = false);
         }
 
         public static TheoryDataSet<string, string, HttpStatusCode> urisForOldDefaultConfig

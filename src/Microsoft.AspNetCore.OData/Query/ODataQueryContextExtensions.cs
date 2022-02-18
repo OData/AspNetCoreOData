@@ -1,20 +1,40 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQueryContextExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
     internal static class ODataQueryContextExtensions
     {
+        public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
+        {
+            ODataQuerySettings returnSettings = new ODataQuerySettings();
+            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+            if (settings != null)
+            {
+                returnSettings.CopyFrom(settings);
+            }
+
+            return returnSettings;
+        }
+
         public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
         {
-            ODataQuerySettings updatedSettings = (context == null || context.RequestContainer == null)
-                ? new ODataQuerySettings()
-                : context.RequestContainer.GetRequiredService<ODataQuerySettings>();
+            ODataQuerySettings updatedSettings = new ODataQuerySettings();
+            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+            if (settings != null)
+            {
+                updatedSettings.CopyFrom(settings);
+            }
 
             updatedSettings.CopyFrom(querySettings);
 
@@ -30,44 +50,91 @@ namespace Microsoft.AspNetCore.OData.Query
 
         public static SkipTokenHandler GetSkipTokenHandler(this ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return DefaultSkipTokenHandler.Instance;
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenHandler>();
+            return context?.RequestContainer?.GetRequiredService<SkipTokenHandler>() ?? DefaultSkipTokenHandler.Instance;
         }
 
         /// <summary>
-        /// Gets the <see cref="FilterBinder"/>.
+        /// Gets the <see cref="IFilterBinder"/>.
         /// </summary>
         /// <param name="context">The query context.</param>
-        /// <param name="querySettings">The query setting.</param>
-        /// <returns>The built <see cref="FilterBinder"/>.</returns>
-        public static FilterBinder GetFilterBinder(this ODataQueryContext context, ODataQuerySettings querySettings)
+        /// <returns>The built <see cref="IFilterBinder"/>.</returns>
+        public static IFilterBinder GetFilterBinder(this ODataQueryContext context)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (querySettings == null)
+            IFilterBinder binder = context.RequestContainer?.GetService<IFilterBinder>();
+            return binder ?? new FilterBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ISearchBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="ISearchBinder"/>.</returns>
+        public static ISearchBinder GetSearchBinder(this ODataQueryContext context)
+        {
+            if (context == null)
             {
-                throw Error.ArgumentNull(nameof(querySettings));
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            FilterBinder binder = null;
-            if (context.RequestContainer != null)
+            // We don't provide the default implementation of ISearchBinder,
+            // Actually, how to match is dependent upon the implementation.
+            return context.RequestContainer?.GetService<ISearchBinder>();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ISelectExpandBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="ISelectExpandBinder"/>.</returns>
+        public static ISelectExpandBinder GetSelectExpandBinder(this ODataQueryContext context)
+        {
+            if (context == null)
             {
-                binder = context.RequestContainer.GetService<FilterBinder>();
-                if (binder != null && binder.Model != context.Model)
-                {
-                    // TODO: Wtf, Need refactor these codes?
-                    binder.Model = context.Model;
-                }
+                throw Error.ArgumentNull(nameof(context));
             }
 
-            return binder ?? new FilterBinder(querySettings, AssemblyResolverHelper.Default, context.Model);
+            ISelectExpandBinder binder = context.RequestContainer?.GetService<ISelectExpandBinder>();
+
+            return binder ?? new SelectExpandBinder(context.GetFilterBinder(), context.GetOrderByBinder());
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IOrderByBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IOrderByBinder"/>.</returns>
+        public static IOrderByBinder GetOrderByBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IOrderByBinder binder = context.RequestContainer?.GetService<IOrderByBinder>();
+
+            return binder ?? new OrderByBinder();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAssemblyResolver"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IAssemblyResolver"/>.</returns>
+        public static IAssemblyResolver GetAssemblyResolver(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IAssemblyResolver resolver = context.RequestContainer?.GetService<IAssemblyResolver>();
+
+            return resolver ?? AssemblyResolverHelper.Default;
         }
     }
 }

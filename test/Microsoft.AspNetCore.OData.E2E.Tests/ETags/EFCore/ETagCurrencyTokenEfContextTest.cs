@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ETagCurrencyTokenEfContextTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -27,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
 
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(DominiosController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).Expand().Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).Expand().Select());
         }
 
         private static IEdmModel GetEdmModel()

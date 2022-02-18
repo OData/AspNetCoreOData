@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataSingletonDeserializerTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.IO;
 using System.Text;
@@ -21,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private IEdmModel _edmModel;
         private IEdmSingleton _singleton;
         private readonly ODataDeserializerContext _readContext;
-        private readonly ODataDeserializerProvider _deserializerProvider;
+        private readonly IODataDeserializerProvider _deserializerProvider;
 
         private sealed class EmployeeModel
         {
@@ -54,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(EmployeeModel)
             };
 
-            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
         }
 
         [Fact]
@@ -82,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
         private ODataMessageReader GetODataMessageReader(string content)
         {
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddModel("odata", _edmModel));
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddRouteComponents("odata", _edmModel));
 
             //request.Content = new StringContent(content);
             //request.Headers.Add("OData-Version", "4.0");

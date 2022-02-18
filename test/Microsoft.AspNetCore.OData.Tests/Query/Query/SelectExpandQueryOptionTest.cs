@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SelectExpandQueryOptionTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -680,8 +684,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var context = new ODataQueryContext(
                 model,
                 model.FindDeclaredType("Microsoft.AspNetCore.OData.Tests.Query.AutoExpandCustomer"));
-            var request = RequestFactory.Create("Get", url, opt => opt.AddModel(model));
-            request.ODataFeature().PrefixName = "";
+            var request = RequestFactory.Create("Get", url, opt => opt.AddRouteComponents(model));
+            request.ODataFeature().RoutePrefix = "";
             request.ODataFeature().Model = model;
             var queryOption = new ODataQueryOptions(context, request);
             queryOption.AddAutoSelectExpandProperties();

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRawValueSerializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.IO;
@@ -138,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Stream stream = new MemoryStream();
             mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
             var messageWriter = new ODataMessageWriter(mockRequest.Object);
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel(EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents(EdmCoreModel.Instance));
             request.ODataFeature().Path = new ODataPath(CountSegment.Instance);
             var context = new ODataSerializerContext { Request = request };
 

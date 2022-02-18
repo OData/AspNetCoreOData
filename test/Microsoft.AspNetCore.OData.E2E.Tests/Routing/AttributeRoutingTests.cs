@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="AttributeRoutingTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             builder.EntitySet<Owner>("Owners").EntityType.Collection.Function("BestOwner").Returns<string>();
             var model2 = builder.GetEdmModel();
 
-            services.AddControllers().AddOData(opt => opt.AddModel("dog", model1).AddModel("cat", model2));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("dog", model1).AddRouteComponents("cat", model2));
         }
 
         [Theory]
@@ -110,7 +114,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
         }
     }
 
-    [ODataRouting]
+    [ODataAttributeRouting]
     public class CatsController : ControllerBase
     {
         private static IList<Cat> cats = Enumerable.Range(1, 5)

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OperationImportRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -59,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             (var actionImports, var functionImports) = edmOperationImports.SplitOperationImports();
 
-            // That's not allowed to have an action import and function import with the same name.
+            // It's not allowed to have an action import and function import with the same name.
             if (actionImports.Count > 0 && functionImports.Count > 0)
             {
                 throw new ODataException(Error.Format(SRResources.OperationMustBeUniqueInEntitySetContainer, actionMethodName));
@@ -73,13 +77,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                 IEdmActionImport actionImport = actionImports[0];
 
-                IEdmEntitySetBase targetSet;
-                actionImport.TryGetStaticEntitySet(model, out targetSet);
+                IEdmEntitySetBase targetEntitySet;
+                actionImport.TryGetStaticEntitySet(model, out targetEntitySet);
 
                 // TODO:
                 // 1. shall we check the [HttpPost] attribute, or does the ASP.NET Core have the default?
                 // 2) shall we check the action has "ODataActionParameters" parameter type?
-                ODataPathTemplate template = new ODataPathTemplate(new ActionImportSegmentTemplate(actionImport, targetSet));
+                ODataPathTemplate template = new ODataPathTemplate(new ActionImportSegmentTemplate(actionImport, targetEntitySet));
                 action.AddSelector("Post", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }

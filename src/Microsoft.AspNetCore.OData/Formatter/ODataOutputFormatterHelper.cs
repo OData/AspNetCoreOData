@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOutputFormatterHelper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -52,14 +56,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
             MediaTypeHeaderValue contentType,
             HttpRequest request,
             IHeaderDictionary requestHeaders,
-            ODataSerializerProvider serializerProvider)
+            IODataSerializerProvider serializerProvider)
         {
             if (model == null)
             {
                 throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
             }
 
-            ODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
+            IODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
 
             ODataPath path = request.ODataFeature().Path;
             IEdmNavigationSource targetNavigationSource = GetTargetNavigationSource(path, model);
@@ -75,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetSubServiceProvider());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetRouteServices());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -137,6 +141,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.Path = path;
                 writeContext.MetadataLevel = metadataLevel;
                 writeContext.QueryOptions = queryOptions;
+                writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
 
                 //Set the SelectExpandClause on the context if it was explicitly specified.
                 if (selectExpandDifferentFromQueryOptions != null)
@@ -148,10 +153,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        internal static ODataSerializer GetSerializer(Type type, object value, HttpRequest request,
-            ODataSerializerProvider serializerProvider)
+        internal static IODataSerializer GetSerializer(Type type, object value, HttpRequest request,
+            IODataSerializerProvider serializerProvider)
         {
-            ODataSerializer serializer;
+            IODataSerializer serializer;
 
             IEdmObject edmObject = value as IEdmObject;
             if (edmObject != null)
@@ -203,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             OperationSegment operationSegment = path.LastSegment as OperationSegment;
             if (operationSegment != null)
             {
-                // OData modelbuilder uses an annotation to save the function returned entity set.
+                // OData model builder uses an annotation to save the function returned entity set.
                 // TODO: we need to refactor it later.
                 ReturnedEntitySetAnnotation entitySetAnnotation = model.GetAnnotationValue<ReturnedEntitySetAnnotation>(operationSegment.Operations.Single());
                 if (entitySetAnnotation != null)

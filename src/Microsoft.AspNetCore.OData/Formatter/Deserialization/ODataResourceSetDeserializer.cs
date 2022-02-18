@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataResourceSetDeserializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataResourceSetDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataResourceSetDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataResourceSetDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.ResourceSet, deserializerProvider)
         {
         }
@@ -49,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEdmTypeReference edmType = readContext.GetEdmType(type);
             Contract.Assert(edmType != null);
 
-            // TODO: is it ok to read the top level collection of entity?
+            // TODO: is it OK to read the top level collection of entity?
             if (!(edmType.IsCollection() && edmType.AsCollection().ElementType().IsStructured()))
             {
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);
@@ -132,10 +136,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (resourceSet == null)
             {
-                throw new ArgumentNullException(nameof(resourceSet));
+                throw Error.ArgumentNull(nameof(resourceSet));
             }
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
             if (deserializer == null)
             {
                 throw new SerializationException(

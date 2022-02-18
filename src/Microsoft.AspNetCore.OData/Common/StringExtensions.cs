@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="StringExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 
@@ -163,7 +167,7 @@ namespace Microsoft.AspNetCore.OData.Common
 
         /// <summary>
         /// Each key/value pair is separated using ",".
-        /// Each value could be a string using single quote, so it could have "," and escaped doulbe single quote.
+        /// Each value could be a string using single quote, so it could have "," and escaped double single quote.
         /// "minSalary=2,maxSalary=3"
         /// "minSalary='af''d,2,897abc' , maxSalary=3"
         /// </summary>

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="MediaTypeMapping.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Net.Http.Headers;
@@ -10,14 +14,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
     /// <summary>
     /// A class to support matching media types.
     /// </summary>
-    /// <remarks>
-    /// This is part of the platform in AspNet but defined here for AspNetCore to allow for reusing
-    /// the classes derive form it for managing media type mapping.
-    /// </remarks>
     public abstract class MediaTypeMapping
     {
         /// <summary>
-        /// Initializes a new instance of a System.Net.Http.Formatting.MediaTypeMapping with
+        /// Initializes a new instance of a <see cref="MediaTypeMapping"/> with
         /// the given mediaType value.
         /// </summary>
         /// <param name="mediaType">The mediaType that is associated with the request.</param>

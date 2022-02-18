@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBodyModelBinder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -87,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
         public static async Task<IDictionary<string, object>> ReadODataBodyAsync(ModelBindingContext bindingContext)
         {
-            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetSubServiceProvider().GetService<ODataActionPayloadDeserializer>();
+            ODataActionPayloadDeserializer deserializer = bindingContext.HttpContext.Request.GetRouteServices().GetService<ODataActionPayloadDeserializer>();
             if (deserializer == null)
             {
                 return null;

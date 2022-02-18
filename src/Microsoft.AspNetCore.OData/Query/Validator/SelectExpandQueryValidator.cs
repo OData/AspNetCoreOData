@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SelectExpandQueryValidator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -76,12 +80,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static SelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SelectExpandQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SelectExpandQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<SelectExpandQueryValidator>()
+                ?? new SelectExpandQueryValidator();
         }
 
         private static void ValidateDepth(SelectExpandClause selectExpand, int maxDepth)

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="HttpRequestTestExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -62,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
             }
 
             IEdmModel model = request.GetModel();
-            IServiceProvider sp = request.GetSubServiceProvider();
+            IServiceProvider sp = request.GetRouteServices();
             string serviceRoot = request.CreateODataLink();
             ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), uri, sp);
             return uriParser.ParsePath();

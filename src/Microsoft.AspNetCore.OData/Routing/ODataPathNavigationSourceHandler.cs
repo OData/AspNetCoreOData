@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataPathNavigationSourceHandler.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -41,9 +45,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a EntitySetSegment
+        /// Handle an <see cref="EntitySetSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(EntitySetSegment segment)
         {
             Contract.Assert(segment != null);
@@ -53,9 +57,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a KeySegment
+        /// Handle a <see cref="KeySegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(KeySegment segment)
         {
             Contract.Assert(segment != null);
@@ -64,9 +68,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a NavigationPropertyLinkSegment
+        /// Handle a <see cref="NavigationPropertyLinkSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to Handle</param>
+        /// <param name="segment">The segment to handle</param>
         public override void Handle(NavigationPropertyLinkSegment segment)
         {
             Contract.Assert(segment != null);
@@ -78,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a NavigationPropertySegment
+        /// Handle a <see cref="NavigationPropertySegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(NavigationPropertySegment segment)
@@ -90,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a OpenPropertySegment
+        /// Handle a <see cref="DynamicPathSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(DynamicPathSegment segment)
@@ -102,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a OperationImportSegment
+        /// Handle an <see cref="OperationImportSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Handle</param>
         public override void Handle(OperationImportSegment segment)
@@ -140,9 +144,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle an OperationSegment
+        /// Handle an <see cref="OperationSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(OperationSegment segment)
         {
             Contract.Assert(segment != null);
@@ -177,9 +181,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a PropertySegment
+        /// Handle a <see cref="PathTemplateSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(PathTemplateSegment segment)
         {
             Contract.Assert(segment != null);
@@ -189,9 +193,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a PropertySegment
+        /// Handle a <see cref="PropertySegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(PropertySegment segment)
         {
             Contract.Assert(segment != null);
@@ -202,9 +206,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a SingletonSegment
+        /// Handle a <see cref="SingletonSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(SingletonSegment segment)
         {
             Contract.Assert(segment != null);
@@ -214,9 +218,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a TypeSegment, we use "cast" for type segment.
+        /// Handle a <see cref="TypeSegment"/>, we use "cast" for type segment.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(TypeSegment segment)
         {
             Contract.Assert(segment != null);
@@ -234,9 +238,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a ValueSegment
+        /// Handle a <see cref="ValueSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(ValueSegment segment)
         {
             Contract.Assert(segment != null);
@@ -246,9 +250,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a CountSegment
+        /// Handle a <see cref="CountSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(CountSegment segment)
         {
             Contract.Assert(segment != null);
@@ -258,9 +262,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a BatchSegment
+        /// Handle a <see cref="BatchSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(BatchSegment segment)
         {
             Contract.Assert(segment != null);
@@ -270,9 +274,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a MetadataSegment
+        /// Handle a <see cref="MetadataSegment"/>.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(MetadataSegment segment)
         {
             Contract.Assert(segment != null);
@@ -282,9 +286,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Handle a general path segment
+        /// Handle a general path segment.
         /// </summary>
-        /// <param name="segment">the segment to handle</param>
+        /// <param name="segment">The segment to handle.</param>
         public override void Handle(ODataPathSegment segment)
         {
             // ODL doesn't provide the handle function for general path segment

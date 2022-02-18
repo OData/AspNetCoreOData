@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ComputeBinder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -41,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //      Instance = $it,
             //      Model = parametrized(IEdmModel),
             //      Container => new AggregationPropertyContainer() {
-            //          Name = "X", 
+            //          Name = "Z", 
             //          Value = $it.X + $it.Y, 
             //          Next = new LastInChain() {
             //              Name = "C",

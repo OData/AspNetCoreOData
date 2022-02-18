@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataModelBinder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -62,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     if (paramValue != null)
                     {
                         HttpRequest request = bindingContext.HttpContext.Request;
-                        object model = ConvertTo(paramValue, bindingContext, request.GetSubServiceProvider());
+                        object model = ConvertTo(paramValue, bindingContext, request.GetRouteServices());
                         bindingContext.Result = ModelBindingResult.Success(model);
                         return Task.CompletedTask;
                     }
@@ -82,7 +86,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                         HttpRequest request = bindingContext.HttpContext.Request;
                         TimeZoneInfo timeZone = request.GetTimeZoneInfo();
-                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType, timeZone);
+                        IEdmModel edmModel = request.GetModel();
+                        object model = ODataModelBinderConverter.ConvertTo(valueProviderResult.FirstValue, bindingContext.ModelType, timeZone, edmModel);
                         if (model != null)
                         {
                             bindingContext.Result = ModelBindingResult.Success(model);

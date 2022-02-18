@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataInputFormatter.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -90,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("type");
             }
 
-            ODataDeserializer deserializer = GetDeserializer(request, type, out _);
+            IODataDeserializer deserializer = GetDeserializer(request, type, out _);
             if (deserializer != null)
             {
                 return _payloadKinds.Contains(deserializer.ODataPayloadKind);
@@ -186,7 +190,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             object result;
             IEdmModel model = request.GetModel();
             IEdmTypeReference expectedPayloadType;
-            ODataDeserializer deserializer = GetDeserializer(request, type, out expectedPayloadType);
+            IODataDeserializer deserializer = GetDeserializer(request, type, out expectedPayloadType);
             if (deserializer == null)
             {
                 throw Error.Argument("type", SRResources.FormatterReadIsNotSupportedForType, type.FullName, typeof(ODataInputFormatter).FullName);
@@ -199,12 +203,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
                 oDataReaderSettings.Version = version;
 
-                // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
-                // In ODL 8.x, ReadUntypedAsString option will be deleted.
-                oDataReaderSettings.ReadUntypedAsString = false;
-
                 IODataRequestMessage oDataRequestMessage =
-                    ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetSubServiceProvider());
+                    ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetRouteServices());
                 ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
                 disposes.Add(oDataMessageReader);
 
@@ -278,7 +278,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <param name="type">The input type.</param>
         /// <param name="expectedPayloadType">Output the expected payload type.</param>
         /// <returns>null or the OData deserializer</returns>
-        private static ODataDeserializer GetDeserializer(HttpRequest request, Type type,  out IEdmTypeReference expectedPayloadType)
+        private static IODataDeserializer GetDeserializer(HttpRequest request, Type type,  out IEdmTypeReference expectedPayloadType)
         {
             Contract.Assert(request != null);
 
@@ -287,10 +287,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmModel model = odataFeature.Model;
             expectedPayloadType = null;
 
-            ODataDeserializerProvider deserializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            IODataDeserializerProvider deserializerProvider = request.GetRouteServices().GetRequiredService<IODataDeserializerProvider>();
 
             // Get the deserializer using the CLR type first from the deserializer provider.
-            ODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);
+            IODataDeserializer deserializer = deserializerProvider.GetODataDeserializer(type, request);
             if (deserializer == null)
             {
                 expectedPayloadType = EdmLibHelper.GetExpectedPayloadType(type, path, model);

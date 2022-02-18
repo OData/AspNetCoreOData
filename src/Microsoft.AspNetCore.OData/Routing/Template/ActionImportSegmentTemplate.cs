@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ActionImportSegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         {
             Segment = segment ?? throw Error.ArgumentNull(nameof(segment));
 
-            IEdmOperationImport operationImport = segment.OperationImports.FirstOrDefault();
+            IEdmOperationImport operationImport = segment.OperationImports.First();
             if (!operationImport.IsActionImport())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "ActionImport", "ActionImportSegmentTemplate"));

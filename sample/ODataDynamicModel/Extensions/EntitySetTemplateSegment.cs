@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EntitySetTemplateSegment.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +31,7 @@ namespace ODataDynamicModel.Extensions
 
             string entitySetName = classname as string;
 
-            // if you want to support case-insenstivie
+            // if you want to support case-insensitive
             var edmEntitySet = context.Model.EntityContainer.EntitySets()
                 .FirstOrDefault(e => string.Equals(entitySetName, e.Name, StringComparison.OrdinalIgnoreCase));
 

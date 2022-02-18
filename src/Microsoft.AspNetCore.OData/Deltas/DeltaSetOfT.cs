@@ -1,8 +1,11 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DeltaSetOfT.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -26,6 +29,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public Type ExpectedClrType => typeof(T);
 
+        #region Exclude unfinished APIs
+#if false
         /// <summary>
         ///  Overwrites the <paramref name="originalSet"/> entity with the changes tracked by this Delta resource set.
         /// </summary>
@@ -69,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                         break;
 
                     default:
-                        throw Error.InvalidOperation($"Unknow delta type {delta.GetType()}");
+                        throw Error.InvalidOperation($"Unknown delta type {delta.GetType()}");
                 }
             }
         }
@@ -94,5 +99,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
             return null;
         }
+#endif
+#endregion
     }
 }

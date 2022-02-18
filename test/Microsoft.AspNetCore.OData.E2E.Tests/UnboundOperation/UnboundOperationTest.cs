@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="UnboundOperationTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -35,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
 
             services.ConfigureControllers(typeof(ConventionCustomersController), typeof(MetadataController));
 
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model)
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model)
                 .Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 

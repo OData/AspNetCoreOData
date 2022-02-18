@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TypelessDeltaSerializationTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -32,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(TypelessDeltaCustomersController));
-            services.AddControllers().AddOData(opt => opt.Expand().AddModel("odata", edmModel));
+            services.AddControllers().AddOData(opt => opt.Expand().AddRouteComponents("odata", edmModel));
         }
 
         private static IEdmModel GetEdmModel()

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="HttpRequestODataQueryExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -46,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 // get the etag handler, and parse the etag
-                IETagHandler etagHandler = request.GetSubServiceProvider().GetRequiredService<IETagHandler>();
+                IETagHandler etagHandler = request.GetRouteServices().GetRequiredService<IETagHandler>();
                 IDictionary<string, object> properties = etagHandler.ParseETag(entityTagHeaderValue) ?? new Dictionary<string, object>();
                 IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
 

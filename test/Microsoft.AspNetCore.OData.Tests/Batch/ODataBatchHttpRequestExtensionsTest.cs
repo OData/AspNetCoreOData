@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBatchHttpRequestExtensionsTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -112,8 +116,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             IEdmModel model = new EdmModel();
             HttpContext context = new DefaultHttpContext();
             HttpRequest request = context.Request;
-            context.ODataFeature().PrefixName = "odata";
-            context.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            context.ODataFeature().RoutePrefix = "odata";
+            context.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
 
             ODataBatchResponseItem[] responses = new ODataBatchResponseItem[] { };
             ODataMessageQuotas quotas = new ODataMessageQuotas();
@@ -189,8 +193,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [InlineData(new[] { "application/json;q=0.9", "multipart/mixed" }, "multipart/mixed")]
         public async Task CreateODataBatchResponseAsync(string[] accept, string expected)
         {
-            var request = RequestFactory.Create("Get", "http://localhost/$batch", opt => opt.AddModel(EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = string.Empty;
+            var request = RequestFactory.Create("Get", "http://localhost/$batch", opt => opt.AddRouteComponents(EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = string.Empty;
             var responses = new[] { new ChangeSetResponseItem(Enumerable.Empty<HttpContext>()) };
 
             if (accept != null)
@@ -213,8 +217,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         [InlineData("multipart/mixed", "multipart/mixed")]
         public async Task CreateODataBatchResponseAsyncWhenNoAcceptHeader(string contentType, string expected)
         {
-            var request = RequestFactory.Create("Get", "http://localhost/$batch", opt => opt.AddModel(EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = string.Empty;
+            var request = RequestFactory.Create("Get", "http://localhost/$batch", opt => opt.AddRouteComponents(EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = string.Empty;
             var responses = new[] { new ChangeSetResponseItem(Enumerable.Empty<HttpContext>()) };
 
             if (contentType != null)

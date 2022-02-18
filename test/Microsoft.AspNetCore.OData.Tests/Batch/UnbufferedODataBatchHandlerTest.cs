@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="UnbufferedODataBatchHandlerTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -46,8 +50,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
             HttpContext context = new DefaultHttpContext();
 
-            context.ODataFeature().PrefixName = "odata";
-            context.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            context.ODataFeature().RoutePrefix = "odata";
+            context.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
 
             // Act & Assert
             await ExceptionAssert.ThrowsArgumentNullAsync(() => batchHandler.CreateResponseMessageAsync(null, context.Request),
@@ -110,13 +114,13 @@ foo
 ";
 
 
-            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
             HttpContext httpContext = request.HttpContext;
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             request.Body = new MemoryStream(requestBytes);
             request.ContentType = "multipart/mixed; boundary=\"2d958200-beb1-4437-97c5-9d19f7a1d538\"";
             request.ContentLength = 603;
-            httpContext.ODataFeature().PrefixName = "odata";
+            httpContext.ODataFeature().RoutePrefix = "odata";
             httpContext.Response.Body = new MemoryStream();
 
             // Act
@@ -190,14 +194,14 @@ Host: example.com
 
 --97a4482b-26c6-4551-aed3-85f8b500bbbf--
 ";
-            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddModel(EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddRouteComponents(EdmCoreModel.Instance));
             HttpContext httpContext = request.HttpContext;
 
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             request.Body = new MemoryStream(requestBytes);
             request.ContentType = "multipart/mixed;boundary=\"be13321d-3c7b-4126-aa20-958b2c7a87e0\"";
             request.ContentLength = 736;
-            httpContext.ODataFeature().PrefixName = "";
+            httpContext.ODataFeature().RoutePrefix = "";
             httpContext.Response.Body = new MemoryStream();
             batchHandler.PrefixName = "";
 
@@ -285,13 +289,13 @@ bar
 ";
 
             HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch",
-                opt => opt.AddModel(EdmCoreModel.Instance).EnableContinueOnErrorHeader = enableContinueOnError);
+                opt => opt.AddRouteComponents(EdmCoreModel.Instance).EnableContinueOnErrorHeader = enableContinueOnError);
             HttpContext httpContext = request.HttpContext;
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             request.Body = new MemoryStream(requestBytes);
             request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
             request.ContentLength = 827;
-            httpContext.ODataFeature().PrefixName = "";
+            httpContext.ODataFeature().RoutePrefix = "";
 
             if (preferenceHeader != null)
             {
@@ -394,14 +398,14 @@ foo
 
 --cb7bb9ee-dce2-4c94-bf11-b742b2bc6072--
 ";
-            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddModel(EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddRouteComponents(EdmCoreModel.Instance));
             HttpContext httpContext = request.HttpContext;
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             request.Body = new MemoryStream(requestBytes);
             request.ContentType = "multipart/mixed;boundary=\"09f27d33-41ea-4334-8ace-1738bd2793a9\"";
             request.ContentLength = 431;
-            httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            httpContext.ODataFeature().RoutePrefix = "";
+            IServiceProvider sp = request.GetRouteServices();
 
             IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(request.Body, request.Headers, sp);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
@@ -469,14 +473,14 @@ Host: example.com
 --86aef3eb-4af6-4750-a66d-df65e3f31ab0--";
 
             IEdmModel model = new EdmModel();
-            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddModel(model));
+            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddRouteComponents(model));
             HttpContext httpContext = request.HttpContext;
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             httpContext.Request.Body = new MemoryStream(requestBytes);
             httpContext.Request.ContentType = "multipart/mixed;boundary=\"86aef3eb-4af6-4750-a66d-df65e3f31ab0\"";
             httpContext.Request.ContentLength = 431;
-            httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            httpContext.ODataFeature().RoutePrefix = "";
+            IServiceProvider sp = request.GetRouteServices();
 
             IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, request.Headers, sp);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });
@@ -515,14 +519,14 @@ Host: example.com
 --75148e61-e67a-4bb7-ac0f-78fa30d0da30--
 ";
 
-            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddModel(EdmCoreModel.Instance));
+            HttpRequest request = RequestFactory.Create("Post", "http://example.com/$batch", opt => opt.AddRouteComponents(EdmCoreModel.Instance));
             HttpContext httpContext = request.HttpContext;
             byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
             request.Body = new MemoryStream(requestBytes);
             request.ContentType = "multipart/mixed;boundary=\"75148e61-e67a-4bb7-ac0f-78fa30d0da30\"";
             request.ContentLength = 431;
-            httpContext.ODataFeature().PrefixName = "";
-            IServiceProvider sp = request.GetSubServiceProvider();
+            httpContext.ODataFeature().RoutePrefix = "";
+            IServiceProvider sp = request.GetRouteServices();
 
             IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(httpContext.Request.Body, request.Headers, sp);
             ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings { BaseUri = new Uri("http://example.com") });

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRouteOptions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.OData;
 
@@ -33,6 +37,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
         /// </summary>
         public bool EnableControllerNameCaseInsensitive { get; set; } = false;
+
+        /// <summary>
+        /// Gets/sets a value indicating whether to enable case insensitive for the property name in conventional routing.
+        /// </summary>
+        public bool EnablePropertyNameCaseInsensitive { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate odata path template as ~/entityset({key}).
@@ -107,9 +116,9 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whther to generate non parenthsis for non-parameter function.
+        /// Gets or sets a value indicating whether to generate non parenthesis for non-parameter function.
         /// Used in conventional routing.
         /// </summary>
-        public bool EnableNonParenthsisForEmptyParameterFunction { get; set; } = false;
+        public bool EnableNonParenthesisForEmptyParameterFunction { get; set; } = false;
     }
 }

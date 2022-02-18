@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataDeltaResourceSetDeserializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -18,7 +22,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> that can read OData delta resource sets.
+    /// Represents an <see cref="IODataDeserializer"/> that can read OData delta resource sets.
     /// </summary>
     public class ODataDeltaResourceSetDeserializer : ODataEdmTypeDeserializer
     {
@@ -26,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataDeltaResourceSetDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataDeltaResourceSetDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataDeltaResourceSetDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Delta, deserializerProvider)
         {
         }
@@ -53,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             EdmDeltaCollectionType edmCollectionType = new EdmDeltaCollectionType(edmType);
             edmType = new EdmCollectionTypeReference(edmCollectionType);
 
-            // TODO: is it ok to read the top level collection of entity?
+            // TODO: is it OK to read the top level collection of entity?
             if (!(edmType.IsCollection() && edmType.AsCollection().ElementType().IsStructured()))
             {
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);
@@ -212,7 +216,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(readContext));
             }
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
             if (deserializer == null)
             {
                 throw new SerializationException(
@@ -260,7 +264,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="elementType">The element type.</param>
         /// <param name="readContext">The deserializer context.</param>
         /// <returns>The created object.</returns>
-        public virtual object ReadDeltaDeletedLink(ODataDeltaDeletedLinkWrapper deletedLink, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
+        internal virtual object ReadDeltaDeletedLink(ODataDeltaDeletedLinkWrapper deletedLink, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
         {
             if (deletedLink == null)
             {
@@ -302,7 +306,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <param name="elementType">The element type.</param>
         /// <param name="readContext">The deserializer context.</param>
         /// <returns>The created object.</returns>
-        public virtual object ReadDeltaLink(ODataDeltaLinkWrapper link, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
+        internal virtual object ReadDeltaLink(ODataDeltaLinkWrapper link, IEdmStructuredTypeReference elementType, ODataDeserializerContext readContext)
         {
             if (link == null)
             {

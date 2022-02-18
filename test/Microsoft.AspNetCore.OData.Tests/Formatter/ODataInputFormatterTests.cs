@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataInputFormatterTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -113,8 +117,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Arrange & Act
             IEdmEntitySet entitySet = _edmModel.EntityContainer.FindEntitySet("Customers");
             EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", _edmModel));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", _edmModel));
+            request.ODataFeature().RoutePrefix = "odata";
             request.ODataFeature().Model = _edmModel;
             request.ODataFeature().Path = new ODataPath(entitySetSeg);
 
@@ -243,10 +247,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ODataInputFormatter formatter = GetInputFormatter();
             formatter.BaseAddressFactory = (request) => new Uri("http://localhost");
 
-            HttpContext httpContext = GetHttpContext(expectedSampleTypeByte, opt => opt.AddModel("odata", _edmModel));
+            HttpContext httpContext = GetHttpContext(expectedSampleTypeByte, opt => opt.AddRouteComponents("odata", _edmModel));
             httpContext.Request.ContentType = "application/json;odata.metadata=minimal";
             httpContext.ODataFeature().Model = _edmModel;
-            httpContext.ODataFeature().PrefixName = "odata";
+            httpContext.ODataFeature().RoutePrefix = "odata";
             httpContext.ODataFeature().Path = new ODataPath(singletonSeg);
             Stream memStream = httpContext.Request.Body;
 

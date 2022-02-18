@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ParameterAliasTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net;
 using System.Net.Http;
@@ -26,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ParameterAlias
             services.ConfigureControllers(typeof(TradesController));
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddModel(GetModel()));
+                .AddRouteComponents(GetModel()));
         }
 
         private static IEdmModel GetModel()

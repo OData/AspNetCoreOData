@@ -1,6 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmModelAnnotationExtensionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
@@ -10,6 +15,7 @@ using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.Edm.Vocabularies.Community.V1;
 using Microsoft.OData.Edm.Vocabularies.V1;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
@@ -115,6 +121,140 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             alternateKey2 = alternateKeyDict2.First(a => a.Key == "Street");
             Assert.Equal("Location/Street", alternateKey2.Value.Path);
+        }
+
+        [Fact]
+        public void GetClrEnumMemberAnnotation_ThrowsArugmentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrEnumMemberAnnotation(null), "edmModel");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrEnumMemberAnnotation(null), "enumType");
+        }
+
+        [Fact]
+        public void GetClrPropertyName_ThrowsArugmentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrPropertyName(null), "edmModel");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetClrPropertyName(null), "edmProperty");
+        }
+
+        [Fact]
+        public void GetDynamicPropertyDictionary_ThrowsArugmentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetDynamicPropertyDictionary(null), "edmModel");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetDynamicPropertyDictionary(null), "edmType");
+        }
+
+        [Fact]
+        public void GetModelName_ThrowsArugmentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetModelName(), "model");
+        }
+
+        [Fact]
+        public void SetModelName_ThrowsArugmentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetModelName(null), "model");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetModelName(null), "name");
+        }
+
+        [Fact]
+        public void GetModelName_CanCallSetModelName_UsingDefaultGuid()
+        {
+            // Arrange
+            IEdmModel model = new EdmModel();
+
+            // Act
+            string modelName = model.GetModelName();
+
+            // Assert
+            Assert.NotNull(modelName);
+            Assert.True(Guid.TryParse(modelName, out _));
+        }
+
+        [Fact]
+        public void GetAndSetModelName_RoundTrip()
+        {
+            // Arrange
+            string testName = "myName";
+            IEdmModel model = new EdmModel();
+
+            // Act
+            model.SetModelName(testName);
+            string name = model.GetModelName();
+
+            // Assert
+            Assert.Equal(testName, name);
+        }
+
+        [Fact]
+        public void GetTypeMapper_ReturnsDefaultTypeMapper_IfNullModelOrWithoutTypeMapper()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+
+            // Arrange & Act & Assert
+            model = EdmCoreModel.Instance;
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+
+            // Arrange & Act & Assert
+            model = new EdmModel();
+            Assert.IsType<DefaultODataTypeMapper>(model.GetTypeMapper());
+        }
+
+        [Fact]
+        public void SetTypeMapper_ThrowsArugmentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetTypeMapper(null), "model");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetTypeMapper(null), "mapper");
+        }
+
+        [Fact]
+        public void GetAndSetTypeMapper_RoundTrip()
+        {
+            // Arrange
+            IODataTypeMapper mapper = new Mock<IODataTypeMapper>().Object;
+            IEdmModel model = new EdmModel();
+
+            // Act
+            model.SetTypeMapper(mapper);
+            IODataTypeMapper actual = model.GetTypeMapper();
+
+            // Assert
+            Assert.Same(mapper, actual);
+        }
+
+        [Fact]
+        public void GetAlternateKeys_ThrowsArugmentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetAlternateKeys(null), "model");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetAlternateKeys(null), "entityType");
         }
 
         private static IEdmModel GetEdmModel()

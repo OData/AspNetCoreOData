@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OrderByQueryOptionTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -487,7 +491,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             }).AsQueryable();
 
             // Act
-            var results = orderByOption.ApplyTo(customers).ToArray();
+            ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True };
+            var results = orderByOption.ApplyTo(customers, settings).ToArray();
 
             // Assert
             Assert.Equal(1, results[0].Id);
@@ -609,7 +614,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [InlineData("Addresses/$count")]
         [InlineData("Aliases/$count")]
         public void CanApplyOrderBy_WithCollectionCount(string orderby)
-
         {
             // Arrange
             var model = new ODataModelBuilder()
@@ -664,7 +668,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             }).AsQueryable();
 
             // Act
-            var results = orderByOption.ApplyTo(customers).ToArray();
+            ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True };
+            var results = orderByOption.ApplyTo(customers, settings).ToArray();
 
             // Assert
             Assert.Equal(3, results[0].Id);

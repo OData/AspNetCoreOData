@@ -1,12 +1,16 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEntityReferenceLinkWrapper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
 {
     /// <summary>
-    /// Encapuslates an <see cref="ODataEntityReferenceLink"/>.
+    /// Encapsulates an <see cref="ODataEntityReferenceLink"/>.
     /// </summary>
     public class ODataEntityReferenceLinkWrapper : ODataItemWrapper
     {

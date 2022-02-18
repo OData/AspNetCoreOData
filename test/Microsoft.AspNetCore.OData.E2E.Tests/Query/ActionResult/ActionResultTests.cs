@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ActionResultTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
                 services.ConfigureControllers(typeof(CustomersController));
 
                 IEdmModel model = ActionResultEdmModel.GetEdmModel();
-                services.AddControllers().AddOData(options => options.AddModel("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
+                services.AddControllers().AddOData(options => options.AddRouteComponents("odata", model).SetMaxTop(2).Expand().Select().OrderBy().Filter());
             }
         }
 

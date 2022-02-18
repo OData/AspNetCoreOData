@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataResourceSetDeserializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -31,8 +35,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private readonly IEdmModel _model;
         private readonly IEdmCollectionTypeReference _customersType;
         private readonly IEdmEntityTypeReference _customerType;
-        private readonly ODataSerializerProvider _serializerProvider;
-        private readonly ODataDeserializerProvider _deserializerProvider;
+        private readonly IODataSerializerProvider _serializerProvider;
+        private readonly IODataDeserializerProvider _deserializerProvider;
 
         public ODataResourceSetDeserializerTests()
         {
@@ -46,22 +50,91 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void Ctor_ThrowsArgumentNull_DeserializerProvider()
         {
-            ExceptionAssert.ThrowsArgumentNull(
-                () => new ODataResourceSetDeserializer(deserializerProvider: null),
-                "deserializerProvider");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new ODataResourceSetDeserializer(deserializerProvider: null), "deserializerProvider");
+        }
+
+        [Fact]
+        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
+        {
+            // Arrange
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(null, null, null), "messageReader");
+        }
+
+        [Fact]
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
+        {
+            // Arrange
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ODataMessageReader reader = ODataFormatterHelpers.GetMockODataMessageReader();
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(reader, null, null), "readContext");
+        }
+
+        [Fact]
+        public async Task ReadAsync_Throws_ArgumentMustBeOfType()
+        {
+            // Arrange
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ODataMessageReader reader = ODataFormatterHelpers.GetMockODataMessageReader();
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = EdmCoreModel.Instance
+            };
+            IEdmTypeReference edmType = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetString(false)));
+
+            // Act & Assert
+            await ExceptionAssert.ThrowsAsync<ArgumentException>(
+                () => deserializer.ReadAsync(reader, typeof(IList<int>), context),
+                "The argument must be of type 'Complex or Entity'. (Parameter 'edmType')");
         }
 
         [Fact]
         public void ReadInline_ReturnsNull_IfItemIsNull()
         {
+            // Arrange
             var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+
+            // Act & Assert
             Assert.Null(deserializer.ReadInline(item: null, edmType: _customersType, readContext: new ODataDeserializerContext()));
+        }
+
+        [Fact]
+        public void ReadInline_ThrowsArgumentNull_ReadContext()
+        {
+            // Arrange
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            IEdmTypeReference typeReference = new Mock<IEdmTypeReference>().Object;
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(42, typeReference, null), "readContext");
+        }
+
+        [Fact]
+        public void ReadInline_Throws_ArgumentTypeMustBeResourceSet()
+        {
+            // Arrange
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            IEdmTypeReference edmType = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetString(false)));
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgument(
+                () => deserializer.ReadInline(42, edmType, new ODataDeserializerContext()),
+                "edmType",
+                "'[Collection([Edm.String Nullable=False Unicode=True]) Nullable=False]' is not a resource set type. Only resource set are supported.");
         }
 
         [Fact]
         public void ReadInline_Throws_ArgumentMustBeOfType()
         {
+            // Arrange
             var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+
+            // Act & Assert
             ExceptionAssert.ThrowsArgument(
                 () => deserializer.ReadInline(item: 42, edmType: _customersType, readContext: new ODataDeserializerContext()),
                 "item",
@@ -72,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadInline_Calls_ReadResourceSet()
         {
             // Arrange
-            ODataDeserializerProvider deserializerProvider = _deserializerProvider;
+            IODataDeserializerProvider deserializerProvider = _deserializerProvider;
             Mock<ODataResourceSetDeserializer> deserializer = new Mock<ODataResourceSetDeserializer>(deserializerProvider);
             ODataResourceSetWrapper feedWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             ODataDeserializerContext readContext = new ODataDeserializerContext();
@@ -90,9 +163,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFeed_Throws_TypeCannotBeDeserialized()
+        public void ReadResourceSet_ThrowsArgumentNull_ResourceSet()
         {
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            // Arrange & Act & Assert
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadResourceSet(null, null, null).GetEnumerator().MoveNext(), "resourceSet");
+        }
+
+        [Fact]
+        public void ReadResourceSet_Throws_TypeCannotBeDeserialized()
+        {
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataResourceSetDeserializer deserializer = new ODataResourceSetDeserializer(deserializerProvider.Object);
             ODataResourceSetWrapper feedWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             ODataDeserializerContext readContext = new ODataDeserializerContext();
@@ -105,10 +186,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadFeed_Calls_ReadInlineForEachEntry()
+        public void ReadResourceSet_Calls_ReadInlineForEachEntry()
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             Mock<ODataEdmTypeDeserializer> entityDeserializer = new Mock<ODataEdmTypeDeserializer>(ODataPayloadKind.Resource);
             ODataResourceSetDeserializer deserializer = new ODataResourceSetDeserializer(deserializerProvider.Object);
             ODataResourceSetWrapper resourceSetWrapper = new ODataResourceSetWrapper(new ODataResourceSet());

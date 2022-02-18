@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQueryContext.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -48,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(elementClrType));
             }
 
-            ElementType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
+            ElementType = model.GetEdmTypeReference(elementClrType)?.Definition;
 
             if (ElementType == null)
             {
@@ -185,18 +189,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (Path != null)
             {
-                IEdmProperty property;
-                IEdmStructuredType structuredType;
-                string name;
-                EdmHelpers.GetPropertyAndStructuredTypeFromPath(
-                    Path,
-                    out property,
-                    out structuredType,
-                    out name);
-
-                TargetProperty = property;
-                TargetStructuredType = structuredType;
-                TargetName = name;
+                (TargetProperty, TargetStructuredType, TargetName) = Path.GetPropertyAndStructuredTypeFromPath();
             }
             else
             {

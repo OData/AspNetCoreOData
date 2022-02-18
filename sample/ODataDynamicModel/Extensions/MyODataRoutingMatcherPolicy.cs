@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="MyODataRoutingMatcherPolicy.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -103,7 +107,7 @@ namespace ODataDynamicModel.Extensions
                     ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                     if (odataPath != null)
                     {
-                        odataFeature.PrefixName = metadata.Prefix;
+                        odataFeature.RoutePrefix = metadata.Prefix;
                         odataFeature.Model = model;
                         odataFeature.Path = odataPath;
 

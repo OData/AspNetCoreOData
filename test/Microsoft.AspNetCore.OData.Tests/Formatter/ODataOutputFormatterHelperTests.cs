@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOutputFormatterHelperTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Runtime.Serialization;
@@ -52,8 +56,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             // Arrange
             Type intType = typeof(int);
             HttpRequest request = new DefaultHttpContext().Request;
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
-            provider.Setup(s => s.GetODataPayloadSerializer(intType, request)).Returns((ODataSerializer)null);
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
+            provider.Setup(s => s.GetODataPayloadSerializer(intType, request)).Returns((IODataSerializer)null);
 
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(
@@ -69,8 +73,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Mock<IEdmObject> mock = new Mock<IEdmObject>();
             mock.Setup(s => s.GetEdmType()).Returns(intType);
 
-            Mock<ODataSerializerProvider> provider = new Mock<ODataSerializerProvider>();
-            provider.Setup(s => s.GetEdmTypeSerializer(intType)).Returns((ODataEdmTypeSerializer)null);
+            Mock<IODataSerializerProvider> provider = new Mock<IODataSerializerProvider>();
+            provider.Setup(s => s.GetEdmTypeSerializer(intType)).Returns((IODataEdmTypeSerializer)null);
 
             // Act & Assert
             ExceptionAssert.Throws<SerializationException>(

@@ -1,12 +1,16 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOperationImportController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace ODataRoutingSample.Controllers.v2
 {
-    [ODataModel("v2{data}")]
+    [ODataRouteComponent("v2{data}")]
     public class ODataOperationImportController : ControllerBase
     {
         [HttpGet]

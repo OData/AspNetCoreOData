@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRawQueryOptions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -17,6 +21,16 @@ namespace Microsoft.AspNetCore.OData.Query
         ///  Gets the raw $apply query value from the incoming request Uri if exists.
         /// </summary>
         public string Apply { get; internal set; }
+
+        /// <summary>
+        ///  Gets the raw $compute query value from the incoming request Uri if exists.
+        /// </summary>
+        public string Compute { get; internal set; }
+
+        /// <summary>
+        ///  Gets the raw $search query value from the incoming request Uri if exists.
+        /// </summary>
+        public string Search { get; internal set; }
 
         /// <summary>
         ///  Gets the raw $orderby query value from the incoming request Uri if exists.

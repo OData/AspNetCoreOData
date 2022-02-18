@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TypeHelper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.ModelBuilder;
 
@@ -28,6 +33,29 @@ namespace Microsoft.AspNetCore.OData.Common
             return (type != null && typeof(DynamicTypeWrapper).IsAssignableFrom(type));
         }
 
+        public static bool IsDeltaSetWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
+
+        public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
+
+        public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
+
+        private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
+        {
+            if (type == null)
+            {
+                entityType = null;
+                return false;
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == wrappedType)
+            {
+                entityType = type.GetGenericArguments()[0];
+                return true;
+            }
+
+            return IsTypeWrapper(wrappedType, type.BaseType, out entityType);
+        }
+
         /// <summary>
         /// Return the collection element type.
         /// </summary>
@@ -42,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Return the undering type or itself.
+        /// Return the underlying type or itself.
         /// </summary>
         /// <param name="type">The input type.</param>
         /// <returns>The underlying type.</returns>
@@ -61,6 +89,30 @@ namespace Microsoft.AspNetCore.OData.Common
             Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
             return Type.GetTypeCode(underlyingTypeOrSelf) == TypeCode.DateTime;
         }
+
+#if NET6_0
+        /// <summary>
+        /// Determine if a type is a <see cref="DateOnly"/>.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a DateOnly; false otherwise.</returns>
+        public static bool IsDateOnly(this Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return underlyingTypeOrSelf == typeof(DateOnly);
+        }
+
+        /// <summary>
+        /// Determine if a type is a <see cref="TimeOnly"/>.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        public static bool IsTimeOnly(this Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return underlyingTypeOrSelf == typeof(TimeOnly);
+        }
+#endif
 
         /// <summary>
         /// Determine if a type is a TimeSpan.
@@ -281,6 +333,40 @@ namespace Microsoft.AspNetCore.OData.Common
             }
 
             return type;
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
+        internal static bool TryGetInstance(Type type, object value, out object instance)
+        {
+            instance = null;
+
+            // Trial to create an instance, using parsing
+            var methodInfo = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { value.GetType(), type.MakeByRefType() }, null);
+            if (methodInfo != null)
+            {
+                object[] parameters = new object[] { value, null };
+                var result = (bool)methodInfo.Invoke(null, parameters);
+                if (result)
+                {
+                    instance = parameters[1];
+                    return true;
+                }
+            }
+
+            try
+            {
+                // Trial to create an instance, using constructor
+                instance = Activator.CreateInstance(type, args: value);
+                if (instance != null)
+                {
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                // Proceed further
+            }
+            return false;
         }
 
         private static Type GetInnerGenericType(Type interfaceType)

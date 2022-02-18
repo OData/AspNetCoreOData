@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataActionPayloadDeserializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -22,7 +26,7 @@ using Microsoft.AspNetCore.OData.Routing;
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> for reading OData action parameters.
+    /// Represents an <see cref="IODataDeserializer"/> for reading OData action parameters.
     /// </summary>
     public class ODataActionPayloadDeserializer : ODataDeserializer
     {
@@ -32,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataActionPayloadDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataActionPayloadDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataActionPayloadDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Parameter)
         {
             DeserializerProvider = deserializerProvider ?? throw new ArgumentNullException(nameof(deserializerProvider));
@@ -41,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// <summary>
         /// Gets the deserializer provider to use to read inner objects.
         /// </summary>
-        public ODataDeserializerProvider DeserializerProvider { get; private set; }
+        public IODataDeserializerProvider DeserializerProvider { get; private set; }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
@@ -87,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         }
                         else
                         {
-                            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(parameter.Type);
+                            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(parameter.Type);
                             payload[parameterName] = deserializer.ReadInline(reader.Value, parameter.Type, readContext);
                         }
                         break;

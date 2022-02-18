@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SelectExpandIncludedProperty.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -45,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Creates a new instance of the <see cref="SelectExpandIncludedProperty"/> class.
         /// </summary>
         /// <param name="propertySegment">The property segment that has this select expand item.</param>
-        /// <param name="navigationSource">The targe navigation source of this property segment.</param>
+        /// <param name="navigationSource">The target navigation source of this property segment.</param>
         public SelectExpandIncludedProperty(PropertySegment propertySegment, IEdmNavigationSource navigationSource)
         {
             if (propertySegment == null)
@@ -72,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Query
             bool isSelectAll = false;
             if (_propertySelectItem != null && _propertySelectItem.SelectAndExpand != null)
             {
-                // Retrieve the "IsSelectAll" from the property sub selectexpand clause.
+                // Retrieve the "IsSelectAll" from the property sub select expand clause.
                 isSelectAll = _propertySelectItem.SelectAndExpand.AllSelected;
                 foreach (var selectItem in _propertySelectItem.SelectAndExpand.SelectedItems)
                 {
@@ -87,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
             else
             {
-                // Mark selectall equals "true" if only include $expand
+                // Mark select-all equals "true" if only include $expand
                 // So, if only "$expand=abc/nav", it means to select all for "abc" then expand "nav".
                 isSelectAll = true;
                 foreach (var item in _subSelectItems)
@@ -142,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 // Be noted: In ODL v7.6.1, it's not allowed duplicated properties in $select.
                 // for example: "$select=abc($top=2),abc($skip=2)" is not allowed in ODL library.
-                // So, don't worry about the previous setting overrided by other same path.
+                // So, don't worry about the previous setting overridden by other same path.
                 // However, it's possibility in later ODL version (>=7.6.2) to allow duplicated properties in $select.
                 // It that case, please update the codes here otherwise the latter will win.
 

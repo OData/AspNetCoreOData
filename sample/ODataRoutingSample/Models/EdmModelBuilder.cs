@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmModelBuilder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -148,6 +152,8 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<DriverDevice>("devices");
             builder.EntitySet<DriverFolder>("folders");
             builder.EntitySet<DriverPage>("pages");
+
+            builder.EntitySet<TestEntity>("TestEntities");
             return builder.GetEdmModel();
         }
     }

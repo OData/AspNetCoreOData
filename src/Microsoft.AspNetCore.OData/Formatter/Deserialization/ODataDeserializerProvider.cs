@@ -1,31 +1,129 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataDeserializerProvider.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
     /// <summary>
-    /// Represents a factory that creates an <see cref="ODataDeserializer"/>.
+    /// The default <see cref="IODataDeserializerProvider"/>.
     /// </summary>
-    public abstract class ODataDeserializerProvider
+    public class ODataDeserializerProvider: IODataDeserializerProvider
     {
-        /// <summary>
-        /// Gets an <see cref="ODataDeserializer"/> for the given type.
-        /// </summary>
-        /// <param name="type">The CLR type.</param>
-        /// <param name="request">The request being deserialized.</param>
-        /// <returns>An <see cref="ODataDeserializer"/> that can deserialize the given type.</returns>
-        public abstract ODataDeserializer GetODataDeserializer(Type type, HttpRequest request);
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Gets the <see cref="ODataEdmTypeDeserializer"/> for the given EDM type.
+        /// Initializes a new instance of the <see cref="ODataDeserializerProvider"/> class.
         /// </summary>
-        /// <param name="edmType">The EDM type.</param>
-        /// <param name="isDelta">Is delta</param>
-        /// <returns>An <see cref="ODataEdmTypeDeserializer"/> that can deserialize the given EDM type.</returns>
-        public abstract ODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false);
+        /// <param name="serviceProvider">The service provider.</param>
+        public ODataDeserializerProvider(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
+        }
+
+        /// <inheritdoc />
+        public virtual IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
+        {
+            if (edmType == null)
+            {
+                throw Error.ArgumentNull(nameof(edmType));
+            }
+
+            switch (edmType.TypeKind())
+            {
+                case EdmTypeKind.Entity:
+                case EdmTypeKind.Complex:
+                    return _serviceProvider.GetRequiredService<ODataResourceDeserializer>();
+
+                case EdmTypeKind.Enum:
+                    return _serviceProvider.GetRequiredService<ODataEnumDeserializer>();
+
+                case EdmTypeKind.Primitive:
+                    return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
+
+                case EdmTypeKind.Collection:
+                    if (isDelta)
+                    {
+                        return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+                    }
+
+                    IEdmCollectionTypeReference collectionType = edmType.AsCollection();
+                    if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
+                    {
+                        return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
+                    }
+                    else
+                    {
+                        return _serviceProvider.GetRequiredService<ODataCollectionDeserializer>();
+                    }
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
+        {
+            if (type == null)
+            {
+                throw Error.ArgumentNull(nameof(type));
+            }
+
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            if (type == typeof(Uri))
+            {
+                return _serviceProvider.GetRequiredService<ODataEntityReferenceLinkDeserializer>();
+            }
+
+            if (type == typeof(ODataActionParameters) || type == typeof(ODataUntypedActionParameters))
+            {
+                return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
+            }
+
+            if (IsDelta(type))
+            {
+                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+            }
+
+            IEdmModel model = request.GetModel();
+            IEdmTypeReference edmType = model.GetEdmTypeReference(type);
+
+            if (edmType == null)
+            {
+                return null;
+            }
+            else
+            {
+                return GetEdmTypeDeserializer(edmType);
+            }
+        }
+
+        private static bool IsDelta(Type type)
+        {
+            if (type == typeof(EdmChangedObjectCollection) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

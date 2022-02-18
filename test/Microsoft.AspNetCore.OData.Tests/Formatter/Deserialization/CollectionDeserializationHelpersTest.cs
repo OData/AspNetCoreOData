@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="CollectionDeserializationHelpersTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -86,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Act
             source.AddToCollection(newCollection, typeof(DateTime), typeof(CollectionDeserializationHelpersTest),
-                "PropertyName", newCollection.GetType(), timeZoneInfo: null);
+                "PropertyName", newCollection.GetType(), context: null);
 
             // Assert
             Assert.Equal(expect, newCollection as IEnumerable<DateTime>);
@@ -101,10 +105,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IList source = new List<DateTimeOffset> { new DateTimeOffset(dt1), new DateTimeOffset(dt2) };
             IEnumerable newCollection = new CustomCollectionWithAdd<DateTime>();
             TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8:00 / -7:00
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                TimeZone = timeZoneInfo
+            };
 
             // Act
             source.AddToCollection(newCollection, typeof(DateTime), typeof(CollectionDeserializationHelpersTest),
-                "PropertyName", newCollection.GetType(), timeZoneInfo);
+                "PropertyName", newCollection.GetType(), context);
 
             // Assert
             Assert.Equal(new[] { dt1.AddHours(-8), dt2.AddHours(-7) }, newCollection as IEnumerable<DateTime>);
@@ -126,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Act
             source.AddToCollection(newCollection, typeof(DateTime), typeof(CollectionDeserializationHelpersTest),
-                "PropertyName", newCollection.GetType(), timeZoneInfo: null);
+                "PropertyName", newCollection.GetType(), context: null);
 
             // Assert
             Assert.Equal(expect, newCollection as IEnumerable<DateTime>);
@@ -141,10 +149,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IList source = new List<DateTimeOffset> { dto1, dto2 };
             IEnumerable newCollection = new CustomCollectionWithAdd<DateTime>();
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8:00 / -7:00
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                TimeZone = timeZone
+            };
 
             // Act
             source.AddToCollection(newCollection, typeof(DateTime), typeof(CollectionDeserializationHelpersTest),
-                "PropertyName", newCollection.GetType(), timeZone);
+                "PropertyName", newCollection.GetType(), context);
 
             // Assert
             Assert.Equal(new[] { new DateTime(2014, 12, 15, 9, 2, 3), new DateTime(2014, 12, 15, 19, 2, 3) },

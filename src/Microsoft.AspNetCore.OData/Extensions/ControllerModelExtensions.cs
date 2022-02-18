@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ControllerModelExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -18,14 +22,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="controller">The given controller model.</param>
         /// <returns>True/False.</returns>
-        public static bool IsNonODataController(this ControllerModel controller)
+        public static bool IsODataIgnored(this ControllerModel controller)
         {
             if (controller == null)
             {
                 throw Error.ArgumentNull(nameof(controller));
             }
 
-            return controller.Attributes.Any(a => a is NonODataControllerAttribute);
+            return controller.Attributes.Any(a => a is ODataIgnoredAttribute);
         }
 
         /// <summary>

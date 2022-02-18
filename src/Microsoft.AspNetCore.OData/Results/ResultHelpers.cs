@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ResultHelpers.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -167,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Results
         private static IEdmEntityTypeReference GetEntityType(IEdmModel model, object entity)
         {
             Type entityType = entity.GetType();
-            IEdmTypeReference edmType = model.GetTypeMappingCache().GetEdmType(entityType, model);
+            IEdmTypeReference edmType = model.GetEdmTypeReference(entityType);
             if (edmType == null)
             {
                 throw Error.InvalidOperation(SRResources.ResourceTypeNotInModel, entityType.FullName);

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="NavigationSourceLinkBuilderAnnotation.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -220,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             return null;
         }
 
-        // Build a naviation link unconditionally, it doesn't depend on metadata level but does require a non-null link builder.
+        // Build a navigation link unconditionally, it doesn't depend on metadata level but does require a non-null link builder.
         internal Uri BuildNavigationLink(ResourceContext instanceContext, IEdmNavigationProperty navigationProperty)
         {
             if (instanceContext == null)

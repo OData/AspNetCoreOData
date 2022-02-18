@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEntityReferenceLinkDeserializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -70,8 +74,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
             await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
 
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataMessageReaderSettings readSettings = new ODataMessageReaderSettings();
             ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage), readSettings, model);
             ODataDeserializerContext context = new ODataDeserializerContext
@@ -104,8 +108,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             IEdmNavigationProperty navigationProperty = GetNavigationProperty(model);
 
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             ODataDeserializerContext context = new ODataDeserializerContext
             {
                 Request = request,

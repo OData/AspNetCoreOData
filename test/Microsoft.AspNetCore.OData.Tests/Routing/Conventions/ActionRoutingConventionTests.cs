@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ActionRoutingConventionTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -197,6 +201,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Theory]
         [InlineData("Post")]
         [InlineData("UnknownAction")]
+        [InlineData("NonSupportedOn")]
+        [InlineData("NonSupportedOnCollectionOf")]
         public void PropertyRoutingConventionDoesNothingForNotSupportedAction(string actionName)
         {
             // Arrange
@@ -339,6 +345,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             [HttpPost]
             public void UnknownAction()
             { }
+
+            [HttpPost]
+            public void NonSupportedOn(int key, ODataActionParameters parameters)
+            {
+            }
+
+            [HttpPost]
+            public void NonSupportedOnCollectionOf(ODataActionParameters parameters)
+            {
+            }
         }
 
         private class MeController

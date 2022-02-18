@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ContainerBuilderExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -38,6 +42,13 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             {
                 EnableMessageStreamDisposal = false,
                 MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+
+                // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
+                // In ODL 8.x, ReadUntypedAsString option will be deleted.
+                ReadUntypedAsString = false,
+
+                // Enable read property name case-insensitive from payload.
+                EnablePropertyNameCaseInsensitive = true
             });
 
             builder.AddServicePrototype(new ODataMessageWriterSettings
@@ -62,8 +73,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<SkipTokenHandler, DefaultSkipTokenHandler>(ServiceLifetime.Singleton);
 
             // SerializerProvider and DeserializerProvider.
-            builder.AddService<ODataSerializerProvider, DefaultODataSerializerProvider>(ServiceLifetime.Singleton);
-            builder.AddService<ODataDeserializerProvider, DefaultODataDeserializerProvider>(ServiceLifetime.Singleton);
+            builder.AddService<IODataSerializerProvider, ODataSerializerProvider>(ServiceLifetime.Singleton);
+            builder.AddService<IODataDeserializerProvider, ODataDeserializerProvider>(ServiceLifetime.Singleton);
 
             // Deserializers.
             builder.AddService<ODataResourceDeserializer>(ServiceLifetime.Singleton);
@@ -91,7 +102,10 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // Binders.
             builder.AddService<ODataQuerySettings>(ServiceLifetime.Scoped);
-            builder.AddService<FilterBinder>(ServiceLifetime.Transient);
+
+            builder.AddService<IFilterBinder, FilterBinder>(ServiceLifetime.Singleton);
+            builder.AddService<IOrderByBinder, OrderByBinder>(ServiceLifetime.Singleton);
+            builder.AddService<ISelectExpandBinder, SelectExpandBinder>(ServiceLifetime.Singleton);
 
             // HttpRequestScope.
             builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);

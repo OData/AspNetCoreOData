@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultODataBatchHandlerTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -56,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
             HttpContext context = new DefaultHttpContext();
-            context.ODataFeature().SubServiceProvider = _serviceProvider;
+            context.ODataFeature().Services = _serviceProvider;
             HttpRequest request = context.Request;
 
             // Act & Assert
@@ -78,8 +82,8 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         {
             // Arrange
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = "odata";
             HttpContext httpContext = request.HttpContext;
             httpContext.Response.StatusCode = StatusCodes.Status200OK;
             httpContext.Response.Body = new MemoryStream();
@@ -189,10 +193,11 @@ bar
             httpContext.Request.Body = new MemoryStream(requestBytes);
             httpContext.Request.ContentType = "multipart/mixed;boundary=\"d3df74a8-8212-4c2a-b4fb-d713a4ba383e\"";
             httpContext.Request.ContentLength = 827;
+            httpContext.Request.Method = "Post";
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().PrefixName = "odata";
-            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model).EnableContinueOnErrorHeader = enableContinueOnError);
 
             if (preferenceHeader != null)
             {
@@ -277,8 +282,8 @@ bar
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().PrefixName = "odata";
-            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
 
             DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
             httpContext.Response.Body = new MemoryStream();
@@ -405,8 +410,8 @@ Host: example.com
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().PrefixName = "odata";
-            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
             httpContext.Response.Body = new MemoryStream();
             batchHandler.PrefixName = "odata";
 
@@ -464,8 +469,8 @@ Host: example.com
             httpContext.Request.ContentLength = requestBytes.Length;
 
             IEdmModel model = new EdmModel();
-            httpContext.ODataFeature().PrefixName = "odata";
-            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddModel("odata", model));
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
             httpContext.Response.Body = new MemoryStream();
             batchHandler.PrefixName = "odata";
 
@@ -583,7 +588,7 @@ Host: example.com
                     builder.EntitySet<BatchTestCustomer>("BatchTestCustomers");
                     builder.EntitySet<BatchTestOrder>("BatchTestOrders");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddControllers().AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
@@ -781,7 +786,7 @@ Accept-Charset: UTF-8
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestHeadersCustomer>("BatchTestHeadersCustomers");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddControllers().AddOData(opt => opt.AddModel("odata", model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {
@@ -877,7 +882,7 @@ Accept-Charset: UTF-8
                     var builder = new ODataConventionModelBuilder();
                     builder.EntitySet<BatchTestOrder>("BatchTestOrders");
                     IEdmModel model = builder.GetEdmModel();
-                    services.AddControllers().AddOData(opt => opt.AddModel(model, new DefaultODataBatchHandler()).Expand());
+                    services.AddControllers().AddOData(opt => opt.AddRouteComponents(model, new DefaultODataBatchHandler()).Expand());
                 })
                 .Configure(app =>
                 {

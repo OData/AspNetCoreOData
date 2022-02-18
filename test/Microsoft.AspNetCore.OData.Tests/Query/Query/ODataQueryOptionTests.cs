@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQueryOptionTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -24,7 +28,6 @@ using Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -670,7 +673,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string queryExpression = ExpressionStringBuilder.ToString(finalQuery.Expression);
             queryExpression = queryExpression.Substring(queryExpression.IndexOf("]") + 2);
 
-            Assert.Equal(queryExpression, expectedExpression);
+            Assert.Equal(expectedExpression, queryExpression);
         }
 
         [Fact]
@@ -1225,7 +1228,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 opt =>
                 {
                     opt.Count().OrderBy().Filter().Expand().SetMaxTop(null);
-                    opt.AddModel("odata", model);
+                    opt.AddRouteComponents("odata", model);
                 },
                 controllers);
 

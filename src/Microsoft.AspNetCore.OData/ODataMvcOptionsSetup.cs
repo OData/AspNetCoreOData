@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataMvcOptionsSetup.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +20,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Configure the default <see cref="MvcOptions"/>
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The <see cref="MvcOptions"/> to configure.</param>
         public void Configure(MvcOptions options)
         {
             if (options == null)

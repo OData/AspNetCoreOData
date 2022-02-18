@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="KeySegmentTemplateTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -83,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Action test = () => new KeySegmentTemplate(new Dictionary<string, string>(), _customerType, _customers);
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(test, "The input key count '0' doesn't match the number '1' of the key of entity type 'NS.Customer'.");
+            ExceptionAssert.Throws<ODataException>(test, "The input key count '0' does not match the number '1' of the key of entity type 'NS.Customer'.");
         }
 
         [Fact]

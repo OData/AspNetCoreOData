@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SingletonRoutingConventionTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -87,6 +91,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
 
+        [Theory]
+        [InlineData("GetFrom")]
+        [InlineData("PutFrom")]
+        [InlineData("PatchFrom")]
+        public void SingletonRoutingConventionDoesNothingForNotSupportedAction(string actionName)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<MeController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = controller.Actions.First();
+
+            // Act
+            bool returnValue = SingletonConvention.AppliesToAction(context);
+            Assert.False(returnValue);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
+        }
+
         private static IEdmModel GetEdmModel()
         {
             EdmModel model = new EdmModel();
@@ -125,6 +151,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             }
 
             public void PatchFromVipCustomer()
+            {
+            }
+
+            public void GetFrom()
+            {
+            }
+
+            public void PutFrom()
+            {
+            }
+
+            public void PatchFrom()
             {
             }
         }

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
@@ -10,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
     /// <summary>
     /// The base controller class for OData.
     /// </summary>
-    [ODataRouting]
+    [ODataAttributeRouting]
     public abstract class ODataController : ControllerBase
     {
         /// <summary>
@@ -20,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <typeparam name="TEntity">The created entity type.</typeparam>
         /// <param name="entity">The created entity.</param>
         /// <returns>A <see cref="CreatedODataResult{TEntity}"/> with the specified values.</returns>
-        /// <remarks>These function uses types that are AspNetCore-specific.</remarks>
+        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         protected virtual CreatedODataResult<TEntity> Created<TEntity>(TEntity entity)
         {
             if (entity == null)
@@ -38,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <typeparam name="TEntity">The updated entity type.</typeparam>
         /// <param name="entity">The updated entity.</param>
         /// <returns>An <see cref="UpdatedODataResult{TEntity}"/> with the specified values.</returns>
-        /// <remarks>These function uses types that are AspNetCore-specific.</remarks>
+        /// <remarks>This function uses types that are AspNetCore-specific.</remarks>
         protected virtual UpdatedODataResult<TEntity> Updated<TEntity>(TEntity entity)
         {
             if (entity == null)

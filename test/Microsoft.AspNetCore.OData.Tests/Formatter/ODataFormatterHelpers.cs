@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataFormatterHelpers.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.IO;
@@ -23,7 +27,7 @@ using Microsoft.OData.ModelBuilder;
 namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     /// <summary>
-    /// A factory for creating <see cref="ODataSerializerProvider"/>.
+    /// A factory for creating <see cref="IODataSerializerProvider"/>.
     /// </summary>
     public static class ODataFormatterHelpers
     {
@@ -102,21 +106,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         /// <summary>
-        /// Gets an <see cref="ODataSerializerProvider"/>.
+        /// Gets an <see cref="IODataSerializerProvider"/>.
         /// </summary>
         /// <returns>An ODataSerializerProvider.</returns>
-        public static ODataSerializerProvider GetSerializerProvider()
+        public static IODataSerializerProvider GetSerializerProvider()
         {
-            return _serviceProvider.GetRequiredService<ODataSerializerProvider>();
+            return _serviceProvider.GetRequiredService<IODataSerializerProvider>();
         }
 
         /// <summary>
-        /// Gets an <see cref="ODataDeserializerProvider"/>.
+        /// Gets an <see cref="IODataDeserializerProvider"/>.
         /// </summary>
         /// <returns>An ODataDeserializerProvider.</returns>
-        public static ODataDeserializerProvider GetDeserializerProvider()
+        public static IODataDeserializerProvider GetDeserializerProvider()
         {
-            return _serviceProvider.GetRequiredService<ODataDeserializerProvider>();
+            return _serviceProvider.GetRequiredService<IODataDeserializerProvider>();
         }
 
         public static ODataMessageWriter GetMockODataMessageWriter()
@@ -138,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
             // Deserializers.
-            services.AddSingleton<ODataDeserializerProvider, DefaultODataDeserializerProvider>();
+            services.AddSingleton<IODataDeserializerProvider, ODataDeserializerProvider>();
 
             services.AddSingleton<ODataResourceDeserializer>();
             services.AddSingleton<ODataEnumDeserializer>();
@@ -149,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             services.AddSingleton<ODataActionPayloadDeserializer>();
 
             // Serializers.
-            services.AddSingleton<ODataSerializerProvider, DefaultODataSerializerProvider>();
+            services.AddSingleton<IODataSerializerProvider, ODataSerializerProvider>();
 
             services.AddSingleton<ODataEnumSerializer>();
             services.AddSingleton<ODataPrimitiveSerializer>();

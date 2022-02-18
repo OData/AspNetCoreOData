@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OrdersController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -14,7 +18,7 @@ using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v2
 {
-    [ODataModel("v2{data}")]
+    [ODataRouteComponent("v2{data}")]
     public class OrdersController : ODataController
     {
         private MyDataContext _context;
@@ -60,7 +64,7 @@ namespace ODataRoutingSample.Controllers.v2
             return _context.Orders;
         }
 
-        [HttpGet] // ~/Oders({key})
+        [HttpGet] // ~/Orders({key})
         [EnableQuery]
         public Order Get(int key)
         {
@@ -80,13 +84,13 @@ namespace ODataRoutingSample.Controllers.v2
             return Created(order);
         }
 
-        [HttpDelete] // ~/Oders({key})
+        [HttpDelete] // ~/Orders({key})
         public string Delete(int key)
         {
             return $"Delete Order at {key}";
         }
 
-       // [Http] // ~/Oders({key})
+       // [Http] // ~/Orders({key})
         [HttpPatch]
         public string Patch(int key)
         {

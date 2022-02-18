@@ -1,12 +1,16 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="IDeltaLink.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 namespace Microsoft.AspNetCore.OData.Deltas
 {
     /// <summary>
     /// <see cref="IDeltaLink" /> allows and tracks changes to an added link.
     /// </summary>
-    public interface IDeltaLink : IDeltaLinkBase
+    internal interface IDeltaLink : IDeltaLinkBase
     {
     }
 }

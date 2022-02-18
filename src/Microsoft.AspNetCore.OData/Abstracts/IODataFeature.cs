@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="IODataFeature.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -12,11 +16,13 @@ using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
+
     /// <summary>
     /// Provide the interface for the details of a given OData request.
     /// </summary>
     public interface IODataFeature
     {
+
         /// <summary>
         /// Gets or sets the OData model.
         /// </summary>
@@ -30,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets/sets the route prefix name
         /// </summary>
-        string PrefixName { get; set; }
+        string RoutePrefix { get; set; }
 
         /// <summary>
         /// Gets/sets the endpoint selected
@@ -50,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// <summary>
         /// Gets or sets the request container.
         /// </summary>
-        IServiceProvider SubServiceProvider { get; set; }
+        IServiceProvider Services { get; set; }
 
         /// <summary>
         /// Gets or sets the batch route data.
@@ -93,5 +99,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         IDictionary<string, object> RoutingConventionsStore { get; }
+
     }
+
 }

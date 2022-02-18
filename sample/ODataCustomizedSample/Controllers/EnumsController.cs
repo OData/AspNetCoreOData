@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EnumsController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +17,6 @@ using ODataCustomizedSample.Models;
 
 namespace ODataCustomizedSample.Controller
 {
-    [Route("convention")]
-    [Route("explicit")]
     public class EmployeesController : ODataController
     {
         public EmployeesController()
@@ -116,7 +118,7 @@ namespace ODataCustomizedSample.Controller
             return Ok(employee.FavoriteSports);
         }
 
-        [HttpGet("Employees({key})/FavoriteSports/LikeMost")]
+        [HttpGet("Employees({key})/FavoriteSports/LikeMost")] // non-OData routing
         public IActionResult GetFavoriteSportLikeMost(int key)
         {
             var firstOrDefault = Employees.FirstOrDefault(e => e.ID == key);
@@ -131,7 +133,7 @@ namespace ODataCustomizedSample.Controller
             return Created(employee);
         }
 
-        [HttpPost("Employees({key})/FavoriteSports/LikeMost")]
+        [HttpPost("Employees({key})/FavoriteSports/LikeMost")] // non-OData routing
         public IActionResult PostToSkillSet(int key, [FromBody] Skill newSkill)
         {
             Employee employee = Employees.FirstOrDefault(e => e.ID == key);
@@ -214,14 +216,14 @@ namespace ODataCustomizedSample.Controller
             return Ok(employee.SkillSet);
         }
 
-        [HttpPost("ResetDataSource")]
+        [HttpPost("ResetDataSource")] // Non-OData Routing
         public IActionResult ResetDataSource()
         {
             this.InitEmployees();
             return this.StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPost("SetAccessLevel")]
+        [HttpPost("SetAccessLevel")] // Non-OData Routing
         public IActionResult SetAccessLevel([FromBody] ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
@@ -256,7 +258,7 @@ namespace ODataCustomizedSample.Controller
             return Ok(employee.AccessLevel);
         }
 
-        [HttpGet("HasAccessLevel(ID={id},AccessLevel={accessLevel})")]
+        [HttpGet("HasAccessLevel(ID={id},AccessLevel={accessLevel})")] // non-odata routing
         public IActionResult HasAccessLevel([FromODataUri] int id, [FromODataUri] AccessLevel accessLevel)
         {
             if (!ModelState.IsValid)

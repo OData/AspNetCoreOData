@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DollarFormatWithoutAcceptMediaTypeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -27,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFormat
         {
             IEdmModel model = GetEdmModel();
             services.ConfigureControllers(typeof(DollarFormatCustomersController), typeof(MetadataController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", model).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         public static TheoryDataSet<string> BasicMediaTypes

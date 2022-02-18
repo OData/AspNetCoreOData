@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRoutingApplicationModelProvider.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -51,10 +55,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             // apply non-attribute convention routing.
-            var routes = _options.Models;
-            foreach (var route in routes)
+            foreach (var route in _options.RouteComponents)
             {
-                IEdmModel model = route.Value.Item1;
+                IEdmModel model = route.Value.EdmModel;
                 if (model == null || model.EntityContainer == null)
                 {
                     continue;
@@ -63,13 +66,13 @@ namespace Microsoft.AspNetCore.OData.Routing
                 foreach (var controller in context.Result.Controllers)
                 {
                     // Skip the controller with [NonODataController] attribute decorated.
-                    if (controller.HasAttribute<NonODataControllerAttribute>())
+                    if (controller.HasAttribute<ODataIgnoredAttribute>())
                     {
                         continue;
                     }
 
                     // Apply to ODataModelAttribute
-                    if (!CanApply(route.Key, () => controller.GetAttribute<ODataModelAttribute>()))
+                    if (!CanApply(route.Key, () => controller.GetAttribute<ODataRouteComponentAttribute>()))
                     {
                         continue;
                     }
@@ -86,9 +89,9 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                     if (conventions.Length > 0)
                     {
-                        foreach (var action in controller.Actions.Where(a => !a.IsNonODataAction()))
+                        foreach (var action in controller.Actions.Where(a => !a.IsODataIgnored()))
                         {
-                            if (!CanApply(route.Key, () => action.GetAttribute<ODataModelAttribute>()))
+                            if (!CanApply(route.Key, () => action.GetAttribute<ODataRouteComponentAttribute>()))
                             {
                                 continue;
                             }
@@ -135,11 +138,11 @@ namespace Microsoft.AspNetCore.OData.Routing
                 Options = _options
             };
 
-            foreach (var controllerModel in controllers.Where(c => !c.IsNonODataController()))
+            foreach (var controllerModel in controllers.Where(c => !c.IsODataIgnored()))
             {
                 controllerActionContext.Controller = controllerModel;
 
-                foreach (var actionModel in controllerModel.Actions.Where(a => !a.IsNonODataAction()))
+                foreach (var actionModel in controllerModel.Actions.Where(a => !a.IsODataIgnored()))
                 {
                     controllerActionContext.Action = actionModel;
 
@@ -148,14 +151,14 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
         }
 
-        internal static bool CanApply(string prefix, Func<ODataModelAttribute> func)
+        internal static bool CanApply(string prefix, Func<ODataRouteComponentAttribute> func)
         {
-            ODataModelAttribute odataModel = func?.Invoke();
+            ODataRouteComponentAttribute odataModel = func?.Invoke();
             if (odataModel == null)
             {
                 return true; // apply to all model
             }
-            else if (prefix == odataModel.Model)
+            else if (prefix == odataModel.RoutePrefix)
             {
                 return true;
             }

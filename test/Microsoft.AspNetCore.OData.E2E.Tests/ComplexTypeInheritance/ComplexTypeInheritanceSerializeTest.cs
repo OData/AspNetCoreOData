@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ComplexTypeInheritanceSerializeTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -33,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
             services.ConfigureControllers(typeof(InheritanceCustomersController));
 
             var edmModel1 = GetEdmModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel1));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel1));
         }
 
         [Fact]

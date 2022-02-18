@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBatchReaderExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -128,9 +132,16 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             HttpContext context = CreateHttpContext(originalContext);
             HttpRequest request = context.Request;
+            Uri requestUri = batchRequest.Url;
+
+            if (!requestUri.IsAbsoluteUri)
+            {
+                Uri baseUri = batchRequest.Container.GetRequiredService<ODataMessageReaderSettings>().BaseUri;
+                requestUri = new Uri(baseUri, requestUri);
+            }
 
             request.Method = batchRequest.Method;
-            request.CopyAbsoluteUrl(batchRequest.Url);
+            request.CopyAbsoluteUrl(requestUri);
 
             // Not using bufferContentStream. Unlike AspNet, AspNetCore cannot guarantee the disposal
             // of the stream in the context of execution so there is no choice but to copy the stream
@@ -186,7 +197,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             // store the request container as a feature of the request and we don't want
             // the features added to one context/request to be visible on another.
             //
-            // Note that just about everything inm the HttpContext and HttpRequest is
+            // Note that just about everything in the HttpContext and HttpRequest is
             // backed by one of these features. So reusing the features means the HttContext
             // and HttpRequests are the same without needing to copy properties. To make them
             // different, we need to avoid copying certain features to that the objects don't

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="NavigationRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// Conventions for <see cref="IEdmNavigationProperty"/>.
-    /// Action name convention should follow up: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
+    /// Action name convention should follow this: {HttpMethodName}{NavigationPropertyName}[From{DeclaringTypeName}]
     /// </summary>
     public class NavigationRoutingConvention : IODataControllerActionConvention
     {
@@ -57,6 +61,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ActionModel action = context.Action;
 
+            IEdmNavigationSource navigationSource = context.NavigationSource;
+
+            // filter by action parameter
+            IEdmEntityType entityType = navigationSource.EntityType();
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
+            if (!(context.Singleton != null ^ hasKeyParameter))
+            {
+                // Singleton, doesn't allow to query property with key
+                // entityset, doesn't allow for non-key to query property
+                return false;
+            }
+
             // Filter by the action name.
             // The action for navigation property request should follow up {httpMethod}{PropertyName}[From{Declaring}]
             string actionName = action.ActionName;
@@ -66,23 +82,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmNavigationSource navigationSource = context.NavigationSource;
-
-            // filter by action parameter
-            IEdmEntityType entityType = navigationSource.EntityType();
-            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
-            if (!(context.Singleton != null ^ hasKeyParameter))
-            {
-                // Singleton, doesn't allow to query property with key
-                // entityset, doesn't allow for non-key to query property
-                return false;
-            }
-
             // Find the declaring type of the property if we have the declaring type name in the action name.
-            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            // Otherwise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
+                if (declared.Length == 0) 
+                {
+                    // Early return for the following cases: Get|PostTo|PutTo|PatchTo{NavigationProperty}From
+                    return false;
+                }
+
                 declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
                 if (declaringEntityType == null)
                 {
@@ -91,7 +101,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Find the property, and we only care about the navigation property.
-            IEdmProperty edmProperty = declaringEntityType.FindProperty(property);
+            bool enablePropertyNameCaseInsensitive = context?.Options?.RouteOptions.EnablePropertyNameCaseInsensitive ?? false;
+
+            IEdmProperty edmProperty = declaringEntityType.FindProperty(property, enablePropertyNameCaseInsensitive);
             if (edmProperty == null || edmProperty.PropertyKind == EdmPropertyKind.Structural)
             {
                 return false;
@@ -141,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmNavigationSource navigationSource, string declared, IEdmEntityType declaringEntityType,
             IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
         {
-            IEdmEntitySet entitySet = navigationSource as IEdmEntitySet;
+            IEdmEntitySet entitySet = context.EntitySet;
             IEdmEntityType entityType = navigationSource.EntityType();
 
             // Starts the routing template

@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ServerSidePagingTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net.Http;
 using System.Text.Json;
@@ -24,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         {
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(typeof(ServerSidePagingCustomersController));
-            services.AddControllers().AddOData(opt => opt.Expand().AddModel("{a}", edmModel));
+            services.AddControllers().AddOData(opt => opt.Expand().AddRouteComponents("{a}", edmModel));
         }
 
         protected static IEdmModel GetEdmModel()

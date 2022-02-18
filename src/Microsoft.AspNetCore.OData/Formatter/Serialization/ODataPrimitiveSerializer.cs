@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataPrimitiveSerializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics.Contracts;
@@ -47,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            await messageWriter.WritePropertyAsync(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
+            await messageWriter.WritePropertyAsync(this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -98,7 +102,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 typeName = primitiveType.FullName();
             }
 
-            primitive.TypeAnnotation = new ODataTypeAnnotation(typeName);
+            if (typeName != null)
+            {
+                primitive.TypeAnnotation = new ODataTypeAnnotation(typeName);
+            }
         }
 
         internal static ODataPrimitiveValue CreatePrimitive(object value, IEdmPrimitiveTypeReference primitiveType,
@@ -139,6 +146,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 TimeOfDay tod = (TimeSpan)value;
                 return tod;
             }
+
+#if NET6_0
+            // Since ODL doesn't support "DateOnly", we have to use Date defined in ODL.
+            if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateOnly(type))
+            {
+                DateOnly dateOnly = (DateOnly)value;
+                return new Date(dateOnly.Year, dateOnly.Month, dateOnly.Day);
+            }
+
+            // Since ODL doesn't support "TimeOnly", we have to use TimeOfDay defined in ODL.
+            if (primitiveType != null && primitiveType.IsTimeOfDay() && TypeHelper.IsTimeOnly(type))
+            {
+                TimeOnly timeOnly = (TimeOnly)value;
+                return new TimeOfDay(timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond);
+            }
+#endif
 
             return ConvertUnsupportedPrimitives(value, timeZoneInfo);
         }

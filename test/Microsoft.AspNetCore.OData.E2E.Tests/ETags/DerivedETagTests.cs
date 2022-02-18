@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DerivedETagTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             IEdmModel edmModel1 = GetEdmModel();
             IEdmModel edmModel2 = GetDerivedEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController), typeof(ETagsDerivedCustomersSingletonController), typeof(ETagsDerivedCustomersController));
-            services.AddControllers().AddOData(opt => opt.Select().AddModel("odata", edmModel1).AddModel("derivedEtag", edmModel2));
+            services.AddControllers().AddOData(opt => opt.Select().AddRouteComponents("odata", edmModel1).AddRouteComponents("derivedEtag", edmModel2));
             services.AddControllers(opt => opt.Filters.Add(new ETagActionFilterAttribute()));
         }
 

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OrderByQueryOption.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -147,6 +151,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public OrderByQueryValidator Validator { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="ComputeQueryOption"/>.
+        /// </summary>
+        public ComputeQueryOption Compute { get; set; }
+
+        /// <summary>
         /// Gets the parsed <see cref="OrderByClause"/> for this query option.
         /// </summary>
         public OrderByClause OrderByClause
@@ -170,7 +179,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
         public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
         {
-            return ApplyToCore(query, new ODataQuerySettings()) as IOrderedQueryable<T>;
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
         }
 
         /// <summary>
@@ -191,7 +201,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
         public IOrderedQueryable ApplyTo(IQueryable query)
         {
-            return ApplyToCore(query, new ODataQuerySettings());
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings);
         }
 
         /// <summary>
@@ -238,6 +249,13 @@ namespace Microsoft.AspNetCore.OData.Query
             HashSet<string> openPropertiesSoFar = new HashSet<string>();
             bool orderByItSeen = false;
 
+            IOrderByBinder binder = Context.GetOrderByBinder();
+            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
+            if (Compute != null)
+            {
+                binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
+            }
+
             foreach (OrderByNode node in nodes)
             {
                 OrderByPropertyNode propertyNode = node as OrderByPropertyNode;
@@ -260,10 +278,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     if (propertyNode.OrderByClause != null)
                     {
-                        querySoFar = AddOrderByQueryForProperty(query, querySettings, propertyNode.OrderByClause, querySoFar, direction, alreadyOrdered);
+                        querySoFar = AddOrderByQueryForProperty(binder, propertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
                     }
                     else
                     {
+                        // could have ensure stable orderby property added
                         querySoFar = ExpressionHelpers.OrderByProperty(querySoFar, Context.Model, edmPropertyWithPath.Property, direction, Context.ElementClrType, alreadyOrdered);
                     }
 
@@ -279,13 +298,13 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     openPropertiesSoFar.Add(openPropertyNode.PropertyName);
                     Contract.Assert(openPropertyNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(query, querySettings, openPropertyNode.OrderByClause, querySoFar, openPropertyNode.Direction, alreadyOrdered);
+                    querySoFar = AddOrderByQueryForProperty(binder, openPropertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
                     alreadyOrdered = true;
                 }
                 else if (countNode != null)
                 {
                     Contract.Assert(countNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(query, querySettings, countNode.OrderByClause, querySoFar, countNode.Direction, alreadyOrdered);
+                    querySoFar = AddOrderByQueryForProperty(binder, countNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
                     alreadyOrdered = true;
                 }
                 else
@@ -305,15 +324,15 @@ namespace Microsoft.AspNetCore.OData.Query
             return querySoFar as IOrderedQueryable;
         }
 
-        private IQueryable AddOrderByQueryForProperty(IQueryable query, ODataQuerySettings querySettings,
-            OrderByClause orderbyClause, IQueryable querySoFar, OrderByDirection direction, bool alreadyOrdered)
+        private static IQueryable AddOrderByQueryForProperty(IOrderByBinder orderByBinder,
+            OrderByClause orderbyClause, IQueryable querySoFar, QueryBinderContext binderContext, bool alreadyOrdered)
         {
-            ODataQuerySettings updatedSettings = Context.UpdateQuerySettings(querySettings, query);
+            // Remove Thenby (make Thenby == null) to make sure we only apply the top orderby
+            // TODO: need to refactor it later.
+            orderbyClause = new OrderByClause(null, orderbyClause.Expression, orderbyClause.Direction, orderbyClause.RangeVariable);
 
-            LambdaExpression orderByExpression =
-                FilterBinder.Bind(query, orderbyClause, Context.ElementClrType, Context, updatedSettings);
-            querySoFar = ExpressionHelpers.OrderBy(querySoFar, orderByExpression, direction, Context.ElementClrType,
-                alreadyOrdered);
+            querySoFar = orderByBinder.ApplyBind(querySoFar, orderbyClause, binderContext, alreadyOrdered);
+
             return querySoFar;
         }
 

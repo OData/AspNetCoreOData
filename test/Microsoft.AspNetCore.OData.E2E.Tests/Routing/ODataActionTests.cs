@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataActionTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing
             IEdmModel typelessEdmModel = GetTypelessModel();
 
             services.ConfigureControllers(typeof(CustomersController), typeof(UntypedCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", edmModel).AddModel("typeless", typelessEdmModel));
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).AddRouteComponents("typeless", typelessEdmModel));
         }
 
         public ODataActionTests(WebApiTestFixture<ODataActionTests> fixture)

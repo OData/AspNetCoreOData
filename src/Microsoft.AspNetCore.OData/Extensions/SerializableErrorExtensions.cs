@@ -1,9 +1,15 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SerializableErrorExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
@@ -98,6 +104,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
         // Convert the model state errors in to a string (for debugging only).
         // This should be improved once ODataError allows more details.
+        [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The default format provider is fine here.")]
         private static string ConvertModelStateErrors(this IReadOnlyDictionary<string, object> errors)
         {
             StringBuilder builder = new StringBuilder();

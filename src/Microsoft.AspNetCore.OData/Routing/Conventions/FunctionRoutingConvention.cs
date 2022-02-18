@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FunctionRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics.Contracts;
@@ -12,8 +16,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// The convention for <see cref="IEdmFunction"/>.
-    /// Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
-    /// Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
+    /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
+    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
     /// </summary>
     public class FunctionRoutingConvention : OperationRoutingConvention
     {
@@ -42,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <inheritdoc />
-        protected override bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action)
+        protected override bool IsOperationParameterMatched(IEdmOperation operation, ActionModel action)
         {
             Contract.Assert(operation != null);
             Contract.Assert(action != null);
@@ -52,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            // we can allow the action has other parameters except the functio parameters.
+            // we can allow the action has other parameters except the function parameters.
             foreach (var parameter in operation.Parameters.Skip(1))
             {
                 // It seems we don't need to distinguish the optional parameter here

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TypedOpenTypeTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net;
 using System.Net.Http;
@@ -53,9 +57,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             services.AddControllers().AddOData(opt =>
             {
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddModel("convention", model1)
-                .AddModel("attributeRouting", model1)
-                .AddModel("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
+                .AddRouteComponents("convention", model1)
+                .AddRouteComponents("attributeRouting", model1)
+                .AddRouteComponents("explicit", OpenComplexTypeEdmModel.GetTypedExplicitModel())
                 .Conventions.Add(new StopODataRoutingConvention());
 
                 // simply suppress the route number from conventional routing
@@ -463,7 +467,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             content = await response.Content.ReadAsObject<JObject>();
-            Assert.Equal(6, content.Count); // @odata.context + 3 declared properties + 1 dynamic properties + 1 new dynamic properties
+            Assert.Equal(7, content.Count); // @odata.context + 3 declared properties + 2 dynamic properties + 1 new dynamic properties
             Assert.Equal("NewCity", content["City"]); // updated
             Assert.Equal("1 Microsoft Way", content["Street"]);
             Assert.Equal("US", content["CountryCode"]);
@@ -583,7 +587,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             content = await response.Content.ReadAsObject<JObject>();
-            Assert.Equal(5, content.Count); // @odata.context + 3 declared properties + 1 new dynamic properties
+            Assert.Equal(6, content.Count); // @odata.context + 3 declared properties + 2 new dynamic properties
             Assert.Equal("NewCity", content["City"]); // updated
             Assert.Equal("NewStreet", content["Street"]); // updated
             Assert.Equal("US", content["CountryCode"]);

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="UriFunctionBinderTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Reflection;
@@ -55,12 +59,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             ExceptionAssert.ThrowsArgumentNull(bindUriFunction, "methodInfo");
         }
 
-        // Add - succ
+        // Add - succeeds
         // Add already exists - fail
 
         // Type of MethodInfo:
         // Static MethodInfo
-        // Static Extenral MethoInfo
+        // Static External MethoInfo
         // Instance
         // Instance different declaring type
         // Add instance when static exists
@@ -157,8 +161,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [Fact]
         public void BindUriFunctionName_CanBindInstanceMethod()
         {
-            const string FUNCTION_NAME = "padright";
-            MethodInfo padRightInstanceMethodInfo = typeof(string).GetMethod("PadRight", new Type[] { typeof(int) });
+            // this test originally used "padright" as case, it has a running conflict with 'CustomMethod_InstanceMethodOfDeclaringType' in 'FilterBinderTests"
+            // Therefore, let's change it to use "PadLeft" as case.
+            // TODO: need to refactor the static logic for UriFunctionsBinder.
+            const string FUNCTION_NAME = "padLeft";
+            MethodInfo padRightInstanceMethodInfo = typeof(string).GetMethod("PadLeft", new Type[] { typeof(int) });
 
             try
             {
@@ -297,8 +304,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         // Remove -
         // Removed not existing
-        // Remove static when instance is tregistered - faile
-        // Remove instance when static is tregistered - faile
+        // Remove static when instance is registered - failed
+        // Remove instance when static is registered - failed
 
         [Fact]
         public void UnbindUriFunctionName_CanUnbind()

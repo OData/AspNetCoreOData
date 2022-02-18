@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataCollectionSerializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -41,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_Throws_ArgumentNull_MessageWriter()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
@@ -55,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataMessageWriter messageWriter = ODataTestUtil.GetMockODataMessageWriter();
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
@@ -78,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             settings.SetContentType(ODataFormat.Json);
 
             ODataMessageWriter messageWriter = new ODataMessageWriter(message, settings);
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(provider);
             ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "CollectionName", Model = EdmCoreModel.Instance };
             IEnumerable enumerable = new int[0];
@@ -103,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteCollectionAsync_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
@@ -120,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataCollectionValue_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
 
             // Act & Assert
@@ -138,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             object nonEnumerable = new object();
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             var serializer = new ODataCollectionSerializer(serializerProvider.Object);
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
 
@@ -154,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             IEnumerable enumerable = new[] { 0 };
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             var serializer = new ODataCollectionSerializer(serializerProvider.Object);
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
 
@@ -170,7 +174,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             ODataCollectionValue oDataCollectionValue = new ODataCollectionValue();
             var collection = new object[0];
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(serializerProvider.Object);
             ODataSerializerContext writeContext = new ODataSerializerContext();
             serializer.CallBase = true;
@@ -193,7 +197,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             ODataPrimitiveSerializer primitiveSerializer = new ODataPrimitiveSerializer();
             ODataSerializerContext writeContext = new ODataSerializerContext { Model = EdmCoreModel.Instance };
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(primitiveSerializer);
 
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
@@ -223,7 +227,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEnumTypeReference elementType = new EdmEnumTypeReference(new EdmEnumType("NS", "EnumType"), isNullable: true);
             edmEnumObject.Setup(s => s.GetEdmType()).Returns(elementType);
 
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             Mock<ODataEnumSerializer> elementSerializer = new Mock<ODataEnumSerializer>(MockBehavior.Strict, serializerProvider.Object);
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(elementType)).Returns(elementSerializer.Object);
             elementSerializer.Setup(s => s.CreateODataEnumValue(collection[0], elementType, serializerContext)).Returns(new ODataEnumValue("1", "NS.EnumType")).Verifiable();
@@ -241,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataCollectionValue_Returns_EmptyODataCollectionValue_ForNull()
         {
             // Arrange
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
 
             // Act
@@ -259,7 +263,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             IEnumerable enumerable = new int[] { 1, 2, 3 };
             ODataSerializerContext context = new ODataSerializerContext { Model = EdmCoreModel.Instance };
-            Mock<ODataSerializerProvider> serializerProvider = new Mock<ODataSerializerProvider>();
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
             ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
 

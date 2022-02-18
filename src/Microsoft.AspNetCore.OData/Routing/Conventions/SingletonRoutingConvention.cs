@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SingletonRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics;
@@ -65,6 +69,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             if (IsSupportedActionName(actionPrefix, singletonName, out httpMethod))
             {
                 string castTypeName = actionMethodName.Substring(index + 4);
+                if (castTypeName.Length == 0)
+                {
+                    // Early return for the following cases: Get|Put|PatchFrom
+                    return false;
+                }
+
                 IEdmEntityType entityType = context.Singleton.EntityType();
 
                 // Shall we cast to base type and the type itself? I think yes.

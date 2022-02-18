@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ComputeWrapperOfT.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -42,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                 var instanceContainer = this.Instance as DynamicTypeWrapper;
                 if (instanceContainer != null)
                 {
-                    // Add proeprties generated in previous transformations to the collection
+                    // Add properties generated in previous transformations to the collection
                     base.Values.MergeWithReplace(instanceContainer.Values);
                 }
                 else

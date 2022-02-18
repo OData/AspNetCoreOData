@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="HttpRequestExtensionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -130,41 +134,41 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         [Fact]
-        public void GetSubServiceProvider_ThrowsArgumentNull_Request()
+        public void GetRouteServices_ThrowsArgumentNull_Request()
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.GetSubServiceProvider(), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.GetRouteServices(), "request");
         }
 
         [Fact]
-        public void CreateSubServiceProvider_ThrowsArgumentNull_Request()
+        public void CreateRouteServices_ThrowsArgumentNull_Request()
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.CreateSubServiceProvider(""), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.CreateRouteServices(""), "request");
         }
 
         [Fact]
-        public void CreateSubServiceProvider_ThrowsInvalidOperation_SubServiceProvider()
+        public void CreateRouteServices_ThrowsInvalidOperation_RouteServices()
         {
             // Arrange
             HttpRequest request = RequestFactory.Create();
-            request.ODataFeature().SubServiceProvider = new Mock<IServiceProvider>().Object;
+            request.ODataFeature().Services = new Mock<IServiceProvider>().Object;
 
             // Act
-            Action test = () => request.CreateSubServiceProvider("odata");
+            Action test = () => request.CreateRouteServices("odata");
 
             // Assert
-            ExceptionAssert.Throws<InvalidOperationException>(test, "A request container already exists on the request.");
+            ExceptionAssert.Throws<InvalidOperationException>(test, "A dependency injection container for this request already exists.");
         }
 
         [Fact]
-        public void DeleteSubRequestProvider_ThrowsArgumentNull_Request()
+        public void ClearRouteServices_ThrowsArgumentNull_Request()
         {
             // Arrange & Act & Assert
             HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.DeleteSubRequestProvider(false), "request");
+            ExceptionAssert.ThrowsArgumentNull(() => request.ClearRouteServices(), "request");
         }
 
         [Fact]

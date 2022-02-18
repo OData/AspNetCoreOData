@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultODataPathParser.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -35,8 +39,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 uriParser = new ODataUriParser(model, odataPath, requestProvider);
             }
 
-            uriParser.Resolver = new UnqualifiedODataUriResolver { EnableCaseInsensitive = true };
-            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parenthese and key as segment.
+            uriParser.Resolver = uriParser.Resolver ?? new UnqualifiedODataUriResolver { EnableCaseInsensitive = true };
+            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parentheses and key as segment.
 
             // The ParsePath throws OData exceptions if the odata path is not valid.
             // That's expected.

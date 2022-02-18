@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FunctionSegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -64,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(operationSegment));
             }
 
-            IEdmOperation operation = operationSegment.Operations.FirstOrDefault();
+            IEdmOperation operation = operationSegment.Operations.First();
             if (!operation.IsFunction())
             {
                 throw new ODataException(Error.Format(SRResources.SegmentShouldBeKind, "Function", "FunctionSegmentTemplate"));
@@ -100,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
             Contract.Assert(options.EnableQualifiedOperationCall || options.EnableUnqualifiedOperationCall);
 
             string unqualifiedIdentifier, qualifiedIdentifier;
-            if (ParameterMappings.Count == 0 && options.EnableNonParenthsisForEmptyParameterFunction)
+            if (ParameterMappings.Count == 0 && options.EnableNonParenthesisForEmptyParameterFunction)
             {
                 unqualifiedIdentifier = "/" + Function.Name;
                 qualifiedIdentifier = "/" + Function.FullName();
@@ -152,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 // If this function template has the optional parameter missing,
                 // for example: ~/GetSalary(min={min},max={max}), without ave={ave}
                 // We should avoid this template matching with "~/GetSalary(min=1,max=2,ave=3)"
-                // Because, In this request, the comming route data has the following:
+                // Because, In this request, the coming route data has the following:
                 // min = 1
                 // max = 2,ave=3
                 // Therefore, we need to combine the route data together and separate them using "," again.

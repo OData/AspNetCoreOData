@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEdmTypeSerializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Threading.Tasks;
@@ -28,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void Ctor_SetsProperty_SerializerProvider()
         {
             // Arrange & Act
-            ODataSerializerProvider serializerProvider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider serializerProvider = new Mock<IODataSerializerProvider>().Object;
             var serializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Unsupported, serializerProvider).Object;
 
             // Assert

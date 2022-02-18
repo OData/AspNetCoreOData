@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="Startup.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,11 +36,11 @@ namespace ODataCustomizedSample
 
             services.AddControllers().AddOData(opt =>
                 opt
-                    .AddModel(model1)
-                    .AddModel("odata", model2)
-                    .AddModel("v{version}", model1)
-                    .AddModel("convention", model3)
-                    .AddModel("explicit", model4)
+                    .AddRouteComponents(model1)
+                    .AddRouteComponents("odata", model2)
+                    .AddRouteComponents("v{version}", model1)
+                    .AddRouteComponents("convention", model3)
+                    .AddRouteComponents("explicit", model4)
                     .Conventions.Add(new MyEntitySetRoutingConvention()));
 
             services.AddSwaggerGen();

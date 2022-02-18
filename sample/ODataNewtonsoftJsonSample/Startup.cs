@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="Startup.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +30,7 @@ namespace ODataNewtonsoftJsonSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddOData(opt => opt.Select().Filter().AddModel("odata", GetEdmModel()))
+                .AddOData(opt => opt.Select().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
                 .AddODataNewtonsoftJson()
                 //.AddNewtonsoftJson(
                 //options =>

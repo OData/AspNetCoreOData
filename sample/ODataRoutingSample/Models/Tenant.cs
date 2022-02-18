@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="Tenant.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -35,4 +39,23 @@ namespace ODataRoutingSample.Models
     {
         public int Id { get; set; }
     }
+
+
+    public class TestEntity
+    {
+        public int Id { get; set; }
+
+        public HuntingQueryResults Query { get; set; }
+    }
+
+    public class HuntingQueryResults
+    {
+        public IList<HuntingRowResult> Results { get; set; }
+    }
+
+    public class HuntingRowResult
+    {
+        public IDictionary<string, object> DynamicProperties { get; set; }
+    }
+
 }

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmComplexCollectionObject.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         private IEdmCollectionTypeReference _edmType;
 
         /// <summary>
-        /// Initialzes a new instance of the <see cref="EdmComplexObjectCollection"/> class.
+        /// Initializes a new instance of the <see cref="EdmComplexObjectCollection"/> class.
         /// </summary>
         /// <param name="edmType">The edm type of the collection.</param>
         public EdmComplexObjectCollection(IEdmCollectionTypeReference edmType)
@@ -26,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <summary>
-        /// Initialzes a new instance of the <see cref="EdmComplexObjectCollection"/> class.
+        /// Initializes a new instance of the <see cref="EdmComplexObjectCollection"/> class.
         /// </summary>
         /// <param name="edmType">The edm type of the collection.</param>
         /// <param name="list">The list that is wrapped by the new collection.</param>

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FilterQueryValidator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -98,8 +102,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="allNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="allNode">The all node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateAllNode(AllNode allNode, ODataValidationSettings settings)
         {
             Contract.Assert(allNode != null);
@@ -126,8 +130,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="anyNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="anyNode">The any node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateAnyNode(AnyNode anyNode, ODataValidationSettings settings)
         {
             Contract.Assert(anyNode != null);
@@ -157,8 +161,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="binaryOperatorNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="binaryOperatorNode">The binary operator node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings settings)
         {
             Contract.Assert(binaryOperatorNode != null);
@@ -194,8 +198,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="binaryNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="binaryNode">The binary operator node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateLogicalOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
         {
             Contract.Assert(binaryNode != null);
@@ -221,8 +225,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="binaryNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="binaryNode">The binary operator node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
         {
             Contract.Assert(binaryNode != null);
@@ -248,8 +252,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="constantNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="constantNode">The constant node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateConstantNode(ConstantNode constantNode, ODataValidationSettings settings)
         {
             // No default validation logic here.
@@ -262,8 +266,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="convertNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="convertNode">The convert node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateConvertNode(ConvertNode convertNode, ODataValidationSettings settings)
         {
             Contract.Assert(convertNode != null);
@@ -273,15 +277,38 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
+        /// Override this method to restrict the '$count' inside the filter query.
+        /// </summary>
+        /// <param name="countNode">The count node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
+        protected virtual void ValidateCountNode(CountNode countNode, ODataValidationSettings settings)
+        {
+            Contract.Assert(countNode != null);
+            Contract.Assert(settings != null);
+
+            ValidateQueryNode(countNode.Source, settings);
+
+            if (countNode.FilterClause != null)
+            {
+                ValidateQueryNode(countNode.FilterClause.Expression, settings);
+            }
+
+            if (countNode.SearchClause != null)
+            {
+                ValidateQueryNode(countNode.SearchClause.Expression, settings);
+            }
+        }
+
+        /// <summary>
         /// Override this method for the navigation property node.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="sourceNode"></param>
-        /// <param name="navigationProperty"></param>
-        /// <param name="settings"></param>
+        /// <param name="sourceNode">The source node to validate.</param>
+        /// <param name="navigationProperty">The navigation property.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
         {
             Contract.Assert(navigationProperty != null);
@@ -308,22 +335,22 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="rangeVariable"></param>
-        /// <param name="settings"></param>
+        /// <param name="rangeVariable">The range variable node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateRangeVariable(RangeVariable rangeVariable, ODataValidationSettings settings)
         {
             // No default validation logic here.
         }
 
         /// <summary>
-        /// Override this method to validate property accessor.
+        /// Override this method to validate property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="propertyAccessNode">The single value property access node.</param>
-        /// <param name="settings">The settings.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
         {
             Contract.Assert(propertyAccessNode != null);
@@ -363,14 +390,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate single complex property accessor.
+        /// Override this method to validate single complex property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="singleComplexNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="singleComplexNode">The single complex node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, ODataValidationSettings settings)
         {
             Contract.Assert(singleComplexNode != null);
@@ -388,14 +415,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate collection property accessor.
+        /// Override this method to validate collection property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="propertyAccessNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="propertyAccessNode">The collection property access node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
         {
             Contract.Assert(propertyAccessNode != null);
@@ -413,14 +440,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method to validate collection complex property accessor.
+        /// Override this method to validate collection complex property accessors.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="collectionComplexNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="collectionComplexNode">The collection complex node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, ODataValidationSettings settings)
         {
             Contract.Assert(collectionComplexNode != null);
@@ -444,8 +471,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="node"></param>
-        /// <param name="settings"></param>
+        /// <param name="node">The single value function call node to validate.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, ODataValidationSettings settings)
         {
             Contract.Assert(node != null);
@@ -488,8 +515,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="unaryOperatorNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="unaryOperatorNode">The unary operator node.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings settings)
         {
             Contract.Assert(unaryOperatorNode != null);
@@ -519,8 +546,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="node"></param>
-        /// <param name="settings"></param>
+        /// <param name="node">The query node.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateQueryNode(QueryNode node, ODataValidationSettings settings)
         {
             Contract.Assert(settings != null);
@@ -550,8 +577,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="collectionResourceCastNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="collectionResourceCastNode">The collection resource cast node.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateCollectionResourceCastNode(CollectionResourceCastNode collectionResourceCastNode, ODataValidationSettings settings)
         {
             Contract.Assert(collectionResourceCastNode != null);
@@ -567,8 +594,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
-        /// <param name="singleResourceCastNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="singleResourceCastNode">The single resource cast node.</param>
+        /// <param name="settings">The validation settings.</param>
         protected virtual void ValidateSingleResourceCastNode(SingleResourceCastNode singleResourceCastNode, ODataValidationSettings settings)
         {
             Contract.Assert(singleResourceCastNode != null);
@@ -579,12 +606,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static FilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new FilterQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<FilterQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<FilterQueryValidator>()
+                ?? new FilterQueryValidator();
         }
 
         private void EnterLambda(ODataValidationSettings validationSettings)
@@ -668,6 +691,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     ValidateConvertNode(node as ConvertNode, settings);
                     break;
 
+                case QueryNodeKind.Count:
+                    ValidateCountNode(node as CountNode, settings);
+                    break;
+
                 case QueryNodeKind.ResourceRangeVariableReference:
                     ValidateRangeVariable((node as ResourceRangeVariableReferenceNode).RangeVariable, settings);
                     break;
@@ -718,10 +745,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     break;
 
                 case QueryNodeKind.In:
-                    // No setting validations
-                    break;
-
-                case QueryNodeKind.Count:
                     // No setting validations
                     break;
 

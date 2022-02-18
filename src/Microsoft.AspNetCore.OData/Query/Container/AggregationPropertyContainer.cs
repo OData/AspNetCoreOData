@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="AggregationPropertyContainer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +14,7 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 namespace Microsoft.AspNetCore.OData.Query.Container
 {
     /// <summary>
-    /// Reperesent properties used in groupby and aggregate clauses to make them accessiable in further clauses/transformations
+    /// Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations
     /// </summary>
     /// <remakrs>
     /// When we have $apply=groupby((Prop1,Prop2, Prop3))&amp;$orderby=Prop1, Prop2
@@ -33,12 +37,12 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// Prop3 could be referenced us $it => (int)$it.Next.Next.Value
     /// Generic type for Value is used to avoid type casts for on primitive types that not supported in EF
     /// 
-    /// Also we have 4 use cases and base type have all requiered properties to support no cast usage. 
+    /// Also we have 4 use cases and base type have all required properties to support no cast usage. 
     /// 1. Primitive property with Next
     /// 2. Primitive property without Next
     /// 3. Nested property with Next
     /// 4. Nested property without Next
-    /// However, EF doesn't allow to set different properties for the same type in two places in an lamba-expression => using new type with just new name to workaround that issue
+    /// However, EF doesn't allow to set different properties for the same type in two places in an lambda-expression => using new type with just new name to workaround that issue
     /// 
     /// </remakrs>
     internal class AggregationPropertyContainer : NamedProperty<object>

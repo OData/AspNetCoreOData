@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TopQueryValidator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,12 +58,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new TopQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<TopQueryValidator>();
+            return context?.RequestContainer?.GetService<TopQueryValidator>() ?? new TopQueryValidator();
         }
     }
 }

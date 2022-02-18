@@ -1,5 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="Product.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using System;
 
 namespace ODataRoutingSample.Models
 {
@@ -10,6 +16,10 @@ namespace ODataRoutingSample.Models
         public string Category { get; set; }
 
         public Color Color { get; set; }
+
+        public DateTimeOffset CreatedDate { get; set; }
+
+        public DateTimeOffset? UpdatedDate { get; set; }
 
         public virtual ProductDetail Detail { get; set; }
     }

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TransformationBinderBase.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics.Contracts;
@@ -37,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <summary>
-        /// Checks IQueryable provider for need of EF6 oprimization
+        /// Checks IQueryable provider for need of EF6 optimization
         /// </summary>
         /// <param name="query"></param>
         /// <returns>True if EF6 optimization are needed.</returns>
@@ -114,8 +118,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     var binaryNode = (BinaryOperatorNode)node;
                     var leftExpression = BindAccessor(binaryNode.Left, baseElement);
                     var rightExpression = BindAccessor(binaryNode.Right, baseElement);
-                    return CreateBinaryExpression(binaryNode.OperatorKind, leftExpression, rightExpression,
-                        liftToNull: true);
+                    return ExpressionBinderHelper.CreateBinaryExpression(binaryNode.OperatorKind, leftExpression, rightExpression,
+                        liftToNull: true, QuerySettings);
                 case QueryNodeKind.Convert:
                     var convertNode = (ConvertNode)node;
                     return CreateConvertExpression(convertNode, BindAccessor(convertNode.Source, baseElement));

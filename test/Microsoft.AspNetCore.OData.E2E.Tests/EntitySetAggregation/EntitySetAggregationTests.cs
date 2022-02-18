@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EntitySetAggregationTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net;
 using System.Net.Http;
@@ -15,8 +19,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 {
-    // The test can't work in EFCore, because it's not supported with Groupby and selectmany on collection.
-    // Later, we'd swith it to EF6.
+    // The test can't work in EFCore, because it's not supported with Groupby and select many on collection.
+    // Later, we'd switch it to EF6.
     public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
     {
         public class TestsStartup : TestStartupBase
@@ -31,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
                 services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
-                    .AddModel("aggregation", edmModel));
+                    .AddRouteComponents("aggregation", edmModel));
             }
         }
 

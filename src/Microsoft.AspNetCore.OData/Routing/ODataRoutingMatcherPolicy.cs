@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRoutingMatcherPolicy.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                 if (odataPath != null)
                 {
-                    odataFeature.PrefixName = metadata.Prefix;
+                    odataFeature.RoutePrefix = metadata.Prefix;
                     odataFeature.Model = metadata.Model;
                     odataFeature.Path = odataPath;
 

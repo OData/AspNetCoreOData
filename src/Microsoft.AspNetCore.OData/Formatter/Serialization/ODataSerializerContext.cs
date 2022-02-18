@@ -1,15 +1,19 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataSerializerContext.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -86,6 +90,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 SelectExpandClause = expandedNavigationSelectItem.SelectAndExpand;
                 NavigationSource = expandedNavigationSelectItem.NavigationSource;
+
+                SetComputedProperties(expandedNavigationSelectItem.ComputeOption);
             }
             else
             {
@@ -94,6 +100,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     SelectExpandClause = pathSelectItem.SelectAndExpand;
                     NavigationSource = resource.NavigationSource; // Use it's parent navigation source.
+
+                    SetComputedProperties(pathSelectItem.ComputeOption);
                 }
 
                 var referencedNavigation = currentSelectItem as ExpandedReferenceSelectItem;
@@ -101,6 +109,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     ExpandReference = true;
                     NavigationSource = referencedNavigation.NavigationSource;
+
+                    SetComputedProperties(referencedNavigation.ComputeOption);
                 }
             }
 
@@ -174,6 +184,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Gets or sets the <see cref="ODataQueryOptions"/>.
         /// </summary>
         public ODataQueryOptions QueryOptions { get; internal set; }
+
+        /// <summary>
+        /// Gets the computed properties in serializer context.
+        /// It contains all computed properties at current serializer context.
+        /// </summary>
+        public ISet<string> ComputedProperties { get; } = new HashSet<string>();
 
         /// <summary>
         /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
@@ -299,14 +315,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
                 }
 
-                var typeMappingCache = Model.GetTypeMappingCache();
-                edmType = typeMappingCache.GetEdmType(type, Model);
+                edmType = Model.GetEdmTypeReference(type);
 
                 if (edmType == null)
                 {
                     if (instance != null)
                     {
-                        edmType = typeMappingCache.GetEdmType(instance.GetType(), Model);
+                        edmType = Model.GetEdmTypeReference(instance.GetType());
                     }
 
                     if (edmType == null)
@@ -316,7 +331,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else if (instance != null)
                 {
-                    IEdmTypeReference actualType = typeMappingCache.GetEdmType(instance.GetType(), Model);
+                    IEdmTypeReference actualType = Model.GetEdmTypeReference(instance.GetType());
                     if (actualType != null && actualType != edmType)
                     {
                         edmType = actualType;
@@ -325,6 +340,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return edmType;
+        }
+
+        internal void SetComputedProperties(ComputeClause computeClause)
+        {
+            if (computeClause == null || !computeClause.ComputedItems.Any())
+            {
+                return;
+            }
+
+            foreach (var item in computeClause.ComputedItems)
+            {
+                ComputedProperties.Add(item.Alias);
+            }
         }
     }
 }

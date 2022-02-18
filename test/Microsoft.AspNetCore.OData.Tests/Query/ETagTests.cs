@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ETagTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -224,7 +228,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmEntityType customer = model.SchemaElements.OfType<IEdmEntityType>().FirstOrDefault(e => e.Name == "MyEtagCustomer");
             IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
             ODataPath odataPath = new ODataPath(new[] { new EntitySetSegment(customers) });
-            var request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            var request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
             request.ODataFeature().Path = odataPath;
 
             ETag etagCustomer = request.GetETag(etagHeaderValue);
@@ -311,7 +315,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet orders = model.FindDeclaredEntitySet("Orders");
             ODataPath odataPath = new ODataPath(new[] {new EntitySetSegment(orders) });
-            var request = RequestFactory.Create(model, opt => opt.AddModel(model));
+            var request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
             request.ODataFeature().Path = odataPath;
 
             ETag etagCustomer = request.GetETag(etagHeaderValue);

@@ -1,21 +1,28 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EnableQueryAttributeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
@@ -24,6 +31,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 {
     public class EnableQueryAttributeTests
     {
+        private static IEdmModel _model = GetEdmModel();
+
 #if false
         public static List<Customer> CustomerList = new List<Customer>()
         {
@@ -228,6 +237,85 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void OnActionExecuted_Throws_Null_Context()
         {
             ExceptionAssert.ThrowsArgumentNull(() => new EnableQueryAttribute().OnActionExecuted(null), "actionExecutedContext");
+        }
+
+        [Fact]
+        public void OnActionExecuted_HandlesStatusCodesCorrectly()
+        {
+            // Arrange
+            HttpContext httpContext = new DefaultHttpContext();
+            httpContext.Request.Method = "Get";
+            ActionDescriptor actionDescriptor = new ActionDescriptor();
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), actionDescriptor);
+
+            ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), "someController");
+            context.Result = new ObjectResult(new { Error = "Error", Message = "Message" }) { StatusCode = 500 };
+
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            // Act and Assert
+            ExceptionAssert.DoesNotThrow(() => attribute.OnActionExecuted(context));
+        }
+
+        [Fact]
+        public void OnActionExecuted_HandlesRequestsNormally()
+        {
+            IEdmModel model = new CustomersModelWithInheritance().Model;
+
+            var request = RequestFactory.Create("Get", "http://localhost/Customers", opt => opt.AddRouteComponents(model).Filter());
+
+            ODataUriParser parser = new ODataUriParser(model, new Uri("Customers", UriKind.Relative));
+            HttpContext httpContext = request.HttpContext;
+
+            Assert.NotNull(httpContext.RequestServices);
+
+            httpContext.Request.Method = "Get";
+            request.Configure("odata", model, parser.ParsePath());
+            ActionDescriptor actionDescriptor = CreateDescriptors("CustomersController", typeof(CustomersController))
+                                                .First(descriptor => descriptor.ActionName.StartsWith("Get", StringComparison.OrdinalIgnoreCase));
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), actionDescriptor);
+
+            ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new CustomersController());
+            context.Result = new ObjectResult(new List<Customer>() { new Customer { Id = 1, Name = "John Doe" } }) { StatusCode = 200 };
+
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            // Act and Assert
+            ExceptionAssert.DoesNotThrow(() => attribute.OnActionExecuted(context));
+            var result = context.Result as ObjectResult;
+            Assert.NotNull(context.Result);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the [Http]ControllerDescriptor class.
+        /// </summary>
+        /// <returns>A new instance of the [Http]ControllerDescriptor  class.</returns>
+        private static IEnumerable<ControllerActionDescriptor> CreateDescriptors(string name, Type controllerType)
+        {
+            // Create descriptors. Search for non-public methods to pick up public methods in nested classes
+            // as controllers are usually a nested class for the test class ad by default, this are marked private.
+            List<ControllerActionDescriptor> descriptors = new List<ControllerActionDescriptor>();
+            IEnumerable<MethodInfo> methods = controllerType.GetTypeInfo().DeclaredMethods;
+            foreach (MethodInfo methodInfo in methods)
+            {
+                ControllerActionDescriptor descriptor = new ControllerActionDescriptor();
+                descriptor.ControllerName = name;
+                descriptor.ControllerTypeInfo = controllerType.GetTypeInfo();
+                descriptor.ActionName = methodInfo.Name;
+                descriptor.DisplayName = methodInfo.Name;
+                descriptor.MethodInfo = methodInfo;
+                descriptor.Parameters = methodInfo
+                    .GetParameters()
+                    .Select(p => new ParameterDescriptor
+                    {
+                        Name = p.Name,
+                        ParameterType = p.ParameterType
+                    })
+                    .ToList();
+                descriptors.Add(descriptor);
+            }
+
+            return descriptors;
         }
 
 #if NETCORE // Following functionality is only supported in NetCore.
@@ -482,16 +570,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(expectedResponse, response.Content);
         }
+#endif
 
         [Fact]
         public void ValidateQuery_Throws_With_Null_Request()
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            var request = RequestFactory.Create();
-            request.EnableHttpDependencyInjectionSupport();
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Builder.TestModels.Customer)), request);
+            HttpRequest request = new DefaultHttpContext().Request;
+            var options = new ODataQueryOptions(new ODataQueryContext(EdmCoreModel.Instance, typeof(int)), request);
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(null, options), "request");
@@ -502,9 +589,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
+            HttpRequest request = new DefaultHttpContext().Request;
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(new HttpRequestMessage(), null), "queryOptions");
+            ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(request, null), "queryOptions");
         }
 
         [Theory]
@@ -516,15 +604,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/?" + query);
-            request.EnableHttpDependencyInjectionSupport();
-            DefaultQuerySettings defaultQuerySettings = request.GetConfiguration().GetDefaultQuerySettings();
-            defaultQuerySettings.EnableFilter = true;
-            defaultQuerySettings.EnableOrderBy = true;
-            defaultQuerySettings.MaxTop = null;
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/?" + query);
 
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var context = new ODataQueryContext(model, typeof(Builder.TestModels.Customer), null);
+            var context = new ODataQueryContext(_model, typeof(QCustomer));
+            context.DefaultQuerySettings.EnableFilter = true;
+            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQuerySettings.MaxTop = null;
             var options = new ODataQueryOptions(context, request);
 
             // Act & Assert
@@ -532,20 +617,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
-        public void ValidateQuery_Sends_BadRequest_For_Unrecognized_QueryNames()
+        public void ValidateQuery_ThrowsODataException_For_Unrecognized_QueryNames()
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/?$xxx");
-            request.EnableHttpDependencyInjectionSupport();
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Builder.TestModels.Customer)), request);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/?$xxx");
+            var options = new ODataQueryOptions(new ODataQueryContext(_model, typeof(QCustomer)), request);
 
             // Act & Assert
-            HttpResponseException responseException = ExceptionAssert.Throws<HttpResponseException>(
-                                                                () => attribute.ValidateQuery(request, options));
+            ODataException ex = ExceptionAssert.Throws<ODataException>(
+                () => attribute.ValidateQuery(request, options));
 
-            Assert.Equal(HttpStatusCode.BadRequest, responseException.Response.StatusCode);
+            Assert.Equal("Custom query option '$xxx' that starts with '$' is not supported.", ex.Message);
         }
 
         [Fact]
@@ -553,13 +636,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             Mock<EnableQueryAttribute> mockAttribute = new Mock<EnableQueryAttribute>();
-            mockAttribute.Setup(m => m.ValidateQuery(It.IsAny<HttpRequestMessage>(), It.IsAny<ODataQueryOptions>())).Callback(() => { }).Verifiable();
+            mockAttribute.Setup(
+                m => m.ValidateQuery(It.IsAny<HttpRequest>(), It.IsAny<ODataQueryOptions>())).Callback(() => { }).Verifiable();
 
             // Act & Assert
             mockAttribute.Object.ValidateQuery(null, null);
             mockAttribute.Verify();
         }
 
+#if false
         [Fact]
         public void ApplyQuery_Throws_With_Null_Queryable()
         {
@@ -985,6 +1070,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
+        public void OnActionExecuted_SingleResult_ReturnsSingleItemForMultipleEnableQueryAttributeSet()
+        {
+            BellevueCustomer customer = new BellevueCustomer();
+            SingleResult singleResult = new SingleResult<BellevueCustomer>(new BellevueCustomer[] { customer }.AsQueryable());
+            HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/", singleResult);
+            EnableQueryAttribute attribute = new EnableQueryAttribute();
+
+            attribute.OnActionExecuted(actionExecutedContext);
+            attribute.OnActionExecuted(actionExecutedContext);
+            attribute.OnActionExecuted(actionExecutedContext);
+
+            Assert.Equal(HttpStatusCode.OK, actionExecutedContext.Response.StatusCode);
+            Assert.Equal(customer, (actionExecutedContext.Response.Content as ObjectContent).Value);
+        }
+
+        [Fact]
         public void OnActionExecuted_SingleResult_Returns400_IfQueryContainsNonSelectExpand()
         {
             HttpActionExecutedContext actionExecutedContext = GetActionExecutedContext("http://localhost/?$top=10", new Customer());
@@ -1050,7 +1151,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 "returned a SingleResult containing more than one element. SingleResult must have zero or one elements.",
                 responseString);
         }
-
+#endif
         [Theory]
         [InlineData("$filter=ID eq 1")]
         [InlineData("$orderby=ID")]
@@ -1059,18 +1160,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [InlineData("$top=0")]
         public void ValidateSelectExpandOnly_ThrowsODataException_IfODataQueryOptionsHasNonSelectExpand(string parameter)
         {
-            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
-            model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost?" + parameter);
-            request.EnableHttpDependencyInjectionSupport();
-            ODataQueryContext context = new ODataQueryContext(model.Model, typeof(Customer));
+            // Arrange
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost?" + parameter);
+            ODataQueryContext context = new ODataQueryContext(_model, typeof(QCustomer));
             ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
+            // Act & Assert
             ExceptionAssert.Throws<ODataException>(
                 () => EnableQueryAttribute.ValidateSelectExpandOnly(queryOptions),
                 "The requested resource is not a collection. Query options $filter, $orderby, $count, $skip, and $top can be applied only on collections.");
         }
 
+#if false
         [Fact]
         public void OnActionExecuted_Works_WithPath()
         {
@@ -1140,5 +1241,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             return actionExecutedContext;
         }
 #endif
+        private static IEdmModel GetEdmModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<QCustomer>("Customers");
+            return builder.GetEdmModel();
+        }
+
+        private class QCustomer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
     }
 }

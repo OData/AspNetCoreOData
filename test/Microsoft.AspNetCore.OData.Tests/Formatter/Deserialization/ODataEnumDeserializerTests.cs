@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEnumDeserializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -30,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 ResourceType = typeof(Color)
             };
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddModel("odata", _edmModel));
+            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddRouteComponents("odata", _edmModel));
 
             // Act
             object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),

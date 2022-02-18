@@ -142,7 +142,7 @@
     <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
   </data>
   <data name="InputKeyNotMatchEntityTypeKey" xml:space="preserve">
-    <value>The input key count '{0}' doesn't match the number '{1}' of the key of entity type '{2}'.</value>
+    <value>The input key count '{0}' does not match the number '{1}' of the key of entity type '{2}'.</value>
   </data>
   <data name="CannotFindKeyInEntityType" xml:space="preserve">
     <value>Cannot find key '{0}' in the '{1}' type.</value>
@@ -402,14 +402,17 @@
   <data name="QueryCannotBeEmpty" xml:space="preserve">
     <value>The value for OData query '{0}' cannot be empty.</value>
   </data>
+  <data name="ActionDescriptorNotControllerActionDescriptor" xml:space="preserve">
+    <value>ActionDescriptor is not ControllerActionDescriptor.</value>
+  </data>
   <data name="FailedToBuildEdmModelBecauseReturnTypeIsNull" xml:space="preserve">
     <value>Cannot create an EDM model as the action '{0}' on controller '{1}' has a void return type.</value>
   </data>
   <data name="FailedToRetrieveTypeToBuildEdmModel" xml:space="preserve">
     <value>Cannot create an EDM model as the action '{0}' on controller '{1}' has a return type '{2}' that does not implement IEnumerable&lt;T&gt;.</value>
   </data>
-  <data name="ActionContextMustHaveRequest" xml:space="preserve">
-    <value>The HttpActionContext.Request is null.</value>
+  <data name="ModelBindingContextMustHaveRequest" xml:space="preserve">
+    <value>The model binding context requires an attached request in order to model binding.</value>
   </data>
   <data name="NotAllowedLogicalOperator" xml:space="preserve">
     <value>Logical operator '{0}' is not allowed. To allow it, set the '{1}' property on EnableQueryAttribute or QueryValidationSettings.</value>
@@ -484,7 +487,7 @@
     <value>Cannot compare an enum of type '{0}' to an expression of type '{1}'.</value>
   </data>
   <data name="PropertyOrPathWasRemovedFromContext" xml:space="preserve">
-    <value>Property or path {0} isn't available in the current context. It was removed in earlier transformation.</value>
+    <value>Property or path {0} is not available in the current context. It was removed in earlier transformation.</value>
   </data>
   <data name="QueryNodeBindingNotSupported" xml:space="preserve">
     <value>Binding OData QueryNode of kind '{0}' is not supported by '{1}'.</value>
@@ -539,6 +542,9 @@
   </data>
   <data name="NonSelectExpandOnSingleEntity" xml:space="preserve">
     <value>The requested resource is not a collection. Query options $filter, $orderby, $count, $skip, and $top can be applied only on collections.</value>
+  </data>
+  <data name="CustomQueryOptionNotSupportedWithDollarSign" xml:space="preserve">
+    <value>Custom query option '{0}' that starts with '$' is not supported.</value>
   </data>
   <data name="SingleResultHasMoreThanOneEntity" xml:space="preserve">
     <value>The action '{0}' on controller '{1}' returned a {2} containing more than one element. {2} must have zero or one elements.</value>
@@ -597,6 +603,9 @@
   <data name="InvalidLastSegmentInSelectExpandPath" xml:space="preserve">
     <value>The last segment '{0}' of the select or expand query option is not supported.</value>
   </data>
+  <data name="ShouldHaveNavigationPropertyInNavigationExpandPath" xml:space="preserve">
+    <value>A navigation property expand path should have navigation property in the path.</value>
+  </data>
   <data name="BatchRequestInvalidMediaType" xml:space="preserve">
     <value>The batch request must have '{0}' or '{1}' as the media type.</value>
   </data>
@@ -615,8 +624,8 @@
   <data name="NullContainerBuilder" xml:space="preserve">
     <value>The container builder created by the container builder factory must not be null.</value>
   </data>
-  <data name="SubRequestServiceProviderAlreadyExists" xml:space="preserve">
-    <value>A request container already exists on the request.</value>
+  <data name="RouteServicesAlreadyExist" xml:space="preserve">
+    <value>A dependency injection container for this request already exists.</value>
   </data>
   <data name="ModelPrefixAlreadyUsed" xml:space="preserve">
     <value>The prefix '{0}' was already used for other Edm model.</value>

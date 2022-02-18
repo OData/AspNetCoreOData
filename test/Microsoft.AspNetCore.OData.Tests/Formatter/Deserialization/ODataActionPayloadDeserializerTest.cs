@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataActionPayloadDeserializerTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
     {
         private static IEdmModel _model;
         private static IEdmEntityContainer _container;
-        private static ODataDeserializerProvider _deserializerProvider;
+        private static IODataDeserializerProvider _deserializerProvider;
         private static ODataActionPayloadDeserializer _deserializer;
         private const string _serviceRoot = "http://any/";
 
@@ -36,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             _model = GetModel();
             _container = _model.EntityContainer;
 
-            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<ODataDeserializerProvider>();
+            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
             _deserializer = new ODataActionPayloadDeserializer(_deserializerProvider);
         }
 
@@ -52,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void Ctor_SetsProperty_DeserializerProvider()
         {
             // Arrange
-            ODataDeserializerProvider deserializerProvider = new Mock<ODataDeserializerProvider>().Object;
+            IODataDeserializerProvider deserializerProvider = new Mock<IODataDeserializerProvider>().Object;
 
             // Act
             var deserializer = new ODataActionPayloadDeserializer(deserializerProvider);
@@ -65,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void Ctor_SetsProperty_ODataPayloadKind()
         {
             // Arrange
-            ODataDeserializerProvider deserializerProvider = new Mock<ODataDeserializerProvider>().Object;
+            IODataDeserializerProvider deserializerProvider = new Mock<IODataDeserializerProvider>().Object;
 
             // Act
             var deserializer = new ODataActionPayloadDeserializer(deserializerProvider);

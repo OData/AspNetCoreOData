@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DeserializationHelper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -20,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     internal static class DeserializationHelpers
     {
         internal static void ApplyProperty(ODataProperty property, IEdmStructuredTypeReference resourceType, object resource,
-            ODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
+            IODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
             IEdmStructuredType structuredType = resourceType.StructuredDefinition();
             IEdmProperty edmProperty = structuredType == null ? null : structuredType.ResolveProperty(property.Name);
@@ -99,15 +103,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
-        internal static void SetCollectionProperty(object resource, IEdmProperty edmProperty, object value, string propertyName, TimeZoneInfo timeZoneInfo = null)
+        internal static void SetCollectionProperty(object resource, IEdmProperty edmProperty, object value, string propertyName, ODataDeserializerContext context = null)
         {
             Contract.Assert(edmProperty != null);
 
-            SetCollectionProperty(resource, propertyName, edmProperty.Type.AsCollection(), value, clearCollection: false, timeZoneInfo: timeZoneInfo);
+            SetCollectionProperty(resource, propertyName, edmProperty.Type.AsCollection(), value, clearCollection: false, context: context);
         }
 
         internal static void SetCollectionProperty(object resource, string propertyName,
-            IEdmCollectionTypeReference edmPropertyType, object value, bool clearCollection, TimeZoneInfo timeZoneInfo = null)
+            IEdmCollectionTypeReference edmPropertyType, object value, bool clearCollection, ODataDeserializerContext context = null)
         {
             if (value != null)
             {
@@ -130,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     CollectionDeserializationHelpers.TryCreateInstance(propertyType, edmPropertyType, elementType, out newCollection))
                 {
                     // settable collections
-                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, timeZoneInfo);
+                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, context);
                     if (propertyType.IsArray)
                     {
                         newCollection = CollectionDeserializationHelpers.ToArray(newCollection, elementType);
@@ -153,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                         newCollection.Clear(propertyName, resourceType);
                     }
 
-                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, timeZoneInfo);
+                    collection.AddToCollection(newCollection, elementType, resourceType, propertyName, propertyType, context);
                 }
             }
         }
@@ -237,7 +241,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
-        internal static object ConvertValue(object oDataValue, ref IEdmTypeReference propertyType, ODataDeserializerProvider deserializerProvider,
+        internal static object ConvertValue(object oDataValue, ref IEdmTypeReference propertyType, IODataDeserializerProvider deserializerProvider,
             ODataDeserializerContext readContext, out EdmTypeKind typeKind)
         {
             if (oDataValue == null)
@@ -329,7 +333,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         private static object ConvertCollectionValue(ODataCollectionValue collection,
-            ref IEdmTypeReference propertyType, ODataDeserializerProvider deserializerProvider,
+            ref IEdmTypeReference propertyType, IODataDeserializerProvider deserializerProvider,
             ODataDeserializerContext readContext)
         {
             IEdmCollectionTypeReference collectionType;
@@ -355,7 +359,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Contract.Assert(collectionType != null, "The type for collection must be a IEdmCollectionType.");
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
+            IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
             return deserializer.ReadInline(collection, collectionType, readContext);
         }
 
@@ -371,7 +375,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return intValue;
             }
 
-            // todo: if it is Ieee754Compatible, parse decimal after double
+            // Todo: if it is Ieee754Compatible, parse decimal after double
             if (Decimal.TryParse(value, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out decimal decimalValue))
             {
                 return decimalValue;
@@ -391,7 +395,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         private static object ConvertEnumValue(ODataEnumValue enumValue, ref IEdmTypeReference propertyType,
-            ODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
+            IODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
             IEdmEnumTypeReference edmEnumType;
             if (propertyType == null)
@@ -410,7 +414,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 edmEnumType = propertyType.AsEnum();
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
+            IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
             return deserializer.ReadInline(enumValue, propertyType, readContext);
         }
 

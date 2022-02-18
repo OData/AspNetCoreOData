@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOutputFormatterFactoryTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -124,7 +128,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         public void ODataOutputFormattersForWriteTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
         {
             // Arrange
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel(_edmModel));
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents(_edmModel));
             request.Configure("", _edmModel, new ODataPath());
             var metadataDocumentFormatters = _formatters.Where(f => CanWriteType(f, type, request));
 
@@ -242,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
         private MediaTypeHeaderValue GetContentTypeFromQueryString(IEdmModel model, Type type, string dollarFormat)
         {
-            Action<ODataOptions> setupAction = opt => opt.AddModel("odata", model);
+            Action<ODataOptions> setupAction = opt => opt.AddRouteComponents("odata", model);
             ODataPath path = new ODataPath();
             HttpRequest request = string.IsNullOrEmpty(dollarFormat)
                 ? RequestFactory.Create("Get", "http://any", setupAction)

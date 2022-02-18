@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmModelExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -217,7 +221,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// Resolve the navigation source using the input identifier
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="identifier">The indentifier</param>
+        /// <param name="identifier">The identifier</param>
         /// <param name="enableCaseInsensitive">Enable case insensitive</param>
         /// <returns>Null or the found navigation source.</returns>
         public static IEdmNavigationSource ResolveNavigationSource(this IEdmModel model, string identifier, bool enableCaseInsensitive = false)
@@ -382,31 +386,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             return false;
         }
 
-        internal static string GetNavigationSourceUrl(this IEdmModel model, IEdmNavigationSource navigationSource)
-        {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
-
-            if (navigationSource == null)
-            {
-                throw new ArgumentNullException(nameof(navigationSource));
-            }
-
-            //NavigationSourceUrlAnnotation annotation = model.GetAnnotationValue<NavigationSourceUrlAnnotation>(navigationSource);
-            //if (annotation == null)
-            //{
-            //    return navigationSource.Name;
-            //}
-            //else
-            //{
-            //    return annotation.Url;
-            //}
-
-            return null;
-        }
-
         /// <summary>
         /// Find the given type in a structured type inheritance, include itself.
         /// </summary>
@@ -439,17 +418,6 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return ((IEdmComplexType)type).Name;
-        }
-
-        public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
-        {
-            if (typeReference.TypeKind() == EdmTypeKind.Collection)
-            {
-                IEdmCollectionTypeReference collectType = typeReference.AsCollection();
-                return collectType.ElementType();
-            }
-
-            return typeReference;
         }
 
         /// <summary>

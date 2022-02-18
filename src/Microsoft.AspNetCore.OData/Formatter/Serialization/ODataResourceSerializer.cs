@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataResourceSerializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Concurrent;
@@ -34,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         private const string Resource = "Resource";
 
         /// <inheritdoc />
-        public ODataResourceSerializer(ODataSerializerProvider serializerProvider)
+        public ODataResourceSerializer(IODataSerializerProvider serializerProvider)
             : base(ODataPayloadKind.Resource, serializerProvider)
         {
         }
@@ -222,7 +226,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 // write object.
 
-                // TODO: enable overriding serializer based on type. Currentlky requires serializer supports WriteDeltaObjectinline, because it takes an ODataDeltaWriter
+                // TODO: enable overriding serializer based on type. Currently requires serializer supports WriteDeltaObjectinline, because it takes an ODataDeltaWriter
                 // ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
                 // if (serializer == null)
                 // {
@@ -640,7 +644,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else
                 {
-                    ODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+                    IODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
                     if (propertySerializer == null)
                     {
                         throw Error.NotSupported(SRResources.DynamicPropertyCannotBeSerialized, dynamicProperty.Key,
@@ -771,7 +775,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, null, null);
 
             // Write object.
-            ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmType);
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmType);
             if (serializer == null)
             {
                 throw new SerializationException(
@@ -929,7 +933,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, null /*resourceContext.SerializerContext.QueryContext*/, selectItem);
 
                 // write object.
-                ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
+                IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
                 if (serializer == null)
                 {
                     throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmProperty.Type.ToTraceString()));
@@ -1033,7 +1037,62 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
+            // Try to add computed properties
+            if (selectExpandNode.SelectedComputedProperties != null)
+            {
+                foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
+                {
+                    ODataProperty property = CreateComputedProperty(propertyName, resourceContext);
+                    if (property != null)
+                    {
+                        properties.Add(property);
+                    }
+                }
+            }
+
             return properties;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataProperty"/> to be written for the given resource.
+        /// </summary>
+        /// <param name="propertyName">The computed property being written.</param>
+        /// <param name="resourceContext">The context for the resource instance being written.</param>
+        /// <returns>The <see cref="ODataProperty"/> to write.</returns>
+        public virtual ODataProperty CreateComputedProperty(string propertyName, ResourceContext resourceContext)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                throw Error.ArgumentNullOrEmpty(nameof(propertyName));
+            }
+
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceContext));
+            }
+
+            // The computed value is from the Linq expression binding.
+            object propertyValue = resourceContext.GetPropertyValue(propertyName);
+            if (propertyValue == null)
+            {
+                return new ODataProperty { Name = propertyName, Value = null };
+            }
+
+            ODataSerializerContext writeContext = resourceContext.SerializerContext;
+
+            IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(propertyValue, propertyValue.GetType());
+            if (edmTypeReference == null)
+            {
+                throw Error.NotSupported(SRResources.TypeOfDynamicPropertyNotSupported, propertyValue.GetType().FullName, propertyName);
+            }
+
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+            if (serializer == null)
+            {
+                throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmTypeReference.FullName()));
+            }
+
+            return serializer.CreateProperty(propertyValue, edmTypeReference, propertyName, writeContext);
         }
 
         /// <summary>
@@ -1092,7 +1151,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
 
-            ODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
             if (serializer == null)
             {
                 throw new SerializationException(
@@ -1322,7 +1381,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (serializerContext.Path != null)
                 {
                     // Note: The navigation source may be different from the path if the instance has redefined the context
-                    // (for example, in a flattended delta response)
+                    // (for example, in a flattened delta response)
                     if (serializerContext.NavigationSource == null || serializerContext.NavigationSource == serializerContext.Path.GetNavigationSource())
                     {
                         edmType = serializerContext.Path.GetEdmType();

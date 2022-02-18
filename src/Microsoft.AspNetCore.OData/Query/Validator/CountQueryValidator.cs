@@ -1,7 +1,13 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="CountQueryValidator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -45,15 +51,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 {
                     if (property == null)
                     {
-                        throw new InvalidOperationException(Error.Format(
-                            SRResources.NotCountableEntitySetUsedForCount,
-                            name));
+                        throw new InvalidOperationException(Error.Format(SRResources.NotCountableEntitySetUsedForCount, name));
                     }
                     else
                     {
-                        throw new InvalidOperationException(Error.Format(
-                            SRResources.NotCountablePropertyUsedForCount,
-                            name));
+                        throw new InvalidOperationException(Error.Format(SRResources.NotCountablePropertyUsedForCount, name));
                     }
                 }
             }
@@ -61,12 +63,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new CountQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<CountQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<CountQueryValidator>()
+                ?? new CountQueryValidator();
         }
     }
 }

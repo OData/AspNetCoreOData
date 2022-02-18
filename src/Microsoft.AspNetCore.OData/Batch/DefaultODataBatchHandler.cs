@@ -1,9 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultODataBatchHandler.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -97,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             }
 
             HttpRequest request = context.Request;
-            IServiceProvider requestContainer = request.CreateSubServiceProvider(PrefixName);
+            IServiceProvider requestContainer = request.CreateRouteServices(PrefixName);
             requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
             using (ODataMessageReader reader = request.GetODataMessageReader(requestContainer))
@@ -106,6 +109,8 @@ namespace Microsoft.AspNetCore.OData.Batch
                 List<ODataBatchRequestItem> requests = new List<ODataBatchRequestItem>();
                 ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
                 Guid batchId = Guid.NewGuid();
+                Dictionary<string, string> contentToLocationMapping = new Dictionary<string, string>();
+
                 while (await batchReader.ReadAsync().ConfigureAwait(false))
                 {
                     if (batchReader.State == ODataBatchReaderState.ChangesetStart)
@@ -113,17 +118,20 @@ namespace Microsoft.AspNetCore.OData.Batch
                         IList<HttpContext> changeSetContexts = await batchReader.ReadChangeSetRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
                         foreach (HttpContext changeSetContext in changeSetContexts)
                         {
-                            changeSetContext.Request.CopyBatchRequestProperties(request);
-                            changeSetContext.Request.DeleteSubRequestProvider(false);
+                            changeSetContext.Request.ClearRouteServices();
                         }
-                        requests.Add(new ChangeSetRequestItem(changeSetContexts));
+
+                        ChangeSetRequestItem requestItem = new ChangeSetRequestItem(changeSetContexts);
+                        requestItem.ContentIdToLocationMapping = contentToLocationMapping;
+                        requests.Add(requestItem);
                     }
                     else if (batchReader.State == ODataBatchReaderState.Operation)
                     {
                         HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
-                        operationContext.Request.CopyBatchRequestProperties(request);
-                        operationContext.Request.DeleteSubRequestProvider(false);
-                        requests.Add(new OperationRequestItem(operationContext));
+                        operationContext.Request.ClearRouteServices();
+                        OperationRequestItem requestItem = new OperationRequestItem(operationContext);
+                        requestItem.ContentIdToLocationMapping = contentToLocationMapping;
+                        requests.Add(requestItem);
                     }
                 }
 

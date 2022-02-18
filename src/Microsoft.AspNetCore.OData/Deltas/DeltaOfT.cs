@@ -1,13 +1,20 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DeltaOfT.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 
@@ -21,11 +28,11 @@ namespace Microsoft.AspNetCore.OData.Deltas
     public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     {
         // cache property accessors for this type and all its derived types.
-        private static ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>> _propertyCache
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>> _propertyCache
             = new ConcurrentDictionary<Type, Dictionary<string, PropertyAccessor<T>>>();
 
         private Dictionary<string, PropertyAccessor<T>> _allProperties;
-        private HashSet<string> _updatableProperties;
+        private List<string> _updatableProperties;
 
         private HashSet<string> _changedProperties;
 
@@ -35,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         private T _instance;
         private Type _structuredType;
 
-        private PropertyInfo _dynamicDictionaryPropertyinfo;
+        private readonly PropertyInfo _dynamicDictionaryPropertyinfo;
         private HashSet<string> _changedDynamicProperties;
         private IDictionary<string, object> _dynamicDictionaryCache;
 
@@ -93,16 +100,17 @@ namespace Microsoft.AspNetCore.OData.Deltas
         public override DeltaItemKind Kind => DeltaItemKind.Resource;
 
         /// <inheritdoc/>
-        public virtual Type StructuredType
-        {
-            get
-            {
-                return _structuredType;
-            }
-        }
+        public virtual Type StructuredType => _structuredType;
 
         /// <inheritdoc/>
         public virtual Type ExpectedClrType => typeof(T);
+
+        /// <summary>
+        /// The list of property names that can be updated.
+        /// </summary>
+        /// <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+        /// considered to be changed.</remarks>
+        public IList<string> UpdatableProperties => _updatableProperties;
 
         /// <inheritdoc/>
         public override void Clear()
@@ -115,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -151,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (name == null)
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -168,18 +176,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 }
             }
 
-            if (this._deltaNestedResources.ContainsKey(name))
+            if (TryGetNestedPropertyValue(name, out value))
             {
-                // If this is a nested resource, get the value from the dictionary of nested resources.
-                object deltaNestedResource = _deltaNestedResources[name];
-
-                Contract.Assert(deltaNestedResource != null, "deltaNestedResource != null");
-                Contract.Assert(DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType()));
-
-                // Get the Delta<{NestedResourceType}>._instance using Reflection.
-                FieldInfo field = deltaNestedResource.GetType().GetField("_instance", BindingFlags.NonPublic | BindingFlags.Instance);
-                Contract.Assert(field != null, "field != null");
-                value = field.GetValue(deltaNestedResource);
                 return true;
             }
             else
@@ -197,12 +195,48 @@ namespace Microsoft.AspNetCore.OData.Deltas
             return false;
         }
 
+        /// <summary>
+        /// Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+        /// <remarks>
+        /// Only properties that exist on Entity can be retrieved.
+        /// Only modified nested properties can be retrieved.
+        /// The nested Property type will be <see cref="IDelta"/> of its defined type.
+        /// </remarks>
+        /// </summary>
+        /// <param name="name">The name of the nested Property</param>
+        /// <param name="value">The value of the nested Property</param>
+        /// <returns><c>True</c> if the Property was found and is a nested Property</returns>
+        internal bool TryGetNestedPropertyValue(string name, out object value)
+        {
+            if (name == null)
+            {
+                throw Error.ArgumentNull(nameof(name));
+            }
+
+            if (!_deltaNestedResources.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            // This is a nested resource, the value returned must be an IDelta<T>
+            // from the dictionary of nested resources to allow the traversal of
+            // hierarchies of Delta<T>.
+            object deltaNestedResource = _deltaNestedResources[name];
+
+            Contract.Assert(deltaNestedResource != null, "deltaNestedResource != null");
+            Contract.Assert(DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType()));
+
+            value = deltaNestedResource;
+            return true;
+        }
+
         /// <inheritdoc/>
         public override bool TryGetPropertyType(string name, out Type type)
         {
             if (name == null)
             {
-                throw Error.ArgumentNull("name");
+                throw Error.ArgumentNull(nameof(name));
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -255,7 +289,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public override IEnumerable<string> GetChangedPropertyNames()
         {
-            return _changedProperties.Concat(_deltaNestedResources.Keys);
+            return _changedProperties.Intersect(_updatableProperties).Concat(_deltaNestedResources.Keys);
         }
 
         /// <summary>
@@ -265,7 +299,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// </summary>
         public override IEnumerable<string> GetUnchangedPropertyNames()
         {
-            return _updatableProperties.Except(GetChangedPropertyNames());
+            // UpdatableProperties could include arbitrary strings, filter by _allProperties
+            return _updatableProperties.Intersect(_allProperties.Keys).Except(GetChangedPropertyNames());
         }
 
         /// <summary>
@@ -277,21 +312,21 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (original == null)
             {
-                throw Error.ArgumentNull("original");
+                throw Error.ArgumentNull(nameof(original));
             }
 
             // Delta parameter type cannot be derived type of original
             // to prevent unrecognizable information from being applied to original resource.
             if (!_structuredType.IsAssignableFrom(original.GetType()))
             {
-                throw Error.Argument("original", SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
+                throw Error.Argument(nameof(original), SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
             }
 
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
             // For regular non-structural properties at current level.
             PropertyAccessor<T>[] propertiesToCopy =
-                this._changedProperties.Select(s => _allProperties[s]).ToArray();
+                _changedProperties.Intersect(_updatableProperties).Select(s => _allProperties[s]).ToArray();
             foreach (PropertyAccessor<T> propertyToCopy in propertiesToCopy)
             {
                 propertyToCopy.Copy(_instance, original);
@@ -342,12 +377,12 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (original == null)
             {
-                throw Error.ArgumentNull("original");
+                throw Error.ArgumentNull(nameof(original));
             }
 
             if (!_structuredType.IsInstanceOfType(original))
             {
-                throw Error.Argument("original", SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
+                throw Error.Argument(nameof(original), SRResources.DeltaTypeMismatch, _structuredType, original.GetType());
             }
 
             IEnumerable<PropertyAccessor<T>> propertiesToCopy = GetUnchangedPropertyNames().Select(s => _allProperties[s]);
@@ -415,15 +450,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         private static IDictionary<string, object> GetDynamicPropertyDictionary(PropertyInfo propertyInfo,
             T entity, bool create)
         {
-            if (propertyInfo == null)
-            {
-                throw Error.ArgumentNull("propertyInfo");
-            }
-
-            if (entity == null)
-            {
-                throw Error.ArgumentNull("entity");
-            }
+            Contract.Assert(propertyInfo != null);
+            Contract.Assert(entity != null);
 
             object propertyValue = propertyInfo.GetValue(entity);
             if (propertyValue != null)
@@ -472,7 +500,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             if (structuralType == null)
             {
-                throw Error.ArgumentNull("structuralType");
+                throw Error.ArgumentNull(nameof(structuralType));
             }
 
             if (!typeof(T).IsAssignableFrom(structuralType))
@@ -495,24 +523,45 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 _structuredType,
                 (backingType) => backingType
                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                    .Where(p => (p.GetSetMethod() != null || TypeHelper.IsCollection(p.PropertyType)) && p.GetGetMethod() != null)
+                    .Where(p => !IsIgnoredProperty(backingType.GetCustomAttributes(typeof(DataContractAttribute), inherit: true).Any(), p) && (p.GetSetMethod() != null || TypeHelper.IsCollection(p.PropertyType)) && p.GetGetMethod() != null)
                     .Select<PropertyInfo, PropertyAccessor<T>>(p => new FastPropertyAccessor<T>(p))
                     .ToDictionary(p => p.Property.Name));
 
             if (updatableProperties != null)
             {
-                _updatableProperties = new HashSet<string>(updatableProperties);
-                _updatableProperties.IntersectWith(_allProperties.Keys);
+                _updatableProperties = updatableProperties.Intersect(_allProperties.Keys).ToList();
             }
             else
             {
-                _updatableProperties = new HashSet<string>(_allProperties.Keys);
+                _updatableProperties = new List<string>(_allProperties.Keys);
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
             {
                 _updatableProperties.Remove(_dynamicDictionaryPropertyinfo.Name);
             }
+        }
+
+        private static bool IsIgnoredProperty(bool isTypeDataContract, PropertyInfo propertyInfo)
+        {
+            //This is for Ignoring the property that matches below criteria
+            //1. Its marked as NotMapped
+            //2. Its a datacontract type but property is not marked as datamember
+            //3. Its marked with IgnoreDataMember (but not where types datacontract and property marked with datamember)
+
+            bool hasNotMappedAttr = propertyInfo.GetCustomAttributes(typeof(NotMappedAttribute), inherit: true).Any();
+
+            if (hasNotMappedAttr)
+            {
+                return true;
+            }
+
+            if (isTypeDataContract)
+            {
+                return !propertyInfo.GetCustomAttributes(typeof(DataMemberAttribute), inherit: true).Any();
+            }
+
+            return propertyInfo.GetCustomAttributes(typeof(IgnoreDataMemberAttribute), inherit: true).Any();
         }
 
         // Copy changed dynamic properties and leave the unchanged dynamic properties
@@ -616,12 +665,9 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private bool TrySetPropertyValueInternal(string name, object value)
         {
-            if (name == null)
-            {
-                throw Error.ArgumentNull("name");
-            }
+            Debug.Assert(name != null, "Argument name is null");
 
-            if (!_updatableProperties.Contains(name))
+            if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
                 return false;
             }
@@ -646,12 +692,9 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private bool TrySetNestedResourceInternal(string name, object deltaNestedResource)
         {
-            if (name == null)
-            {
-                throw Error.ArgumentNull("name");
-            }
+            Debug.Assert(name != null, "Argument name is null");
 
-            if (!_updatableProperties.Contains(name))
+            if (!(_allProperties.ContainsKey(name) && _updatableProperties.Contains(name)))
             {
                 return false;
             }

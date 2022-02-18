@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataMvcCoreBuilderExtensionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -76,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            Assert.Empty(odataOptions.Models);
+            Assert.Empty(odataOptions.RouteComponents);
         }
 
         [Fact]
@@ -93,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             IEdmModel coreModel = EdmCoreModel.Instance;
 
             // Act
-            builder.AddOData(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            builder.AddOData(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
             IServiceProvider provider = services.BuildServiceProvider();
 
             // Assert
@@ -101,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            var model = Assert.Single(odataOptions.Models);
+            var model = Assert.Single(odataOptions.RouteComponents);
             Assert.Equal("odata", model.Key);
             Assert.Same(coreModel, model.Value.Item1);
             Assert.NotNull(model.Value.Item2);
@@ -125,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             builder.AddOData((options, serviceProvider) =>
             {
                 var edmModel = serviceProvider.GetRequiredService<IEdmModel>();
-                options.AddModel("odata", edmModel);
+                options.AddRouteComponents("odata", edmModel);
             });
 
             IServiceProvider provider = services.BuildServiceProvider();
@@ -135,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests
             Assert.NotNull(options);
 
             ODataOptions odataOptions = options.Value;
-            var model = Assert.Single(odataOptions.Models);
+            var model = Assert.Single(odataOptions.RouteComponents);
             Assert.Equal("odata", model.Key);
             Assert.Same(coreModel, model.Value.Item1);
             Assert.NotNull(model.Value.Item2);

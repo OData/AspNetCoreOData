@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmModelAnnotationExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -23,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// Gets the Org.OData.Core.V1.AcceptableMediaTypes
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="target">The vocabulary annotatable target.</param>
+        /// <param name="target">The vocabulary annotate target.</param>
         /// <returns>null or the collection of media type.</returns>
         internal static IList<string> GetAcceptableMediaTypes(this IEdmModel model, IEdmVocabularyAnnotatable target)
         {
@@ -136,12 +140,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (enumType == null)
             {
-                throw new ArgumentNullException(nameof(enumType));
+                throw Error.ArgumentNull(nameof(enumType));
             }
 
             ClrEnumMemberAnnotation annotation = edmModel.GetAnnotationValue<ClrEnumMemberAnnotation>(enumType);
@@ -163,12 +167,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (edmProperty == null)
             {
-                throw new ArgumentNullException(nameof(edmProperty));
+                throw Error.ArgumentNull(nameof(edmProperty));
             }
 
             string propertyName = edmProperty.Name;
@@ -195,12 +199,12 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (edmModel == null)
             {
-                throw new ArgumentNullException(nameof(edmModel));
+                throw Error.ArgumentNull(nameof(edmModel));
             }
 
             if (edmType == null)
             {
-                throw new ArgumentNullException(nameof(edmType));
+                throw Error.ArgumentNull(nameof(edmType));
             }
 
             DynamicPropertyDictionaryAnnotation annotation =
@@ -222,7 +226,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
             ModelNameAnnotation annotation =
@@ -232,23 +236,71 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return annotation.ModelName;
             }
 
-            return SetModelName(model);
+            string name = Guid.NewGuid().ToString();
+            SetModelName(model, name);
+            return name;
         }
 
         /// <summary>
         /// Sets the Edm model name.
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        public static string SetModelName(this IEdmModel model)
+        /// <param name="name">The Edm model name.</param>
+        public static void SetModelName(this IEdmModel model, string name)
         {
             if (model == null)
             {
-                throw new ArgumentNullException(nameof(model));
+                throw Error.ArgumentNull(nameof(model));
             }
 
-            string name = Guid.NewGuid().ToString();
+            if (name == null)
+            {
+                throw Error.ArgumentNull(nameof(name));
+            }
+
             model.SetAnnotationValue(model, new ModelNameAnnotation(name));
-            return name;
+        }
+
+        /// <summary>
+        /// Gets the OData type mapping provider from the model.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <returns>The <see cref="IODataTypeMapper"/>.</returns>
+        public static IODataTypeMapper GetTypeMapper(this IEdmModel model)
+        {
+            // use the default one if no model or no mapper registered.
+            if (model == null)
+            {
+                return DefaultODataTypeMapper.Default;
+            }
+
+            IODataTypeMapper provider = model.GetAnnotationValue<IODataTypeMapper>(model);
+            if (provider == null)
+            {
+                return DefaultODataTypeMapper.Default;
+            }
+
+            return provider;
+        }
+
+        /// <summary>
+        /// Sets the OData type mapping provider to the model.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="mapper">The given mapper.</param>
+        public static void SetTypeMapper(this IEdmModel model, IODataTypeMapper mapper)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (mapper == null)
+            {
+                throw Error.ArgumentNull(nameof(mapper));
+            }
+
+            model.SetAnnotationValue(model, mapper);
         }
 
         /// <summary>
@@ -278,7 +330,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 model.TryGetAlternateKeys(entityType, coreAlternateTerm, out alternateCoreKeys);
             }
 
-            // for back compability, let's support the community.alternatekey
+            // for back compatibility, let's support the community.alternatekey
             IEnumerable<IDictionary<string, IEdmPathExpression>> alternateKeys = null;
             IEdmTerm communityAlternateTerm = AlternateKeysVocabularyModel.Instance.FindDeclaredTerm("OData.Community.Keys.V1.AlternateKeys");
             if (communityAlternateTerm != null)

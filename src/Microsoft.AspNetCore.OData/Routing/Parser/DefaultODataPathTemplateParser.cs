@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultODataPathTemplateParser.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Diagnostics.Contracts;
@@ -47,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
                 EnableCaseInsensitive = true
             };
 
-            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parenthese and key as segment.
+            uriParser.UrlKeyDelimiter = ODataUrlKeyDelimiter.Slash; // support key in parentheses and key as segment.
 
             ODataPath path = uriParser.ParsePath();
 
@@ -60,6 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
             {
                 throw Error.ArgumentNull(nameof(path));
             }
+
             Contract.Assert(model != null);
 
             ODataPathSegmentToTemplateHandler handler = new ODataPathSegmentToTemplateHandler(model);

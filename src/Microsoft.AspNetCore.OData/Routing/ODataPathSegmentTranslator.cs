@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataPathSegmentTranslator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using Microsoft.OData.UriParser;
@@ -23,12 +27,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (node == null)
             {
-                throw Error.ArgumentNull("node");
+                throw Error.ArgumentNull(nameof(node));
             }
 
             if (parameterAliasNodes == null)
             {
-                throw Error.ArgumentNull("parameterAliasNodes");
+                throw Error.ArgumentNull(nameof(parameterAliasNodes));
             }
 
             ParameterAliasNode parameterAliasNode = node as ParameterAliasNode;

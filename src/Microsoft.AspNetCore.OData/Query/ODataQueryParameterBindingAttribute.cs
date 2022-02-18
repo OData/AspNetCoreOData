@@ -1,8 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataQueryParameterBindingAttribute.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -50,7 +53,6 @@ namespace Microsoft.AspNetCore.OData.Query
             private static MethodInfo _createODataQueryOptions = typeof(ODataQueryParameterBinding).GetMethod("CreateODataQueryOptions");
             private const string CreateODataQueryOptionsCtorKey = "MS_CreateODataQueryOptionsOfT";
 
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We don't want to fail in model binding.")]
             public Task BindModelAsync(ModelBindingContext bindingContext)
             {
                 if (bindingContext == null)
@@ -59,14 +61,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 HttpRequest request = bindingContext.HttpContext.Request;
-
                 if (request == null)
                 {
-                    throw Error.Argument("actionContext", SRResources.ActionContextMustHaveRequest);
+                    throw Error.Argument("bindingContext", SRResources.ModelBindingContextMustHaveRequest);
                 }
 
                 ActionDescriptor actionDescriptor = bindingContext.ActionContext.ActionDescriptor;
-
                 if (actionDescriptor == null)
                 {
                     throw Error.Argument("actionContext", SRResources.ActionContextMustHaveDescriptor);
@@ -127,6 +127,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     return false;
                 }
+
                 return ((parameterType == typeof(ODataQueryOptions)) ||
                         (parameterType.IsGenericType &&
                          parameterType.GetGenericTypeDefinition() == typeof(ODataQueryOptions<>)));
@@ -144,10 +145,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
                 if (controllerActionDescriptor == null)
                 {
-                    throw Error.InvalidOperation(
-                                    SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull,
-                                    actionDescriptor.DisplayName,
-                                    actionDescriptor.ToString());
+                    throw Error.InvalidOperation(SRResources.ActionDescriptorNotControllerActionDescriptor);
                 }
 
                 if (controllerActionDescriptor.MethodInfo.ReturnType == null)

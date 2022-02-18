@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ETagsOtherTypesTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             IEdmModel edmModel1 = GetDoubleETagEdmModel();
             IEdmModel edmModel2 = GetShortETagEdmModel();
             services.ConfigureControllers(typeof(ETagsCustomersController));
-            services.AddControllers().AddOData(opt => opt.Select().AddModel("double", edmModel1).AddModel("short", edmModel2));
+            services.AddControllers().AddOData(opt => opt.Select().AddRouteComponents("double", edmModel1).AddRouteComponents("short", edmModel2));
         }
 
         private static IEdmModel GetDoubleETagEdmModel()

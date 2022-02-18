@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataResourceDeserializer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -33,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// Initializes a new instance of the <see cref="ODataResourceDeserializer"/> class.
         /// </summary>
         /// <param name="deserializerProvider">The deserializer provider to use to read inner objects.</param>
-        public ODataResourceDeserializer(ODataDeserializerProvider deserializerProvider)
+        public ODataResourceDeserializer(IODataDeserializerProvider deserializerProvider)
             : base(ODataPayloadKind.Resource, deserializerProvider)
         {
         }
@@ -142,7 +146,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(readContext));
             }
 
-            if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) && structuredType.FullName() != resourceWrapper.Resource.TypeName)
+            if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) &&
+                structuredType.FullName() != resourceWrapper.Resource.TypeName &&
+                resourceWrapper.Resource.TypeName != "Edm.Untyped")
             {
                 // received a derived type in a base type deserializer. delegate it to the appropriate derived type deserializer.
                 IEdmModel model = readContext.Model;
@@ -175,7 +181,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     actualStructuredType = new EdmComplexTypeReference(actualType as IEdmComplexType, isNullable: false);
                 }
 
-                ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(actualStructuredType);
+                IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(actualStructuredType);
                 if (deserializer == null)
                 {
                     throw new SerializationException(
@@ -276,7 +282,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
-        /// Deserializes the delete infromation from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// Deserializes the delete information from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
         /// <param name="resource">The object into which the nested properties should be read.</param>
         /// <param name="resourceWrapper">The resource object containing the nested properties.</param>
@@ -356,7 +362,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(resourceInfoWrapper));
             }
 
-            IEdmProperty edmProperty = structuredType.FindProperty(resourceInfoWrapper.NestedResourceInfo.Name);
+            // ODL has "FindProperty" method to find property using property name case-sensitive.
+            // We use "ResolveProperty" method to support case-insensitive
+            IEdmProperty edmProperty = structuredType.StructuredDefinition().ResolveProperty(resourceInfoWrapper.NestedResourceInfo.Name);
             if (edmProperty == null)
             {
                 if (!structuredType.IsOpen())
@@ -562,7 +570,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return null;
             }
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
             if (deserializer == null)
             {
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
@@ -635,7 +643,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEdmTypeReference edmTypeReference = elementType.ToEdmTypeReference(true);
             EdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(edmTypeReference));
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(collectionType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(collectionType);
             if (deserializer == null)
             {
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, collectionType.FullName()));
@@ -662,7 +670,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(edmType != null);
             Contract.Assert(readContext != null);
 
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
             if (deserializer == null)
             {
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
@@ -706,7 +714,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(readContext != null);
 
             IEdmTypeReference edmType = nestedProperty.Type;
-            ODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType, true);
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType, true);
             if (deserializer == null)
             {
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
@@ -876,7 +884,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 DefaultODataPathParser pathParser = new DefaultODataPathParser();
 
                 IList<ODataProperty> properties = null;
-                var path = pathParser.Parse(model, serviceRootUri, id, request.GetSubServiceProvider());
+                var path = pathParser.Parse(model, serviceRootUri, id, request.GetRouteServices());
                 KeySegment keySegment = path.OfType<KeySegment>().LastOrDefault();
                 if (keySegment != null)
                 {

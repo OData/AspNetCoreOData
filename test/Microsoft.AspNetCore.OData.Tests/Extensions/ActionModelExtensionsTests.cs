@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ActionModelExtensionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange & Act & Assert
             ActionModel action = null;
-            ExceptionAssert.ThrowsArgumentNull(() => action.IsNonODataAction(), "action");
+            ExceptionAssert.ThrowsArgumentNull(() => action.IsODataIgnored(), "action");
         }
 
         [Theory]
@@ -34,12 +38,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             List<object> attributes = new List<object>();
             if (expected)
             {
-                attributes.Add(new NonODataActionAttribute());
+                attributes.Add(new ODataIgnoredAttribute());
             }
             ActionModel action = new ActionModel(_methodInfo, attributes);
 
             // Act
-            bool actual = action.IsNonODataAction();
+            bool actual = action.IsODataIgnored();
 
             // Assert
             Assert.Equal(expected, actual);

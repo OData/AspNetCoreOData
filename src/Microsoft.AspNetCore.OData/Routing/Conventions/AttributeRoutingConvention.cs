@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="AttributeRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -18,9 +22,9 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
-    /// The convention for an odata template string.
-    /// It looks for the <see cref="RouteAttribute"/> on controller
-    /// and <see cref="RouteAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
+    /// The convention for an OData template string.
+    /// It looks for the <see cref="ODataAttributeRoutingAttribute"/> on controller
+    /// and <see cref="ODataAttributeRoutingAttribute"/> or other Http Verb attribute, for example <see cref="HttpGetAttribute"/> on action.
     /// </summary>
     public class AttributeRoutingConvention : IODataControllerActionConvention
     {
@@ -60,8 +64,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             ControllerModel controllerModel = context.Controller;
             ActionModel actionModel = context.Action;
 
-            bool isODataController = controllerModel.Attributes.Any(a => a is ODataRoutingAttribute);
-            bool isODataAction = actionModel.Attributes.Any(a => a is ODataRoutingAttribute);
+            bool isODataController = controllerModel.Attributes.Any(a => a is ODataAttributeRoutingAttribute);
+            bool isODataAction = actionModel.Attributes.Any(a => a is ODataAttributeRoutingAttribute);
 
             // At least one of controller or action has "ODataRoutingAttribute"
             // The best way is to derive your controller from ODataController.
@@ -71,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // TODO: Which one is better? input from context or inject from constructor?
-            IEnumerable<string> prefixes = context.Options.Models.Keys;
+            IEnumerable<string> prefixes = context.Options.RouteComponents.Keys;
 
             // Loop through all attribute routes defined on the controller.
             var controllerSelectors = controllerModel.Selectors.Where(sm => sm.AttributeRouteModel != null).ToList();
@@ -81,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 controllerSelectors.Add(null);
             }
 
-            // In order to avoiding pollute the action selectors, we use a Dictionary to save the intermediate results.
+            // In order to avoiding polluting the action selectors, we use a Dictionary to save the intermediate results.
             IDictionary<SelectorModel, IList<SelectorModel>> updatedSelectors = new Dictionary<SelectorModel, IList<SelectorModel>>();
             foreach (var actionSelector in actionModel.Selectors)
             {
@@ -134,8 +138,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return;
             }
 
-            IEdmModel model = context.Options.Models[prefix].Item1;
-            IServiceProvider sp = context.Options.Models[prefix].Item2;
+            IEdmModel model = context.Options.RouteComponents[prefix].EdmModel;
+            IServiceProvider sp = context.Options.RouteComponents[prefix].ServiceProvider;
 
             SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
                         attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);
@@ -158,7 +162,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         {
             try
             {
-                // Do the uri parser, it will throw exception if the route template is not a OData path.
+                // Due the uri parser, it will throw exception if the route template is not a OData path.
                 ODataPathTemplate pathTemplate = _templateParser.Parse(model, routeTemplate, sp);
                 if (pathTemplate != null)
                 {
@@ -248,7 +252,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // So, #1 matches the "odata" prefix route
             //     #2 matches the non-odata prefix route
             // Since #1 and #2 can be considered starting with "",
-            // In order to avoiding ambugious, let's compare non-empty route prefix first,
+            // In order to avoiding ambiguous, let's compare non-empty route prefix first,
             // If no match, then compare empty route prefix.
             string emptyPrefix = null;
             foreach (var prefix in prefixes)

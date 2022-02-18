@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EnableQueryAttribute.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -16,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -55,10 +60,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 QueryValidationRunBeforeActionExecution = false,
             };
 
-            actionExecutingContext.HttpContext.Items.Add(nameof(RequestQueryData), requestQueryData);
+            actionExecutingContext.HttpContext.Items.TryAdd(nameof(RequestQueryData), requestQueryData);
 
             HttpRequest request = actionExecutingContext.HttpContext.Request;
             ODataPath path = request.ODataFeature().Path;
+
+            _querySettings.TimeZone = request.GetTimeZoneInfo();
 
             ODataQueryContext queryContext;
 
@@ -84,9 +91,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     return;
                 }
 
-                Type clrType = edmModel.GetTypeMappingCache().GetClrType(
-                    elementType.ToEdmTypeReference(isNullable: false),
-                    edmModel);
+                Type clrType = edmModel.GetClrType(elementType.ToEdmTypeReference(isNullable: false));
 
                 // CLRType can be missing if untyped registrations were made.
                 if (clrType != null)
@@ -124,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     returnType = returnType.GetGenericArguments().First();
                 }
 
-                // For NetCore2.2+ new type ActionResult<> was created which encapculates IActionResult and T result.
+                // For NetCore2.2+ new type ActionResult<> was created which encapsulates IActionResult and T result.
                 if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
                 {
                     returnType = returnType.GetGenericArguments().First();
@@ -222,8 +227,8 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 // actionExecutedContext.Result might also indicate a status code that has not yet
                 // been applied to the result; make sure it's also successful.
-                StatusCodeResult statusCodeResult = actionExecutedContext.Result as StatusCodeResult;
-                if (statusCodeResult == null || IsSuccessStatusCode(statusCodeResult.StatusCode))
+                IStatusCodeActionResult statusCodeResult = actionExecutedContext.Result as IStatusCodeActionResult;
+                if (statusCodeResult?.StatusCode == null || IsSuccessStatusCode(statusCodeResult.StatusCode.Value))
                 {
                     ObjectResult responseContent = actionExecutedContext.Result as ObjectResult;
                     if (responseContent != null)
@@ -362,9 +367,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 return;
             }
 
-            ModelBoundQuerySettings querySettings = EdmHelpers.GetModelBoundQuerySettings(queryContext.TargetProperty,
-                queryContext.TargetStructuredType,
-                queryContext.Model);
+            ModelBoundQuerySettings querySettings = queryContext.Model.GetModelBoundQuerySettings(queryContext.TargetProperty,
+                queryContext.TargetStructuredType);
             if (querySettings != null && querySettings.PageSize.HasValue)
             {
                 _querySettings.ModelBoundPageSize = querySettings.PageSize;
@@ -680,12 +684,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (queryOptions == null)
             {
-                throw Error.ArgumentNull("queryOptions");
+                throw Error.ArgumentNull(nameof(queryOptions));
             }
 
             IQueryCollection queryParameters = request.Query;
@@ -696,7 +700,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     // we don't support any custom query options that start with $
                     // this should be caught be OnActionExecuted().
-                    throw new ArgumentOutOfRangeException(kvp.Key);
+                    throw new ODataException(Error.Format(SRResources.CustomQueryOptionNotSupportedWithDollarSign, kvp.Key));
                 }
             }
 
@@ -704,18 +708,15 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Determine if the query containes auto select expand property.
+        /// Determine if the query contains auto select and expand property.
         /// </summary>
         /// <param name="responseValue">The response value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-        /// <param name="request">The OData path.</param>
-        /// <returns></returns>
-        private static bool ContainsAutoSelectExpandProperty(
-            object responseValue,
-            IQueryable singleResultCollection,
-            ControllerActionDescriptor actionDescriptor,
-            HttpRequest request)
+        /// <param name="request">The Http request.</param>
+        /// <returns>true/false</returns>
+        private static bool ContainsAutoSelectExpandProperty(object responseValue, IQueryable singleResultCollection,
+            ControllerActionDescriptor actionDescriptor, HttpRequest request)
         {
             Type elementClrType = GetElementType(responseValue, singleResultCollection, actionDescriptor);
 
@@ -724,65 +725,26 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 throw Error.InvalidOperation(SRResources.QueryGetModelMustNotReturnNull);
             }
-            ODataPath path = request.ODataFeature().Path;
-            IEdmType edmType = model.GetTypeMappingCache().GetEdmType(elementClrType, model)?.Definition;
-            IEdmEntityType baseEntityType = edmType as IEdmEntityType;
+            IEdmType edmType = model.GetEdmTypeReference(elementClrType)?.Definition;
+
             IEdmStructuredType structuredType = edmType as IEdmStructuredType;
-            IEdmProperty property = null;
+            ODataPath path = request.ODataFeature().Path;
+
+            IEdmProperty pathProperty = null;
+            IEdmStructuredType pathStructuredType = null;
             if (path != null)
             {
-                string name;
-                EdmHelpers.GetPropertyAndStructuredTypeFromPath(path, out property, out structuredType, out name);
+                (pathProperty, pathStructuredType, _) = path.GetPropertyAndStructuredTypeFromPath();
             }
 
-            if (baseEntityType != null)
+            // Take the type and property from path first, it's higher priority than the value type.
+            if (pathStructuredType != null && pathProperty != null)
             {
-                List<IEdmEntityType> entityTypes = new List<IEdmEntityType>();
-                entityTypes.Add(baseEntityType);
-                entityTypes.AddRange(EdmHelpers.GetAllDerivedEntityTypes(baseEntityType, model));
-                foreach (var entityType in entityTypes)
-                {
-                    IEnumerable<IEdmNavigationProperty> navigationProperties = entityType == baseEntityType
-                        ? entityType.NavigationProperties()
-                        : entityType.DeclaredNavigationProperties();
-                    if (navigationProperties != null)
-                    {
-                        if (navigationProperties.Any(
-                                navigationProperty =>
-                                    EdmHelpers.IsAutoExpand(navigationProperty, property, entityType, model)))
-                        {
-                            return true;
-                        }
-                    }
-
-                    IEnumerable<IEdmStructuralProperty> properties = entityType == baseEntityType
-                        ? entityType.StructuralProperties()
-                        : entityType.DeclaredStructuralProperties();
-                    if (properties != null)
-                    {
-                        foreach (var edmProperty in properties)
-                        {
-                            if (EdmHelpers.IsAutoSelect(edmProperty, property, entityType, model))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
+                return model.HasAutoExpandProperty(pathStructuredType, pathProperty) || model.HasAutoSelectProperty(pathStructuredType, pathProperty);
             }
             else if (structuredType != null)
             {
-                IEnumerable<IEdmStructuralProperty> properties = structuredType.StructuralProperties();
-                if (properties != null)
-                {
-                    foreach (var edmProperty in properties)
-                    {
-                        if (EdmHelpers.IsAutoSelect(edmProperty, property, structuredType, model))
-                        {
-                            return true;
-                        }
-                    }
-                }
+                return model.HasAutoExpandProperty(structuredType, null) || model.HasAutoSelectProperty(structuredType, null);
             }
 
             return false;

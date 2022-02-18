@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FunctionImportSegmentTemplateTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -138,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             // Act & Assert
             templates = functionImportSegment.GetTemplates(new ODataRouteOptions
             {
-                EnableNonParenthsisForEmptyParameterFunction = true
+                EnableNonParenthesisForEmptyParameterFunction = true
             });
             template = Assert.Single(templates);
             Assert.Equal("/MyFunctionImport", template);

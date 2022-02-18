@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EntitySetRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// GET ~/entityset/cast/$count
     /// POST ~/entityset
     /// POST ~/entityset/cast
-    /// PATCH ~/entityset   ==> Delta resource set patch
+    /// PATCH ~/entityset ==> Delta resource set patch
     /// </summary>
     public class EntitySetRoutingConvention : IODataControllerActionConvention
     {
@@ -51,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmEntityType entityType = entitySet.EntityType();
 
             // if the action has key parameter, skip it.
-            if (action.HasODataKeyParameter(entityType))
+            if (action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
             {
                 return false;
             }
@@ -64,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return true;
             }
 
-            // 2. process the derive type (cast) by searching all derived types
+            // 2. process the derived type (cast) by searching all derived types
             // GetFrom{EntityTypeName} or Get{EntitySet}From{EntityTypeName}
             int index = actionName.IndexOf("From", StringComparison.Ordinal);
             if (index == -1)
@@ -73,6 +77,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string castTypeName = actionName.Substring(index + 4); // + 4 means to skip the "From"
+
+            if (castTypeName.Length == 0)
+            {
+                // Early return for the following cases:
+                // - Get|Post|PatchFrom
+                // - Get|Patch{EntitySet}From
+                // - Post{EntityType}From
+                return false;
+            }
+
             IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
             if (castType == null)
             {
@@ -101,10 +115,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
+
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
@@ -113,10 +129,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
+
                 segments.Add(CountSegmentTemplate.Instance);
 
                 template = new ODataPathTemplate(segments);
@@ -130,6 +148,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 {
                     new EntitySetSegmentTemplate(entitySet)
                 };
+
                 if (castType != null)
                 {
                     IEdmCollectionType castCollectionType = castType.ToCollection(true);

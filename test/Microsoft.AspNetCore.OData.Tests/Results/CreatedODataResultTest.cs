@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="CreatedODataResultTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Net;
@@ -123,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             // Arrange
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();
             ODataPath path = new ODataPath(new EntitySetSegment(model.Customers));
-            var request = RequestFactory.Create(opt => opt.AddModel(model.Model));
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents(model.Model));
             request.Configure("", model.Model, path);
             var createdODataResult = GetCreatedODataResult<TestEntity>(_entity, request);
 
@@ -181,7 +185,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
                 new Uri("http://localhost/"),
                 new Uri("MyOrders(1)/OrderLines", UriKind.Relative)).ParsePath();
 
-            var request = RequestFactory.Create(opt => opt.AddModel(model.Model));
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents(model.Model));
             request.Configure("", model.Model, path);
             var orderLine = new OrderLine { ID = 2 };
             var createdODataResult = GetCreatedODataResult<OrderLine>(orderLine, request);

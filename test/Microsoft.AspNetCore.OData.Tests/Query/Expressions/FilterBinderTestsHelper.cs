@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="FilterBinderTestsHelper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq.Expressions;
@@ -36,9 +40,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 throw Error.ArgumentNull(nameof(assembliesResolver));
             }
 
-            FilterBinder binder = new FilterBinder(querySettings, assembliesResolver, model, filterType);
+            IFilterBinder binder = new FilterBinder();
 
-            return FilterBinder.BindFilterClause(binder, filterClause, filterType);
+            QueryBinderContext context = new QueryBinderContext(model, querySettings, filterType)
+            {
+                AssembliesResolver = assembliesResolver,
+            };
+
+            return binder.BindFilter(filterClause, context);
         }
     }
 

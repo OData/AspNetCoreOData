@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="Startup.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +18,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.OData;
 using ODataRoutingSample.Models;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using System.Reflection;
+using System.Linq;
 
 namespace ODataRoutingSample
 {
@@ -29,6 +36,7 @@ namespace ODataRoutingSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Codes for backup and use to compare with preview design/implementation
             //services.AddControllers(options => {
             //{
             //    options.Conventions.Add(new MetadataApplicationModelConventionAttribute());
@@ -46,6 +54,7 @@ namespace ODataRoutingSample
             services.AddODataFormatter();
             services.AddODataQuery(options => options.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5));
             */
+            #endregion
 
             services.AddDbContext<MyDataContext>(opt => opt.UseLazyLoadingProxies().UseInMemoryDatabase("MyDataContextList"));
 
@@ -55,11 +64,21 @@ namespace ODataRoutingSample
             IEdmModel model3 = EdmModelBuilder.GetEdmModelV3();
 
             services.AddControllers()
+                /*  If you want to remove $metadata endpoint, you can use ControllerFeatureProvider as follows
+                .ConfigureApplicationPartManager(manager =>
+                {
+                    manager.FeatureProviders.Remove(manager.FeatureProviders.OfType<ControllerFeatureProvider>().FirstOrDefault());
+                    manager.FeatureProviders.Add(new RemoveMetadataControllerFeatureProvider());
+                })
+
+                or, remove MetadataRoutingConvention in AddOData as
+                     opt.Conventions.Remove(opt.Conventions.First(convention => convention is MetadataRoutingConvention));
+                */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                    .AddModel(model0)
-                    .AddModel("v1", model1)
-                    .AddModel("v2{data}", model2, builder => builder.AddService<ODataBatchHandler, DefaultODataBatchHandler>(Microsoft.OData.ServiceLifetime.Singleton))
-                    .AddModel("v3", model3)
+                    .AddRouteComponents(model0)
+                    .AddRouteComponents("v1", model1)
+                    .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
+                    .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())
                 );
 
@@ -94,7 +113,7 @@ namespace ODataRoutingSample
 
             app.UseRouting();
 
-            // Test middelware
+            // Test middleware
             app.Use(next => context =>
             {
                 var endpoint = context.GetEndpoint();
@@ -112,6 +131,19 @@ namespace ODataRoutingSample
             {
                 endpoints.MapControllers();
             });
+        }
+    }
+
+    public class RemoveMetadataControllerFeatureProvider : ControllerFeatureProvider
+    {
+        protected override bool IsController(TypeInfo typeInfo)
+        {
+            if (typeInfo.FullName == "Microsoft.AspNetCore.OData.Routing.Controllers.MetadataController")
+            {
+                return false;
+            }
+
+            return base.IsController(typeInfo);
         }
     }
 

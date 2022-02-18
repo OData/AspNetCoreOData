@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DefaultSkipTokenHandlerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -299,7 +303,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext queryContext = new ODataQueryContext(model, edmType, path);
             queryContext.DefaultQuerySettings.EnableSkipToken = enableSkipToken;
 
-            var request = RequestFactory.Create(opt => opt.AddModel(model));
+            var request = RequestFactory.Create(opt => opt.AddRouteComponents(model));
             ResourceContext resource = new ResourceContext();
             ODataSerializerContext context = new ODataSerializerContext(resource, edmProperty, queryContext, null)
             {

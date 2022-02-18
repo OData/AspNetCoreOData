@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBatchHttpRequestExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +19,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
@@ -186,7 +189,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             ODataVersion odataVersion = GetODataResponseVersion(request);
 
-            IServiceProvider requestContainer = request.GetSubServiceProvider();
+            IServiceProvider requestContainer = request.GetRouteServices();
             ODataMessageWriterSettings writerSettings = requestContainer.GetRequiredService<ODataMessageWriterSettings>();
             writerSettings.Version = odataVersion;
             writerSettings.MessageQuotas = messageQuotas;
@@ -293,7 +296,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             // string requestUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, request.Path);
             // use requestUri to remove the "$batch"?
 
-            request.ODataFeature().PrefixName = oDataPrefixName;
+            request.ODataFeature().RoutePrefix = oDataPrefixName;
 
             RouteValueDictionary batchRouteData = request.ODataFeature().BatchRouteData;
             if (batchRouteData != null && batchRouteData.Any())

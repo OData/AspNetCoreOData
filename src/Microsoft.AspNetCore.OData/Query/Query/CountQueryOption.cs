@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="CountQueryOption.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -148,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// Gets the Func of entities number that satisfy the given query if the response should include a count query option, or <c>null</c> otherwise.
         /// </summary>
         /// <param name="query">The query to compute the count for.</param>
-        /// <returns>The the Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
+        /// <returns>The Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
         internal Func<long> GetEntityCountFunc(IQueryable query)
         {
             if (Context.ElementClrType == null)

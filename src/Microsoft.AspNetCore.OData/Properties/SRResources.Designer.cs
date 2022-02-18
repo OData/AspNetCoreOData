@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SRResources {
@@ -70,11 +70,11 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The HttpActionContext.Request is null..
+        ///   Looks up a localized string similar to ActionDescriptor is not ControllerActionDescriptor..
         /// </summary>
-        internal static string ActionContextMustHaveRequest {
+        internal static string ActionDescriptorNotControllerActionDescriptor {
             get {
-                return ResourceManager.GetString("ActionContextMustHaveRequest", resourceCulture);
+                return ResourceManager.GetString("ActionDescriptorNotControllerActionDescriptor", resourceCulture);
             }
         }
         
@@ -448,6 +448,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Custom query option &apos;{0}&apos; that starts with &apos;$&apos; is not supported..
+        /// </summary>
+        internal static string CustomQueryOptionNotSupportedWithDollarSign {
+            get {
+                return ResourceManager.GetString("CustomQueryOptionNotSupportedWithDollarSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The actual entity type &apos;{0}&apos; is not assignable to the expected type &apos;{1}&apos;..
         /// </summary>
         internal static string DeltaEntityTypeNotAssignable {
@@ -781,7 +790,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; doesn&apos;t match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
+        ///   Looks up a localized string similar to The input key count &apos;{0}&apos; does not match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
         /// </summary>
         internal static string InputKeyNotMatchEntityTypeKey {
             get {
@@ -1020,6 +1029,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string ModelBinderUtil_ValueCannotBeEnum {
             get {
                 return ResourceManager.GetString("ModelBinderUtil_ValueCannotBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The model binding context requires an attached request in order to model binding..
+        /// </summary>
+        internal static string ModelBindingContextMustHaveRequest {
+            get {
+                return ResourceManager.GetString("ModelBindingContextMustHaveRequest", resourceCulture);
             }
         }
         
@@ -1465,7 +1483,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Property or path {0} isn&apos;t available in the current context. It was removed in earlier transformation..
+        ///   Looks up a localized string similar to Property or path {0} is not available in the current context. It was removed in earlier transformation..
         /// </summary>
         internal static string PropertyOrPathWasRemovedFromContext {
             get {
@@ -1618,6 +1636,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A dependency injection container for this request already exists..
+        /// </summary>
+        internal static string RouteServicesAlreadyExist {
+            get {
+                return ResourceManager.GetString("RouteServicesAlreadyExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The input segment should be &apos;{0}&apos; in &apos;{1}&apos;..
         /// </summary>
         internal static string SegmentShouldBeKind {
@@ -1654,6 +1681,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A navigation property expand path should have navigation property in the path..
+        /// </summary>
+        internal static string ShouldHaveNavigationPropertyInNavigationExpandPath {
+            get {
+                return ResourceManager.GetString("ShouldHaveNavigationPropertyInNavigationExpandPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
         /// </summary>
         internal static string SingleResultHasMoreThanOneEntity {
@@ -1677,15 +1713,6 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SkipTopLimitExceeded {
             get {
                 return ResourceManager.GetString("SkipTopLimitExceeded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A request container already exists on the request..
-        /// </summary>
-        internal static string SubRequestServiceProviderAlreadyExists {
-            get {
-                return ResourceManager.GetString("SubRequestServiceProviderAlreadyExists", resourceCulture);
             }
         }
         

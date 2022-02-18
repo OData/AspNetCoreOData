@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="RefRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -15,6 +19,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// An implementation of <see cref="IODataControllerActionConvention"/> that handles entity reference manipulations.
+    /// Conventions:
+    /// GET|DELETE ~/entityset/key/navigationproperty/$ref
+    /// GET|POST|PUT|DELETE ~/entityset/key/navigationproperty/key/$ref
+    /// GET|POST|PUT|DELETE ~/entityset/key/cast/navigationproperty/key/$ref
     /// </summary>
     public class RefRoutingConvention : IODataControllerActionConvention
     {
@@ -50,8 +58,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
             // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
             string method = SplitRefActionName(actionMethodName, out string httpMethod, out string property, out string declaring);
-            if (method == null)
+            if (method == null || (property != null && property.Length == 0))
             {
+                // Early return for the following cases: Get|Create|DeleteRefTo
                 return false;
             }
 
@@ -60,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // For entity set, we should have the key parameter
             // For Singleton, we should not have the key parameter
-            bool hasODataKeyParameter = action.HasODataKeyParameter(entityType);
+            bool hasODataKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if ((context.EntitySet != null && !hasODataKeyParameter) ||
                 (context.Singleton != null && hasODataKeyParameter))
             {
@@ -71,6 +80,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmStructuredType declaringType = entityType;
             if (declaring != null)
             {
+                if (declaring.Length == 0)
+                {
+                    // Early return for the following cases: Get|Create|DeleteRefTo{NavigationProperty}From
+                    return false;
+                }
+
                 declaringType = entityType.FindTypeInInheritance(context.Model, declaring);
                 if (declaringType == null)
                 {
@@ -86,10 +101,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // Find the navigation property if have
             IEdmNavigationProperty navigationProperty = null;
-            if (property != null)
-            {
-                navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
-            }
+            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
 
             if (navigationProperty == null)
             {
@@ -116,14 +128,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
 
             IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
-            bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedKey");
+            bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedKey");
             if (hasNavigationPropertyKeyParameter)
             {
                 linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
             }
             else
             {
-                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, "relatedId");
+                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedId");
                 if (hasNavigationPropertyKeyParameter)
                 {
                     linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");

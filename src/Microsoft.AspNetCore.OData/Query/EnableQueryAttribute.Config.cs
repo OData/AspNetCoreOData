@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EnableQueryAttribute.Config.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -71,9 +75,9 @@ namespace Microsoft.AspNetCore.OData.Query
 
         /// <summary>
         /// Gets or sets a value indicating whether queries with expanded navigations should be formulated
-        /// to encourage correlated subquery results to be buffered.
-        /// Buffering correlated subquery results can reduce the number of queries from N + 1 to 2
-        /// by buffering results from the subquery.
+        /// to encourage correlated sub-query results to be buffered.
+        /// Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
+        /// by buffering results from the sub-query.
         /// </summary>
         /// <value>The default value is <c>false</c>.</value>
         public bool EnableCorrelatedSubqueryBuffering

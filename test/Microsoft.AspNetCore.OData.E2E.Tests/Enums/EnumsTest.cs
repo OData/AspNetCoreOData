@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EnumsTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -31,8 +35,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                 IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                .AddModel("convention", model1)
-                .AddModel("explicit", model2));
+                .AddRouteComponents("convention", model1)
+                .AddRouteComponents("explicit", model2));
         }
 
         public EnumsTest(WebApiTestFixture<EnumsTest> fixture)

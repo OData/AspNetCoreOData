@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ComplexTypeInheritanceTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -31,8 +35,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
 
             var edmModel1 = ComplexTypeInheritanceEdmModels.GetConventionModel();
             var edmModel2 = ComplexTypeInheritanceEdmModels.GetExplicitModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("convention", edmModel1)
-                .AddModel("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("convention", edmModel1)
+                .AddRouteComponents("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         public static TheoryDataSet<string, string> MediaTypes

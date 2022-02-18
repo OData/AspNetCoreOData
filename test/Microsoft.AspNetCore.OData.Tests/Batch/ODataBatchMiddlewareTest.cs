@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataBatchMiddlewareTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Threading.Tasks;
@@ -29,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public void Ctor_NullBatchMapping_WithServiceProvider_WithoutBatchHandler()
         {
             // Arrange
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, null);
 
             // Act & Assert
@@ -40,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
         public void Ctor_NullBatchMapping_WithServiceProvider_WithBatchHandler()
         {
             // Arrange
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, new DefaultODataBatchHandler()));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, new DefaultODataBatchHandler()));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, null);
 
             // Act & Assert
@@ -89,10 +93,11 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                     return Task.CompletedTask;
                 });
 
-            IServiceProvider sp = BuildServiceProvider(opt => opt.AddModel("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
             ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
             HttpContext context = new DefaultHttpContext();
             context.Request.Path = new PathString("/odata/$batch");
+            context.Request.Method = "Post";
 
             // Act
             Assert.False(called);
@@ -102,6 +107,42 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Assert
             Assert.False(called);
             Assert.True(processed);
+        }
+
+        [Fact]
+        public async Task Invoke_CorsCallNextDelegateWithBatchHandler()
+        {
+            // Arrange
+            bool called = false;
+            RequestDelegate next = context =>
+            {
+                called = true;
+                return Task.CompletedTask;
+            };
+            Mock<ODataBatchHandler> batchHandlerMock = new Mock<ODataBatchHandler>();
+
+            bool processed = false;
+            batchHandlerMock.Setup(b => b.ProcessBatchAsync(It.IsAny<HttpContext>(), It.IsAny<RequestDelegate>()))
+                .Returns(() =>
+                {
+                    processed = true;
+                    return Task.CompletedTask;
+                });
+
+            IServiceProvider sp = BuildServiceProvider(opt => opt.AddRouteComponents("odata", EdmCoreModel.Instance, batchHandlerMock.Object));
+            ODataBatchMiddleware middleware = new ODataBatchMiddleware(sp, next.Invoke);
+            HttpContext context = new DefaultHttpContext();
+            context.Request.Path = new PathString("/odata/$batch");
+            context.Request.Method = "options";
+
+            // Act
+            Assert.False(called);
+            Assert.False(processed);
+            await middleware.Invoke(context);
+
+            // Assert
+            Assert.True(called);
+            Assert.False(processed);
         }
 
         private static IServiceProvider BuildServiceProvider(Action<ODataOptions> setupAction)

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="KeySegmentTemplate.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -24,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// Initializes a new instance of the <see cref="KeySegmentTemplate" /> class.
         /// </summary>
         /// <param name="keys">The input key mappings, the key string is case-sensitive, the value string should wrapper with { and }.</param>
-        /// <param name="entityType">The declaring type containes the key.</param>
+        /// <param name="entityType">The declaring type contains the key.</param>
         /// <param name="navigationSource">The navigation source. It could be null.</param>
         public KeySegmentTemplate(IDictionary<string, string> keys, IEdmEntityType entityType, IEdmNavigationSource navigationSource)
         {
@@ -104,8 +108,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
         /// <summary>
         /// Gets the keys.
-        /// The key of dict is the key name or alias name.
-        /// The value of dict is the key property, it could be property on entity type or sub property on complex property.
+        /// The key of dictionary is the key name or alias.
+        /// The value of dictionary is the key property, it could be property on entity type or sub property on complex property.
         /// </summary>
         public IDictionary<string, IEdmProperty> KeyProperties { get; }
 

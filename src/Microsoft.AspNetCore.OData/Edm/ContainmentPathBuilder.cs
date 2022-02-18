@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ContainmentPathBuilder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -62,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             //   -or-
             //   Single valued: singleton
             // Copy over other path segments such as: not a navigation path segment, contained navigation property,
-            // single valued navigation property with navigation source targetting an entity set (we won't have key
+            // single valued navigation property with navigation source targeting an entity set (we won't have key
             // information for that navigation property.)
             _segments.Reverse();
             NavigationPropertySegment navigationPropertySegment = null;

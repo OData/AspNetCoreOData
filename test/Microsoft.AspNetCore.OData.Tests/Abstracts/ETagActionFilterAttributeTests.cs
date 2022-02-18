@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ETagActionFilterAttributeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
@@ -84,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
             ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
             httpContext.ODataFeature().Path = new ODataPath();
             httpContext.ODataFeature().Model = new EdmModel();
-            httpContext.ODataFeature().SubServiceProvider = new ServiceCollection().BuildServiceProvider();
+            httpContext.ODataFeature().Services = new ServiceCollection().BuildServiceProvider();
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => filter.OnActionExecuted(context), "etagHandler");

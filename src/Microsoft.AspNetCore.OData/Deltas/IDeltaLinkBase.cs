@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="IDeltaLinkBase.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 
@@ -8,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
     /// <summary>
     /// <see cref="IDelta" /> allows and tracks changes to delta link.
     /// </summary>
-    public interface IDeltaLinkBase : IDeltaSetItem
+    internal interface IDeltaLinkBase : IDeltaSetItem
     {
         /// <summary>
         /// The Uri of the entity from which the relationship is defined, which may be absolute or relative.

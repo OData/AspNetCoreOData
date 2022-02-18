@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="LinkGeneratorHelpersTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -33,8 +37,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange
             string baseAddress = "http://localhost:8080/";
-            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = prefix;
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddRouteComponents(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = prefix;
 
             // Act
             string odataLink = request.CreateODataLink();
@@ -50,8 +54,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             // Arrange
             string baseAddress = "http://localhost:8080/";
-            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = prefix;
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddRouteComponents(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = prefix;
 
             // Act
             string odataLink = request.CreateODataLink(MetadataSegment.Instance);
@@ -81,8 +85,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
 
             string baseAddress = "http://localhost:8080/";
             string prefix = "odata{version}";
-            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = prefix;
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddRouteComponents(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = prefix;
             request.RouteValues = new RouteValueDictionary(new { version = value });
             request.HttpContext.RequestServices = sp; // global level SP
 
@@ -107,8 +111,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
 
             string baseAddress = "http://localhost:8080/";
             string prefix = "odata{version}";
-            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddModel(prefix, EdmCoreModel.Instance));
-            request.ODataFeature().PrefixName = prefix;
+            HttpRequest request = RequestFactory.Create("Get", baseAddress, opt => opt.AddRouteComponents(prefix, EdmCoreModel.Instance));
+            request.ODataFeature().RoutePrefix = prefix;
             request.RouteValues = new RouteValueDictionary(new { version = value });
             request.HttpContext.RequestServices = sp; // global level SP
 

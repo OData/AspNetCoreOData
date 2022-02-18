@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEndpointController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -124,7 +128,7 @@ namespace ODataSampleCommon
 <body>
     <h1 id=""odata"">OData Endpoint Mappings</h1>
     <p>
-        <a href=""#standard"">Got to none OData endpoint mappings</a>
+        <a href=""#standard"">Got to non-OData endpoint mappings</a>
     </p>
     <table>
         <tr>
@@ -134,7 +138,7 @@ namespace ODataSampleCommon
         </tr>
         ODATA_ROUTE_CONTENT
     </table>
-    <h1 id=""standard"">None OData Endpoint Mappings</h1>
+    <h1 id=""standard"">Non-OData Endpoint Mappings</h1>
     <p>
         <a href=""#odata"">Go to OData endpoint mappings</a>
     </p>

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ActionModelExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -26,14 +30,14 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="action">The given action model.</param>
         /// <returns>True/False.</returns>
-        public static bool IsNonODataAction(this ActionModel action)
+        public static bool IsODataIgnored(this ActionModel action)
         {
             if (action == null)
             {
                 throw Error.ArgumentNull(nameof(action));
             }
 
-            return action.Attributes.Any(a => a is NonODataActionAttribute);
+            return action.Attributes.Any(a => a is ODataIgnoredAttribute);
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <typeparam name="T">The required attribute type.</typeparam>
         /// <param name="action">The given action model.</param>
-        /// <returns>Null or the corresponing attribute.</returns>
+        /// <returns>Null or the corresponding attribute.</returns>
         public static T GetAttribute<T>(this ActionModel action)
         {
             if (action == null)
@@ -81,9 +85,10 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// </summary>
         /// <param name="action">The action model.</param>
         /// <param name="entityType">The Edm entity type.</param>
+        /// <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
         /// <param name="keyPrefix">The key prefix for the action parameter.</param>
         /// <returns>True/false.</returns>
-        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, string keyPrefix = "key")
+        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, bool enablePropertyNameCaseInsensitive = false, string keyPrefix = "key")
         {
             if (action == null)
             {
@@ -104,13 +109,25 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
             else
             {
-                // multipe keys
+                // multiple keys
                 foreach (var key in keys)
                 {
                     string keyName = $"{keyPrefix}{key.Name}";
-                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+
+                    if (enablePropertyNameCaseInsensitive)
                     {
-                        return false;
+                        keyName = keyName.ToUpperInvariant();
+                        if (!action.Parameters.Any(p => p.ParameterInfo.Name.ToUpperInvariant() == keyName))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+                        {
+                            return false;
+                        }
                     }
                 }
 
@@ -122,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// Adds the OData selector model to the action.
         /// </summary>
         /// <param name="action">The given action model.</param>
-        /// <param name="httpMethods">The supported http methods, if mulitple, using ',' to separate.</param>
+        /// <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="path">The OData path template.</param>
@@ -154,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             // public class CustomersController : Controller
             // {}
             // let's always create new selector model for action.
-            // Since the new created selector model is absolute attribute route, tthe controller attribute route doesn't apply to this selector model.
+            // Since the new created selector model is absolute attribute route, the controller attribute route doesn't apply to this selector model.
             bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
 
             // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,

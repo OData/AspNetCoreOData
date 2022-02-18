@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataModelAttributeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -13,19 +17,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Attributes
         public void CtorODataModelAttribute_SetsModel()
         {
             // Assert & Act & Assert
-            ODataModelAttribute odataModel = new ODataModelAttribute();
-            Assert.Equal(string.Empty, odataModel.Model);
+            ODataRouteComponentAttribute odataModel = new ODataRouteComponentAttribute();
+            Assert.Equal(string.Empty, odataModel.RoutePrefix);
 
             // Assert & Act & Assert
-            odataModel = new ODataModelAttribute("odata");
-            Assert.Equal("odata", odataModel.Model);
+            odataModel = new ODataRouteComponentAttribute("odata");
+            Assert.Equal("odata", odataModel.RoutePrefix);
         }
 
         [Fact]
         public void CtorODataModelAttribute_ThrowsArgumentNull_Model()
         {
             // Assert & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ODataModelAttribute(model: null), "model");
+            ExceptionAssert.ThrowsArgumentNull(() => new ODataRouteComponentAttribute(routePrefix: null), "routePrefix");
         }
     }
 }

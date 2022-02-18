@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="HttpRequestExtensions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.ComponentModel;
@@ -23,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Batch
         /// <param name="request">The request.</param>
         /// <param name="requestContainer">The dependency injection container for the request.</param>
         /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
-        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Creates a message reader that the user manages.")]
         public static ODataMessageReader GetODataMessageReader(this HttpRequest request, IServiceProvider requestContainer)
         {
             if (request == null)
@@ -66,28 +70,6 @@ namespace Microsoft.AspNetCore.OData.Batch
                 path = remainingPath;
             }
             request.Path = path;
-        }
-
-        /// <summary>
-        /// Copies the properties from another <see cref="HttpRequest"/>.
-        /// </summary>
-        /// <param name="subRequest">The sub-request.</param>
-        /// <param name="batchRequest">The batch request that contains the properties to copy.</param>
-        /// <remarks>
-        /// Currently, this method is unused but is retained to keep a similar API surface area
-        /// between the AspNet and AspNetCore versions of OData WebApi.
-        /// </remarks>
-        public static void CopyBatchRequestProperties(this HttpRequest subRequest, HttpRequest batchRequest)
-        {
-            if (subRequest == null)
-            {
-                throw new ArgumentNullException(nameof(subRequest));
-            }
-
-            if (batchRequest == null)
-            {
-                throw new ArgumentNullException(nameof(batchRequest));
-            }
         }
     }
 }

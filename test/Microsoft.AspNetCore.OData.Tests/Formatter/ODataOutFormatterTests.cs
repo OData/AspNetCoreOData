@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOutFormatterTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -105,8 +109,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
             EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
-            HttpRequest request = RequestFactory.Create(opt => opt.AddModel("odata", model));
-            request.ODataFeature().PrefixName = "odata";
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
             request.ODataFeature().Model = model;
             request.ODataFeature().Path = new ODataPath(entitySetSeg);
 

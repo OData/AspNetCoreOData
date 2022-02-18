@@ -1,6 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ProductsController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -28,18 +33,24 @@ namespace ODataRoutingSample.Controllers
                     {
                         Category = "Goods",
                         Color = Color.Red,
+                        CreatedDate = new DateTimeOffset(2001, 4, 15, 16, 24, 8, TimeSpan.FromHours(-8)),
+                        UpdatedDate = new DateTimeOffset(2011, 2, 15, 16, 24, 8, TimeSpan.FromHours(-8)),
                         Detail = new ProductDetail { Id = "3", Info = "Zhang" },
                     },
                     new Product
                     {
                         Category = "Magazine",
                         Color = Color.Blue,
+                        CreatedDate = new DateTimeOffset(2021, 12, 27, 9, 12, 8, TimeSpan.FromHours(-8)),
+                        UpdatedDate = null,
                         Detail = new ProductDetail { Id = "4", Info = "Jinchan" },
                     },
                     new Product
                     {
                         Category = "Fiction",
                         Color = Color.Green,
+                        CreatedDate = new DateTimeOffset(1978, 11, 15, 9, 24, 8, TimeSpan.FromHours(-8)),
+                        UpdatedDate = new DateTimeOffset(1987, 2, 25, 5, 1, 8, TimeSpan.FromHours(-8)),
                         Detail = new ProductDetail { Id = "5", Info = "Hollewye" },
                     },
                 };

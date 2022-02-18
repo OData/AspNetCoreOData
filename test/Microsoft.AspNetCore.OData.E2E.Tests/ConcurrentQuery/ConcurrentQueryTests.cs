@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ConcurrentQueryTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
             services.ConfigureControllers(typeof(CustomersController));
 
             var model = ConcurrentQueryEdmModel.GetEdmModel();
-            services.AddControllers().AddOData(opt => opt.AddModel("concurrentquery", model)
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("concurrentquery", model)
                 .Count().Filter().OrderBy().Expand().SetMaxTop(null));
         }
 
@@ -69,6 +73,40 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
             foreach (var result in results)
             {
                 Assert.Equal(100 - result.i, result.length);
+            }
+        }
+
+        [Fact]
+        public async Task ConcurrentExpandQueryExecutionIsThreadSafe()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Bumping thread count to allow higher parallelization.
+            ThreadPool.SetMinThreads(100, 100);
+
+            // Act
+            var results = await Task.WhenAll(
+                Enumerable.Range(1, 100)
+                .Select(async i =>
+                {
+                    string queryUrl = $"concurrentquery/Customers?$expand=Orders";
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+                    request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                    List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+
+                    return customers.Count;
+                }));
+
+            // Assert
+            foreach (var result in results)
+            {
+                Assert.Equal(100, result);
             }
         }
     }

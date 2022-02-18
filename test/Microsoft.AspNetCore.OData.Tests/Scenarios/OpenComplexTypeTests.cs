@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OpenComplexTypeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -310,7 +314,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
             var controllers = new[] { typeof(OpenCustomersController) };
 
             var model = GetEdmModel();
-            var server = TestServerUtils.Create(opt => opt.AddModel("odata", model), typeof(OpenCustomersController));
+            var server = TestServerUtils.Create(opt => opt.AddRouteComponents("odata", model), typeof(OpenCustomersController));
             return server.CreateClient();
         }
     }
@@ -556,15 +560,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
                     Assert.NotNull(addressInstance.LineA.PhoneInfo);
                     Assert.Equal(7654321, addressInstance.LineA.PhoneInfo.PhoneNumber);
 
-                    object lineAValue;
-                    // Fetch LineA property using TryGetPropertyValue
-                    Assert.True(address.TryGetPropertyValue("LineA", out lineAValue));
-                    LineDetails lineA = lineAValue as LineDetails;
-                    Assert.NotNull(lineA);
+                    object nestedLineAValue;
+                    // Fetch LineA property using TryGetNestedPropertyValue
+                    Assert.True(address.TryGetNestedPropertyValue("LineA", out nestedLineAValue));
+                    Delta<LineDetails> deltaLineA = nestedLineAValue as Delta<LineDetails>;
+                    Assert.NotNull(deltaLineA);
 
                     // Nested complex property
-                    Assert.NotNull(lineA.PhoneInfo);
-                    Assert.Equal(7654321, lineA.PhoneInfo.PhoneNumber);
+                    dynamic nestedLineA = deltaLineA;
+                    Assert.NotNull(nestedLineA.PhoneInfo);
+                    Assert.Equal(7654321, nestedLineA.PhoneInfo.PhoneNumber);
                     break;
                 default:
                     // Error

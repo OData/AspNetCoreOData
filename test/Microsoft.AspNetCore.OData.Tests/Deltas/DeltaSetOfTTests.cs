@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DeltaSetOfTTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -29,14 +33,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             Assert.Equal(typeof(DeltaSetOfTTests), set.ExpectedClrType);
         }
 
-        [Fact]
-        public void PatchOnDeltaSet_ThrowsArgumentNull_OriginalSet()
-        {
-            // Arrange
-            DeltaSet<DeltaSetOfTTests> set = new DeltaSet<DeltaSetOfTTests>();
+        //[Fact]
+        //public void PatchOnDeltaSet_ThrowsArgumentNull_OriginalSet()
+        //{
+        //    // Arrange
+        //    DeltaSet<DeltaSetOfTTests> set = new DeltaSet<DeltaSetOfTTests>();
 
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => set.Patch(null), "originalSet");
-        }
+        //    // Act & Assert
+        //    ExceptionAssert.ThrowsArgumentNull(() => set.Patch(null), "originalSet");
+        //}
     }
 }

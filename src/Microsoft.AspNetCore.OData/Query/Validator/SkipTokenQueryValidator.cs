@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SkipTokenQueryValidator.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -41,12 +45,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         internal static SkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
         {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new SkipTokenQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<SkipTokenQueryValidator>();
+            return context?.RequestContainer?.GetRequiredService<SkipTokenQueryValidator>() ?? new SkipTokenQueryValidator();
         }
     }
 }

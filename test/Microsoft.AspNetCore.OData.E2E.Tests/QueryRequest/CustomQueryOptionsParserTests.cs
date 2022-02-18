@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="CustomQueryOptionsParserTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             services.ConfigureControllers(typeof(DollarQueryCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddModel("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
             services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>());
             // NOTE: The following statement also does what is expected

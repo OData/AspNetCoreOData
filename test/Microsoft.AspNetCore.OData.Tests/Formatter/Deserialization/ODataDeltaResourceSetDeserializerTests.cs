@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataDeltaResourceSetDeserializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -31,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
         {
             // Arrange & Act & Assert
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
 
             await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(null, null, null), "messageReader");
@@ -41,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
         {
             // Arrange & Act & Assert
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
             ODataMessageReader reader = new ODataMessageReader((IODataResponseMessage)new InMemoryMessage(), new ODataMessageReaderSettings());
 
@@ -68,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
             ODataDeserializerContext readerContext = new ODataDeserializerContext() { Path = path, Model = _model };
 
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             Mock<ODataDeltaResourceSetDeserializer> deserializer = new Mock<ODataDeltaResourceSetDeserializer>(deserializerProvider.Object);
 
             // Arrange & Act & Assert
@@ -78,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 .Returns((object)null)
                 .Verifiable();
 
-            object actual = await deserializer.Object.ReadAsync(reader, typeof(DeltaSet<>), readerContext);
+            object actual = await deserializer.Object.ReadAsync(reader, typeof(DeltaSet<Customer>), readerContext);
 
             // Arrange & Act & Assert
             deserializer.Verify();
@@ -98,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadInline_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
 
             // Arrange & Act & Assert
@@ -135,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IEdmEntityTypeReference entityTypeRef = new EdmEntityTypeReference(entityType, false);
             IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(entityTypeRef));
 
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             Mock<ODataDeltaResourceSetDeserializer> deserializer = new Mock<ODataDeltaResourceSetDeserializer>(deserializerProvider.Object);
 
             ODataDeltaResourceSetWrapper wrapper = new ODataDeltaResourceSetWrapper(new ODataDeltaResourceSet());
@@ -155,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [Fact]
         public void ReadInline_Calls_ReadInlineForEachDeltaItem()
         {
-            ODataDeserializerProvider provider = ODataFormatterHelpers.GetDeserializerProvider();
+            IODataDeserializerProvider provider = ODataFormatterHelpers.GetDeserializerProvider();
         }
 
         [Fact]
@@ -166,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IEdmEntityType customer = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
             IEdmStructuredTypeReference elementType = new EdmEntityTypeReference(customer, true);
 
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             Mock<ODataEdmTypeDeserializer> resourceDeserializer = new Mock<ODataEdmTypeDeserializer>(ODataPayloadKind.Resource);
 
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
@@ -199,7 +203,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadDeltaResource_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
             ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaResource(null, null, null), "resource");
 
@@ -214,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Arrange & Act & Assert
             IEdmComplexType complex = new EdmComplexType("NS", "Complex");
             IEdmStructuredTypeReference typeRef = new EdmComplexTypeReference(complex, false);
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             deserializerProvider.Setup(s => s.GetEdmTypeDeserializer(typeRef, false)).Returns((ODataEdmTypeDeserializer)null);
 
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
@@ -238,7 +242,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             IEdmEntityType customer = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
             IEdmStructuredTypeReference elementType = new EdmEntityTypeReference(customer, true);
 
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataResourceDeserializer resourceDeserializer = new ODataResourceDeserializer(deserializerProvider.Object);
 
             Uri id = new Uri("Customers(8)", UriKind.RelativeOrAbsolute);
@@ -300,7 +304,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadDeltaDeletedLink_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
             ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaDeletedLink(null, null, null), "deletedLink");
 
@@ -316,7 +320,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadDeltaDeletedLink_Returns_DeletedDeltaLink(bool typed)
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
 
             Uri source = new Uri("Customers(8)", UriKind.RelativeOrAbsolute);
@@ -367,7 +371,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadDeltaLink_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
             ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadDeltaLink(null, null, null), "link");
 
@@ -383,7 +387,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         public void ReadDeltaLink_Returns_DeltaLink(bool typed)
         {
             // Arrange
-            Mock<ODataDeserializerProvider> deserializerProvider = new Mock<ODataDeserializerProvider>();
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
             ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
 
             Uri source = new Uri("Customers(8)", UriKind.RelativeOrAbsolute);

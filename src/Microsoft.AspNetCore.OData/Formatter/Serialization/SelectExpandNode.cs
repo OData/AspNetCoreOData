@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="SelectExpandNode.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -41,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull(nameof(writeContext));
             }
 
-            Initialize(writeContext.SelectExpandClause, structuredType, writeContext.Model, writeContext.ExpandReference);
+            Initialize(writeContext.SelectExpandClause, structuredType, writeContext.Model, writeContext.ExpandReference, writeContext.ComputedProperties);
         }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public SelectExpandNode(SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmModel model)
             : this()
         {
-            Initialize(selectExpandClause, structuredType, model, false);
+            Initialize(selectExpandClause, structuredType, model, false, null);
         }
 
         /// <summary>
@@ -93,6 +97,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public ISet<string> SelectedDynamicProperties { get; internal set; }
 
         /// <summary>
+        /// Gets the set of computed property in select.
+        /// </summary>
+        public ISet<string> SelectedComputedProperties { get; } = new HashSet<string>();
+
+        /// <summary>
         /// Gets the flag to indicate the dynamic property to be included in the response or not.
         /// </summary>
         public bool SelectAllDynamicProperties { get; internal set; }
@@ -114,7 +123,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="structuredType">The related structural type to select and expand.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="expandedReference">Is expanded reference.</param>
-        private void Initialize(SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmModel model, bool expandedReference)
+        /// <param name="computedProperties">The computed properties.</param>
+        private void Initialize(SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmModel model, bool expandedReference, ISet<string> computedProperties)
         {
             if (structuredType == null)
             {
@@ -164,7 +174,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else
                 {
-                    BuildSelectExpand(selectExpandClause, structuralTypeInfo);
+                    BuildSelectExpand(selectExpandClause, computedProperties, structuralTypeInfo);
                 }
 
                 AdjustSelectNavigationProperties();
@@ -175,8 +185,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Build $select and $expand clause
         /// </summary>
         /// <param name="selectExpandClause">The select expand clause</param>
-        /// <param name="structuralTypeInfo">The structural type properties.</param>
-        private void BuildSelectExpand(SelectExpandClause selectExpandClause, EdmStructuralTypeInfo structuralTypeInfo)
+        /// <param name="computedProperties">The structural type properties.</param>
+        /// <param name="structuralTypeInfo">The computed properties.</param>
+        private void BuildSelectExpand(SelectExpandClause selectExpandClause, ISet<string> computedProperties, EdmStructuralTypeInfo structuralTypeInfo)
         {
             Contract.Assert(selectExpandClause != null);
             Contract.Assert(structuralTypeInfo != null);
@@ -200,7 +211,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (pathSelectItem != null)
                 {
                     // $select=abc/.../xyz
-                    BuildSelectItem(pathSelectItem, currentLevelPropertiesInclude, structuralTypeInfo);
+                    BuildSelectItem(pathSelectItem, currentLevelPropertiesInclude, computedProperties, structuralTypeInfo);
                     continue;
                 }
 
@@ -211,6 +222,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     MergeAllStructuralProperties(structuralTypeInfo.AllStructuralProperties, currentLevelPropertiesInclude);
                     MergeSelectedNavigationProperties(structuralTypeInfo.AllNavigationProperties);
                     SelectAllDynamicProperties = true;
+
+                    if (computedProperties != null)
+                    {
+                        foreach (var property in computedProperties)
+                        {
+                            SelectedComputedProperties.Add(property);
+                        }
+                    }
                     continue;
                 }
 
@@ -300,7 +319,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 if (structuralTypeInfo.IsNavigationPropertyDefined(firstNavigationSegment.NavigationProperty))
                 {
-                    // It's not allowed to have mulitple navigation expanded or referenced.
+                    // It's not allowed to have multiple navigation expanded or referenced.
                     // for example: "$expand=nav($top=2),nav($skip=3)" is not allowed and will be merged (or throw exception) at ODL side.
                     ExpandedNavigationSelectItem expanded = expandReferenceItem as ExpandedNavigationSelectItem;
                     if (expanded != null)
@@ -331,9 +350,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// </summary>
         /// <param name="pathSelectItem">The expanded reference select item.</param>
         /// <param name="currentLevelPropertiesInclude">The current properties to include at current level.</param>
+        /// <param name="computedProperties">The computed properties.</param>
         /// <param name="structuralTypeInfo">The structural type properties.</param>
         private void BuildSelectItem(PathSelectItem pathSelectItem,
             IDictionary<IEdmStructuralProperty, SelectExpandIncludedProperty> currentLevelPropertiesInclude,
+            ISet<string> computedProperties,
             EdmStructuralTypeInfo structuralTypeInfo)
         {
             Contract.Assert(pathSelectItem != null && pathSelectItem.SelectedPath != null);
@@ -365,7 +386,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // If the first segment is not a property segment,
-            // that segment must be the last segment, so the remainging segments should be null.
+            // that segment must be the last segment, so the remaining segments should be null.
             Contract.Assert(remainingSegments == null);
 
             NavigationPropertySegment navigationSegment = segment as NavigationPropertySegment;
@@ -396,12 +417,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             DynamicPathSegment dynamicPathSegment = segment as DynamicPathSegment;
             if (dynamicPathSegment != null)
             {
-                if (SelectedDynamicProperties == null)
+                if (computedProperties != null && computedProperties.Contains(dynamicPathSegment.Identifier))
                 {
-                    SelectedDynamicProperties = new HashSet<string>();
+                    // If it's from $compute
+                    SelectedComputedProperties.Add(dynamicPathSegment.Identifier);
                 }
+                else
+                {
+                    // or it's from dynamic property
+                    if (SelectedDynamicProperties == null)
+                    {
+                        SelectedDynamicProperties = new HashSet<string>();
+                    }
 
-                SelectedDynamicProperties.Add(dynamicPathSegment.Identifier);
+                    SelectedDynamicProperties.Add(dynamicPathSegment.Identifier);
+                }
                 return;
             }
 
@@ -609,7 +639,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
-        /// An internal cache class used to provide the propert, operations
+        /// An internal cache class used to provide the property, operations
         /// and do verification on the given <see cref="IEdmStructuredType"/>.
         /// </summary>
         internal class EdmStructuralTypeInfo

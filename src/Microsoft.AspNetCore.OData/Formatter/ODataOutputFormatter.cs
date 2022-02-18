@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataOutputFormatter.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -127,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             type = TypeHelper.GetTaskInnerTypeOrSelf(type);
 
-            ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
+            IODataSerializerProvider serializerProvider = request.GetRouteServices().GetRequiredService<IODataSerializerProvider>();
 
             // See if this type is a SingleResult or is derived from SingleResult.
             bool isSingleResult = false;
@@ -240,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             Uri baseAddress = GetBaseAddressInternal(request);
             MediaTypeHeaderValue contentType = GetContentType(response.Headers[HeaderNames.ContentType].FirstOrDefault());
 
-            ODataSerializerProvider serializerProvider = request.GetSubServiceProvider().GetRequiredService<ODataSerializerProvider>();
+            IODataSerializerProvider serializerProvider = request.GetRouteServices().GetRequiredService<IODataSerializerProvider>();
 
             return ODataOutputFormatterHelper.WriteToStreamAsync(
                 type,
@@ -333,7 +337,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         }
 
         private static ODataPayloadKind? GetClrObjectResponsePayloadKind(Type type, bool isGenericSingleResult,
-            ODataSerializerProvider serializerProvider, HttpRequest request)
+            IODataSerializerProvider serializerProvider, HttpRequest request)
         {
             // SingleResult<T> should be serialized as T.
             if (isGenericSingleResult)
@@ -341,7 +345,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 type = type.GetGenericArguments()[0];
             }
 
-            ODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
+            IODataSerializer serializer = serializerProvider.GetODataPayloadSerializer(type, request);
             return serializer == null ? null : (ODataPayloadKind?)serializer.ODataPayloadKind;
         }
 

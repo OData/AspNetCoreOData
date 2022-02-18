@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataModelBinderConverter.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections;
@@ -31,8 +35,15 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// </summary>
     internal static class ODataModelBinderConverter
     {
-        private static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethods()
-            .Single(m => m.Name == "TryParse" && m.GetParameters().Length == 2);
+        // .NET 6 adds a new overload: TryParse<TEnum>(ReadOnlySpan<Char>, TEnum)
+        // Now, with `TryParse<TEnum>(String, TEnum)`, there will have two versions with two parameters
+        // So, the previous Single() will throw exception.
+        private static readonly MethodInfo EnumTryParseMethod = typeof(Enum).GetMethod("TryParse",
+            new[]
+            {
+                typeof(string),
+                Type.MakeGenericMethodParameter(0).MakeByRefType()
+            });
 
         private static readonly MethodInfo CastMethodInfo = typeof(Enumerable).GetMethod("Cast");
 
@@ -70,8 +81,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 IEdmEnumTypeReference edmEnumType = edmTypeReference.AsEnum();
                 Contract.Assert(edmEnumType != null);
 
-                ODataDeserializerProvider deserializerProvider =
-                    requestContainer.GetRequiredService<ODataDeserializerProvider>();
+                IODataDeserializerProvider deserializerProvider =
+                    requestContainer.GetRequiredService<IODataDeserializerProvider>();
 
                 ODataEnumDeserializer deserializer =
                     (ODataEnumDeserializer)deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
@@ -80,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             // primitive value
-            if (edmTypeReference.IsPrimitive())
+            if (edmTypeReference.IsPrimitive() || edmTypeReference.IsTypeDefinition())
             {
                 ConstantNode node = graph as ConstantNode;
                 return EdmPrimitiveHelper.ConvertPrimitiveValue(node != null ? node.Value : graph, clrType, readContext?.TimeZone);
@@ -90,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return ConvertResourceOrResourceSet(graph, edmTypeReference, readContext);
         }
 
-        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone)
+        internal static object ConvertTo(string valueString, Type type, TimeZoneInfo timeZone, IEdmModel edmModel = null)
         {
             if (valueString == null)
             {
@@ -133,8 +144,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             // can return the correct Date object.
             if (type == typeof(Date) || type == typeof(Date?))
             {
-                EdmCoreModel model = EdmCoreModel.Instance;
-                IEdmPrimitiveTypeReference dateTypeReference = type.GetEdmPrimitiveTypeReference();
+                IEdmModel model = edmModel ?? EdmCoreModel.Instance;
+                IEdmPrimitiveTypeReference dateTypeReference = model.GetEdmPrimitiveTypeReference(type);
                 return ODataUriUtils.ConvertFromUriLiteral(valueString, ODataVersion.V4, model, dateTypeReference);
             }
 
@@ -154,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             bool isNonStandardEdmPrimitive;
-            type.IsNonstandardEdmPrimitive(out isNonStandardEdmPrimitive);
+            edmModel.IsNonstandardEdmPrimitive(type, out isNonStandardEdmPrimitive);
 
             if (isNonStandardEdmPrimitive)
             {
@@ -177,8 +188,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmCollectionTypeReference collectionType = edmTypeReference as IEdmCollectionTypeReference;
             Contract.Assert(collectionType != null);
 
-            ODataDeserializerProvider deserializerProvider =
-                requestContainer.GetRequiredService<ODataDeserializerProvider>();
+            IODataDeserializerProvider deserializerProvider =
+                requestContainer.GetRequiredService<IODataDeserializerProvider>();
             ODataCollectionDeserializer deserializer =
                 (ODataCollectionDeserializer)deserializerProvider.GetEdmTypeDeserializer(collectionType);
 
@@ -270,7 +281,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataResourceSetWrapper resourceSet =
                 odataReader.ReadResourceOrResourceSet() as ODataResourceSetWrapper;
 
-            ODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
+            IODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
 
             ODataResourceSetDeserializer resourceSetDeserializer =
                 (ODataResourceSetDeserializer)deserializerProvider.GetEdmTypeDeserializer(collectionType);
@@ -318,7 +329,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             ODataResourceWrapper topLevelResource = item as ODataResourceWrapper;
             Contract.Assert(topLevelResource != null);
 
-            ODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
+            IODataDeserializerProvider deserializerProvider = readContext.Request.GetDeserializerProvider();
 
             ODataResourceDeserializer entityDeserializer =
                 (ODataResourceDeserializer)deserializerProvider.GetEdmTypeDeserializer(edmTypeReference);

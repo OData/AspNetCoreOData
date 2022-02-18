@@ -2,11 +2,11 @@
 <package>
   <metadata>
     <id>Microsoft.AspNetCore.OData</id>
-    <title>Microsoft ASP.NET Core 3.x and 5.x for OData v4.0</title>
+    <title>Microsoft ASP.NET Core 3.x, 5.x and 6.x for OData v4.0</title>
     <version>$VersionFullSemantic$-Nightly$NightlyBuildVersion$</version>
-    <authors>Microsoft</authors>
-    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
-    <description>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core 3.x and 5.x to support OData query syntax for your Web APIs.</description>
+    <authors>OData (.NET Foundation)</authors>
+    <copyright>&#169; .NET Foundation and Contributors. All rights reserved.</copyright>
+    <description>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core MVC Core 3.x and 5.x to support OData query syntax for your Web APIs.</description>
     <summary>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core.</summary>
     <language>en-US</language>
     <projectUrl>http://github.com/OData/AspNetCoreOData</projectUrl>
@@ -28,6 +28,12 @@
         <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
         <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
       </group>
+      <group targetFramework=".net6.0">
+        <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
+        <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
+      </group>
     </dependencies>
   </metadata>
   <files>
@@ -37,6 +43,9 @@
     <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.dll" target="lib\net5.0" />
     <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.xml" target="lib\net5.0" />
     <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.pdb" target="lib\net5.0" />
+    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.dll" target="lib\net6.0" />
+    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.xml" target="lib\net6.0" />
+    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.pdb" target="lib\net6.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
   </files>
 </package>

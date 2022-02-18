@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="PropertyRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -74,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // filter by action parameter
             IEdmEntityType entityType = navigationSource.EntityType();
-            bool hasKeyParameter = action.HasODataKeyParameter(entityType);
+            bool hasKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if (!(context.Singleton != null ^ hasKeyParameter))
             {
                 // Singleton, doesn't allow to query property with key
@@ -83,10 +87,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // Find the declaring type of the property if we have the declaring type name in the action name.
-            // eitherwise, it means the property is defined on the entity type of the navigation source.
+            // otherwise, it means the property is defined on the entity type of the navigation source.
             IEdmEntityType declaringEntityType = entityType;
             if (declared != null)
             {
+                if (declared.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}From
+                    // - Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}Of{Cast}From
+                    return false;
+                }
+
                 declaringEntityType = entityType.FindTypeInInheritance(context.Model, declared) as IEdmEntityType;
                 if (declaringEntityType == null)
                 {
@@ -94,7 +106,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            IEdmProperty edmProperty = declaringEntityType.FindProperty(property);
+            bool enablePropertyNameCaseInsensitive = context?.Options?.RouteOptions.EnablePropertyNameCaseInsensitive ?? false;
+            IEdmProperty edmProperty = declaringEntityType.FindProperty(property, enablePropertyNameCaseInsensitive);
             if (edmProperty == null || edmProperty.PropertyKind != EdmPropertyKind.Structural)
             {
                 return false;
@@ -105,9 +118,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmComplexType castType = null;
+            IEdmComplexType castType;
+            // Only process structural property
+            IEdmStructuredType castComplexType = null;
             if (cast != null)
             {
+                if (cast.Length == 0)
+                {
+                    // Avoid unnecessary call to FindTypeInheritance
+                    // Cases handled: Get|PostTo|PutTo|PatchTo|DeleteTo{PropertyName}Of
+                    return false;
+                }
+
                 IEdmType propertyElementType = edmProperty.Type.Definition.AsElementType();
                 if (propertyElementType.TypeKind == EdmTypeKind.Complex)
                 {
@@ -123,17 +145,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // only support complex type cast, (TODO: maybe consider to support Edm.PrimitiveType cast)
                     return false;
                 }
-            }
 
-            // only process structural property
-            IEdmStructuredType castComplexType = null;
-            if (cast != null)
-            {
                 IEdmTypeReference propertyType = edmProperty.Type;
                 if (propertyType.IsCollection())
                 {
                     propertyType = propertyType.AsCollection().ElementType();
                 }
+
                 if (!propertyType.IsComplex())
                 {
                     return false;
@@ -276,7 +294,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            //Allow post only to collection properties
+            // Allow post only to collection properties
             if (!isCollection && method == "PostTo")
             {
                 return false;

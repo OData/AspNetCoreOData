@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ExpressionLexer.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.OData;
@@ -196,7 +200,7 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Advance the pointer to the next occurence of the given value, swallowing all characters in between.
+        /// Advance the pointer to the next occurrence of the given value, swallowing all characters in between.
         /// </summary>
         /// <param name="endingValue">the ending delimiter.</param>
         protected virtual void AdvanceToNextOccurenceOf(char endingValue)

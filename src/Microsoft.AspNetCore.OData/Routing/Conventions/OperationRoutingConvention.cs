@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="OperationRoutingConvention.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -15,10 +19,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 {
     /// <summary>
     /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
-    /// Get ~/entity|singleton/function,  ~/entity|singleton/cast/function
-    /// Get ~/entity|singleton/key/function, ~/entity|singleton/key/cast/function
-    /// Post ~/entity|singleton/action,  ~/entity|singleton/cast/action
-    /// Post ~/entity|singleton/key/action,  ~/entity|singleton/key/cast/action
+    /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
+    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+    /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
+    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
     /// </summary>
     public abstract class OperationRoutingConvention : IODataControllerActionConvention
     {
@@ -54,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             string actionName = context.Action.ActionName;
 
-            bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType);
+            bool hasKeyParameter = context.Action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if (context.Singleton != null && hasKeyParameter)
             {
                 // Singleton doesn't allow to call action with key.
@@ -67,6 +71,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmEntityType castTypeFromActionName = null;
             if (cast != null)
             {
+                if (cast.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - {OperationName}On
+                    // - {OperationName}OnCollectionOf
+                    return;
+                }
+
                 castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast) as IEdmEntityType;
                 if (castTypeFromActionName == null)
                 {
@@ -75,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             // TODO: refactor here
-            // If we have mulitple same function defined, we should match the best one?
+            // If we have multiple same function defined, we should match the best one?
             IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name == operationName);
             foreach (IEdmOperation edmOperation in candidates)
             {
@@ -147,10 +159,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     }
                 }
 
-                // TODO: need discussion ahout:
+                // TODO: need discussion about:
                 // 1) Do we need to match the whole parameter count?
                 // 2) Do we need to select the best match? So far, i don't think and let it go.
-                if (!IsOperationParameterMeet(edmOperation, context.Action))
+                if (!IsOperationParameterMatched(edmOperation, context.Action))
                 {
                     continue;
                 }
@@ -198,12 +210,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         }
 
         /// <summary>
-        /// Verify the parameter of the edm operation meets the parameter defined in action.
+        /// Verify the parameter of the Edm operation matches the parameter defined in action.
         /// </summary>
         /// <param name="operation">The Edm operation.</param>
         /// <param name="action">The action model.</param>
-        /// <returns>true/false.</returns>
-        protected abstract bool IsOperationParameterMeet(IEdmOperation operation, ActionModel action);
+        /// <returns>true if the parameter of the Edm operation matches the parameter defined in the action; otherwise, false.</returns>
+        protected abstract bool IsOperationParameterMatched(IEdmOperation operation, ActionModel action);
 
         /// <summary>
         /// Add the template to the action
@@ -254,22 +266,22 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 }
             }
 
-            IEdmNavigationSource targetset = null;
+            IEdmNavigationSource targetEntitySet = null;
             if (edmOperation.ReturnType != null)
             {
-                targetset = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
+                targetEntitySet = edmOperation.GetTargetEntitySet(navigationSource, context.Model);
             }
 
             string httpMethod;
             if (edmOperation.IsAction())
             {
-                segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetset));
+                segments.Add(new ActionSegmentTemplate((IEdmAction)edmOperation, targetEntitySet));
                 httpMethod = "Post";
             }
             else
             {
                 IDictionary<string, string> required = GetRequiredFunctionParamters(edmOperation, context.Action);
-                segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetset));
+                segments.Add(new FunctionSegmentTemplate(required, (IEdmFunction)edmOperation, targetEntitySet));
                 httpMethod = "Get";
             }
 
@@ -284,7 +296,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             Contract.Assert(action != null);
 
             IDictionary<string, string> requiredParameters = new Dictionary<string, string>();
-            // we can allow the action has other parameters except the functio parameters.
+            // we can allow the action has other parameters except the function parameters.
             foreach (var parameter in operation.Parameters.Skip(1))
             {
                 if (action.Parameters.Any(p => p.ParameterInfo.Name == parameter.Name))

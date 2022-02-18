@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataParameterValue.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.OData.Edm;
@@ -38,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         public IEdmTypeReference EdmType { get; }
 
         /// <summary>
-        /// Gets the paraemter value.
+        /// Gets the parameter value.
         /// </summary>
         public object Value { get; }
     }

@@ -1,5 +1,9 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="EdmPrimitiveHelper.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -75,7 +79,18 @@ namespace Microsoft.AspNetCore.OData.Edm
             else
             {
                 type = Nullable.GetUnderlyingType(type) ?? type;
-                if (TypeHelper.IsEnum(type))
+
+                // Convert.ChangeType invalid cast from 'System.String' to 'System.Guid'
+                if (type == typeof(Guid))
+                {
+                    if (str == null)
+                    {
+                        throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
+                    }
+
+                    return Guid.Parse(str);
+                }
+                else if (TypeHelper.IsEnum(type))
                 {
                     if (str == null)
                     {
@@ -122,12 +137,37 @@ namespace Microsoft.AspNetCore.OData.Edm
 
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
                 }
+#if NET6_0
+                else if (type == typeof(DateOnly))
+                {
+                    if (value is Date dt)
+                    {
+                        return new DateOnly(dt.Year, dt.Month, dt.Day);
+                    }
+
+                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+                }
+                else if (type == typeof(TimeOnly))
+                {
+                    if (value is TimeOfDay tod)
+                    {
+                        return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
+                    }
+
+                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                }
+#endif
                 else
                 {
+                    if (TypeHelper.TryGetInstance(type, value, out var result))
+                    {
+                        return result;
+                    }
+
                     try
                     {
                         // Note that we are not casting the return value to nullable<T> as even if we do it
-                        // CLR would unbox it back to T.
+                        // CLR would un-box it back to T.
                         return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
                     }
                     catch (InvalidCastException)

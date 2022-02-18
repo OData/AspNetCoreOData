@@ -1,13 +1,49 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="TenantsController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v3
 {
-    [ODataRouting]
+    public class TestEntitiesController : Controller
+    {
+        /* HttpPatch http://localhost:5000/v3/TestEntities/1/Query
+         * 
+         * Request Body is: 
+{
+    "results": [
+        {
+            "EmailClusterId@odata.type": "#Int64",
+            "EmailClusterId": 2629759514
+        },
+        {
+            "EmailClusterId@odata.type": "#Int64",
+            "EmailClusterId": 2629759515
+        }
+    ]
+}
+         */
+        [HttpPatch]
+        public IActionResult PatchToQuery(int key, Delta<HuntingQueryResults> delta)
+        {
+            var changedPropertyNames = delta.GetChangedPropertyNames();
+
+            HuntingQueryResults original = new HuntingQueryResults();
+            delta.Patch(original);
+
+            return Ok(key);
+        }
+    }
+
+    [ODataAttributeRouting]
     [Route("v3")]
     public class tenantsController : Controller
     {

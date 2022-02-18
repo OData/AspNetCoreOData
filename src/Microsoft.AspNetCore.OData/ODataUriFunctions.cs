@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataUriFunctions.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Reflection;
@@ -36,7 +40,7 @@ namespace Microsoft.AspNetCore.OData
             }
             catch
             {
-                // Clear in case of excpetion
+                // Clear in case of exception
                 RemoveCustomUriFunction(functionName, functionSignature, methodInfo);
                 throw;
             }
@@ -51,7 +55,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="functionSignature">The new custom function signature.</param>
         /// <param name="methodInfo">The MethodInfo to bind the given function name.</param>
         /// <exception cref="Exception">Any exception thrown by 'CustomUriFunctions.RemoveCustomUriFunction' and 'UriFunctionsBinder.UnbindUriFunctionName' methods.</exception>
-        /// <returns>'True' if the fucntion signature has successfully removed and unbinded. 'False' otherwise.</returns>
+        /// <returns>'True' if the function signature has successfully removed and unbounded. 'False' otherwise.</returns>
         public static bool RemoveCustomUriFunction(string functionName,
             FunctionSignatureWithReturnType functionSignature, MethodInfo methodInfo)
         {

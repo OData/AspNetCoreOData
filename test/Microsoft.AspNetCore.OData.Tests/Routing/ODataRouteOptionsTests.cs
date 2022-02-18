@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataRouteOptionsTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using Microsoft.AspNetCore.OData.Routing;
@@ -22,8 +26,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableKeyAsSegment);
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
-            Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
             Assert.False(options.EnableControllerNameCaseInsensitive);
+            Assert.False(options.EnablePropertyNameCaseInsensitive);
         }
 
         [Fact]
@@ -37,8 +42,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableKeyAsSegment);
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
-            Assert.False(options.EnableNonParenthsisForEmptyParameterFunction);
+            Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
             Assert.False(options.EnableControllerNameCaseInsensitive);
+            Assert.False(options.EnablePropertyNameCaseInsensitive);
         }
 
         [Fact]
@@ -48,8 +54,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Verify(opt => opt.EnableKeyAsSegment, (opt, b) => opt.EnableKeyAsSegment = b);
             Verify(opt => opt.EnableQualifiedOperationCall, (opt, b) => opt.EnableQualifiedOperationCall = b);
             Verify(opt => opt.EnableUnqualifiedOperationCall, (opt, b) => opt.EnableUnqualifiedOperationCall = b);
-            Verify(opt => opt.EnableNonParenthsisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthsisForEmptyParameterFunction = b, false);
+            Verify(opt => opt.EnableNonParenthesisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthesisForEmptyParameterFunction = b, false);
             Verify(opt => opt.EnableControllerNameCaseInsensitive, (opt, b) => opt.EnableControllerNameCaseInsensitive = b, false);
+            Verify(opt => opt.EnablePropertyNameCaseInsensitive, (opt, b) => opt.EnablePropertyNameCaseInsensitive = b, false);
         }
 
         private static void Verify(Func<ODataRouteOptions, bool> func, Action<ODataRouteOptions, bool> config, bool defValue = true)

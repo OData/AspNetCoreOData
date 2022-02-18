@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ComplexTypeTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -21,9 +25,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Arrange
             string routeName = "OData";
             IEdmModel model = GetSampleModel();
-            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddModel(routeName, model));
+            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, model));
             request.ODataFeature().Model = model;
-            request.ODataFeature().PrefixName = routeName;
+            request.ODataFeature().RoutePrefix = routeName;
 
             var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
             var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);

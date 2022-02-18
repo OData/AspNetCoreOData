@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="MyODataRoutingApplicationModelProvider.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
@@ -15,7 +19,7 @@ namespace ODataDynamicModel.Extensions
         public MyODataRoutingApplicationModelProvider(
             IOptions<ODataOptions> options)
         {
-            options.Value.AddModel("odata/{datasource}", EdmCoreModel.Instance);
+            options.Value.AddRouteComponents("odata/{datasource}", EdmCoreModel.Instance);
         }
 
         /// <summary>

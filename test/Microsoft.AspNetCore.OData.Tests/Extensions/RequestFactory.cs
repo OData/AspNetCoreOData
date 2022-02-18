@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="RequestFactory.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.IO;
@@ -133,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         {
             HttpRequest request = Create("Get", "http://localhost/", setupAction);
             IODataFeature feature = request.ODataFeature();
-            feature.PrefixName = "";
+            feature.RoutePrefix = "";
             feature.Model = model;
             return request;
         }
@@ -170,13 +174,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
           //  HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
             HttpRequest request = Create(method, uri, setupAction: null);
             IODataFeature feature = request.ODataFeature();
-            feature.PrefixName = "";
+            feature.RoutePrefix = "";
             feature.Model = model;
             return request;
         }
 
         /// <summary>
-        /// Confgiures the http request with OData values.
+        /// Configures the http request with OData values.
         /// </summary>
         /// <param name="request">The http request.</param>
         /// <param name="prefix">The prefix.</param>
@@ -191,7 +195,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             }
 
             IODataFeature feature = request.ODataFeature();
-            feature.PrefixName = prefix;
+            feature.RoutePrefix = prefix;
             feature.Model = model;
             feature.Path = path;
             return request;
@@ -220,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             IEdmModel model = request.GetModel();
 
             ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), new Uri(link.LocalPath, UriKind.Relative),
-                request.GetSubServiceProvider());
+                request.GetRouteServices());
 
             var odataPath = uriParser.ParsePath();
 

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataPathSegmentToTemplateHandler.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -36,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         public IList<ODataSegmentTemplate> Templates => _segmentTemplates;
 
         /// <summary>
-        /// Translate a MetadataSegment
+        /// Translate a <see cref="MetadataSegment"/>
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(MetadataSegment segment)
@@ -45,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a ValueSegment.
+        /// Translate a <see cref="ValueSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(ValueSegment segment)
@@ -54,7 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a NavigationPropertyLinkSegment.
+        /// Translate a <see cref="NavigationPropertyLinkSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(NavigationPropertyLinkSegment segment)
@@ -63,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a CountSegment.
+        /// Translate a <see cref="CountSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(CountSegment segment)
@@ -72,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a DynamicPathSegment.
+        /// Translate a <see cref="DynamicPathSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(DynamicPathSegment segment)
@@ -81,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a OperationSegment.
+        /// Translate a <see cref="OperationSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(OperationSegment segment)
@@ -98,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a OperationImportSegment.
+        /// Translate a <see cref="OperationImportSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(OperationImportSegment segment)
@@ -119,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a PropertySegment.
+        /// Translate a <see cref="PropertySegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(PropertySegment segment)
@@ -128,7 +132,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a KeySegment.
+        /// Translate a <see cref="KeySegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(KeySegment segment)
@@ -169,7 +173,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a SingletonSegment.
+        /// Translate a <see cref="SingletonSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(SingletonSegment segment)
@@ -178,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a EntitySetSegment.
+        /// Translate a <see cref="EntitySetSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(EntitySetSegment segment)
@@ -187,7 +191,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a NavigationPropertySegment.
+        /// Translate a <see cref="NavigationPropertySegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(NavigationPropertySegment segment)
@@ -196,7 +200,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a TypeSegment.
+        /// Translate a <see cref="TypeSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(TypeSegment segment)
@@ -205,7 +209,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a PathTemplateSegment.
+        /// Translate a <see cref="PathTemplateSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(PathTemplateSegment segment)
@@ -214,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a BatchSegment.
+        /// Translate a <see cref="BatchSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         /// <returns>Translated the path segment template.</returns>
@@ -224,7 +228,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         }
 
         /// <summary>
-        /// Translate a BatchReferenceSegment.
+        /// Translate a <see cref="BatchReferenceSegment"/>.
         /// </summary>
         /// <param name="segment">the segment to Translate</param>
         /// <returns>Translated the path segment template.</returns>

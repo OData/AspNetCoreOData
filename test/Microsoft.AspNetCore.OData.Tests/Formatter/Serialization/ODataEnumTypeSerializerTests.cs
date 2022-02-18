@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="ODataEnumTypeSerializerTests.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -72,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectAsync_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
 
             // Act & Assert
@@ -101,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             IEdmEnumType enumType = model.SchemaElements.OfType<IEdmEnumType>().Single();
 
             IServiceProvider serviceProvder = new Mock<IServiceProvider>().Object;
-            var provider = new DefaultODataSerializerProvider(serviceProvder);
+            var provider = new ODataSerializerProvider(serviceProvder);
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             ODataSerializerContext writeContext = new ODataSerializerContext
             {
@@ -121,7 +125,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateODataValue_ThrowsInvalidOperation_NonEnumType()
         {
             // Arrange
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             IEdmTypeReference expectedType = EdmCoreModel.Instance.GetString(false);
 
@@ -135,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             ODataEnumSerializer serializer = new ODataEnumSerializer(provider);
             IEdmEnumType enumType = new EdmEnumType("NS", "Enum");
             IEdmTypeReference expectedType = new EdmEnumTypeReference(enumType, false);
@@ -152,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataSerializerContext writeContext = new ODataSerializerContext();
-            ODataSerializerProvider provider = new Mock<ODataSerializerProvider>().Object;
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
             Mock<ODataEnumSerializer> serializer = new Mock<ODataEnumSerializer>(provider);
             ODataEnumValue enumValue = new ODataEnumValue("Cartoon");
             serializer.Setup(s => s.CreateODataEnumValue(null, It.IsAny<IEdmEnumTypeReference>(), writeContext)).Returns(enumValue);

@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.  See License.txt in the project root for license information.
+//-----------------------------------------------------------------------------
+// <copyright file="DateAndTimeOfDayTest.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -41,8 +45,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
             services.AddControllers().AddOData(opt =>
             {
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                    .AddModel("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
-                    .AddModel("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel());
+                    .AddRouteComponents("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
+                    .AddRouteComponents("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel());
                 opt.TimeZone = timeZoneInfo;
             });
         }

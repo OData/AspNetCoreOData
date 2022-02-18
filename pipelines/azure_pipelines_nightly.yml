@@ -9,6 +9,13 @@ resources:
     type: git
     ref: master
 
+variables:
+  BuildPlatformDirName: 'AnyCpu'
+  buildConfiguration: 'Release'
+  rootDir: '$(Build.SourcesDirectory)'
+  productBinPath: '$(rootDir)\bin\$(BuildPlatformDirName)\$(buildConfiguration)'
+  RELEASE_SEMANTICS: '$(ReleaseSemantics)'
+  SourcesRoot: '$(rootDir)'
 stages: 
 - stage: Build
   jobs:
@@ -77,22 +84,34 @@ stages:
         projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
         arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
     - task: DotNetCoreCLI@2
-      displayName: build Product(Microsoft.AspNetCore.OData.NewtonsoftJson)
-      enabled: False
+      displayName: Build Microsoft.AspNetCore.OData.NewtonsoftJson
       inputs:
         projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
         arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: NuGetCommand@2
-      displayName: NuGet - pack Microsoft.AspNetCore.OData.NewtonsoftJson
+
+    - task: DotNetCoreCLI@2
       inputs:
         command: custom
-        arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.$(RELEASE_SEMANTICS).nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Packages -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic) -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
-    
-    - task: NuGetCommand@2
-      displayName: NuGet - pack Microsoft.AspNetCore.OData 
+        custom: pack
+        arguments: >
+          $(rootDir)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
+          /p:NuspecFile=$(rootDir)\src\Microsoft.AspNetCore.OData.$(RELEASE_SEMANTICS).nuspec
+          --configuration=$(buildConfiguration) 
+          --output=$(Build.ArtifactStagingDirectory)\Packages 
+          -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+      displayName: Packing ASP.NET Core OData
+
+    - task: DotNetCoreCLI@2
       inputs:
         command: custom
-        arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.$(RELEASE_SEMANTICS).nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Packages -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic);ODataModelBuilderPackageDependency="$(ODataModelBuilderPackageDependency)";ODataLibPackageDependency="$(ODataLibPackageDependency)" -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
+        custom: pack
+        arguments: >
+          $(rootDir)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj 
+          /p:NuspecFile=$(rootDir)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.$(RELEASE_SEMANTICS).nuspec
+          --configuration=$(buildConfiguration) 
+          --output=$(Build.ArtifactStagingDirectory)\Packages 
+          -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+      displayName: Packing  NewtonsoftJson
 
     - publish: $(Build.ArtifactStagingDirectory)\Packages
       displayName: Publish Build Artifacts  
