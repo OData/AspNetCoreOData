@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataDynamicModel", "sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataSampleCommon", "sample\ODataSampleCommon\ODataSampleCommon.csproj", "{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataAlternateKeySample", "sample\ODataAlternateKeySample\ODataAlternateKeySample.csproj", "{7B153669-A42F-4511-8BDB-587B3B27B2F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{BDC5474B-9511-4CDF-83FE-376C7130F7F0} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 		{CE04E38B-547F-46C0-ABE4-F981E3A1874F} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 		{647EFCFA-55A7-4F0A-AD40-4B6EB1BFCFFA} = {B1F86961-6958-4617-ACA4-C231F95AE099}
+		{7B153669-A42F-4511-8BDB-587B3B27B2F3} = {B1F86961-6958-4617-ACA4-C231F95AE099}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {540C9752-AAC0-49EA-BA60-78490C90FF86}
