@@ -42,6 +42,13 @@ namespace ODataAlternateKeySample.Controllers
             return Ok(c);
         }
 
+        [HttpPost]
+        [EnableQuery]
+        public IActionResult Post([FromBody]Customer c)
+        {
+            return Ok(c);
+        }
+
         // Alternate key: SSN
         [HttpGet("odata/Customers(SSN={ssn})")]
         public IActionResult GetCustomerBySSN(string ssn)

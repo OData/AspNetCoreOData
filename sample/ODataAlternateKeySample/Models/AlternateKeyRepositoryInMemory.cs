@@ -21,7 +21,8 @@ namespace ODataAlternateKeySample.Models
             {
                 Id = e,
                 Name = names[e - 1],
-                SSN = "SSN-" + e + "-" + (100 + e)
+                SSN = "SSN-" + e + "-" + (100 + e),
+                Titles = new string[] { "abc", null, "efg" }
             }).ToList();
 
             // Orders
