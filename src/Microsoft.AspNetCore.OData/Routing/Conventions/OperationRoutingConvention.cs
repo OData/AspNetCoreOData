@@ -88,7 +88,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // TODO: refactor here
             // If we have multiple same function defined, we should match the best one?
-            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name == operationName);
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive switch
+            {
+                true => StringComparison.InvariantCultureIgnoreCase,
+                _ => StringComparison.InvariantCulture
+            };
+            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && string.Equals(f.Name, operationName, actionNameComparison));
             foreach (IEdmOperation edmOperation in candidates)
             {
                 IEdmOperationParameter bindingParameter = edmOperation.Parameters.FirstOrDefault();

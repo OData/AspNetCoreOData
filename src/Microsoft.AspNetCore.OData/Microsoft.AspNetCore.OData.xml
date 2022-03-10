@@ -12855,6 +12855,11 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive">
+            <summary>
+            Gets/sets a value indicating whether to enable case insensitive for the action name in conventional routing.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive">
             <summary>
             Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
