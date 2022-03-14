@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     return;
                 }
 
-                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast) as IEdmEntityType;
+                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
                 if (castTypeFromActionName == null)
                 {
                     return;
@@ -88,12 +88,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // TODO: refactor here
             // If we have multiple same function defined, we should match the best one?
-            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive switch
-            {
-                true => StringComparison.InvariantCultureIgnoreCase,
-                _ => StringComparison.InvariantCulture
-            };
-            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && string.Equals(f.Name, operationName, actionNameComparison));
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name.Equals(operationName, actionNameComparison));
             foreach (IEdmOperation edmOperation in candidates)
             {
                 IEdmOperationParameter bindingParameter = edmOperation.Parameters.FirstOrDefault();

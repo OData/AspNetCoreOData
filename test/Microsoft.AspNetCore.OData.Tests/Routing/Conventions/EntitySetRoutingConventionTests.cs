@@ -50,16 +50,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
-        [InlineData("Get", "Customers")]
-        [InlineData("GetCustomersFromVipCustomer", "Customers/NS.VipCustomer")]
-        public void AppliesToActionForGetActionWorksAsExpected(string actionName, string expectedTemplate)
+        [InlineData(typeof(CustomersController), "Get", "Customers", false)]
+        [InlineData(typeof(CustomersController), "GetCustomersFromVipCustomer", "Customers/NS.VipCustomer", false)]
+        [InlineData(typeof(CaseInsensitiveCustomersController), "GET", "CaseInsensitiveCustomers", true)]
+        [InlineData(typeof(CaseInsensitiveCustomersController), "GETCASEINSENSITIVECUSTOMERSFromVIPCUSTOMER", "CaseInsensitiveCustomers/NS.VipCustomer", true)]
+        public void AppliesToActionForGetActionWorksAsExpected(Type controllerType, string actionName, string expectedTemplate, bool ignoreCase)
         {
             // Arrange
-            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
             ActionModel action = controller.Actions.First();
 
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = action;
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = ignoreCase;
 
             EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
@@ -78,16 +81,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
-        [InlineData("Post", "/Customers")]
-        [InlineData("PostFromVipCustomer", "/Customers/NS.VipCustomer")]
-        public void AppliesToActionForPostActionWorksAsExpected(string actionName, string expected)
+        [InlineData(typeof(CustomersController), "Post", "/Customers", false)]
+        [InlineData(typeof(CustomersController), "PostFromVipCustomer", "/Customers/NS.VipCustomer", false)]
+        [InlineData(typeof(CaseInsensitiveCustomersController), "POST", "/CaseInsensitiveCustomers", true)]
+        [InlineData(typeof(CaseInsensitiveCustomersController), "POSTFromVIPCUSTOMER", "/CaseInsensitiveCustomers/NS.VipCustomer", true)]
+        public void AppliesToActionForPostActionWorksAsExpected(Type controllerType, string actionName, string expected, bool ignoreCase)
         {
             // Arrange
-            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
             ActionModel action = controller.Actions.First();
 
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = controller.Actions.First();
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = ignoreCase;
 
             EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
@@ -101,16 +107,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
-        [InlineData("Patch", "/Customers")]
-        [InlineData("PatchCustomers", "/Customers")]
-        public void AppliesToAction_Works_ForPatchActionWorksAsExpected(string actionName, string expected)
+        [InlineData(typeof(CustomersController), "Patch", "/Customers", false)]
+        [InlineData(typeof(CustomersController), "PatchCustomers", "/Customers", false)]        
+        [InlineData(typeof(CaseInsensitiveCustomersController), "PATCH", "/CaseInsensitiveCustomers", true)]
+        [InlineData(typeof(CaseInsensitiveCustomersController), "PATCHCASEINSENSITIVECUSTOMERS", "/CaseInsensitiveCustomers", true)]
+        public void AppliesToAction_Works_ForPatchActionWorksAsExpected(Type controllerType, string actionName, string expected, bool ignoreCase)
         {
             // Arrange
-            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CustomersController>(actionName);
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
             ActionModel action = controller.Actions.First();
 
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = controller.Actions.First();
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = ignoreCase;
 
             EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
 
@@ -124,6 +133,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
+        [InlineData("GET")]
         [InlineData("Get")]
         [InlineData("PostTo")]
         [InlineData("GetFrom")]
@@ -166,6 +176,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
+            container.AddEntitySet("CaseInsensitiveCustomers", customer);
             container.AddEntitySet("AnotherCustomers", customer);
             model.AddElement(container);
             return model;
@@ -191,9 +202,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             public void PatchCustomers()
             { }
         }
+        
+        private class CaseInsensitiveCustomersController
+        {
+            public void GET()
+            { }
+
+            public void GETCASEINSENSITIVECUSTOMERSFromVIPCUSTOMER()
+            { }
+
+            public void POST()
+            { }
+
+            public void POSTFromVIPCUSTOMER()
+            { }
+
+            public void PATCH()
+            { }
+
+            public void PATCHCASEINSENSITIVECUSTOMERS()
+            { }
+        }
 
         private class AnotherCustomersController
         {
+            public void GET() // Verify case insensitive by default
+            { }
+            
             public void Get(int key)
             { }
 

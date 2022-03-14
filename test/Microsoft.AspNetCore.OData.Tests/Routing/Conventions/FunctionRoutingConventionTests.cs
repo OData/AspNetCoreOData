@@ -157,6 +157,78 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                     }
                 };
             }
+        }        
+        
+        public static TheoryDataSet<Type, string, string[]> FunctionRoutingConventionCaseInsensitiveTestData
+        {
+            get
+            {
+                return new TheoryDataSet<Type, string, string[]>()
+                {
+                    // Bound to single
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISBASEUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.IsBaseUpgraded()",
+                            "/CustomersCaseInsensitive({key})/IsBaseUpgraded()",
+                            "/CustomersCaseInsensitive/{key}/NS.IsBaseUpgraded()",
+                            "/CustomersCaseInsensitive/{key}/IsBaseUpgraded()"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.IsUpgraded()",
+                            "/CustomersCaseInsensitive({key})/IsUpgraded()",
+                            "/CustomersCaseInsensitive/{key}/NS.IsUpgraded()",
+                            "/CustomersCaseInsensitive/{key}/IsUpgraded()"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISVIPUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
+                            "/CustomersCaseInsensitive({key})/NS.VipCustomer/IsVipUpgraded(param={param})",
+                            "/CustomersCaseInsensitive/{key}/NS.VipCustomer/NS.IsVipUpgraded(param={param})",
+                            "/CustomersCaseInsensitive/{key}/NS.VipCustomer/IsVipUpgraded(param={param})"
+                        }
+                    },
+                    // bound to collection
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISBASEALLUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.IsBaseAllUpgraded(param={param})",
+                            "/CustomersCaseInsensitive/IsBaseAllUpgraded(param={param})"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISALLCUSTOMERSUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.IsAllCustomersUpgraded(param={param})",
+                            "/CustomersCaseInsensitive/IsAllCustomersUpgraded(param={param})"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISVIPALLUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.VipCustomer/NS.IsVipAllUpgraded(param={param})",
+                            "/CustomersCaseInsensitive/NS.VipCustomer/IsVipAllUpgraded(param={param})"
+                        }
+                    }
+                };
+            }
         }
 
         [Theory]
@@ -177,6 +249,46 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(templates.Length, action.Selectors.Count);
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
+        
+        [Theory]
+        [MemberData(nameof(FunctionRoutingConventionTestData))]
+        [MemberData(nameof(FunctionRoutingConventionCaseInsensitiveTestData))]
+        public void FunctionRoutingConventionCaseInsensitiveTestDataRunsAsExpected(Type controllerType, string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = true;
+
+            // Act
+            FunctionConvention.AppliesToAction(context);
+
+            // Assert
+            Assert.Equal(templates.Length, action.Selectors.Count);
+            Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+        }
+        
+        [Theory]
+        [MemberData(nameof(FunctionRoutingConventionCaseInsensitiveTestData))]
+        public void FunctionRoutingConventionCaseSensitiveByDefault(Type controllerType, string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+
+            // Act
+            FunctionConvention.AppliesToAction(context);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
+        }        
 
         public static TheoryDataSet<MethodInfo, string[]> OverloadFunctionTestData
         {
@@ -337,6 +449,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
+            container.AddEntitySet("CustomersCaseInsensitive", customer);
             container.AddSingleton("Me", customer);
             model.AddElement(container);
             return model;
@@ -414,6 +527,37 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             public void IsVipUpgraded(string param)
             { }
         }
+        
+        private class CustomersCaseInsensitiveController
+        {
+            public void GET()
+            { }
+
+            [HttpGet]
+            public void ISBASEUPGRADED(int key, CancellationToken cancellation)
+            { }
+
+            [HttpGet]
+            public void ISUPGRADED(int key, CancellationToken cancellation)
+            { }
+
+            [HttpGet]
+            public void ISVIPUPGRADED(int key, string param)
+            { }
+
+            [HttpGet]
+            public void ISBASEALLUPGRADED(int param)
+            { }
+
+            [HttpGet]
+            public void ISALLCUSTOMERSUPGRADED(int param)
+            { }
+
+            [HttpGet]
+            public void ISVIPALLUPGRADED(CancellationToken cancellation, int param)
+            { }
+        }
+        
 
         private class AnotherCustomersController
         { }

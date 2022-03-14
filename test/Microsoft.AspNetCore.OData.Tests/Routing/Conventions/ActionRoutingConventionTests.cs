@@ -239,7 +239,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                     // overload
                     {
                         typeof(CustomersCaseInsensitiveController),
-                        "UPGRADEDALLOnCustomer",
+                        "UPGRADEDALLOnCUSTOMER",
                         new[]
                         {
                             "/CustomersCaseInsensitive({key})/NS.UpgradedAll",
@@ -250,7 +250,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                     },
                     {
                         typeof(CustomersCaseInsensitiveController),
-                        "UPGRADEDALLOnCollectionOfCustomer",
+                        "UPGRADEDALLOnCollectionOfCUSTOMER",
                         new[]
                         {
                             "/CustomersCaseInsensitive/NS.UpgradedAll",
@@ -259,7 +259,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                     },
                     {
                         typeof(CustomersCaseInsensitiveController),
-                        "UPGRADEDALLOnCollectionOfVipCustomer",
+                        "UPGRADEDALLOnCollectionOfVIPCUSTOMER",
                         new[]
                         {
                             "/CustomersCaseInsensitive/NS.VipCustomer/NS.UpgradedAll",
@@ -310,6 +310,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(templates.Length, action.Selectors.Count);
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
+        
+        [Theory]
+        [MemberData(nameof(ActionRoutingConventionCaseInsensitiveTestData))]
+        public void ActionRoutingConventionDoesCaseSensitiveMatchingByDefault(Type controllerType, string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+
+            // Act
+            ActionConvention.AppliesToAction(context);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
+        }        
 
         [Theory]
         [InlineData("Post")]
@@ -505,15 +524,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             { }
             
             [HttpPost]
-            public void UPGRADEDALLOnCustomer(int key, ODataActionParameters parameters)
+            public void UPGRADEDALLOnCUSTOMER(int key, ODataActionParameters parameters)
             { }            
             
             [HttpPost]
-            public void UPGRADEDALLOnCollectionOfCustomer(ODataActionParameters parameters)
+            public void UPGRADEDALLOnCollectionOfCUSTOMER(ODataActionParameters parameters)
             { }
             
             [HttpPost]
-            public void UPGRADEDALLOnCollectionOfVipCustomer(ODataActionParameters parameters)
+            public void UPGRADEDALLOnCollectionOfVIPCUSTOMER(ODataActionParameters parameters)
             { }            
         }
 
