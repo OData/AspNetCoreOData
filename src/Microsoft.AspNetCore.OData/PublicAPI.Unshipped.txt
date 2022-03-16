@@ -1225,6 +1225,8 @@ Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathLiteral.get -> st
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator.ODataPathSegmentTranslator() -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive.get -> bool
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.get -> bool

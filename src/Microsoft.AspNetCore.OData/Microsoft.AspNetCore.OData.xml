@@ -2271,13 +2271,14 @@
             <param name="edmType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Find the given type in a structured type inheritance, include itself.
             </summary>
             <param name="structuralType">The starting structural type.</param>
             <param name="model">The Edm model.</param>
             <param name="typeName">The searching type name.</param>
+            <param name="caseInsensitive">If true, performs case insensitive search</param>
             <returns>The found type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetAvailableActions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
@@ -12853,6 +12854,11 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive">
+            <summary>
+            Gets/sets a value indicating whether to enable case insensitive for the action name in conventional routing.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive">

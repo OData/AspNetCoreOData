@@ -123,6 +123,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                     Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}/NS.Customer", e.AttributeRouteModel.Template);
                 });
         }
+        
+        [Fact]
+        public void AppliesToActionForEntityActionWithEntityTypeNameSameAsEntityTypeOnEntitySetWorksAndCaseInsensitiveAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CaseInsensitiveCustomersController>("GetCUSTOMER");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = true;
+
+            EntityRoutingConvention entityConvention = ConventionHelpers.CreateConvention<EntityRoutingConvention>();
+
+            // Act
+            bool returnValue = entityConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            Assert.Equal(4, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers(FirstName={keyFirstName},LastName={keyLastName})", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers/FirstName={keyFirstName},LastName={keyLastName}", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers(FirstName={keyFirstName},LastName={keyLastName})/NS.Customer", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers/FirstName={keyFirstName},LastName={keyLastName}/NS.Customer", e.AttributeRouteModel.Template);
+                });
+        }
 
         [Theory]
         [InlineData("GetVipCustomer")]
@@ -154,6 +192,36 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 e =>
                 {
                     Assert.Equal("/Customers/FirstName={keyFirstName},LastName={keyLastName}/NS.VipCustomer", e.AttributeRouteModel.Template);
+                });
+        }
+        
+        [Fact]
+        public void AppliesToActionForEntityActionWithDerivedEntityTypeAndCaseInsensitiveWorksAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CaseInsensitiveCustomersController>("GetVIPCUSTOMER");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = true;
+
+            EntityRoutingConvention entityConvention = ConventionHelpers.CreateConvention<EntityRoutingConvention>();
+
+            // Act
+            bool returnValue = entityConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            Assert.Equal(2, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers(FirstName={keyFirstName},LastName={keyLastName})/NS.VipCustomer", e.AttributeRouteModel.Template);
+                },
+                e =>
+                {
+                    Assert.Equal("/CaseInsensitiveCustomers/FirstName={keyFirstName},LastName={keyLastName}/NS.VipCustomer", e.AttributeRouteModel.Template);
                 });
         }
 
@@ -219,6 +287,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
             container.AddEntitySet("AnotherCustomers", customer);
+            container.AddEntitySet("CaseInsensitiveCustomers", customer);
             model.AddElement(container);
             return model;
         }
@@ -277,6 +346,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             public void Get(int key)
             { }
         }
+        
+        private class CaseInsensitiveCustomersController
+        {
+            #region Action Name with EntityType of entity set
+            public void GetCUSTOMER(string keyLastName, string keyFirstName, CancellationToken cancellation)
+            { }
+            #endregion
+
+            #region Action Name with derived entity type
+            public void GetVIPCUSTOMER(string keyLastName, string keyFirstName, CancellationToken cancellation)
+            { }
+            #endregion
+        }        
 
         private class UnknownController
         { }

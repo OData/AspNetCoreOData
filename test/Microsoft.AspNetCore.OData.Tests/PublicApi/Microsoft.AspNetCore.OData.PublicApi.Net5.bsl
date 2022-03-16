@@ -1760,6 +1760,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator : Mic
 public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	public ODataRouteOptions ()
 
+	bool EnableActionNameCaseInsensitive  { public get; public set; }
 	bool EnableControllerNameCaseInsensitive  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }

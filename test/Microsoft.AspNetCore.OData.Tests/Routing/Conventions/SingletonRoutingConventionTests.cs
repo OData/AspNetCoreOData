@@ -71,6 +71,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 };
             }
         }
+        
+        public static TheoryDataSet<string, string[]> SingletonConventionCaseInsensitiveTestData
+        {
+            get
+            {
+                return new TheoryDataSet<string, string[]>()
+                {
+                    // Bound to single
+                    { "GET", new[] { "/CaseInsensitiveMe" } },
+                    { "GETFromVIPCUSTOMER", new[] { "/CaseInsensitiveMe/NS.VipCustomer" } },
+                    { "PUT", new[] { "/CaseInsensitiveMe" } },
+                    { "PUTFromVIPCUSTOMER", new[] { "/CaseInsensitiveMe/NS.VipCustomer" } },
+                    { "PATCH", new[] { "/CaseInsensitiveMe" } },
+                    { "PATCHFromVIPCUSTOMER", new[] { "/CaseInsensitiveMe/NS.VipCustomer" } },
+                };
+            }
+        }
 
         [Theory]
         [MemberData(nameof(SingletonConventionTestData))]
@@ -82,6 +99,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
             context.Action = action;
+
+            // Act
+            SingletonConvention.AppliesToAction(context);
+
+            // Assert
+            Assert.Equal(templates.Length, action.Selectors.Count);
+            Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+        }
+        
+        [Theory]
+        [MemberData(nameof(SingletonConventionCaseInsensitiveTestData))]
+        public void SingletonRoutingConventionCaseInsensitiveTestDataRunsAsExpected(string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<CaseInsensitiveMeController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = true;
 
             // Act
             SingletonConvention.AppliesToAction(context);
@@ -124,6 +161,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             model.AddElement(vipCustomer);
             var entityContainer = new EdmEntityContainer("NS", "Default");
             entityContainer.AddSingleton("Me", customer);
+            entityContainer.AddSingleton("CaseInsensitiveMe", customer);
             model.AddElement(entityContainer);
             return model;
         }
@@ -163,6 +201,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             }
 
             public void PatchFrom()
+            {
+            }
+        }        
+        
+        private class CaseInsensitiveMeController
+        {
+            public void GET()
+            {
+            }
+
+            public void GETFromVIPCUSTOMER()
+            {
+            }
+
+            public void PUT()
+            {
+            }
+
+            public void PUTFromVIPCUSTOMER()
+            {
+            }
+
+            public void PATCH()
+            {
+            }
+
+            public void PATCHFromVIPCUSTOMER()
             {
             }
         }
