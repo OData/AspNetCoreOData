@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
+            IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true);
             if (castType == null)
             {
                 return false;
@@ -100,7 +100,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         private static bool ProcessEntitySetAction(string actionName, IEdmEntitySet entitySet, IEdmStructuredType castType,
             ODataControllerActionContext context, ActionModel action)
         {
-            if (actionName == "Get" || actionName == $"Get{entitySet.Name}")
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                 
+            if (actionName.Equals("Get", actionNameComparison) || actionName.Equals($"Get{entitySet.Name}", actionNameComparison))
             {
                 IEdmCollectionType castCollectionType = null;
                 if (castType != null)
@@ -141,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
-            else if (actionName == "Post" || actionName == $"Post{entitySet.EntityType().Name}")
+            else if (actionName.Equals("Post", actionNameComparison) || actionName.Equals($"Post{entitySet.EntityType().Name}", actionNameComparison))
             {
                 // POST ~/Customers
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
@@ -159,7 +161,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 action.AddSelector("Post", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
-            else if (actionName == "Patch" || actionName == $"Patch{entitySet.Name}")
+            else if (actionName.Equals("Patch", actionNameComparison) || actionName.Equals($"Patch{entitySet.Name}", actionNameComparison))
             {
                 // PATCH ~/Patch  , ~/PatchCustomers
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
