@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -43,17 +44,24 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="model">The Edm model.</param>
         /// <param name="querySettings">The query setting.</param>
         /// <param name="clrType">The current element CLR type in this context (scope).</param>
-        public QueryBinderContext(IEdmModel model, ODataQuerySettings querySettings, Type clrType)
+        public QueryBinderContext(IEdmModel model, ODataQuerySettings querySettings, Type clrType, Type beforeAggregationClrType = null)
         {
             Model = model ?? throw Error.ArgumentNull(nameof(model));
 
             QuerySettings = querySettings ?? throw Error.ArgumentNull(nameof(querySettings));
 
-            ElementClrType = clrType ?? throw Error.ArgumentNull(nameof(clrType));
+            ElementClrType = beforeAggregationClrType ?? clrType ?? throw Error.ArgumentNull(nameof(clrType));
+
+            // Store before aggregation clr type.
+            BeforeAggregationClrType = beforeAggregationClrType ?? clrType;
+
+            // Store after aggregation clr type.
+            AfterAggregationClrType = clrType;
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
-            if (ElementType == null)
+            // Check if element type is null and not of AggregationWrapper type.
+            if (ElementType == null && ElementClrType != typeof(AggregationWrapper))
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
             }
@@ -125,7 +133,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Gets the Element Clr type.
         /// </summary>
-        public Type ElementClrType { get; }
+        public Type ElementClrType { get; internal set; }
+
+        /// <summary>
+        /// Gets the CLR type of the element before the aggregation wrapper override.
+        /// </summary>
+        public Type BeforeAggregationClrType { get; }
+
+        /// <summary>
+        /// Gets the CLR type of the element after the aggregation wrapper override.
+        /// </summary>
+        public Type AfterAggregationClrType { get; }
 
         /// <summary>
         /// Gets or sets the assembly resolver.

@@ -140,6 +140,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         public Type ElementClrType { get; internal set; }
 
+        public Type BeforeAggregationClrType { get; internal set; }
+
         /// <summary>
         /// Gets the <see cref="ODataPath"/>.
         /// </summary>

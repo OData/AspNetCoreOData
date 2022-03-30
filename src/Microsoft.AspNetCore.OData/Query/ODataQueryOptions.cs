@@ -358,6 +358,7 @@ namespace Microsoft.AspNetCore.OData.Query
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, AllowedQueryOptions.Apply))
             {
+                this.Context.BeforeAggregationClrType = this.Context.ElementClrType;
                 result = Apply.ApplyTo(result, querySettings);
                 odataFeature.ApplyClause = Apply.ApplyClause;
                 this.Context.ElementClrType = Apply.ResultClrType;

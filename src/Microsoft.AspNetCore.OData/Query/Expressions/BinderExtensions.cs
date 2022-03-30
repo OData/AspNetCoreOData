@@ -163,6 +163,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
+            context.ElementClrType = context.AfterAggregationClrType;
             OrderByBinderResult orderByResult = binder.BindOrderBy(orderByClause, context);
             IQueryable querySoFar = query;
 

@@ -1176,21 +1176,36 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-             //   return GetFlattenedPropertyExpression(propertyPath, context)
-              //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
+                //   return GetFlattenedPropertyExpression(propertyPath, context)
+                //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
+
+                if (context.ElementClrType == typeof(AggregationWrapper))
+                {
+                    return GetFlattenedPropertyExpression(propertyPath, context)
+                        ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName, isAggregated: true), context);
+                }
 
                 return GetFlattenedPropertyExpression(propertyPath, context)
                     ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName), context);
             }
         }
 
-        internal static Expression GetPropertyExpression(Expression source, string propertyPath)
+        internal static Expression GetPropertyExpression(Expression source, string propertyPath, bool isAggregated = false)
         {
             string[] propertyNameParts = propertyPath.Split('\\');
             Expression propertyValue = source;
             foreach (var propertyName in propertyNameParts)
             {
-                propertyValue = Expression.Property(propertyValue, propertyName);
+                // Trying to fix problem with $apply and $orderby. https://github.com/OData/AspNetCoreOData/issues/420
+                if (isAggregated)
+                {
+                    propertyValue = Expression.Property(propertyValue, "Values");
+                    var propertyInfo = typeof(Dictionary<string, object>).GetProperty("Item");
+                    var arguments = new List<Expression> { Expression.Constant(propertyName) };
+
+                    propertyValue = Expression.MakeIndex(propertyValue, propertyInfo, arguments);
+                }
+                else propertyValue = Expression.Property(propertyValue, propertyName);
             }
             return propertyValue;
         }

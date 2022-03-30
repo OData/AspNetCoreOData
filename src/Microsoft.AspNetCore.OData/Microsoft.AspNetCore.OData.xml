@@ -9192,7 +9192,7 @@
             All parameters present in current context.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type,System.Type)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
             </summary>
@@ -9221,6 +9221,16 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementClrType">
             <summary>
             Gets the Element Clr type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.BeforeAggregationClrType">
+            <summary>
+            Gets the CLR type of the element before the aggregation wrapper override.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AfterAggregationClrType">
+            <summary>
+            Gets the CLR type of the element after the aggregation wrapper override.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.AssembliesResolver">
