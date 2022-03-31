@@ -5,12 +5,17 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
@@ -113,15 +118,50 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             IEdmModel model = new Mock<IEdmModel>().Object;
             ExceptionAssert.ThrowsArgumentNull(() => action.AddSelector(httpMethods, null, model, null), "path");
         }
+
+        [Theory]
+        [InlineData(typeof(TestController), "Get", true)]
+        [InlineData(typeof(TestController), "Create", true)]
+        [InlineData(typeof(TestController), "Index", false)]
+        [InlineData(typeof(CorsTestController), "Index", true)]
+        public void AddSelector_AddsCors_ForActionsWithCorsAttribute(Type controllerType, string actionName, bool expectedCorsSetting)
+        {
+            // Arrange
+            IEdmModel model = new Mock<IEdmModel>().Object;
+            MethodInfo methodInfo = controllerType.GetMethod(actionName);
+            ActionModel action = methodInfo.BuildActionModel();
+            action.Controller = ControllerModelHelpers.BuildControllerModel(controllerType);
+            
+            // Act
+            action.AddSelector("Get", string.Empty, model, new ODataPathTemplate(CountSegmentTemplate.Instance));
+            
+            // Assert
+            SelectorModel newSelector = action.Selectors.FirstOrDefault();
+            Assert.NotNull(newSelector);
+            HttpMethodMetadata httpMethodMetadata = newSelector.EndpointMetadata.OfType<HttpMethodMetadata>().FirstOrDefault();
+            Assert.NotNull(httpMethodMetadata);
+            Assert.Equal(httpMethodMetadata.AcceptCorsPreflight, expectedCorsSetting);
+        }
     }
 
     internal class TestController
     {
         public void Index(int id)
-        {
-        }
+        { }
 
+        [EnableCors]
         public void Get(int key)
+        { }
+        
+        [DisableCors]
+        public void Create()
+        { }
+    }
+
+    [EnableCors]
+    internal class CorsTestController
+    {
+        public void Index(int id)
         { }
     }
 }
