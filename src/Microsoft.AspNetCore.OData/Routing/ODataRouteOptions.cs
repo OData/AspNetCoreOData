@@ -34,6 +34,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Gets/sets a value indicating whether to enable case insensitive for the action name in conventional routing.
+        /// </summary>
+        public bool EnableActionNameCaseInsensitive { get; set; } = false;
+        
+        /// <summary>
         /// Gets/sets a value indicating whether to enable case insensitive for the controller name in conventional routing.
         /// </summary>
         public bool EnableControllerNameCaseInsensitive { get; set; } = false;

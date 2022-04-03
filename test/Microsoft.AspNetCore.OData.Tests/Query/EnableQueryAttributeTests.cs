@@ -6,23 +6,15 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
@@ -30,6 +22,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
@@ -38,6 +31,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 {
     public class EnableQueryAttributeTests
     {
+        private static IEdmModel _model = GetEdmModel();
+
 #if false
         public static List<Customer> CustomerList = new List<Customer>()
         {
@@ -575,16 +570,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(expectedResponse, response.Content);
         }
+#endif
 
         [Fact]
         public void ValidateQuery_Throws_With_Null_Request()
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            var request = RequestFactory.Create();
-            request.EnableHttpDependencyInjectionSupport();
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Builder.TestModels.Customer)), request);
+            HttpRequest request = new DefaultHttpContext().Request;
+            var options = new ODataQueryOptions(new ODataQueryContext(EdmCoreModel.Instance, typeof(int)), request);
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(null, options), "request");
@@ -595,9 +589,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
+            HttpRequest request = new DefaultHttpContext().Request;
 
             // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(new HttpRequestMessage(), null), "queryOptions");
+            ExceptionAssert.ThrowsArgumentNull(() => attribute.ValidateQuery(request, null), "queryOptions");
         }
 
         [Theory]
@@ -609,15 +604,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/?" + query);
-            request.EnableHttpDependencyInjectionSupport();
-            DefaultQuerySettings defaultQuerySettings = request.GetConfiguration().GetDefaultQuerySettings();
-            defaultQuerySettings.EnableFilter = true;
-            defaultQuerySettings.EnableOrderBy = true;
-            defaultQuerySettings.MaxTop = null;
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/?" + query);
 
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var context = new ODataQueryContext(model, typeof(Builder.TestModels.Customer), null);
+            var context = new ODataQueryContext(_model, typeof(QCustomer));
+            context.DefaultQuerySettings.EnableFilter = true;
+            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQuerySettings.MaxTop = null;
             var options = new ODataQueryOptions(context, request);
 
             // Act & Assert
@@ -625,20 +617,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
-        public void ValidateQuery_Sends_BadRequest_For_Unrecognized_QueryNames()
+        public void ValidateQuery_ThrowsODataException_For_Unrecognized_QueryNames()
         {
             // Arrange
             EnableQueryAttribute attribute = new EnableQueryAttribute();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/?$xxx");
-            request.EnableHttpDependencyInjectionSupport();
-            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
-            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Builder.TestModels.Customer)), request);
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/?$xxx");
+            var options = new ODataQueryOptions(new ODataQueryContext(_model, typeof(QCustomer)), request);
 
             // Act & Assert
-            HttpResponseException responseException = ExceptionAssert.Throws<HttpResponseException>(
-                                                                () => attribute.ValidateQuery(request, options));
+            ODataException ex = ExceptionAssert.Throws<ODataException>(
+                () => attribute.ValidateQuery(request, options));
 
-            Assert.Equal(HttpStatusCode.BadRequest, responseException.Response.StatusCode);
+            Assert.Equal("Custom query option '$xxx' that starts with '$' is not supported.", ex.Message);
         }
 
         [Fact]
@@ -646,13 +636,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             Mock<EnableQueryAttribute> mockAttribute = new Mock<EnableQueryAttribute>();
-            mockAttribute.Setup(m => m.ValidateQuery(It.IsAny<HttpRequestMessage>(), It.IsAny<ODataQueryOptions>())).Callback(() => { }).Verifiable();
+            mockAttribute.Setup(
+                m => m.ValidateQuery(It.IsAny<HttpRequest>(), It.IsAny<ODataQueryOptions>())).Callback(() => { }).Verifiable();
 
             // Act & Assert
             mockAttribute.Object.ValidateQuery(null, null);
             mockAttribute.Verify();
         }
 
+#if false
         [Fact]
         public void ApplyQuery_Throws_With_Null_Queryable()
         {
@@ -1159,7 +1151,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 "returned a SingleResult containing more than one element. SingleResult must have zero or one elements.",
                 responseString);
         }
-
+#endif
         [Theory]
         [InlineData("$filter=ID eq 1")]
         [InlineData("$orderby=ID")]
@@ -1168,18 +1160,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [InlineData("$top=0")]
         public void ValidateSelectExpandOnly_ThrowsODataException_IfODataQueryOptionsHasNonSelectExpand(string parameter)
         {
-            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
-            model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost?" + parameter);
-            request.EnableHttpDependencyInjectionSupport();
-            ODataQueryContext context = new ODataQueryContext(model.Model, typeof(Customer));
+            // Arrange
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost?" + parameter);
+            ODataQueryContext context = new ODataQueryContext(_model, typeof(QCustomer));
             ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
+            // Act & Assert
             ExceptionAssert.Throws<ODataException>(
                 () => EnableQueryAttribute.ValidateSelectExpandOnly(queryOptions),
                 "The requested resource is not a collection. Query options $filter, $orderby, $count, $skip, and $top can be applied only on collections.");
         }
 
+#if false
         [Fact]
         public void OnActionExecuted_Works_WithPath()
         {
@@ -1249,5 +1241,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             return actionExecutedContext;
         }
 #endif
+        private static IEdmModel GetEdmModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<QCustomer>("Customers");
+            return builder.GetEdmModel();
+        }
+
+        private class QCustomer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
     }
 }

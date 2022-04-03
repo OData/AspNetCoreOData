@@ -235,11 +235,13 @@ public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchHandler {
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem {
 	protected ODataBatchRequestItem ()
 
+	System.Collections.Generic.IDictionary`2[[System.String],[System.String]] ContentIdToLocationMapping  { public get; public set; }
+
 	public abstract System.Threading.Tasks.Task`1[[Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem]] SendRequestAsync (Microsoft.AspNetCore.Http.RequestDelegate handler)
 	[
 	AsyncStateMachineAttribute(),
 	]
-	public static System.Threading.Tasks.Task SendRequestAsync (Microsoft.AspNetCore.Http.RequestDelegate handler, Microsoft.AspNetCore.Http.HttpContext context, System.Collections.Generic.Dictionary`2[[System.String],[System.String]] contentIdToLocationMapping)
+	public static System.Threading.Tasks.Task SendRequestAsync (Microsoft.AspNetCore.Http.RequestDelegate handler, Microsoft.AspNetCore.Http.HttpContext context, System.Collections.Generic.IDictionary`2[[System.String],[System.String]] contentIdToLocationMapping)
 }
 
 public abstract class Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem {
@@ -1759,6 +1761,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator : Mic
 public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	public ODataRouteOptions ()
 
+	bool EnableActionNameCaseInsensitive  { public get; public set; }
 	bool EnableControllerNameCaseInsensitive  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }

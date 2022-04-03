@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            await SendRequestAsync(handler, Context, null).ConfigureAwait(false);
+            await SendRequestAsync(handler, Context, this.ContentIdToLocationMapping).ConfigureAwait(false);
 
             return new OperationResponseItem(Context);
         }

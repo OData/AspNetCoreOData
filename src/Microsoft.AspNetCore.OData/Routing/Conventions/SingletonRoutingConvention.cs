@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             string singletonName = context.Singleton.Name;
 
             string actionMethodName = action.ActionName;
-            if (IsSupportedActionName(actionMethodName, singletonName, out string httpMethod))
+            if (IsSupportedActionName(context, actionMethodName, singletonName, out string httpMethod))
             {
                 // ~/Me
                 ODataPathTemplate template = new ODataPathTemplate(new SingletonSegmentTemplate(context.Singleton));
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             string actionPrefix = actionMethodName.Substring(0, index);
-            if (IsSupportedActionName(actionPrefix, singletonName, out httpMethod))
+            if (IsSupportedActionName(context, actionPrefix, singletonName, out httpMethod))
             {
                 string castTypeName = actionMethodName.Substring(index + 4);
                 if (castTypeName.Length == 0)
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 IEdmEntityType entityType = context.Singleton.EntityType();
 
                 // Shall we cast to base type and the type itself? I think yes.
-                IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
+                IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true);
                 if (castType != null)
                 {
                     // ~/Me/Namespace.TypeCast
@@ -94,19 +94,20 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return false;
         }
 
-        private static bool IsSupportedActionName(string actionName, string singletonName, out string httpMethod)
+        private static bool IsSupportedActionName(ODataControllerActionContext context, string actionName, string singletonName, out string httpMethod)
         {
-            if (actionName == "Get" || actionName == $"Get{singletonName}")
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            if (actionName.Equals("Get", actionNameComparison) || actionName.Equals($"Get{singletonName}", actionNameComparison))
             {
                 httpMethod = "Get";
                 return true;
             }
-            else if (actionName == "Put" || actionName == $"Put{singletonName}")
+            else if (actionName.Equals("Put", actionNameComparison) || actionName.Equals($"Put{singletonName}", actionNameComparison))
             {
                 httpMethod = "Put";
                 return true;
             }
-            else if (actionName == "Patch" || actionName == $"Patch{singletonName}")
+            else if (actionName.Equals("Patch", actionNameComparison) || actionName.Equals($"Patch{singletonName}", actionNameComparison))
             {
                 httpMethod = "Patch";
                 return true;

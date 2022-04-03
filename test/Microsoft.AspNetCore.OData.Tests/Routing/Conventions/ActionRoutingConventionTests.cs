@@ -17,13 +17,20 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData.Edm;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 {
     public class ActionRoutingConventionTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
         private static ActionRoutingConvention ActionConvention = ConventionHelpers.CreateConvention<ActionRoutingConvention>();
         private static IEdmModel EdmModel = GetEdmModel();
+
+        public ActionRoutingConventionTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
 
         [Fact]
         public void AppliesToActionOnActionRoutingConvention_Throws_Context()
@@ -178,6 +185,90 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 };
             }
         }
+        
+        public static TheoryDataSet<Type, string, string[]> ActionRoutingConventionCaseInsensitiveTestData
+        {
+            get
+            {
+                return new TheoryDataSet<Type, string, string[]>()
+                {
+                    // Bound to single
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISBASEUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.IsBaseUpgraded",
+                            "/CustomersCaseInsensitive({key})/IsBaseUpgraded",
+                            "/CustomersCaseInsensitive/{key}/NS.IsBaseUpgraded",
+                            "/CustomersCaseInsensitive/{key}/IsBaseUpgraded",
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.IsUpgraded",
+                            "/CustomersCaseInsensitive({key})/IsUpgraded",
+                            "/CustomersCaseInsensitive/{key}/NS.IsUpgraded",
+                            "/CustomersCaseInsensitive/{key}/IsUpgraded"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISVIPUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.VipCustomer/NS.IsVipUpgraded",
+                            "/CustomersCaseInsensitive({key})/NS.VipCustomer/IsVipUpgraded",
+                            "/CustomersCaseInsensitive/{key}/NS.VipCustomer/NS.IsVipUpgraded",
+                            "/CustomersCaseInsensitive/{key}/NS.VipCustomer/IsVipUpgraded"
+                        }
+                    },
+                    // bound to collection
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "ISBASEALLUPGRADED",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.IsBaseAllUpgraded",
+                            "/CustomersCaseInsensitive/IsBaseAllUpgraded"
+                        }
+                    },
+                    // overload
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "UPGRADEDALLOnCUSTOMER",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive({key})/NS.UpgradedAll",
+                            "/CustomersCaseInsensitive({key})/UpgradedAll",
+                            "/CustomersCaseInsensitive/{key}/NS.UpgradedAll",
+                            "/CustomersCaseInsensitive/{key}/UpgradedAll"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "UPGRADEDALLOnCollectionOfCUSTOMER",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.UpgradedAll",
+                            "/CustomersCaseInsensitive/UpgradedAll"
+                        }
+                    },
+                    {
+                        typeof(CustomersCaseInsensitiveController),
+                        "UPGRADEDALLOnCollectionOfVIPCUSTOMER",
+                        new[]
+                        {
+                            "/CustomersCaseInsensitive/NS.VipCustomer/NS.UpgradedAll",
+                            "/CustomersCaseInsensitive/NS.VipCustomer/UpgradedAll"
+                        }
+                    }
+                };
+            }
+        }
 
         [Theory]
         [MemberData(nameof(ActionRoutingConventionTestData))]
@@ -197,6 +288,47 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             Assert.Equal(templates.Length, action.Selectors.Count);
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
         }
+
+        [Theory]
+        [MemberData(nameof(ActionRoutingConventionCaseInsensitiveTestData))]
+        [MemberData(nameof(ActionRoutingConventionTestData))]
+        public void ActionRoutingConventionTestDataWithCaseInsensitiveActionNameRunsAsExpected(Type controllerType, string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Options.RouteOptions.EnableActionNameCaseInsensitive = true;
+            context.Action = action;
+
+            // Act
+            ActionConvention.AppliesToAction(context);
+
+            
+            // Assert
+            Assert.Equal(templates.Length, action.Selectors.Count);
+            Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
+        }
+        
+        [Theory]
+        [MemberData(nameof(ActionRoutingConventionCaseInsensitiveTestData))]
+        public void ActionRoutingConventionDoesCaseSensitiveMatchingByDefault(Type controllerType, string actionName, string[] templates)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+
+            // Act
+            ActionConvention.AppliesToAction(context);
+
+            // Assert
+            SelectorModel selector = Assert.Single(action.Selectors);
+            Assert.Null(selector.AttributeRouteModel);
+        }        
 
         [Theory]
         [InlineData("Post")]
@@ -295,6 +427,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
+            container.AddEntitySet("CustomersCaseInsensitive", customer);
             container.AddSingleton("Me", customer);
             model.AddElement(container);
             return model;
@@ -370,6 +503,37 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             [HttpPost]
             public void IsVipUpgraded(ODataActionParameters parameters, string param)
             { }
+        }
+        
+        private class CustomersCaseInsensitiveController
+        {
+            [HttpPost]
+            public void ISBASEUPGRADED(int key, CancellationToken cancellation, ODataActionParameters parameters)
+            { }            
+            
+            [HttpPost]
+            public void ISUPGRADED(int key, CancellationToken cancellation)
+            { }
+            
+            [HttpPost]
+            public void ISVIPUPGRADED(int key, ODataActionParameters parameters)
+            { }
+            
+            [HttpPost]
+            public void ISBASEALLUPGRADED(ODataActionParameters parameters)
+            { }
+            
+            [HttpPost]
+            public void UPGRADEDALLOnCUSTOMER(int key, ODataActionParameters parameters)
+            { }            
+            
+            [HttpPost]
+            public void UPGRADEDALLOnCollectionOfCUSTOMER(ODataActionParameters parameters)
+            { }
+            
+            [HttpPost]
+            public void UPGRADEDALLOnCollectionOfVIPCUSTOMER(ODataActionParameters parameters)
+            { }            
         }
 
         private class AnotherCustomersController

@@ -90,6 +90,30 @@ namespace Microsoft.AspNetCore.OData.Common
             return Type.GetTypeCode(underlyingTypeOrSelf) == TypeCode.DateTime;
         }
 
+#if NET6_0
+        /// <summary>
+        /// Determine if a type is a <see cref="DateOnly"/>.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a DateOnly; false otherwise.</returns>
+        public static bool IsDateOnly(this Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return underlyingTypeOrSelf == typeof(DateOnly);
+        }
+
+        /// <summary>
+        /// Determine if a type is a <see cref="TimeOnly"/>.
+        /// </summary>
+        /// <param name="clrType">The type to test.</param>
+        /// <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        public static bool IsTimeOnly(this Type clrType)
+        {
+            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(clrType);
+            return underlyingTypeOrSelf == typeof(TimeOnly);
+        }
+#endif
+
         /// <summary>
         /// Determine if a type is a TimeSpan.
         /// </summary>

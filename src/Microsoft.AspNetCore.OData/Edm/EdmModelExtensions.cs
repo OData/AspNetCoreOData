@@ -392,13 +392,15 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="structuralType">The starting structural type.</param>
         /// <param name="model">The Edm model.</param>
         /// <param name="typeName">The searching type name.</param>
+        /// <param name="caseInsensitive">If true, performs case insensitive search</param>
         /// <returns>The found type.</returns>
-        public static IEdmStructuredType FindTypeInInheritance(this IEdmStructuredType structuralType, IEdmModel model, string typeName)
+        public static IEdmStructuredType FindTypeInInheritance(this IEdmStructuredType structuralType, IEdmModel model, string typeName, bool caseInsensitive = false)
         {
+            StringComparison typeStringComparison = caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;   
             IEdmStructuredType baseType = structuralType;
             while (baseType != null)
             {
-                if (GetName(baseType) == typeName)
+                if (GetName(baseType).Equals(typeName, typeStringComparison))
                 {
                     return baseType;
                 }
@@ -406,7 +408,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 baseType = baseType.BaseType;
             }
 
-            return model.FindAllDerivedTypes(structuralType).FirstOrDefault(c => GetName(c) == typeName);
+            return model.FindAllDerivedTypes(structuralType).FirstOrDefault(c => GetName(c).Equals(typeName, typeStringComparison));
         }
 
         private static string GetName(IEdmStructuredType type)

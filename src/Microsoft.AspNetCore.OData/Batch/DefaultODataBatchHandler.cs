@@ -109,6 +109,8 @@ namespace Microsoft.AspNetCore.OData.Batch
                 List<ODataBatchRequestItem> requests = new List<ODataBatchRequestItem>();
                 ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
                 Guid batchId = Guid.NewGuid();
+                Dictionary<string, string> contentToLocationMapping = new Dictionary<string, string>();
+
                 while (await batchReader.ReadAsync().ConfigureAwait(false))
                 {
                     if (batchReader.State == ODataBatchReaderState.ChangesetStart)
@@ -118,13 +120,18 @@ namespace Microsoft.AspNetCore.OData.Batch
                         {
                             changeSetContext.Request.ClearRouteServices();
                         }
-                        requests.Add(new ChangeSetRequestItem(changeSetContexts));
+
+                        ChangeSetRequestItem requestItem = new ChangeSetRequestItem(changeSetContexts);
+                        requestItem.ContentIdToLocationMapping = contentToLocationMapping;
+                        requests.Add(requestItem);
                     }
                     else if (batchReader.State == ODataBatchReaderState.Operation)
                     {
                         HttpContext operationContext = await batchReader.ReadOperationRequestAsync(context, batchId, cancellationToken).ConfigureAwait(false);
                         operationContext.Request.ClearRouteServices();
-                        requests.Add(new OperationRequestItem(operationContext));
+                        OperationRequestItem requestItem = new OperationRequestItem(operationContext);
+                        requestItem.ContentIdToLocationMapping = contentToLocationMapping;
+                        requests.Add(requestItem);
                     }
                 }
 

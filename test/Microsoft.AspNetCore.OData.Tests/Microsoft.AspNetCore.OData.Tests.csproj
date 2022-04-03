@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' >= '17.0'">$(TargetFrameworks);net6.0</TargetFrameworks>
     <AssemblyName>Microsoft.AspNetCore.OData.Tests</AssemblyName>
     <RootNamespace>Microsoft.AspNetCore.OData.Tests</RootNamespace>
 
@@ -13,8 +14,12 @@
 
   <ItemGroup>
     <!-- AsyncInterfaces reference is required because ODL uses IAsyncDisposable -->
+    <PackageReference Include="coverlet.collector" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.8" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="xunit" Version="2.3.1" />

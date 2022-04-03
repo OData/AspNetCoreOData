@@ -684,12 +684,12 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (queryOptions == null)
             {
-                throw Error.ArgumentNull("queryOptions");
+                throw Error.ArgumentNull(nameof(queryOptions));
             }
 
             IQueryCollection queryParameters = request.Query;
@@ -700,7 +700,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     // we don't support any custom query options that start with $
                     // this should be caught be OnActionExecuted().
-                    throw new ArgumentOutOfRangeException(kvp.Key);
+                    throw new ODataException(Error.Format(SRResources.CustomQueryOptionNotSupportedWithDollarSign, kvp.Key));
                 }
             }
 

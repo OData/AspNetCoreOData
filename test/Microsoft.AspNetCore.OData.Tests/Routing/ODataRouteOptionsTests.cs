@@ -27,6 +27,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
             Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
+            Assert.False(options.EnableActionNameCaseInsensitive);
             Assert.False(options.EnableControllerNameCaseInsensitive);
             Assert.False(options.EnablePropertyNameCaseInsensitive);
         }
@@ -43,6 +44,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Assert.True(options.EnableQualifiedOperationCall);
             Assert.True(options.EnableUnqualifiedOperationCall);
             Assert.False(options.EnableNonParenthesisForEmptyParameterFunction);
+            Assert.False(options.EnableActionNameCaseInsensitive);
             Assert.False(options.EnableControllerNameCaseInsensitive);
             Assert.False(options.EnablePropertyNameCaseInsensitive);
         }
@@ -55,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             Verify(opt => opt.EnableQualifiedOperationCall, (opt, b) => opt.EnableQualifiedOperationCall = b);
             Verify(opt => opt.EnableUnqualifiedOperationCall, (opt, b) => opt.EnableUnqualifiedOperationCall = b);
             Verify(opt => opt.EnableNonParenthesisForEmptyParameterFunction, (opt, b) => opt.EnableNonParenthesisForEmptyParameterFunction = b, false);
+            Verify(opt => opt.EnableActionNameCaseInsensitive, (opt, b) => opt.EnableActionNameCaseInsensitive = b, false);
             Verify(opt => opt.EnableControllerNameCaseInsensitive, (opt, b) => opt.EnableControllerNameCaseInsensitive = b, false);
             Verify(opt => opt.EnablePropertyNameCaseInsensitive, (opt, b) => opt.EnablePropertyNameCaseInsensitive = b, false);
         }

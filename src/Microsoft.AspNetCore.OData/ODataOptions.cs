@@ -315,7 +315,12 @@ namespace Microsoft.AspNetCore.OData
             builder.AddDefaultWebApiServices();
 
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-            builder.Services.AddSingleton<ODataUriResolver>(sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });
+            builder.Services.AddSingleton<ODataUriResolver>(sp =>
+                new UnqualifiedODataUriResolver
+                {
+                    EnableCaseInsensitive = true, // by default to enable case insensitive
+                    EnableNoDollarQueryOptions = EnableNoDollarQueryOptions // retrieve it from global setting
+                });
 
             if (model != null)
             {

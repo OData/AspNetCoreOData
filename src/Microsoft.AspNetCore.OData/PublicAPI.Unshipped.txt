@@ -157,6 +157,8 @@ Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.Invoke(Microsoft.AspNetCor
 Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware.ODataBatchMiddleware(System.IServiceProvider serviceProvider, Microsoft.AspNetCore.Http.RequestDelegate next) -> void
 Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions
 Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem
+Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.ContentIdToLocationMapping.get -> System.Collections.Generic.IDictionary<string, string>
+Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.ContentIdToLocationMapping.set -> void
 Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.ODataBatchRequestItem() -> void
 Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem
 Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.ODataBatchResponseItem() -> void
@@ -1224,6 +1226,8 @@ Microsoft.AspNetCore.OData.Routing.ODataPathSegmentHandler.PathLiteral.get -> st
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator
 Microsoft.AspNetCore.OData.Routing.ODataPathSegmentTranslator.ODataPathSegmentTranslator() -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive.get -> bool
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableKeyAsSegment.get -> bool
@@ -1530,7 +1534,7 @@ static Microsoft.AspNetCore.OData.Batch.ODataBatchHttpRequestExtensions.SetOData
 static Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(this Microsoft.OData.ODataBatchReader reader, Microsoft.AspNetCore.Http.HttpContext context, System.Guid batchId, System.Guid changeSetId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Http.HttpContext>
 static Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadChangeSetRequestAsync(this Microsoft.OData.ODataBatchReader reader, Microsoft.AspNetCore.Http.HttpContext context, System.Guid batchId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Microsoft.AspNetCore.Http.HttpContext>>
 static Microsoft.AspNetCore.OData.Batch.ODataBatchReaderExtensions.ReadOperationRequestAsync(this Microsoft.OData.ODataBatchReader reader, Microsoft.AspNetCore.Http.HttpContext context, System.Guid batchId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Http.HttpContext>
-static Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler, Microsoft.AspNetCore.Http.HttpContext context, System.Collections.Generic.Dictionary<string, string> contentIdToLocationMapping) -> System.Threading.Tasks.Task
+static Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler, Microsoft.AspNetCore.Http.HttpContext context, System.Collections.Generic.IDictionary<string, string> contentIdToLocationMapping) -> System.Threading.Tasks.Task
 static Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteMessageAsync(Microsoft.OData.ODataBatchWriter writer, Microsoft.AspNetCore.Http.HttpContext context) -> System.Threading.Tasks.Task
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetAlternateKeys(this Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmEntityType entityType) -> System.Collections.Generic.IEnumerable<System.Collections.Generic.IDictionary<string, Microsoft.OData.Edm.IEdmPathExpression>>
 static Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrEnumMemberAnnotation(this Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmEnumType enumType) -> Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation

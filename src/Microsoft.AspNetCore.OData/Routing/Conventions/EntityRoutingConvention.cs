@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmStructuredType castType = null;
             if (castTypeName != null)
             {
-                castType = entityType.FindTypeInInheritance(context.Model, castTypeName);
+                castType = entityType.FindTypeInInheritance(context.Model, castTypeName, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true);
                 if (castType == null)
                 {
                     return false;

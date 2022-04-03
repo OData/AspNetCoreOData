@@ -713,7 +713,7 @@
             Represents an OData batch request.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.IDictionary{System.String,System.String})">
             <summary>
             Routes a single OData batch request.
             </summary>
@@ -728,6 +728,11 @@
             </summary>
             <param name="handler">The handler for processing a message.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem"/>.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.ContentIdToLocationMapping">
+            <summary>
+            Default dictionary that ODataBatchRequestItems should use when mapping ID references to URLs
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem">
             <summary>
@@ -1088,6 +1093,20 @@
             </summary>
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
@@ -1902,11 +1921,6 @@
             <param name="entityType">The EDM entity type.</param>
             <returns>A collection of operations bound to the feed.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.ClrTypeCache">
-            <summary>
-            CLR type cache
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.CustomAggregateMethodAnnotation">
             <summary>
             Allows client to tell OData which are the custom aggregation methods defined.
@@ -2257,13 +2271,14 @@
             <param name="edmType"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
             Find the given type in a structured type inheritance, include itself.
             </summary>
             <param name="structuralType">The starting structural type.</param>
             <param name="model">The Edm model.</param>
             <param name="typeName">The searching type name.</param>
+            <param name="caseInsensitive">If true, performs case insensitive search</param>
             <returns>The found type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetAvailableActions(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmEntityType)">
@@ -6549,6 +6564,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CreateODataValueNotSupported">
             <summary>
               Looks up a localized string similar to {0} does not support CreateODataValue..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CustomQueryOptionNotSupportedWithDollarSign">
+            <summary>
+              Looks up a localized string similar to Custom query option &apos;{0}&apos; that starts with &apos;$&apos; is not supported..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.DeltaEntityTypeNotAssignable">
@@ -12841,6 +12861,11 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive">
+            <summary>
+            Gets/sets a value indicating whether to enable case insensitive for the action name in conventional routing.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive">
