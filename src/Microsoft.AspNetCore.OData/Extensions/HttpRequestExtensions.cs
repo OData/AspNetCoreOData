@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
@@ -15,9 +18,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.AspNetCore.OData.Extensions
 {
