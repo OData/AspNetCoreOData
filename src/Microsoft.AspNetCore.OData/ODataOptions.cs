@@ -65,11 +65,11 @@ namespace Microsoft.AspNetCore.OData
         private IServiceProvider ServiceProvider { get; set; }
 
         /// <summary>
-        /// Enables dependency injection support for non-model scenario
+        /// Configures service collection for non-EDM scenario
         /// </summary>
         /// <param name="configureServices">The configuring action to add the services to the container.</param>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
-        public ODataOptions EnableDependencyInjection(Action<IServiceCollection> configureServices)
+        public ODataOptions ConfigureServiceCollection(Action<IServiceCollection> configureServices)
         {
             ServiceProvider = BuildContainer(configureServices);
             return this;
