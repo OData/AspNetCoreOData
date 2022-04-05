@@ -613,7 +613,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The OData path.</param>
         /// <returns></returns>
-        private static ODataQueryContext GetODataQueryContext(
+        private ODataQueryContext GetODataQueryContext(
             object responseValue,
             IQueryable singleResultCollection,
             ControllerActionDescriptor actionDescriptor,
@@ -715,7 +715,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
         /// <param name="request">The Http request.</param>
         /// <returns>true/false</returns>
-        private static bool ContainsAutoSelectExpandProperty(object responseValue, IQueryable singleResultCollection,
+        private bool ContainsAutoSelectExpandProperty(object responseValue, IQueryable singleResultCollection,
             ControllerActionDescriptor actionDescriptor, HttpRequest request)
         {
             Type elementClrType = GetElementType(responseValue, singleResultCollection, actionDescriptor);
@@ -758,7 +758,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="request">The request message to retrieve a model for.</param>
         /// <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
         /// <returns>The EDM model for the given type and request.</returns>
-        public static IEdmModel GetModel(
+        public virtual IEdmModel GetModel(
             Type elementClrType,
             HttpRequest request,
             ActionDescriptor actionDescriptor)
