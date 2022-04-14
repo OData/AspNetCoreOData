@@ -288,6 +288,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Assert
             SelectorModel selector = Assert.Single(action.Selectors);
             Assert.Null(selector.AttributeRouteModel);
+            Assert.NotEmpty(templates);
         }        
 
         public static TheoryDataSet<MethodInfo, string[]> OverloadFunctionTestData
