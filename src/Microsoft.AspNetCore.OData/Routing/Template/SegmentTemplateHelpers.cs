@@ -58,6 +58,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     string strValue = rawValue as string;
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
+                    newStrValue = Uri.UnescapeDataString(newStrValue);
                     if (newStrValue != strValue)
                     {
                         updatedValues[parameterTemp] = newStrValue;
