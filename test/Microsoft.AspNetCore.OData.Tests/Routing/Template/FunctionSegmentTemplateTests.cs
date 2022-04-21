@@ -370,5 +370,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
                     Assert.Equal(42, e.Value);
                 });
         }
+
+        [Fact]
+        public void TryTranslateFunctionSegmentTemplate_ReturnsODataFunctionSegment_UsingEscapedString()
+        {
+            // Arrange
+            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, false);
+            EdmFunction function = new EdmFunction("NS", "MyFunction", primitive, true, null, false);
+            function.AddParameter("bindingParameter", primitive);
+            function.AddParameter("name", primitive);
+
+            FunctionSegmentTemplate template = new FunctionSegmentTemplate(function, null);
+            EdmModel edmModel = new EdmModel();
+            edmModel.AddElement(function);
+
+            RouteValueDictionary routeValue = new RouteValueDictionary(new { name = "'Ji%2FChange%23%20T'" });
+
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValue,
+                Model = edmModel
+            };
+
+            // Act
+            bool ok = template.TryTranslate(context);
+
+            // Assert
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
+            OperationSegment functionSegment = Assert.IsType<OperationSegment>(actual);
+            Assert.Same(function, functionSegment.Operations.First());
+            var parameter = Assert.Single(functionSegment.Parameters);
+            Assert.Equal("name", parameter.Name);
+            Assert.Equal("Ji/Change# T", parameter.Value.ToString());
+        }
     }
 }
