@@ -227,7 +227,8 @@ namespace Microsoft.AspNetCore.OData.Batch
                     kvp.Key == typeof(IODataFeature) ||
                     kvp.Key == typeof(IItemsFeature) ||
                     kvp.Key == typeof(IHttpRequestFeature) ||
-                    kvp.Key == typeof(IHttpResponseFeature))
+                    kvp.Key == typeof(IHttpResponseFeature) ||
+                    kvp.Key == typeof(IQueryFeature)) // Noted: we should not pass the QueryFeature from Main request to the sub request
                 {
                     continue;
                 }
