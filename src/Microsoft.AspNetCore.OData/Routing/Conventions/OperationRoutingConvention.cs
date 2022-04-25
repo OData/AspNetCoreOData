@@ -68,34 +68,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             bool isOnCollection = false;
             IEdmEntityType castTypeFromActionName = null;
 
-            // Let's find the operations using the action first,
-            // If not founding, let's split the action name, search again
             IEdmOperation[] candidates = FindCandidates(context, actionName);
-
             if (candidates.Length == 0)
             {
-                // OperationNameOnCollectionOfEntityType
-                string operationName = SplitActionName(actionName, out string cast, out isOnCollection);
+                // If we can't find any Edm operation using the action name directly,
+                // Let's split the action name and use part of it to search again.
+                candidates = FindCandidates(context, entityType, actionName, out castTypeFromActionName, out isOnCollection);
+            }
 
-                castTypeFromActionName = null;
-                if (cast != null)
-                {
-                    if (cast.Length == 0)
-                    {
-                        // Early return for the following cases:
-                        // - {OperationName}On
-                        // - {OperationName}OnCollectionOf
-                        return;
-                    }
-
-                    castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
-                    if (castTypeFromActionName == null)
-                    {
-                        return;
-                    }
-                }
-
-                candidates = FindCandidates(context, operationName);
+            if (candidates == null || candidates.Length == 0)
+            {
+                return;
             }
 
             foreach (IEdmOperation edmOperation in candidates)
@@ -185,8 +168,41 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // TODO: refactor here
             // If we have multiple same function defined, we should match the best one?
 
-            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            return context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name.Equals(operationName, actionNameComparison)).ToArray();
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ?
+                StringComparison.OrdinalIgnoreCase :
+                StringComparison.Ordinal;
+
+            return context.Model.SchemaElements
+                .OfType<IEdmOperation>()
+                .Where(f => f.IsBound && f.Name.Equals(operationName, actionNameComparison))
+                .ToArray();
+        }
+
+        private static IEdmOperation[] FindCandidates(ODataControllerActionContext context, IEdmEntityType entityType, string actionName,
+            out IEdmEntityType castTypeFromActionName, out bool isOnCollection)
+        {
+            // OperationNameOnCollectionOfEntityType
+            string operationName = SplitActionName(actionName, out string cast, out isOnCollection);
+
+            castTypeFromActionName = null;
+            if (cast != null)
+            {
+                if (cast.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - {OperationName}On
+                    // - {OperationName}OnCollectionOf
+                    return null;
+                }
+
+                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
+                if (castTypeFromActionName == null)
+                {
+                    return null;
+                }
+            }
+
+            return FindCandidates(context, operationName);
         }
 
         /// <summary>
