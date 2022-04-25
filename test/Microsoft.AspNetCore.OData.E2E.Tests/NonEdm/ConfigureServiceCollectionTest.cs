@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.UriParser;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -34,9 +32,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.NonEdm
         [Fact]
         public async Task EnableConfigureServiceCollectionTest()
         {
-            HttpResponseMessage response = await CreateClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, $"api/Customers?$filter=Gender eq 'MaLe'"));
-            var values = await response.Content.ReadAsObject<JArray>();
-            Assert.Equal(3, values.Count);
+            using (var response = await CreateClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, $"api/Customers?$filter=Gender eq 'MaLe'")))
+            {
+                var values = await response.Content.ReadAsObject<JArray>();
+                Assert.Equal(3, values.Count);
+            }
         }
     }
 }
