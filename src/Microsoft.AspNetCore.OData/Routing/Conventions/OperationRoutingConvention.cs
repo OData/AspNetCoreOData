@@ -76,11 +76,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 candidates = FindCandidates(context, entityType, actionName, out castTypeFromActionName, out isOnCollection);
             }
 
-            if (candidates == null || candidates.Length == 0)
-            {
-                return;
-            }
-
             foreach (IEdmOperation edmOperation in candidates)
             {
                 IEdmOperationParameter bindingParameter = edmOperation.Parameters.FirstOrDefault();
@@ -192,13 +187,13 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // Early return for the following cases:
                     // - {OperationName}On
                     // - {OperationName}OnCollectionOf
-                    return null;
+                    return Array.Empty<IEdmOperation>();
                 }
 
                 castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
                 if (castTypeFromActionName == null)
                 {
-                    return null;
+                    return Array.Empty<IEdmOperation>();
                 }
             }
 
