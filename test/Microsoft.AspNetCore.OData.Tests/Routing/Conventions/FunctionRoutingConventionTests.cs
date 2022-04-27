@@ -154,11 +154,47 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                             "/Customers/NS.GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})",
                             "/Customers/GetWholeSalary(minSalary={minSalary},maxSalary={maxSalary},aveSalary={aveSalary})"
                         }
+                    },
+                    {
+                        typeof(CustomersController),
+                        "GetStatusOnLineOfflineUser",
+                        new[]
+                        {
+                            "/Customers/NS.GetStatusOnLineOfflineUser()",
+                            "/Customers/GetStatusOnLineOfflineUser()"
+                        }
+                    },
+                    {
+                        typeof(CustomersController),
+                        "GetStatusOnLineOfflineUser",
+                        new[]
+                        {
+                            "/Customers/NS.GetStatusOnLineOfflineUser()",
+                            "/Customers/GetStatusOnLineOfflineUser()"
+                        }
+                    },
+                    {
+                        typeof(CustomersController),
+                        "StatusLineOfflineUserOn",
+                        new[]
+                        {
+                            "/Customers/NS.StatusLineOfflineUserOn()",
+                            "/Customers/StatusLineOfflineUserOn()"
+                        }
+                    },
+                    {
+                        typeof(CustomersController),
+                        "GetStatusOnLineOfflineUserOnVipCustomer",
+                        new[]
+                        {
+                            "/Customers/NS.VipCustomer/NS.GetStatusOnLineOfflineUser(param={param})",
+                            "/Customers/NS.VipCustomer/GetStatusOnLineOfflineUser(param={param})"
+                        }
                     }
                 };
             }
-        }        
-        
+        }
+
         public static TheoryDataSet<Type, string, string[]> FunctionRoutingConventionCaseInsensitiveTestData
         {
             get
@@ -448,6 +484,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             getSalaray.AddOptionalParameter("aveSalary", intType, "129");
             model.AddElement(getSalaray);
 
+            EdmFunction f = new EdmFunction("NS", "GetStatusOnLineOfflineUser", intType, isBound: true, entitySetPathExpression: null, isComposable: false);
+            f.AddParameter("entityset", new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            model.AddElement(f);
+
+            EdmFunction f2 = new EdmFunction("NS", "StatusLineOfflineUserOn", intType, isBound: true, entitySetPathExpression: null, isComposable: false);
+            f2.AddParameter("entityset", new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            model.AddElement(f2);
+
+            EdmFunction f3 = new EdmFunction("NS", "GetStatusOnLineOfflineUser", intType, isBound: true, entitySetPathExpression: null, isComposable: false);
+            f3.AddParameter("entityset", new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(vipCustomer, false))));
+            f3.AddParameter("param", intType);
+            model.AddElement(f3);
+
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             container.AddEntitySet("Customers", customer);
             container.AddEntitySet("CustomersCaseInsensitive", customer);
@@ -460,6 +509,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         {
             public void Get()
             { }
+
+            [HttpGet]
+            public void GetStatusOnLineOfflineUser() { }
+
+            [HttpGet]
+            public void GetStatusOnLineOfflineUserOnVipCustomer(int param) { }
+
+            [HttpGet]
+            public void StatusLineOfflineUserOn() { }
 
             [HttpGet]
             public void IsBaseUpgraded(int key, CancellationToken cancellation)

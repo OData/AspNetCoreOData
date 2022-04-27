@@ -12427,13 +12427,14 @@
             <param name="entityType">The Edm entity type.</param>
             <param name="navigationSource">The Edm navigation source.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.SplitActionName(System.String,System.String@,System.Boolean@)">
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.SplitActionName(System.String,System.String@,System.Boolean@,System.StringComparison)">
             <summary>
             Split the action based on supporting pattern.
             </summary>
             <param name="actionName">The input action name.</param>
             <param name="cast">The out of cast type name.</param>
             <param name="isOnCollection">The out of collection binding flag.</param>
+            <param name="comparison">The case comparision flag.</param>
             <returns>The operation name.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel)">
