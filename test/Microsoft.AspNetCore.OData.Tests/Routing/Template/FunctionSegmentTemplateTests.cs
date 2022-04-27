@@ -8,12 +8,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
@@ -403,6 +406,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             var parameter = Assert.Single(functionSegment.Parameters);
             Assert.Equal("name", parameter.Name);
             Assert.Equal("Ji/Change# T", parameter.Value.ToString());
+        }
+
+        [Fact]
+        public void TryTranslateFunctionSegmentTemplate_ReturnsODataFunctionSegment_WithReturnedEntitySet()
+        {
+            // Arrange
+            var httpContext = new Mock<HttpContext>().Object;
+            var endpoint = new Endpoint(c => Task.CompletedTask, EndpointMetadataCollection.Empty, "Test");
+            var routeValues = new RouteValueDictionary();
+
+            var model = new EdmModel();
+            var entityType = new EdmEntityType("NS", "Entity");
+            entityType.AddKeys(entityType.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+            model.AddElement(entityType);
+            EdmFunction function = new EdmFunction("NS", "Function", new EdmEntityTypeReference(entityType, true), true, null, true);
+            model.AddElement(function);
+            var entityContainer = new EdmEntityContainer("NS", "Default");
+            var entitySet = entityContainer.AddEntitySet("EntitySet", entityType);
+            model.AddElement(entityContainer);
+            model.SetAnnotationValue(function, new ReturnedEntitySetAnnotation("EntitySet"));
+
+            var template = new FunctionSegmentTemplate(function, null);
+            var translateContext = new ODataTemplateTranslateContext(httpContext, endpoint, routeValues, model);
+
+            // Act
+            bool ok = template.TryTranslate(translateContext);
+
+            // Assert
+            Assert.True(ok);
+            var actual = Assert.Single(translateContext.Segments);
+            var functionSegment = Assert.IsType<OperationSegment>(actual);
+            Assert.Equal(functionSegment.EdmType, entityType);
+            Assert.Equal(functionSegment.EntitySet, entitySet);
         }
     }
 }
