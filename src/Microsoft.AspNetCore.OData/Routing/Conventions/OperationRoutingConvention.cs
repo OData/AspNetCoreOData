@@ -177,7 +177,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             out IEdmEntityType castTypeFromActionName, out bool isOnCollection)
         {
             // OperationNameOnCollectionOfEntityType
-            string operationName = SplitActionName(actionName, out string cast, out isOnCollection);
+            StringComparison caseComparision = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ?
+                StringComparison.OrdinalIgnoreCase :
+                StringComparison.Ordinal;
+
+            string operationName = SplitActionName(actionName, out string cast, out isOnCollection, caseComparision);
 
             castTypeFromActionName = null;
             if (cast != null)
@@ -206,8 +210,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// <param name="actionName">The input action name.</param>
         /// <param name="cast">The out of cast type name.</param>
         /// <param name="isOnCollection">The out of collection binding flag.</param>
+        /// <param name="comparison">The case comparision flag.</param>
         /// <returns>The operation name.</returns>
-        internal static string SplitActionName(string actionName, out string cast, out bool isOnCollection)
+        internal static string SplitActionName(string actionName, out string cast, out bool isOnCollection,
+            StringComparison comparison = StringComparison.Ordinal)
         {
             Contract.Assert(actionName != null);
 
@@ -218,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             cast = null;
             isOnCollection = false;
             string operation;
-            int index = actionName.LastIndexOf("OnCollectionOf", StringComparison.Ordinal);
+            int index = actionName.LastIndexOf("OnCollectionOf", comparison);
             if (index > 0)
             {
                 operation = actionName.Substring(0, index);
@@ -227,7 +233,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return operation;
             }
 
-            index = actionName.LastIndexOf("On", StringComparison.Ordinal);
+            index = actionName.LastIndexOf("On", comparison);
             if (index > 0)
             {
                 operation = actionName.Substring(0, index);
