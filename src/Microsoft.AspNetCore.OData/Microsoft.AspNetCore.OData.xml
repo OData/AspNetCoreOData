@@ -14056,6 +14056,16 @@
             <param name="parameterMappings">The parameter mappings.</param>
             <returns>True/False.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.SegmentTemplateHelpers.GetNavigationSourceFromEdmOperation(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation)">
+            <summary>
+            Gets the navigation source from an Edm operation.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="operation">The Edm operation.</param>
+            <returns>
+            The navigation source or null if the annotation indicating the mapping from an Edm operation to an entity set is not found.
+            </returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.SingletonSegmentTemplate">
             <summary>
             Represents a template that could match an <see cref="T:Microsoft.OData.Edm.IEdmSingleton"/>.
