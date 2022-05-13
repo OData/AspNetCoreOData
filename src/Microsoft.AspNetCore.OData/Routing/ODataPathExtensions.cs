@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 {
                     if (structuredType == null)
                     {
-                        structuredType = operationSegment.EdmType as IEdmStructuredType;
+                        structuredType = operationSegment.EdmType.AsElementType() as IEdmStructuredType;
                     }
 
                     string name = operationSegment.Operations.First().FullName() + typeCast;
