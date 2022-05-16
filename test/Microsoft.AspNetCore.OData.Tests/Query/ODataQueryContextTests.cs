@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmEntityType entityType = entitySet.EntityType();
             IEnumerable<IEdmOperation> operations = model.FindDeclaredOperations(qualifiedName);
 
-            ODataPath path = new ODataPath(new EntitySetSegment(entitySet), new OperationSegment(operations,entitySet));
+            ODataPath path = new ODataPath(new EntitySetSegment(entitySet), new OperationSegment(operations, entitySet));
 
             // Act
             ODataQueryContext context = new ODataQueryContext(model, typeof(Customer), path);
