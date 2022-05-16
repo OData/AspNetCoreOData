@@ -111,6 +111,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             {
                 qualifiedName = op.FullyQualifiedName;
             }
+
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(setName);
             IEdmEntityType entityType = entitySet.EntityType();
             IEnumerable<IEdmOperation> operations = model.FindDeclaredOperations(qualifiedName);
