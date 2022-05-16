@@ -92,6 +92,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Same(entitySet, context.NavigationSource);
             Assert.Same(typeof(Customer), context.ElementClrType);
         }
+
         [Fact]
         public void CtorODataQueryContext_TakingOperationAndPath_SetsProperties()
         {
