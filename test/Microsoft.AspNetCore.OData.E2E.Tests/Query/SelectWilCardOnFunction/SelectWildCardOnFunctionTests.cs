@@ -14,7 +14,6 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
 {
-
     public class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
     {
         public class Startup : TestStartupBase
@@ -32,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
                 });
             }
         }
+
         public SelectWildCardOnFunctionTests(WebODataTestFixture<Startup> fixture)
             : base(fixture)
         {
@@ -65,7 +65,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         }
     }
 
-
     public class SelectWildCardOnFunctionEdmModel
     {
         public static IEdmModel GetEdmModel()
@@ -80,7 +79,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         }
     }
 
-
     public class Customer
     {
         public string Id { get; set; }
@@ -88,8 +86,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         public string Status { get; set; }
     }
 
-
-    public class CustomersController : ControllerBase
+    public class CustomersController : ODataController
     {
         [HttpGet]
         public IEnumerable<Customer> GetAllCustomer()
