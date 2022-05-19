@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -22,13 +23,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
             {
                 services.ConfigureControllers(typeof(CustomersController));
 
-                IEdmModel model = SelectWildCardOnFunctionEdmModel.GetEdmModel();
+                IEdmModel model = GetEdmModel();
                 services.AddControllers().AddOData(opt =>
                 {
                     opt.Select();
                     opt.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
                     opt.AddRouteComponents("odata", model);
                 });
+            }
+            public static IEdmModel GetEdmModel()
+            {
+                ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+                builder.EntitySet<Customer>("Customers").EntityType
+                    .Collection.Function("GetAllCustomers")
+                    .ReturnsCollectionFromEntitySet<Customer>("Customers");
+
+                return builder.GetEdmModel();
             }
         }
 
@@ -45,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         public async Task SelectWildCardOnFunction_Success()
         {
             //Arrange
-            string queryUrl = "odata/Customers/GetAllCustomer?$select=*";
+            string queryUrl = "odata/Customers/GetAllCustomers?$select=*";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
@@ -59,22 +69,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
             foreach(Customer c in customers)
             {
                 Assert.NotNull(c.Id);
+                Assert.Equal("custId1", c.Id);
                 Assert.NotNull(c.Name);
+                Assert.Equal("John", c.Name);
                 Assert.NotNull(c.Status);
+                Assert.Equal("Active", c.Status);
             }
-        }
-    }
-
-    public class SelectWildCardOnFunctionEdmModel
-    {
-        public static IEdmModel GetEdmModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers").EntityType
-                .Collection.Function("GetAllCustomers")
-                .ReturnsCollectionFromEntitySet<Customer>("Customers");
-
-            return builder.GetEdmModel();
         }
     }
 
@@ -95,12 +95,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
                 new Customer
                 {
                     Id = "custId1",
-                    Name = "John",
-                    Status = "Active"
-                },
-                 new Customer
-                {
-                    Id = "custId2",
                     Name = "John",
                     Status = "Active"
                 }
