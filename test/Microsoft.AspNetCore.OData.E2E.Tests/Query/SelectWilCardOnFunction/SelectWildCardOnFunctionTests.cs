@@ -17,8 +17,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
 
     public class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
     {
-
-
         public class Startup : TestStartupBase
         {
             public override void ConfigureServices(IServiceCollection services)
