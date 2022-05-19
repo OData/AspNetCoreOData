@@ -70,10 +70,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         public static IEdmModel GetEdmModel()
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
             builder.EntitySet<Customer>("Customers").EntityType
-                .Collection.Function("GetAllCustomer")
-                .ReturnsCollectionFromEntitySet<Customer>("GetAllCustomer");
+                .Collection.Function("GetAllCustomers")
+                .ReturnsCollectionFromEntitySet<Customer>("Customers");
 
             return builder.GetEdmModel();
         }
@@ -89,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
     public class CustomersController : ODataController
     {
         [HttpGet]
-        public IEnumerable<Customer> GetAllCustomer()
+        public IEnumerable<Customer> GetAllCustomers()
         {
             return new List<Customer>()
             {
