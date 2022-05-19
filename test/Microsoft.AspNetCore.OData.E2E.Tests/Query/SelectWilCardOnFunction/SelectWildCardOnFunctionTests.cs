@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task SelectWildCardOnFunction_success()
+        public async Task SelectWildCardOnFunction_Success()
         {
             //Arrange
             string queryUrl = "odata/Customers/GetAllCustomer?$select=*";
