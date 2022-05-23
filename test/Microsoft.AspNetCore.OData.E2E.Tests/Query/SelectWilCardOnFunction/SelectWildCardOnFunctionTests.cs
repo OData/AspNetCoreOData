@@ -69,11 +69,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
             List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
             foreach(Customer c in customers)
             {
-                Assert.NotNull(c.Id);
                 Assert.Equal("custId1", c.Id);
-                Assert.NotNull(c.Name);
                 Assert.Equal("John", c.Name);
-                Assert.NotNull(c.Status);
                 Assert.Equal("Active", c.Status);
             }
         }
