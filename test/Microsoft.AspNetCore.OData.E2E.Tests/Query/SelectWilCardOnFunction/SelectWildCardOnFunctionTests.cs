@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
                     opt.AddRouteComponents("odata", model);
                 });
             }
+
             public static IEdmModel GetEdmModel()
             {
                 ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
