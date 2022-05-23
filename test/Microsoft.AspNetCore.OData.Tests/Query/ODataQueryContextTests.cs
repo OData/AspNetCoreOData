@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string setName = typeof(Customer).Name;
             odataModel.EntitySet<Customer>(setName);
             odataModel.EntitySet<Customer>("Customers").EntityType
-                .Collection.Function("GetAllCustomer")
+                .Collection.Function("GetAllCustomers")
                 .ReturnsCollectionFromEntitySet<Customer>("GetAllCustomer");
             IEdmModel model = odataModel.GetEdmModel();
             IEnumerable<OperationConfiguration> operationConfiguration = odataModel.Operations;
