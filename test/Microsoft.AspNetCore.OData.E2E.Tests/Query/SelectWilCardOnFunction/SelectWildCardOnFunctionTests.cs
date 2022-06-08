@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
 {
-    public class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
+    public sealed class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
     {
         public class Startup : TestStartupBase
         {
