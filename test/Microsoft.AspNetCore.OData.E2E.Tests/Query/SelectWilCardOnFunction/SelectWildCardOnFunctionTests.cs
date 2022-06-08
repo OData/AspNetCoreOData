@@ -64,21 +64,24 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         {
             //Arrange
             string queryUrl = "odata/Customers/GetAllCustomers?$select=*";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-
-            //Act
-            HttpResponseMessage response = await this.Client.SendAsync(request);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
-            foreach(Customer c in customers)
+            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl))
             {
-                Assert.Equal("custId1", c.Id);
-                Assert.Equal("John", c.Name);
-                Assert.Equal("Active", c.Status);
+                request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+                //Act
+                using (HttpResponseMessage response = await this.Client.SendAsync(request))
+                {
+                    // Assert
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                    List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+                    foreach(Customer c in customers)
+                    {
+                        Assert.Equal("custId1", c.Id);
+                        Assert.Equal("John", c.Name);
+                        Assert.Equal("Active", c.Status);
+                    }
+                }
             }
         }
     }
