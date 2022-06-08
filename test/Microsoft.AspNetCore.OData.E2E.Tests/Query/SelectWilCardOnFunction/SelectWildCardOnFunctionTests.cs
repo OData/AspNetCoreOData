@@ -64,6 +64,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
         {
             //Arrange
             string queryUrl = "odata/Customers/GetAllCustomers?$select=*";
+            
             using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl))
             {
                 request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
