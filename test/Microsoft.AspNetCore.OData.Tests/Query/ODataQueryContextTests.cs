@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
@@ -88,6 +90,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Same(model, context.Model);
             Assert.Same(entityType, context.ElementType);
             Assert.Same(entitySet, context.NavigationSource);
+            Assert.Same(typeof(Customer), context.ElementClrType);
+        }
+
+        [Fact]
+        public void CtorODataQueryContext_TakingOperationAndPath_SetsProperties()
+        {
+            // Arrange
+            ODataModelBuilder odataModel = new ODataModelBuilder().Add_Customer_EntityType();
+            string setName = typeof(Customer).Name;
+            odataModel.EntitySet<Customer>(setName);
+            odataModel.EntitySet<Customer>("Customers").EntityType
+                .Collection.Function("GetAllCustomers")
+                .ReturnsCollectionFromEntitySet<Customer>("GetAllCustomer");
+            IEdmModel model = odataModel.GetEdmModel();
+            IEnumerable<OperationConfiguration> operationConfiguration = odataModel.Operations;
+
+            string qualifiedName = null;
+            foreach(var op in operationConfiguration)
+            {
+                qualifiedName = op.FullyQualifiedName;
+            }
+
+            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(setName);
+            IEdmEntityType entityType = entitySet.EntityType();
+            IEnumerable<IEdmOperation> operations = model.FindDeclaredOperations(qualifiedName);
+
+            ODataPath path = new ODataPath(new EntitySetSegment(entitySet), new OperationSegment(operations, entitySet));
+
+            // Act
+            ODataQueryContext context = new ODataQueryContext(model, typeof(Customer), path);
+
+            // Assert
+            Assert.Same(model, context.Model);
+            Assert.Same(entityType, context.TargetStructuredType);
             Assert.Same(typeof(Customer), context.ElementClrType);
         }
 
