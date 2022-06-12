@@ -70,6 +70,16 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddDataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension extension)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddMultipleDataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension]]]] extensions)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services)
 
 	[
@@ -2751,6 +2761,16 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, params Microsoft.OData.UriParser.ComputeClause computeClause)
 	public virtual System.Linq.Expressions.Expression CreateTotalCountExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, System.Nullable`1[[System.Boolean]] countOption)
 	public virtual System.Linq.Expressions.Expression CreateTypeNameExpression (System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model)
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension {
+	System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.Extension.MultipleODataQueryOptionsBindingExtension : IODataQueryOptionsBindingExtension {
+	public MultipleODataQueryOptionsBindingExtension (System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension]] extensions)
+
+	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator {
