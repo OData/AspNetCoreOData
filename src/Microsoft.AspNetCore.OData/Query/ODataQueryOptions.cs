@@ -500,17 +500,18 @@ namespace Microsoft.AspNetCore.OData.Query
 
         internal IQueryable ApplyCustom(IQueryable query, ODataQuerySettings querySettings)
         {
-            IODataQueryOptionsBindingExtension extension = Context.RequestContainer
-                .GetService<IODataQueryOptionsBindingExtension>();
+            if(Context.RequestContainer != null)
+            {
+                IODataQueryOptionsBindingExtension extension = Context.RequestContainer
+                    .GetService<IODataQueryOptionsBindingExtension>();
 
-            if(extension != null)
-            {
-                return extension.ApplyTo(query, this, querySettings);
+                if(extension != null)
+                {
+                    return extension.ApplyTo(query, this, querySettings);
+                }
             }
-            else
-            {
-                return query;
-            }
+
+            return query;
         }
 
         /// <summary>
