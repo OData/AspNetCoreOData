@@ -5,11 +5,14 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Extension;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -103,6 +106,53 @@ namespace Microsoft.AspNetCore.OData
 
             services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
 
+            return services;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="IODataQueryOptionsBindingExtension"/> to a service collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="extension">The <see cref="IODataQueryOptionsBindingExtension"/> to add to the service collection.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddDataQueryOptionsBindingExtension(this IServiceCollection services, IODataQueryOptionsBindingExtension extension)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(extension));
+            }
+
+            services.AddSingleton<IODataQueryOptionsBindingExtension>(extension);
+            return services;
+        }
+
+        /// <summary>
+        /// Adds multiple <see cref="IODataQueryOptionsBindingExtension"/> to a service collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="extensions">The <see cref="IODataQueryOptionsBindingExtension"/> to add to the service collection.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddMultipleDataQueryOptionsBindingExtension(this IServiceCollection services, Action<IList<IODataQueryOptionsBindingExtension>> extensions)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (extensions == null)
+            {
+                throw Error.ArgumentNull(nameof(extensions));
+            }
+
+            IList<IODataQueryOptionsBindingExtension> extensionResult = new List<IODataQueryOptionsBindingExtension>();
+            extensions.Invoke(extensionResult);
+            services.AddSingleton<IODataQueryOptionsBindingExtension>(new MultipleODataQueryOptionsBindingExtension(extensionResult));
+            
             return services;
         }
     }

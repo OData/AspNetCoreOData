@@ -9474,6 +9474,42 @@
             'methodName(argTypeName1,argTypeName2,argTypeName3..)'
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Extension.GroupODataQueryOptionsBindingExtension">
+            <summary>
+            This class allows to use multiple <see cref="T:Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension"/> extenion interfaces.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Extension.GroupODataQueryOptionsBindingExtension.#ctor(System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Extension.GroupODataQueryOptionsBindingExtension"/> class
+            with a list of extension interfaces.
+            </summary>
+            <param name="extensions">A list of query extensions to apply.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Extension.GroupODataQueryOptionsBindingExtension.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply multiple custom queries to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="queryOptions">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> object that is executing this method.</param>
+            <param name="querySettings">The settings to use in query composition.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension">
+            <summary>
+            This interface allows to extend the <see cref="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ApplyTo(System.Object,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)"/> method
+            and apply custom query features.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Apply a custom query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="queryOptions">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> object that is executing this method.</param>
+            <param name="querySettings">The settings to use in query composition.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption">
             <summary>
             This enum defines how to handle null propagation in queryable support.
