@@ -97,11 +97,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             if (options.RawValues.Expand != null)
             {
+                ValidateNotEmptyOrWhitespace(options.RawValues.Expand);
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions);
             }
 
             if (options.RawValues.Select != null)
             {
+                ValidateNotEmptyOrWhitespace(options.RawValues.Select);
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions);
             }
 
@@ -137,6 +139,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             if ((queryOption & allowed) == AllowedQueryOptions.None)
             {
                 throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, "AllowedQueryOptions"));
+            }
+        }
+        
+        private static void ValidateNotEmptyOrWhitespace(string rawValue)
+        {
+            if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
+            {
+                throw new ODataException(SRResources.SelectExpandEmptyOrWhitespace);
             }
         }
     }

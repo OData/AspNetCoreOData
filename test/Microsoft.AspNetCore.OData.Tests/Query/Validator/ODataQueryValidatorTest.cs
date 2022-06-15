@@ -269,5 +269,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Assert
             selectExpandValidator.Verify(v => v.Validate(option.SelectExpand, settings), Times.Once());
         }
+
+        [Theory]
+        [InlineData("$select=")]
+        [InlineData("$select=  ")]
+        [InlineData("$expand=")]
+        [InlineData("$expand=  ")]
+        [InlineData("$select=   &$expand=  &")]
+        public void Validate_ValidatesNotEmptyOrWhitespaceSelectExpandQueryOption_IfEmptyOrWhitespace(string query)
+        {
+            var expectedMessage = "'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.";
+            
+            // Arrange
+            var message = RequestFactory.Create("Get", $"http://localhost/?{query}", setupAction: null);
+            ODataQueryOptions option = new ODataQueryOptions(_context, message);
+            ODataValidationSettings settings = new ODataValidationSettings();
+
+            // Act & Assert
+            ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+        }
     }
 }
