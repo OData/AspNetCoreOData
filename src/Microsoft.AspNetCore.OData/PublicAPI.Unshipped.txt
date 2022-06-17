@@ -43,6 +43,9 @@ const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.UnboundAction = "unbo
 const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.UnboundFunction = "unboundfunction" -> string
 const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.Unresolved = "unresolved" -> string
 const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.Value = "$value" -> string
+Microsoft.AspNet.OData.Results.BadRequestODataResult
+Microsoft.AspNet.OData.Results.BadRequestODataResult.BadRequestODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.BadRequestODataResult.BadRequestODataResult(string message) -> void
 Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute
 Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.ETagActionFilterAttribute() -> void
 Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope
@@ -1359,6 +1362,7 @@ Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.ValueSegment
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.Edm.IEdmType previousType) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.UriParser.ValueSegment segment) -> void
+override Microsoft.AspNet.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext) -> void
 override Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource.get -> Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource
 override Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>
@@ -1822,6 +1826,7 @@ virtual Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator.Valid
 virtual Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.Entity.get -> T
 virtual Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.Entity.get -> T
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(string message) -> Microsoft.AspNet.OData.Results.BadRequestODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.CreatedODataResult<TEntity>
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Updated<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.UpdatedODataResult<TEntity>
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
