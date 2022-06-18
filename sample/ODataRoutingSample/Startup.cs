@@ -76,7 +76,7 @@ namespace ODataRoutingSample
                     .AddRouteComponents(model0)
                     .AddRouteComponents("v1", model1, (services) =>
                     {
-                        services.AddDataQueryOptionsBindingExtension(new ExampleQueryOptionsBindingExtension());
+                        services.AddODataQueryOptionsBindingExtension(new ExampleQueryOptionsBindingExtension());
                     })
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddRouteComponents("v3", model3)

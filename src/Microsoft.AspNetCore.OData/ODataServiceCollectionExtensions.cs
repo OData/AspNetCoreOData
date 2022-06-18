@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <param name="extension">The <see cref="IODataQueryOptionsBindingExtension"/> to add to the service collection.</param>
         /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddDataQueryOptionsBindingExtension(this IServiceCollection services, IODataQueryOptionsBindingExtension extension)
+        public static IServiceCollection AddODataQueryOptionsBindingExtension(this IServiceCollection services, IODataQueryOptionsBindingExtension extension)
         {
             if (services == null)
             {
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <param name="extensions">The <see cref="IODataQueryOptionsBindingExtension"/> to add to the service collection.</param>
         /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddMultipleDataQueryOptionsBindingExtension(this IServiceCollection services, Action<IList<IODataQueryOptionsBindingExtension>> extensions)
+        public static IServiceCollection AddMultipleODataQueryOptionsBindingExtension(this IServiceCollection services, Action<IList<IODataQueryOptionsBindingExtension>> extensions)
         {
             if (services == null)
             {
