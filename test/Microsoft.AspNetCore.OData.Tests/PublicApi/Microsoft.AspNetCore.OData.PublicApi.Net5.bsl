@@ -70,12 +70,7 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	[
 	ExtensionAttribute(),
 	]
-	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddDataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension extension)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddMultipleDataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension]]]] extensions)
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddMultipleODataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action`1[[System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension]]]] extensions)
 
 	[
 	ExtensionAttribute(),
@@ -86,6 +81,11 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	ExtensionAttribute(),
 	]
 	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryOptionsBindingExtension (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.OData.Query.Extension.IODataQueryOptionsBindingExtension extension)
 }
 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
