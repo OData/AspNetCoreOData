@@ -115,10 +115,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
             return new UnauthorizedODataResult(odataError);
         }
 
-        // ConflictResult and UnprocessableEntityResult were introduced in AspNet core 2.1, which is implemented from .Net standard 2.1
-        // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase.conflict?view=aspnetcore-2.1
-        // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.unprocessableentityresult?view=aspnetcore-2.1
-#if !NETSTANDARD2_0
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Conflict (409) response.
         /// </summary>
@@ -158,7 +154,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         {
             return new UnprocessableEntityODataResult(odataError);
         }
-#endif
 
         /// <summary>
         /// Creates a <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.

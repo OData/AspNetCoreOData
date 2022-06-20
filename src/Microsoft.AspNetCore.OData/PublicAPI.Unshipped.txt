@@ -1852,8 +1852,19 @@ virtual Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator.Valid
 virtual Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.Entity.get -> T
 virtual Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.Entity.get -> T
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.BadRequestODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(string message) -> Microsoft.AspNet.OData.Results.BadRequestODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.ConflictODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(string message) -> Microsoft.AspNet.OData.Results.ConflictODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.CreatedODataResult<TEntity>
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.NotFoundODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(string message) -> Microsoft.AspNet.OData.Results.NotFoundODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.ODataErrorResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(string errorCode, string message) -> Microsoft.AspNet.OData.Results.ODataErrorResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.UnauthorizedODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(string message) -> Microsoft.AspNet.OData.Results.UnauthorizedODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(Microsoft.OData.ODataError odataError) -> Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(string message) -> Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Updated<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.UpdatedODataResult<TEntity>
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
