@@ -21,5 +21,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
     public class Order
     {
         public int Id { get; set; }
+
+        public string Name { get; set; }
     }
 }

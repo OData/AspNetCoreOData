@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
 {
@@ -52,31 +53,63 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         [EnableQuery]
         public IActionResult Get()
         {
-            return NotFound();
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "401",
+                Message = "Not authorized to access this resource."
+            };
+            return Unauthorized(odataError);
         }
 
         [EnableQuery]
         public IActionResult Get(int key)
         {
-            return ODataErrorResult("404", $"Order with key: {key} not found.");
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "404",
+                Message = $"Order with key: {key} not found."
+            };
+            return NotFound(odataError);
         }
 
-        [EnableQuery]
-        public IActionResult Post()
+        public IActionResult Post([FromBody] Order order)
         {
-            return UnprocessableEntity("Unprocessable order object.");
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "422",
+                Message = "Unprocessable order object."
+            };
+            return UnprocessableEntity(odataError);
         }
 
-        [EnableQuery]
-        public IActionResult Patch()
+        public IActionResult Patch([FromODataUri] int key, [FromBody] Order order)
         {
-            return Conflict("Conflict on patch.");
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "409",
+                Message = "Conflict during update."
+            };
+            return Conflict(odataError);
         }
 
-        [EnableQuery]
-        public IActionResult Delete()
+        public IActionResult Put([FromODataUri] int key, [FromBody] Order order)
         {
-            return BadRequest("Bad request on delete.");
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "400",
+                Message = "Bad request during PUT."
+            };
+            return ODataErrorResult(odataError);
+        }
+
+        public IActionResult Delete(int key)
+        {
+            ODataError odataError = new ODataError()
+            {
+                ErrorCode = "400",
+                Message = "Bad request on delete."
+            };
+            return BadRequest(odataError);
         }
     }
 }

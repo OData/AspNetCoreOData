@@ -38,13 +38,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select().AddRouteComponents("odataerrors", edmModel));
         }
 
-        [Fact]
-        public async Task NotFoundResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData("odataerrors/Customers(1)", "{\"error\":{\"code\":\"404\",\"message\":\"Customer with key: 1 not found.\"}}")]
+        [InlineData("odataerrors/Orders(1)", "{\"error\":{\"code\":\"404\",\"message\":\"Order with key: 1 not found.\"}}")]
+        public async Task NotFoundResponseFromODataControllerIsSerializedAsODataError(string queryUrl, string expectedResponse)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers(1)";
-            const string expectedResponse = "{\"error\":{\"code\":\"404\",\"message\":\"Customer with key: 1 not found.\"}}";
-
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -62,11 +61,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             Assert.Equal(expectedResponse, payload);
         }
 
-        [Fact]
-        public async Task UnauthorizedResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData("odataerrors/Customers")]
+        [InlineData("odataerrors/Orders")]
+        public async Task UnauthorizedResponseFromODataControllerIsSerializedAsODataError(string queryUrl)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers";
             const string expectedResponse = "{\"error\":{\"code\":\"401\",\"message\":\"Not authorized to access this resource.\"}}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);           
@@ -86,17 +86,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             Assert.Equal(expectedResponse, payload);
         }
 
-        [Fact]
-        public async Task ConflictResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData("odataerrors/Customers(1000)", @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer',
+                            'ID':1000,'Name':'Customer 1000,}}")]
+        [InlineData("odataerrors/Orders(1000)", @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Order',
+                            'ID':1000,'Name':'Order 1000,}}")]
+        public async Task ConflictResponseFromODataControllerIsSerializedAsODataError(string queryUrl, string requestContent)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers(1000)";
             const string expectedResponse = "{\"error\":{\"code\":\"409\",\"message\":\"Conflict during update.\"}}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Patch, queryUrl);
             request.Content = new StringContent(
-                    string.Format(@"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer',
-                            'ID':1000,'Name':'Customer 1000,}}"));
+                    string.Format(requestContent));
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
             HttpResponseMessage response;
@@ -113,11 +115,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             Assert.Equal(expectedResponse, payload);
         }
 
-        [Fact]
-        public async Task BadRequestResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData("odataerrors/Customers(1)")]
+        [InlineData("odataerrors/Orders(1)")]
+        public async Task BadRequestResponseFromODataControllerIsSerializedAsODataError(string queryUrl)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers(1)";
             const string expectedResponse = "{\"error\":{\"code\":\"400\",\"message\":\"Bad request on delete.\"}}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, queryUrl);
@@ -137,17 +140,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             Assert.Equal(expectedResponse, payload);
         }
 
-        [Fact]
-        public async Task UnprocessableEntityResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData(
+            "odataerrors/Customers",
+            @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer', 'ID':1000,'Name':'Customer 1000}}",
+            "{\"error\":{\"code\":\"422\",\"message\":\"Unprocessable customer object.\"}}")]
+        [InlineData(
+            "odataerrors/Orders",
+            @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Order', 'ID':1000,'Name':'Order 1000}}",
+            "{\"error\":{\"code\":\"422\",\"message\":\"Unprocessable order object.\"}}")]
+        public async Task UnprocessableEntityResponseFromODataControllerIsSerializedAsODataError(string queryUrl, string requestContent, string expectedResponse)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers";
-            const string expectedResponse = "{\"error\":{\"code\":\"422\",\"message\":\"Unprocessable customer object.\"}}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, queryUrl);
             request.Content = new StringContent(
-                    string.Format(@"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer',
-                            'ID':1000,'Name':'Customer 1000,}}"));
+                    string.Format(requestContent));
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
             HttpResponseMessage response;
@@ -164,17 +172,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             Assert.Equal(expectedResponse, payload);
         }
 
-        [Fact]
-        public async Task ODataErrorResultResponseFromODataControllerIsSerializedAsODataError()
+        [Theory]
+        [InlineData("odataerrors/Customers(1000)", @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer',
+                            'ID':1000,'Name':'Customer 1000,}}")]
+        [InlineData("odataerrors/Orders(1000)", @"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Order',
+                            'ID':1000,'Name':'Order 1000,}}")]
+        public async Task ODataErrorResultResponseFromODataControllerIsSerializedAsODataError(string queryUrl, string requestContent)
         {
             // Arrange
-            string queryUrl = "odataerrors/Customers(1000)";
             const string expectedResponse = "{\"error\":{\"code\":\"400\",\"message\":\"Bad request during PUT.\"}}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, queryUrl);
             request.Content = new StringContent(
-                    string.Format(@"{{'@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors.Customer',
-                            'ID':1000,'Name':'Customer 1000,}}"));
+                    string.Format(requestContent));
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
             HttpResponseMessage response;
