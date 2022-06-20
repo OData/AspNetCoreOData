@@ -46,6 +46,27 @@ const Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds.Value = "$value" -> s
 Microsoft.AspNet.OData.Results.BadRequestODataResult
 Microsoft.AspNet.OData.Results.BadRequestODataResult.BadRequestODataResult(Microsoft.OData.ODataError odataError) -> void
 Microsoft.AspNet.OData.Results.BadRequestODataResult.BadRequestODataResult(string message) -> void
+Microsoft.AspNet.OData.Results.BadRequestODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.ConflictODataResult
+Microsoft.AspNet.OData.Results.ConflictODataResult.ConflictODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.ConflictODataResult.ConflictODataResult(string message) -> void
+Microsoft.AspNet.OData.Results.ConflictODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.NotFoundODataResult
+Microsoft.AspNet.OData.Results.NotFoundODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.NotFoundODataResult.NotFoundODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.NotFoundODataResult.NotFoundODataResult(string message) -> void
+Microsoft.AspNet.OData.Results.ODataErrorResult
+Microsoft.AspNet.OData.Results.ODataErrorResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.ODataErrorResult.ODataErrorResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.ODataErrorResult.ODataErrorResult(string errorCode, string message) -> void
+Microsoft.AspNet.OData.Results.UnauthorizedODataResult
+Microsoft.AspNet.OData.Results.UnauthorizedODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.UnauthorizedODataResult.UnauthorizedODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.UnauthorizedODataResult.UnauthorizedODataResult(string message) -> void
+Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult
+Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.UnprocessableEntityODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.UnprocessableEntityODataResult(string message) -> void
 Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute
 Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.ETagActionFilterAttribute() -> void
 Microsoft.AspNetCore.OData.Abstracts.HttpRequestScope
@@ -1363,6 +1384,11 @@ Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment.get -> 
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.Edm.IEdmType previousType) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.UriParser.ValueSegment segment) -> void
 override Microsoft.AspNet.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNet.OData.Results.ConflictODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNet.OData.Results.NotFoundODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNet.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNet.OData.Results.UnauthorizedODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext) -> void
 override Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource.get -> Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource
 override Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>

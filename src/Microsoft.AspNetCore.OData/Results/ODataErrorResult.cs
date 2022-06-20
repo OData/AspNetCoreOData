@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData;
@@ -64,7 +65,7 @@ namespace Microsoft.AspNet.OData.Results
         {
             ObjectResult objectResult = new ObjectResult(Error)
             {
-                StatusCode = Convert.ToInt32(Error.ErrorCode)
+                StatusCode = Convert.ToInt32(Error.ErrorCode, CultureInfo.InvariantCulture)
             };
 
             await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);

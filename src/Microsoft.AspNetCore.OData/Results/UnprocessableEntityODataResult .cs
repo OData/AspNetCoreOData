@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-#if !NETSTANDARD2_0
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -69,4 +68,3 @@ namespace Microsoft.AspNet.OData.Results
         }
     }
 }
-#endif
