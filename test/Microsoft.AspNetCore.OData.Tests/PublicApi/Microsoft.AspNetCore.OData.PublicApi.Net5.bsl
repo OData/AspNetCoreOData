@@ -134,6 +134,82 @@ public class Microsoft.AspNetCore.OData.ODataOptionsSetup : IConfigureOptions`1 
 	public virtual void Configure (Microsoft.AspNetCore.OData.ODataOptions options)
 }
 
+public interface Microsoft.AspNet.OData.Results.IODataErrorResult {
+	Microsoft.OData.ODataError Error  { public abstract get; }
+}
+
+public class Microsoft.AspNet.OData.Results.BadRequestODataResult : Microsoft.AspNetCore.Mvc.BadRequestResult, IActionResult, IODataErrorResult, IClientErrorActionResult, IStatusCodeActionResult {
+	public BadRequestODataResult (Microsoft.OData.ODataError odataError)
+	public BadRequestODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNet.OData.Results.ConflictODataResult : Microsoft.AspNetCore.Mvc.ConflictResult, IActionResult, IODataErrorResult, IClientErrorActionResult, IStatusCodeActionResult {
+	public ConflictODataResult (Microsoft.OData.ODataError odataError)
+	public ConflictODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNet.OData.Results.NotFoundODataResult : Microsoft.AspNetCore.Mvc.NotFoundResult, IActionResult, IODataErrorResult, IClientErrorActionResult, IStatusCodeActionResult {
+	public NotFoundODataResult (Microsoft.OData.ODataError odataError)
+	public NotFoundODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNet.OData.Results.ODataErrorResult : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult, IODataErrorResult {
+	public ODataErrorResult (Microsoft.OData.ODataError odataError)
+	public ODataErrorResult (string errorCode, string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNet.OData.Results.UnauthorizedODataResult : Microsoft.AspNetCore.Mvc.UnauthorizedResult, IActionResult, IODataErrorResult, IClientErrorActionResult, IStatusCodeActionResult {
+	public UnauthorizedODataResult (Microsoft.OData.ODataError odataError)
+	public UnauthorizedODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult : Microsoft.AspNetCore.Mvc.UnprocessableEntityResult, IActionResult, IODataErrorResult, IClientErrorActionResult, IStatusCodeActionResult {
+	public UnprocessableEntityODataResult (Microsoft.OData.ODataError odataError)
+	public UnprocessableEntityODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
 public interface Microsoft.AspNetCore.OData.Abstracts.IETagHandler {
 	Microsoft.Net.Http.Headers.EntityTagHeaderValue CreateETag (System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] properties, params System.TimeZoneInfo timeZoneInfo)
 	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ParseETag (Microsoft.Net.Http.Headers.EntityTagHeaderValue etagHeaderValue)
@@ -2882,7 +2958,19 @@ ODataAttributeRoutingAttribute(),
 public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	protected ODataController ()
 
+	protected virtual Microsoft.AspNet.OData.Results.BadRequestODataResult BadRequest (Microsoft.OData.ODataError odataError)
+	public virtual Microsoft.AspNet.OData.Results.BadRequestODataResult BadRequest (string message)
+	protected virtual Microsoft.AspNet.OData.Results.ConflictODataResult Conflict (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNet.OData.Results.ConflictODataResult Conflict (string message)
 	protected virtual CreatedODataResult`1 Created (TEntity entity)
+	protected virtual Microsoft.AspNet.OData.Results.NotFoundODataResult NotFound (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNet.OData.Results.NotFoundODataResult NotFound (string message)
+	protected virtual Microsoft.AspNet.OData.Results.ODataErrorResult ODataErrorResult (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNet.OData.Results.ODataErrorResult ODataErrorResult (string errorCode, string message)
+	protected virtual Microsoft.AspNet.OData.Results.UnauthorizedODataResult Unauthorized (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNet.OData.Results.UnauthorizedODataResult Unauthorized (string message)
+	protected virtual Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (string message)
 	protected virtual UpdatedODataResult`1 Updated (TEntity entity)
 }
 
