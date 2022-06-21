@@ -2959,7 +2959,7 @@ public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataContro
 	protected ODataController ()
 
 	protected virtual Microsoft.AspNet.OData.Results.BadRequestODataResult BadRequest (Microsoft.OData.ODataError odataError)
-	public virtual Microsoft.AspNet.OData.Results.BadRequestODataResult BadRequest (string message)
+	protected virtual Microsoft.AspNet.OData.Results.BadRequestODataResult BadRequest (string message)
 	protected virtual Microsoft.AspNet.OData.Results.ConflictODataResult Conflict (Microsoft.OData.ODataError odataError)
 	protected virtual Microsoft.AspNet.OData.Results.ConflictODataResult Conflict (string message)
 	protected virtual CreatedODataResult`1 Created (TEntity entity)

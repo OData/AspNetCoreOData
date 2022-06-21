@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// </summary>
         /// <param name="message">Error Message</param>
         /// <returns>A <see cref="BadRequestODataResult"/> with the specified values.</returns>
-        public virtual BadRequestODataResult BadRequest(string message)
+        protected virtual BadRequestODataResult BadRequest(string message)
         {
             return new BadRequestODataResult(message);
         }

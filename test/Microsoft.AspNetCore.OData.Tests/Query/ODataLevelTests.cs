@@ -71,17 +71,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Arrange
             string uri = "odata/LevelsEntities?$expand=Parent($levels=20)";
 
+            string expectedResponse = "{\"errorCode\":\"400\",\"message\":" +
+                "\"The query specified in the URI is not valid. " +
+                "The request includes a $expand path which is too deep. " +
+                "The maximum depth allowed is 5. To increase the limit, set the 'MaxExpansionDepth' " +
+                "property on EnableQueryAttribute or ODataValidationSettings, or set the 'MaxDepth' " +
+                "property in ExpandAttribute.\"," +
+                "\"target\":null,\"details\":null,\"innerError\":null,\"instanceAnnotations\":[]," +
+                "\"typeAnnotation\":null}";
+
             // Act
             HttpResponseMessage response = await Client.GetAsync(uri);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             string result = await response.Content.ReadAsStringAsync();
-            Assert.Equal(
-                "The query specified in the URI is not valid. The request includes a $expand path which is too deep. " +
-                "The maximum depth allowed is 5. To increase the limit, set the 'MaxExpansionDepth' property on " +
-                "EnableQueryAttribute or ODataValidationSettings, or set the 'MaxDepth' property in ExpandAttribute.",
-                result);
+            Assert.Equal(expectedResponse, result);
         }
 
         [Fact]
