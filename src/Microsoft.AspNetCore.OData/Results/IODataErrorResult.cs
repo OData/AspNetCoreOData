@@ -7,7 +7,7 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNet.OData.Results
+namespace Microsoft.AspNetCore.OData.Results
 {
     /// <summary>
     /// Provide the interface for the details of a given OData Error result.

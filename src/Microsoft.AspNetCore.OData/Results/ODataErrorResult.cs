@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData;
 using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 
-namespace Microsoft.AspNet.OData.Results
+namespace Microsoft.AspNetCore.OData.Results
 {
     /// <summary>
     /// Represents a result that when executed will produce an <see cref="ActionResult"/>.

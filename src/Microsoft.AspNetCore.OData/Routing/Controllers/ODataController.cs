@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
@@ -160,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// </summary>
         /// <param name="errorCode">Http Error code.</param>
         /// <param name="message">Http Error Message.</param>
-        /// <returns>An <see cref="Microsoft.AspNet.OData.Results.ODataErrorResult"/> with the specified values.</returns>
+        /// <returns>An <see cref="Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         protected virtual ODataErrorResult ODataErrorResult(string errorCode, string message)
         {
             return new ODataErrorResult(errorCode, message);
@@ -170,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// Creates a <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.
         /// </summary>
         /// <param name="odataError"><see cref="ODataError"/>.</param>
-        /// <returns>An <see cref="Microsoft.AspNet.OData.Results.ODataErrorResult"/> with the specified values.</returns>
+        /// <returns>An <see cref="Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         protected virtual ODataErrorResult ODataErrorResult(ODataError odataError)
         {
             return new ODataErrorResult(odataError);

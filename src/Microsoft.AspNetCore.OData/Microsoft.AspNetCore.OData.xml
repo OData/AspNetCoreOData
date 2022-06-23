@@ -1094,6 +1094,20 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -11827,6 +11841,58 @@
             Gets or sets the instance of the element being selected and expanded.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.BadRequestODataResult">
+            <summary>
+            Represents a result that when executed will produce a Bad Request (400) response.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 400.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.BadRequestODataResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.BadRequestODataResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="message">Error Message</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.BadRequestODataResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="odataError">OData Error.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ConflictODataResult">
+            <summary>
+            Represents a result that when executed will produce a Conflict (409) response.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 409.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ConflictODataResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ConflictODataResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="message">Error Message</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ConflictODataResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="odataError">OData Error.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ConflictODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1">
             <summary>
             Represents an action result that is a response to a create operation that adds an entity to an entity set.
@@ -11848,6 +11914,66 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.CreatedODataResult`1.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.IODataErrorResult">
+            <summary>
+            Provide the interface for the details of a given OData Error result.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.IODataErrorResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.NotFoundODataResult">
+            <summary>
+            Represents a result that when executed will produce a Not Found (404) response.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 404.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.NotFoundODataResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.NotFoundODataResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="message">Error Message</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.NotFoundODataResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="odataError">OData Error.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.NotFoundODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataErrorResult">
+            <summary>
+            Represents a result that when executed will produce an <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/>.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> response.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ODataErrorResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataErrorResult.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataErrorResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.PageResult">
@@ -11996,6 +12122,58 @@
             <param name="options">The serialization options to use.</param>
             <returns>A converter for which T is compatible with typeToConvert.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult">
+            <summary>
+            Represents a result that when executed will produce a Unauthorized (401) response.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 401.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="message">Error Message</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="odataError">OData Error.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult">
+            <summary>
+            Represents a result that when executed will produce a UnprocessableEntity (422) response.
+            </summary>
+            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 422.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.Error">
+            <summary>
+            OData Error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="message">Error Message</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.#ctor(Microsoft.OData.ODataError)">
+            <summary>
+            Initializes a new instance of the class.
+            </summary>
+            <param name="odataError">OData Error.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1">
             <summary>
             Represents an action result that is a response to a PUT, PATCH, or a MERGE operation on an OData entity.
@@ -12112,70 +12290,70 @@
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Bad Request (400) response.
             </summary>
             <param name="message">Error Message</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.BadRequestODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.BadRequestODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Bad Request (400) response.
             </summary>
             <param name="odataError">Parameter of type <see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.BadRequestODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.BadRequestODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(System.String)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Not Found (404) response.
             </summary>
             <param name="message">Error Message</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.NotFoundODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.NotFoundODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Not Found (404) response.
             </summary>
             <param name="odataError">Parameter of type <see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.NotFoundODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.NotFoundODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(System.String)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Unauthorized (401) response.
             </summary>
             <param name="message">Error Message</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.UnauthorizedODataResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Unauthorized (401) response.
             </summary>
             <param name="odataError">Parameter of type <see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.UnauthorizedODataResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(System.String)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Conflict (409) response.
             </summary>
             <param name="message">Error Message</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.ConflictODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.ConflictODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce a Conflict (409) response.
             </summary>
             <param name="odataError">Parameter of type <see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>A <see cref="T:Microsoft.AspNet.OData.Results.ConflictODataResult"/> with the specified values.</returns>
+            <returns>A <see cref="T:Microsoft.AspNetCore.OData.Results.ConflictODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(System.String)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce an UnprocessableEntity (422) response.
             </summary>
             <param name="message">Error Message</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.StatusCodeResult"/> that when executed will produce an UnprocessableEntity (422) response.
             </summary>
             <param name="odataError">Parameter of type <see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(System.String,System.String)">
             <summary>
@@ -12183,14 +12361,14 @@
             </summary>
             <param name="errorCode">Http Error code.</param>
             <param name="message">Http Error Message.</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.ODataErrorResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(Microsoft.OData.ODataError)">
             <summary>
             Creates a <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> that when executed will produce an <see cref="T:Microsoft.OData.ODataError"/> response.
             </summary>
             <param name="odataError"><see cref="T:Microsoft.OData.ODataError"/>.</param>
-            <returns>An <see cref="T:Microsoft.AspNet.OData.Results.ODataErrorResult"/> with the specified values.</returns>
+            <returns>An <see cref="T:Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention">
             <summary>
@@ -14197,187 +14375,6 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.BadRequestODataResult">
-            <summary>
-            Represents a result that when executed will produce a Bad Request (400) response.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 400.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.BadRequestODataResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.BadRequestODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.BadRequestODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.ConflictODataResult">
-            <summary>
-            Represents a result that when executed will produce a Conflict (409) response.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 409.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.ConflictODataResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ConflictODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ConflictODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ConflictODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.IODataErrorResult">
-            <summary>
-            Provide the interface for the details of a given OData Error result.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.IODataErrorResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.NotFoundODataResult">
-            <summary>
-            Represents a result that when executed will produce a Not Found (404) response.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 404.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.NotFoundODataResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.NotFoundODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.NotFoundODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.NotFoundODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.ODataErrorResult">
-            <summary>
-            Represents a result that when executed will produce an <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/>.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> response.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.ODataErrorResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ODataErrorResult.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ODataErrorResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.UnauthorizedODataResult">
-            <summary>
-            Represents a result that when executed will produce a Unauthorized (401) response.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 401.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.UnauthorizedODataResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnauthorizedODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnauthorizedODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnauthorizedODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult">
-            <summary>
-            Represents a result that when executed will produce a UnprocessableEntity (422) response.
-            </summary>
-            <remarks>This result creates an <see cref="T:Microsoft.OData.ODataError"/> with status code: 422.</remarks>
-        </member>
-        <member name="P:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.Error">
-            <summary>
-            OData Error.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
-        </member>
-    </members>
-</doc>
-processableEntityODataResult.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="message">Error Message</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.#ctor(Microsoft.OData.ODataError)">
-            <summary>
-            Initializes a new instance of the class.
-            </summary>
-            <param name="odataError">OData Error.</param>
-        </member>
-        <member name="M:Microsoft.AspNet.OData.Results.UnprocessableEntityODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
-            <inheritdoc/>
         </member>
     </members>
 </doc>
