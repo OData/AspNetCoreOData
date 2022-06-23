@@ -8,17 +8,33 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<IAlternateKeyRepository, AlternateKeyRepositoryInMemory>();
 
-// builder.Services.AddSingleton<Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider, IngoreNullEntityPropertiesSerializerProvider>();
+// source code reference
 
-var serviceDescriptor = builder.Services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IODataSerializerProvider));
-builder.Services.Remove(serviceDescriptor);
-builder.Services.AddSingleton<Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider, IngoreNullEntityPropertiesSerializerProvider>();
+// ODataOutputFormatter.cs
+// ODataOptions.cs
+// HttpRequestExtensions.cs
 
-builder.Services.AddControllers().
-    AddOData(opt => opt.EnableQueryFeatures()
-        .AddRouteComponents("odata", EdmModelBuilder.GetEdmModel()));
+// Not work
+// Modify the global scope didn't affect the odata scope... idea why design like this
+// Please look at the source code in the source code at ODataOptions.cs
+// routeServiceProvider.CreateAsyncScope
+// builder.Services.AddSingleton<IODataSerializerProvider, IngoreNullEntityPropertiesSerializerProvider>();
 
-builder.Services.AddTransient<IAlternateKeyRepository, AlternateKeyRepositoryInMemory>();
+builder.Services.AddControllers()
+    .AddOData((opt, d) =>
+        {
+            // IServiceCollection services = new ServiceCollection();
+            var odataOptions = opt.EnableQueryFeatures()
+                .AddRouteComponents("odata", EdmModelBuilder.GetEdmModel(), (services) =>
+                {
+                    // this service is for odata scope only ... no idea why
+                    // by looking at the source code at ODataOptions.cs
+                    services.AddSingleton<IODataSerializerProvider, IngoreNullEntityPropertiesSerializerProvider>();
+                });
+            // debug
+            // var routeServiceProvider = odataOptions.GetRouteServices("odata");
+            //var serializerProvider = routeServiceProvider.GetRequiredService<IODataSerializerProvider>();
+        });
 
 var app = builder.Build();
 
