@@ -19,6 +19,8 @@ namespace Microsoft.AspNetCore.OData.Results
     /// <remarks>This result creates an <see cref="ODataError"/> with status code: 400.</remarks>
     public class BadRequestODataResult : BadRequestResult, IODataErrorResult
     {
+        private const string errorCode = "400";
+
         /// <summary>
         /// OData Error.
         /// </summary>
@@ -32,13 +34,13 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (message == null)
             {
-                throw ErrorUtils.ArgumentNull("message");
+                throw ErrorUtils.ArgumentNull(nameof(message));
             }
 
             Error = new ODataError
             {
                 Message = message,
-                ErrorCode = "400"
+                ErrorCode = errorCode
             };
         }
 
@@ -50,8 +52,10 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (odataError == null)
             {
-                throw ErrorUtils.ArgumentNull("odataError");
+                throw ErrorUtils.ArgumentNull(nameof(odataError));
             }
+
+            ErrorUtils.ValidateErrorCode(errorCode, odataError);
 
             Error = odataError;
         }

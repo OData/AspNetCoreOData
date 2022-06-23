@@ -1094,6 +1094,20 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -2793,16 +2807,7 @@
             <param name="entityType">The Edm entity type.</param>
             <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
             <param name="keyPrefix">The key prefix for the action parameter.</param>
-            <returns>True/false.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.ActionModelExtensions.AddSelector(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel,System.String,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <summary>
-            Adds the OData selector model to the action.
-            </summary>
-            <param name="action">The given action model.</param>
-            <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
-            <param name="prefix">The prefix.</param>
-            <param name="model">The Edm model.</param>
+            <returns>Tru/param>
             <param name="path">The OData path template.</param>
             <param name="options">The route build options.</param>
         </member>
@@ -2857,13 +2862,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataBatchFeature(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             Return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
-            </summary>
-            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/>.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)">
-            <summary>
-            Returns the <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)"/> inst       Return the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/> from the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.
             </summary>
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataBatchFeature"/>.</returns>
@@ -3090,7 +3088,25 @@
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.ExceptionMessageKey">
             <summary>
-            Provides a key for the ExceptionMeCore.OData.Extensions.SerializableErrorKeys.MessageLanguageKey">
+            Provides a key for the ExceptionMessage.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.ExceptionTypeKey">
+            <summary>
+            Provides a key for the ExceptionType.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.StackTraceKey">
+            <summary>
+            Provides a key for the StackTrace.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.InnerExceptionKey">
+            <summary>
+            Provides a key for the InnerException.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.MessageLanguageKey">
             <summary>
             Provides a key for the MessageLanguage.
             </summary>
@@ -5312,16 +5328,6 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
-            </summary>
-            <param name="entityType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this DeltaEntityObject.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject.#ctor(Microsoft.OData.Edm.IEdmEntityTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
-            </summary>
-            <param name="entityTypeReferenceect.#ctor(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject"/> class.
             </summary>
@@ -8129,7 +8135,17 @@
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The internal request.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModelBoundPageSData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModelBoundPageSize(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext,System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Get the page size.
+            </summary>
+            <param name="actionExecutedContext">The response value.</param>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The request.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
             <summary>
             Create a BadRequestObjectResult.
             </summary>
@@ -8656,17 +8672,6 @@
             <summary>Compares two byte arrays for equality.</summary>
             <param name="left">First byte array.</param>
             <param name="right">Second byte array.</param>
-            <returns>true if the arrays are equal; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysNotEqual(System.Byte[],System.Byte[])">
-            <summary>Compares two byte arrays for equality.</summary>
-            <param name="left">First byte array.</param>
-            <param name="right">Second byte array.</param>
-            <returns>true if the arrays are not equal; false otherwise.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder">
-            <summary>
-            The default implementation to bind an OData $orderby representedd byte array.</param>
             <returns>true if the arrays are equal; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.Linq2ObjectsComparisonMethods.AreByteArraysNotEqual(System.Byte[],System.Byte[])">
@@ -9853,6 +9858,22 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(System.String)">
             <summary>
+            Check if the given querymmary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Count">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator">
+            <summary>
+            Gets or sets the query validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(System.String)">
+            <summary>
             Check if the given query option is an OData system query option using $-prefix-required theme.
             </summary>
             <param name="queryOptionName">The name of the query option.</param>
@@ -10550,15 +10571,7 @@
             <summary>
             Default implementation of SkipTokenHandler for the service.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateNextPageLink(System.Uri,System.Int32,System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <summary>
-            Returns the URI for NextPageLink
-            </summary>
-            <param name="baseUri">BaseUri for nextlink. It should be request URI for top level resource and navigation link for nested resource.</param>
-            <param name="pageSize">Maximum number of records in the set of partial results for a resource.</param>
-            <param name="instance">Instance based on which SkipToken value will be generated.</param>
-            <param name="context">Serializer context</param>
+ text</param>
             <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},System.TimeZoneInfo)">
@@ -11020,7 +11033,15 @@
             Represents how NextLink for paging is generated.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Q
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Apply the $skiptoken query to the given IQueryable.
+            </summary>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="skipTokenQueryOption">The query option that contains all the relevant information for applying skiptoken.</param>
+            <param name="querySettings">The query settings to use while applying this query option.</param>
+            <param name="queryOptions">Information about the other query options.</param>
+            <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
             <summary>
@@ -11248,17 +11269,6 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" /> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
-            </summary>
-            <remarks>
-            Please note this class is not thread safe.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
-            <summary>
-            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" />.
-            </summary>
-            <param name="filterQueryOption">The $filter query.</param>
-            <par"T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" /> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
             <remarks>
             Please note this class is not thread safe.
@@ -14352,6 +14362,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

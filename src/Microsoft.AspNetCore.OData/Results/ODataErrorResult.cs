@@ -32,12 +32,12 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (errorCode == null)
             {
-                throw ErrorUtils.ArgumentNull("errorCode");
+                throw ErrorUtils.ArgumentNull(nameof(errorCode));
             }
 
             if (message == null)
             {
-                throw ErrorUtils.ArgumentNull("message");
+                throw ErrorUtils.ArgumentNull(nameof(message));
             }
 
             Error = new ODataError
@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (odataError == null)
             {
-                throw ErrorUtils.ArgumentNull("odataError");
+                throw ErrorUtils.ArgumentNull(nameof(odataError));
             }
 
             Error = odataError;
