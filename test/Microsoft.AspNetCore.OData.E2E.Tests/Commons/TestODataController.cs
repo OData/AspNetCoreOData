@@ -8,12 +8,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
 {
-    public class TestODataController : ODataController
+    public class TestODataController : ControllerBase
     {
         [NonAction]
         public new TestOkResult Ok() => new TestOkResult(base.Ok());
@@ -30,17 +28,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         [NonAction]
         public TestUpdatedODataResult<T> Updated<T>(T entity) => new TestUpdatedODataResult<T>(entity);
 
-    }
-
-    /// <summary>
-    /// Wrapper for BadRequestResult
-    /// </summary>
-    public class TestBadRequestResult : TestActionResult
-    {
-        public TestBadRequestResult(BadRequestResult innerResult)
-            : base(innerResult)
-        {
-        }
     }
 
     /// <summary>
