@@ -27,7 +27,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
 
         [NonAction]
         public TestUpdatedODataResult<T> Updated<T>(T entity) => new TestUpdatedODataResult<T>(entity);
-
     }
 
     /// <summary>
