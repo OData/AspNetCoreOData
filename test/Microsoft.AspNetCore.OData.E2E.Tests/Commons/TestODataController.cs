@@ -30,49 +30,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         [NonAction]
         public TestUpdatedODataResult<T> Updated<T>(T entity) => new TestUpdatedODataResult<T>(entity);
 
-        // new code block
-        [NonAction]
-        public new TestNotFoundResult NotFound() { return new TestNotFoundResult(base.NotFound()); }
-
-        [NonAction]
-        public new TestBadRequestResult BadRequest() { return new TestBadRequestResult(base.BadRequest()); }
-
-        [NonAction]
-        public new TestBadRequestResult BadRequest(string message) { return new TestBadRequestResult(base.BadRequest(message)); }
-
-        [NonAction]
-        public new TestBadRequestResult BadRequest(ODataError error) { return new TestBadRequestResult(base.BadRequest(error)); }
-
-        [NonAction]
-        public new TestUnauthorizedResult Unauthorized() { return new TestUnauthorizedResult(base.Unauthorized()); }
-
-        [NonAction]
-        public new TestUnauthorizedResult Unauthorized(string message) { return new TestUnauthorizedResult(base.Unauthorized(message)); }
-
-        [NonAction]
-        public new TestUnauthorizedResult Unauthorized(ODataError error) { return new TestUnauthorizedResult(base.Unauthorized(error)); }
-
-        // ConflictResult and UnprocessableEntityResult were introduced in AspNet core 2.1, which is implemented from .Net standard 2.1
-        // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase.conflict?view=aspnetcore-2.1
-        // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.unprocessableentityresult?view=aspnetcore-2.1
-        [NonAction]
-        public new TestConflictResult Conflict() { return new TestConflictResult(base.Conflict()); }
-
-        [NonAction]
-        public new TestConflictResult Conflict(string message) { return new TestConflictResult(base.Conflict(message)); }
-
-        [NonAction]
-        public new TestConflictResult Conflict(ODataError error) { return new TestConflictResult(base.Conflict(error)); }
-
-        [NonAction]
-        public new TestUnprocessableEntityResult UnprocessableEntity() { return new TestUnprocessableEntityResult(base.UnprocessableEntity()); }
-
-        [NonAction]
-        public new TestUnprocessableEntityResult UnprocessableEntity(string message) { return new TestUnprocessableEntityResult(base.UnprocessableEntity(message)); }
-
-        [NonAction]
-        public new TestUnprocessableEntityResult UnprocessableEntity(ODataError error) { return new TestUnprocessableEntityResult(base.UnprocessableEntity(error)); }
-        // -- end of new code
     }
 
     /// <summary>
@@ -211,39 +168,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
         {
         }
     }
-
-    // new code
-    /// <summary>
-    /// Wrapper for UnauthorizedResult
-    /// </summary>
-    public class TestUnauthorizedResult : TestActionResult
-    {
-        public TestUnauthorizedResult(UnauthorizedResult innerResult)
-            : base(innerResult)
-        {
-        }
-    }
-
-    /// <summary>
-    /// Wrapper for ConflictResult
-    /// </summary>
-    public class TestConflictResult : TestActionResult
-    {
-        public TestConflictResult(ConflictResult innerResult)
-            : base(innerResult)
-        {
-        }
-    }
-
-    /// <summary>
-    /// Wrapper for UnprocessableEntityResult
-    /// </summary>
-    public class TestUnprocessableEntityResult : TestActionResult
-    {
-        public TestUnprocessableEntityResult(UnprocessableEntityResult innerResult)
-            : base(innerResult)
-        {
-        }
-    }
-    // --  end of new code
 }

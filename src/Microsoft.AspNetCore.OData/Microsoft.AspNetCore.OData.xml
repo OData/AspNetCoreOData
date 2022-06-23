@@ -2557,17 +2557,7 @@
             Gets a value representing whether this factory follows OData conventions or not.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation">
-            <summary>
-            <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> is a class used to annotate
-            an <see cref="T:Microsoft.OData.Edm.IEdmNavigationSource" /> inside an <see cref="T:Microsoft.OData.Edm.IEdmModel" />
-            with information about how to build links related to that navigation source.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation" /> class.
-            </summary>
+        <member name="T:Microsoft.AspNetCore.ODa
             <remarks>The default constructor is intended for use by unit testing only.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.#ctor(Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.Edm.IEdmModel)">
@@ -2920,6 +2910,16 @@
             Gets the <see cref="T:System.TimeZoneInfo"/> setting.
             </summary>
             <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <returns>null or the time zone info.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the boolean value indicating whether the non-dollar prefix query option.
+            </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsCountRequest(Microsoft.AspNetCore.Http.Htt"T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>null or the time zone info.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.IsNoDollarQueryEnable(Microsoft.AspNetCore.Http.HttpRequest)">
@@ -5149,21 +5149,7 @@
             Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.#ctor(Microsoft.OData.Edm.IEdmTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType"/> class.
-            </summary>
-            <param name="typeReference">The element type reference.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.TypeKind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionType.ElementType">
-            <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaCollectionTy        Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> with no backing CLR <see cref="T:System.Type"/>.
             Used to hold the Entry object in the Delta Feed Payload.
             </summary>
         </member>
@@ -5716,6 +5702,17 @@
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject"/> backed by a CLR object with a one-to-one mapping.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject"/> class.
+            </summary>
+            <param name="instance">The backing CLR instance.</param>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+            <param name="edmModel">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
+        </member>
+        <membee mapping.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.#ctor(System.Object,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.OData.Edm.IEdmModel)">
@@ -8457,14 +8454,7 @@
             <param name="alreadyOrdered">The boolean value indicating whether it's ordered or not.</param>
             <returns>The applied result.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
-            <summary>
-            Translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
-            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>. ALso <see cref="T:System.Linq.IQueryable"/>
-            </summary>
-            <param name="binder">The built in <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder"/></param>
-            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="selectExpandClause">The OData $select or $expand parse tree.</param>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressio            <param name="selectExpandClause">The OData $select or $expand parse tree.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns></returns>
         </member>
@@ -9277,6 +9267,21 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder" /> class.
             Select and Expand binder depends on <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/> to process inner $filter and $orderby.
+            </summary>
+            <param name="filterBinder">The injected filter binder.</param>
+            <param name="orderByBinder">The injected orderby binder.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.#ctor">
+            <summary>
+            For unit test only.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.FilterBinder">
+            <summary>
+            Gets the filter binder.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.OrderByBerByBinder"/> to process inner $filter and $orderby.
             </summary>
             <param name="filterBinder">The injected filter binder.</param>
             <param name="orderByBinder">The injected orderby binder.</param>
@@ -10803,20 +10808,7 @@
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Compute">
-            <summary>
-            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause">
-            <summary>
-            Gets the parsed <see cref="P:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByClause"/> for this query option.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0})">
-            <summary>
-            Apply the $orderby query to the given IQueryable.
-            </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+m.Linq.IQueryable"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the orderby query has been applied to.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
@@ -12017,6 +12009,16 @@
             Currently limited to:
             <list type="bullet">
             <item><description>The Count of all matching entities on the server (requested using $count=true).</description></item>
+            <item><description>The NextLink to retrieve the next page of results (added if the server enforces Server Driven Paging).</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.PageResult`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Uri,System.Nullable{System.Int64})">
+            <summary>
+            Creates a partial set of results - used when server driven paging is enabled.
+            </summary>
+            <param name="items">The subset of matching results that should be serialized in this page.</param>
+            <param name="nextPageLink"entities on the server (requested using $count=true).</description></item>
             <item><description>The NextLink to retrieve the next page of results (added if the server enforces Server Driven Paging).</description></item>
             </list>
             </remarks>
@@ -13932,18 +13934,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.Instance">
             <summary>
             Gets the static instance of $metadata
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate" /> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.MetadataSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
+            oc />
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Template.NavigationLinkSegmentTemplate">
             <summary>
@@ -14363,6 +14354,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
