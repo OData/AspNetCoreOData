@@ -44,13 +44,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         public async Task NotFoundResponseFromODataControllerIsSerializedAsODataError(string queryUrl, string expectedResponse)
         {
             // Arrange
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
@@ -69,13 +68,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             // Arrange
             const string expectedResponse = "{\"error\":{\"code\":\"401\",\"message\":\"Not authorized to access this resource.\"}}";
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);           
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);           
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
@@ -96,15 +94,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             // Arrange
             const string expectedResponse = "{\"error\":{\"code\":\"409\",\"message\":\"Conflict during update.\"}}";
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Patch, queryUrl);
-            request.Content = new StringContent(
-                    string.Format(requestContent));
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Patch, queryUrl);
+            using var content = new StringContent(requestContent);
+            request.Content = content;
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
@@ -123,13 +120,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             // Arrange
             const string expectedResponse = "{\"error\":{\"code\":\"400\",\"message\":\"Bad request on delete.\"}}";
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, queryUrl);
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
@@ -153,15 +149,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             // Arrange
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, queryUrl);
-            request.Content = new StringContent(
-                    string.Format(requestContent));
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, queryUrl);
+            using var content = new StringContent(requestContent);
+            request.Content = content;
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
@@ -182,15 +177,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
             // Arrange
             const string expectedResponse = "{\"error\":{\"code\":\"400\",\"message\":\"Bad request during PUT.\"}}";
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, queryUrl);
-            request.Content = new StringContent(
-                    string.Format(requestContent));
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, queryUrl);
+            using var content = new StringContent(requestContent);
+            request.Content = content;
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-            HttpClient client = CreateClient();
-            HttpResponseMessage response;
+            using HttpClient client = CreateClient();
 
             // Act
-            response = await client.SendAsync(request);
+            using HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
             Assert.NotNull(response);
