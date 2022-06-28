@@ -14,7 +14,7 @@ using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 namespace Microsoft.AspNetCore.OData.Results
 {
     /// <summary>
-    /// Represents a result that when executed will produce a Unauthorized (401) response.
+    /// Represents a result that when executed will produce an Unauthorized (401) response.
     /// </summary>
     /// <remarks>This result creates an <see cref="ODataError"/> with status code: 401.</remarks>
     public class UnauthorizedODataResult : UnauthorizedResult, IODataErrorResult
