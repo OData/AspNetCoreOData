@@ -234,7 +234,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (expectedErrorCode != error.ErrorCode)
             {
-                throw ArgumentNull(error.ErrorCode,"Invalid error code");
+                throw Argument(error.ErrorCode, "Invalid error code");
             }
         }
     }

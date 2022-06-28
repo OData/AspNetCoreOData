@@ -32,9 +32,9 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <param name="message">Error Message</param>
         public NotFoundODataResult(string message)
         {
-            if (message == null)
+            if (string.IsNullOrEmpty(message))
             {
-                throw ErrorUtils.ArgumentNull(nameof(message));
+                throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
             }
 
             Error = new ODataError

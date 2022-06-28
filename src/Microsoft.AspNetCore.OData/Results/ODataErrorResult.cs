@@ -30,14 +30,14 @@ namespace Microsoft.AspNetCore.OData.Results
         /// </summary>
         public ODataErrorResult(string errorCode, string message)
         {
-            if (errorCode == null)
+            if (string.IsNullOrEmpty(errorCode))
             {
-                throw ErrorUtils.ArgumentNull(nameof(errorCode));
+                throw ErrorUtils.ArgumentNullOrEmpty(nameof(errorCode));
             }
 
-            if (message == null)
+            if (string.IsNullOrEmpty(message))
             {
-                throw ErrorUtils.ArgumentNull(nameof(message));
+                throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
             }
 
             Error = new ODataError
