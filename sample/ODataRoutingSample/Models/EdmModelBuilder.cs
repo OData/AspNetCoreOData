@@ -46,6 +46,9 @@ namespace ODataRoutingSample.Models
             unboundFunction.Parameter<int>("minSalary");
             unboundFunction.Parameter<int>("maxSalary").Optional();
             unboundFunction.Parameter<string>("wholeName").HasDefaultValue("abc");
+
+            builder.EnableLowerCamelCase();
+
             return builder.GetEdmModel();
         }
 

@@ -142,6 +142,10 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, sanitizedRoutePrefix);
             }
 
+            if (model is EdmModel edmModel && edmModel.CaseInsensitive)
+            {
+                this.RouteOptions.EnablePropertyNameCaseInsensitive = true;
+            }
 
             // Consider to use Lazy<IServiceProvider> ?
             IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);

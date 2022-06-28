@@ -74,13 +74,16 @@ namespace ODataRoutingSample
                 or, remove MetadataRoutingConvention in AddOData as
                      opt.Conventions.Remove(opt.Conventions.First(convention => convention is MetadataRoutingConvention));
                 */
-                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-                    .AddRouteComponents(model0)
-                    .AddRouteComponents("v1", model1)
-                    .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
-                    .AddRouteComponents("v3", model3)
-                    .Conventions.Add(new MyConvention())
-                );
+                .AddOData(opt =>
+                {
+                    opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                        .AddRouteComponents(model0)
+                        .AddRouteComponents("v1", model1)
+                        .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
+                        .AddRouteComponents("v3", model3)
+                        .Conventions.Add(new MyConvention());
+                    ////opt.RouteOptions.EnablePropertyNameCaseInsensitive = true;
+                });
 
             services.AddSwaggerGen();
         }
