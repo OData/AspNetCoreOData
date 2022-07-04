@@ -14,7 +14,7 @@ using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 namespace Microsoft.AspNetCore.OData.Results
 {
     /// <summary>
-    /// Represents a result that when executed will produce a UnprocessableEntity (422) response.
+    /// Represents a result that when executed will produce an UnprocessableEntity (422) response.
     /// </summary>
     /// <remarks>This result creates an <see cref="ODataError"/> with status code: 422.</remarks>
     public class UnprocessableEntityODataResult : UnprocessableEntityResult, IODataErrorResult
@@ -22,14 +22,14 @@ namespace Microsoft.AspNetCore.OData.Results
         private const string errorCode = "422";
 
         /// <summary>
-        /// OData Error.
+        /// OData error.
         /// </summary>
         public ODataError Error { get; }
 
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         public UnprocessableEntityODataResult(string message)
         {
             if (string.IsNullOrEmpty(message))
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        /// <param name="odataError">OData Error.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         public UnprocessableEntityODataResult(ODataError odataError)
         {
             if (odataError == null)

@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Bad Request (400) response.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         /// <returns>A <see cref="BadRequestODataResult"/> with the specified values.</returns>
         protected virtual BadRequestODataResult BadRequest(string message)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Bad Request (400) response.
         /// </summary>
-        /// <param name="odataError">Parameter of type <see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>A <see cref="BadRequestODataResult"/> with the specified values.</returns>
         protected virtual BadRequestODataResult BadRequest(ODataError odataError)
         {
@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Not Found (404) response.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         /// <returns>A <see cref="NotFoundODataResult"/> with the specified values.</returns>
         protected virtual NotFoundODataResult NotFound(string message)
         {
@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Not Found (404) response.
         /// </summary>
-        /// <param name="odataError">Parameter of type <see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>A <see cref="NotFoundODataResult"/> with the specified values.</returns>
         protected virtual NotFoundODataResult NotFound(ODataError odataError)
         {
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Unauthorized (401) response.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         /// <returns>An <see cref="UnauthorizedODataResult"/> with the specified values.</returns>
         protected virtual UnauthorizedODataResult Unauthorized(string message)
         {
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Unauthorized (401) response.
         /// </summary>
-        /// <param name="odataError">Parameter of type <see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>An <see cref="UnauthorizedODataResult"/> with the specified values.</returns>
         protected virtual UnauthorizedODataResult Unauthorized(ODataError odataError)
         {
@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Conflict (409) response.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         /// <returns>A <see cref="ConflictODataResult"/> with the specified values.</returns>
         protected virtual ConflictODataResult Conflict(string message)
         {
@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce a Conflict (409) response.
         /// </summary>
-        /// <param name="odataError">Parameter of type <see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>A <see cref="ConflictODataResult"/> with the specified values.</returns>
         protected virtual ConflictODataResult Conflict(ODataError odataError)
         {
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce an UnprocessableEntity (422) response.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         /// <returns>An <see cref="UnprocessableEntityODataResult"/> with the specified values.</returns>
         protected virtual UnprocessableEntityODataResult UnprocessableEntity(string message)
         {
@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         /// <summary>
         /// Creates a <see cref="StatusCodeResult"/> that when executed will produce an UnprocessableEntity (422) response.
         /// </summary>
-        /// <param name="odataError">Parameter of type <see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>An <see cref="UnprocessableEntityODataResult"/> with the specified values.</returns>
         protected virtual UnprocessableEntityODataResult UnprocessableEntity(ODataError odataError)
         {
@@ -155,10 +155,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         }
 
         /// <summary>
-        /// Creates a <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.
+        /// Creates an <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.
         /// </summary>
-        /// <param name="errorCode">Http Error code.</param>
-        /// <param name="message">Http Error Message.</param>
+        /// <param name="errorCode">Http error code.</param>
+        /// <param name="message">Error message.</param>
         /// <returns>An <see cref="Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         protected virtual ODataErrorResult ODataErrorResult(string errorCode, string message)
         {
@@ -166,9 +166,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Controllers
         }
 
         /// <summary>
-        /// Creates a <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.
+        /// Creates an <see cref="ActionResult"/> that when executed will produce an <see cref="ODataError"/> response.
         /// </summary>
-        /// <param name="odataError"><see cref="ODataError"/>.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         /// <returns>An <see cref="Microsoft.AspNetCore.OData.Results.ODataErrorResult"/> with the specified values.</returns>
         protected virtual ODataErrorResult ODataErrorResult(ODataError odataError)
         {

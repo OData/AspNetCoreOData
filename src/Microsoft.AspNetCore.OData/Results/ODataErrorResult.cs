@@ -21,13 +21,15 @@ namespace Microsoft.AspNetCore.OData.Results
     public class ODataErrorResult : ActionResult, IODataErrorResult
     {
         /// <summary>
-        /// OData Error.
+        /// OData error.
         /// </summary>
         public ODataError Error { get; }
 
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
+        /// <param name="errorCode">Error code.</param>
+        /// <param name="message">Error message.</param>
         public ODataErrorResult(string errorCode, string message)
         {
             if (string.IsNullOrEmpty(errorCode))
@@ -50,6 +52,7 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         public ODataErrorResult(ODataError odataError)
         {
             if (odataError == null)

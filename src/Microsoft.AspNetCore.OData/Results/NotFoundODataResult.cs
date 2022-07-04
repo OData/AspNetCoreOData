@@ -22,14 +22,14 @@ namespace Microsoft.AspNetCore.OData.Results
         private const string errorCode = "404";
 
         /// <summary>
-        /// OData Error.
+        /// OData error.
         /// </summary>
         public ODataError Error { get; }
 
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        /// <param name="message">Error Message</param>
+        /// <param name="message">Error message.</param>
         public NotFoundODataResult(string message)
         {
             if (string.IsNullOrEmpty(message))
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Results
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        /// <param name="odataError">OData Error.</param>
+        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
         public NotFoundODataResult(ODataError odataError)
         {
             if (odataError == null)
