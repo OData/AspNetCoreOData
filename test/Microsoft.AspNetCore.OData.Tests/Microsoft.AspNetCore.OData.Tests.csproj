@@ -33,11 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
     <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
     <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
     <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
     <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
   </ItemGroup>

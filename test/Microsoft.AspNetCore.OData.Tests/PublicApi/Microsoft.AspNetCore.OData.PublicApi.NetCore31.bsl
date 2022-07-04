@@ -1575,6 +1575,10 @@ public sealed class Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingA
 	public ODataQueryParameterBindingAttribute ()
 }
 
+public interface Microsoft.AspNetCore.OData.Results.IODataErrorResult {
+	Microsoft.OData.ODataError Error  { public abstract get; }
+}
+
 [
 DataContractAttribute(),
 ]
@@ -1602,10 +1606,58 @@ public abstract class Microsoft.AspNetCore.OData.Results.SingleResult {
 	public static SingleResult`1 Create (IQueryable`1 queryable)
 }
 
+public class Microsoft.AspNetCore.OData.Results.BadRequestODataResult : Microsoft.AspNetCore.Mvc.BadRequestResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public BadRequestODataResult (Microsoft.OData.ODataError odataError)
+	public BadRequestODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.ConflictODataResult : Microsoft.AspNetCore.Mvc.ConflictResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public ConflictODataResult (Microsoft.OData.ODataError odataError)
+	public ConflictODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
 public class Microsoft.AspNetCore.OData.Results.CreatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
 	public CreatedODataResult`1 (T entity)
 
 	T Entity  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.NotFoundODataResult : Microsoft.AspNetCore.Mvc.NotFoundResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public NotFoundODataResult (Microsoft.OData.ODataError odataError)
+	public NotFoundODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.ODataErrorResult : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult, IODataErrorResult {
+	public ODataErrorResult (Microsoft.OData.ODataError odataError)
+	public ODataErrorResult (string errorCode, string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
 
 	[
 	AsyncStateMachineAttribute(),
@@ -1627,6 +1679,30 @@ public class Microsoft.AspNetCore.OData.Results.PageResult`1 : Microsoft.AspNetC
 	public virtual IEnumerator`1 GetEnumerator ()
 	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
+}
+
+public class Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult : Microsoft.AspNetCore.Mvc.UnauthorizedResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public UnauthorizedODataResult (Microsoft.OData.ODataError odataError)
+	public UnauthorizedODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult : Microsoft.AspNetCore.Mvc.UnprocessableEntityResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public UnprocessableEntityODataResult (Microsoft.OData.ODataError odataError)
+	public UnprocessableEntityODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
@@ -2882,7 +2958,19 @@ ODataAttributeRoutingAttribute(),
 public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	protected ODataController ()
 
+	protected virtual Microsoft.AspNetCore.OData.Results.BadRequestODataResult BadRequest (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.BadRequestODataResult BadRequest (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.ConflictODataResult Conflict (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.ConflictODataResult Conflict (string message)
 	protected virtual CreatedODataResult`1 Created (TEntity entity)
+	protected virtual Microsoft.AspNetCore.OData.Results.NotFoundODataResult NotFound (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.NotFoundODataResult NotFound (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.ODataErrorResult ODataErrorResult (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.ODataErrorResult ODataErrorResult (string errorCode, string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult Unauthorized (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult Unauthorized (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (string message)
 	protected virtual UpdatedODataResult`1 Updated (TEntity entity)
 }
 
