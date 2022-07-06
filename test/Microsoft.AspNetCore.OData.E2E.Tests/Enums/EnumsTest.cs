@@ -179,6 +179,32 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [Theory]
+        [InlineData("/convention/Employees/$count", true)]
+        [InlineData("/convention/Employees/$count", false)]
+        public async Task QueryEntitySetCountEncoding(string requestUri, bool sendAcceptCharset)
+        {
+            // Arrange
+            await ResetDatasource();
+            HttpClient client = CreateClient();
+			client.DefaultRequestHeaders.AcceptCharset.Clear();
+            if (sendAcceptCharset)
+            {
+                client.DefaultRequestHeaders.AcceptCharset.ParseAdd("utf-8");
+            }
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            var blob = await response.Content.ReadAsByteArrayAsync();
+            Assert.Equal("utf-8", response.Content.Headers.ContentType.CharSet, StringComparer.OrdinalIgnoreCase);
+            Assert.False((blob[0] == 0xEF) && (blob[1] == 0xBB) && (blob[2] == 0xBF));
+            var count = Encoding.UTF8.GetString(blob);
+            Assert.Equal(3, int.Parse(count));
+        }
+
+        [Theory]
         [InlineData("/convention/Employees(1)/SkillSet/$count", 2)]
         [InlineData("/convention/Employees(1)/SkillSet/$count?$filter=$it eq Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill'Sql'", 1)]
         public async Task QuerySkillSetCount(string requestUri, int expectedCount)
