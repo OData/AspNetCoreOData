@@ -199,9 +199,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.True(response.IsSuccessStatusCode);
             var blob = await response.Content.ReadAsByteArrayAsync();
             Assert.Equal("utf-8", response.Content.Headers.ContentType.CharSet, StringComparer.OrdinalIgnoreCase);
-            Assert.False((blob[0] == 0xEF) && (blob[1] == 0xBB) && (blob[2] == 0xBF));
             var count = Encoding.UTF8.GetString(blob);
             Assert.Equal(3, int.Parse(count));
+            Assert.False((blob[0] == 0xEF) && (blob[1] == 0xBB) && (blob[2] == 0xBF));
         }
 
         [Theory]
