@@ -186,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             // Arrange
             await ResetDatasource();
             HttpClient client = CreateClient();
-			client.DefaultRequestHeaders.AcceptCharset.Clear();
+            client.DefaultRequestHeaders.AcceptCharset.Clear();
             if (sendAcceptCharset)
             {
                 client.DefaultRequestHeaders.AcceptCharset.ParseAdd("utf-8");
