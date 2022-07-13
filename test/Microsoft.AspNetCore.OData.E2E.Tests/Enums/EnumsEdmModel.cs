@@ -66,7 +66,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
             builder.Namespace = typeof(Employee).Namespace;
 
+            builder.EntitySet<GdebruinEntity>("Gdebruins");
+
+            builder.EnableLowerCamelCaseForPropertiesAndEnums();
+
             var edmModel = builder.GetEdmModel();
+
             return edmModel;
         }
 

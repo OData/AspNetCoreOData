@@ -26,6 +26,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         public FavoriteSports FavoriteSports { get; set; }
     }
 
+    public class GdebruinEntity
+    {
+        public GdebruinKey ID { get; set; }
+
+        public string Data { get; set; }
+    }
+
+    public enum GdebruinKey
+    {
+        First = 0,
+        Second = 1,
+        Third = 2,
+        Fourth = 3,
+    }
+
     [Flags]
     public enum AccessLevel
     {

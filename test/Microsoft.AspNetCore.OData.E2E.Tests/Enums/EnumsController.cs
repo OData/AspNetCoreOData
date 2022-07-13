@@ -128,6 +128,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(firstOrDefault.FavoriteSports.LikeMost);
         }
 
+        [HttpGet("Gdebruins/{key}")]
+        public IActionResult GetGdebruins(GdebruinKey key)
+        {
+            return Ok(new List<GdebruinEntity>() { new GdebruinEntity() { ID = GdebruinKey.Third, Data = "asdf" } }.Single(_ => _.ID == key));
+        }
+
         public IActionResult Post([FromBody]Employee employee)
         {
             employee.ID = Employees.Count + 1;

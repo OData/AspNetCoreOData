@@ -179,6 +179,35 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [Theory]
+        [InlineData("/convention/Employees?$filter=Gender eq 'female'")]
+        [InlineData("/convention/Employees?$filter=Gender eq 'Female'")]
+        public async Task Gdebruin1(string requestUri)
+        {
+            await ResetDatasource();
+            HttpClient client = CreateClient();           
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+            var data = await response.Content.ReadAsStringAsync();
+            Assert.True(response.IsSuccessStatusCode, data);
+        }
+
+        [Fact]
+        public async Task Gdebruin2()
+        {
+            var requestUri = "/convention/Gdebruins/Microsoft.AspNetCore.OData.E2E.Tests.Enums.GdebruinKey'Third'";
+
+            // Arrange
+            await ResetDatasource();
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+
+            // Assert
+            string count = await response.Content.ReadAsStringAsync();
+            Assert.True(response.IsSuccessStatusCode, count);
+        }
+
+        [Theory]
         [InlineData("/convention/Employees/$count", true)]
         [InlineData("/convention/Employees/$count", false)]
         public async Task QueryEntitySetCountEncoding(string requestUri, bool sendAcceptCharset)
