@@ -190,11 +190,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.True(response.IsSuccessStatusCode, data);
         }
 
-        [Fact]
-        public async Task Gdebruin2()
+        [Theory]
+        [InlineData("/convention/Gdebruins/Microsoft.AspNetCore.OData.E2E.Tests.Enums.GdebruinKey'third'")]
+        [InlineData("/convention/Gdebruins/Microsoft.AspNetCore.OData.E2E.Tests.Enums.GdebruinKey'Third'")]
+        public async Task Gdebruin2(string requestUri)
         {
-            var requestUri = "/convention/Gdebruins/Microsoft.AspNetCore.OData.E2E.Tests.Enums.GdebruinKey'Third'";
-
             // Arrange
             await ResetDatasource();
             HttpClient client = CreateClient();
