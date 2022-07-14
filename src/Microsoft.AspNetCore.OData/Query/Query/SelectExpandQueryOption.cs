@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
+            if (string.IsNullOrWhiteSpace(select) && string.IsNullOrWhiteSpace(expand))
             {
                 throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
             }
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!(context.ElementType is IEdmStructuredType))
             {
-                throw Error.Argument(SRResources.SelectNonStructured, context.ElementType);
+                throw Error.Argument("context", SRResources.SelectNonStructured, context.ElementType.ToTraceString());
             }
 
             Context = context;
@@ -82,33 +82,19 @@ namespace Microsoft.AspNetCore.OData.Query
 
         // This constructor is intended for unit testing only.
         internal SelectExpandQueryOption(string select, string expand, ODataQueryContext context)
+            : this(select, expand, context, queryOptionParser: context != null
+                    ? new ODataQueryOptionParser(
+                        context.Model,
+                        context.ElementType,
+                        context.NavigationSource,
+                        new Dictionary<string, string>
+                        {
+                            { "$select", select },
+                            { "$expand", expand }
+                        },
+                        context.RequestContainer)
+                    : null)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
-            {
-                throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
-            }
-
-            if (!(context.ElementType is IEdmStructuredType))
-            {
-                throw Error.Argument("context", SRResources.SelectNonStructured, context.ElementType.ToTraceString());
-            }
-
-            Context = context;
-            RawSelect = select;
-            RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
-
-            _queryOptionParser = new ODataQueryOptionParser(
-                context.Model,
-                context.ElementType,
-                context.NavigationSource,
-                new Dictionary<string, string> { { "$select", select }, { "$expand", expand } },
-                context.RequestContainer);
         }
 
         /// <summary>

@@ -1663,6 +1663,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;select&apos; and &apos;expand&apos; cannot be empty or whitespace. Omit the parameter from the query if it is not used..
+        /// </summary>
+        internal static string SelectExpandEmptyOrWhitespace {
+            get {
+                return ResourceManager.GetString("SelectExpandEmptyOrWhitespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to $select does not support selections of type &apos;{0}&apos;..
         /// </summary>
         internal static string SelectionTypeNotSupported {

@@ -37,8 +37,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 "context");
         }
 
-        [Fact]
-        public void Ctor_ThrowsArgument_IfBothSelectAndExpandAreNull()
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData("", "")]
+        [InlineData("  ", "  ")]
+        public void Ctor_ThrowsArgument_IfBothSelectAndExpandAreNullOrWhitespace(string select, string expand)
         {
             // Arrange
             _model.Model.SetAnnotationValue<ClrTypeAnnotation>(_model.Customer, new ClrTypeAnnotation(typeof(Customer)));
@@ -46,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             // Act & Assert
             ExceptionAssert.Throws<ArgumentException>(
-                () => new SelectExpandQueryOption(select: null, expand: null, context: context),
+                () => new SelectExpandQueryOption(select, expand, context: context),
                 "'select' and 'expand' cannot be both null or empty.");
         }
 
