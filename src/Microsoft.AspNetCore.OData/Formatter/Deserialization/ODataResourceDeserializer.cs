@@ -891,7 +891,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
 
                 Uri serviceRootUri = new Uri(request.CreateODataLink());
-                IODataPathParser pathParser = requestContainer.GetService<IODataPathParser>();
+                IODataPathParser pathParser = requestContainer?.GetService<IODataPathParser>();
                 if (pathParser == null) // Seem like IODataPathParser is NOT injected into DI container by default
                 {
                     pathParser = new DefaultODataPathParser();
