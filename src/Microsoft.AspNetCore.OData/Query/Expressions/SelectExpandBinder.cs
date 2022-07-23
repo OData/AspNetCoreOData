@@ -231,7 +231,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             PropertyInfo propertyInfo = source.Type.GetProperty(propertyName, BindingFlags.DeclaredOnly);
             if (propertyInfo == null)
             {
-                propertyInfo = source.Type.GetProperty(propertyName);
+                /*
+                 * History of code:
+                 * propertyInfo = source.Type.GetProperty(propertyName);
+                */
+                propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName)).FirstOrDefault();
             }
             
             Expression propertyValue = Expression.Property(source, propertyInfo);
