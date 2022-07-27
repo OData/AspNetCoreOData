@@ -883,7 +883,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 string idOriginalString = id.OriginalString;
                 if (ContentIdReferencePattern.IsMatch(idOriginalString))
                 {
-                    // We can expect request.ODataBatchFeature() to not be null?
+                    // We can expect request.ODataBatchFeature() to not be null
                     string resolvedUri = ContentIdHelpers.ResolveContentId(
                         idOriginalString,
                         request.ODataBatchFeature().ContentIdMapping);
