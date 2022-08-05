@@ -1094,20 +1094,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -12798,6 +12784,11 @@
             Gets the OData path template
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.IsConventional">
+            <summary>
+            Gets the boolean value indicating whether it's from OData conventional routing, false means from attribute routing.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataPathExtensions">
             <summary>
              Extension methods for <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.
@@ -13256,6 +13247,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Template">
             <summary>
             Gets the OData path template
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.IsConventional">
+            <summary>
+            Gets or sets a boolean value indicating from odata conventional routing.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.ODataSegmentKinds">
@@ -14371,6 +14367,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

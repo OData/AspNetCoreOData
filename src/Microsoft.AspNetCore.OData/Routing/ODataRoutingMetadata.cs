@@ -51,5 +51,10 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// Gets the OData path template
         /// </summary>
         public ODataPathTemplate Template { get; }
+
+        /// <summary>
+        /// Gets or sets a boolean value indicating from odata conventional routing.
+        /// </summary>
+        public bool IsConventional { get; set; } = true;
     }
 }

@@ -1723,6 +1723,7 @@ public sealed class Microsoft.AspNetCore.OData.Results.SingleResult`1 : Microsof
 }
 
 public interface Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata {
+	bool IsConventional  { public abstract get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; }
 	string Prefix  { public abstract get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public abstract get; }
@@ -1849,6 +1850,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IODataRoutingMetadata {
 	public ODataRoutingMetadata (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate template)
 
+	bool IsConventional  { public virtual get; public set; }
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
