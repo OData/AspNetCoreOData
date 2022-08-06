@@ -232,9 +232,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (propertyInfo == null)
             {
                 /*
-                 * History of code:
-                 * propertyInfo = source.Type.GetProperty(propertyName);
-                */
+                 History of code:
+                    propertyInfo = source.Type.GetProperty(propertyName);
+                 This code fixes an issue where 'History of code' was unable to obtain attributes with the same name as the parent class after the subclass hid the parent class member.
+                 Such as: 
+                    'History of code' cannot get the Key property of the Child.
+                        public class Father
+                        {
+                            public string Key { get; set; }
+                        }
+                        public class Child : Father
+                        {
+                            public new Guid Key { get; set; }
+                        }
+                 */
                 propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName)).FirstOrDefault();
             }
             
