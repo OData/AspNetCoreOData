@@ -235,6 +235,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
+        public async Task WriteObjectInlineAsync_Calls_CreateComplexNestedResourceInfo_ForEachSelectedComplexProperty()
+        {
+            // Arrange
+            SelectExpandNode selectExpandNode = new SelectExpandNode
+            {
+                SelectedComplexProperties = new Dictionary<IEdmStructuralProperty, PathSelectItem>
+                {
+                    { new Mock<IEdmStructuralProperty>().Object, null },
+                    { new Mock<IEdmStructuralProperty>().Object, null }
+                }
+            };
+
+            Mock<ODataWriter> writer = new Mock<ODataWriter>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
+            serializer.CallBase = true;
+
+            serializer.Setup(s => s.CreateComplexNestedResourceInfo(selectExpandNode.SelectedComplexProperties.ElementAt(0).Key, null, It.IsAny<ResourceContext>())).Verifiable();
+            serializer.Setup(s => s.CreateComplexNestedResourceInfo(selectExpandNode.SelectedComplexProperties.ElementAt(1).Key, null, It.IsAny<ResourceContext>())).Verifiable();
+
+            // Act
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
+
+            // Assert
+            serializer.Verify();
+        }
+
+        [Fact]
         public async Task WriteObjectInlineAsync_Calls_CreateNavigationLink_ForEachSelectedNavigationProperty()
         {
             // Arrange
