@@ -373,6 +373,10 @@ Microsoft.AspNetCore.OData.Formatter.ODataParameterValue.Value.get -> object
 Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters
 Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters.Action.get -> Microsoft.OData.Edm.IEdmAction
 Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters.ODataUntypedActionParameters(Microsoft.OData.Edm.IEdmAction action) -> void
+Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
+Microsoft.AspNetCore.OData.Formatter.OmitValuesKind.Defaults = 2 -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
+Microsoft.AspNetCore.OData.Formatter.OmitValuesKind.Nulls = 1 -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
+Microsoft.AspNetCore.OData.Formatter.OmitValuesKind.Unknown = 0 -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
 Microsoft.AspNetCore.OData.Formatter.ResourceContext
 Microsoft.AspNetCore.OData.Formatter.ResourceContext.DynamicComplexProperties.get -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Formatter.ResourceContext.DynamicComplexProperties.set -> void
@@ -460,6 +464,8 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Naviga
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.NavigationSource.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ODataSerializerContext() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ODataSerializerContext(Microsoft.AspNetCore.OData.Formatter.ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty) -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.OmitValuesKind.get -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.OmitValuesKind.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Path.get -> Microsoft.OData.UriParser.ODataPath
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Path.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.QueryOptions.get -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
@@ -666,6 +672,8 @@ Microsoft.AspNetCore.OData.ODataOptions.Expand() -> Microsoft.AspNetCore.OData.O
 Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.GetRouteServices(string routePrefix) -> System.IServiceProvider
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
+Microsoft.AspNetCore.OData.ODataOptions.OmitValuesKind.get -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
+Microsoft.AspNetCore.OData.ODataOptions.OmitValuesKind.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
 Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel EdmModel, System.IServiceProvider ServiceProvider)>
@@ -1610,6 +1618,7 @@ static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetETagHandle
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.Edm.IEdmModel
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(this Microsoft.AspNetCore.Http.HttpRequest request, int pageSize, object instance, System.Func<object, string> objectToSkipTokenValue) -> System.Uri
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataVersion
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetOmitValuesKind(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.OmitValuesKind
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetReaderSettings(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataMessageReaderSettings
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetRouteServices(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.TimeZoneInfo
@@ -1736,7 +1745,9 @@ virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerialize
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.CreateODataEnumValue(object graph, Microsoft.OData.Edm.IEdmEnumTypeReference enumType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataEnumValue
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.CreateODataPrimitiveValue(object graph, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataPrimitiveValue
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.AppendDynamicProperties(Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> void
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComplexNestedResourceInfo(Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComputedProperty(string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataProperty
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDynamicComplexNestedResourceInfo(string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateETag(Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> string
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateNavigationLink(Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateODataAction(Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataAction

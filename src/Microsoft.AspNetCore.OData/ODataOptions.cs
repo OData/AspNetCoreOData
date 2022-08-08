@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +52,11 @@ namespace Microsoft.AspNetCore.OData
         /// Gets or sets a TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
         /// </summary>
         public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.Local;
+
+        /// <summary>
+        /// Gets or sets a omit values kind for the property value serialization.
+        /// </summary>
+        public OmitValuesKind OmitValuesKind { get; set; } = OmitValuesKind.Unknown;
 
         /// <summary>
         /// Gets the routing conventions.

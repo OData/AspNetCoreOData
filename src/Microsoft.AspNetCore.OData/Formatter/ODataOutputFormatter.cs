@@ -209,6 +209,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             // Add version header.
             response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(request.GetODataVersion());
+
+            // Set the prefer-applied header on response
+            ResponsePreferenceHelpers.SetResponsePreferAppliedHeader(response);
         }
 
         /// <inheritdoc/>
