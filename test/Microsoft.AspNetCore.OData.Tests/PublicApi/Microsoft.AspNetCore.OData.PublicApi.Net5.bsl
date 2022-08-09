@@ -2216,7 +2216,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public ODataResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual void AppendDynamicProperties (Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataNestedResourceInfo CreateComplexNestedResourceInfo (Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataProperty CreateComputedProperty (string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataNestedResourceInfo CreateDynamicComplexNestedResourceInfo (string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual string CreateETag (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateNavigationLink (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataAction CreateODataAction (Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
