@@ -78,6 +78,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Items = context.Items;
             ExpandReference = context.ExpandReference;
             TimeZone = context.TimeZone;
+            OmitValuesKind = context.OmitValuesKind;
 
             QueryContext = queryContext;
 
@@ -179,6 +180,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Gets or sets the <see cref="TimeZoneInfo"/>.
         /// </summary>
         public TimeZoneInfo TimeZone { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OmitValuesKind"/>.
+        /// </summary>
+        public OmitValuesKind OmitValuesKind { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ODataQueryOptions"/>.

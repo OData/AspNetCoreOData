@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,6 +70,44 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             return request.HttpContext.ODataOptions();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="OmitValuesKind"/> from the request.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to access.</param>
+        /// <returns>The <see cref="OmitValuesKind"/> from the request.</returns>
+        public static OmitValuesKind GetOmitValuesKind(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            // The 'Prefer' header from client has the top priority
+            string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(request.Headers);
+            if (preferHeader != null)
+            {
+                // use case insensitive string comparison
+                if (preferHeader.Contains("omit-values=nulls", StringComparison.OrdinalIgnoreCase))
+                {
+                    return OmitValuesKind.Nulls;
+                }
+
+                if (preferHeader.Contains("omit-values=defaults", StringComparison.OrdinalIgnoreCase))
+                {
+                    return OmitValuesKind.Defaults;
+                }
+            }
+
+            // If there's no setting from client, we move to use the configuration on the OData options.
+            ODataOptions options = request.ODataOptions();
+            if (options == null)
+            {
+                return OmitValuesKind.Unknown;
+            }
+
+            return options.OmitValuesKind;
         }
 
         /// <summary>

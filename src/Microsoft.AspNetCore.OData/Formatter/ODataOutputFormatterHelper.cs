@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -24,7 +23,6 @@ using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter
@@ -142,6 +140,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.MetadataLevel = metadataLevel;
                 writeContext.QueryOptions = queryOptions;
                 writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
+                writeContext.OmitValuesKind = request.GetOmitValuesKind();
 
                 //Set the SelectExpandClause on the context if it was explicitly specified.
                 if (selectExpandDifferentFromQueryOptions != null)
