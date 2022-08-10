@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(request.Headers);
             if (preferHeader != null)
             {
-                // simply use the string comparision case-insensitive
+                // use case insensitive string comparison
                 if (preferHeader.Contains("omit-values=nulls", StringComparison.OrdinalIgnoreCase))
                 {
                     return OmitValuesKind.Nulls;
