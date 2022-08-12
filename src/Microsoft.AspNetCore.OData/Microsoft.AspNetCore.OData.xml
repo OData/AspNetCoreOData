@@ -1094,6 +1094,20 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -4605,6 +4619,27 @@
             <summary>
             Write the navigation link for the select navigation properties.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDynamicComplexNestedResourceInfo(System.String,System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> to be written while writing this dynamic complex property.
+            </summary>
+            <param name="propertyName">The dynamic property name.</param>
+            <param name="propertyValue">The dynamic property value.</param>
+            <param name="edmType">The edm type reference.</param>
+            <param name="resourceContext">The context for the complex instance being written.</param>
+            <returns>The nested resource info to be written. Returns 'null' will omit this serialization.</returns>
+            <remarks>It enables customer to get more controll by overriding this method. </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComplexNestedResourceInfo(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> to be written while writing this complex property.
+            </summary>
+            <param name="complexProperty">The complex property for which the nested resource info is being created.</param>
+            <param name="pathSelectItem">The corresponding sub select item belongs to this complex property.</param>
+            <param name="resourceContext">The context for the complex instance being written.</param>
+            <returns>The nested resource info to be written. Returns 'null' will omit this complex serialization.</returns>
+            <remarks>It enables customer to get more controll by overriding this method. </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateNavigationLink(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -14367,22 +14402,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
