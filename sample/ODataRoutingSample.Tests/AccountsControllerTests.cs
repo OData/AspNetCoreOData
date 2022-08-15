@@ -36,12 +36,12 @@ namespace ODataRoutingSample.Tests
             var edmModel = modelBuilder.GetEdmModel();
 
             var options = new ODataOptions();
-            options.AddModel("odata", EdmCoreModel.Instance);
-            options.AddModel("my{data}", edmModel);
+            options.AddRouteComponents("odata", EdmCoreModel.Instance);
+            options.AddRouteComponents("my{data}", edmModel);
 
             HttpRequest request = RequestFactory.Create("GET",
                 "http://localhost/api?$top=2&$count=true",
-                dataOptions => dataOptions.AddModel("odata", edmModel));
+                dataOptions => dataOptions.AddRouteComponents("odata", edmModel));
 
             var oDataQueryContext = new ODataQueryContext(edmModel, typeof(Account), new ODataPath());
 
@@ -65,12 +65,12 @@ namespace ODataRoutingSample.Tests
             var edmModel = modelBuilder.GetEdmModel();
 
             var options = new ODataOptions();
-            options.AddModel("odata", EdmCoreModel.Instance);
-            options.AddModel("my{data}", edmModel);
+            options.AddRouteComponents("odata", EdmCoreModel.Instance);
+            options.AddRouteComponents("my{data}", edmModel);
 
             HttpRequest request = RequestFactory.Create("GET",
                 "http://localhost/api?filter=Name eq 'Hot'",
-                dataOptions => dataOptions.AddModel("odata", edmModel));
+                dataOptions => dataOptions.AddRouteComponents("odata", edmModel));
 
             var oDataQueryContext = new ODataQueryContext(edmModel, typeof(Account), new ODataPath());
 

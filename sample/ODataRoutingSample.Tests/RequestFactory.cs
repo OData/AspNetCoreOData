@@ -12,14 +12,15 @@ namespace ODataRoutingSample
         /// </summary>
         /// <param name="method">The http method.</param>
         /// <param name="uri">The http request uri.</param>
+        /// <param name="setupDataConfigurationOption">Data configuration option action</param>
         /// <returns>The HttpRequest.</returns>
-        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupActio)
+        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupDataConfigurationOption)
         {
             HttpContext context = new DefaultHttpContext();
             HttpRequest request = context.Request;
 
             IServiceCollection services = new ServiceCollection();
-            services.Configure(setupActio);
+            services.Configure(setupDataConfigurationOption);
             context.RequestServices = services.BuildServiceProvider();
 
             request.Method = method;
