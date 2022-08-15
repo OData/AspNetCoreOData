@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -144,10 +145,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
+            IEdmNavigationSource navigationSource = NavigationSource;
+            if (navigationSource == null)
+            {
+                navigationSource = SegmentTemplateHelpers.GetNavigationSourceFromEdmOperation(context.Model, Function);
+            }
+
             // If the function has no parameter, we don't need to do anything and just return an operation segment.
             if (ParameterMappings.Count == 0)
             {
-                context.Segments.Add(new OperationSegment(Function, NavigationSource as IEdmEntitySetBase));
+                context.Segments.Add(new OperationSegment(Function, navigationSource as IEdmEntitySetBase));
                 return true;
             }
 
@@ -172,7 +179,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 return false;
             }
 
-            context.Segments.Add(new OperationSegment(Function, parameters, NavigationSource as IEdmEntitySetBase));
+            context.Segments.Add(new OperationSegment(Function, parameters, navigationSource as IEdmEntitySetBase));
             return true;
         }
 

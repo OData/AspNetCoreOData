@@ -729,4 +729,7 @@
   <data name="MultipleActionImportFound" xml:space="preserve">
     <value>Found multiple action imports with same '{0}' name within an entity container..</value>
   </data>
+  <data name="SelectExpandEmptyOrWhitespace" xml:space="preserve">
+    <value>'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.</value>
+  </data>
 </root>

@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IODataSerializer serializer = GetSerializer(type, value, request, serializerProvider);
 
             ODataPath path = request.ODataFeature().Path;
-            IEdmNavigationSource targetNavigationSource = GetTargetNavigationSource(path, model);
+            IEdmNavigationSource targetNavigationSource = path.GetNavigationSource();
             HttpResponse response = request.HttpContext.Response;
 
             // serialize a response
@@ -194,30 +194,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             return serializer;
-        }
-
-        private static IEdmNavigationSource GetTargetNavigationSource(ODataPath path, IEdmModel model)
-        {
-            if (path == null)
-            {
-                return null;
-            }
-
-            Contract.Assert(model != null);
-
-            OperationSegment operationSegment = path.LastSegment as OperationSegment;
-            if (operationSegment != null)
-            {
-                // OData model builder uses an annotation to save the function returned entity set.
-                // TODO: we need to refactor it later.
-                ReturnedEntitySetAnnotation entitySetAnnotation = model.GetAnnotationValue<ReturnedEntitySetAnnotation>(operationSegment.Operations.Single());
-                if (entitySetAnnotation != null)
-                {
-                    return model.EntityContainer.FindEntitySet(entitySetAnnotation.EntitySetName);
-                }
-            }
-
-            return path.GetNavigationSource();
         }
 
         private static string GetRootElementName(ODataPath path)

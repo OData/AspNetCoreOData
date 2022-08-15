@@ -172,7 +172,11 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     ClearMetadata(newSelectorModel);
 
                     // Add OData routing metadata
-                    ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, pathTemplate);
+                    ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, pathTemplate)
+                    {
+                        IsConventional = false
+                    };
+
                     newSelectorModel.EndpointMetadata.Add(odataMetadata);
 
                     // replace the attribute routing template using absolute routing template to avoid appending any controller route template

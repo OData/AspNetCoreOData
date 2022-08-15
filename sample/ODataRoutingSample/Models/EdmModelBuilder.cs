@@ -18,6 +18,10 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<Product>("Products");
             builder.EntitySet<Person>("People").EntityType.HasKey(c => new { c.FirstName, c.LastName });
 
+            // use the following codes to set the order and change the route template.
+            // builder.EntityType<Person>().Property(c => c.FirstName).Order = 2;
+            // builder.EntityType<Person>().Property(c => c.LastName).Order = 1;
+
             // function with optional parameters
             var functionWithOptional = builder.EntityType<Product>().Collection.Function("GetWholeSalary").ReturnsCollectionFromEntitySet<Order>("Orders");
             functionWithOptional.Parameter<int>("minSalary");

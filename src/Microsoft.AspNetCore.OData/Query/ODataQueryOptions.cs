@@ -1017,7 +1017,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
             }
 
-            if (RawValues.Select != null || RawValues.Expand != null)
+            if (!string.IsNullOrWhiteSpace(RawValues.Select) || !string.IsNullOrWhiteSpace(RawValues.Expand))
             {
                 SelectExpand = new SelectExpandQueryOption(RawValues.Select, RawValues.Expand,
                     Context, _queryOptionParser);

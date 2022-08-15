@@ -8,12 +8,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
@@ -141,6 +146,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             ODataPathSegment actual = Assert.Single(context.Segments);
             OperationSegment actionSegment = Assert.IsType<OperationSegment>(actual);
             Assert.Same(action, actionSegment.Operations.First());
+        }
+
+        [Fact]
+        public void TryTranslateActionSegmentTemplate_ReturnsODataActionSegment_WithReturnedEntitySet()
+        {
+            // Arrange
+            var httpContext = new Mock<HttpContext>().Object;
+            var endpoint = new Endpoint(c => Task.CompletedTask, EndpointMetadataCollection.Empty, "Test");
+            var routeValues = new RouteValueDictionary();
+
+            var model = new EdmModel();
+            var entityType = new EdmEntityType("NS", "Entity");
+            entityType.AddKeys(entityType.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+            model.AddElement(entityType);
+            EdmAction action = new EdmAction("NS", "Action", new EdmEntityTypeReference(entityType, true), true, null);
+            model.AddElement(action);
+            var entityContainer = new EdmEntityContainer("NS", "Default");
+            var entitySet = entityContainer.AddEntitySet("EntitySet", entityType);
+            model.AddElement(entityContainer);
+            model.SetAnnotationValue(action, new ReturnedEntitySetAnnotation("EntitySet"));
+
+            var template = new ActionSegmentTemplate(action, null);
+            var translateContext = new ODataTemplateTranslateContext(httpContext, endpoint, routeValues, model);
+
+            // Act
+            bool ok = template.TryTranslate(translateContext);
+
+            // Assert
+            Assert.True(ok);
+            var actual = Assert.Single(translateContext.Segments);
+            var actionSegment = Assert.IsType<OperationSegment>(actual);
+            Assert.Equal(actionSegment.EdmType, entityType);
+            Assert.Equal(actionSegment.EntitySet, entitySet);
         }
     }
 }

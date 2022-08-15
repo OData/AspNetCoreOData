@@ -305,7 +305,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Act
             ActionConvention.AppliesToAction(context);
 
-            
             // Assert
             Assert.Equal(templates.Length, action.Selectors.Count);
             Assert.Equal(templates, action.Selectors.Select(s => s.AttributeRouteModel.Template));
@@ -328,6 +327,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Assert
             SelectorModel selector = Assert.Single(action.Selectors);
             Assert.Null(selector.AttributeRouteModel);
+            Assert.NotEmpty(templates);
         }        
 
         [Theory]

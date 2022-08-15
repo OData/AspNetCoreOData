@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
         /// <returns>The <see cref="IMvcCoreBuilder"/>.</returns>
         public static IMvcCoreBuilder AddODataNewtonsoftJson(this IMvcCoreBuilder builder)
         {
-            return builder.AddNewtonsoftJson(null);
+            return builder.AddODataNewtonsoftJson(null);
         }
 
         /// <summary>

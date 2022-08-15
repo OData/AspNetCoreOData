@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // <copyright file="ODataRouteDebugMiddleware.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -107,6 +107,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     HttpMethods = endpoint.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods ?? EmptyHeaders,
                     Pattern = routeEndpoint?.RoutePattern?.RawText ?? "N/A",
                     IsODataRoute = metadata != null,
+                    IsConventional = metadata != null ? metadata.IsConventional : false
                 };
 
                 routInfoList.Add(info);
@@ -183,6 +184,13 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 builder.Append($"<td>{routeInfo.Pattern}</td>");
             }
+
+            if (routeInfo.IsODataRoute)
+            {
+                var isConventional = routeInfo.IsConventional ? "Yes" : "-";
+                builder.Append($"<td>{isConventional}</td>");
+            }
+
             builder.AppendLine("</tr>");
         }
 
@@ -216,7 +224,8 @@ namespace Microsoft.AspNetCore.OData.Routing
         <tr>
             <th> Controller & Action </th>
             <th> HttpMethods </th>
-            <th> Template </th>
+            <th> Template </th> 
+            <th> IsConventional </th>
         </tr>
         ODATA_ROUTE_CONTENT
     </table>
@@ -244,6 +253,8 @@ namespace Microsoft.AspNetCore.OData.Routing
             public string Pattern { get; set; }
 
             public bool IsODataRoute { get; set; }
+
+            public bool IsConventional { get; set; }
         }
     }
 }
