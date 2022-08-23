@@ -246,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                             public new Guid Key { get; set; }
                         }
                  */
-                propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName)).FirstOrDefault();
+                propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName, StringComparison.Ordinal)).FirstOrDefault();
             }
             
             Expression propertyValue = Expression.Property(source, propertyInfo);
