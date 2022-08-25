@@ -16,6 +16,8 @@ This is the official ASP.NET Core OData repository.
 
 **Blogs**:
 
+* [An ASP.NET Core OData Example using the Wide WorldImporters database and Entity Framework Core](https://www.bytefish.de/blog/aspnet_core_odata_example.html) By [Philipp Wagner](https://github.com/bytefish)
+
 * [$compute and $search in ASP.NET Core OData 8](https://devblogs.microsoft.com/odata/compute-and-search-in-asp-net-core-odata-8/)
 
 * [API versioning extension with ASP.NET Core OData 8](https://devblogs.microsoft.com/odata/api-versioning-extension-with-asp-net-core-odata-8/)
