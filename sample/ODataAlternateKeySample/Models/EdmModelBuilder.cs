@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Csdl;
+using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.ModelBuilder;
 
 namespace ODataAlternateKeySample.Models
@@ -38,6 +40,13 @@ namespace ODataAlternateKeySample.Models
             {
                 {"SSN", ssn}
             });
+
+            // Use Core Vocabulary version.
+            model.AddAlternateKeyAnnotation(customer, new Dictionary<string, IEdmProperty>()
+            {
+                {"CoreSN", ssn}
+            },
+            true /*true means to use core.alternatekeys term*/);
         }
 
         private static void SetOrderAlternateKey(EdmModel model)
@@ -58,15 +67,14 @@ namespace ODataAlternateKeySample.Models
                 {"Token", token},
             });
 
-            // ODL doesn't support Org.OData.Core.V1.AlternateKeys to do the uri parsing
-            /*
+            // Use the APIs to build the core alternate keys
             var alternateKeysCollection = new List<IEdmExpression>();
             foreach (string item in new [] { "Name", "Token"})
             {
                 List<IEdmExpression> propertyRefs = new List<IEdmExpression>();
 
                 IEdmRecordExpression propertyRef = new EdmRecordExpression(
-                    new EdmPropertyConstructor("Alias", new EdmStringConstant(item)),
+                    new EdmPropertyConstructor("Alias", new EdmStringConstant($"Core{item}")),
                     new EdmPropertyConstructor("Name", new EdmPropertyPathExpression(item)));
                 propertyRefs.Add(propertyRef);
 
@@ -81,7 +89,6 @@ namespace ODataAlternateKeySample.Models
 
             annotation.SetSerializationLocation(model, EdmVocabularyAnnotationSerializationLocation.Inline);
             model.SetVocabularyAnnotation(annotation);
-            */
         }
 
         private static void SetPersonAlternateKey(EdmModel model)
@@ -98,32 +105,13 @@ namespace ODataAlternateKeySample.Models
                 {"passport", passport},
             });
 
-            // ODL doesn't support Org.OData.Core.V1.AlternateKeys to do the uri parsing
-            /*
-            List<IEdmExpression> propertyRefs = new List<IEdmExpression>();
-
-            IEdmRecordExpression propertyRef = new EdmRecordExpression(
-                new EdmPropertyConstructor("Alias", new EdmStringConstant("CountryOrRegion")),
-                new EdmPropertyConstructor("Name", new EdmPropertyPathExpression("CountryOrRegion")));
-            propertyRefs.Add(propertyRef);
-
-            propertyRef = new EdmRecordExpression(
-                new EdmPropertyConstructor("Alias", new EdmStringConstant("Passport")),
-                new EdmPropertyConstructor("Name", new EdmPropertyPathExpression("Passport")));
-            propertyRefs.Add(propertyRef);
-
-            EdmRecordExpression alternateKeyRecord = new EdmRecordExpression(
-               new EdmPropertyConstructor("Key", new EdmCollectionExpression(propertyRefs)));
-
-            var alternateKeysCollection = new List<IEdmExpression>();
-            alternateKeysCollection.Add(alternateKeyRecord);
-
-            var term = model.FindTerm("Org.OData.Core.V1.AlternateKeys");
-            var annotation = new EdmVocabularyAnnotation(person, term, new EdmCollectionExpression(alternateKeysCollection));
-
-            annotation.SetSerializationLocation(model, EdmVocabularyAnnotationSerializationLocation.Inline);
-            model.SetVocabularyAnnotation(annotation);
-            */
+            // Use Core Vocabulary version.
+            model.AddAlternateKeyAnnotation(person, new Dictionary<string, IEdmProperty>
+            {
+                {"core_c_r", cr},
+                {"core_passport", passport},
+            },
+            true);
         }
     }
 }
