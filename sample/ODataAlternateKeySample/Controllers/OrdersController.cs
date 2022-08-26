@@ -42,7 +42,8 @@ namespace ODataAlternateKeySample.Controllers
         }
 
         // alternate key: Name
-        [HttpGet("odata/Orders(Name={orderName})")]
+        [HttpGet("odata/Orders(Name={orderName})")] // use community alternate key
+        [HttpGet("odata/Orders(CoreName={orderName})")] // use core alternate key
         public IActionResult GetOrderByName(string orderName)
         {
             var c = _repository.GetOrders().FirstOrDefault(c => c.Name == orderName);
@@ -55,7 +56,8 @@ namespace ODataAlternateKeySample.Controllers
         }
 
         // alternate key: Token
-        [HttpGet("odata/Orders(Token={token})")]
+        [HttpGet("odata/Orders(Token={token})")] // use community alternate key
+        [HttpGet("odata/Orders(CoreToken={token})")] // use core alternate key
         public IActionResult GetOrderByToken(Guid token)
         {
             var c = _repository.GetOrders().FirstOrDefault(c => c.Token == token);
