@@ -55,8 +55,6 @@ namespace Microsoft.AspNetCore.OData.Results
                 throw ErrorUtils.ArgumentNull(nameof(odataError));
             }
 
-            ErrorUtils.ValidateErrorCode(errorCode, odataError);
-
             Error = odataError;
         }
 
