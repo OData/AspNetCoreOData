@@ -5,12 +5,18 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.AspNetCore.OData.Query;
 using System;
 
 namespace ODataRoutingSample.Models
 {
+    [EnableQuery]
     public class Product
     {
+        public Guid CRMRecordID { get; set; }
+
+        public string ProductName { get; set; }
+
         public int Id { get; set; }
 
         public string Category { get; set; }

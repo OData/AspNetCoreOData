@@ -1488,7 +1488,22 @@
             Helper method to check whether the given object is Delta resource set.
             </summary>
             <param name="result">The given object.</param>
-    Object (Equivalent of ODataDeletedResource in ODL).
+            <returns>True/False.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind">
+            <summary>
+            The Kind of the object within the DeltaPayload used to distinguish between
+            Resource/DeletedResource/DeltaDeletedLink/AddedLink.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.Resource">
+            <summary>
+            Corresponds to EdmEntityObject (Equivalent of ODataResource in ODL).
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeletedResource">
+            <summary>
+            Corresponds to EdmDeltaDeletedResourceObject (Equivalent of ODataDeletedResource in ODL).
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Deltas.DeltaItemKind.DeltaDeletedLink">
@@ -1571,20 +1586,6 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta`1">
             <summary>
-            A class the tracnew instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1"/>.
-            </summary>
-            <param name="structuralType">The derived structural type for which the changes would be tracked.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1.Kind">
-            <inheritdoc />
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Deltas.Delta`1">
-            <summary>
             A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">T is the type of the instance this delta tracks changes for.</typeparam>
@@ -1637,7 +1638,21 @@
             <summary>
             The list of property names that can be updated.
             </summary>
-            <remarks>When the list is modified, ttempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+            considered to be changed.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetNestedPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
             <remarks>
             Only properties that exist on Entity can be retrieved.
             Only modified nested properties can be retrieved.
@@ -1689,19 +1704,6 @@
             <summary>
             Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
             <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Put(`0)">
-            <summary>
-            Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
-            <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
-            <summary>
-            Attempts to get the property by the specmarks>
             </summary>
             <param name="original">The entity to be updated.</param>
         </member>
@@ -2669,7 +2671,16 @@
             This is how formatters create links to invoke bound actions or functions.
             </summary>
         </member>
-        <member n.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,System.Uri},System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Uri},System.Boolean)">
+            <summary>
+            Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on an entity link factory.
+            </summary>
+            <param name="linkFactory">The link factory this <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> should use when building links.</param>
+            <param name="followsConventions">
+            A value indicating whether the link factory generates links that follow OData conventions.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,System.Uri},System.Boolean)">
             <summary>
             Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on a feed link factory.
             </summary>
@@ -7990,18 +8001,6 @@
             be modified when necessary to guarantee a stable sort order.
             A <c>false</c> value indicates the sort order can be considered
             stable without modifying the query.  Query providers that ensure
-            a stable sort order shoa controller action to support OData query parameters.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnsureStableOrdering">
-            <summary>
-            Gets or sets a value indicating whether query composition should
-            alter the original query when necessary to ensure a stable sort order.
-            </summary>
-            <value>A <c>true</c> value indicates the original query should
-            be modified when necessary to guarantee a stable sort order.
-            A <c>false</c> value indicates the sort order can be considered
-            stable without modifying the query.  Query providers that ensure
             a stable sort order should set this value to <c>false</c>.
             The default value is <c>true</c>.</value>
         </member>
@@ -10357,7 +10356,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleNavigationNode)">
             <summary>
-      ">
+            Translate a SingleNavigationNode.
+            </summary>
+            <param name="nodeIn">The node to be translated.</param>
+            <returns>The translated node.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValueFunctionCallNode)">
+            <summary>
+            Translate a SingleValueFunctionCallNode.
+            </summary>
+            <param name="nodeIn">The node to be translated.</param>
+            <returns>The translated node.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode)">
             <summary>
             Translate a SingleValueOpenPropertyAccessNode.
             </summary>
@@ -10418,18 +10429,6 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
-            <summary>
-            Provides filters to apply to the specified action.
-            </summary>
-            <param name="context">The filter context.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
-            <summary>
-            Summary:
-            Called in decreasing Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order,
-            after all Microsoft.AspNetCore.Mvc.Filters.IFilterProviders have executed once.
-            </summary>
-            <param name="context">The Mica.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
             <summary>
             Provides filters to apply to the specified action.
             </summary>
@@ -10554,7 +10553,21 @@
             <summary>
             Gets the raw $count value.
             </summary>
- validation failed.
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.Value">
+            <summary>
+            Gets the value of the $count in a parsed form.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator">
+            <summary>
+            Gets or sets the $count query validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the count query based on the given <paramref name="validationSettings"/>.
+            It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance
             which contains all the validation settings.</param>
@@ -11577,20 +11590,6 @@
              Type related:isof, cast,
             
              Collection related: any, all
-            
-             </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators">
-            <summary>
-            Gets or sets a list of allowed logical operators such as 'eq', 'ne', 'gt', 'ge', 'lt', 'le', 'and', 'or', 'not'.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedOrderByProperties">
-             <summary>
-             Gets a list of properties one can orderby the result with. Note, by default this list is empty,
-             it means it can be ordered by any property.
-            
-             For example, having an empty col: any, all
             
              </summary>
         </member>

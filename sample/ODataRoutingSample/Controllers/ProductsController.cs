@@ -31,6 +31,8 @@ namespace ODataRoutingSample.Controllers
                 {
                     new Product
                     {
+                        CRMRecordID = Guid.NewGuid(),
+                        ProductName = "Red Bag",
                         Category = "Goods",
                         Color = Color.Red,
                         CreatedDate = new DateTimeOffset(2001, 4, 15, 16, 24, 8, TimeSpan.FromHours(-8)),
@@ -39,6 +41,8 @@ namespace ODataRoutingSample.Controllers
                     },
                     new Product
                     {
+                        CRMRecordID = Guid.NewGuid(),
+                        ProductName = "Blue Magazine",
                         Category = "Magazine",
                         Color = Color.Blue,
                         CreatedDate = new DateTimeOffset(2021, 12, 27, 9, 12, 8, TimeSpan.FromHours(-8)),
@@ -47,6 +51,8 @@ namespace ODataRoutingSample.Controllers
                     },
                     new Product
                     {
+                        CRMRecordID = Guid.NewGuid(),
+                        ProductName = "Green Book",
                         Category = "Fiction",
                         Color = Color.Green,
                         CreatedDate = new DateTimeOffset(1978, 11, 15, 9, 24, 8, TimeSpan.FromHours(-8)),

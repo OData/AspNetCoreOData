@@ -74,7 +74,7 @@ namespace ODataRoutingSample
                 or, remove MetadataRoutingConvention in AddOData as
                      opt.Conventions.Remove(opt.Conventions.First(convention => convention is MetadataRoutingConvention));
                 */
-                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(250)
                     .AddRouteComponents(model0)
                     .AddRouteComponents("v1", model1)
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
@@ -82,6 +82,7 @@ namespace ODataRoutingSample
                     .Conventions.Add(new MyConvention())
                 );
 
+            
             services.AddSwaggerGen();
         }
 
@@ -105,11 +106,11 @@ namespace ODataRoutingSample
             // Add the OData Batch middleware to support OData $Batch
             app.UseODataBatching();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
-            });
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+            //});
 
             app.UseRouting();
 
