@@ -31,7 +31,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
                 typeof(UmbrellaController),
                 typeof(MonstersIncController),
                 typeof(PartnersController),
-                typeof(ODataEndpointController)
+                typeof(ODataEndpointController),
+                typeof(SampleController)
             };
 
             services.ConfigureControllers(controllers);
@@ -71,6 +72,24 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             // Assert
             response.EnsureSuccessStatusCode();
             string contentOfString = await response.Content.ReadAsStringAsync();
+        }
+
+        [Fact]
+        public async Task SingletonContainer()
+        {
+            // Arrange
+            string requestUri = "odata/Sample/SItems"; // TODO: utilize/modify existing EDM classes instead
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+
+            // Assert
+            string result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+            string expectedResult = "{\"@odata.context\":\"http://localhost/odata/$metadata#Sample/SItems(SampleItem_guide())\",\"value\":[{\"Uid\":\"sampleitems1\",\"SampleItem_guide\":[{\"Uid\":\"sampleuid1\",\"Type\":\"sampletype1\"},{\"Uid\":\"sampleuid2\",\"Type\":\"sampletype2\"}],\"SampleItem_guide@odata.nextLink\":\"http://localhost/odata/Sample/SItems/sampleitems1/SampleItem_guide?$skip=2\"},{\"Uid\":\"sampleitems2\",\"SampleItem_guide\":[{\"Uid\":\"sampleuid3\",\"Type\":\"sampletype3\"}]}],\"@odata.nextLink\":\"http://localhost/odata/Sample/SItems?$skip=2\"}";
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]

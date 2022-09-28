@@ -6,6 +6,9 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
@@ -67,5 +70,32 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         public string Location { get; set; }
         public string Description { get; set; }
         public Office Office { get; set; }
+    }
+
+    // Sample case for Issue #701
+
+    public class Sample
+    {
+        [Contained]
+        [ForeignKey("Uid")]
+        [AutoExpand]
+        public IEnumerable<SampleItems> SItems { get; set; } = Enumerable.Empty<SampleItems>();
+    }
+
+    public class SampleItems
+    {
+        [Key]
+        public string Uid { get; set; }
+
+        [AutoExpand]
+        [Contained]
+        public IEnumerable<SampleItemGuide> SampleItem_guide { get; set; } = System.Array.Empty<SampleItemGuide>();
+    }
+
+    public class SampleItemGuide
+    {
+        [Key]
+        public string Uid { get; set; }
+        public string Type { get; set; }
     }
 }

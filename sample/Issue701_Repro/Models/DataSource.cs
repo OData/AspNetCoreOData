@@ -8,24 +8,24 @@ namespace Issue701_Repro.Models
 
         public static Sample GetSample()
         {
-            ensureData();
+            EnsureData();
             return _sample;
         }
 
         public static IEnumerable<SampleItems> GetSampleItems()
         {
-            ensureData();
+            EnsureData();
             return _sample.SItems;
         }
 
-        private static void ensureData()
+        private static void EnsureData()
         {
             if (_sample == null)
             {
                 // Create sample item guides
-                SampleItemGuide si1 = createSIG(1);
-                SampleItemGuide si2 = createSIG(2);
-                SampleItemGuide si3 = createSIG(3);
+                SampleItemGuide si1 = CreateSIG(1);
+                SampleItemGuide si2 = CreateSIG(2);
+                SampleItemGuide si3 = CreateSIG(3);
 
                 // Create sample items
                 SampleItems sampleItems1 = new SampleItems
@@ -51,11 +51,13 @@ namespace Issue701_Repro.Models
                 var SItems = new List<SampleItems>();
                 SItems.Add(sampleItems1);
                 SItems.Add(sampleItems2);
+                SItems.Add(sampleItems2);
+                SItems.Add(sampleItems2);
                 _sample.SItems = SItems;
             }
         }
 
-        private static SampleItemGuide createSIG(int num)
+        private static SampleItemGuide CreateSIG(int num)
         {
             SampleItemGuide sig = new SampleItemGuide
             {
