@@ -110,10 +110,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             monstersIncConfiguration.EntityType.Function("GetPartnersCount").Returns<int>();
             builder.EntityType<Project>();
 
-            // Singleton "Sample"
-            builder.Singleton<Sample>("Sample");
-            builder.EntityType<SampleItems>();
-
             builder.Namespace = typeof(Company).Namespace;
             return builder.GetEdmModel();
         }
