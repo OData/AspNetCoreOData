@@ -110,6 +110,41 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Assert.Equal(expectedNavigationLink, uri.AbsoluteUri);
         }
 
+        [Fact]
+        public void GenerateNavigationLink_WorksToGenerateExpectedBasePathSegments_ForSingletonContainer()
+        {
+            // Arrange
+            IEdmSingleton myVipOrder = _myOrderModel.FindDeclaredSingleton("VipOrder"); 
+            IEdmEntityType vipOrderType = (IEdmEntityType)myVipOrder.Type;
+            IEdmNavigationProperty orderLinesProperty = vipOrderType.NavigationProperties().Single(x => x.ContainsTarget && x.Name == "OrderLines");
+            IEdmContainedEntitySet orderLines = (IEdmContainedEntitySet)myVipOrder.FindNavigationTarget(orderLinesProperty);
+            IEdmEntityType orderLine = _myOrderModel.SchemaElements.OfType<IEdmEntityType>().First(e => e.Name == "OrderLine");
+            IEdmNavigationProperty orderLineDetailsNav = orderLine.NavigationProperties().First();
+
+            // Link relationships
+            HttpRequest request = RequestFactory.Create(_myOrderModel);
+            
+            ODataPath path = new ODataPath(
+                    new SingletonSegment(myVipOrder),
+                    new NavigationPropertySegment(orderLinesProperty, orderLines));
+
+            var orderLineSerializerContext = ODataSerializerContextFactory.Create(_myOrderModel, orderLines, path, request);
+            orderLineSerializerContext.EdmProperty = orderLineDetailsNav;
+            var orderLineResource = new ResourceContext(orderLineSerializerContext, orderLine.AsReference(), new { ID = 21 });
+            orderLineSerializerContext.ExpandedResource = orderLineResource;
+
+            // Act
+            IList<ODataPathSegment> newPaths = orderLineResource.GenerateBaseODataPathSegments();
+            Uri selfLink = orderLineResource.GenerateSelfLink(false);
+
+            // Assert
+            Assert.Equal(3, newPaths.Count());
+            Assert.Equal("Microsoft.OData.UriParser.SingletonSegment", newPaths[0].GetType().FullName); // VipOrder
+            Assert.Equal("Microsoft.OData.UriParser.NavigationPropertySegment", newPaths[1].GetType().FullName); // OrderLines
+            Assert.Equal("Microsoft.OData.UriParser.KeySegment", newPaths[2].GetType().FullName); // 21
+            Assert.Equal("http://localhost/VipOrder/OrderLines(21)", selfLink.AbsoluteUri);
+        }
+
         [Theory]
         [InlineData(false, "http://localhost/MyOrders(42)/OrderLines(21)/OrderLines")]
         [InlineData(true, "http://localhost/MyOrders(42)/OrderLines(21)/NS.OrderLine/OrderLines")]
@@ -125,8 +160,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmEntityType myOrder = (IEdmEntityType)_myOrderModel.FindDeclaredType("NS.MyOrder");
             IEdmEntityType orderLine = (IEdmEntityType)_myOrderModel.FindDeclaredType("NS.OrderLine");
 
-            IEdmNavigationProperty orderLinesProperty = myOrder.NavigationProperties().Single(x => x.ContainsTarget);
-
+            IEdmNavigationProperty orderLinesProperty = myOrder.NavigationProperties().Single(x => x.ContainsTarget && x.Name == "OrderLines");
+            
             IEdmEntitySet entitySet = _myOrderModel.FindDeclaredEntitySet("MyOrders");
             IDictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -689,6 +724,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.Namespace = "NS";
             builder.EntitySet<MyOrder>("MyOrders");
+            builder.Singleton<MyOrder>("VipOrder");
             return builder.GetEdmModel();
         }
 
@@ -699,10 +735,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             [Contained]
             public IList<OrderLine> OrderLines { get; set; }
 
+            /*[Contained]
+            public OrderLine SingleContainedOrderLine { get; set; }*/
+
             public IList<OrderLine> NonContainedOrderLines { get; set; }
         }
 
         private class OrderLine
+        {
+            public int ID { get; set; }
+
+            [Contained]
+            public IList<OrderLineDetail> OrderLineDetails { get; set; }
+        }
+
+        private class OrderLineDetail
         {
             public int ID { get; set; }
         }
