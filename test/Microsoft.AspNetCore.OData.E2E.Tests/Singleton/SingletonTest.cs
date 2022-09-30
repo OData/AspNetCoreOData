@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         }
 
         [Fact]
-        public async Task SingletonContainer()
+        public async Task SingletonContainerSample()
         {
             // Arrange
             string requestUri = "odata/Sample/SItems"; // TODO: utilize/modify existing EDM classes instead
@@ -89,6 +89,24 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             response.EnsureSuccessStatusCode();
 
             string expectedResult = "{\"@odata.context\":\"http://localhost/odata/$metadata#Sample/SItems(SampleItem_guide())\",\"value\":[{\"Uid\":\"sampleitems1\",\"SampleItem_guide\":[{\"Uid\":\"sampleuid1\",\"Type\":\"sampletype1\"},{\"Uid\":\"sampleuid2\",\"Type\":\"sampletype2\"}],\"SampleItem_guide@odata.nextLink\":\"http://localhost/odata/Sample/SItems/sampleitems1/SampleItem_guide?$skip=2\"},{\"Uid\":\"sampleitems2\",\"SampleItem_guide\":[{\"Uid\":\"sampleuid3\",\"Type\":\"sampletype3\"}]}],\"@odata.nextLink\":\"http://localhost/odata/Sample/SItems?$skip=2\"}";
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task SingletonContainerGeneratesCorrectNestedNextLink()
+        {
+            // Arrange
+            string requestUri = "odata/MonstersInc/Projects";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+
+            // Assert
+            string result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+            string expectedResult = "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\",\"value\":[{\"Uid\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[{\"Uid\":1,\"Comment\":\"The original scare\"},{\"Uid\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}],\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"},{\"Uid\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[{\"Uid\":5,\"Comment\":\"Tried and true\"},{\"Uid\":6,\"Comment\":\"Tip: grab a foot\"}]}],\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"}";
             Assert.Equal(expectedResult, result);
         }
 

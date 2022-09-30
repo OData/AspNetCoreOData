@@ -108,11 +108,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             SingletonConfiguration<Company> monstersIncConfiguration = builder.Singleton<Company>("MonstersInc");
             //monstersIncConfiguration.EntityType.Action("ResetDataSource");
             monstersIncConfiguration.EntityType.Function("GetPartnersCount").Returns<int>();
+            builder.EntityType<Project>();
 
-            // Singleton "Sample" - makes the NotCountable test fail
+            // Singleton "Sample"
             builder.Singleton<Sample>("Sample");
             builder.EntityType<SampleItems>();
-            //builder.EnableLowerCamelCase(); // makes the NotCountable test fail
 
             builder.Namespace = typeof(Company).Namespace;
             return builder.GetEdmModel();

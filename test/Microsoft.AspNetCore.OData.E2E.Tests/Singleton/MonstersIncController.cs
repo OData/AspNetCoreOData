@@ -42,6 +42,36 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
                 Category = CompanyCategory.Electronics,
                 Partners = new List<Partner>(),
                 Branches = new List<Office>() { new Office { City = "Shanghai", Address = "Minhang" }, new Office { City = "Xi'an", Address = "Dayanta" } },
+                Projects = new List<Project>() 
+                {
+                    new Project 
+                    {
+                        Uid = 1,
+                        Title = "In Closet Scare",
+                        ProjectDetails = new List<ProjectDetail>()
+                        {
+                            new ProjectDetail { Uid = 1, Comment = "The original scare" },
+                            new ProjectDetail { Uid = 2, Comment = "Leaving the door open is the worst mistake any employee can make" },
+                            new ProjectDetail { Uid = 3, Comment = "Leaving the door open could let it not only a draft, but a child" },
+                            new ProjectDetail { Uid = 4, Comment = "Has led to the intrusion of a young girl, Boo" }
+                        },
+                    },
+                    new Project 
+                    {
+                        Uid = 2,
+                        Title = "Under Bed Scare", 
+                        ProjectDetails = new List<ProjectDetail>() { 
+                            new ProjectDetail { Uid = 5, Comment = "Tried and true" },
+                            new ProjectDetail { Uid = 6, Comment = "Tip: grab a foot"}
+                        },
+                    },
+                    new Project
+                    {
+                        Uid = 3,
+                        Title = "Midnight Snack in Kitchen Scare",
+                        ProjectDetails= new List<ProjectDetail>(),
+                    },
+                },
             };
         }
 
@@ -68,6 +98,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         public IActionResult GetCompanyRevenue()
         {
             return Ok(MonstersInc.Revenue);
+        }
+
+        [HttpGet("Projects")]
+        [EnableQuery(PageSize = 2)]
+        public IActionResult GetProjects()
+        {
+            return Ok(MonstersInc.Projects);
         }
 
         [HttpGet("Branches/$count")]

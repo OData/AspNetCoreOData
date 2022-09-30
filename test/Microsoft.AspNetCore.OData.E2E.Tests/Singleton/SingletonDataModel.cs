@@ -51,6 +51,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         [NotCountable]
         public IList<Partner> Partners { get; set; }
         public IList<Office> Branches { get; set; }
+
+        [Contained]
+        [ForeignKey("Uid")]
+        [AutoExpand]
+        public IList<Project> Projects { get; set; }
     }
 
     /// <summary>
@@ -58,8 +63,33 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     /// </summary>
     public class Office
     {
+        public string Uid { get; set; }
         public string City { get; set; }
         public string Address { get; set; }
+    }
+
+    /// <summary>
+    /// Present a contained navigation property
+    /// </summary>
+    public class Project
+    {
+        [Key]
+        public int Uid { get; set; }
+        public string Title { get; set; }
+
+        [AutoExpand]
+        [Contained]
+        public IList<ProjectDetail> ProjectDetails { get; set; }
+    }
+
+    /// <summary>
+    /// Present a nested contained navigation property
+    /// </summary>
+    public class ProjectDetail
+    {
+        [Key]
+        public int Uid { get; set; }
+        public string Comment { get; set; }
     }
 
     /// <summary>
@@ -73,6 +103,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     }
 
     // Sample case for Issue #701
+    public class BestCompaniesEver
+    {
+        [Contained]
+        [ForeignKey("Uid")]
+        [AutoExpand]
+        public IEnumerable<Company> BestCompanies { get; set; } = Enumerable.Empty<Company>();
+    }
 
     public class Sample
     {

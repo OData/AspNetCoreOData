@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             };
             var items1 = new List<SampleItemGuide>();
             items1.Add(si1);
-           items1.Add(si2);
+            items1.Add(si2);
             items1.Add(si3);
             sampleItems1.SampleItem_guide = items1;
 
