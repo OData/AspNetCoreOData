@@ -735,9 +735,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             [Contained]
             public IList<OrderLine> OrderLines { get; set; }
 
-            /*[Contained]
-            public OrderLine SingleContainedOrderLine { get; set; }*/
-
             public IList<OrderLine> NonContainedOrderLines { get; set; }
         }
 
