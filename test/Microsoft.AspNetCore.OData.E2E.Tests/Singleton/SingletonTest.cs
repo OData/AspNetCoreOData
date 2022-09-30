@@ -87,7 +87,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             string result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
-            string expectedResult = "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\",\"value\":[{\"Uid\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[{\"Uid\":1,\"Comment\":\"The original scare\"},{\"Uid\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}],\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"},{\"Uid\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[{\"Uid\":5,\"Comment\":\"Tried and true\"},{\"Uid\":6,\"Comment\":\"Tip: grab a foot\"}]}],\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"}";
+            string expectedResult = 
+                "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
+                  "\"value\":[" +
+                    "{\"Id\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[" +
+                      "{\"Id\":1,\"Comment\":\"The original scare\"}," +
+                      "{\"Id\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}]," +
+                      "\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"}," +
+                    "{\"Id\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[" +
+                      "{\"Id\":5,\"Comment\":\"Tried and true\"}," +
+                      "{\"Id\":6,\"Comment\":\"Tip: grab a foot\"}]}]," +
+                  "\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"" +
+                "}";
             Assert.Equal(expectedResult, result);
         }
 

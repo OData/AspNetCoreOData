@@ -349,7 +349,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return odataPath;
         }
 
-        private static void GenerateBaseODataPathSegmentsForContainedNavProperties(
+        private static void GenerateBaseODataPathSegments(
             ODataPath path,
             IEdmNavigationSource navigationSource,
             IList<ODataPathSegment> odataPath)
@@ -450,7 +450,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             // If the navigation is a contained property, we need to walk all of the path segments
             // to generate a contextually accurate URI.
-            GenerateBaseODataPathSegmentsForContainedNavProperties(
+            GenerateBaseODataPathSegments(
                 resourceContext.SerializerContext.Path, resourceContext.NavigationSource, odataPath);
 
             odataPath.Add(new KeySegment(ConventionsHelpers.GetEntityKey(resourceContext), resourceContext.StructuredType as IEdmEntityType,
@@ -461,7 +461,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             this ResourceSetContext feedContext,
             IList<ODataPathSegment> odataPath)
         {
-            GenerateBaseODataPathSegmentsForContainedNavProperties(feedContext.Request.ODataFeature().Path,
+            GenerateBaseODataPathSegments(feedContext.Request.ODataFeature().Path,
                 feedContext.EntitySetBase,
                 odataPath);
         }

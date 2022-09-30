@@ -108,7 +108,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             SingletonConfiguration<Company> monstersIncConfiguration = builder.Singleton<Company>("MonstersInc");
             //monstersIncConfiguration.EntityType.Action("ResetDataSource");
             monstersIncConfiguration.EntityType.Function("GetPartnersCount").Returns<int>();
-            builder.EntityType<Project>();
 
             builder.Namespace = typeof(Company).Namespace;
             return builder.GetEdmModel();

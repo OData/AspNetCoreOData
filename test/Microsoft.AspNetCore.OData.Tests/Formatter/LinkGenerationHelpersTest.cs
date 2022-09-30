@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -110,38 +111,56 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Assert.Equal(expectedNavigationLink, uri.AbsoluteUri);
         }
 
-        [Fact]
-        public void GenerateNavigationLink_WorksToGenerateExpectedBasePathSegments_ForSingletonContainer()
+        private ResourceContext GetOrderLineResourceForNewSingletonContainer()
         {
             // Arrange
-            IEdmSingleton myVipOrder = _myOrderModel.FindDeclaredSingleton("VipOrder"); 
+            IEdmSingleton myVipOrder = _myOrderModel.FindDeclaredSingleton("VipOrder");
             IEdmEntityType vipOrderType = (IEdmEntityType)myVipOrder.Type;
             IEdmNavigationProperty orderLinesProperty = vipOrderType.NavigationProperties().Single(x => x.ContainsTarget && x.Name == "OrderLines");
             IEdmContainedEntitySet orderLines = (IEdmContainedEntitySet)myVipOrder.FindNavigationTarget(orderLinesProperty);
             IEdmEntityType orderLine = _myOrderModel.SchemaElements.OfType<IEdmEntityType>().First(e => e.Name == "OrderLine");
             IEdmNavigationProperty orderLineDetailsNav = orderLine.NavigationProperties().First();
 
-            // Link relationships
             HttpRequest request = RequestFactory.Create(_myOrderModel);
-            
+
             ODataPath path = new ODataPath(
                     new SingletonSegment(myVipOrder),
                     new NavigationPropertySegment(orderLinesProperty, orderLines));
 
-            var orderLineSerializerContext = ODataSerializerContextFactory.Create(_myOrderModel, orderLines, path, request);
+            ODataSerializerContext orderLineSerializerContext = ODataSerializerContextFactory.Create(_myOrderModel, orderLines, path, request);
             orderLineSerializerContext.EdmProperty = orderLineDetailsNav;
-            var orderLineResource = new ResourceContext(orderLineSerializerContext, orderLine.AsReference(), new { ID = 21 });
+            ResourceContext orderLineResource = new ResourceContext(orderLineSerializerContext, orderLine.AsReference(), new { ID = 21 });
             orderLineSerializerContext.ExpandedResource = orderLineResource;
+
+            return orderLineResource;
+        }
+
+        [Fact]
+        public void GenerateBaseODataPathSegments_WorksToGenerateExpectedPath_ForSingletonContainer()
+        {
+            // Arrange
+            ResourceContext orderLineResource = GetOrderLineResourceForNewSingletonContainer();
 
             // Act
             IList<ODataPathSegment> newPaths = orderLineResource.GenerateBaseODataPathSegments();
-            Uri selfLink = orderLineResource.GenerateSelfLink(false);
 
             // Assert
             Assert.Equal(3, newPaths.Count());
             Assert.Equal("Microsoft.OData.UriParser.SingletonSegment", newPaths[0].GetType().FullName); // VipOrder
             Assert.Equal("Microsoft.OData.UriParser.NavigationPropertySegment", newPaths[1].GetType().FullName); // OrderLines
             Assert.Equal("Microsoft.OData.UriParser.KeySegment", newPaths[2].GetType().FullName); // 21
+        }
+
+        [Fact]
+        public void GenerateSelfLink_WorksToGenerateExpectedSelfLink_ForSingletonContainer()
+        {
+            // Arrange
+            ResourceContext orderLineResource = GetOrderLineResourceForNewSingletonContainer();
+
+            // Act
+            Uri selfLink = orderLineResource.GenerateSelfLink(false);
+
+            // Assert
             Assert.Equal("http://localhost/VipOrder/OrderLines(21)", selfLink.AbsoluteUri);
         }
 

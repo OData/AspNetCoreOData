@@ -53,7 +53,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         public IList<Office> Branches { get; set; }
 
         [Contained]
-        [ForeignKey("Uid")]
         [AutoExpand]
         public IList<Project> Projects { get; set; }
     }
@@ -63,7 +62,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     /// </summary>
     public class Office
     {
-        public string Uid { get; set; }
         public string City { get; set; }
         public string Address { get; set; }
     }
@@ -73,8 +71,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     /// </summary>
     public class Project
     {
-        [Key]
-        public int Uid { get; set; }
+        public int Id { get; set; }
         public string Title { get; set; }
 
         [AutoExpand]
@@ -87,8 +84,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
     /// </summary>
     public class ProjectDetail
     {
-        [Key]
-        public int Uid { get; set; }
+        public int Id { get; set; }
         public string Comment { get; set; }
     }
 
