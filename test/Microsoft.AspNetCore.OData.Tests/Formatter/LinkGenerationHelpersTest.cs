@@ -145,7 +145,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IList<ODataPathSegment> newPaths = orderLineResource.GenerateBaseODataPathSegments();
 
             // Assert
-            Assert.Equal(3, newPaths.Count());
+            Assert.Equal(3, newPaths.Count);
             Assert.Equal("Microsoft.OData.UriParser.SingletonSegment", newPaths[0].GetType().FullName); // VipOrder
             Assert.Equal("Microsoft.OData.UriParser.NavigationPropertySegment", newPaths[1].GetType().FullName); // OrderLines
             Assert.Equal("Microsoft.OData.UriParser.KeySegment", newPaths[2].GetType().FullName); // 21
