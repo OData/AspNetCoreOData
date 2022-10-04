@@ -146,9 +146,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Assert
             Assert.Equal(3, newPaths.Count);
-            Assert.Equal("Microsoft.OData.UriParser.SingletonSegment", newPaths[0].GetType().FullName); // VipOrder
-            Assert.Equal("Microsoft.OData.UriParser.NavigationPropertySegment", newPaths[1].GetType().FullName); // OrderLines
-            Assert.Equal("Microsoft.OData.UriParser.KeySegment", newPaths[2].GetType().FullName); // 21
+            Assert.IsType<Microsoft.OData.UriParser.SingletonSegment>(newPaths[0]); // VipOrder
+            Assert.IsType<Microsoft.OData.UriParser.NavigationPropertySegment>(newPaths[1]); // OrderLines
+            Assert.IsType<Microsoft.OData.UriParser.KeySegment>(newPaths[2]); // 21
         }
 
         [Fact]

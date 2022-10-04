@@ -1638,21 +1638,7 @@
             <summary>
             The list of property names that can be updated.
             </summary>
-            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
-            considered to be changed.</remarks>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TrySetPropertyValue(System.String,System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetNestedPropertyValue(System.String,System.Object@)">
-            <summary>
-            Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+            <remarks>When the list is modified, ttempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
             <remarks>
             Only properties that exist on Entity can be retrieved.
             Only modified nested properties can be retrieved.
@@ -5142,6 +5128,17 @@
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> with no backing CLR <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject"/> class.
+            </summary>
+            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatterlue.EdmComplexObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> with no backing CLR <see cref="T:System.Type"/>.
             </summary>
