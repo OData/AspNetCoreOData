@@ -1094,20 +1094,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -1638,7 +1624,21 @@
             <summary>
             The list of property names that can be updated.
             </summary>
-            <remarks>When the list is modified, ttempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
+            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+            considered to be changed.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TrySetPropertyValue(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetNestedPropertyValue(System.String,System.Object@)">
+            <summary>
+            Attempts to get the value of the nested Property called <paramref name="name"/> from the underlying resource.
             <remarks>
             Only properties that exist on Entity can be retrieved.
             Only modified nested properties can be retrieved.
@@ -1763,6 +1763,19 @@
             </summary>
             <param name="name">The name of the Property</param>
             <param name="type">The type of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.Clear">
+            <summary>
+            Clears the <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" />.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelt          <param name="type">The type of the Property</param>
             <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.Clear">
@@ -2033,18 +2046,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.IsNonstandardEdmPrimitive(Microsoft.OData.Edm.IEdmModel,System.Type,System.Boolean@)">
             <summary>
             Figures out if the given clr type is nonstandard edm primitive like uint, ushort, char[] etc.
-            and returns the corresponding clr type to which we map like uint => long.
-            </summary>
-            <param name="edmModel">The Edm model.</param>
-            <param name="clrType">The potential non-standard CLR type.</param>
-            <param name="isNonstandardEdmPrimitive">A boolean value out to indicate whether the input CLR type is standard OData primitive type.</param>
-            <returns>The standard CLR type or the input CLR type itself.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
-            <summary>
-            Gets the Edm type reference from the CLR type.
-            </summary>
-            <param name="edmModel">The Edm model.</param>
+            and returns the corresponding clr type to whic</param>
             <param name="clrType">The given CLR type.</param>
             <returns>null or the Edm type reference.</returns>
         </member>
@@ -2103,6 +2105,17 @@
             <returns>Element type or itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementType(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Get the elementType if it's collection or return itself's type
+            </summary>
+            <param name="edmTypeReference">The test type reference.</param>
+            <returns>Element type or itself.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.ToCollection(Microsoft.OData.Edm.IEdmType,System.Boolean)">
+            <summary>
+            Converts the <see cref="T:Microsoft.OData.Edm.IEdmType"/> to <see cref="T:Microsoft.OData.Edm.IEdmCollectionType"/>.
+            </summary>
+            <param name="edmType">The given Edm type.</paramber name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementType(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
             Get the elementType if it's collection or return itself's type
             </summary>
@@ -2356,15 +2369,7 @@
             </summary>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the navigation source.</param>
             <param name="navigationSource">The navigation source.</param>
-            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation"/> to set.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.GetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation)">
-            <summary>
-            Gets the <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to be used while generating operation links for the given action.
-            </summary>
-            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> containing the operation.</param>
-            <param name="operation">The operation for which the link builder is needed.</param>
-            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> for the given operation if one is set; otherwise, a new
+            <param name="navigationSourceLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAoperation if one is set; otherwise, a new
             <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> that generates operation links following OData URL conventions.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelLinkBuilderExtensions.SetOperationLinkBuilder(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmOperation,Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder)">
@@ -2414,6 +2419,24 @@
         <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.Navigation">
             <summary>
             Gets the navigation property resolved from this path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.NavigationPropertyPath">
+            <summary>
+            Gets the navigation property path, it doesn't include the navigation property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.ExpandPath">
+            <summary>
+            Gets the whole expand path.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
+            <summary>
+            Provides the mapping between CLR type and Edm type.
+            </summary>
+        </member>
+  s the navigation property resolved from this path.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.NavigationPropertyPath">
@@ -2657,16 +2680,7 @@
             This is how formatters create links to invoke bound actions or functions.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Uri},System.Boolean)">
-            <summary>
-            Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on an entity link factory.
-            </summary>
-            <param name="linkFactory">The link factory this <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> should use when building links.</param>
-            <param name="followsConventions">
-            A value indicating whether the link factory generates links that follow OData conventions.
-            </param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,System.Uri},System.Boolean)">
+        <member n.OperationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceSetContext,System.Uri},System.Boolean)">
             <summary>
             Create a new <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> based on a feed link factory.
             </summary>
@@ -5128,17 +5142,6 @@
             <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> with no backing CLR <see cref="T:System.Type"/>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject.#ctor(Microsoft.OData.Edm.IEdmComplexType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject"/> class.
-            </summary>
-            <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> of this object.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatterlue.EdmComplexObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject"/> with no backing CLR <see cref="T:System.Type"/>.
             </summary>
@@ -14399,6 +14402,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

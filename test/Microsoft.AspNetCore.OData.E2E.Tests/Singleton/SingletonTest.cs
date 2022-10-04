@@ -78,28 +78,30 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         {
             // Arrange
             string requestUri = "odata/MonstersInc/Projects";
-            HttpClient client = CreateClient();
+            using (HttpClient client = CreateClient())
+            {
+                // Act
+                using (HttpResponseMessage response = await client.GetAsync(requestUri))
+                {
+                    // Assert
+                    string result = await response.Content.ReadAsStringAsync();
+                    response.EnsureSuccessStatusCode();
 
-            // Act
-            HttpResponseMessage response = await client.GetAsync(requestUri);
-
-            // Assert
-            string result = await response.Content.ReadAsStringAsync();
-            response.EnsureSuccessStatusCode();
-
-            string expectedResult = 
-                "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
-                  "\"value\":[" +
-                    "{\"Id\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[" +
-                      "{\"Id\":1,\"Comment\":\"The original scare\"}," +
-                      "{\"Id\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}]," +
-                      "\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"}," +
-                    "{\"Id\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[" +
-                      "{\"Id\":5,\"Comment\":\"Tried and true\"}," +
-                      "{\"Id\":6,\"Comment\":\"Tip: grab a foot\"}]}]," +
-                  "\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"" +
-                "}";
-            Assert.Equal(expectedResult, result);
+                    string expectedResult =
+                        "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
+                            "\"value\":[" +
+                            "{\"Id\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[" +
+                                "{\"Id\":1,\"Comment\":\"The original scare\"}," +
+                                "{\"Id\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}]," +
+                                "\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"}," +
+                            "{\"Id\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[" +
+                                "{\"Id\":5,\"Comment\":\"Tried and true\"}," +
+                                "{\"Id\":6,\"Comment\":\"Tip: grab a foot\"}]}]," +
+                            "\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"" +
+                        "}";
+                    Assert.Equal(expectedResult, result);
+                }
+            }
         }
 
         [Fact]
