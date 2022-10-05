@@ -74,20 +74,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         }
 
         [Fact]
-        public async Task SingletonContainerGeneratesCorrectNestedNextLink()
+        public async Task SingletonContainerGeneratesCorrectNextLink()
         {
             // Arrange
             string requestUri = "odata/MonstersInc/Projects";
+            string nextLinkUri = "odata/MonstersInc/Projects?$skip=2";
+            //string nestedNextLinkUri = "odata/MonstersInc/Projects/1/ProjectDetails?$skip=2";
+
             using (HttpClient client = CreateClient())
             {
-                // Act
-                using (HttpResponseMessage response = await client.GetAsync(requestUri))
-                {
-                    // Assert
-                    string result = await response.Content.ReadAsStringAsync();
-                    response.EnsureSuccessStatusCode();
-
-                    string expectedResult =
+                // Act & Assert
+                string expectedOriginalResult =
                         "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
                             "\"value\":[" +
                             "{\"Id\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[" +
@@ -99,8 +96,24 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
                                 "{\"Id\":6,\"Comment\":\"Tip: grab a foot\"}]}]," +
                             "\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"" +
                         "}";
-                    Assert.Equal(expectedResult, result);
-                }
+                await RequestYieldsExpectedResult(client, requestUri, expectedOriginalResult);
+
+                string expectedNextResult =
+                        "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
+                        "\"value\":[{\"Id\":3,\"Title\":\"Midnight Snack in Kitchen Scare\",\"ProjectDetails\":[]}]}";
+                await RequestYieldsExpectedResult(client, nextLinkUri, expectedNextResult);
+            }
+        }
+
+        private async Task RequestYieldsExpectedResult(HttpClient client, string requestUri, string expectedResult)
+        {
+            // Act
+            using (HttpResponseMessage response = await client.GetAsync(requestUri))
+            {
+                // Assert
+                string result = await response.Content.ReadAsStringAsync();
+                response.EnsureSuccessStatusCode();
+                Assert.Equal(expectedResult, result);
             }
         }
 
