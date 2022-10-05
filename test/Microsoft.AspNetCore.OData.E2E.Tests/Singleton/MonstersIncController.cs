@@ -107,6 +107,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
             return Ok(MonstersInc.Projects);
         }
 
+        [HttpGet("Projects/{key}/ProjectDetails")]
+        [EnableQuery]
+        public IActionResult GetProjectDetails(int key)
+        {
+            var project = MonstersInc.Projects.FirstOrDefault(a => a.Id == key);
+            if (project == null)
+            {
+                return NotFound($"Project with given key {key} does not exist.");
+            }
+
+            return Ok(project.ProjectDetails);
+        }
+
         [HttpGet("Branches/$count")]
         public IActionResult GetBranchesCount(ODataQueryOptions<Office> options)
         {
