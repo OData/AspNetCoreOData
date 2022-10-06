@@ -349,13 +349,13 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return odataPath;
         }
 
-        private static void GenerateBaseODataPathSegmentsForNonSingletons(
+        private static void GenerateBaseODataPathSegments(
             ODataPath path,
             IEdmNavigationSource navigationSource,
             IList<ODataPathSegment> odataPath)
         {
-            // If the navigation is not a singleton we need to walk all of the path segments to generate a
-            // contextually accurate URI.
+            // If the navigation is a contained property, we need to walk all of the path segments
+            // to generate a contextually accurate URI.
             bool segmentFound = false;
             bool containedFound = false;
             if (path != null)
@@ -379,6 +379,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     {
                         currentNavigationSource = navigationPathSegment.NavigationSource;
                     }
+
+                    var singletonPathSegment = pathSegment as SingletonSegment;
+                    if (singletonPathSegment != null)
+                    {
+                        currentNavigationSource = singletonPathSegment.Singleton;
+                    }
+
+
                     if (containedFound)
                     {
                         odataPath.Add(pathSegment);
@@ -440,9 +448,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
             this ResourceContext resourceContext,
             IList<ODataPathSegment> odataPath)
         {
-            // If the navigation is not a singleton we need to walk all of the path segments to generate a
-            // contextually accurate URI.
-            GenerateBaseODataPathSegmentsForNonSingletons(
+            // If the navigation is a contained property, we need to walk all of the path segments
+            // to generate a contextually accurate URI.
+            GenerateBaseODataPathSegments(
                 resourceContext.SerializerContext.Path, resourceContext.NavigationSource, odataPath);
 
             odataPath.Add(new KeySegment(ConventionsHelpers.GetEntityKey(resourceContext), resourceContext.StructuredType as IEdmEntityType,
@@ -453,7 +461,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             this ResourceSetContext feedContext,
             IList<ODataPathSegment> odataPath)
         {
-            GenerateBaseODataPathSegmentsForNonSingletons(feedContext.Request.ODataFeature().Path,
+            GenerateBaseODataPathSegments(feedContext.Request.ODataFeature().Path,
                 feedContext.EntitySetBase,
                 odataPath);
         }

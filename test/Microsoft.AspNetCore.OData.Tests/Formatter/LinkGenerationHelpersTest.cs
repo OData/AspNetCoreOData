@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -110,6 +111,59 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             Assert.Equal(expectedNavigationLink, uri.AbsoluteUri);
         }
 
+        private ResourceContext GetOrderLineResourceForNewSingletonContainer()
+        {
+            // Arrange
+            IEdmSingleton myVipOrder = _myOrderModel.FindDeclaredSingleton("VipOrder");
+            IEdmEntityType vipOrderType = (IEdmEntityType)myVipOrder.Type;
+            IEdmNavigationProperty orderLinesProperty = vipOrderType.NavigationProperties().Single(x => x.ContainsTarget && x.Name == "OrderLines");
+            IEdmContainedEntitySet orderLines = (IEdmContainedEntitySet)myVipOrder.FindNavigationTarget(orderLinesProperty);
+            IEdmEntityType orderLine = _myOrderModel.SchemaElements.OfType<IEdmEntityType>().First(e => e.Name == "OrderLine");
+            IEdmNavigationProperty orderLineDetailsNav = orderLine.NavigationProperties().First();
+
+            HttpRequest request = RequestFactory.Create(_myOrderModel);
+
+            ODataPath path = new ODataPath(
+                    new SingletonSegment(myVipOrder),
+                    new NavigationPropertySegment(orderLinesProperty, orderLines));
+
+            ODataSerializerContext orderLineSerializerContext = ODataSerializerContextFactory.Create(_myOrderModel, orderLines, path, request);
+            orderLineSerializerContext.EdmProperty = orderLineDetailsNav;
+            ResourceContext orderLineResource = new ResourceContext(orderLineSerializerContext, orderLine.AsReference(), new { ID = 21 });
+            orderLineSerializerContext.ExpandedResource = orderLineResource;
+
+            return orderLineResource;
+        }
+
+        [Fact]
+        public void GenerateBaseODataPathSegments_WorksToGenerateExpectedPath_ForSingletonContainer()
+        {
+            // Arrange
+            ResourceContext orderLineResource = GetOrderLineResourceForNewSingletonContainer();
+
+            // Act
+            IList<ODataPathSegment> newPaths = orderLineResource.GenerateBaseODataPathSegments();
+
+            // Assert
+            Assert.Equal(3, newPaths.Count);
+            Assert.IsType<Microsoft.OData.UriParser.SingletonSegment>(newPaths[0]); // VipOrder
+            Assert.IsType<Microsoft.OData.UriParser.NavigationPropertySegment>(newPaths[1]); // OrderLines
+            Assert.IsType<Microsoft.OData.UriParser.KeySegment>(newPaths[2]); // 21
+        }
+
+        [Fact]
+        public void GenerateSelfLink_WorksToGenerateExpectedSelfLink_ForSingletonContainer()
+        {
+            // Arrange
+            ResourceContext orderLineResource = GetOrderLineResourceForNewSingletonContainer();
+
+            // Act
+            Uri selfLink = orderLineResource.GenerateSelfLink(false);
+
+            // Assert
+            Assert.Equal("http://localhost/VipOrder/OrderLines(21)", selfLink.AbsoluteUri);
+        }
+
         [Theory]
         [InlineData(false, "http://localhost/MyOrders(42)/OrderLines(21)/OrderLines")]
         [InlineData(true, "http://localhost/MyOrders(42)/OrderLines(21)/NS.OrderLine/OrderLines")]
@@ -125,8 +179,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             IEdmEntityType myOrder = (IEdmEntityType)_myOrderModel.FindDeclaredType("NS.MyOrder");
             IEdmEntityType orderLine = (IEdmEntityType)_myOrderModel.FindDeclaredType("NS.OrderLine");
 
-            IEdmNavigationProperty orderLinesProperty = myOrder.NavigationProperties().Single(x => x.ContainsTarget);
-
+            IEdmNavigationProperty orderLinesProperty = myOrder.NavigationProperties().Single(x => x.ContainsTarget && x.Name == "OrderLines");
+            
             IEdmEntitySet entitySet = _myOrderModel.FindDeclaredEntitySet("MyOrders");
             IDictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -689,6 +743,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.Namespace = "NS";
             builder.EntitySet<MyOrder>("MyOrders");
+            builder.Singleton<MyOrder>("VipOrder");
             return builder.GetEdmModel();
         }
 
@@ -703,6 +758,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         private class OrderLine
+        {
+            public int ID { get; set; }
+
+            [Contained]
+            public IList<OrderLineDetail> OrderLineDetails { get; set; }
+        }
+
+        private class OrderLineDetail
         {
             public int ID { get; set; }
         }
