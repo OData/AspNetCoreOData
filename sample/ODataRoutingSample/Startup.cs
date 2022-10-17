@@ -16,11 +16,9 @@ using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.OData;
 using ODataRoutingSample.Models;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using System.Reflection;
-using System.Linq;
 
 namespace ODataRoutingSample
 {
@@ -76,7 +74,10 @@ namespace ODataRoutingSample
                 */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                     .AddRouteComponents(model0)
-                    .AddRouteComponents("v1", model1)
+                    .AddRouteComponents("v1", model1, (services) =>
+                    {
+                        services.AddODataQueryOptionsBindingExtension(new ExampleQueryOptionsBindingExtension());
+                    })
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())

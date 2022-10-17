@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Container;
+using Microsoft.AspNetCore.OData.Query.Extension;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -455,6 +456,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 result = Top.ApplyTo(result, querySettings);
             }
 
+            result = ApplyCustom(result, querySettings);
+
             result = ApplyPaging(result, querySettings);
 
             return result;
@@ -493,6 +496,22 @@ namespace Microsoft.AspNetCore.OData.Query
             odataFeature.QueryOptions = this;
 
             return result;
+        }
+
+        internal IQueryable ApplyCustom(IQueryable query, ODataQuerySettings querySettings)
+        {
+            if(Context.RequestContainer != null)
+            {
+                IODataQueryOptionsBindingExtension extension = Context.RequestContainer
+                    .GetService<IODataQueryOptionsBindingExtension>();
+
+                if(extension != null)
+                {
+                    return extension.ApplyTo(query, this, querySettings);
+                }
+            }
+
+            return query;
         }
 
         /// <summary>
