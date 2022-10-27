@@ -27,6 +27,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
 
             // Act & Assert
             Assert.Equal("City", mapper.MapProperty("City"));
+
+            // Act & Assert
+            Assert.Null(mapper.MapProperty("IgnoreThis"));
         }
 
         private static (IEdmModel, IEdmStructuredType) GetOData()
@@ -35,12 +38,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             EdmComplexType address = new EdmComplexType("NS", "Address");
             address.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
             address.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
+            address.AddStructuralProperty("IgnoreThis", EdmPrimitiveTypeKind.String);
             model.AddElement(address);
 
             model.SetAnnotationValue(address, new ClrTypeAnnotation(typeof(JAddress)));
 
             model.SetAnnotationValue(address.FindProperty("Street"),
                 new ClrPropertyInfoAnnotation(typeof(JAddress).GetProperty("Street")));
+
+            model.SetAnnotationValue(address.FindProperty("IgnoreThis"),
+                new ClrPropertyInfoAnnotation(typeof(JAddress).GetProperty("IgnoreThis")));
 
             return (model, address);
         }
@@ -51,6 +58,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
 
             [JsonPropertyName("Road")]
             public string Street { get; set; }
+
+            [JsonIgnore]
+            public string IgnoreThis { get; set; }
         }
     }
 }
