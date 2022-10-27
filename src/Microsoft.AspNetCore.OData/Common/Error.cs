@@ -229,13 +229,5 @@ namespace Microsoft.AspNetCore.OData
         {
             return new NotSupportedException(Error.Format(messageFormat, messageArgs));
         }
-
-        internal static void ValidateErrorCode(string expectedErrorCode, Microsoft.OData.ODataError error)
-        {
-            if (expectedErrorCode != error.ErrorCode)
-            {
-                throw Argument(error.ErrorCode, "Invalid error code");
-            }
-        }
     }
 }

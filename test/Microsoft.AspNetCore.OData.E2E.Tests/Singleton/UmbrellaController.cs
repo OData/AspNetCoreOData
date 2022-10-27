@@ -41,6 +41,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
                 Category = CompanyCategory.Communication,
                 Partners = new List<Partner>(),
                 Branches = new List<Office>(),
+                Projects = new List<Project>(),
             };
         }
 
