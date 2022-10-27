@@ -49,6 +49,13 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
 
             IEdmProperty property = _type.Properties().Single(s => s.Name == propertyName);
             PropertyInfo info = GetPropertyInfo(property);
+
+            JsonIgnoreAttribute jsonIgnore = GetJsonIgnore(info);
+            if (jsonIgnore != null)
+            {
+                return null;
+            }
+
             JsonPropertyAttribute jsonProperty = GetJsonProperty(info);
             if (jsonProperty != null && !string.IsNullOrWhiteSpace(jsonProperty.PropertyName))
             {
@@ -81,6 +88,12 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson
         {
             return property.GetCustomAttributes(typeof(JsonPropertyAttribute), inherit: false)
                    .OfType<JsonPropertyAttribute>().SingleOrDefault();
+        }
+
+        private static JsonIgnoreAttribute GetJsonIgnore(PropertyInfo property)
+        {
+            return property.GetCustomAttributes(typeof(JsonIgnoreAttribute), inherit: false)
+                   .OfType<JsonIgnoreAttribute>().SingleOrDefault();
         }
     }
 }
