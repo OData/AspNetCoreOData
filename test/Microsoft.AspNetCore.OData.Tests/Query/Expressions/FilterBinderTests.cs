@@ -1150,16 +1150,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             // Arrange & Act & Assert
             var filters = BindFilterAndVerify<Product>(
-                "matchesPattern(ProductName, 'A.c')",
-                "$it => $it.ProductName.IsMatch(\"A.c\", ECMAScript)",
+                "matchesPattern(ProductName, 'A\\wc')",
+                "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript)",
                 NotTesting);
 
             // Arrange & Act & Assert
-            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(NullReferenceException), false));
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(ArgumentNullException), false));
 
             InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
 
             InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Aθd" }, (false, false)); // ECMAScript has strict matching of \w
         }
 
         [Fact]

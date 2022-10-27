@@ -1110,9 +1110,9 @@ FlagsAttribute(),
 public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	All = 268435456
 	AllDateTimeFunctions = 7010304
-	AllFunctions = 535494655
+	AllFunctions = 1072365567
 	AllMathFunctions = 58720256
-	AllStringFunctions = 1023
+	AllStringFunctions = 536871935
 	Any = 134217728
 	Cast = 1024
 	Ceiling = 33554432
@@ -1127,6 +1127,7 @@ public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	IndexOf = 16
 	IsOf = 67108864
 	Length = 8
+	MatchesPattern = 536870912
 	Minute = 524288
 	Month = 8192
 	None = 0
@@ -2712,6 +2713,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 	public virtual System.Linq.Expressions.Expression BindInNode (Microsoft.OData.UriParser.InNode inNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindIsOf (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindLength (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	protected virtual System.Linq.Expressions.Expression BindMatchesPattern (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindNow (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindPropertyAccessQueryNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
