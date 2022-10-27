@@ -6822,7 +6822,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidPropertyMapping">
             <summary>
-              Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be null or empty..
+              Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be empty..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidSegmentInSelectExpandPath">
@@ -7792,6 +7792,9 @@
             properties in the <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that will be used during the serialization of the $select
             and $expand projection by a given formatter. For example, to support custom serialization attributes of a
             particular formatter.
+            
+            It also allows you to ignore a field (ensure that the returned <see cref="T:System.Collections.Generic.IDictionary`2"/>
+            does not have a key for that field), by mapping the property name to null.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(System.String)">

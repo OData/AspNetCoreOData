@@ -880,7 +880,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be null or empty..
+        ///   Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be empty..
         /// </summary>
         internal static string InvalidPropertyMapping {
             get {

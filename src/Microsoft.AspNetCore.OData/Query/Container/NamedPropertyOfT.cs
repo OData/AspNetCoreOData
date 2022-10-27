@@ -27,12 +27,15 @@ namespace Microsoft.AspNetCore.OData.Query.Container
             if (Name != null && (includeAutoSelected || !AutoSelected))
             {
                 string mappedName = propertyMapper.MapProperty(Name);
-                if (String.IsNullOrEmpty(mappedName))
+                if (mappedName != null)
                 {
-                    throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, Name);
-                }
+                    if (String.IsNullOrEmpty(mappedName))
+                    {
+                        throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, Name);
+                    }
 
-                dictionary.Add(mappedName, GetValue());
+                    dictionary.Add(mappedName, GetValue());
+                }
             }
         }
 
