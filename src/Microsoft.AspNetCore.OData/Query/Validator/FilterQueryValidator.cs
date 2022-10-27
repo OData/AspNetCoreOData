@@ -816,6 +816,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 case ClrCanonicalFunctions.LengthFunctionName:
                     result = AllowedFunctions.Length;
                     break;
+                case ClrCanonicalFunctions.MatchesPatternFunctionName:
+                    result = AllowedFunctions.MatchesPattern;
+                    break;
                 case ClrCanonicalFunctions.MinuteFunctionName:
                     result = AllowedFunctions.Minute;
                     break;
