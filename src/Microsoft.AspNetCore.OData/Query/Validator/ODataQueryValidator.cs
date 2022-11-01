@@ -36,18 +36,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // Validate each query options
             if (options.Compute != null)
             {
-                if (options.Compute.ComputeClause != null)
-                {
-                    ValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions);
-                }
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions);
+                options.Compute.Validate(validationSettings);
             }
 
             if (options.Apply != null)
             {
-                if (options.Apply.ApplyClause != null)
-                {
-                    ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
-                }
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
             }
 
             if (options.Skip != null)

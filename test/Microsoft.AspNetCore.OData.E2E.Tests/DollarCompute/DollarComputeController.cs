@@ -43,5 +43,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
 
             return Ok(c.Location);
         }
+
+        [HttpGet("odata/sales")]
+        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.None)]
+        public IActionResult GetSales()
+        {
+            return Ok();
+        }
     }
 }

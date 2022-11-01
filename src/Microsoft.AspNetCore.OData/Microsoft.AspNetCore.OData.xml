@@ -10531,6 +10531,17 @@
              Gets the raw $compute value.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator">
+            <summary>
+            Gets or sets the $compute Query Validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the $compute query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.CountQueryOption">
             <summary>
             Represents the value of the $count query option and exposes a way to retrieve the number of entities that satisfy a query.
@@ -11279,6 +11290,18 @@
             <param name="expandPath">The input $expand path.</param>
             <param name="remainingSegments">The remaining segments after the first non type segment.</param>
             <returns>First non-type cast segment.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator">
+            <summary>
+            Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption" />.
+            </summary>
+            <param name="computeQueryOption">The $compute query.</param>
+            <param name="validationSettings">The validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator">
             <summary>
