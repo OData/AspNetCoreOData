@@ -277,5 +277,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
                 "]" +
               "}", payload);
         }
+
+        [Fact]
+        public async Task QuerySales_ThrowsNotAllowed_IncludesDollarCompute_WithAllowedQueryOptionsNone()
+        {
+            // Arrange
+            string queryUrl = "odata/sales?$compute=Amount mul TaxRate as Tax";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.Contains("The query specified in the URI is not valid. " +
+                "Query option 'Compute' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings", payload);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }

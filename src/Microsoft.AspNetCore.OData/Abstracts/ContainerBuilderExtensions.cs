@@ -69,6 +69,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<SkipQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<SkipTokenQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<TopQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ComputeQueryValidator>(ServiceLifetime.Singleton);
 
             builder.AddService<SkipTokenHandler, DefaultSkipTokenHandler>(ServiceLifetime.Singleton);
 
