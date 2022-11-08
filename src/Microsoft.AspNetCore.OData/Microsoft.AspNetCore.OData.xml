@@ -7570,6 +7570,11 @@
             A value that corresponds to allowing 'All' function in $filter.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.MatchesPattern">
+            <summary>
+            A value that corresponds to allowing 'MatchesPattern' function in $filter.
+            </summary>
+        </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions">
             <summary>
             A value that corresponds to allowing all string related functions in $filter.
@@ -8074,7 +8079,7 @@
             <item>
             <term>String related:</term>
             <description>contains, endswith, startswith, length, indexof, substring, tolower, toupper, trim,
-            concat e.g. ~/Customers?$filter=length(CompanyName) eq 19</description>
+            concat, matchesPattern e.g. ~/Customers?$filter=length(CompanyName) eq 19</description>
             </item>
             <item>
             <term>DateTime related:</term>
@@ -9097,6 +9102,14 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindConcat(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Binds a 'concat' function to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="node">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindMatchesPattern(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds a 'matchesPattern' function to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
             <param name="node">The query node to bind.</param>
             <param name="context">The query binder context.</param>
@@ -11577,7 +11590,7 @@
             
              The allowed functions include the following:
             
-             String related: contains, endswith, startswith, length, indexof, substring, tolower, toupper, trim, concat
+             String related: contains, endswith, startswith, length, indexof, substring, tolower, toupper, trim, concat, matchesPattern
             
              e.g. ~/Customers?$filter=length(CompanyName) eq 19
             
