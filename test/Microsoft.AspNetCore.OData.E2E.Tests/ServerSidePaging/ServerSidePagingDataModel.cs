@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -24,5 +25,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         public int Id { get; set; }
         public decimal Amount { get; set; }
         public ServerSidePagingCustomer ServerSidePagingCustomer { get; set; }
+    }
+
+    public class ServerSidePagingEmployee
+    {
+        public int Id { get; set; }
+        public DateTime HireDate { get; set; }
     }
 }

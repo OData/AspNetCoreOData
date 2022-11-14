@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +46,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         public IActionResult Get()
         {
             return Ok(_serverSidePagingCustomers);
+        }
+    }
+
+    public class ServerSidePagingEmployeesController : ODataController
+    {
+        private static List<ServerSidePagingEmployee> employees = new List<ServerSidePagingEmployee>(
+            Enumerable.Range(1, 13).Select(idx => new ServerSidePagingEmployee
+            {
+                Id = idx,
+                HireDate = TimeZoneInfo.ConvertTimeFromUtc(new DateTime(2022, 11, 07).AddMonths(idx), TimeZoneInfo.Local)
+            }));
+
+        [HttpGet]
+        [EnableQuery(PageSize = 3)]
+        public IActionResult GetEmployeesHiredInPeriod([FromRoute] DateTime fromDate, [FromRoute] DateTime toDate)
+        {
+            var hiredInPeriod = employees.Where(d => d.HireDate >= fromDate && d.HireDate <= toDate);
+
+            return Ok(hiredInPeriod);
         }
     }
 }
