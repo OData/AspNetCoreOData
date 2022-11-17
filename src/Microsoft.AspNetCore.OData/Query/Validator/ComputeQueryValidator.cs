@@ -22,8 +22,21 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="validationSettings">The validation settings.</param>
         public virtual void Validate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings)
         {
+            if (computeQueryOption == null)
+            {
+                throw Error.ArgumentNull(nameof(computeQueryOption));
+            }
+
+            if (validationSettings == null)
+            {
+                throw Error.ArgumentNull(nameof(validationSettings));
+            }
+
             // so far, we don't have validation rules here for $compute
-            // however, customer can use this to inject the validator to add his own rules
+            // because 'DefaultQuerySetting' doesn't have configuration for $compute
+            // we can only let ODL to parse and verify the compute clause,
+            // however, developer can override this method add his own rules
+            _ = computeQueryOption.ComputeClause;
         }
 
         internal static ComputeQueryValidator GetComputeQueryValidator(ODataQueryContext context)
