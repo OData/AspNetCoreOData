@@ -19,6 +19,38 @@ namespace Microsoft.AspNetCore.OData.Edm
     internal static class EdmModelExtensions
     {
         /// <summary>
+        /// Get all property names for the given structured type.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="structuredType">The given structured type.</param>
+        /// <returns>All property names.</returns>
+        public static IList<string> GetAllProperties(this IEdmModel model, IEdmStructuredType structuredType)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (structuredType == null)
+            {
+                throw Error.ArgumentNull(nameof(structuredType));
+            }
+
+            IList<string> allProperties = new List<string>();
+            foreach (var property in structuredType.StructuralProperties())
+            {
+                allProperties.Add(model.GetClrPropertyName(property));
+            }
+
+            foreach (var property in structuredType.NavigationProperties())
+            {
+                allProperties.Add(model.GetClrPropertyName(property));
+            }
+
+            return allProperties;
+        }
+
+        /// <summary>
         /// Resolve the alternate key properties.
         /// </summary>
         /// <param name="model">The Edm model.</param>

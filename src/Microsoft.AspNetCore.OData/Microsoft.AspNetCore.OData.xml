@@ -2221,6 +2221,14 @@
             <param name="entityType">The Edm entity type.</param>
             <returns>Alternate Keys of this type.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetAllProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Get all property names for the given structured type.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="structuredType">The given structured type.</param>
+            <returns>All property names.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveAlternateKeyProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.KeySegment)">
             <summary>
             Resolve the alternate key properties.
