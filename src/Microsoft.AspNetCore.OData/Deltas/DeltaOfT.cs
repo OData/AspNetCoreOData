@@ -351,8 +351,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 if (deltaNestedResource is IDeltaSet)
                 {
                     // TODO: That's the bulk insert OData Path handler feature,
-                    // Let's figure out it later.
-                    // So far, for the DeltaSet, let's skip it now.
+                    // See the comments in https://github.com/OData/AspNetCoreOData/issues/748
+                    // So far, Let's skip DeltaSet and figure it out later.
                     continue;
                 }
 

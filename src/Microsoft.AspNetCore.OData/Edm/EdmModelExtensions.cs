@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="model">The Edm model.</param>
         /// <param name="structuredType">The given structured type.</param>
         /// <returns>All property names.</returns>
-        public static IList<string> GetAllProperties(this IEdmModel model, IEdmStructuredType structuredType)
+        public static ICollection<string> GetAllProperties(this IEdmModel model, IEdmStructuredType structuredType)
         {
             if (model == null)
             {

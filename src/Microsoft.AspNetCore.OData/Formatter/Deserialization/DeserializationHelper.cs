@@ -116,8 +116,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             if (value != null)
             {
                 // If the setting value is a delta set, we don't need to create a new collection, just use it.
-                IDeltaSet set = value as IDeltaSet;
-                if (set != null)
+                if (value is IDeltaSet set)
                 {
                     SetProperty(resource, propertyName, set);
                     return;
