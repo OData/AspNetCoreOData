@@ -65,4 +65,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public string Street { get; set; }
     }
+
+    public class Employee
+    {
+        public int Id { get; set; }
+        public NextOfKin NextOfKin { get; set; }
+    }
+
+    public class NextOfKin
+    {
+        public string Name { get; set; }
+        public Location PhysicalAddress { get; set; }
+    }
+
+    public class Location
+    {
+        public string City { get; set; }
+    }
 }

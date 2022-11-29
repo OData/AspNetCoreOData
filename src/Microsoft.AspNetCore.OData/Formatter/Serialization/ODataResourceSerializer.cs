@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmEntityType entityType, object graph,
+        private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmStructuredType structuredType, object graph,
             Dictionary<IEdmProperty, object> dynamicTypeProperties, ODataSerializerContext writeContext)
         {
             Contract.Assert(dynamicTypeProperties != null);
@@ -267,7 +267,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 foreach (var prop in dynamicObject.Values)
                 {
-                    IEdmProperty edmProperty = entityType?.Properties()
+                    IEdmProperty edmProperty = structuredType?.Properties()
                             .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
 
                     if (prop.Value != null
@@ -321,21 +321,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataSerializerContext writeContext)
         {
             var dynamicTypeProperties = new Dictionary<IEdmProperty, object>();
-            var entityType = expectedType.Definition as EdmEntityType;
+            var structuredType = expectedType.Definition as EdmStructuredType;
             var resource = new ODataResource()
             {
                 TypeName = expectedType.FullName(),
-                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties, writeContext)
+                Properties = CreateODataPropertiesFromDynamicType(structuredType, graph, dynamicTypeProperties, writeContext)
             };
 
             resource.IsTransient = true;
             await writer.WriteStartAsync(resource).ConfigureAwait(false);
             foreach (var property in dynamicTypeProperties.Keys)
             {
-                var resourceContext = new ResourceContext(writeContext, expectedType.AsEntity(), graph);
-                if (entityType.NavigationProperties().Any(p => p.Type.Equals(property.Type)) && !(property.Type is EdmCollectionTypeReference))
+                var resourceContext = new ResourceContext(writeContext, expectedType.AsStructured(), graph);
+                if (structuredType.NavigationProperties().Any(p => p.Type.Equals(property.Type)) && !(property.Type is EdmCollectionTypeReference))
                 {
-                    var navigationProperty = entityType.NavigationProperties().FirstOrDefault(p => p.Type.Equals(property.Type));
+                    var navigationProperty = structuredType.NavigationProperties().FirstOrDefault(p => p.Type.Equals(property.Type));
                     var navigationLink = CreateNavigationLink(navigationProperty, resourceContext);
                     if (navigationLink != null)
                     {
