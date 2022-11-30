@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -200,6 +201,72 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             var customerOneOrders = value[1]["Orders"];
             var customerOnePrice = customerOneOrders.First["TotalPrice"].ToObject<int>();
             Assert.Equal(2 * (25 + 75), customerOnePrice);
+        }
+    }
+
+    public class NestedComplexPropertyAggregationTests : WebApiTestBase<NestedComplexPropertyAggregationTests>
+    {
+        public NestedComplexPropertyAggregationTests(WebApiTestFixture<NestedComplexPropertyAggregationTests> fixture)
+            : base(fixture)
+        {
+        }
+
+        protected static void UpdateConfigureServices(IServiceCollection services)
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Employee>("Employees");
+
+            services.ConfigureControllers(typeof(EmployeesController));
+
+            services.AddControllers().AddOData(options => options.Select().Filter().OrderBy().Expand().Count().SkipToken().SetMaxTop(null)
+                .AddRouteComponents("aggregation", builder.GetEdmModel()));
+        }
+
+        private const string AggregationTestBaseUrl = "aggregation/Employees";
+
+        [Fact]
+        public async Task GroupByComplexProperty()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((NextOfKin/Name))";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = this.CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            var result = await response.Content.ReadAsObject<JObject>();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var results = result["value"] as JArray;
+            Assert.Equal(3, results.Count);
+            Assert.Equal("NoK 1", (results[0]["NextOfKin"] as JObject)["Name"].ToString());
+            Assert.Equal("NoK 2", (results[1]["NextOfKin"] as JObject)["Name"].ToString());
+            Assert.Equal("NoK 3", (results[2]["NextOfKin"] as JObject)["Name"].ToString());
+        }
+
+        [Fact]
+        public async Task GroupByNestedComplexProperty()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((NextOfKin/PhysicalAddress/City))";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = this.CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            var result = await response.Content.ReadAsObject<JObject>();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var results = result["value"] as JArray;
+            Assert.Equal(2, results.Count);
+            Assert.Equal("Redmond", ((results[0]["NextOfKin"] as JObject)["PhysicalAddress"] as JObject)["City"].ToString());
+            Assert.Equal("Nairobi", ((results[1]["NextOfKin"] as JObject)["PhysicalAddress"] as JObject)["City"].ToString());
         }
     }
 }
