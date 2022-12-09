@@ -203,7 +203,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             IList<NamedPropertyExpression> properties = new NamedPropertyExpression[]
             {
                 new NamedPropertyExpression(name: Expression.Constant("PropA"), value: Expression.Constant(3)),
-                new NamedPropertyExpression(name: Expression.Constant("PropB"), value: Expression.Constant(6))
+                new NamedPropertyExpression(name: Expression.Constant("PropB"), value: Expression.Constant(6)),
+                new NamedPropertyExpression(name: Expression.Constant("PropC"), value: Expression.Constant(9))
             };
             Expression containerExpression = PropertyContainer.CreatePropertyContainer(properties);
             PropertyContainer container = ToContainer(containerExpression);
@@ -211,6 +212,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             Mock<IPropertyMapper> mapperMock = new Mock<IPropertyMapper>();
             mapperMock.Setup(m => m.MapProperty("PropA")).Returns("PropertyA");
             mapperMock.Setup(m => m.MapProperty("PropB")).Returns("PropB");
+            mapperMock.Setup(m => m.MapProperty("PropC")).Returns((string)null);
 
             //Act
             IDictionary<string, object> result = container.ToDictionary(mapperMock.Object);
@@ -219,12 +221,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
             Assert.NotNull(result);
             Assert.True(result.ContainsKey("PropertyA"));
             Assert.True(result.ContainsKey("PropB"));
+            Assert.False(result.ContainsKey("PropC"));
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
-        public void ToDictionary_Throws_IfMappingFunctionReturns_NullOrEmpty(string mappedName)
+        public void ToDictionary_Throws_IfMappingFunctionReturns_Empty(string mappedName)
         {
             // Arrange
             IList<NamedPropertyExpression> properties = new NamedPropertyExpression[]
@@ -239,7 +241,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
 
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() =>
-                container.ToDictionary(mapperMock.Object), "The key mapping for the property 'PropA' can't be null or empty.");
+                container.ToDictionary(mapperMock.Object), "The key mapping for the property 'PropA' can't be empty.");
         }
 
         private static PropertyContainer ToContainer(Expression containerCreationExpression)

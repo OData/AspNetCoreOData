@@ -5,8 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.OData.Query.Container;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.OData.NewtonsoftJson;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
         {
             public string City { get; set; }
 
-            [JsonPropertyName("Road")]
+            [JsonProperty("Road")]
             public string Street { get; set; }
 
             [JsonIgnore]

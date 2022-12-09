@@ -23,6 +23,9 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// properties in the <see cref="IEdmStructuredType"/> that will be used during the serialization of the $select
     /// and $expand projection by a given formatter. For example, to support custom serialization attributes of a
     /// particular formatter.
+    /// 
+    /// It also allows you to ignore a field (ensure that the returned <see cref="IDictionary{TKey,TValue}"/>
+    /// does not have a key for that field), by mapping the property name to null.
     /// </summary>
     public interface IPropertyMapper
     {
