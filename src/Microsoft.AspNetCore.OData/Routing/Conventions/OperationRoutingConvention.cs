@@ -20,9 +20,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
     /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
-    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+    /// Get ~/entityset/key/function, ~/entityset/key/cast/function
     /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
-    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
+    /// Post ~/entityset/key/action,  ~/entityset/key/cast/action
     /// </summary>
     public abstract class OperationRoutingConvention : IODataControllerActionConvention
     {
