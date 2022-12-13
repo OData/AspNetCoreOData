@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the Top Query Validator.
         /// </summary>
-        public TopQueryValidator Validator { get; set; }
+        public ITopQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Apply the $top query to the given IQueryable.

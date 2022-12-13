@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="ComputeQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class ComputeQueryValidator
+    public class ComputeQueryValidator : IComputeQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="ComputeQueryOption" />.
@@ -39,9 +39,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             _ = computeQueryOption.ComputeClause;
         }
 
-        internal static ComputeQueryValidator GetComputeQueryValidator(ODataQueryContext context)
+        internal static IComputeQueryValidator GetComputeQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetService<ComputeQueryValidator>() ?? new ComputeQueryValidator();
+            return context?.RequestContainer?.GetService<IComputeQueryValidator>() ??
+                new ComputeQueryValidator();
         }
     }
 }

@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the $compute Query Validator.
         /// </summary>
-        public ComputeQueryValidator Validator { get; set; }
+        public IComputeQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Validate the $compute query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.

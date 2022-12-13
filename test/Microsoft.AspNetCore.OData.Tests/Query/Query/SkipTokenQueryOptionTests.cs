@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
             IServiceProvider sp = new ServiceCollection()
                 .AddSingleton<SkipTokenHandler>(handler.Object)
-                .AddSingleton<SkipTokenQueryValidator>(validator)
+                .AddSingleton<ISkipTokenQueryValidator>(validator)
                 .BuildServiceProvider();
 
             ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int))
@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
             IServiceProvider sp = new ServiceCollection()
                 .AddSingleton<SkipTokenHandler>(handler.Object)
-                .AddSingleton<SkipTokenQueryValidator>(validator)
+                .AddSingleton<ISkipTokenQueryValidator>(validator)
                 .BuildServiceProvider();
 
             ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int))
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
             IServiceProvider sp = new ServiceCollection()
                 .AddSingleton<SkipTokenHandler>(handler.Object)
-                .AddSingleton<SkipTokenQueryValidator>(validator)
+                .AddSingleton<ISkipTokenQueryValidator>(validator)
                 .BuildServiceProvider();
 
             ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int))

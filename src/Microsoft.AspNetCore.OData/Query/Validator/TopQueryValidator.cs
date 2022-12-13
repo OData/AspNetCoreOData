@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="TopQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class TopQueryValidator
+    public class TopQueryValidator : ITopQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="TopQueryOption" />.
@@ -56,9 +56,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)
+        internal static ITopQueryValidator GetTopQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetService<TopQueryValidator>() ?? new TopQueryValidator();
+            return context?.RequestContainer?.GetService<ITopQueryValidator>() ?? new TopQueryValidator();
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets the SkipToken Query Validator.
         /// </summary>
-        public SkipTokenQueryValidator Validator { get; }
+        public ISkipTokenQueryValidator Validator { get; }
 
         /// <summary>
         /// Gets the skip token handler.
