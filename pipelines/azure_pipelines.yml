@@ -31,6 +31,11 @@ jobs:
     inputs:
       version: 5.x
       includePreviewVersions: true
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core SDK 6.x'
+    inputs:
+      version: 6.x
+      includePreviewVersions: true
   - task: DotNetCoreCLI@2
     displayName: Build Microsoft.AspNetCore.OData
     inputs:
