@@ -1,14 +1,14 @@
 trigger:
   branches:
     include:
-    - master
+    - main
 resources:
   repositories:
   - repository: self
     type: git
-    ref: master
+    ref: main
 pr:
-  - master
+  - main
 jobs:
 - job: Main
   displayName: Main Build
