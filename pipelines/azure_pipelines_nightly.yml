@@ -23,7 +23,7 @@ stages:
     displayName: Main Build
     timeoutInMinutes: 120
     pool:
-      vmImage: windows-2019
+      vmImage: windows-latest
     steps:
     - checkout: self
     - task: NuGetToolInstaller@1
@@ -39,6 +39,11 @@ stages:
       displayName: Use .NET Core sdk 5.x
       inputs:
         version: 5.x
+        includePreviewVersions: true
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core SDK 6.x'
+      inputs:
+        version: 6.x
         includePreviewVersions: true
     - task: DotNetCoreCLI@2
       displayName: Build Microsoft.AspNetCore.OData
