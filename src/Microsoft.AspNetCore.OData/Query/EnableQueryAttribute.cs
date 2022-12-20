@@ -542,7 +542,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             RequestQueryData requestQueryData = request.HttpContext.Items[nameof(RequestQueryData)] as RequestQueryData;
 
-            if (requestQueryData.QueryValidationRunBeforeActionExecution)
+            if (requestQueryData != null && requestQueryData.QueryValidationRunBeforeActionExecution)
             {
                 return requestQueryData.ProcessedQueryOptions;
             }
