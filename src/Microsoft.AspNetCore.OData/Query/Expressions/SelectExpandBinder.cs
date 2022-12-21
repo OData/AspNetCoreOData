@@ -943,10 +943,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             propertyValue = CreatePropertyValueExpression(context, structuredType, structuralProperty, source, pathSelectItem.FilterOption, pathSelectItem.ComputeOption);
             Type propertyValueType = propertyValue.Type;
-            if (propertyValueType == typeof(char[]) || propertyValueType == typeof(byte[]))
+            if (TypeHelper.IsCollection(propertyValueType))
             {
-                includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue));
-                return;
+                Type elementType = TypeHelper.GetInnerElementType(propertyValueType);
+
+                if (elementType.IsValueType || elementType == typeof(string))
+                {
+                    includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue));
+                    return;
+                }
             }
 
             Expression nullCheck = GetNullCheckExpression(structuralProperty, propertyValue, subSelectExpandClause);
