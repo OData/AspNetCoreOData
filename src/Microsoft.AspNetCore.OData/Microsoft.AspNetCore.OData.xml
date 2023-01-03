@@ -11645,7 +11645,7 @@
             <summary>
             Validates the OData query.
             </summary>
-            <param name="options">The OData query to validate.</param>
+            <param name="options">The OData query options to validate.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator">
