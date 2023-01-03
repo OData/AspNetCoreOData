@@ -147,7 +147,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return tod;
             }
 
-#if NET6_0
             // Since ODL doesn't support "DateOnly", we have to use Date defined in ODL.
             if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateOnly(type))
             {
@@ -161,7 +160,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 TimeOnly timeOnly = (TimeOnly)value;
                 return new TimeOfDay(timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond);
             }
-#endif
 
             return ConvertUnsupportedPrimitives(value, timeZoneInfo);
         }
