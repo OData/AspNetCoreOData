@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// Validates the OData query.
         /// </summary>
-        /// <param name="options">The OData query to validate.</param>
+        /// <param name="options">The OData query options to validate.</param>
         /// <param name="validationSettings">The validation settings.</param>
         void Validate(ODataQueryOptions options, ODataValidationSettings validationSettings);
     }
