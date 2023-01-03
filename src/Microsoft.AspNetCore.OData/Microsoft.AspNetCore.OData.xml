@@ -11596,6 +11596,123 @@
             <param name="node"></param>
             <param name="settings"></param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="computeQueryOption">The $compute query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="countQueryOption">The $count query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="filterQueryOption">The $filter query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="options">The OData query to validate.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption" />.
+            </summary>
+            <param name="orderByOption">The $orderby query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="selectExpandQueryOption">The $select and $expand query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption" />.
+            </summary>
+            <param name="skipQueryOption">The $skip query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption" />.
+            </summary>
+            <param name="skipToken">The $skiptoken query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator">
+            <summary>
+            Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption" />.
+            </summary>
+            <param name="topQueryOption">The $top query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator">
             <summary>
             Represents a validator used to validate OData queries based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -12450,7 +12567,7 @@
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmAction"/>.
             Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
-            Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
+            Post ~/entityset/key/action,  ~/entityset/key/cast/action
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.Order">
@@ -12535,7 +12652,7 @@
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmFunction"/>.
             Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
-            Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+            Get ~/entityset/key/function, ~/entityset/key/cast/function
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention.Order">
@@ -12730,9 +12847,9 @@
             <summary>
             Conventions for <see cref="T:Microsoft.OData.Edm.IEdmAction"/> and <see cref="T:Microsoft.OData.Edm.IEdmFunction"/>.
             Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
-            Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+            Get ~/entityset/key/function, ~/entityset/key/cast/function
             Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
-            Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
+            Post ~/entityset/key/action,  ~/entityset/key/cast/action
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.Order">

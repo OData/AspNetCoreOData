@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate OData queries based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class ODataQueryValidator
+    public class ODataQueryValidator : IODataQueryValidator
     {
         /// <summary>
         /// Validates the OData query.
@@ -123,9 +123,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static ODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
+        internal static IODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetRequiredService<ODataQueryValidator>()
+            return context?.RequestContainer?.GetRequiredService<IODataQueryValidator>()
                 ?? new ODataQueryValidator();
         }
 

@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the $select and $expand query validator.
         /// </summary>
-        public SelectExpandQueryValidator Validator { get; set; }
+        public ISelectExpandQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Gets the parsed <see cref="SelectExpandClause"/> for this query option.

@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="SkipTokenQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class SkipTokenQueryValidator
+    public class SkipTokenQueryValidator : ISkipTokenQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="SkipTokenQueryOption" />.
@@ -43,9 +43,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static SkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
+        internal static ISkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetRequiredService<SkipTokenQueryValidator>() ?? new SkipTokenQueryValidator();
+            return context?.RequestContainer?.GetRequiredService<ISkipTokenQueryValidator>() ?? new SkipTokenQueryValidator();
         }
     }
 }

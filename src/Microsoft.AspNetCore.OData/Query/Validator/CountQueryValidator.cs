@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// Represents a validator used to validate a <see cref="CountQueryOption"/> 
     /// based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class CountQueryValidator
+    public class CountQueryValidator : ICountQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="CountQueryOption" />.
@@ -59,9 +59,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
+        internal static ICountQueryValidator GetCountQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetRequiredService<CountQueryValidator>()
+            return context?.RequestContainer?.GetRequiredService<ICountQueryValidator>()
                 ?? new CountQueryValidator();
         }
     }

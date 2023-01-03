@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="SelectExpandQueryOption" /> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class SelectExpandQueryValidator
+    public class SelectExpandQueryValidator : ISelectExpandQueryValidator
     {
         private readonly FilterQueryValidator _filterQueryValidator;
         private OrderByModelLimitationsValidator _orderByQueryValidator;
@@ -78,9 +78,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static SelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
+        internal static ISelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetRequiredService<SelectExpandQueryValidator>()
+            return context?.RequestContainer?.GetRequiredService<ISelectExpandQueryValidator>()
                 ?? new SelectExpandQueryValidator();
         }
 

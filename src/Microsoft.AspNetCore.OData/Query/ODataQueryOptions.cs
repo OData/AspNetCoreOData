@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the query validator.
         /// </summary>
-        public ODataQueryValidator Validator { get; set; }
+        public IODataQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Check if the given query option is an OData system query option using $-prefix-required theme.
