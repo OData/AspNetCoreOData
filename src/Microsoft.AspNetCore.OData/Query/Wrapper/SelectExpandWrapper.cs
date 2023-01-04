@@ -144,12 +144,15 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                     if (TryGetPropertyValue(property.Name, out propertyValue))
                     {
                         string mappingName = mapper.MapProperty(property.Name);
-                        if (String.IsNullOrWhiteSpace(mappingName))
+                        if (mappingName != null)
                         {
-                            throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, property.Name);
-                        }
+                            if (String.IsNullOrWhiteSpace(mappingName))
+                            {
+                                throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, property.Name);
+                            }
 
-                        dictionary[mappingName] = propertyValue;
+                            dictionary[mappingName] = propertyValue;
+                        }
                     }
                 }
             }

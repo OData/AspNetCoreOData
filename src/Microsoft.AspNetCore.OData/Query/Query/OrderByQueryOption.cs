@@ -148,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the OrderBy Query Validator.
         /// </summary>
-        public OrderByQueryValidator Validator { get; set; }
+        public IOrderByQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ComputeQueryOption"/>.

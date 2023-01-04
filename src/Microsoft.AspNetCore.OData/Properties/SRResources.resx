@@ -496,7 +496,7 @@
     <value>A binary operator with incompatible types was detected. Found operand types '{0}' and '{1}' for operator kind '{2}'.</value>
   </data>
   <data name="InvalidPropertyMapping" xml:space="preserve">
-    <value>The key mapping for the property '{0}' can't be null or empty.</value>
+    <value>The key mapping for the property '{0}' can't be empty.</value>
   </data>
   <data name="ODataFunctionNotSupported" xml:space="preserve">
     <value>Unknown function '{0}'.</value>

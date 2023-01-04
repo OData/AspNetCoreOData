@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// The convention for <see cref="IEdmFunction"/>.
     /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
-    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+    /// Get ~/entityset/key/function, ~/entityset/key/cast/function
     /// </summary>
     public class FunctionRoutingConvention : OperationRoutingConvention
     {

@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <remarks>
     /// Please note this class is not thread safe.
     /// </remarks>
-    public class FilterQueryValidator
+    public class FilterQueryValidator : IFilterQueryValidator
     {
         private int _currentAnyAllExpressionDepth;
         private int _currentNodeCount;
@@ -604,9 +604,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             ValidateQueryNode(singleResourceCastNode.Source, settings);
         }
 
-        internal static FilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
+        internal static IFilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetRequiredService<FilterQueryValidator>()
+            return context?.RequestContainer?.GetRequiredService<IFilterQueryValidator>()
                 ?? new FilterQueryValidator();
         }
 

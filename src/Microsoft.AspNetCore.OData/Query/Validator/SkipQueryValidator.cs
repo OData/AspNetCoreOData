@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="SkipQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class SkipQueryValidator
+    public class SkipQueryValidator : ISkipQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="SkipQueryOption" />.
@@ -38,9 +38,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static SkipQueryValidator GetSkipQueryValidator(ODataQueryContext context)
+        internal static ISkipQueryValidator GetSkipQueryValidator(ODataQueryContext context)
         {
-            return context?.RequestContainer?.GetService<SkipQueryValidator>() ?? new SkipQueryValidator();
+            return context?.RequestContainer?.GetService<ISkipQueryValidator>() ?? new SkipQueryValidator();
         }
     }
 }

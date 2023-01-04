@@ -263,20 +263,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
                 if (readContext.IsDeltaOfT || readContext.IsDeltaDeleted)
                 {
-                    IEnumerable<string> structuralProperties = structuredType.StructuralProperties()
-                        .Select(edmProperty => model.GetClrPropertyName(edmProperty));
+                    IEnumerable<string> updatablePoperties = model.GetAllProperties(structuredType.StructuredDefinition());
 
                     if (structuredType.IsOpen())
                     {
                         PropertyInfo dynamicDictionaryPropertyInfo = model.GetDynamicPropertyDictionary(
                             structuredType.StructuredDefinition());
 
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, structuralProperties,
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties,
                             dynamicDictionaryPropertyInfo);
                     }
                     else
                     {
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, structuralProperties);
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties);
                     }
                 }
                 else

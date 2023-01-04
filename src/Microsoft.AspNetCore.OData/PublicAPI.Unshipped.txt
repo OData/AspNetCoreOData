@@ -767,7 +767,7 @@ Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Context.get -> Microsoft.Asp
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ResultClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(string propertyName) -> string
@@ -804,7 +804,7 @@ Microsoft.AspNetCore.OData.Query.CountQueryOption.CountQueryOption(string rawVal
 Microsoft.AspNetCore.OData.Query.CountQueryOption.GetEntityCount(System.Linq.IQueryable query) -> long?
 Microsoft.AspNetCore.OData.Query.CountQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator
+Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Value.get -> bool
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser
@@ -923,7 +923,7 @@ Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterClause.get -> Microsoft
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator
+Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default = 0 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
@@ -959,7 +959,7 @@ Microsoft.AspNetCore.OData.Query.ODataQueryOptions.SelectExpand.get -> Microsoft
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Skip.get -> Microsoft.AspNetCore.OData.Query.SkipQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.SkipToken.get -> Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Top.get -> Microsoft.AspNetCore.OData.Query.TopQueryOption
-Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
+Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.IfMatch.get -> Microsoft.AspNetCore.OData.Query.ETag<TEntity>
@@ -1032,7 +1032,7 @@ Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByNodes.get -> System.C
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
+Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context) -> void
@@ -1060,7 +1060,7 @@ Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.RawSelect.get -> string
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandClause.get -> Microsoft.OData.UriParser.SelectExpandClause
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandQueryOption(string select, string expand, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator
+Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
@@ -1069,7 +1069,7 @@ Microsoft.AspNetCore.OData.Query.SkipQueryOption.Context.get -> Microsoft.AspNet
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.SkipQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator
+Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Value.get -> int
 Microsoft.AspNetCore.OData.Query.SkipTokenHandler
@@ -1080,7 +1080,7 @@ Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Handler.get -> Microsoft.A
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.SkipTokenQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context) -> void
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator
+Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator
 Microsoft.AspNetCore.OData.Query.TopQueryOption
 Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IOrderedQueryable<T>
@@ -1088,7 +1088,7 @@ Microsoft.AspNetCore.OData.Query.TopQueryOption.Context.get -> Microsoft.AspNetC
 Microsoft.AspNetCore.OData.Query.TopQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.TopQueryOption.TopQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator
+Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Value.get -> int
 Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator
@@ -1097,6 +1097,24 @@ Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.CountQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.FilterQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.ODataQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings

@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the Filter Query Validator
         /// </summary>
-        public FilterQueryValidator Validator { get; set; }
+        public IFilterQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ComputeQueryOption"/>.

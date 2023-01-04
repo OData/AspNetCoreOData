@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the Skip Query Validator.
         /// </summary>
-        public SkipQueryValidator Validator { get; set; }
+        public ISkipQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Apply the $skip query to the given IQueryable.

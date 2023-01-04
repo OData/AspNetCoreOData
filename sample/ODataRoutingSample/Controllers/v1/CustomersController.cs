@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
@@ -38,6 +39,7 @@ namespace ODataRoutingSample.Controllers.v1
             }
         }
 
+        // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=name desc
         [HttpGet]
         [EnableQuery]
         public IActionResult Get()
@@ -89,6 +91,7 @@ namespace ODataRoutingSample.Controllers.v1
                     Name = "Jonier",
                     FavoriteColor = Color.Red,
                     HomeAddress = new Address { City = "Redmond", Street = "156 AVE NE" },
+                    Amount = 3,
                     FavoriteAddresses = new List<Address>
                     {
                         new Address { City = "Redmond", Street = "256 AVE NE" },
@@ -101,6 +104,7 @@ namespace ODataRoutingSample.Controllers.v1
                     Name = "Sam",
                     FavoriteColor = Color.Blue,
                     HomeAddress = new CnAddress { City = "Bellevue", Street = "Main St NE", Postcode = "201100" },
+                    Amount = 6,
                     FavoriteAddresses = new List<Address>
                     {
                         new Address { City = "Red4ond", Street = "456 AVE NE" },
@@ -113,11 +117,25 @@ namespace ODataRoutingSample.Controllers.v1
                     Name = "Peter",
                     FavoriteColor = Color.Green,
                     HomeAddress = new UsAddress { City = "Hollewye", Street = "Main St NE", Zipcode = "98029" },
+                    Amount = 4,
                     FavoriteAddresses = new List<Address>
                     {
                         new Address { City = "R4mond", Street = "546 NE" },
                         new Address { City = "R4d", Street = "546 AVE" },
                     },
+                },
+                new Customer
+                {
+                    Id = 4,
+                    Name = "Sam",
+                    FavoriteColor = Color.Red,
+                    HomeAddress = new UsAddress { City = "Banff", Street = "183 St NE", Zipcode = "111" },
+                    Amount = 5,
+                    FavoriteAddresses = new List<Address>
+                    {
+                        new Address { City = "R4m11ond", Street = "116 NE" },
+                        new Address { City = "Jesper", Street = "5416 AVE" },
+                    }
                 }
             };
         }

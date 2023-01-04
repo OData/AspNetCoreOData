@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the $count query validator.
         /// </summary>
-        public CountQueryValidator Validator { get; set; }
+        public ICountQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Validate the count query based on the given <paramref name="validationSettings"/>.

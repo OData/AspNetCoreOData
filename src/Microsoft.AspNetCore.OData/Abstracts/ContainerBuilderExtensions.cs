@@ -58,18 +58,18 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             });
 
             // QueryValidators.
-            builder.AddService<CountQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ICountQueryValidator, CountQueryValidator>(ServiceLifetime.Singleton);
 
             // FilterQueryValidator should be scoped, otherwise some instance field (for example:_currentNodeCount) should be a problem.
-            builder.AddService<FilterQueryValidator>(ServiceLifetime.Scoped);
+            builder.AddService<IFilterQueryValidator, FilterQueryValidator>(ServiceLifetime.Scoped);
 
-            builder.AddService<ODataQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<OrderByQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<SelectExpandQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<SkipQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<SkipTokenQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<TopQueryValidator>(ServiceLifetime.Singleton);
-            builder.AddService<ComputeQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<IODataQueryValidator, ODataQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<IOrderByQueryValidator, OrderByQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ISelectExpandQueryValidator, SelectExpandQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ISkipQueryValidator, SkipQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ISkipTokenQueryValidator, SkipTokenQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<ITopQueryValidator, TopQueryValidator>(ServiceLifetime.Singleton);
+            builder.AddService<IComputeQueryValidator, ComputeQueryValidator>(ServiceLifetime.Singleton);
 
             builder.AddService<SkipTokenHandler, DefaultSkipTokenHandler>(ServiceLifetime.Singleton);
 
