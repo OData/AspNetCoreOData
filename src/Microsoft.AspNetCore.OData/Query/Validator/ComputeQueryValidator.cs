@@ -5,9 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData;
-
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
     /// <summary>
@@ -37,12 +34,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // we can only let ODL to parse and verify the compute clause,
             // however, developer can override this method add his own rules
             _ = computeQueryOption.ComputeClause;
-        }
-
-        internal static IComputeQueryValidator GetComputeQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetService<IComputeQueryValidator>() ??
-                new ComputeQueryValidator();
         }
     }
 }

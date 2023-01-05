@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -54,11 +53,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
                     AllowedQueryOptions.Top, topQueryOption.Value));
             }
-        }
-
-        internal static ITopQueryValidator GetTopQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetService<ITopQueryValidator>() ?? new TopQueryValidator();
         }
     }
 }

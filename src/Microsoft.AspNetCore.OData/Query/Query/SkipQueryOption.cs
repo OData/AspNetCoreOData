@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = SkipQueryValidator.GetSkipQueryValidator(context);
+            Validator = context.GetSkipQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = SkipQueryValidator.GetSkipQueryValidator(context);
+            Validator = context.GetSkipQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,

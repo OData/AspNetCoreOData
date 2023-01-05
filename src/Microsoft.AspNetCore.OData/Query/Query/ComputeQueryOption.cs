@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = ComputeQueryValidator.GetComputeQueryValidator(context);
+            Validator = context.GetComputeQueryValidator();
             _queryOptionParser = queryOptionParser;
             ResultClrType = Context.ElementClrType;
         }
@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Context = context;
             RawValue = rawValue;
 
-            Validator = ComputeQueryValidator.GetComputeQueryValidator(context);
+            Validator = context.GetComputeQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,

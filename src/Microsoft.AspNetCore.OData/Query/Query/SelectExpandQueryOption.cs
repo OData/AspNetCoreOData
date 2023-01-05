@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -66,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Context = context;
             RawSelect = select;
             RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
+            Validator = context.GetSelectExpandQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 

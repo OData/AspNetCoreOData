@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             RawValue = rawValue;
-            Validator = SkipTokenQueryValidator.GetSkipTokenQueryValidator(context);
+            Validator = context.GetSkipTokenQueryValidator();
             Handler = context.GetSkipTokenHandler();
             Context = context;
         }

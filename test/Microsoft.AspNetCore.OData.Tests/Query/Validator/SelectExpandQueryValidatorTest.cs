@@ -230,7 +230,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
             context.RequestContainer = new MockServiceProvider();
-            var validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
+            var validator = context.GetSelectExpandQueryValidator();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
 
             // Act & Assert
@@ -386,7 +386,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 new QueryableRestrictionsAnnotation(new QueryableRestrictions { NotNavigable = true }));
 
             string select = "Orders";
-            ISelectExpandQueryValidator validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(queryContext);
+            ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(select, null, queryContext);
             ExceptionAssert.Throws<ODataException>(
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings()),
@@ -406,7 +406,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             model.Model.SetAnnotationValue(classType.FindProperty(propertyName), new QueryableRestrictionsAnnotation(new QueryableRestrictions { NotNavigable = true }));
 
             string select = "NS.SpecialCustomer/" + propertyName;
-            ISelectExpandQueryValidator validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(queryContext);
+            ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(select, null, queryContext);
             ExceptionAssert.Throws<ODataException>(
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings()),
@@ -423,7 +423,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             model.Model.SetAnnotationValue(model.Customer.FindProperty("Orders"), new QueryableRestrictionsAnnotation(new QueryableRestrictions { NotExpandable = true }));
 
             string expand = "Orders";
-            ISelectExpandQueryValidator validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(queryContext);
+            ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
             ExceptionAssert.Throws<ODataException>(
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings()),
@@ -438,7 +438,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
             ODataQueryContext queryContext = new ODataQueryContext(model.Model, typeof(Customer));
             queryContext.RequestContainer = new MockServiceProvider();
-            ISelectExpandQueryValidator validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(queryContext);
+            ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, "Orders", queryContext);
             IEdmStructuredType customerType =
                 model.Model.SchemaElements.First(e => e.Name.Equals("Customer")) as IEdmStructuredType;
@@ -469,7 +469,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             model.Model.SetAnnotationValue(classType.FindProperty(propertyName), new QueryableRestrictionsAnnotation(new QueryableRestrictions { NotExpandable = true }));
 
             string expand = "NS.SpecialCustomer/" + propertyName;
-            ISelectExpandQueryValidator validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(queryContext);
+            ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
             ExceptionAssert.Throws<ODataException>(
                 () => validator.Validate(selectExpandQueryOption, new ODataValidationSettings()),
@@ -480,18 +480,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public void GetSelectExpandQueryValidator_Returns_Validator()
         {
             // Arrange & Act & Assert
-            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(null));
+            ODataQueryContext context = null;
+            Assert.NotNull(context.GetSelectExpandQueryValidator());
 
             // Arrange & Act & Assert
-            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
-            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(context));
+            context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(context.GetSelectExpandQueryValidator());
 
             // Arrange & Act & Assert
             IServiceProvider services = new ServiceCollection()
                 .AddSingleton<ISelectExpandQueryValidator, SelectExpandQueryValidator>()
                 .AddSingleton<DefaultQuerySettings>().BuildServiceProvider();
             context.RequestContainer = services;
-            Assert.NotNull(SelectExpandQueryValidator.GetSelectExpandQueryValidator(context));
+            Assert.NotNull(context.GetSelectExpandQueryValidator());
         }
     }
 }

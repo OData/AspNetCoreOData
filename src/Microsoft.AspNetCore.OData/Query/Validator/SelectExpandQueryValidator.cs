@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -76,12 +75,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
                 ValidateDepth(selectExpandQueryOption.SelectExpandClause, validationSettings.MaxExpansionDepth);
             }
-        }
-
-        internal static ISelectExpandQueryValidator GetSelectExpandQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<ISelectExpandQueryValidator>()
-                ?? new SelectExpandQueryValidator();
         }
 
         private static void ValidateDepth(SelectExpandClause selectExpand, int maxDepth)

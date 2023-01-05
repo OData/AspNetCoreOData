@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder.Config;
 
@@ -41,11 +40,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
                 }
             }
-        }
-
-        internal static ISkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<ISkipTokenQueryValidator>() ?? new SkipTokenQueryValidator();
         }
     }
 }

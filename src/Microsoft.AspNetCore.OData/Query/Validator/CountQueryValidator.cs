@@ -7,7 +7,6 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -57,12 +56,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     }
                 }
             }
-        }
-
-        internal static ICountQueryValidator GetCountQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<ICountQueryValidator>()
-                ?? new CountQueryValidator();
         }
     }
 }
